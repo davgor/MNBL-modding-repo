@@ -1,0 +1,595 @@
+{
+  "schema": "mnbl.retreat-exit-contract",
+  "version": 1,
+  "verifiedUtc": "2026-10-13T16:19:59.5832997Z",
+  "scope": "Representative installed shipping-client scene/prefab references and managed exit/retreat mechanisms. Read-only inventory; no new game/editor run; not a full catalogue or stock UI acceptance.",
+  "sceneReferences": [
+    {
+      "source": {
+        "sha256": "4556bca659fba3690021ce254e147f2521d688f3fe4f67c5ed96838b36fc68e7",
+        "path": "D:/SteamLibrary/steamapps/common/Mount & Blade II Bannerlord/Modules/SandBoxCore/SceneObj/battle_terrain_biome_093b/scene.xscene"
+      },
+      "module": "SandBoxCore",
+      "matchingAttributes": [],
+      "scene": "battle_terrain_biome_093b",
+      "searchScope": "All XML attribute values; bounded retreat/exit/passage name search, not proof no authored or native exit exists."
+    },
+    {
+      "source": {
+        "sha256": "b882799945e2aad12bc9ddec7828174ceae07410c6a2df2356bfe81222e72838",
+        "path": "D:/SteamLibrary/steamapps/common/Mount & Blade II Bannerlord/Modules/NavalDLC/SceneObj/battle_terrain_coastal_04/scene.xscene"
+      },
+      "module": "NavalDLC",
+      "matchingAttributes": [],
+      "scene": "battle_terrain_coastal_04",
+      "searchScope": "All XML attribute values; bounded retreat/exit/passage name search, not proof no authored or native exit exists."
+    },
+    {
+      "source": {
+        "sha256": "76688079787f738ed47acfe4d4b13b92050fd44aae41d13abd7def66443af53d",
+        "path": "D:/SteamLibrary/steamapps/common/Mount & Blade II Bannerlord/Modules/NavalDLC/SceneObj/empire_shipyard/scene.xscene"
+      },
+      "module": "NavalDLC",
+      "matchingAttributes": [
+        {
+          "element": "game_entity",
+          "value": "_barrier_passage_center",
+          "attribute": "prefab"
+        }
+      ],
+      "scene": "empire_shipyard",
+      "searchScope": "All XML attribute values; bounded retreat/exit/passage name search, not proof no authored or native exit exists."
+    }
+  ],
+  "representativePassage": {
+    "child": "passage_use_point",
+    "ToLocationId": "center",
+    "prefab": "_barrier_passage_center",
+    "sceneLine": 7348,
+    "scripts": [
+      "Passage",
+      "PassageUsePoint"
+    ],
+    "runtimeStatus": "Not traversed by baseline11588; port probe used public EndMission. Prefab resolution/usable geometry not independently tested.",
+    "scene": "NavalDLC/empire_shipyard",
+    "meaning": "Authored location passage reference, not evidence of a map-return exit. OnUse can set NextLocation/PreviousLocation and end mission if player entry is allowed. The IsMissionExit branch is separate; this prefab does not explicitly set it.",
+    "childTags": [
+      "Pilot",
+      "sp_common_hidden"
+    ],
+    "definitionSelector": "//*[@name=\"_barrier_passage_center\"]",
+    "definitionSource": {
+      "sha256": "aa5c36047f6bd8ac2df40ae3d1bba22ec370eec9778f86a6280e3fdd858d6a28",
+      "path": "D:/SteamLibrary/steamapps/common/Mount & Blade II Bannerlord/Modules/SandBox/Prefabs/sp_editor_barriers.xml"
+    },
+    "scenePosition": "1286.919, 985.077, 23.168",
+    "tags": [
+      "npc_passage",
+      "unaffected_by_area"
+    ]
+  },
+  "installedMethods": [
+    {
+      "public": false,
+      "signature": "System.Void TaleWorlds.MountAndBlade.Source.Missions.Handlers.BasicMissionHandler::OnEventAcceptSelectionWidget()",
+      "assembly": {
+        "sha256": "19387f31557ff840d14f378f6bbdf1d58fcff406ab9ff2294dfbb3e49a50b87e",
+        "path": "D:/SteamLibrary/steamapps/common/Mount & Blade II Bannerlord/bin/Win64_Shipping_Client/TaleWorlds.MountAndBlade.dll"
+      },
+      "metadataToken": 100677242,
+      "static": false,
+      "calls": [
+        "IL_0001: call TaleWorlds.MountAndBlade.Mission TaleWorlds.MountAndBlade.MissionBehavior::get_Mission()",
+        "IL_0006: callvirt System.Collections.Generic.List`1<TaleWorlds.MountAndBlade.MissionLogic> TaleWorlds.MountAndBlade.Mission::get_MissionLogics()",
+        "IL_000b: callvirt !0[] System.Collections.Generic.List`1<TaleWorlds.MountAndBlade.MissionLogic>::ToArray()",
+        "IL_0018: callvirt System.Void TaleWorlds.MountAndBlade.MissionLogic::OnBattleEnded()",
+        "IL_0028: call System.Void TaleWorlds.MountAndBlade.Source.Missions.Handlers.BasicMissionHandler::CloseSelectionWidget()",
+        "IL_0036: call TaleWorlds.MountAndBlade.Mission TaleWorlds.MountAndBlade.MissionBehavior::get_Mission()",
+        "IL_003b: callvirt System.Void TaleWorlds.MountAndBlade.Mission::SurrenderMission()",
+        "IL_0042: call TaleWorlds.MountAndBlade.Mission TaleWorlds.MountAndBlade.MissionBehavior::get_Mission()",
+        "IL_0047: callvirt System.Void TaleWorlds.MountAndBlade.Mission::RetreatMission()"
+      ]
+    },
+    {
+      "public": true,
+      "signature": "System.Void TaleWorlds.MountAndBlade.Mission::OnEndMissionRequest()",
+      "assembly": {
+        "sha256": "19387f31557ff840d14f378f6bbdf1d58fcff406ab9ff2294dfbb3e49a50b87e",
+        "path": "D:/SteamLibrary/steamapps/common/Mount & Blade II Bannerlord/bin/Win64_Shipping_Client/TaleWorlds.MountAndBlade.dll"
+      },
+      "metadataToken": 100670092,
+      "static": false,
+      "calls": [
+        "IL_0001: call System.Collections.Generic.List`1<TaleWorlds.MountAndBlade.MissionLogic> TaleWorlds.MountAndBlade.Mission::get_MissionLogics()",
+        "IL_0006: callvirt System.Collections.Generic.List`1/Enumerator<!0> System.Collections.Generic.List`1<TaleWorlds.MountAndBlade.MissionLogic>::GetEnumerator()",
+        "IL_0010: call !0 System.Collections.Generic.List`1/Enumerator<TaleWorlds.MountAndBlade.MissionLogic>::get_Current()",
+        "IL_0017: callvirt TaleWorlds.Library.InquiryData TaleWorlds.MountAndBlade.MissionLogic::OnEndMissionRequest(System.Boolean&)",
+        "IL_0036: call System.Void TaleWorlds.Library.InformationManager::ShowInquiry(TaleWorlds.Library.InquiryData,System.Boolean,System.Boolean)",
+        "IL_003f: call System.Boolean System.Collections.Generic.List`1/Enumerator<TaleWorlds.MountAndBlade.MissionLogic>::MoveNext()",
+        "IL_0050: callvirt System.Void System.IDisposable::Dispose()",
+        "IL_0064: callvirt System.Single TaleWorlds.MountAndBlade.BasicMissionTimer::get_ElapsedTime()",
+        "IL_0078: call System.Void TaleWorlds.MountAndBlade.Mission::EndMission()"
+      ]
+    },
+    {
+      "public": true,
+      "signature": "System.Void TaleWorlds.MountAndBlade.Mission::OnEndMissionResult()",
+      "assembly": {
+        "sha256": "19387f31557ff840d14f378f6bbdf1d58fcff406ab9ff2294dfbb3e49a50b87e",
+        "path": "D:/SteamLibrary/steamapps/common/Mount & Blade II Bannerlord/bin/Win64_Shipping_Client/TaleWorlds.MountAndBlade.dll"
+      },
+      "metadataToken": 100670124,
+      "static": false,
+      "calls": [
+        "IL_0001: call System.Collections.Generic.List`1<TaleWorlds.MountAndBlade.MissionLogic> TaleWorlds.MountAndBlade.Mission::get_MissionLogics()",
+        "IL_0006: callvirt !0[] System.Collections.Generic.List`1<TaleWorlds.MountAndBlade.MissionLogic>::ToArray()",
+        "IL_0013: callvirt System.Void TaleWorlds.MountAndBlade.MissionLogic::OnBattleEnded()",
+        "IL_0023: call System.Void TaleWorlds.MountAndBlade.Mission::RetreatMission()"
+      ]
+    },
+    {
+      "public": true,
+      "signature": "System.Void TaleWorlds.MountAndBlade.Mission::RetreatMission()",
+      "assembly": {
+        "sha256": "19387f31557ff840d14f378f6bbdf1d58fcff406ab9ff2294dfbb3e49a50b87e",
+        "path": "D:/SteamLibrary/steamapps/common/Mount & Blade II Bannerlord/bin/Win64_Shipping_Client/TaleWorlds.MountAndBlade.dll"
+      },
+      "metadataToken": 100670053,
+      "static": false,
+      "calls": [
+        "IL_0001: call System.Collections.Generic.List`1<TaleWorlds.MountAndBlade.MissionLogic> TaleWorlds.MountAndBlade.Mission::get_MissionLogics()",
+        "IL_0006: callvirt System.Collections.Generic.List`1/Enumerator<!0> System.Collections.Generic.List`1<TaleWorlds.MountAndBlade.MissionLogic>::GetEnumerator()",
+        "IL_0010: call !0 System.Collections.Generic.List`1/Enumerator<TaleWorlds.MountAndBlade.MissionLogic>::get_Current()",
+        "IL_0015: callvirt System.Void TaleWorlds.MountAndBlade.MissionLogic::OnRetreatMission()",
+        "IL_001c: call System.Boolean System.Collections.Generic.List`1/Enumerator<TaleWorlds.MountAndBlade.MissionLogic>::MoveNext()",
+        "IL_002d: callvirt System.Void System.IDisposable::Dispose()",
+        "IL_0033: call System.Boolean TaleWorlds.MountAndBlade.MBEditor::get_EditModeEnabled()",
+        "IL_003a: call System.Boolean TaleWorlds.MountAndBlade.MBEditor::get_IsEditModeOn()",
+        "IL_0041: call System.Void TaleWorlds.MountAndBlade.MBEditor::LeaveEditMissionMode()",
+        "IL_0048: call System.Void TaleWorlds.MountAndBlade.Mission::EndMission()"
+      ]
+    },
+    {
+      "public": true,
+      "signature": "System.Void TaleWorlds.MountAndBlade.Mission::EndMission()",
+      "assembly": {
+        "sha256": "19387f31557ff840d14f378f6bbdf1d58fcff406ab9ff2294dfbb3e49a50b87e",
+        "path": "D:/SteamLibrary/steamapps/common/Mount & Blade II Bannerlord/bin/Win64_Shipping_Client/TaleWorlds.MountAndBlade.dll"
+      },
+      "metadataToken": 100670117,
+      "static": false,
+      "calls": [
+        "IL_0011: call System.Void TaleWorlds.Library.Debug::Print(System.String,System.Int32,TaleWorlds.Library.Debug/DebugColor,System.UInt64)",
+        "IL_002e: call System.Void TaleWorlds.MountAndBlade.Mission::set_MissionEnded(System.Boolean)",
+        "IL_0035: call System.Void TaleWorlds.MountAndBlade.Mission::set_CurrentState(TaleWorlds.MountAndBlade.Mission/State)"
+      ]
+    },
+    {
+      "public": false,
+      "signature": "System.Void TaleWorlds.MountAndBlade.Mission::FinalizeMission()",
+      "assembly": {
+        "sha256": "19387f31557ff840d14f378f6bbdf1d58fcff406ab9ff2294dfbb3e49a50b87e",
+        "path": "D:/SteamLibrary/steamapps/common/Mount & Blade II Bannerlord/bin/Win64_Shipping_Client/TaleWorlds.MountAndBlade.dll"
+      },
+      "metadataToken": 100669790,
+      "static": false,
+      "calls": [
+        "IL_0000: call System.Void TaleWorlds.MountAndBlade.TeamAISiegeComponent::OnMissionFinalize()",
+        "IL_000b: call System.UIntPtr TaleWorlds.MountAndBlade.Mission::get_Pointer()",
+        "IL_0010: callvirt System.Void TaleWorlds.MountAndBlade.IMBMission::FinalizeMission(System.UIntPtr)",
+        "IL_001b: call System.Void TaleWorlds.MountAndBlade.Mission::set_Pointer(System.UIntPtr)"
+      ]
+    },
+    {
+      "public": true,
+      "signature": "TaleWorlds.Library.InquiryData TaleWorlds.MountAndBlade.BasicLeaveMissionLogic::OnEndMissionRequest(System.Boolean&)",
+      "assembly": {
+        "sha256": "19387f31557ff840d14f378f6bbdf1d58fcff406ab9ff2294dfbb3e49a50b87e",
+        "path": "D:/SteamLibrary/steamapps/common/Mount & Blade II Bannerlord/bin/Win64_Shipping_Client/TaleWorlds.MountAndBlade.dll"
+      },
+      "metadataToken": 100672312,
+      "static": false,
+      "calls": [
+        "IL_0004: call TaleWorlds.MountAndBlade.Mission TaleWorlds.MountAndBlade.MissionBehavior::get_Mission()",
+        "IL_0009: callvirt TaleWorlds.MountAndBlade.Agent TaleWorlds.MountAndBlade.Mission::get_MainAgent()",
+        "IL_0011: call TaleWorlds.MountAndBlade.Mission TaleWorlds.MountAndBlade.MissionBehavior::get_Mission()",
+        "IL_0016: callvirt TaleWorlds.MountAndBlade.Agent TaleWorlds.MountAndBlade.Mission::get_MainAgent()",
+        "IL_001b: callvirt System.Boolean TaleWorlds.MountAndBlade.Agent::IsActive()",
+        "IL_0031: call TaleWorlds.MountAndBlade.Mission TaleWorlds.MountAndBlade.MissionBehavior::get_Mission()",
+        "IL_003d: callvirt System.Boolean TaleWorlds.MountAndBlade.Mission::IsPlayerCloseToAnEnemy(System.Single)",
+        "IL_004d: call TaleWorlds.Localization.TextObject TaleWorlds.Core.GameTexts::FindText(System.String,System.String)",
+        "IL_005a: call System.Void TaleWorlds.Core.MBInformationManager::AddQuickInformation(TaleWorlds.Localization.TextObject,System.Int32,TaleWorlds.Core.BasicCharacterObject,TaleWorlds.Core.Equipment,System.String)",
+        "IL_0074: call TaleWorlds.Localization.TextObject TaleWorlds.Core.GameTexts::FindText(System.String,System.String)",
+        "IL_0079: callvirt System.String System.Object::ToString()",
+        "IL_0086: call TaleWorlds.Localization.TextObject TaleWorlds.Core.GameTexts::FindText(System.String,System.String)",
+        "IL_008b: callvirt System.String System.Object::ToString()",
+        "IL_0096: call TaleWorlds.Localization.TextObject TaleWorlds.Core.GameTexts::FindText(System.String,System.String)",
+        "IL_009b: callvirt System.String System.Object::ToString()",
+        "IL_00a1: call TaleWorlds.MountAndBlade.Mission TaleWorlds.MountAndBlade.MissionBehavior::get_Mission()",
+        "IL_00a6: ldftn System.Void TaleWorlds.MountAndBlade.Mission::OnEndMissionResult()"
+      ]
+    },
+    {
+      "public": true,
+      "signature": "System.Void TaleWorlds.CampaignSystem.Encounters.PlayerEncounter::Finish(System.Boolean)",
+      "assembly": {
+        "sha256": "1f8e33e2ed73e6ec653d7629180afb70649ddc6e5bd1657a802a264efda1c3ae",
+        "path": "D:/SteamLibrary/steamapps/common/Mount & Blade II Bannerlord/bin/Win64_Shipping_Client/TaleWorlds.CampaignSystem.dll"
+      },
+      "metadataToken": 100673954,
+      "static": true,
+      "calls": [
+        "IL_0000: call TaleWorlds.CampaignSystem.Party.MobileParty TaleWorlds.CampaignSystem.Party.MobileParty::get_MainParty()",
+        "IL_0005: callvirt TaleWorlds.CampaignSystem.Army TaleWorlds.CampaignSystem.Party.MobileParty::get_Army()",
+        "IL_000c: call TaleWorlds.CampaignSystem.Party.MobileParty TaleWorlds.CampaignSystem.Party.MobileParty::get_MainParty()",
+        "IL_0011: callvirt TaleWorlds.CampaignSystem.Army TaleWorlds.CampaignSystem.Party.MobileParty::get_Army()",
+        "IL_0016: callvirt TaleWorlds.CampaignSystem.Party.MobileParty TaleWorlds.CampaignSystem.Army::get_LeaderParty()",
+        "IL_001b: call TaleWorlds.CampaignSystem.Party.MobileParty TaleWorlds.CampaignSystem.Encounters.PlayerEncounter::get_EncounteredMobileParty()",
+        "IL_0022: call TaleWorlds.CampaignSystem.Campaign TaleWorlds.CampaignSystem.Campaign::get_Current()",
+        "IL_0028: callvirt System.Void TaleWorlds.CampaignSystem.Campaign::set_TimeControlMode(TaleWorlds.CampaignSystem.CampaignTimeControlMode)",
+        "IL_002d: call TaleWorlds.CampaignSystem.Campaign TaleWorlds.CampaignSystem.Campaign::get_Current()",
+        "IL_0032: callvirt TaleWorlds.CampaignSystem.GameState.MenuContext TaleWorlds.CampaignSystem.Campaign::get_CurrentMenuContext()",
+        "IL_0039: call System.Void TaleWorlds.CampaignSystem.GameMenus.GameMenu::ExitToLast()",
+        "IL_0040: call TaleWorlds.CampaignSystem.Campaign TaleWorlds.CampaignSystem.Campaign::get_Current()",
+        "IL_0045: callvirt TaleWorlds.CampaignSystem.GameState.MapStateData TaleWorlds.CampaignSystem.Campaign::get_MapStateData()",
+        "IL_0050: call TaleWorlds.CampaignSystem.Encounters.PlayerEncounter TaleWorlds.CampaignSystem.Encounters.PlayerEncounter::get_Current()",
+        "IL_005a: call TaleWorlds.CampaignSystem.Siege.SiegeEvent TaleWorlds.CampaignSystem.Siege.PlayerSiege::get_PlayerSiegeEvent()",
+        "IL_0064: call TaleWorlds.Core.BattleSideEnum TaleWorlds.CampaignSystem.Siege.PlayerSiege::get_PlayerSide()",
+        "IL_006f: call TaleWorlds.CampaignSystem.Party.MobileParty TaleWorlds.CampaignSystem.Party.MobileParty::get_MainParty()",
+        "IL_0074: callvirt TaleWorlds.CampaignSystem.MapEvents.MapEvent TaleWorlds.CampaignSystem.Party.MobileParty::get_MapEvent()",
+        "IL_007e: call TaleWorlds.CampaignSystem.Party.MobileParty TaleWorlds.CampaignSystem.Party.MobileParty::get_MainParty()",
+        "IL_0083: callvirt TaleWorlds.CampaignSystem.MapEvents.MapEvent TaleWorlds.CampaignSystem.Party.MobileParty::get_MapEvent()",
+        "IL_0088: callvirt System.Boolean TaleWorlds.CampaignSystem.MapEvents.MapEvent::get_IsSiegeAssault()",
+        "IL_008f: call TaleWorlds.CampaignSystem.Party.MobileParty TaleWorlds.CampaignSystem.Party.MobileParty::get_MainParty()",
+        "IL_0094: callvirt TaleWorlds.CampaignSystem.MapEvents.MapEvent TaleWorlds.CampaignSystem.Party.MobileParty::get_MapEvent()",
+        "IL_0099: callvirt System.Boolean TaleWorlds.CampaignSystem.MapEvents.MapEvent::get_HasWinner()",
+        "IL_00a0: call TaleWorlds.CampaignSystem.Party.MobileParty TaleWorlds.CampaignSystem.Party.MobileParty::get_MainParty()",
+        "IL_00a5: callvirt TaleWorlds.CampaignSystem.MapEvents.MapEvent TaleWorlds.CampaignSystem.Party.MobileParty::get_MapEvent()",
+        "IL_00aa: callvirt TaleWorlds.Core.BattleSideEnum TaleWorlds.CampaignSystem.MapEvents.MapEvent::get_PlayerSide()",
+        "IL_00b1: call TaleWorlds.CampaignSystem.Party.MobileParty TaleWorlds.CampaignSystem.Party.MobileParty::get_MainParty()",
+        "IL_00b6: callvirt TaleWorlds.CampaignSystem.Settlements.Settlement TaleWorlds.CampaignSystem.Party.MobileParty::get_BesiegedSettlement()",
+        "IL_00bd: call TaleWorlds.CampaignSystem.Siege.SiegeEvent TaleWorlds.CampaignSystem.Siege.PlayerSiege::get_PlayerSiegeEvent()",
+        "IL_00c7: call TaleWorlds.CampaignSystem.Party.MobileParty TaleWorlds.CampaignSystem.Party.MobileParty::get_MainParty()",
+        "IL_00cc: callvirt TaleWorlds.CampaignSystem.MapEvents.MapEvent TaleWorlds.CampaignSystem.Party.MobileParty::get_MapEvent()",
+        "IL_00d1: callvirt TaleWorlds.CampaignSystem.MapEvents.MapEvent/BattleTypes TaleWorlds.CampaignSystem.MapEvents.MapEvent::get_EventType()",
+        "IL_00d6: callvirt System.Collections.Generic.IEnumerable`1<TaleWorlds.CampaignSystem.Party.PartyBase> TaleWorlds.CampaignSystem.Settlements.Settlement::GetInvolvedPartiesForEventType(TaleWorlds.CampaignSystem.MapEvents.MapEvent/BattleTypes)",
+        "IL_00e9: ldftn System.Boolean TaleWorlds.CampaignSystem.Encounters.PlayerEncounter/<>c::<Finish>b__193_0(TaleWorlds.CampaignSystem.Party.PartyBase)",
+        "IL_00fa: call System.Boolean System.Linq.Enumerable::Any<TaleWorlds.CampaignSystem.Party.PartyBase>(System.Collections.Generic.IEnumerable`1<!!0>,System.Func`2<!!0,System.Boolean>)",
+        "IL_0105: call TaleWorlds.CampaignSystem.Encounters.PlayerEncounter TaleWorlds.CampaignSystem.Encounters.PlayerEncounter::get_Current()",
+        "IL_0111: call TaleWorlds.CampaignSystem.Hero TaleWorlds.CampaignSystem.Hero::get_MainHero()",
+        "IL_0116: callvirt TaleWorlds.CampaignSystem.Party.PartyBase TaleWorlds.CampaignSystem.Hero::get_PartyBelongedToAsPrisoner()",
+        "IL_011d: call TaleWorlds.CampaignSystem.Encounters.PlayerEncounter TaleWorlds.CampaignSystem.Encounters.PlayerEncounter::get_Current()",
+        "IL_0129: call TaleWorlds.CampaignSystem.Encounters.PlayerEncounter TaleWorlds.CampaignSystem.Encounters.PlayerEncounter::get_Current()",
+        "IL_0133: callvirt TaleWorlds.CampaignSystem.IFaction TaleWorlds.CampaignSystem.Party.PartyBase::get_MapFaction()",
+        "IL_0138: call TaleWorlds.CampaignSystem.Hero TaleWorlds.CampaignSystem.Hero::get_MainHero()",
+        "IL_013d: callvirt TaleWorlds.CampaignSystem.IFaction TaleWorlds.CampaignSystem.Hero::get_MapFaction()",
+        "IL_0142: callvirt System.Boolean TaleWorlds.CampaignSystem.IFaction::IsAtWarWith(TaleWorlds.CampaignSystem.IFaction)",
+        "IL_014e: call System.Void TaleWorlds.CampaignSystem.GameMenus.GameMenu::ActivateGameMenu(System.String)",
+        "IL_0153: call TaleWorlds.CampaignSystem.Encounters.PlayerEncounter TaleWorlds.CampaignSystem.Encounters.PlayerEncounter::get_Current()",
+        "IL_015f: call TaleWorlds.CampaignSystem.Encounters.PlayerEncounter TaleWorlds.CampaignSystem.Encounters.PlayerEncounter::get_Current()",
+        "IL_016c: call TaleWorlds.CampaignSystem.Encounters.PlayerEncounter TaleWorlds.CampaignSystem.Encounters.PlayerEncounter::get_Current()",
+        "IL_0178: call TaleWorlds.CampaignSystem.Hero TaleWorlds.CampaignSystem.Hero::get_MainHero()",
+        "IL_017d: callvirt TaleWorlds.CampaignSystem.Party.PartyBase TaleWorlds.CampaignSystem.Hero::get_PartyBelongedToAsPrisoner()",
+        "IL_0184: call TaleWorlds.CampaignSystem.Encounters.PlayerEncounter TaleWorlds.CampaignSystem.Encounters.PlayerEncounter::get_Current()",
+        "IL_0190: call TaleWorlds.CampaignSystem.Party.MobileParty TaleWorlds.CampaignSystem.Party.MobileParty::get_MainParty()",
+        "IL_0196: callvirt System.Void TaleWorlds.CampaignSystem.Party.MobileParty::set_BesiegerCamp(TaleWorlds.CampaignSystem.Siege.BesiegerCamp)",
+        "IL_019b: call TaleWorlds.CampaignSystem.Encounters.PlayerEncounter TaleWorlds.CampaignSystem.Encounters.PlayerEncounter::get_Current()",
+        "IL_01a6: call TaleWorlds.CampaignSystem.Encounters.PlayerEncounter TaleWorlds.CampaignSystem.Encounters.PlayerEncounter::get_Current()",
+        "IL_01b7: call TaleWorlds.CampaignSystem.Party.PartyBase TaleWorlds.CampaignSystem.Party.PartyBase::get_MainParty()",
+        "IL_01bc: callvirt TaleWorlds.Core.BattleSideEnum TaleWorlds.CampaignSystem.Party.PartyBase::get_Side()",
+        "IL_01c1: call System.Boolean TaleWorlds.CampaignSystem.MapEvents.MapEvent::IsWinnerSide(TaleWorlds.Core.BattleSideEnum)",
+        "IL_01c7: call TaleWorlds.CampaignSystem.Settlements.Settlement TaleWorlds.CampaignSystem.Encounters.PlayerEncounter::get_EncounterSettlement()",
+        "IL_01d2: call System.Void TaleWorlds.CampaignSystem.Settlements.Settlement::OnPlayerEncounterFinish()",
+        "IL_01d7: call TaleWorlds.CampaignSystem.Encounters.PlayerEncounter TaleWorlds.CampaignSystem.Encounters.PlayerEncounter::get_Current()",
+        "IL_01dc: callvirt System.Void TaleWorlds.CampaignSystem.Encounters.PlayerEncounter::FinalizeBattle()",
+        "IL_01e1: call TaleWorlds.CampaignSystem.Encounters.PlayerEncounter TaleWorlds.CampaignSystem.Encounters.PlayerEncounter::get_Current()",
+        "IL_01e7: callvirt System.Void TaleWorlds.CampaignSystem.Encounters.PlayerEncounter::FinishEncounterInternal(System.Boolean)",
+        "IL_01ec: call TaleWorlds.CampaignSystem.BattleSimulation TaleWorlds.CampaignSystem.Encounters.PlayerEncounter::get_CurrentBattleSimulation()",
+        "IL_01f3: call TaleWorlds.Core.Game TaleWorlds.Core.Game::get_Current()",
+        "IL_01f8: callvirt TaleWorlds.Core.GameStateManager TaleWorlds.Core.Game::get_GameStateManager()",
+        "IL_01fd: callvirt !!0 TaleWorlds.Core.GameStateManager::LastOrDefault<TaleWorlds.CampaignSystem.GameState.MapState>()",
+        "IL_0207: callvirt System.Boolean TaleWorlds.CampaignSystem.GameState.MapState::get_IsSimulationActive()",
+        "IL_020f: callvirt System.Void TaleWorlds.CampaignSystem.GameState.MapState::EndBattleSimulation()",
+        "IL_0214: call TaleWorlds.CampaignSystem.Encounters.PlayerEncounter TaleWorlds.CampaignSystem.Encounters.PlayerEncounter::get_Current()",
+        "IL_021f: call System.Boolean TaleWorlds.CampaignSystem.Encounters.PlayerEncounter::get_InsideSettlement()",
+        "IL_0226: call TaleWorlds.CampaignSystem.Party.MobileParty TaleWorlds.CampaignSystem.Party.MobileParty::get_MainParty()",
+        "IL_022b: callvirt TaleWorlds.CampaignSystem.Party.MobileParty TaleWorlds.CampaignSystem.Party.MobileParty::get_AttachedTo()",
+        "IL_023a: call System.Void TaleWorlds.CampaignSystem.Encounters.PlayerEncounter::LeaveSettlement()",
+        "IL_023f: call TaleWorlds.CampaignSystem.Campaign TaleWorlds.CampaignSystem.Campaign::get_Current()",
+        "IL_0245: callvirt System.Void TaleWorlds.CampaignSystem.Campaign::set_PlayerEncounter(TaleWorlds.CampaignSystem.Encounters.PlayerEncounter)",
+        "IL_024a: call TaleWorlds.CampaignSystem.Campaign TaleWorlds.CampaignSystem.Campaign::get_Current()",
+        "IL_0250: callvirt System.Void TaleWorlds.CampaignSystem.Campaign::set_LocationEncounter(TaleWorlds.CampaignSystem.Encounters.LocationEncounter)"
+      ]
+    },
+    {
+      "public": true,
+      "signature": "System.Void TaleWorlds.CampaignSystem.Encounters.PlayerEncounter::FinalizeBattle()",
+      "assembly": {
+        "sha256": "1f8e33e2ed73e6ec653d7629180afb70649ddc6e5bd1657a802a264efda1c3ae",
+        "path": "D:/SteamLibrary/steamapps/common/Mount & Blade II Bannerlord/bin/Win64_Shipping_Client/TaleWorlds.CampaignSystem.dll"
+      },
+      "metadataToken": 100673992,
+      "static": false,
+      "calls": [
+        "IL_0011: callvirt System.Boolean TaleWorlds.CampaignSystem.MapEvents.MapEvent::get_HasWinner()",
+        "IL_0031: callvirt System.Boolean TaleWorlds.CampaignSystem.MapEvents.MapEvent::get_IsSiegeAmbush()",
+        "IL_003e: callvirt System.Boolean TaleWorlds.CampaignSystem.MapEvents.MapEvent::get_IsRaid()",
+        "IL_004b: callvirt TaleWorlds.CampaignSystem.Settlements.Settlement TaleWorlds.CampaignSystem.MapEvents.MapEvent::get_MapEventSettlement()",
+        "IL_0050: callvirt System.Single TaleWorlds.CampaignSystem.Settlements.Settlement::get_SettlementHitPoints()",
+        "IL_005f: call System.Boolean TaleWorlds.Library.MBMath::ApproximatelyEqualsTo(System.Single,System.Single,System.Single)",
+        "IL_006c: callvirt TaleWorlds.Core.BattleSideEnum TaleWorlds.CampaignSystem.MapEvents.MapEvent::get_PlayerSide()",
+        "IL_0080: callvirt TaleWorlds.Core.BattleSideEnum TaleWorlds.CampaignSystem.MapEvents.MapEvent::get_PlayerSide()",
+        "IL_0085: callvirt TaleWorlds.Library.MBReadOnlyList`1<TaleWorlds.CampaignSystem.MapEvents.MapEventParty> TaleWorlds.CampaignSystem.MapEvents.MapEvent::PartiesOnSide(TaleWorlds.Core.BattleSideEnum)",
+        "IL_0098: ldftn System.Boolean TaleWorlds.CampaignSystem.Encounters.PlayerEncounter/<>c::<FinalizeBattle>b__231_0(TaleWorlds.CampaignSystem.MapEvents.MapEventParty)",
+        "IL_00a9: call System.Boolean System.Linq.Enumerable::Any<TaleWorlds.CampaignSystem.MapEvents.MapEventParty>(System.Collections.Generic.IEnumerable`1<!!0>,System.Func`2<!!0,System.Boolean>)",
+        "IL_00b6: callvirt System.Void TaleWorlds.CampaignSystem.MapEvents.MapEvent::FinalizeEvent()",
+        "IL_00c3: call System.Void TaleWorlds.CampaignSystem.Encounters.PlayerEncounter::LeaveBattle()"
+      ]
+    },
+    {
+      "public": true,
+      "signature": "System.Void TaleWorlds.CampaignSystem.Encounters.PlayerEncounter::LeaveBattle()",
+      "assembly": {
+        "sha256": "1f8e33e2ed73e6ec653d7629180afb70649ddc6e5bd1657a802a264efda1c3ae",
+        "path": "D:/SteamLibrary/steamapps/common/Mount & Blade II Bannerlord/bin/Win64_Shipping_Client/TaleWorlds.CampaignSystem.dll"
+      },
+      "metadataToken": 100673997,
+      "static": true,
+      "calls": [
+        "IL_0000: call TaleWorlds.CampaignSystem.MapEvents.MapEvent TaleWorlds.CampaignSystem.MapEvents.MapEvent::get_PlayerMapEvent()",
+        "IL_0015: call TaleWorlds.CampaignSystem.Party.PartyBase TaleWorlds.CampaignSystem.Party.PartyBase::get_MainParty()",
+        "IL_001a: callvirt TaleWorlds.Core.BattleSideEnum TaleWorlds.CampaignSystem.Party.PartyBase::get_Side()",
+        "IL_001f: callvirt System.Int32 TaleWorlds.CampaignSystem.MapEvents.MapEvent::GetNumberOfInvolvedMen(TaleWorlds.Core.BattleSideEnum)",
+        "IL_0025: call TaleWorlds.CampaignSystem.Party.MobileParty TaleWorlds.CampaignSystem.Party.MobileParty::get_MainParty()",
+        "IL_002a: callvirt TaleWorlds.CampaignSystem.Army TaleWorlds.CampaignSystem.Party.MobileParty::get_Army()",
+        "IL_0034: call TaleWorlds.CampaignSystem.Party.PartyBase TaleWorlds.CampaignSystem.Party.PartyBase::get_MainParty()",
+        "IL_0039: callvirt TaleWorlds.CampaignSystem.MapEvents.MapEventSide TaleWorlds.CampaignSystem.Party.PartyBase::get_MapEventSide()",
+        "IL_003e: callvirt TaleWorlds.CampaignSystem.Party.PartyBase TaleWorlds.CampaignSystem.MapEvents.MapEventSide::get_LeaderParty()",
+        "IL_0043: call TaleWorlds.CampaignSystem.Party.PartyBase TaleWorlds.CampaignSystem.Party.PartyBase::get_MainParty()",
+        "IL_004a: call TaleWorlds.CampaignSystem.Party.PartyBase TaleWorlds.CampaignSystem.Party.PartyBase::get_MainParty()",
+        "IL_004f: callvirt TaleWorlds.CampaignSystem.MapEvents.MapEventSide TaleWorlds.CampaignSystem.Party.PartyBase::get_MapEventSide()",
+        "IL_0054: callvirt TaleWorlds.Library.MBReadOnlyList`1<TaleWorlds.CampaignSystem.MapEvents.MapEventParty> TaleWorlds.CampaignSystem.MapEvents.MapEventSide::get_Parties()",
+        "IL_005a: ldftn System.Boolean TaleWorlds.CampaignSystem.Encounters.PlayerEncounter/<>c__DisplayClass236_0::<LeaveBattle>b__0(TaleWorlds.CampaignSystem.MapEvents.MapEventParty)",
+        "IL_0065: call System.Boolean System.Linq.Enumerable::Any<TaleWorlds.CampaignSystem.MapEvents.MapEventParty>(System.Collections.Generic.IEnumerable`1<!!0>,System.Func`2<!!0,System.Boolean>)",
+        "IL_006c: call TaleWorlds.CampaignSystem.Party.PartyBase TaleWorlds.CampaignSystem.Party.PartyBase::get_MainParty()",
+        "IL_0071: callvirt TaleWorlds.CampaignSystem.MapEvents.MapEvent TaleWorlds.CampaignSystem.Party.PartyBase::get_MapEvent()",
+        "IL_0076: callvirt System.Boolean TaleWorlds.CampaignSystem.MapEvents.MapEvent::get_IsSallyOut()",
+        "IL_007d: call TaleWorlds.CampaignSystem.Campaign TaleWorlds.CampaignSystem.Campaign::get_Current()",
+        "IL_0082: callvirt TaleWorlds.CampaignSystem.GameModels TaleWorlds.CampaignSystem.Campaign::get_Models()",
+        "IL_0087: callvirt TaleWorlds.CampaignSystem.ComponentInterfaces.EncounterModel TaleWorlds.CampaignSystem.GameModels::get_EncounterModel()",
+        "IL_008c: call TaleWorlds.CampaignSystem.Party.PartyBase TaleWorlds.CampaignSystem.Party.PartyBase::get_MainParty()",
+        "IL_0091: callvirt TaleWorlds.CampaignSystem.MapEvents.MapEvent TaleWorlds.CampaignSystem.Party.PartyBase::get_MapEvent()",
+        "IL_0096: call TaleWorlds.CampaignSystem.Party.PartyBase TaleWorlds.CampaignSystem.Party.PartyBase::get_MainParty()",
+        "IL_009b: callvirt TaleWorlds.CampaignSystem.MapEvents.MapEventSide TaleWorlds.CampaignSystem.Party.PartyBase::get_MapEventSide()",
+        "IL_00a0: callvirt TaleWorlds.Core.BattleSideEnum TaleWorlds.CampaignSystem.MapEvents.MapEventSide::get_MissionSide()",
+        "IL_00a5: callvirt TaleWorlds.CampaignSystem.Hero TaleWorlds.CampaignSystem.ComponentInterfaces.EncounterModel::GetLeaderOfMapEvent(TaleWorlds.CampaignSystem.MapEvents.MapEvent,TaleWorlds.Core.BattleSideEnum)",
+        "IL_00aa: call TaleWorlds.CampaignSystem.Hero TaleWorlds.CampaignSystem.Hero::get_MainHero()",
+        "IL_00b1: call TaleWorlds.CampaignSystem.Party.PartyBase TaleWorlds.CampaignSystem.Party.PartyBase::get_MainParty()",
+        "IL_00b7: callvirt System.Void TaleWorlds.CampaignSystem.Party.PartyBase::set_MapEventSide(TaleWorlds.CampaignSystem.MapEvents.MapEventSide)",
+        "IL_00bf: callvirt System.Void TaleWorlds.CampaignSystem.MapEvents.MapEvent::FinalizeEvent()",
+        "IL_00c4: call TaleWorlds.CampaignSystem.Party.PartyBase TaleWorlds.CampaignSystem.Party.PartyBase::get_MainParty()",
+        "IL_00c9: callvirt System.Int32 TaleWorlds.CampaignSystem.Party.PartyBase::get_NumberOfHealthyMembers()",
+        "IL_00d1: callvirt TaleWorlds.CampaignSystem.MapEvents.MapEventSide TaleWorlds.CampaignSystem.MapEvents.MapEvent::get_AttackerSide()",
+        "IL_00d6: callvirt TaleWorlds.CampaignSystem.Party.PartyBase TaleWorlds.CampaignSystem.MapEvents.MapEventSide::get_LeaderParty()",
+        "IL_00db: call TaleWorlds.CampaignSystem.Party.PartyBase TaleWorlds.CampaignSystem.Party.PartyBase::get_MainParty()",
+        "IL_00e3: callvirt TaleWorlds.CampaignSystem.MapEvents.MapEventSide TaleWorlds.CampaignSystem.MapEvents.MapEvent::get_DefenderSide()",
+        "IL_00e8: callvirt TaleWorlds.CampaignSystem.Party.PartyBase TaleWorlds.CampaignSystem.MapEvents.MapEventSide::get_LeaderParty()",
+        "IL_00ed: call TaleWorlds.CampaignSystem.Party.PartyBase TaleWorlds.CampaignSystem.Party.PartyBase::get_MainParty()",
+        "IL_00fb: call TaleWorlds.CampaignSystem.BattleSimulation TaleWorlds.CampaignSystem.Encounters.PlayerEncounter::get_CurrentBattleSimulation()",
+        "IL_0102: call TaleWorlds.Core.Game TaleWorlds.Core.Game::get_Current()",
+        "IL_0107: callvirt TaleWorlds.Core.GameStateManager TaleWorlds.Core.Game::get_GameStateManager()",
+        "IL_010c: callvirt !!0 TaleWorlds.Core.GameStateManager::LastOrDefault<TaleWorlds.CampaignSystem.GameState.MapState>()",
+        "IL_0116: callvirt System.Boolean TaleWorlds.CampaignSystem.GameState.MapState::get_IsSimulationActive()",
+        "IL_011e: callvirt System.Void TaleWorlds.CampaignSystem.GameState.MapState::EndBattleSimulation()",
+        "IL_0123: call TaleWorlds.CampaignSystem.Encounters.PlayerEncounter TaleWorlds.CampaignSystem.Encounters.PlayerEncounter::get_Current()",
+        "IL_012e: call TaleWorlds.CampaignSystem.Encounters.PlayerEncounter TaleWorlds.CampaignSystem.Encounters.PlayerEncounter::get_Current()",
+        "IL_0139: callvirt System.Void TaleWorlds.CampaignSystem.MapEvents.MapEvent::set_BattleObserver(TaleWorlds.Core.IBattleObserver)",
+        "IL_013e: call TaleWorlds.CampaignSystem.Encounters.PlayerEncounter TaleWorlds.CampaignSystem.Encounters.PlayerEncounter::get_Current()",
+        "IL_0144: callvirt System.Void TaleWorlds.CampaignSystem.Encounters.PlayerEncounter::set_IsJoinedBattle(System.Boolean)",
+        "IL_0149: call TaleWorlds.CampaignSystem.Encounters.PlayerEncounter TaleWorlds.CampaignSystem.Encounters.PlayerEncounter::get_Current()",
+        "IL_0158: callvirt System.Boolean TaleWorlds.CampaignSystem.MapEvents.MapEvent::get_HasWinner()",
+        "IL_0160: call TaleWorlds.CampaignSystem.Encounters.PlayerEncounter TaleWorlds.CampaignSystem.Encounters.PlayerEncounter::get_Current()",
+        "IL_0176: callvirt System.Void TaleWorlds.CampaignSystem.MapEvents.MapEvent::SimulateBattleSetup(TaleWorlds.CampaignSystem.Roster.FlattenedTroopRoster[])"
+      ]
+    },
+    {
+      "public": true,
+      "signature": "System.Void SandBox.Objects.PassageUsePoint::OnUse(TaleWorlds.MountAndBlade.Agent,System.SByte)",
+      "assembly": {
+        "sha256": "587c6e94c425745c1478f632f3b66226ff8298666cb27e8e6d9a62488df5956a",
+        "path": "D:/SteamLibrary/steamapps/common/Mount & Blade II Bannerlord/Modules/SandBox/bin/Win64_Shipping_Client/SandBox.dll"
+      },
+      "metadataToken": 100663823,
+      "static": false,
+      "calls": [
+        "IL_0000: call TaleWorlds.CampaignSystem.Campaign TaleWorlds.CampaignSystem.Campaign::get_Current()",
+        "IL_0005: callvirt TaleWorlds.CampaignSystem.CampaignGameMode TaleWorlds.CampaignSystem.Campaign::get_GameMode()",
+        "IL_000e: callvirt System.Boolean TaleWorlds.MountAndBlade.Agent::get_IsAIControlled()",
+        "IL_001b: call System.Void TaleWorlds.MountAndBlade.StandingPoint::OnUse(TaleWorlds.MountAndBlade.Agent,System.SByte)",
+        "IL_0023: call TaleWorlds.CampaignSystem.Settlements.Locations.Location SandBox.Objects.PassageUsePoint::get_ToLocation()",
+        "IL_002e: call TaleWorlds.MountAndBlade.Agent TaleWorlds.MountAndBlade.UsableMissionObject::get_UserAgent()",
+        "IL_0033: callvirt System.Boolean TaleWorlds.MountAndBlade.Agent::get_IsMainAgent()",
+        "IL_003b: call TaleWorlds.CampaignSystem.Settlements.Locations.Location SandBox.Objects.PassageUsePoint::get_ToLocation()",
+        "IL_0040: callvirt System.Boolean TaleWorlds.CampaignSystem.Settlements.Locations.Location::CanPlayerEnter()",
+        "IL_0052: callvirt System.String System.Object::ToString()",
+        "IL_005c: call System.Void TaleWorlds.Library.InformationManager::DisplayMessage(TaleWorlds.Library.InformationMessage)",
+        "IL_0068: call TaleWorlds.CampaignSystem.Campaign TaleWorlds.CampaignSystem.Campaign::get_Current()",
+        "IL_006d: callvirt TaleWorlds.CampaignSystem.GameMenus.GameMenuManager TaleWorlds.CampaignSystem.Campaign::get_GameMenuManager()",
+        "IL_0073: call TaleWorlds.CampaignSystem.Settlements.Locations.Location SandBox.Objects.PassageUsePoint::get_ToLocation()",
+        "IL_007d: call TaleWorlds.CampaignSystem.Campaign TaleWorlds.CampaignSystem.Campaign::get_Current()",
+        "IL_0082: callvirt TaleWorlds.CampaignSystem.GameMenus.GameMenuManager TaleWorlds.CampaignSystem.Campaign::get_GameMenuManager()",
+        "IL_0087: call TaleWorlds.CampaignSystem.ICampaignMission TaleWorlds.CampaignSystem.CampaignMission::get_Current()",
+        "IL_008c: callvirt TaleWorlds.CampaignSystem.Settlements.Locations.Location TaleWorlds.CampaignSystem.ICampaignMission::get_Location()",
+        "IL_0096: call TaleWorlds.MountAndBlade.Mission TaleWorlds.MountAndBlade.Mission::get_Current()",
+        "IL_009b: callvirt System.Void TaleWorlds.MountAndBlade.Mission::EndMission()",
+        "IL_00a6: call TaleWorlds.MountAndBlade.Agent TaleWorlds.MountAndBlade.UsableMissionObject::get_UserAgent()",
+        "IL_00ab: callvirt System.Boolean TaleWorlds.MountAndBlade.Agent::get_IsAIControlled()",
+        "IL_00b2: call TaleWorlds.CampaignSystem.ICampaignMission TaleWorlds.CampaignSystem.CampaignMission::get_Current()",
+        "IL_00b7: callvirt TaleWorlds.CampaignSystem.Settlements.Locations.Location TaleWorlds.CampaignSystem.ICampaignMission::get_Location()",
+        "IL_00bd: call TaleWorlds.MountAndBlade.Agent TaleWorlds.MountAndBlade.UsableMissionObject::get_UserAgent()",
+        "IL_00c2: callvirt TaleWorlds.Core.IAgentOriginBase TaleWorlds.MountAndBlade.Agent::get_Origin()",
+        "IL_00c7: callvirt TaleWorlds.CampaignSystem.Settlements.Locations.LocationCharacter TaleWorlds.CampaignSystem.Settlements.Locations.Location::GetLocationCharacter(TaleWorlds.Core.IAgentOriginBase)",
+        "IL_00ce: call TaleWorlds.CampaignSystem.Settlements.Locations.Location SandBox.Objects.PassageUsePoint::get_ToLocation()",
+        "IL_00d4: callvirt System.Boolean TaleWorlds.CampaignSystem.Settlements.Locations.Location::CanAIEnter(TaleWorlds.CampaignSystem.Settlements.Locations.LocationCharacter)",
+        "IL_00e0: call System.Void TaleWorlds.Engine.MBDebug::ShowWarning(System.String)",
+        "IL_00e9: call TaleWorlds.CampaignSystem.Settlements.Locations.LocationComplex TaleWorlds.CampaignSystem.Settlements.Locations.LocationComplex::get_Current()",
+        "IL_00ef: call TaleWorlds.CampaignSystem.ICampaignMission TaleWorlds.CampaignSystem.CampaignMission::get_Current()",
+        "IL_00f4: callvirt TaleWorlds.CampaignSystem.Settlements.Locations.Location TaleWorlds.CampaignSystem.ICampaignMission::get_Location()",
+        "IL_00fa: call TaleWorlds.CampaignSystem.Settlements.Locations.Location SandBox.Objects.PassageUsePoint::get_ToLocation()",
+        "IL_00ff: callvirt System.Void TaleWorlds.CampaignSystem.Settlements.Locations.LocationComplex::ChangeLocation(TaleWorlds.CampaignSystem.Settlements.Locations.LocationCharacter,TaleWorlds.CampaignSystem.Settlements.Locations.Location,TaleWorlds.CampaignSystem.Settlements.Locations.Location)",
+        "IL_0105: call TaleWorlds.MountAndBlade.Agent TaleWorlds.MountAndBlade.UsableMissionObject::get_UserAgent()",
+        "IL_010c: callvirt System.Void TaleWorlds.MountAndBlade.Agent::FadeOut(System.Boolean,System.Boolean)",
+        "IL_011d: call TaleWorlds.MountAndBlade.Mission TaleWorlds.MountAndBlade.Mission::get_Current()",
+        "IL_0122: callvirt System.Void TaleWorlds.MountAndBlade.Mission::EndMission()",
+        "IL_012a: call TaleWorlds.MountAndBlade.Mission TaleWorlds.MountAndBlade.Mission::get_Current()",
+        "IL_012f: call System.Int32 TaleWorlds.MountAndBlade.MiscSoundContainer::get_SoundCodeMovementFoleyDoorOpen()",
+        "IL_0135: call TaleWorlds.Engine.WeakGameEntity TaleWorlds.Engine.ScriptComponentBehavior::get_GameEntity()",
+        "IL_013d: call TaleWorlds.Library.MatrixFrame TaleWorlds.Engine.WeakGameEntity::GetGlobalFrame()",
+        "IL_014b: callvirt System.Void TaleWorlds.MountAndBlade.Mission::MakeSound(System.Int32,TaleWorlds.Library.Vec3,System.Boolean,System.Boolean,System.Int32,System.Int32)"
+      ]
+    },
+    {
+      "public": false,
+      "signature": "System.Void SandBox.Objects.PassageUsePoint::InitializeLocation()",
+      "assembly": {
+        "sha256": "587c6e94c425745c1478f632f3b66226ff8298666cb27e8e6d9a62488df5956a",
+        "path": "D:/SteamLibrary/steamapps/common/Mount & Blade II Bannerlord/Modules/SandBox/bin/Win64_Shipping_Client/SandBox.dll"
+      },
+      "metadataToken": 100663826,
+      "static": false,
+      "calls": [
+        "IL_0006: call System.Boolean System.String::IsNullOrEmpty(System.String)",
+        "IL_0029: call TaleWorlds.MountAndBlade.Mission TaleWorlds.MountAndBlade.Mission::get_Current()",
+        "IL_0030: call TaleWorlds.CampaignSystem.Campaign TaleWorlds.CampaignSystem.Campaign::get_Current()",
+        "IL_0037: call TaleWorlds.CampaignSystem.Encounters.LocationEncounter TaleWorlds.CampaignSystem.Encounters.PlayerEncounter::get_LocationEncounter()",
+        "IL_003e: call TaleWorlds.CampaignSystem.ICampaignMission TaleWorlds.CampaignSystem.CampaignMission::get_Current()",
+        "IL_0043: callvirt TaleWorlds.CampaignSystem.Settlements.Locations.Location TaleWorlds.CampaignSystem.ICampaignMission::get_Location()",
+        "IL_004b: call TaleWorlds.CampaignSystem.ICampaignMission TaleWorlds.CampaignSystem.CampaignMission::get_Current()",
+        "IL_0050: callvirt TaleWorlds.CampaignSystem.Settlements.Locations.Location TaleWorlds.CampaignSystem.ICampaignMission::get_Location()",
+        "IL_005b: callvirt TaleWorlds.CampaignSystem.Settlements.Locations.Location TaleWorlds.CampaignSystem.Settlements.Locations.Location::GetPassageToLocation(System.String)"
+      ]
+    },
+    {
+      "public": true,
+      "signature": "TaleWorlds.CampaignSystem.Settlements.Locations.Location SandBox.Objects.PassageUsePoint::get_ToLocation()",
+      "assembly": {
+        "sha256": "587c6e94c425745c1478f632f3b66226ff8298666cb27e8e6d9a62488df5956a",
+        "path": "D:/SteamLibrary/steamapps/common/Mount & Blade II Bannerlord/Modules/SandBox/bin/Win64_Shipping_Client/SandBox.dll"
+      },
+      "metadataToken": 100663816,
+      "static": false,
+      "calls": [
+        "IL_0009: call System.Void SandBox.Objects.PassageUsePoint::InitializeLocation()"
+      ]
+    }
+  ],
+  "mechanisms": [
+    {
+      "limitation": "Probe invokes the affirmative callback directly; it does not verify stock UI proximity/confirmation gates, boundary walking, victory or damage exchange.",
+      "entry": "public void Mission.OnEndMissionResult()",
+      "id": "field-and-naval-retreat",
+      "callPath": [
+        "BasicLeaveMissionLogic.OnEndMissionRequest(ref bool): proximity/confirmation gates; affirmative callback points to Mission.OnEndMissionResult (IL_00a6)",
+        "Mission.OnEndMissionResult: MissionLogics.OnBattleEnded (IL_0013) -> RetreatMission (IL_0023)",
+        "RetreatMission: MissionLogics.OnRetreatMission (IL_0015) -> EndMission (IL_0048), except active editor play branch leaves edit mission mode",
+        "EndMission: mark MissionEnded and ending state; asynchronous teardown, not immediate MapState",
+        "After Mission.Current clears and MapState returns, probe calls PlayerEncounter.Finish(true) if same encounter remains",
+        "Finish -> FinalizeBattle -> FinalizeEvent for resolved outcomes, otherwise LeaveBattle for a no-winner field/naval event"
+      ],
+      "authoredPoint": "No retreat/exit-named attribute found in the two inspected battle scene XMLs; this managed callback does not require a named point. Expanded prefab/native boundary exit behavior remains unverified."
+    },
+    {
+      "limitation": "Proves diagnostic mission teardown and return to port menu. Does not prove physical passage traversal or ordinary keyboard exit.",
+      "entry": "public void Mission.EndMission()",
+      "id": "port-diagnostic-exit",
+      "callPath": [
+        "Probe directly calls EndMission",
+        "Wait for Mission.Current null, active MapState and mission screen gone",
+        "Wait for port_menu before official sail_option"
+      ]
+    },
+    {
+      "limitation": "Static installed call path; center passage reference is not asserted to take the IsMissionExit branch.",
+      "entry": "public void SandBox.Objects.PassageUsePoint.OnUse(Agent userAgent, sbyte usedObjectPreferenceIndex)",
+      "id": "authored-passage",
+      "callPath": [
+        "Campaign mode/AI-user gate -> StandingPoint.OnUse",
+        "If ToLocation is available and main user may enter: set GameMenuManager.NextLocation and PreviousLocation -> Mission.EndMission (IL_009b)",
+        "If ToLocation is null and IsMissionExit: Mission.EndMission (IL_0113-0122)"
+      ]
+    }
+  ],
+  "runtimeAnchor": {
+    "pid": 11588,
+    "fieldReturnedToMap": true,
+    "moduleSha256": "ebacae1c8cd78fb9a505d591255aee4ba4ae7957a8ed0d98d864086a612bec16",
+    "vanillaRun": false,
+    "final": true,
+    "relevantLogLines": [
+      "2026-10-13T14:04:44.6181239Z +40079ms field_diagnostic_retreat",
+      "2026-10-13T14:04:45.1715786Z +40632ms field_returned_to_map",
+      "2026-10-13T14:04:52.8056075Z +48267ms port_diagnostic_retreat",
+      "2026-10-13T14:04:53.3143997Z +48775ms combat_official_sail_option",
+      "2026-10-13T14:05:10.1101522Z +65572ms naval_diagnostic_retreat",
+      "2026-10-13T14:05:10.5365888Z +65998ms naval_returned_to_map",
+      "2026-10-13T14:05:10.5587828Z +66020ms probe_end status=ok",
+      "2026-10-13T14:05:11.4790385Z +66940ms submodule_unloaded"
+    ],
+    "status": "ok",
+    "navalReturnedToMap": true,
+    "naval": {
+      "scene": "battle_terrain_coastal_04",
+      "module": "$BASE/Modules/NavalDLC/",
+      "loadSeconds": 1.3565518999999995,
+      "screen": "NavalDLC.View.NavalMissionScreen",
+      "shipObjects": 2
+    },
+    "result": {
+      "sha256": "0adc441ef4cf6de03b0213ef2e314e6f6392777d2918e7768b665a819c401f63",
+      "path": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\evidence\\runtime\\in-game\\baseline_combat-11588.json"
+    },
+    "field": {
+      "scene": "battle_terrain_biome_093b",
+      "module": "$BASE/Modules/SandBoxCore/",
+      "loadSeconds": 2.4449576000000004,
+      "screen": "TaleWorlds.MountAndBlade.View.Screens.MissionScreen",
+      "shipObjects": 0
+    },
+    "log": {
+      "sha256": "4038fc5ac327fc7fb52e5769e361361ce669e04b8674ff03996fd7e8e9b5e46d",
+      "path": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\evidence\\runtime\\in-game\\baseline_combat-11588.log"
+    },
+    "observation": {
+      "sha256": "c2650de937a66c36d802e0d4db52ef9648f98bd696b23eede3aaafebf1aaaf43",
+      "path": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\evidence\\runtime\\in-game\\baseline_combat-11588-observation.json"
+    },
+    "port": {
+      "scene": "empire_shipyard",
+      "module": "$BASE/Modules/NavalDLC/",
+      "loadSeconds": 2.221777499999998,
+      "screen": "TaleWorlds.MountAndBlade.View.Screens.MissionScreen",
+      "shipObjects": 0
+    }
+  },
+  "probeSource": {
+    "sha256": "2b76be2a0938d9f77a323921c2da5bb2bcceede732d9e12e6a63e6e016f9377c",
+    "path": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\src\\MNBL.ProceduralWorld\\Automation\\BaselineCombatSteps.cs"
+  },
+  "trace": {
+    "sha256": "287c4c42aa9322a582259a5651b14f173dfdf0bab11f103b3dbfa58c6a5e80a2",
+    "path": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\build\\research-baseline\\retreat-exit-installed.il.txt"
+  },
+  "unknowns": [
+    "Native scene boundary retreat detection and actual traversable exit geometry were not tested.",
+    "No claim that name-search absence means no authored point; prefab expansion and native-generated entities can supply behavior.",
+    "Global prefab-name resolution/collisions were not isolated by this inventory; module-qualified scene source does not prove prefab provider precedence.",
+    "No direct runtime traversal of the inventoried port passage or naval ship boundary retreat; successful anchor covers public callback teardown.",
+    "Current source hash is inspection provenance, not proof it equals the source compiled into PID11588; result carries the loaded binary hash."
+  ],
+  "checks": [
+    "Parsed all three installed scene XML files and the passage prefab XML",
+    "Read 13 exact installed methods with Mono.Cecil; retained signatures, visibility, metadata tokens, calls and full IL in owned scratch",
+    "SHA-256 recorded for all scene/prefab/assembly/runtime/source references",
+    "PID11588 final ok and both battle map returns verified; result SHA-256 matches retained observation"
+  ]
+}

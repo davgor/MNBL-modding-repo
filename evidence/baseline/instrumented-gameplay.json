@@ -1,0 +1,174 @@
+{
+  "schema": "mnbl.instrumented-official-gameplay",
+  "version": 1,
+  "vanillaRun": false,
+  "generatedTerrain": false,
+  "gameVersion": "v1.4.8.119303",
+  "navalVersion": "v1.2.8.119303",
+  "sourcePids": [
+    31116,
+    32644,
+    27112
+  ],
+  "land": {
+    "distance": 17.464716676141173,
+    "campaignHours": 3.8221317222341895,
+    "village": {
+      "loadSeconds": 1.889857500000005,
+      "scene": "empire_village_003",
+      "module": "$BASE/Modules/SandBoxCore/",
+      "screen": "TaleWorlds.MountAndBlade.View.Screens.MissionScreen",
+      "loadingFinished": true,
+      "mainAgentPresent": true,
+      "evidence": "Active MissionState, matching mission, loaded scene, mission screen, main agent, no pending shaders; screenshot requires visual review."
+    },
+    "villageTeleported": false,
+    "town": {
+      "loadSeconds": 6.126720499999998,
+      "scene": "empire_town_s",
+      "module": "$BASE/Modules/SandBoxCore/",
+      "screen": "TaleWorlds.MountAndBlade.View.Screens.MissionScreen",
+      "loadingFinished": true,
+      "mainAgentPresent": true,
+      "evidence": "Active MissionState, matching mission, loaded scene, mission screen, main agent, no pending shaders; screenshot requires visual review."
+    },
+    "townTeleported": true
+  },
+  "field": {
+    "mission": {
+      "scene": "battle_terrain_biome_093b",
+      "module": "$BASE/Modules/SandBoxCore/",
+      "loadSeconds": 2.4085041,
+      "screen": "TaleWorlds.MountAndBlade.View.Screens.MissionScreen",
+      "shipObjects": 0
+    },
+    "state": {
+      "deploymentFinished": true,
+      "agents": 26,
+      "ships": 0,
+      "missionResultPresent": false,
+      "missionTimeBefore": 0.03326999768614769,
+      "missionTimeAdvanced": 5.040389899164438
+    },
+    "returnedToMap": true
+  },
+  "naval": {
+    "port": {
+      "scene": "empire_shipyard",
+      "module": "$BASE/Modules/NavalDLC/",
+      "loadSeconds": 2.223775100000001,
+      "screen": "TaleWorlds.MountAndBlade.View.Screens.MissionScreen",
+      "shipObjects": 0
+    },
+    "ship": {
+      "party": "player_party",
+      "hull": "northern_trade_ship",
+      "skeletalCrew": 6,
+      "capacity": 18,
+      "synthetic": true,
+      "purchased": false
+    },
+    "travel": {
+      "x": 772.2274,
+      "y": 268.133972,
+      "distance": 7.124085149308168,
+      "campaignHours": 2.8576498054899275,
+      "atSea": true,
+      "faceTerrain": "CoastalSea"
+    },
+    "mission": {
+      "scene": "battle_terrain_coastal_04",
+      "module": "$BASE/Modules/NavalDLC/",
+      "loadSeconds": 1.4006764000000018,
+      "screen": "NavalDLC.View.NavalMissionScreen",
+      "shipObjects": 2
+    },
+    "state": {
+      "deploymentFinished": true,
+      "agents": 25,
+      "ships": 2,
+      "missionResultPresent": false,
+      "missionTimeBefore": 0.02199999988079071,
+      "missionTimeAdvanced": 5.002019718289375
+    },
+    "returnedToMap": true
+  },
+  "save": {
+    "schema": "mnbl.baseline-save-roundtrip",
+    "version": 1,
+    "verifiedUtc": "2026-10-13T13:10:29.2307019Z",
+    "verified": true,
+    "vanillaRun": false,
+    "scenarioPid": 31116,
+    "loadPid": 32644,
+    "moduleSha256": "70b4b005647b4c76d90df8f227c3ede9ddb9215283a9430d785d4ea4a529a8d3",
+    "saveName": "mnbl_baseline_65da8d934c644e4a99ed7a310cc3726e",
+    "positionError": 0.0,
+    "campaignHoursError": 0.0,
+    "saveSeconds": 1.7940243000000038,
+    "loadToReadySeconds": 9.7409345,
+    "sourceResults": [
+      {
+        "path": "evidence/runtime/in-game/baseline_scenario-31116.json",
+        "sha256": "3edd3d9a5cb29b8bc67e9a3195679b97a43b37c0440dd02a948be862ad5b1069"
+      },
+      {
+        "path": "evidence/runtime/in-game/baseline_load-32644.json",
+        "sha256": "ac883c20d6ecec612ba176cb6324e1263afe9d4195c8fc282a612ae2bab48e0a"
+      }
+    ],
+    "scope": "Instrumented official-content land/settlement/save scenario. Does not establish generated campaign persistence, naval gameplay, or the full epic."
+  },
+  "visualReview": "Root inspected village, town, field, port, sea-travel and naval captures. Runtime simulation time was checked after a pause-like HUD icon prompted follow-up; field advanced5.0403899s/naval5.0020197s.",
+  "existingSavesChanged": [],
+  "combatNewSaves": [],
+  "limits": [
+    "Official content driven by opt-in diagnostic module; not an unmodified vanilla UI run.",
+    "Town/port/bandit placement and troop/ship grants are synthetic in-memory setup.",
+    "Both battles simulated then retreated; no victory, damage-exchange or normal UI exit claim.",
+    "No generated campaign persistence or generated land/sea route claim."
+  ],
+  "evidence": [
+    "evidence/runtime/in-game/baseline_scenario-31116.json",
+    "evidence/runtime/in-game/baseline_load-32644.json",
+    "evidence/runtime/in-game/baseline_combat-27112.json",
+    "evidence/runtime/in-game/baseline_combat-27112-observation.json"
+  ],
+  "replay": {
+    "schema": "mnbl.baseline-replay-verification",
+    "verified": true,
+    "processId": 11588,
+    "sourceProcessId": 27112,
+    "capturedUtc": "2026-10-13T14:06:52.2631874Z",
+    "resultSha256": "0adc441ef4cf6de03b0213ef2e314e6f6392777d2918e7768b665a819c401f63",
+    "moduleSha256": "ebacae1c8cd78fb9a505d591255aee4ba4ae7957a8ed0d98d864086a612bec16",
+    "coordinateTolerance": 0.001,
+    "identitiesMatched": true,
+    "routeMatched": true,
+    "reservationReleased": true,
+    "visualReview": "Root inspected all four engine captures: field, port, sea travel, naval",
+    "fieldSimulationSeconds": 5.041249793022871,
+    "navalSimulationSeconds": 5.011529758572578,
+    "seaTravel": {
+      "x": 772.236938,
+      "y": 268.134949,
+      "distance": 7.114513719102012,
+      "campaignHours": 2.853413083124906,
+      "atSea": true,
+      "faceTerrain": "CoastalSea"
+    },
+    "existingSavesChanged": [],
+    "newSaves": [],
+    "limits": [
+      "Instrumented official content; not generated campaign gameplay.",
+      "Enemy campaign AI/encounter isolation is synthetic and released after scenario.",
+      "Ten-second route measurement allows timing variation; post-measurement player relocation pins battle location.",
+      "Exact physics determinism and isolated CPU/GPU cost not claimed."
+    ],
+    "evidence": [
+      "evidence/runtime/in-game/baseline_combat-11588.json",
+      "evidence/runtime/in-game/baseline_combat-11588-observation.json",
+      "evidence/baseline/combat-replay-27112-args.json"
+    ]
+  }
+}

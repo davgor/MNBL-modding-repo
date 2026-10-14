@@ -1,0 +1,631 @@
+{
+  "schema": "mnbl.sandbox-startup-plan.v1",
+  "status": "released-root-reported-first-boot-passed",
+  "concrete_managed_blockers": [],
+  "runtime_verified_by_sidecar": false,
+  "whole_task_acceptance_owner": "root",
+  "scope": "Installed-assembly trace and opt-in diagnostic Sandbox bootstrap. No launch/deploy/official-file edits by sidecar. Source ownership expanded by user to CampaignBootstrap/*.cs. Root owns fixture, renderer, shared integration, build and runtime acceptance.",
+  "validation": {
+    "research_bootstrap_compile": "Passed against installed assemblies before user transferred build ownership; build/research-sandbox/compile.log. This predates final source additions.",
+    "integration_compile": "Root reported successful integrated build after Path alias and ref argument fixes. Sidecar did not run shared build.",
+    "load_review": "Compared DiagnosticMapScene.Load to fresh installed SandBox.MapScene.Load IL_0016..02bb and checked Cecil out/ref metadata. Root independently reported review.",
+    "acceptance": [
+      {
+        "id": "A1",
+        "result": "accepted-static",
+        "item": "Exact installed constructors, callbacks and ordering recorded."
+      },
+      {
+        "id": "A2",
+        "result": "accepted-static",
+        "item": "Diagnostic source supplied with active-state character auto-completion, per-campaign creator and autosave suppression."
+      },
+      {
+        "id": "A3",
+        "result": "accepted-static",
+        "item": "Managed entity requirements separated from native uncertainties and retained official content."
+      },
+      {
+        "id": "A4",
+        "result": "root-reported-passed",
+        "item": "First paused map boot and screenshot passed per root; screenshot includes known introductory inquiry. Clean exit, existing saves unchanged."
+      }
+    ]
+  },
+  "source": [
+    {
+      "path": "src/MNBL.ProceduralWorld/CampaignBootstrap/DiagnosticSandboxBootstrap.cs",
+      "sha256": "0822ac53deb06dabdf637bb2c59ec8a00aa7c90ce2d4860d4c7852a5d5b3b75f",
+      "released": true
+    },
+    {
+      "path": "src/MNBL.ProceduralWorld/CampaignBootstrap/DiagnosticMapScene.cs",
+      "sha256": "ae1923854312a25f142736b348e0a4153cf0a3a21b9175f326872e5616e5ff8c",
+      "released": true
+    }
+  ],
+  "integration_hooks": {
+    "namespace": "MNBL.ProceduralWorld.CampaignBootstrap",
+    "start": "DiagnosticSandboxBootstrap.Start(bool explicitDiagnosticFlag, Action<string> trace)",
+    "tick": "instance.Tick() on game/application thread once per tick; continue while screenshot settles to maintain pause",
+    "status": [
+      "bool Completed",
+      "bool Failed",
+      "string Error"
+    ],
+    "completed_semantics": "MapState observed and paused, not proof of loading completion, unobscured screen, renderer correctness or clean exit.",
+    "entry": "Call only for a claimed explicit diagnostic request or explicit diagnostic menu action. No OnSubModuleLoad auto-start. Start(false, ...) rejects. Never invoke for a save load.",
+    "slot": "mnbl_campaign_42",
+    "module": "MNBL.ProceduralWorld",
+    "module_callbacks": "No SubModule.OnGameInitializationFinished hook required: diagnostic manager override calls base then replaces creator after all submodule callbacks.",
+    "screenshot": "Root iterator verifies wrapper type, scene name, heights, loading completion and MapState, then screenshot/exit. Naval introductory inquiry may need dismissal using TaleWorlds.Library.InformationManager.HideInquiry()."
+  },
+  "boot_sequence": [
+    {
+      "step": 1,
+      "action": "Validate five fixture files under uniquely named slot. MBGameManager.StartNewGame(new diagnostic SandBoxGameManager subclass). Base constructor takes CampaignCreatorDelegate; delegate creates new Campaign(CampaignGameMode.Campaign), enum value 1 as official Sandbox menu.",
+      "evidence": [
+        {
+          "signature": "SandBox :: System.Void SandBox.SandBoxGameManager::.ctor(SandBox.SandBoxGameManager/CampaignCreatorDelegate) [public]",
+          "file": "build/research-sandbox/boot.il.txt",
+          "line": 3507,
+          "assembly": "D:\\SteamLibrary\\steamapps\\common\\Mount & Blade II Bannerlord\\Modules\\SandBox\\bin\\Win64_Shipping_Client\\SandBox.dll"
+        },
+        {
+          "signature": "SandBox :: System.Void SandBox.SandBoxGameManager::.ctor(TaleWorlds.SaveSystem.Load.LoadResult) [public]",
+          "file": "build/research-sandbox/boot.il.txt",
+          "line": 3519,
+          "assembly": "D:\\SteamLibrary\\steamapps\\common\\Mount & Blade II Bannerlord\\Modules\\SandBox\\bin\\Win64_Shipping_Client\\SandBox.dll"
+        },
+        {
+          "signature": "SandBox.View :: TaleWorlds.CampaignSystem.Campaign SandBox.View.SandBoxViewSubModule/<>c::<StartGame>b__35_0()",
+          "file": "build/research-sandbox/details.il.txt",
+          "line": 70637,
+          "assembly": "D:\\SteamLibrary\\steamapps\\common\\Mount & Blade II Bannerlord\\Modules\\SandBox\\bin\\Win64_Shipping_Client\\SandBox.View.dll"
+        },
+        {
+          "signature": "TaleWorlds.MountAndBlade :: System.Void TaleWorlds.MountAndBlade.MBGameManager::StartNewGame(TaleWorlds.MountAndBlade.MBGameManager) [public] [static]",
+          "file": "build/research-sandbox/boot.il.txt",
+          "line": 3428,
+          "assembly": "D:\\SteamLibrary\\steamapps\\common\\Mount & Blade II Bannerlord\\bin\\Win64_Shipping_Client\\TaleWorlds.MountAndBlade.dll"
+        }
+      ]
+    },
+    {
+      "step": 2,
+      "action": "In override public void OnGameInitializationFinished(Game game), call base first, then game.GameType as Campaign.MapSceneCreator = DiagnosticMapSceneCreator. Instance mutation only; official SandBox callback default creator assignment has already run.",
+      "evidence": [
+        {
+          "signature": "TaleWorlds.MountAndBlade :: System.Void TaleWorlds.MountAndBlade.MBGameManager::OnGameInitializationFinished(TaleWorlds.Core.Game) [public] [virtual]",
+          "file": "build/research-sandbox/details.il.txt",
+          "line": 12854,
+          "assembly": "D:\\SteamLibrary\\steamapps\\common\\Mount & Blade II Bannerlord\\bin\\Win64_Shipping_Client\\TaleWorlds.MountAndBlade.dll"
+        },
+        {
+          "signature": "SandBox :: System.Void SandBox.SandBoxSubModule::OnGameInitializationFinished(TaleWorlds.Core.Game) [public] [virtual]",
+          "file": "build/research-sandbox/finalize.il.txt",
+          "line": 364,
+          "assembly": "D:\\SteamLibrary\\steamapps\\common\\Mount & Blade II Bannerlord\\Modules\\SandBox\\bin\\Win64_Shipping_Client\\SandBox.dll"
+        },
+        {
+          "signature": "TaleWorlds.CampaignSystem :: System.Void TaleWorlds.CampaignSystem.Campaign::set_MapSceneCreator(TaleWorlds.CampaignSystem.Map.IMapSceneCreator) [public]",
+          "file": "build/research-sandbox/details.il.txt",
+          "line": 8,
+          "assembly": "D:\\SteamLibrary\\steamapps\\common\\Mount & Blade II Bannerlord\\bin\\Win64_Shipping_Client\\TaleWorlds.CampaignSystem.dll"
+        },
+        {
+          "signature": "TaleWorlds.CampaignSystem :: System.Void TaleWorlds.CampaignSystem.Campaign::OnInitialize() [virtual]",
+          "file": "build/research-sandbox/boot.il.txt",
+          "line": 81,
+          "assembly": "D:\\SteamLibrary\\steamapps\\common\\Mount & Blade II Bannerlord\\bin\\Win64_Shipping_Client\\TaleWorlds.CampaignSystem.dll"
+        },
+        {
+          "signature": "TaleWorlds.CampaignSystem :: System.Void TaleWorlds.CampaignSystem.Campaign::OnInitialize() [virtual] [protected]",
+          "file": "build/research-sandbox/verified.il.txt",
+          "line": 81,
+          "assembly": "D:\\SteamLibrary\\steamapps\\common\\Mount & Blade II Bannerlord\\bin\\Win64_Shipping_Client\\TaleWorlds.CampaignSystem.dll"
+        }
+      ]
+    },
+    {
+      "step": 3,
+      "action": "Campaign loading stage 2 invokes LoadMapScene. It assigns wrapper, calls inherited SetSceneLevels(level_1, level_2, level_3, siege, raid, burned) IL_005e, interface Load IL_0069, borders IL_007a and AfterLoad IL_00ff. Do not duplicate SetSceneLevels (dictionary Add would duplicate keys).",
+      "evidence": [
+        {
+          "signature": "TaleWorlds.CampaignSystem :: System.Void TaleWorlds.CampaignSystem.Campaign::DoLoadingForGameType(TaleWorlds.Core.GameTypeLoadingStates,TaleWorlds.Core.GameTypeLoadingStates&) [virtual]",
+          "file": "build/research-sandbox/boot.il.txt",
+          "line": 338,
+          "assembly": "D:\\SteamLibrary\\steamapps\\common\\Mount & Blade II Bannerlord\\bin\\Win64_Shipping_Client\\TaleWorlds.CampaignSystem.dll"
+        },
+        {
+          "signature": "TaleWorlds.CampaignSystem :: System.Void TaleWorlds.CampaignSystem.Campaign::DoLoadingForGameType(TaleWorlds.Core.GameTypeLoadingStates,TaleWorlds.Core.GameTypeLoadingStates&) [virtual] [protected]",
+          "file": "build/research-sandbox/verified.il.txt",
+          "line": 338,
+          "assembly": "D:\\SteamLibrary\\steamapps\\common\\Mount & Blade II Bannerlord\\bin\\Win64_Shipping_Client\\TaleWorlds.CampaignSystem.dll"
+        },
+        {
+          "signature": "TaleWorlds.CampaignSystem :: System.Void TaleWorlds.CampaignSystem.Campaign::LoadMapScene()",
+          "file": "build/research-sandbox/verified.il.txt",
+          "line": 2,
+          "assembly": "D:\\SteamLibrary\\steamapps\\common\\Mount & Blade II Bannerlord\\bin\\Win64_Shipping_Client\\TaleWorlds.CampaignSystem.dll"
+        },
+        {
+          "signature": "SandBox :: System.Void SandBox.MapScene::SetSceneLevels(System.Collections.Generic.List`1<System.String>) [public] [virtual] [final]",
+          "file": "build/research-sandbox/release.il.txt",
+          "line": 123,
+          "assembly": "D:\\SteamLibrary\\steamapps\\common\\Mount & Blade II Bannerlord\\Modules\\SandBox\\bin\\Win64_Shipping_Client\\SandBox.dll"
+        }
+      ]
+    },
+    {
+      "step": 4,
+      "action": "DiagnosticMapScene : SandBox.MapScene, IMapScene reimplements public new void Load(). Preserve base fields through reflection so inherited methods and Naval/Sandbox casts work. Read unique slot with explicit module; never invoke base.Load, publish Main_map, or rename scene to Main_map.",
+      "evidence": [
+        {
+          "signature": "SandBox :: System.Void SandBox.MapScene::Load() [public] [virtual]",
+          "file": "build/research-sandbox/details.il.txt",
+          "line": 18924,
+          "assembly": "D:\\SteamLibrary\\steamapps\\common\\Mount & Blade II Bannerlord\\Modules\\SandBox\\bin\\Win64_Shipping_Client\\SandBox.dll"
+        },
+        {
+          "signature": "SandBox :: System.Void SandBox.MapScene::Load() [public] [virtual] [final]",
+          "file": "build/research-sandbox/verified.il.txt",
+          "line": 591,
+          "assembly": "D:\\SteamLibrary\\steamapps\\common\\Mount & Blade II Bannerlord\\Modules\\SandBox\\bin\\Win64_Shipping_Client\\SandBox.dll"
+        },
+        {
+          "signature": "SandBox :: System.Void SandBox.MapScene::GetMapBorders(TaleWorlds.Library.Vec2&,TaleWorlds.Library.Vec2&,System.Single&) [public] [virtual]",
+          "file": "build/research-sandbox/extra.il.txt",
+          "line": 94,
+          "assembly": "D:\\SteamLibrary\\steamapps\\common\\Mount & Blade II Bannerlord\\Modules\\SandBox\\bin\\Win64_Shipping_Client\\SandBox.dll"
+        }
+      ]
+    },
+    {
+      "step": 5,
+      "action": "Override public void OnLoadFinished(): reinstall no-autosave manager (SandBox.OnCampaignStart replaces earlier manager), create CharacterCreationState through GameStateManager.CreateState, CleanAndPushState(state,0), set protected IsLoaded=true. This mirrors private LaunchSandboxCharacterCreation while skipping intro video only.",
+      "evidence": [
+        {
+          "signature": "SandBox :: System.Void SandBox.SandBoxGameManager::LaunchSandboxCharacterCreation()",
+          "file": "build/research-sandbox/boot.il.txt",
+          "line": 3817,
+          "assembly": "D:\\SteamLibrary\\steamapps\\common\\Mount & Blade II Bannerlord\\Modules\\SandBox\\bin\\Win64_Shipping_Client\\SandBox.dll"
+        },
+        {
+          "signature": "SandBox :: System.Void SandBox.SandBoxGameManager::OnLoadFinished() [public] [virtual]",
+          "file": "build/research-sandbox/boot.il.txt",
+          "line": 3669,
+          "assembly": "D:\\SteamLibrary\\steamapps\\common\\Mount & Blade II Bannerlord\\Modules\\SandBox\\bin\\Win64_Shipping_Client\\SandBox.dll"
+        },
+        {
+          "signature": "TaleWorlds.MountAndBlade :: System.Void TaleWorlds.MountAndBlade.MBGameManager::set_IsLoaded(System.Boolean)",
+          "file": "build/research-sandbox/extra.il.txt",
+          "line": 37,
+          "assembly": "D:\\SteamLibrary\\steamapps\\common\\Mount & Blade II Bannerlord\\bin\\Win64_Shipping_Client\\TaleWorlds.MountAndBlade.dll"
+        },
+        {
+          "signature": "TaleWorlds.MountAndBlade :: System.Void TaleWorlds.MountAndBlade.MBGameManager::set_IsLoaded(System.Boolean) [protected]",
+          "file": "build/research-sandbox/finalize.il.txt",
+          "line": 159,
+          "assembly": "D:\\SteamLibrary\\steamapps\\common\\Mount & Blade II Bannerlord\\bin\\Win64_Shipping_Client\\TaleWorlds.MountAndBlade.dll"
+        },
+        {
+          "signature": "SandBox :: System.Void SandBox.SandBoxSubModule::OnCampaignStart(TaleWorlds.Core.Game,System.Object) [public] [virtual]",
+          "file": "build/research-sandbox/boot.il.txt",
+          "line": 4004,
+          "assembly": "D:\\SteamLibrary\\steamapps\\common\\Mount & Blade II Bannerlord\\Modules\\SandBox\\bin\\Win64_Shipping_Client\\SandBox.dll"
+        }
+      ]
+    },
+    {
+      "step": 6,
+      "action": "Tick only owned active CharacterCreationState. Advance culture, face, narrative, banner, clan, review, options one stage/menu per tick. Use NextStage for OnFinalize/OnStageCompleted and final ApplyFinalEffects then FinalizeCharacterCreationState. Do not finalize state directly or construct manager before campaign loading.",
+      "evidence": [
+        {
+          "signature": "TaleWorlds.CampaignSystem :: System.Void TaleWorlds.CampaignSystem.CharacterCreationContent.CharacterCreationState::.ctor() [public]",
+          "file": "build/research-sandbox/boot.il.txt",
+          "line": 2093,
+          "assembly": "D:\\SteamLibrary\\steamapps\\common\\Mount & Blade II Bannerlord\\bin\\Win64_Shipping_Client\\TaleWorlds.CampaignSystem.dll"
+        },
+        {
+          "signature": "TaleWorlds.CampaignSystem :: System.Void TaleWorlds.CampaignSystem.CharacterCreationContent.CharacterCreationManager::.ctor(TaleWorlds.CampaignSystem.CharacterCreationContent.CharacterCreationState) [public]",
+          "file": "build/research-sandbox/boot.il.txt",
+          "line": 1169,
+          "assembly": "D:\\SteamLibrary\\steamapps\\common\\Mount & Blade II Bannerlord\\bin\\Win64_Shipping_Client\\TaleWorlds.CampaignSystem.dll"
+        },
+        {
+          "signature": "TaleWorlds.CampaignSystem :: System.Void TaleWorlds.CampaignSystem.CharacterCreationContent.CharacterCreationManager::NextStage() [public]",
+          "file": "build/research-sandbox/boot.il.txt",
+          "line": 1326,
+          "assembly": "D:\\SteamLibrary\\steamapps\\common\\Mount & Blade II Bannerlord\\bin\\Win64_Shipping_Client\\TaleWorlds.CampaignSystem.dll"
+        },
+        {
+          "signature": "TaleWorlds.CampaignSystem :: System.Void TaleWorlds.CampaignSystem.CharacterCreationContent.CharacterCreationState::FinalizeCharacterCreationState() [public]",
+          "file": "build/research-sandbox/boot.il.txt",
+          "line": 2122,
+          "assembly": "D:\\SteamLibrary\\steamapps\\common\\Mount & Blade II Bannerlord\\bin\\Win64_Shipping_Client\\TaleWorlds.CampaignSystem.dll"
+        }
+      ]
+    },
+    {
+      "step": 7,
+      "action": "Stop and lock time immediately after final NextStage and on subsequent MapState ticks. Root observes render/loading readiness and captures screenshot, then exits without save.",
+      "evidence": [
+        {
+          "signature": "TaleWorlds.CampaignSystem :: System.Void TaleWorlds.CampaignSystem.Campaign::SetTimeControlModeLock(System.Boolean) [public]",
+          "file": "build/research-sandbox/save-interface.il.txt",
+          "line": 91,
+          "assembly": "D:\\SteamLibrary\\steamapps\\common\\Mount & Blade II Bannerlord\\bin\\Win64_Shipping_Client\\TaleWorlds.CampaignSystem.dll"
+        },
+        {
+          "signature": "TaleWorlds.CampaignSystem :: System.Void TaleWorlds.CampaignSystem.Campaign::set_TimeControlModeLock(System.Boolean)",
+          "file": "build/research-sandbox/safety.il.txt",
+          "line": 2,
+          "assembly": "D:\\SteamLibrary\\steamapps\\common\\Mount & Blade II Bannerlord\\bin\\Win64_Shipping_Client\\TaleWorlds.CampaignSystem.dll"
+        },
+        {
+          "signature": "TaleWorlds.CampaignSystem :: System.Void TaleWorlds.CampaignSystem.Campaign::set_TimeControlMode(TaleWorlds.CampaignSystem.CampaignTimeControlMode) [public]",
+          "file": "build/research-sandbox/safety.il.txt",
+          "line": 9,
+          "assembly": "D:\\SteamLibrary\\steamapps\\common\\Mount & Blade II Bannerlord\\bin\\Win64_Shipping_Client\\TaleWorlds.CampaignSystem.dll"
+        },
+        {
+          "signature": "TaleWorlds.CampaignSystem :: System.Int32 TaleWorlds.CampaignSystem.ISaveManager::GetAutoSaveInterval() [public] [virtual]",
+          "file": "build/research-sandbox/save-interface.il.txt",
+          "line": 98,
+          "assembly": "D:\\SteamLibrary\\steamapps\\common\\Mount & Blade II Bannerlord\\bin\\Win64_Shipping_Client\\TaleWorlds.CampaignSystem.dll"
+        },
+        {
+          "signature": "TaleWorlds.CampaignSystem :: System.Boolean TaleWorlds.CampaignSystem.ISaveManager::IsAutoSaveDisabled() [public] [virtual]",
+          "file": "build/research-sandbox/save-interface.il.txt",
+          "line": 101,
+          "assembly": "D:\\SteamLibrary\\steamapps\\common\\Mount & Blade II Bannerlord\\bin\\Win64_Shipping_Client\\TaleWorlds.CampaignSystem.dll"
+        },
+        {
+          "signature": "TaleWorlds.CampaignSystem :: System.Void TaleWorlds.CampaignSystem.ISaveManager::OnSaveOver(System.Boolean,System.String) [public] [virtual]",
+          "file": "build/research-sandbox/save-interface.il.txt",
+          "line": 104,
+          "assembly": "D:\\SteamLibrary\\steamapps\\common\\Mount & Blade II Bannerlord\\bin\\Win64_Shipping_Client\\TaleWorlds.CampaignSystem.dll"
+        },
+        {
+          "signature": "TaleWorlds.CampaignSystem :: System.Boolean TaleWorlds.CampaignSystem.SaveHandler::get__isAutoSaveEnabled()",
+          "file": "build/research-sandbox/safety.il.txt",
+          "line": 474,
+          "assembly": "D:\\SteamLibrary\\steamapps\\common\\Mount & Blade II Bannerlord\\bin\\Win64_Shipping_Client\\TaleWorlds.CampaignSystem.dll"
+        },
+        {
+          "signature": "TaleWorlds.CampaignSystem :: System.Void TaleWorlds.CampaignSystem.SaveHandler::TryAutoSave(System.Boolean)",
+          "file": "build/research-sandbox/safety.il.txt",
+          "line": 520,
+          "assembly": "D:\\SteamLibrary\\steamapps\\common\\Mount & Blade II Bannerlord\\bin\\Win64_Shipping_Client\\TaleWorlds.CampaignSystem.dll"
+        }
+      ]
+    }
+  ],
+  "character_creation": {
+    "culture": "Registered empire culture selected through content.GetCultures(), content.SetSelectedCulture(culture, manager). Diagnostic keeps generated/default appearance; it does not claim UI-equivalent chosen-culture face randomization.",
+    "narrative": "StartNarrativeStage; for each CurrentMenu pick first GetSuitableNarrativeMenuOptions; OnNarrativeMenuOptionSelected executes OnSelect; TrySwitchToNextMenu executes OnConsequence even on final menu. Repeated/missing menu and no option fail closed; 128 step limit.",
+    "banner_and_names": "Preserve player clan banner, assign primary/icon colors and UpdateBannerColor, SetMainClanBanner. ChangeClanName with explicit diagnostic TextObject. SetMainCharacterName and Hero.SetName before leaving review.",
+    "callbacks": "NextStage finalizes active stage, invokes every OnStageCompleted handler; at last stage applies culture, narrative final effects, traits, valid culture start position and content finalizers, then pushes MapState, marks party visual dirty, invokes handler finalization and OnCharacterCreationIsOver.",
+    "important_active_state_requirement": "CharacterCreationCampaignBehavior.FaceGenUpdated reads GameStateManager.Current.ActiveState as CharacterCreationState without a null guard. Do not use an unpushed/headless state while advancing stages.",
+    "evidence": [
+      {
+        "signature": "TaleWorlds.CampaignSystem :: System.Void TaleWorlds.CampaignSystem.CharacterCreationContent.CharacterCreationManager::StartNarrativeStage() [public]",
+        "file": "build/research-sandbox/boot.il.txt",
+        "line": 1618,
+        "assembly": "D:\\SteamLibrary\\steamapps\\common\\Mount & Blade II Bannerlord\\bin\\Win64_Shipping_Client\\TaleWorlds.CampaignSystem.dll"
+      },
+      {
+        "signature": "TaleWorlds.CampaignSystem :: System.Boolean TaleWorlds.CampaignSystem.CharacterCreationContent.CharacterCreationManager::TrySwitchToNextMenu() [public]",
+        "file": "build/research-sandbox/boot.il.txt",
+        "line": 1640,
+        "assembly": "D:\\SteamLibrary\\steamapps\\common\\Mount & Blade II Bannerlord\\bin\\Win64_Shipping_Client\\TaleWorlds.CampaignSystem.dll"
+      },
+      {
+        "signature": "TaleWorlds.CampaignSystem :: System.Void TaleWorlds.CampaignSystem.CharacterCreationContent.CharacterCreationManager::OnNarrativeMenuOptionSelected(TaleWorlds.CampaignSystem.CharacterCreationContent.NarrativeMenuOption) [public]",
+        "file": "build/research-sandbox/boot.il.txt",
+        "line": 1847,
+        "assembly": "D:\\SteamLibrary\\steamapps\\common\\Mount & Blade II Bannerlord\\bin\\Win64_Shipping_Client\\TaleWorlds.CampaignSystem.dll"
+      },
+      {
+        "signature": "TaleWorlds.CampaignSystem :: System.Void TaleWorlds.CampaignSystem.CharacterCreationContent.CharacterCreationManager::ApplyFinalEffects() [public]",
+        "file": "build/research-sandbox/boot.il.txt",
+        "line": 1871,
+        "assembly": "D:\\SteamLibrary\\steamapps\\common\\Mount & Blade II Bannerlord\\bin\\Win64_Shipping_Client\\TaleWorlds.CampaignSystem.dll"
+      },
+      {
+        "signature": "TaleWorlds.CampaignSystem :: System.Void TaleWorlds.CampaignSystem.CampaignBehaviors.CharacterCreationCampaignBehavior::FaceGenUpdated() [public]",
+        "file": "build/research-sandbox/details.il.txt",
+        "line": 439,
+        "assembly": "D:\\SteamLibrary\\steamapps\\common\\Mount & Blade II Bannerlord\\bin\\Win64_Shipping_Client\\TaleWorlds.CampaignSystem.dll"
+      },
+      {
+        "signature": "StoryMode :: System.Void StoryMode.GameComponents.CampaignBehaviors.StoryModeCharacterCreationCampaignBehavior::FaceGenUpdated()",
+        "file": "build/research-sandbox/details.il.txt",
+        "line": 71689,
+        "assembly": "D:\\SteamLibrary\\steamapps\\common\\Mount & Blade II Bannerlord\\Modules\\StoryMode\\bin\\Win64_Shipping_Client\\StoryMode.dll"
+      },
+      {
+        "signature": "SandBox.GauntletUI :: System.Void SandBox.GauntletUI.CharacterCreation.CharacterCreationBannerEditorView::AffirmativeAction()",
+        "file": "build/research-sandbox/finalize.il.txt",
+        "line": 385,
+        "assembly": "D:\\SteamLibrary\\steamapps\\common\\Mount & Blade II Bannerlord\\Modules\\SandBox\\bin\\Win64_Shipping_Client\\SandBox.GauntletUI.dll"
+      },
+      {
+        "signature": "SandBox.GauntletUI :: System.Void SandBox.GauntletUI.CharacterCreation.CharacterCreationReviewStageView::NextStage() [public] [virtual]",
+        "file": "build/research-sandbox/finalize.il.txt",
+        "line": 1506,
+        "assembly": "D:\\SteamLibrary\\steamapps\\common\\Mount & Blade II Bannerlord\\Modules\\SandBox\\bin\\Win64_Shipping_Client\\SandBox.GauntletUI.dll"
+      }
+    ]
+  },
+  "map_load_contract": {
+    "ordered_calls": [
+      "CreateNewScene(false,true,(DecalAtlasGroup)1,\"MapScene\")",
+      "Set base _scene before all dependent initialization",
+      "SetClothSimulationState(true)",
+      "CreateNewAgentRendererSceneController; store base field; SetDoTimerBasedForcedSkeletonUpdates(false)",
+      "SetOcclusionMode(true)",
+      "SceneInitializationData(true): UsePhysicsMaterials=false, EnableFloraPhysics=false, UseTerrainMeshBlending=false, CreateOros=false",
+      "SetFetchCrcInfoOfScene(true)",
+      "inherited DisableUnwalkableNavigationMeshes()",
+      "SetNavMeshRegionMap(SandBoxHelpers.MapSceneHelper.GetRegionMapping(PartyNavigationModel))",
+      "Read(slot,module,ref init,\"\")",
+      "Utilities.SetAllocationAlwaysValidScene",
+      "Read border_min/max frames into three base border fields",
+      "DisableStaticShadows(true); InvalidateTerrainPhysicsMaterials; SetDontLoadInvisibleEntities(true)",
+      "Optional medit_water_plane.SetDoNotCheckVisibility(true); Town Scene Manager warning",
+      "MBMapScene.LoadAtmosphereData(scene)",
+      "MapWeatherModel.InitializeCaches(); MBMapScene.ValidateTerrainSoundIds()",
+      "OptimizeScene(true,false)",
+      "GetTerrainData(out nodes,out nodeSize,out layerCount,out layerVersion); store _terrainSize",
+      "GetBattleSceneIndexMap(scene,ref byteArray,ref width,ref height); store three base fields",
+      "scene.Tick(0.1f)",
+      "CampaignLateAITickTask=AsyncTask.CreateWithDelegate(new ManagedDelegate { Instance=Campaign.LateAITick },false)"
+    ],
+    "metadata": "build/research-sandbox/metadata.txt",
+    "changes_from_official": "Unique module-qualified Read; file/field preflight; explicit missing-border exception; logging instead of Town Scene Manager popup; one-load guard. Original managed initialization order retained.",
+    "document_corrections": [
+      "scene-bundle.md first CreateNewScene argument is false in installed IL, not true.",
+      "MapColorGradeManager entity is null-checked in MapScreen.OnInitialize.",
+      "Siege-cache projectile_position children are read from dynamically instantiated siege prefabs; do not assume they belong under cache entity itself."
+    ]
+  },
+  "scene_entities": [
+    {
+      "item": "border_min / border_max",
+      "status": "hard managed load requirement",
+      "reason": "Official Load dereferences global frame without guard; max.z determines campaign maximum height.",
+      "evidence": [
+        {
+          "signature": "SandBox :: System.Void SandBox.MapScene::Load() [public] [virtual]",
+          "file": "build/research-sandbox/details.il.txt",
+          "line": 18924,
+          "assembly": "D:\\SteamLibrary\\steamapps\\common\\Mount & Blade II Bannerlord\\Modules\\SandBox\\bin\\Win64_Shipping_Client\\SandBox.dll"
+        },
+        {
+          "signature": "SandBox :: System.Void SandBox.MapScene::Load() [public] [virtual] [final]",
+          "file": "build/research-sandbox/verified.il.txt",
+          "line": 591,
+          "assembly": "D:\\SteamLibrary\\steamapps\\common\\Mount & Blade II Bannerlord\\Modules\\SandBox\\bin\\Win64_Shipping_Client\\SandBox.dll"
+        }
+      ]
+    },
+    {
+      "item": "CampaignMapSiegePrefabEntityCache",
+      "status": "hard managed MapScreen requirement",
+      "reason": "MapScreen.OnInitialize IL_0229..022e dereferences entity. OnInit uses registered siege prefabs and projectile_position descendants.",
+      "evidence": [
+        {
+          "signature": "SandBox.View :: System.Void SandBox.View.Map.MapScreen::OnInitialize() [virtual]",
+          "file": "build/research-sandbox/details.il.txt",
+          "line": 70643,
+          "assembly": "D:\\SteamLibrary\\steamapps\\common\\Mount & Blade II Bannerlord\\Modules\\SandBox\\bin\\Win64_Shipping_Client\\SandBox.View.dll"
+        },
+        {
+          "signature": "SandBox :: System.Void SandBox.CampaignMapSiegePrefabEntityCache::OnInit() [virtual]",
+          "file": "build/research-sandbox/details.il.txt",
+          "line": 18444,
+          "assembly": "D:\\SteamLibrary\\steamapps\\common\\Mount & Blade II Bannerlord\\Modules\\SandBox\\bin\\Win64_Shipping_Client\\SandBox.dll"
+        }
+      ]
+    },
+    {
+      "item": "MapSnowAndRainDefiner / SnowAndRainTextureDefiner",
+      "status": "retain weather initialization dependency",
+      "reason": "SetDataToScene allocates snow/rain/wind data via MapScene.SetSnowAndRainDataWithDimension.",
+      "evidence": [
+        {
+          "signature": "SandBox.View :: System.Void SandBox.View.Map.SnowAndRainTextureDefiner::SetDataToScene()",
+          "file": "build/research-sandbox/details.il.txt",
+          "line": 70916,
+          "assembly": "D:\\SteamLibrary\\steamapps\\common\\Mount & Blade II Bannerlord\\Modules\\SandBox\\bin\\Win64_Shipping_Client\\SandBox.View.dll"
+        },
+        {
+          "signature": "SandBox :: System.Void SandBox.MapScene::SetSnowAndRainDataWithDimension(TaleWorlds.Engine.Texture,System.Int32) [public]",
+          "file": "build/research-sandbox/finalize.il.txt",
+          "line": 166,
+          "assembly": "D:\\SteamLibrary\\steamapps\\common\\Mount & Blade II Bannerlord\\Modules\\SandBox\\bin\\Win64_Shipping_Client\\SandBox.dll"
+        }
+      ]
+    },
+    {
+      "item": "Town Scene Manager",
+      "status": "warning-only managed check; retain",
+      "evidence": [
+        {
+          "signature": "SandBox :: System.Void SandBox.MapScene::Load() [public] [virtual]",
+          "file": "build/research-sandbox/details.il.txt",
+          "line": 18924,
+          "assembly": "D:\\SteamLibrary\\steamapps\\common\\Mount & Blade II Bannerlord\\Modules\\SandBox\\bin\\Win64_Shipping_Client\\SandBox.dll"
+        },
+        {
+          "signature": "SandBox :: System.Void SandBox.MapScene::Load() [public] [virtual] [final]",
+          "file": "build/research-sandbox/verified.il.txt",
+          "line": 591,
+          "assembly": "D:\\SteamLibrary\\steamapps\\common\\Mount & Blade II Bannerlord\\Modules\\SandBox\\bin\\Win64_Shipping_Client\\SandBox.dll"
+        }
+      ]
+    },
+    {
+      "item": "MapColorGradeManager",
+      "status": "optional at traced MapScreen initialization check; retain for normal rendering",
+      "evidence": [
+        {
+          "signature": "SandBox.View :: System.Void SandBox.View.Map.MapScreen::OnInitialize() [virtual]",
+          "file": "build/research-sandbox/details.il.txt",
+          "line": 70643,
+          "assembly": "D:\\SteamLibrary\\steamapps\\common\\Mount & Blade II Bannerlord\\Modules\\SandBox\\bin\\Win64_Shipping_Client\\SandBox.View.dll"
+        }
+      ]
+    },
+    {
+      "item": "SettlementPositionScript, settlement StringId entities with Town Entity Manager and official children/tags",
+      "status": "retain official campaign scaffolding for this fixture",
+      "reason": "Distance cache registration and settlement visuals remain official. Boot does not establish minimal generated campaign data.",
+      "evidence": [
+        {
+          "signature": "SandBox.View :: System.Void SandBox.View.Map.SettlementPositionScript::InitializeCachedVariables()",
+          "file": "build/research-sandbox/extra.il.txt",
+          "line": 153,
+          "assembly": "D:\\SteamLibrary\\steamapps\\common\\Mount & Blade II Bannerlord\\Modules\\SandBox\\bin\\Win64_Shipping_Client\\SandBox.View.dll"
+        },
+        {
+          "signature": "SandBox.View :: System.Void SandBox.View.Map.Visuals.SettlementVisual::OnStartup()",
+          "file": "build/research-sandbox/details.il.txt",
+          "line": 70939,
+          "assembly": "D:\\SteamLibrary\\steamapps\\common\\Mount & Blade II Bannerlord\\Modules\\SandBox\\bin\\Win64_Shipping_Client\\SandBox.View.dll"
+        }
+      ]
+    },
+    {
+      "item": "PirateSpawnPoint and main_map_village_dropoff",
+      "status": "retain for NavalDLC",
+      "reason": "Pirate points are enumerated; dropoff tag parent matching must find a Village before unguarded Settlement dereference. Keep exact official parent names/hierarchy.",
+      "evidence": [
+        {
+          "signature": "NavalDLC.View :: System.Void NavalDLC.View.NavalMapSceneWrapper::InitializePirateSpawnPoints()",
+          "file": "build/research-sandbox/release.il.txt",
+          "line": 15,
+          "assembly": "D:\\SteamLibrary\\steamapps\\common\\Mount & Blade II Bannerlord\\Modules\\NavalDLC\\bin\\Win64_Shipping_Client\\NavalDLC.View.dll"
+        },
+        {
+          "signature": "NavalDLC.View :: System.Void NavalDLC.View.NavalMapSceneWrapper::InitializeDropOffLocations()",
+          "file": "build/research-sandbox/release.il.txt",
+          "line": 70,
+          "assembly": "D:\\SteamLibrary\\steamapps\\common\\Mount & Blade II Bannerlord\\Modules\\NavalDLC\\bin\\Win64_Shipping_Client\\NavalDLC.View.dll"
+        }
+      ]
+    },
+    {
+      "item": "water/rivers/landscape decoration",
+      "status": "no new proven managed boot blocker from omission; native behavior unverified",
+      "reason": "Naval wrapper unconditionally SetupWaterWake(128,8). Managed trace cannot prove no-water native success.",
+      "evidence": [
+        {
+          "signature": "NavalDLC.View :: System.Void NavalDLC.View.NavalMapSceneWrapper::InitializeMapWaterWake()",
+          "file": "build/research-sandbox/release.il.txt",
+          "line": 114,
+          "assembly": "D:\\SteamLibrary\\steamapps\\common\\Mount & Blade II Bannerlord\\Modules\\NavalDLC\\bin\\Win64_Shipping_Client\\NavalDLC.View.dll"
+        }
+      ]
+    }
+  ],
+  "safe_activation": {
+    "no_global_override": "No SceneObj/Main_map publication, no global creator substitution, no engine patch/Harmony, no scene.SetName(\"Main_map\"), no permanent module distance-cache override.",
+    "autosave": "Campaign-local ISaveManager returns GetAutoSaveInterval=-1 and IsAutoSaveDisabled=true; installed in initialization and again OnLoadFinished after SandBox.OnCampaignStart. SaveHandler.TryAutoSave returns at IL_0006 when interval <= -1.",
+    "manual_save_limit": "ISaveManager does not intercept explicit SaveAs/QuickSave calls. Diagnostic harness must not invoke save actions or allow interactive saving before exit. No such calls exist in owned bootstrap.",
+    "vanilla_isolation": "Diagnostic new-game manager only; no save-load constructor. Static Start checks opt-in and absence of Game.Current. Per-campaign pause lock and save manager discarded with diagnostic campaign."
+  },
+  "remaining_unknowns": [
+    "Sidecar performed no runtime execution. Root reports first boot passed (PID25644); no further native/character boot blocker observed in that run.",
+    "No-water fixture boot passed per root, but sea nav groups and dry generated terrain are not full navigation/gameplay acceptance.",
+    "Naval Call of the Oceans inquiry is shown by OnCharacterCreationIsOver at IL_006b with null affirmative/negative actions. It may cover screenshot despite Completed=true; public HideInquiry only invokes OnHideInquiry.",
+    "Selected culture start XY may be invalid for altered nav topology; ApplyFinalEffects asserts then searches closest valid face. Fixture retains official face XY/groups by root report; heights alone do not certify native navigation.",
+    "Retained official weather, battle map, settlements, distance caches and naval data are bootstrap scaffolding, not generated content. Module-qualified unique name also differs from ShipWaterEffects Main_map name check.",
+    "Exact globally minimal campaign entity set cannot be proved through managed IL because native components load scene scripts/prefabs. This release lists hard managed dereferences and retains official scaffolding."
+  ],
+  "naval_inquiry_evidence": [
+    {
+      "signature": "NavalDLC :: System.Void NavalDLC.CampaignBehaviors.NavalInitializationCampaignBehavior::OnCharacterCreationIsOver()",
+      "file": "build/research-sandbox/safety.il.txt",
+      "line": 1071,
+      "assembly": "D:\\SteamLibrary\\steamapps\\common\\Mount & Blade II Bannerlord\\Modules\\NavalDLC\\bin\\Win64_Shipping_Client\\NavalDLC.dll"
+    },
+    {
+      "signature": "TaleWorlds.Library :: System.Void TaleWorlds.Library.InformationManager::HideInquiry() [public] [static]",
+      "file": "build/research-sandbox/release.il.txt",
+      "line": 5,
+      "assembly": "D:\\SteamLibrary\\steamapps\\common\\Mount & Blade II Bannerlord\\bin\\Win64_Shipping_Client\\TaleWorlds.Library.dll"
+    }
+  ],
+  "assemblies_sha256": {
+    "D:\\SteamLibrary\\steamapps\\common\\Mount & Blade II Bannerlord\\bin\\Win64_Shipping_Client\\TaleWorlds.CampaignSystem.dll": "1f8e33e2ed73e6ec653d7629180afb70649ddc6e5bd1657a802a264efda1c3ae",
+    "D:\\SteamLibrary\\steamapps\\common\\Mount & Blade II Bannerlord\\bin\\Win64_Shipping_Client\\TaleWorlds.MountAndBlade.dll": "19387f31557ff840d14f378f6bbdf1d58fcff406ab9ff2294dfbb3e49a50b87e",
+    "D:\\SteamLibrary\\steamapps\\common\\Mount & Blade II Bannerlord\\Modules\\NavalDLC\\bin\\Win64_Shipping_Client\\NavalDLC.dll": "146e16de9ac242ef63047cc337c858ffaf24a7b153f7bd7e18f1ccca1d268a94",
+    "D:\\SteamLibrary\\steamapps\\common\\Mount & Blade II Bannerlord\\Modules\\SandBox\\bin\\Win64_Shipping_Client\\SandBox.dll": "587c6e94c425745c1478f632f3b66226ff8298666cb27e8e6d9a62488df5956a",
+    "D:\\SteamLibrary\\steamapps\\common\\Mount & Blade II Bannerlord\\Modules\\SandBox\\bin\\Win64_Shipping_Client\\SandBox.View.dll": "c7360e71da06799a0cb6c00c4a0cfab5877621197ba25101433ac28654d169e2",
+    "D:\\SteamLibrary\\steamapps\\common\\Mount & Blade II Bannerlord\\Modules\\StoryMode\\bin\\Win64_Shipping_Client\\StoryMode.dll": "cc205186bca26ea04197c543f06bfd14ec7ca8a94b559a3a2753921c4bb27ef0",
+    "D:\\SteamLibrary\\steamapps\\common\\Mount & Blade II Bannerlord\\bin\\Win64_Shipping_Client\\TaleWorlds.MountAndBlade.AutoGenerated.dll": "b392461201996aec3dc5b7b3b0a4f57918f712681d3d6c32bc398df633662174",
+    "D:\\SteamLibrary\\steamapps\\common\\Mount & Blade II Bannerlord\\bin\\Win64_Shipping_Client\\TaleWorlds.CampaignSystem.ViewModelCollection.dll": "5d817a46456d07b5e4382a870795fd9f8d6f11b4707a91d8a8b5d5cd50e762a5",
+    "D:\\SteamLibrary\\steamapps\\common\\Mount & Blade II Bannerlord\\Modules\\Native\\bin\\Win64_Shipping_Client\\TaleWorlds.MountAndBlade.View.dll": "ffaac5ed867cd299f8c14f58ffee64f86e50d8b197db5f966759524c3e574ba1",
+    "D:\\SteamLibrary\\steamapps\\common\\Mount & Blade II Bannerlord\\Modules\\NavalDLC\\bin\\Win64_Shipping_Client\\NavalDLC.View.dll": "4d074b0558467b534e06aa132c5b9ade0c0e431007a42a754fe61e39674fab8b",
+    "D:\\SteamLibrary\\steamapps\\common\\Mount & Blade II Bannerlord\\Modules\\SandBox\\bin\\Win64_Shipping_Client\\SandBox.GauntletUI.AutoGenerated.0.dll": "4d4575b4953b168c6b23d68262b67b824740cb17c5691a1bde3c249bb2f022ac",
+    "D:\\SteamLibrary\\steamapps\\common\\Mount & Blade II Bannerlord\\Modules\\SandBox\\bin\\Win64_Shipping_Client\\SandBox.GauntletUI.AutoGenerated.1.dll": "c7871e36940473b7a59b40885baf4d9c242f4182fb596be8ebae0b420a2c5122",
+    "D:\\SteamLibrary\\steamapps\\common\\Mount & Blade II Bannerlord\\Modules\\SandBox\\bin\\Win64_Shipping_Client\\SandBox.GauntletUI.dll": "69f2a87c3c3883d04ece46200c5cddf39c188f0ee7c20e26c47fcf64c0f97ed3",
+    "D:\\SteamLibrary\\steamapps\\common\\Mount & Blade II Bannerlord\\bin\\Win64_Shipping_Client\\TaleWorlds.Library.dll": "ab4ff23e94a6f4b6f293d0cb4333cae731a0499063fe4a8b6c6a3770de32c4e5"
+  },
+  "trace_artifacts": [
+    {
+      "path": "build/research-sandbox/boot.il.txt",
+      "sha256": "19e5797a9f6a61d369cd553b097461997303383bc1f099257c8878de3524737f"
+    },
+    {
+      "path": "build/research-sandbox/contracts.il.txt",
+      "sha256": "0ed0a52724d868a419921cd396262a713b43c89a0166cc79af73f3659909acb2"
+    },
+    {
+      "path": "build/research-sandbox/details.il.txt",
+      "sha256": "678e61f4252b882aead1aab85da05bb532560f46e5e05f235223d5a09a71ef2a"
+    },
+    {
+      "path": "build/research-sandbox/extra.il.txt",
+      "sha256": "e13930f2a8aad9aab9c3e089b56904ac72dbfa770441d8019d9a2729f99bb147"
+    },
+    {
+      "path": "build/research-sandbox/finalize.il.txt",
+      "sha256": "af70f74b075368f621d1796d82b493726b033111866833e4ffff45711bd7e0fd"
+    },
+    {
+      "path": "build/research-sandbox/release.il.txt",
+      "sha256": "365a1758896521738fdbab3a4302188f079f9292c71abb67e02b649893d4cac2"
+    },
+    {
+      "path": "build/research-sandbox/safety.il.txt",
+      "sha256": "2318a5ff8201213a5b214ba592c7ac0137faea8cd5f34840b131394d7390a087"
+    },
+    {
+      "path": "build/research-sandbox/save-interface.il.txt",
+      "sha256": "17e56561eabc4b214b7c621055fc807cbd365ad3f7774720e5389ca6cfa1fb94"
+    },
+    {
+      "path": "build/research-sandbox/verified.il.txt",
+      "sha256": "c749c5e86dd411877fcd778ec0bf7e536cc94480324d0c30a0e48b0262336d76"
+    }
+  ],
+  "reproduce": "Use Windows PowerShell 5.1: powershell.exe -NoProfile -File build/research-sandbox/Trace.ps1 -Mode methods -Needles <type::method substrings> -Out <owned .il.txt>. Metadata.ps1 reads method flags/out-ref metadata. Trace uses installed Mono.Cecil 0.11.0.0. No installed assembly execution.",
+  "root_runtime_result": {
+    "source": "user/root report, not independently observed by sidecar",
+    "pid": 25644,
+    "observed": [
+      "MapState",
+      "NavalMapScreen",
+      "DiagnosticMapScene mnbl_campaign_42 owned module",
+      "loading_finished",
+      "seed42 heights match",
+      "terrain and campaign UI screenshot with Call of the Oceans inquiry",
+      "clean exit",
+      "existing saves unchanged"
+    ]
+  }
+}

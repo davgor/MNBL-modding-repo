@@ -1,0 +1,120 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "mnbl.projection/1",
+  "title": "MNBL campaign world projection",
+  "description": "The resolved projection of one generated world (projection.json, written by worldbridge --project). It is canonical JSON (mnbl.canonical-json/1), and its SHA-256 is the projection identity that terrain.bin, terrain.json, objects.json and manifest.json carry. The policy (worldgen/policies/projection.json, schema mnbl.projection-policy v1) chooses the free parameters; this document resolves them against the world's own radius, sea level and grid. Free-text members state the exact formulas the C++ object (src/WorldBridge/src/projection.cpp) evaluates.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "version", "policySha256", "projection", "source", "centralMeridianDeg", "seam", "target", "axes", "forward", "inverse", "horizontal", "vertical", "periodicLayout", "paths", "seaContinuity", "singular", "calibration", "tradeoffs", "duplicateSeam"],
+  "$defs": {
+    "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "formula": { "type": "string", "minLength": 1 }
+  },
+  "properties": {
+    "schema": { "const": "mnbl.projection" },
+    "version": { "const": 1 },
+    "policySha256": { "$ref": "#/$defs/sha256", "description": "SHA-256 of the canonical JSON of the policy's mapping members (schema, version, projection, projectionVersion, centralMeridianDeg, logicalWidth, heightRatio, verticalScale, stripRatio, poleMarginRatio, calibration); notes are not hashed." },
+    "projection": {
+      "type": "object", "additionalProperties": false, "required": ["name", "version"],
+      "properties": { "name": { "const": "periodic-equirectangular" }, "version": { "const": 1 } }
+    },
+    "source": {
+      "type": "object", "additionalProperties": false,
+      "required": ["layoutSeed", "gridSide", "nodeCount", "radiusM", "seaLevelM", "longitudeDeg", "latitudeDeg", "coverage", "samples"],
+      "properties": {
+        "layoutSeed": { "type": "string", "pattern": "^(0|[1-9][0-9]{0,19})$" },
+        "gridSide": { "type": "integer", "minimum": 3, "maximum": 65537 },
+        "nodeCount": { "type": "integer", "description": "2 + (n - 2)(n - 1): the poles collapse to one node each and column n-1 duplicates column 0." },
+        "radiusM": { "type": "number", "exclusiveMinimum": 0, "description": "topology.radius_m (metres), never the design-space config." },
+        "seaLevelM": { "type": "number", "description": "effective_config.sea_level (metres of radial height)." },
+        "longitudeDeg": { "const": [-180, 180] },
+        "latitudeDeg": { "const": [90, -90] },
+        "coverage": { "$ref": "#/$defs/formula" },
+        "samples": { "$ref": "#/$defs/formula" }
+      }
+    },
+    "centralMeridianDeg": { "type": "number", "minimum": -180, "exclusiveMaximum": 180 },
+    "seam": {
+      "type": "object", "additionalProperties": false, "required": ["longitudeDeg", "x", "wrapIntervalDeg", "wrapIntervalWorldUnits"],
+      "properties": {
+        "longitudeDeg": { "type": "number" },
+        "x": { "const": "0 = W" },
+        "wrapIntervalDeg": { "const": 360 },
+        "wrapIntervalWorldUnits": { "type": "number", "exclusiveMinimum": 0 }
+      }
+    },
+    "target": {
+      "type": "object", "additionalProperties": false, "required": ["units", "logicalWidth", "logicalHeight", "x", "y"],
+      "properties": {
+        "units": { "const": "campaign world units" },
+        "logicalWidth": { "type": "number", "exclusiveMinimum": 0 },
+        "logicalHeight": { "type": "number", "exclusiveMinimum": 0 },
+        "x": { "$ref": "#/$defs/formula" },
+        "y": { "$ref": "#/$defs/formula" }
+      }
+    },
+    "axes": {
+      "type": "object", "additionalProperties": false, "required": ["x", "y", "z", "origin", "handedness"],
+      "properties": { "x": { "$ref": "#/$defs/formula" }, "y": { "$ref": "#/$defs/formula" }, "z": { "$ref": "#/$defs/formula" }, "origin": { "$ref": "#/$defs/formula" }, "handedness": { "$ref": "#/$defs/formula" } }
+    },
+    "forward": {
+      "type": "object", "additionalProperties": false, "required": ["x", "y", "z", "sourceSample", "refused"],
+      "properties": { "x": { "$ref": "#/$defs/formula" }, "y": { "$ref": "#/$defs/formula" }, "z": { "$ref": "#/$defs/formula" }, "sourceSample": { "$ref": "#/$defs/formula" }, "refused": { "$ref": "#/$defs/formula" } }
+    },
+    "inverse": {
+      "type": "object", "additionalProperties": false, "required": ["longitudeDeg", "latitudeDeg", "poles", "sourceGrid", "refused"],
+      "properties": { "longitudeDeg": { "$ref": "#/$defs/formula" }, "latitudeDeg": { "$ref": "#/$defs/formula" }, "poles": { "$ref": "#/$defs/formula" }, "sourceGrid": { "$ref": "#/$defs/formula" }, "refused": { "$ref": "#/$defs/formula" } }
+    },
+    "horizontal": {
+      "type": "object", "additionalProperties": false, "required": ["equatorWorldUnitsPerMetre", "meridianWorldUnitsPerMetre", "sourceCellWorldUnits", "eastWestDistortion"],
+      "properties": {
+        "equatorWorldUnitsPerMetre": { "type": "number", "exclusiveMinimum": 0 },
+        "meridianWorldUnitsPerMetre": { "type": "number", "exclusiveMinimum": 0 },
+        "sourceCellWorldUnits": { "type": "array", "items": { "type": "number" }, "minItems": 2, "maxItems": 2 },
+        "eastWestDistortion": { "$ref": "#/$defs/formula", "description": "Formula only: no transcendental results enter the identity." }
+      }
+    },
+    "vertical": {
+      "type": "object", "additionalProperties": false, "required": ["datum", "datumM", "worldUnitsPerMetre", "exaggeration", "belowDatum", "water"],
+      "properties": {
+        "datum": { "$ref": "#/$defs/formula" },
+        "datumM": { "type": "number" },
+        "worldUnitsPerMetre": { "type": "number", "exclusiveMinimum": 0 },
+        "exaggeration": { "type": "number", "exclusiveMinimum": 0 },
+        "belowDatum": { "$ref": "#/$defs/formula" },
+        "water": { "$ref": "#/$defs/formula" }
+      }
+    },
+    "periodicLayout": {
+      "type": "object", "additionalProperties": false,
+      "required": ["source", "physicalX", "strip", "physicalWidth", "canonicalPhysicalX", "strips", "physicalY", "poleMargin", "physicalHeight", "beyondPoles"],
+      "properties": {
+        "source": { "$ref": "#/$defs/formula" },
+        "physicalX": { "$ref": "#/$defs/formula" },
+        "strip": { "type": "number", "description": "At least W/2 (R10: every shortest seam-crossing route has its image inside the terrain)." },
+        "physicalWidth": { "type": "number" },
+        "canonicalPhysicalX": { "type": "array", "items": { "type": "number" }, "minItems": 2, "maxItems": 2 },
+        "strips": { "$ref": "#/$defs/formula" },
+        "physicalY": { "$ref": "#/$defs/formula" },
+        "poleMargin": { "type": "number", "minimum": 0 },
+        "physicalHeight": { "type": "number" },
+        "beyondPoles": { "$ref": "#/$defs/formula" }
+      }
+    },
+    "paths": {
+      "type": "object", "additionalProperties": false, "required": ["seam", "pole", "steps"],
+      "properties": { "seam": { "$ref": "#/$defs/formula" }, "pole": { "$ref": "#/$defs/formula" }, "steps": { "$ref": "#/$defs/formula" } }
+    },
+    "seaContinuity": {
+      "type": "object", "additionalProperties": false, "required": ["seam", "strips", "poles"],
+      "properties": { "seam": { "$ref": "#/$defs/formula" }, "strips": { "$ref": "#/$defs/formula" }, "poles": { "$ref": "#/$defs/formula" } }
+    },
+    "singular": { "$ref": "#/$defs/formula" },
+    "calibration": {
+      "type": "object", "additionalProperties": false, "required": ["file", "sha256"],
+      "properties": { "file": { "type": "string", "description": "Relative to the policy file." }, "sha256": { "$ref": "#/$defs/sha256" } }
+    },
+    "tradeoffs": { "$ref": "#/$defs/formula" },
+    "duplicateSeam": { "const": true }
+  }
+}

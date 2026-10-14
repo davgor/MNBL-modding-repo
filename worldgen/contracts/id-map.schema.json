@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "mnbl.id-map/1",
+  "title": "MNBL generated-campaign id map",
+  "description": "id-map.json written by worldbridge --compile-campaign (MMR-27), canonical JSON. One entry per generated object: its deterministic Bannerlord id, its object kind and the stable source UID it comes from. Ids never depend on display names. Synthesized objects use a UID derived from their source (clan:<realm uid>, regent:<realm uid>). Entries are sorted by id; ids are unique; (kind, uid) pairs are unique. An object excluded later (campaign.json exclusions) keeps its entry: its id stays reserved.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "version", "layoutSeed", "sourceIdentity", "worldSha256", "prefix", "algorithm", "entries"],
+  "properties": {
+    "schema": { "const": "mnbl.id-map" },
+    "version": { "const": 1 },
+    "layoutSeed": { "type": "string", "pattern": "^(0|[1-9][0-9]{0,19})$" },
+    "sourceIdentity": { "type": "string", "minLength": 2, "description": "The source identity document (worldgen/contracts/source-identity.schema.json) exactly as worldbridge writes it: schema, stage, generator version, grid side and seeds" },
+    "worldSha256": { "type": "string", "pattern": "^[0-9a-f]{64}$", "description": "SHA-256 of the split's world.json" },
+    "prefix": { "type": "string", "pattern": "^mnbl_[0-9a-f]{8}$", "description": "'mnbl_' + hex(sha256('mnbl.world-prefix/2\\n' + sourceIdentity + '\\n' + worldSha256))[0:8]: different worlds get different prefixes even when they share a seed" },
+    "algorithm": { "type": "string" },
+    "entries": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "kind", "uid"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^mnbl_[0-9a-f]{8}_[tvcklh]_[0-9a-f]{1,64}$", "maxLength": 80, "description": "prefix + '_' + kind code + '_' + hash prefix (10 hex digits by default, 26 characters in all)" },
+          "kind": { "enum": ["town", "village", "castle", "kingdom", "clan", "hero"] },
+          "uid": { "type": "string", "minLength": 1 }
+        }
+      }
+    }
+  }
+}

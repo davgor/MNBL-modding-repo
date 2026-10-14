@@ -1,0 +1,13 @@
+{
+  "author": {
+    "label": "Codex FWGC implementation",
+    "role": "orchestrator"
+  },
+  "body": "Native procedural collision now has a positive control: PID 31440 cleanly renders our two-triangle quad and RayCastForClosestEntityOrTerrain hits distance 27.6 from z=30, exactly expected height 2.4, at frames 60/1200. Separate sphere control distance26 also matches. Template scene read initializes physics; Moveable plus SetGlobalFrame and SetPhysicsState registers collision, following installed War Sails quad callers. Pinned Vec3/int buffers retained through scene teardown; normal finalize observed. Previous static quad PID25444 missed. No campaign backend accepted. Evidence raycast-probe-31440-42.json/render-observation-31440.json/render-progress-31440.log. Extending to asymmetric calibration and both actual generated grids, with in-game source-reader extraction.",
+  "createdAt": "2026-10-09T22:17:55.189Z",
+  "epicId": "ep_01m4fpnf646t254mnh69jhz107",
+  "format": "darkmechanicus.comment",
+  "formatVersion": 1,
+  "id": "cm_01m4hbx2qnrr93fvgk81c74fzs",
+  "ticketId": null
+}

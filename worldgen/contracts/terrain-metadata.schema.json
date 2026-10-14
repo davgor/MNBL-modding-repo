@@ -1,0 +1,385 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "mnbl.terrain-metadata/1",
+  "title": "MNBL compiled campaign terrain",
+  "description": "terrain.json written by worldbridge --compile-terrain (MMR-26), canonical JSON. It names the projection, material policy and import calibration it was compiled with, describes every output file, and reports coherence, checks and fidelity. Output files: heightfield.bin (MNBLHF01, side*side binary64 world units, the surface encoder's input at scale 1), weights.bin (MNBLWT01, side*side rock_k bytes, the encoder's --surface-weights), height-q16.bin (MNBLQ16B, u32 side, f64 hmin, f64 hmax little-endian, then side*side big-endian u16), masks.bin (MNBLMK01, u32 side, then biome, intent, landform and padding byte planes; padding is 1 on rows beyond a pole line), projection.json (the resolved projection; its SHA-256 equals projectionSha256). All rasters are row-major from physical row 0 (the north padding).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "version",
+    "projectionSha256",
+    "materialsSha256",
+    "importSha256",
+    "source",
+    "output",
+    "height",
+    "coherence",
+    "checks",
+    "intentSamples",
+    "biomeSamples",
+    "fidelity",
+    "performance",
+    "files",
+    "poles"
+  ],
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "pair": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      },
+      "minItems": 2,
+      "maxItems": 2
+    },
+    "histogram": {
+      "type": "object",
+      "propertyNames": {
+        "pattern": "^[0-9]+$"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/count"
+      }
+    }
+  },
+  "properties": {
+    "schema": {
+      "const": "mnbl.terrain-metadata"
+    },
+    "version": {
+      "const": 1
+    },
+    "projectionSha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "materialsSha256": {
+      "$ref": "#/$defs/sha256",
+      "description": "SHA-256 of the canonical worldgen/policies/terrain-materials.json."
+    },
+    "importSha256": {
+      "$ref": "#/$defs/sha256",
+      "description": "SHA-256 of the canonical worldgen/calibration/terrain-import/terrain-import.json."
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "layoutSeed",
+        "gridSide",
+        "cellWorldUnits",
+        "height"
+      ],
+      "properties": {
+        "layoutSeed": {
+          "type": "string",
+          "pattern": "^(0|[1-9][0-9]{0,19})$"
+        },
+        "gridSide": {
+          "type": "integer",
+          "minimum": 3
+        },
+        "cellWorldUnits": {
+          "$ref": "#/$defs/pair",
+          "description": "Source cell size in world units across and along: W/(n-1), H/(n-1)."
+        },
+        "height": {
+          "type": "string"
+        }
+      }
+    },
+    "output": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "side",
+        "extent",
+        "spacing",
+        "nodes",
+        "nodeCells",
+        "seamPeriodColumns",
+        "rasterOrientation"
+      ],
+      "properties": {
+        "side": {
+          "enum": [
+            129,
+            257
+          ],
+          "description": "A grid side the import calibration lists."
+        },
+        "extent": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "spacing": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "nodes": {
+          "$ref": "#/$defs/pair"
+        },
+        "nodeCells": {
+          "type": "integer"
+        },
+        "seamPeriodColumns": {
+          "type": "integer",
+          "description": "Columns per W: column c and c + period show the same logical x."
+        },
+        "rasterOrientation": {
+          "type": "string"
+        }
+      }
+    },
+    "height": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "hmin",
+        "hmax",
+        "step",
+        "zeroRange",
+        "rule",
+        "byteOrder",
+        "maxRoundtripError",
+        "tolerance"
+      ],
+      "properties": {
+        "hmin": {
+          "type": "number"
+        },
+        "hmax": {
+          "type": "number"
+        },
+        "step": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "zeroRange": {
+          "type": "boolean"
+        },
+        "rule": {
+          "type": "string"
+        },
+        "byteOrder": {
+          "type": "string"
+        },
+        "maxRoundtripError": {
+          "type": "number",
+          "minimum": 0
+        },
+        "tolerance": {
+          "type": "number",
+          "description": "Half a quantization step."
+        }
+      }
+    },
+    "coherence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "coastEpsilon",
+        "oceanLowered",
+        "landRaised",
+        "maxAdjustment",
+        "engineSignViolations",
+        "engineVertexTruncation",
+        "lakeBelowDatum"
+      ],
+      "properties": {
+        "coastEpsilon": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "oceanLowered": {
+          "$ref": "#/$defs/count"
+        },
+        "landRaised": {
+          "$ref": "#/$defs/count"
+        },
+        "maxAdjustment": {
+          "type": "number",
+          "minimum": 0
+        },
+        "engineSignViolations": {
+          "const": 0,
+          "description": "A compile with any violation is refused (coast_sign)."
+        },
+        "engineVertexTruncation": {
+          "type": "number",
+          "minimum": 0
+        },
+        "lakeBelowDatum": {
+          "$ref": "#/$defs/count",
+          "description": "Lake samples below the sea datum (left as compiled; for MMR-39)."
+        }
+      }
+    },
+    "checks": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "seamPairs",
+        "nodeBorders"
+      ],
+      "properties": {
+        "seamPairs": {
+          "$ref": "#/$defs/count"
+        },
+        "nodeBorders": {
+          "type": "string"
+        }
+      }
+    },
+    "intentSamples": {
+      "$ref": "#/$defs/histogram",
+      "description": "Output samples per navigation intent (material policy intents)."
+    },
+    "biomeSamples": {
+      "$ref": "#/$defs/histogram"
+    },
+    "fidelity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sourceCellWorldUnits",
+        "outputSpacing",
+        "outputSamplesPerSourceCell",
+        "outputSamplesOnSourceSamples",
+        "outputSamplesInDomain",
+        "sourceSamples",
+        "sourceSamplesRepresented",
+        "heightRmsAtSourceSamples",
+        "heightMaxAtSourceSamples",
+        "coastMismatchedSourceSamples",
+        "landComponents",
+        "landComponentsLost",
+        "landSamplesLost",
+        "note"
+      ],
+      "properties": {
+        "sourceCellWorldUnits": {
+          "$ref": "#/$defs/pair"
+        },
+        "outputSpacing": {
+          "type": "number"
+        },
+        "outputSamplesPerSourceCell": {
+          "$ref": "#/$defs/pair",
+          "description": "Below 1: source samples between output samples are not represented."
+        },
+        "outputSamplesOnSourceSamples": {
+          "$ref": "#/$defs/count"
+        },
+        "outputSamplesInDomain": {
+          "$ref": "#/$defs/count"
+        },
+        "sourceSamples": {
+          "$ref": "#/$defs/count"
+        },
+        "sourceSamplesRepresented": {
+          "$ref": "#/$defs/count",
+          "description": "Distinct source samples that some output sample sits on exactly."
+        },
+        "heightRmsAtSourceSamples": {
+          "type": "number",
+          "minimum": 0
+        },
+        "heightMaxAtSourceSamples": {
+          "type": "number",
+          "minimum": 0
+        },
+        "coastMismatchedSourceSamples": {
+          "$ref": "#/$defs/count"
+        },
+        "landComponents": {
+          "$ref": "#/$defs/count"
+        },
+        "landComponentsLost": {
+          "$ref": "#/$defs/count"
+        },
+        "landSamplesLost": {
+          "$ref": "#/$defs/count"
+        },
+        "note": {
+          "type": "string"
+        }
+      }
+    },
+    "performance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "readMilliseconds",
+        "compileMilliseconds"
+      ],
+      "properties": {
+        "readMilliseconds": {
+          "$ref": "#/$defs/count"
+        },
+        "compileMilliseconds": {
+          "$ref": "#/$defs/count"
+        }
+      }
+    },
+    "files": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "heightfield.bin",
+        "weights.bin",
+        "height-q16.bin",
+        "masks.bin",
+        "projection.json"
+      ],
+      "properties": {
+        "heightfield.bin": {
+          "$ref": "#/$defs/sha256"
+        },
+        "weights.bin": {
+          "$ref": "#/$defs/sha256"
+        },
+        "height-q16.bin": {
+          "$ref": "#/$defs/sha256"
+        },
+        "masks.bin": {
+          "$ref": "#/$defs/sha256"
+        },
+        "projection.json": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "poles": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "northIntent",
+        "southIntent",
+        "paddingRows",
+        "padding"
+      ],
+      "properties": {
+        "northIntent": {
+          "type": "integer"
+        },
+        "southIntent": {
+          "type": "integer"
+        },
+        "paddingRows": {
+          "$ref": "#/$defs/count"
+        },
+        "padding": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

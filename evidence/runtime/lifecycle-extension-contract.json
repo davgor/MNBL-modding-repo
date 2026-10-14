@@ -1,0 +1,957 @@
+{
+  "schema": "mnbl.lifecycle-extension-contract.v1",
+  "ticket": "MMR-14",
+  "criterion": "c2",
+  "status": "installed-IL trace complete; generated-load safe injection timing remains unknown",
+  "acceptanceOwner": "root",
+  "runtimeVerifiedByThisAssignment": false,
+  "installed": {
+    "game": "1.4.8",
+    "warSails": "1.2.8",
+    "assemblies": [
+      {
+        "path": "D:/SteamLibrary/steamapps/common/Mount & Blade II Bannerlord/bin/Win64_Shipping_Client/TaleWorlds.CampaignSystem.dll",
+        "sha256": "1f8e33e2ed73e6ec653d7629180afb70649ddc6e5bd1657a802a264efda1c3ae",
+        "fileVersion": "1.0.0.0"
+      },
+      {
+        "path": "D:/SteamLibrary/steamapps/common/Mount & Blade II Bannerlord/bin/Win64_Shipping_Client/TaleWorlds.Core.dll",
+        "sha256": "3e5cece8ca42faf3fdde27632519ed2a6f86d1ec6d1a742867729f00001689bf",
+        "fileVersion": "1.0.0.0"
+      },
+      {
+        "path": "D:/SteamLibrary/steamapps/common/Mount & Blade II Bannerlord/bin/Win64_Shipping_Client/TaleWorlds.Library.dll",
+        "sha256": "ab4ff23e94a6f4b6f293d0cb4333cae731a0499063fe4a8b6c6a3770de32c4e5",
+        "fileVersion": "1.0.0.0"
+      },
+      {
+        "path": "D:/SteamLibrary/steamapps/common/Mount & Blade II Bannerlord/bin/Win64_Shipping_Client/TaleWorlds.MountAndBlade.dll",
+        "sha256": "19387f31557ff840d14f378f6bbdf1d58fcff406ab9ff2294dfbb3e49a50b87e",
+        "fileVersion": "1.0.0.0"
+      },
+      {
+        "path": "D:/SteamLibrary/steamapps/common/Mount & Blade II Bannerlord/bin/Win64_Shipping_Client/TaleWorlds.ObjectSystem.dll",
+        "sha256": "d76e1d883a6d9a4efe6f9f3b4d14da41a414c7b587f7280705255dc99abd9977",
+        "fileVersion": "1.0.0.0"
+      },
+      {
+        "path": "D:/SteamLibrary/steamapps/common/Mount & Blade II Bannerlord/bin/Win64_Shipping_Client/TaleWorlds.SaveSystem.dll",
+        "sha256": "aee0f88d156ba286cf85624f91e2cee4e2a4da3ae2689a603f33ed247b28aac7",
+        "fileVersion": "1.0.0.0"
+      },
+      {
+        "path": "D:/SteamLibrary/steamapps/common/Mount & Blade II Bannerlord/Modules/NavalDLC/bin/Win64_Shipping_Client/NavalDLC.dll",
+        "sha256": "146e16de9ac242ef63047cc337c858ffaf24a7b153f7bd7e18f1ccca1d268a94",
+        "fileVersion": "1.0.0.0"
+      },
+      {
+        "path": "D:/SteamLibrary/steamapps/common/Mount & Blade II Bannerlord/Modules/SandBox/bin/Win64_Shipping_Client/SandBox.dll",
+        "sha256": "587c6e94c425745c1478f632f3b66226ff8298666cb27e8e6d9a62488df5956a",
+        "fileVersion": "1.0.0.0"
+      },
+      {
+        "path": "D:/SteamLibrary/steamapps/common/Mount & Blade II Bannerlord/Modules/StoryMode/bin/Win64_Shipping_Client/StoryMode.dll",
+        "sha256": "cc205186bca26ea04197c543f06bfd14ec7ca8a94b559a3a2753921c4bb27ef0",
+        "fileVersion": "1.0.0.0"
+      }
+    ],
+    "moduleDescriptors": [
+      {
+        "path": "D:/SteamLibrary/steamapps/common/Mount & Blade II Bannerlord/Modules/Native/SubModule.xml",
+        "version": "v1.4.8",
+        "sha256": "38e8f6fa52498346cda474ea648d59cab0180284209f603d2bb1161e2b2bfefe"
+      },
+      {
+        "path": "D:/SteamLibrary/steamapps/common/Mount & Blade II Bannerlord/Modules/SandBox/SubModule.xml",
+        "version": "v1.4.8",
+        "sha256": "179168441d5696c64e9a7bb53ea93c0b61302e40fd20b504c0fc57141a9c02ec"
+      },
+      {
+        "path": "D:/SteamLibrary/steamapps/common/Mount & Blade II Bannerlord/Modules/NavalDLC/SubModule.xml",
+        "version": "v1.2.8",
+        "sha256": "64b0cdc985667266f1d9efcbe24d7ba4847795e0f806cf22128ebe3a32601aa2"
+      }
+    ]
+  },
+  "methodEvidence": {
+    "il": {
+      "sha256": "55ba9b274ffdcca484f3bf92c4aa15aeea9659f435f5c81bff40f9ac71edfa8c",
+      "path": "build/research-lifecycle14/installed.il.txt"
+    },
+    "index": {
+      "sha256": "c021bfbc4327a98e7663aeac939f93a0308882c46ddb4658d96cb2c8a60554f7",
+      "path": "build/research-lifecycle14/methods.json"
+    },
+    "methodCount": 598,
+    "lineConvention": "one-based assembly header immediately before signature; calls include exact IL offsets",
+    "mechanism": "Mono.Cecil metadata/body reads only; no target assembly execution"
+  },
+  "reusedEvidenceHashChecks": [
+    {
+      "path": "build/research-save-baseline/callers.il.txt",
+      "recordedSha256": "19c1fafa4f5a828b303d932832331a674a918fb98ad45a59341862c43f679d70",
+      "currentSha256": "19c1fafa4f5a828b303d932832331a674a918fb98ad45a59341862c43f679d70",
+      "matches": true,
+      "usage": "corroboration only; fresh installed trace is authoritative"
+    },
+    {
+      "path": "build/research-save-baseline/save-load.il.txt",
+      "recordedSha256": "d4adcd934b6f3341f9206417038a5ea5839ebbec906e6f989a94578f8832c7fa",
+      "currentSha256": "d4adcd934b6f3341f9206417038a5ea5839ebbec906e6f989a94578f8832c7fa",
+      "matches": true,
+      "usage": "corroboration only; fresh installed trace is authoritative"
+    },
+    {
+      "path": "build/research-sandbox/boot.il.txt",
+      "recordedSha256": "19e5797a9f6a61d369cd553b097461997303383bc1f099257c8878de3524737f",
+      "currentSha256": "19e5797a9f6a61d369cd553b097461997303383bc1f099257c8878de3524737f",
+      "matches": true,
+      "usage": "corroboration only; fresh installed trace is authoritative"
+    },
+    {
+      "path": "build/research-sandbox/contracts.il.txt",
+      "recordedSha256": "0ed0a52724d868a419921cd396262a713b43c89a0166cc79af73f3659909acb2",
+      "currentSha256": "0ed0a52724d868a419921cd396262a713b43c89a0166cc79af73f3659909acb2",
+      "matches": true,
+      "usage": "corroboration only; fresh installed trace is authoritative"
+    },
+    {
+      "path": "build/research-sandbox/details.il.txt",
+      "recordedSha256": "678e61f4252b882aead1aab85da05bb532560f46e5e05f235223d5a09a71ef2a",
+      "currentSha256": "678e61f4252b882aead1aab85da05bb532560f46e5e05f235223d5a09a71ef2a",
+      "matches": true,
+      "usage": "corroboration only; fresh installed trace is authoritative"
+    },
+    {
+      "path": "build/research-sandbox/extra.il.txt",
+      "recordedSha256": "e13930f2a8aad9aab9c3e089b56904ac72dbfa770441d8019d9a2729f99bb147",
+      "currentSha256": "e13930f2a8aad9aab9c3e089b56904ac72dbfa770441d8019d9a2729f99bb147",
+      "matches": true,
+      "usage": "corroboration only; fresh installed trace is authoritative"
+    },
+    {
+      "path": "build/research-sandbox/finalize.il.txt",
+      "recordedSha256": "af70f74b075368f621d1796d82b493726b033111866833e4ffff45711bd7e0fd",
+      "currentSha256": "af70f74b075368f621d1796d82b493726b033111866833e4ffff45711bd7e0fd",
+      "matches": true,
+      "usage": "corroboration only; fresh installed trace is authoritative"
+    },
+    {
+      "path": "build/research-sandbox/release.il.txt",
+      "recordedSha256": "365a1758896521738fdbab3a4302188f079f9292c71abb67e02b649893d4cac2",
+      "currentSha256": "365a1758896521738fdbab3a4302188f079f9292c71abb67e02b649893d4cac2",
+      "matches": true,
+      "usage": "corroboration only; fresh installed trace is authoritative"
+    },
+    {
+      "path": "build/research-sandbox/safety.il.txt",
+      "recordedSha256": "2318a5ff8201213a5b214ba592c7ac0137faea8cd5f34840b131394d7390a087",
+      "currentSha256": "2318a5ff8201213a5b214ba592c7ac0137faea8cd5f34840b131394d7390a087",
+      "matches": true,
+      "usage": "corroboration only; fresh installed trace is authoritative"
+    },
+    {
+      "path": "build/research-sandbox/save-interface.il.txt",
+      "recordedSha256": "17e56561eabc4b214b7c621055fc807cbd365ad3f7774720e5389ca6cfa1fb94",
+      "currentSha256": "17e56561eabc4b214b7c621055fc807cbd365ad3f7774720e5389ca6cfa1fb94",
+      "matches": true,
+      "usage": "corroboration only; fresh installed trace is authoritative"
+    },
+    {
+      "path": "build/research-sandbox/verified.il.txt",
+      "recordedSha256": "c749c5e86dd411877fcd778ec0bf7e536cc94480324d0c30a0e48b0262336d76",
+      "currentSha256": "c749c5e86dd411877fcd778ec0bf7e536cc94480324d0c30a0e48b0262336d76",
+      "matches": true,
+      "usage": "corroboration only; fresh installed trace is authoritative"
+    },
+    {
+      "path": "src/MNBL.ProceduralWorld/CampaignBootstrap/DiagnosticSandboxBootstrap.cs",
+      "recordedSha256": "0822ac53deb06dabdf637bb2c59ec8a00aa7c90ce2d4860d4c7852a5d5b3b75f",
+      "currentSha256": "0822ac53deb06dabdf637bb2c59ec8a00aa7c90ce2d4860d4c7852a5d5b3b75f",
+      "matches": true,
+      "usage": "corroboration only; fresh installed trace is authoritative"
+    },
+    {
+      "path": "src/MNBL.ProceduralWorld/CampaignBootstrap/DiagnosticMapScene.cs",
+      "recordedSha256": "ae1923854312a25f142736b348e0a4153cf0a3a21b9175f326872e5616e5ff8c",
+      "currentSha256": "ae1923854312a25f142736b348e0a4153cf0a3a21b9175f326872e5616e5ff8c",
+      "matches": true,
+      "usage": "corroboration only; fresh installed trace is authoritative"
+    }
+  ],
+  "terminology": {
+    "binaryDeserialization": "SaveManager.Load/LoadContext.Load constructs, resolves and fills the root graph before returning LoadResult.",
+    "xmlDeserialization": "MBObjectManager.LoadXml calls MBObjectBase.Deserialize on XML records; not the binary save read.",
+    "deferredInitialization": "MBSaveLoad passes true to SaveManager.Load: initialization/late-initialization callbacks are retained for Game.LoadSaveGame."
+  },
+  "newGameOrder": [
+    "MBGameManager.StartNewGame(MBGameManager): Module.OnBeforeGameStart -> GameLoadingState.SetLoadingParameters -> CleanAndPushState.",
+    "GameLoadingState.OnTick -> SandBoxGameManager.DoLoadingForGameManager: LoadModuleData(false), no-argument StartNewGame engine bridge, MBGlobals.InitializeReferences, CampaignCreatorDelegate.Invoke -> Game.CreateGame.",
+    "Game.CreateGame: MBObjectManager.Init -> Game.RegisterTypes (GameType.BeforeRegisterTypes, core registrations, GameType.OnRegisterTypes, manager.RegisterSubModuleTypes) -> Game constructor/BeginLoading.",
+    "Campaign loading Initialize -> Game.Initialize -> Campaign.OnInitialize: events/managers -> SandBoxManager.Initialize(default models/behaviors) -> manager.InitializeGameStarter -> manager.OnGameStart -> basic/campaign model managers.",
+    "BeginGameStart -> OnNewCampaignStart -> default campaign objects/Game.InitializeDefaultGameObjects (InitializeSubModuleGameObjects), basic XML, main party/managers -> CreateLists -> cultures/concepts XML -> manager.OnNewCampaignStart.",
+    "SandBoxManager.OnCampaignStart -> manager.RegisterSubModuleObjects(false) -> AfterRegisterSubModuleObjects(false); SandBox loads NPCCharacters, Heroes, Kingdoms, Factions, WorkshopTypes, LocationComplexTemplates, Settlements (campaign mode and not edit mode).",
+    "Behavior setup/new-game campaign objects -> Game.OnGameStart -> manager.OnGameInitializationFinished; SandBox assigns default MapSceneCreator here.",
+    "Later Campaign loading stage -> LoadMapScene: CreateMapScene -> SetSceneLevels -> Load -> map bounds -> AfterLoad. Data/caches, new-game/session callbacks and OnAfterGameInitializationFinished follow; manager.OnLoadFinished launches normal character creation/intro."
+  ],
+  "savedGameOrder": [
+    "Owned preflight candidate BEFORE MBSaveLoad.LoadSaveGameData(saveName); normal-menu interception and generated identity injection are not established.",
+    "MBSaveLoad.LoadSaveGameData -> SaveManager.Load(name,driver,true) -> DefinitionContext.FillWithCurrentTypes -> driver.Load -> LoadContext.Load. Root is created/resolved/filled here; parallel work exists. Deferred initialization callback holder returned in LoadResult.",
+    "new SandBoxGameManager(LoadResult) -> MBGameManager.StartNewGame(manager) -> GameLoadingState -> SandBoxGameManager loading with LoadModuleData(true) and MBGlobals.InitializeReferences.",
+    "Game.LoadSaveGame: MBSaveLoad.OnStartGame -> MBObjectManager.Init -> result.Root/GameType -> Game.RegisterTypes -> result.InitializeObjects -> manager.ReInitialize -> result.AfterInitializeObjects -> GC -> assign Game.ObjectManager -> BeginLoading.",
+    "Game.Initialize/Campaign.OnInitialize rebuilds model managers and default campaign objects, XML and behaviors. RegisterSubModuleObjects(true) skips Heroes/Kingdoms/Factions in SandBox XML, but still loads NPCCharacters and campaign Settlements. OnGameLoaded -> InitializeCampaignBehaviors -> LoadBehaviorData -> RegisterEvents precede initialization-finished/map load.",
+    "Campaign later loads map, checks map update, data/caches, OnAfterGameLoaded, OnGameLoaded/session events and OnAfterGameInitializationFinished; SandBoxGameManager.OnLoadFinished restores MapState/menu/encounter and emits OnGameLoadFinished."
+  ],
+  "candidates": [
+    {
+      "id": "register-types",
+      "signatures": [
+        {
+          "signature": "System.Void TaleWorlds.MountAndBlade.MBSubModuleBase::RegisterSubModuleTypes()",
+          "genericParameters": [],
+          "parameters": [],
+          "access": "FamORAssem, Virtual, HideBySig, VtableLayoutMask",
+          "token": 100670500,
+          "assembly": "D:/SteamLibrary/steamapps/common/Mount & Blade II Bannerlord/bin/Win64_Shipping_Client/TaleWorlds.MountAndBlade.dll",
+          "sha256": "19387f31557ff840d14f378f6bbdf1d58fcff406ab9ff2294dfbb3e49a50b87e",
+          "line": 10209
+        }
+      ],
+      "thread": "Expected game/loading tick thread: GameLoadingState.OnTick calls DoLoadingForGameManager and OnLoadFinished synchronously. Managed IL does not establish OS thread identity or engine thread safety; root must log/assert main-thread identity. SaveSystem itself uses TWParallel.ForWithoutRenderThread; do not assume deserialization workers may touch engine objects.",
+      "initializationTiming": "Game.RegisterTypes -> MBGameManager.RegisterSubModuleTypes -> each submodule. New: before Game constructor/BeginLoading. Saved: after LoadResult.Root was deserialized, before InitializeObjects/ReInitialize/AfterInitializeObjects.",
+      "ownership": "Current MBObjectManager owns type records; Init replaces singleton. Do not retain a previous-game manager.",
+      "serialization": "Type registration is not SaveSystem type definition registration and is not binary pre-deserialization. Stable numeric type IDs and object string IDs must be separately established.",
+      "editorOnly": false,
+      "status": "installed-managed-candidate; no new runtime proof"
+    },
+    {
+      "id": "register-objects",
+      "signatures": [
+        {
+          "signature": "System.Void TaleWorlds.MountAndBlade.MBSubModuleBase::RegisterSubModuleObjects(System.Boolean)",
+          "genericParameters": [],
+          "parameters": [
+            "System.Boolean isSavedCampaign"
+          ],
+          "access": "Public, Virtual, HideBySig, VtableLayoutMask",
+          "token": 100670513,
+          "assembly": "D:/SteamLibrary/steamapps/common/Mount & Blade II Bannerlord/bin/Win64_Shipping_Client/TaleWorlds.MountAndBlade.dll",
+          "sha256": "19387f31557ff840d14f378f6bbdf1d58fcff406ab9ff2294dfbb3e49a50b87e",
+          "line": 10245
+        },
+        {
+          "signature": "System.Void TaleWorlds.MountAndBlade.MBSubModuleBase::AfterRegisterSubModuleObjects(System.Boolean)",
+          "genericParameters": [],
+          "parameters": [
+            "System.Boolean isSavedCampaign"
+          ],
+          "access": "Public, Virtual, HideBySig, VtableLayoutMask",
+          "token": 100670514,
+          "assembly": "D:/SteamLibrary/steamapps/common/Mount & Blade II Bannerlord/bin/Win64_Shipping_Client/TaleWorlds.MountAndBlade.dll",
+          "sha256": "19387f31557ff840d14f378f6bbdf1d58fcff406ab9ff2294dfbb3e49a50b87e",
+          "line": 10248
+        }
+      ],
+      "thread": "Expected game/loading tick thread: GameLoadingState.OnTick calls DoLoadingForGameManager and OnLoadFinished synchronously. Managed IL does not establish OS thread identity or engine thread safety; root must log/assert main-thread identity. SaveSystem itself uses TWParallel.ForWithoutRenderThread; do not assume deserialization workers may touch engine objects.",
+      "initializationTiming": "Campaign.OnInitialize -> SandBoxManager.OnCampaignStart -> all RegisterSubModuleObjects(isSavedCampaign), then all AfterRegisterSubModuleObjects. After basic XML, before campaign behavior setup and map load.",
+      "ownership": "Objects enter current object manager; ready/presumed objects may subsequently be removed by UnregisterNonReadyObjects. XML/object dependencies and uniqueness require explicit validation.",
+      "serialization": "Saved callback occurs after binary deserialization and saved-object initialization. Too late to claim reconstruction before saved references resolve.",
+      "editorOnly": false,
+      "status": "installed-managed-candidate; no new runtime proof"
+    },
+    {
+      "id": "xml-load",
+      "signatures": [
+        {
+          "signature": "System.Void TaleWorlds.ObjectSystem.MBObjectManager::LoadXML(System.String,System.Boolean,System.String,System.Boolean)",
+          "genericParameters": [],
+          "parameters": [
+            "System.String id",
+            "System.Boolean isDevelopment",
+            "System.String gameType",
+            "System.Boolean skipXmlFilterForEditor"
+          ],
+          "access": "Public, HideBySig",
+          "token": 100663383,
+          "assembly": "D:/SteamLibrary/steamapps/common/Mount & Blade II Bannerlord/bin/Win64_Shipping_Client/TaleWorlds.ObjectSystem.dll",
+          "sha256": "d76e1d883a6d9a4efe6f9f3b4d14da41a414c7b587f7280705255dc99abd9977",
+          "line": 5969
+        },
+        {
+          "signature": "System.Void TaleWorlds.ObjectSystem.MBObjectManager::LoadXml(System.Xml.XmlDocument,System.Boolean)",
+          "genericParameters": [],
+          "parameters": [
+            "System.Xml.XmlDocument doc",
+            "System.Boolean isDevelopment"
+          ],
+          "access": "Public, HideBySig",
+          "token": 100663404,
+          "assembly": "D:/SteamLibrary/steamapps/common/Mount & Blade II Bannerlord/bin/Win64_Shipping_Client/TaleWorlds.ObjectSystem.dll",
+          "sha256": "d76e1d883a6d9a4efe6f9f3b4d14da41a414c7b587f7280705255dc99abd9977",
+          "line": 6630
+        }
+      ],
+      "thread": "Expected game/loading tick thread: GameLoadingState.OnTick calls DoLoadingForGameManager and OnLoadFinished synchronously. Managed IL does not establish OS thread identity or engine thread safety; root must log/assert main-thread identity. SaveSystem itself uses TWParallel.ForWithoutRenderThread; do not assume deserialization workers may touch engine objects.",
+      "initializationTiming": "Callable after required type records exist. Existing installed callers load basic files/default objects, cultures/concepts, then sandbox XML.",
+      "ownership": "Mutates MBObjectManager objects via GetPresumedObject -> MBObjectBase.Deserialize -> AfterInitialized. Document is input; registered objects belong to the active manager.",
+      "serialization": "XML Deserialize is distinct from SaveSystem binary deserialization. Compatibility of replacing official campaign records with generated IDs remains untested.",
+      "editorOnly": false,
+      "status": "installed-managed-candidate; no new runtime proof"
+    },
+    {
+      "id": "models",
+      "signatures": [
+        {
+          "signature": "System.Void TaleWorlds.MountAndBlade.MBGameManager::InitializeGameStarter(TaleWorlds.Core.Game,TaleWorlds.Core.IGameStarter)",
+          "genericParameters": [],
+          "parameters": [
+            "TaleWorlds.Core.Game game",
+            "TaleWorlds.Core.IGameStarter starterObject"
+          ],
+          "access": "Public, Virtual, HideBySig",
+          "token": 100670334,
+          "assembly": "D:/SteamLibrary/steamapps/common/Mount & Blade II Bannerlord/bin/Win64_Shipping_Client/TaleWorlds.MountAndBlade.dll",
+          "sha256": "19387f31557ff840d14f378f6bbdf1d58fcff406ab9ff2294dfbb3e49a50b87e",
+          "line": 9956
+        },
+        {
+          "signature": "System.Void TaleWorlds.MountAndBlade.MBSubModuleBase::InitializeGameStarter(TaleWorlds.Core.Game,TaleWorlds.Core.IGameStarter)",
+          "genericParameters": [],
+          "parameters": [
+            "TaleWorlds.Core.Game game",
+            "TaleWorlds.Core.IGameStarter starterObject"
+          ],
+          "access": "FamORAssem, Virtual, HideBySig, VtableLayoutMask",
+          "token": 100670507,
+          "assembly": "D:/SteamLibrary/steamapps/common/Mount & Blade II Bannerlord/bin/Win64_Shipping_Client/TaleWorlds.MountAndBlade.dll",
+          "sha256": "19387f31557ff840d14f378f6bbdf1d58fcff406ab9ff2294dfbb3e49a50b87e",
+          "line": 10227
+        }
+      ],
+      "thread": "Expected game/loading tick thread: GameLoadingState.OnTick calls DoLoadingForGameManager and OnLoadFinished synchronously. Managed IL does not establish OS thread identity or engine thread safety; root must log/assert main-thread identity. SaveSystem itself uses TWParallel.ForWithoutRenderThread; do not assume deserialization workers may touch engine objects.",
+      "initializationTiming": "Campaign.OnInitialize: SandBoxManager.Initialize defaults -> manager.InitializeGameStarter dispatch -> manager.OnGameStart dispatch -> basic/campaign model snapshots. Candidate: custom manager override after base.InitializeGameStarter and before OnGameStart.",
+      "ownership": "Starter owns model list; GameModelsManager copies it. Generic AddModel<T> initializes wrapper with prior selected T before appending. Preserve intended DLC delegation.",
+      "serialization": "Models are reconstructed during startup in traced path; no claim arbitrary adapter state is serialized. Runtime selection and wrapper delegation must be checked on both new/load.",
+      "editorOnly": false,
+      "status": "installed-managed-candidate; no new runtime proof"
+    },
+    {
+      "id": "map-creator",
+      "signatures": [
+        {
+          "signature": "System.Void TaleWorlds.MountAndBlade.MBGameManager::OnGameInitializationFinished(TaleWorlds.Core.Game)",
+          "genericParameters": [],
+          "parameters": [
+            "TaleWorlds.Core.Game game"
+          ],
+          "access": "Public, Virtual, HideBySig",
+          "token": 100670335,
+          "assembly": "D:/SteamLibrary/steamapps/common/Mount & Blade II Bannerlord/bin/Win64_Shipping_Client/TaleWorlds.MountAndBlade.dll",
+          "sha256": "19387f31557ff840d14f378f6bbdf1d58fcff406ab9ff2294dfbb3e49a50b87e",
+          "line": 9977
+        },
+        {
+          "signature": "System.Void TaleWorlds.MountAndBlade.MBSubModuleBase::OnGameInitializationFinished(TaleWorlds.Core.Game)",
+          "genericParameters": [],
+          "parameters": [
+            "TaleWorlds.Core.Game game"
+          ],
+          "access": "Public, Virtual, HideBySig, VtableLayoutMask",
+          "token": 100670516,
+          "assembly": "D:/SteamLibrary/steamapps/common/Mount & Blade II Bannerlord/bin/Win64_Shipping_Client/TaleWorlds.MountAndBlade.dll",
+          "sha256": "19387f31557ff840d14f378f6bbdf1d58fcff406ab9ff2294dfbb3e49a50b87e",
+          "line": 10254
+        }
+      ],
+      "thread": "Expected game/loading tick thread: GameLoadingState.OnTick calls DoLoadingForGameManager and OnLoadFinished synchronously. Managed IL does not establish OS thread identity or engine thread safety; root must log/assert main-thread identity. SaveSystem itself uses TWParallel.ForWithoutRenderThread; do not assume deserialization workers may touch engine objects.",
+      "initializationTiming": "End of Campaign.OnInitialize, after objects/behaviors; before later Campaign.DoLoadingForGameType -> LoadMapScene. SandBox callback installs SandBox.MapSceneCreator. Candidate manager override calls base then replaces creator.",
+      "ownership": "Campaign owns creator and created map wrapper; this assignment alone proves neither native scene ownership nor disposal safety.",
+      "serialization": "Not a pre-deserialization hook. Generated scene binding must be selected/validated before load entry, not inferred here.",
+      "editorOnly": false,
+      "status": "installed-managed-candidate; no new runtime proof"
+    },
+    {
+      "id": "explicit-load-entry",
+      "signatures": [
+        {
+          "signature": "TaleWorlds.SaveSystem.Load.LoadResult TaleWorlds.Core.MBSaveLoad::LoadSaveGameData(System.String)",
+          "genericParameters": [],
+          "parameters": [
+            "System.String saveName"
+          ],
+          "access": "Public, Static, HideBySig",
+          "token": 100665727,
+          "assembly": "D:/SteamLibrary/steamapps/common/Mount & Blade II Bannerlord/bin/Win64_Shipping_Client/TaleWorlds.Core.dll",
+          "sha256": "3e5cece8ca42faf3fdde27632519ed2a6f86d1ec6d1a742867729f00001689bf",
+          "line": 9139
+        }
+      ],
+      "thread": "Expected game/loading tick thread: GameLoadingState.OnTick calls DoLoadingForGameManager and OnLoadFinished synchronously. Managed IL does not establish OS thread identity or engine thread safety; root must log/assert main-thread identity. SaveSystem itself uses TWParallel.ForWithoutRenderThread; do not assume deserialization workers may touch engine objects.",
+      "initializationTiming": "An explicitly owned loader can validate immutable manifest/save binding before calling this public static entry. No universal vanilla-menu pre-deserialization interception hook proven by this trace.",
+      "ownership": "Returns LoadResult with already constructed/read root graph. Pass to SandBoxGameManager(LoadResult); standard Game.LoadSaveGame owns deferred callback execution; do not manually call InitializeObjects.",
+      "serialization": "Preflight before this call is a candidate only. Exact safe timing for injecting generated objects before SaveSystem resolution remains UNKNOWN. Calling MBObjectManager.Init/RegisterTypes early is not established safe and a later Init replaces it.",
+      "editorOnly": false,
+      "status": "installed-managed-candidate; no new runtime proof"
+    },
+    {
+      "id": "loaded-manager",
+      "signatures": [
+        {
+          "signature": "System.Void SandBox.SandBoxGameManager::.ctor(TaleWorlds.SaveSystem.Load.LoadResult)",
+          "genericParameters": [],
+          "parameters": [
+            "TaleWorlds.SaveSystem.Load.LoadResult loadedGameResult"
+          ],
+          "access": "Public, HideBySig, SpecialName, RTSpecialName",
+          "token": 100663571,
+          "assembly": "D:/SteamLibrary/steamapps/common/Mount & Blade II Bannerlord/Modules/SandBox/bin/Win64_Shipping_Client/SandBox.dll",
+          "sha256": "587c6e94c425745c1478f632f3b66226ff8298666cb27e8e6d9a62488df5956a",
+          "line": 9203
+        },
+        {
+          "signature": "System.Void SandBox.SandBoxGameManager::OnLoadFinished()",
+          "genericParameters": [],
+          "parameters": [],
+          "access": "Public, Virtual, HideBySig",
+          "token": 100663575,
+          "assembly": "D:/SteamLibrary/steamapps/common/Mount & Blade II Bannerlord/Modules/SandBox/bin/Win64_Shipping_Client/SandBox.dll",
+          "sha256": "587c6e94c425745c1478f632f3b66226ff8298666cb27e8e6d9a62488df5956a",
+          "line": 9349
+        }
+      ],
+      "thread": "Expected game/loading tick thread: GameLoadingState.OnTick calls DoLoadingForGameManager and OnLoadFinished synchronously. Managed IL does not establish OS thread identity or engine thread safety; root must log/assert main-thread identity. SaveSystem itself uses TWParallel.ForWithoutRenderThread; do not assume deserialization workers may touch engine objects.",
+      "initializationTiming": "Constructor receives already deserialized result. OnLoadFinished occurs after loading stages, restores MapState and encounter/menu state, emits OnGameLoadFinished and MapState.OnLoadingFinished.",
+      "ownership": "MBGameManager/GameLoadingState control loading and state transition. Preserve base lifecycle; do not manually initialize save objects.",
+      "serialization": "A derived manager cannot make its constructor or OnLoadFinished pre-deserialization. Save custom campaign type construction/identity compatibility not established.",
+      "editorOnly": false,
+      "status": "installed-managed-candidate; no new runtime proof"
+    }
+  ],
+  "modelOrder": {
+    "enumeration": "MBGameManager dispatches CollectSubModules in returned order. CollectSubModules enumerates ModuleHelper.GetAllModules dictionary values, active modules, declared submodules with loaded instances. This trace does not prove a stable total order merely from module names or launcher display.",
+    "installedNaval": "NavalDLCSubModule.InitializeGameStarter -> AddModels appends campaign/mission/naval wrappers, including MapDistanceModel, MapVisibilityModel, PartyTransitionModel, ShipStatModel, MapStormModel and ShipPhysicsParametersModel.",
+    "selection": "CampaignGameStarter.GetModel<T> and GameModelsManager.GetGameModel<T> scan Count-1 down to zero. Last assignable model wins. Generic AddModel<T> calls newModel.Initialize(previousSelectedModel) before appending.",
+    "snapshot": "GameModelsManager constructor copies enumerable via ToMBList. NavalDLCSubModule.OnGameStart -> NavalDLCManager.OnGameStart snapshots NavalDLC.GameModels DURING submodule OnGameStart dispatch. MBGameManager snapshots MissionGameModels after dispatch; Campaign snapshots basic/campaign models after manager.OnGameStart returns.",
+    "candidate": "For a manager-owned diagnostic, override InitializeGameStarter(Game,IGameStarter), call base then append adapter(s); all InitializeGameStarter callbacks including NavalDLC have completed, while no OnGameStart snapshot has happened. Later OnGameStart additions may still supersede campaign/mission selection: root must inspect actual selected model instances and captured wrapper chain, not only starter list.",
+    "stop": "Do not claim a later submodule OnGameStart addition reaches NavalDLC.GameModels. Stop on missing/overwritten model, unexpected module order, broken DLC delegation or incompatible loaded campaign type.",
+    "evidence": [
+      {
+        "signature": "System.Void NavalDLC.NavalDLCManager::OnGameStart(TaleWorlds.Core.Game,TaleWorlds.Core.IGameStarter)",
+        "genericParameters": [],
+        "parameters": [
+          "TaleWorlds.Core.Game game",
+          "TaleWorlds.Core.IGameStarter gameStarter"
+        ],
+        "access": "Public, HideBySig",
+        "token": 100663659,
+        "assembly": "D:/SteamLibrary/steamapps/common/Mount & Blade II Bannerlord/Modules/NavalDLC/bin/Win64_Shipping_Client/NavalDLC.dll",
+        "sha256": "146e16de9ac242ef63047cc337c858ffaf24a7b153f7bd7e18f1ccca1d268a94",
+        "line": 26
+      },
+      {
+        "signature": "System.Void NavalDLC.NavalDLCSubModule::OnGameStart(TaleWorlds.Core.Game,TaleWorlds.Core.IGameStarter)",
+        "genericParameters": [],
+        "parameters": [
+          "TaleWorlds.Core.Game game",
+          "TaleWorlds.Core.IGameStarter gameStarterObject"
+        ],
+        "access": "Family, Virtual, HideBySig",
+        "token": 100663665,
+        "assembly": "D:/SteamLibrary/steamapps/common/Mount & Blade II Bannerlord/Modules/NavalDLC/bin/Win64_Shipping_Client/NavalDLC.dll",
+        "sha256": "146e16de9ac242ef63047cc337c858ffaf24a7b153f7bd7e18f1ccca1d268a94",
+        "line": 136
+      },
+      {
+        "signature": "System.Void NavalDLC.NavalDLCSubModule::InitializeGameStarter(TaleWorlds.Core.Game,TaleWorlds.Core.IGameStarter)",
+        "genericParameters": [],
+        "parameters": [
+          "TaleWorlds.Core.Game game",
+          "TaleWorlds.Core.IGameStarter gameStarterObject"
+        ],
+        "access": "Family, Virtual, HideBySig",
+        "token": 100663669,
+        "assembly": "D:/SteamLibrary/steamapps/common/Mount & Blade II Bannerlord/Modules/NavalDLC/bin/Win64_Shipping_Client/NavalDLC.dll",
+        "sha256": "146e16de9ac242ef63047cc337c858ffaf24a7b153f7bd7e18f1ccca1d268a94",
+        "line": 191
+      },
+      {
+        "signature": "System.Void NavalDLC.NavalDLCSubModule::AddModels(TaleWorlds.CampaignSystem.CampaignGameStarter)",
+        "genericParameters": [],
+        "parameters": [
+          "TaleWorlds.CampaignSystem.CampaignGameStarter campaignGameStarter"
+        ],
+        "access": "Private, HideBySig",
+        "token": 100663673,
+        "assembly": "D:/SteamLibrary/steamapps/common/Mount & Blade II Bannerlord/Modules/NavalDLC/bin/Win64_Shipping_Client/NavalDLC.dll",
+        "sha256": "146e16de9ac242ef63047cc337c858ffaf24a7b153f7bd7e18f1ccca1d268a94",
+        "line": 246
+      },
+      {
+        "signature": "T TaleWorlds.CampaignSystem.CampaignGameStarter::GetModel()",
+        "genericParameters": [
+          {
+            "name": "T",
+            "constraints": [
+              null
+            ]
+          }
+        ],
+        "parameters": [],
+        "access": "Public, HideBySig",
+        "token": 100665538,
+        "assembly": "D:/SteamLibrary/steamapps/common/Mount & Blade II Bannerlord/bin/Win64_Shipping_Client/TaleWorlds.CampaignSystem.dll",
+        "sha256": "1f8e33e2ed73e6ec653d7629180afb70649ddc6e5bd1657a802a264efda1c3ae",
+        "line": 2904
+      },
+      {
+        "signature": "System.Void TaleWorlds.CampaignSystem.CampaignGameStarter::AddModel(TaleWorlds.Core.GameModel)",
+        "genericParameters": [],
+        "parameters": [
+          "TaleWorlds.Core.GameModel gameModel"
+        ],
+        "access": "Public, Final, Virtual, HideBySig, VtableLayoutMask",
+        "token": 100665539,
+        "assembly": "D:/SteamLibrary/steamapps/common/Mount & Blade II Bannerlord/bin/Win64_Shipping_Client/TaleWorlds.CampaignSystem.dll",
+        "sha256": "1f8e33e2ed73e6ec653d7629180afb70649ddc6e5bd1657a802a264efda1c3ae",
+        "line": 2936
+      },
+      {
+        "signature": "System.Void TaleWorlds.CampaignSystem.CampaignGameStarter::AddModel(TaleWorlds.Core.MBGameModel`1<T>)",
+        "genericParameters": [
+          {
+            "name": "T",
+            "constraints": [
+              null
+            ]
+          }
+        ],
+        "parameters": [
+          "TaleWorlds.Core.MBGameModel`1<T> gameModel"
+        ],
+        "access": "Public, Final, Virtual, HideBySig, VtableLayoutMask",
+        "token": 100665540,
+        "assembly": "D:/SteamLibrary/steamapps/common/Mount & Blade II Bannerlord/bin/Win64_Shipping_Client/TaleWorlds.CampaignSystem.dll",
+        "sha256": "1f8e33e2ed73e6ec653d7629180afb70649ddc6e5bd1657a802a264efda1c3ae",
+        "line": 2943
+      },
+      {
+        "signature": "TaleWorlds.Library.MBList`1<T> TaleWorlds.Library.Extensions::ToMBList(T[])",
+        "genericParameters": [
+          {
+            "name": "T",
+            "constraints": []
+          }
+        ],
+        "parameters": [
+          "T[] source"
+        ],
+        "access": "Public, Static, HideBySig",
+        "token": 100663675,
+        "assembly": "D:/SteamLibrary/steamapps/common/Mount & Blade II Bannerlord/bin/Win64_Shipping_Client/TaleWorlds.Library.dll",
+        "sha256": "ab4ff23e94a6f4b6f293d0cb4333cae731a0499063fe4a8b6c6a3770de32c4e5",
+        "line": 8039
+      },
+      {
+        "signature": "TaleWorlds.Library.MBList`1<T> TaleWorlds.Library.Extensions::ToMBList(System.Collections.Generic.List`1<T>)",
+        "genericParameters": [
+          {
+            "name": "T",
+            "constraints": []
+          }
+        ],
+        "parameters": [
+          "System.Collections.Generic.List`1<T> source"
+        ],
+        "access": "Public, Static, HideBySig",
+        "token": 100663676,
+        "assembly": "D:/SteamLibrary/steamapps/common/Mount & Blade II Bannerlord/bin/Win64_Shipping_Client/TaleWorlds.Library.dll",
+        "sha256": "ab4ff23e94a6f4b6f293d0cb4333cae731a0499063fe4a8b6c6a3770de32c4e5",
+        "line": 8049
+      },
+      {
+        "signature": "TaleWorlds.Library.MBList`1<T> TaleWorlds.Library.Extensions::ToMBList(System.Collections.Generic.IEnumerable`1<T>)",
+        "genericParameters": [
+          {
+            "name": "T",
+            "constraints": []
+          }
+        ],
+        "parameters": [
+          "System.Collections.Generic.IEnumerable`1<T> source"
+        ],
+        "access": "Public, Static, HideBySig",
+        "token": 100663677,
+        "assembly": "D:/SteamLibrary/steamapps/common/Mount & Blade II Bannerlord/bin/Win64_Shipping_Client/TaleWorlds.Library.dll",
+        "sha256": "ab4ff23e94a6f4b6f293d0cb4333cae731a0499063fe4a8b6c6a3770de32c4e5",
+        "line": 8058
+      },
+      {
+        "signature": "System.Void TaleWorlds.Core.GameModelsManager::.ctor(System.Collections.Generic.IEnumerable`1<TaleWorlds.Core.GameModel>)",
+        "genericParameters": [],
+        "parameters": [
+          "System.Collections.Generic.IEnumerable`1<TaleWorlds.Core.GameModel> inputComponents"
+        ],
+        "access": "Family, HideBySig, SpecialName, RTSpecialName",
+        "token": 100665319,
+        "assembly": "D:/SteamLibrary/steamapps/common/Mount & Blade II Bannerlord/bin/Win64_Shipping_Client/TaleWorlds.Core.dll",
+        "sha256": "3e5cece8ca42faf3fdde27632519ed2a6f86d1ec6d1a742867729f00001689bf",
+        "line": 9004
+      },
+      {
+        "signature": "T TaleWorlds.Core.GameModelsManager::GetGameModel()",
+        "genericParameters": [
+          {
+            "name": "T",
+            "constraints": [
+              null
+            ]
+          }
+        ],
+        "parameters": [],
+        "access": "Family, HideBySig",
+        "token": 100665320,
+        "assembly": "D:/SteamLibrary/steamapps/common/Mount & Blade II Bannerlord/bin/Win64_Shipping_Client/TaleWorlds.Core.dll",
+        "sha256": "3e5cece8ca42faf3fdde27632519ed2a6f86d1ec6d1a742867729f00001689bf",
+        "line": 9013
+      },
+      {
+        "signature": "System.Void TaleWorlds.Core.MBGameModel`1::Initialize(T)",
+        "genericParameters": [],
+        "parameters": [
+          "T baseModel"
+        ],
+        "access": "Public, HideBySig",
+        "token": 100665640,
+        "assembly": "D:/SteamLibrary/steamapps/common/Mount & Blade II Bannerlord/bin/Win64_Shipping_Client/TaleWorlds.Core.dll",
+        "sha256": "3e5cece8ca42faf3fdde27632519ed2a6f86d1ec6d1a742867729f00001689bf",
+        "line": 9061
+      },
+      {
+        "signature": "TaleWorlds.Library.MBReadOnlyList`1<TaleWorlds.MountAndBlade.MBSubModuleBase> TaleWorlds.MountAndBlade.Module::CollectSubModules()",
+        "genericParameters": [],
+        "parameters": [],
+        "access": "Public, HideBySig",
+        "token": 100674086,
+        "assembly": "D:/SteamLibrary/steamapps/common/Mount & Blade II Bannerlord/bin/Win64_Shipping_Client/TaleWorlds.MountAndBlade.dll",
+        "sha256": "19387f31557ff840d14f378f6bbdf1d58fcff406ab9ff2294dfbb3e49a50b87e",
+        "line": 10399
+      }
+    ]
+  },
+  "callPathEvidence": [
+    {
+      "signature": "System.Void TaleWorlds.CampaignSystem.Campaign::LoadMapScene()",
+      "genericParameters": [],
+      "parameters": [],
+      "access": "Private, HideBySig",
+      "token": 100664063,
+      "assembly": "D:/SteamLibrary/steamapps/common/Mount & Blade II Bannerlord/bin/Win64_Shipping_Client/TaleWorlds.CampaignSystem.dll",
+      "sha256": "1f8e33e2ed73e6ec653d7629180afb70649ddc6e5bd1657a802a264efda1c3ae",
+      "line": 1513
+    },
+    {
+      "signature": "System.Void TaleWorlds.CampaignSystem.Campaign::OnInitialize()",
+      "genericParameters": [],
+      "parameters": [],
+      "access": "Family, Virtual, HideBySig",
+      "token": 100664077,
+      "assembly": "D:/SteamLibrary/steamapps/common/Mount & Blade II Bannerlord/bin/Win64_Shipping_Client/TaleWorlds.CampaignSystem.dll",
+      "sha256": "1f8e33e2ed73e6ec653d7629180afb70649ddc6e5bd1657a802a264efda1c3ae",
+      "line": 1813
+    },
+    {
+      "signature": "System.Void TaleWorlds.CampaignSystem.Campaign::OnNewCampaignStart()",
+      "genericParameters": [],
+      "parameters": [],
+      "access": "Private, HideBySig",
+      "token": 100664083,
+      "assembly": "D:/SteamLibrary/steamapps/common/Mount & Blade II Bannerlord/bin/Win64_Shipping_Client/TaleWorlds.CampaignSystem.dll",
+      "sha256": "1f8e33e2ed73e6ec653d7629180afb70649ddc6e5bd1657a802a264efda1c3ae",
+      "line": 2236
+    },
+    {
+      "signature": "System.Void TaleWorlds.CampaignSystem.Campaign::DoLoadingForGameType(TaleWorlds.Core.GameTypeLoadingStates,TaleWorlds.Core.GameTypeLoadingStates&)",
+      "genericParameters": [],
+      "parameters": [
+        "TaleWorlds.Core.GameTypeLoadingStates gameTypeLoadingState",
+        "TaleWorlds.Core.GameTypeLoadingStates& nextState"
+      ],
+      "access": "Family, Virtual, HideBySig",
+      "token": 100664090,
+      "assembly": "D:/SteamLibrary/steamapps/common/Mount & Blade II Bannerlord/bin/Win64_Shipping_Client/TaleWorlds.CampaignSystem.dll",
+      "sha256": "1f8e33e2ed73e6ec653d7629180afb70649ddc6e5bd1657a802a264efda1c3ae",
+      "line": 2693
+    },
+    {
+      "signature": "System.Void TaleWorlds.CampaignSystem.SandBoxManager::OnCampaignStart(TaleWorlds.CampaignSystem.CampaignGameStarter,TaleWorlds.Core.GameManagerBase,System.Boolean)",
+      "genericParameters": [],
+      "parameters": [
+        "TaleWorlds.CampaignSystem.CampaignGameStarter gameInitializer",
+        "TaleWorlds.Core.GameManagerBase gameManager",
+        "System.Boolean isSavedCampaign"
+      ],
+      "access": "Public, HideBySig",
+      "token": 100668211,
+      "assembly": "D:/SteamLibrary/steamapps/common/Mount & Blade II Bannerlord/bin/Win64_Shipping_Client/TaleWorlds.CampaignSystem.dll",
+      "sha256": "1f8e33e2ed73e6ec653d7629180afb70649ddc6e5bd1657a802a264efda1c3ae",
+      "line": 5269
+    },
+    {
+      "signature": "System.Void TaleWorlds.CampaignSystem.SandBoxManager::InitializeSandboxXMLs(System.Boolean)",
+      "genericParameters": [],
+      "parameters": [
+        "System.Boolean isSavedCampaign"
+      ],
+      "access": "Public, HideBySig",
+      "token": 100668214,
+      "assembly": "D:/SteamLibrary/steamapps/common/Mount & Blade II Bannerlord/bin/Win64_Shipping_Client/TaleWorlds.CampaignSystem.dll",
+      "sha256": "1f8e33e2ed73e6ec653d7629180afb70649ddc6e5bd1657a802a264efda1c3ae",
+      "line": 5298
+    },
+    {
+      "signature": "TaleWorlds.ObjectSystem.MBObjectManager TaleWorlds.ObjectSystem.MBObjectManager::Init()",
+      "genericParameters": [],
+      "parameters": [],
+      "access": "Public, Static, HideBySig",
+      "token": 100663354,
+      "assembly": "D:/SteamLibrary/steamapps/common/Mount & Blade II Bannerlord/bin/Win64_Shipping_Client/TaleWorlds.ObjectSystem.dll",
+      "sha256": "d76e1d883a6d9a4efe6f9f3b4d14da41a414c7b587f7280705255dc99abd9977",
+      "line": 5573
+    },
+    {
+      "signature": "System.Void TaleWorlds.ObjectSystem.MBObjectManager::LoadXML(System.String,System.Boolean,System.String,System.Boolean)",
+      "genericParameters": [],
+      "parameters": [
+        "System.String id",
+        "System.Boolean isDevelopment",
+        "System.String gameType",
+        "System.Boolean skipXmlFilterForEditor"
+      ],
+      "access": "Public, HideBySig",
+      "token": 100663383,
+      "assembly": "D:/SteamLibrary/steamapps/common/Mount & Blade II Bannerlord/bin/Win64_Shipping_Client/TaleWorlds.ObjectSystem.dll",
+      "sha256": "d76e1d883a6d9a4efe6f9f3b4d14da41a414c7b587f7280705255dc99abd9977",
+      "line": 5969
+    },
+    {
+      "signature": "System.Xml.XmlDocument TaleWorlds.ObjectSystem.MBObjectManager::GetMergedXmlForManaged(System.String,System.Boolean,System.Boolean,System.String)",
+      "genericParameters": [],
+      "parameters": [
+        "System.String id",
+        "System.Boolean skipValidation",
+        "System.Boolean ignoreGameTypeInclusionCheck",
+        "System.String gameType"
+      ],
+      "access": "Public, Static, HideBySig",
+      "token": 100663386,
+      "assembly": "D:/SteamLibrary/steamapps/common/Mount & Blade II Bannerlord/bin/Win64_Shipping_Client/TaleWorlds.ObjectSystem.dll",
+      "sha256": "d76e1d883a6d9a4efe6f9f3b4d14da41a414c7b587f7280705255dc99abd9977",
+      "line": 5989
+    },
+    {
+      "signature": "System.Void TaleWorlds.ObjectSystem.MBObjectManager::LoadXml(System.Xml.XmlDocument,System.Boolean)",
+      "genericParameters": [],
+      "parameters": [
+        "System.Xml.XmlDocument doc",
+        "System.Boolean isDevelopment"
+      ],
+      "access": "Public, HideBySig",
+      "token": 100663404,
+      "assembly": "D:/SteamLibrary/steamapps/common/Mount & Blade II Bannerlord/bin/Win64_Shipping_Client/TaleWorlds.ObjectSystem.dll",
+      "sha256": "d76e1d883a6d9a4efe6f9f3b4d14da41a414c7b587f7280705255dc99abd9977",
+      "line": 6630
+    },
+    {
+      "signature": "System.Void TaleWorlds.ObjectSystem.MBObjectManager::ReInitialize()",
+      "genericParameters": [],
+      "parameters": [],
+      "access": "Public, HideBySig",
+      "token": 100663419,
+      "assembly": "D:/SteamLibrary/steamapps/common/Mount & Blade II Bannerlord/bin/Win64_Shipping_Client/TaleWorlds.ObjectSystem.dll",
+      "sha256": "d76e1d883a6d9a4efe6f9f3b4d14da41a414c7b587f7280705255dc99abd9977",
+      "line": 7053
+    },
+    {
+      "signature": "TaleWorlds.SaveSystem.Load.LoadResult TaleWorlds.SaveSystem.SaveManager::Load(System.String,TaleWorlds.SaveSystem.ISaveDriver)",
+      "genericParameters": [],
+      "parameters": [
+        "System.String saveName",
+        "TaleWorlds.SaveSystem.ISaveDriver driver"
+      ],
+      "access": "Public, Static, HideBySig",
+      "token": 100663491,
+      "assembly": "D:/SteamLibrary/steamapps/common/Mount & Blade II Bannerlord/bin/Win64_Shipping_Client/TaleWorlds.SaveSystem.dll",
+      "sha256": "aee0f88d156ba286cf85624f91e2cee4e2a4da3ae2689a603f33ed247b28aac7",
+      "line": 7106
+    },
+    {
+      "signature": "TaleWorlds.SaveSystem.Load.LoadResult TaleWorlds.SaveSystem.SaveManager::Load(System.String,TaleWorlds.SaveSystem.ISaveDriver,System.Boolean)",
+      "genericParameters": [],
+      "parameters": [
+        "System.String saveName",
+        "TaleWorlds.SaveSystem.ISaveDriver driver",
+        "System.Boolean loadAsLateInitialize"
+      ],
+      "access": "Public, Static, HideBySig",
+      "token": 100663492,
+      "assembly": "D:/SteamLibrary/steamapps/common/Mount & Blade II Bannerlord/bin/Win64_Shipping_Client/TaleWorlds.SaveSystem.dll",
+      "sha256": "aee0f88d156ba286cf85624f91e2cee4e2a4da3ae2689a603f33ed247b28aac7",
+      "line": 7113
+    },
+    {
+      "signature": "System.Void TaleWorlds.SaveSystem.Load.LoadCallbackInitializator::InitializeObjects()",
+      "genericParameters": [],
+      "parameters": [],
+      "access": "Public, HideBySig",
+      "token": 100663870,
+      "assembly": "D:/SteamLibrary/steamapps/common/Mount & Blade II Bannerlord/bin/Win64_Shipping_Client/TaleWorlds.SaveSystem.dll",
+      "sha256": "aee0f88d156ba286cf85624f91e2cee4e2a4da3ae2689a603f33ed247b28aac7",
+      "line": 7186
+    },
+    {
+      "signature": "System.Void TaleWorlds.SaveSystem.Load.LoadCallbackInitializator::AfterInitializeObjects()",
+      "genericParameters": [],
+      "parameters": [],
+      "access": "Public, HideBySig",
+      "token": 100663871,
+      "assembly": "D:/SteamLibrary/steamapps/common/Mount & Blade II Bannerlord/bin/Win64_Shipping_Client/TaleWorlds.SaveSystem.dll",
+      "sha256": "aee0f88d156ba286cf85624f91e2cee4e2a4da3ae2689a603f33ed247b28aac7",
+      "line": 7309
+    },
+    {
+      "signature": "System.Boolean TaleWorlds.SaveSystem.Load.LoadContext::Load(TaleWorlds.SaveSystem.LoadData,System.Boolean)",
+      "genericParameters": [],
+      "parameters": [
+        "TaleWorlds.SaveSystem.LoadData loadData",
+        "System.Boolean loadAsLateInitialize"
+      ],
+      "access": "Public, HideBySig",
+      "token": 100663882,
+      "assembly": "D:/SteamLibrary/steamapps/common/Mount & Blade II Bannerlord/bin/Win64_Shipping_Client/TaleWorlds.SaveSystem.dll",
+      "sha256": "aee0f88d156ba286cf85624f91e2cee4e2a4da3ae2689a603f33ed247b28aac7",
+      "line": 7521
+    },
+    {
+      "signature": "TaleWorlds.Core.Game TaleWorlds.Core.Game::CreateGame(TaleWorlds.Core.GameType,TaleWorlds.Core.GameManagerBase,System.Int32)",
+      "genericParameters": [],
+      "parameters": [
+        "TaleWorlds.Core.GameType gameType",
+        "TaleWorlds.Core.GameManagerBase gameManager",
+        "System.Int32 seed"
+      ],
+      "access": "Public, Static, HideBySig",
+      "token": 100665211,
+      "assembly": "D:/SteamLibrary/steamapps/common/Mount & Blade II Bannerlord/bin/Win64_Shipping_Client/TaleWorlds.Core.dll",
+      "sha256": "3e5cece8ca42faf3fdde27632519ed2a6f86d1ec6d1a742867729f00001689bf",
+      "line": 8320
+    },
+    {
+      "signature": "TaleWorlds.Core.Game TaleWorlds.Core.Game::CreateGame(TaleWorlds.Core.GameType,TaleWorlds.Core.GameManagerBase)",
+      "genericParameters": [],
+      "parameters": [
+        "TaleWorlds.Core.GameType gameType",
+        "TaleWorlds.Core.GameManagerBase gameManager"
+      ],
+      "access": "Public, Static, HideBySig",
+      "token": 100665213,
+      "assembly": "D:/SteamLibrary/steamapps/common/Mount & Blade II Bannerlord/bin/Win64_Shipping_Client/TaleWorlds.Core.dll",
+      "sha256": "3e5cece8ca42faf3fdde27632519ed2a6f86d1ec6d1a742867729f00001689bf",
+      "line": 8365
+    },
+    {
+      "signature": "TaleWorlds.Core.Game TaleWorlds.Core.Game::LoadSaveGame(TaleWorlds.SaveSystem.Load.LoadResult,TaleWorlds.Core.GameManagerBase)",
+      "genericParameters": [],
+      "parameters": [
+        "TaleWorlds.SaveSystem.Load.LoadResult loadResult",
+        "TaleWorlds.Core.GameManagerBase gameManager"
+      ],
+      "access": "Public, Static, HideBySig",
+      "token": 100665214,
+      "assembly": "D:/SteamLibrary/steamapps/common/Mount & Blade II Bannerlord/bin/Win64_Shipping_Client/TaleWorlds.Core.dll",
+      "sha256": "3e5cece8ca42faf3fdde27632519ed2a6f86d1ec6d1a742867729f00001689bf",
+      "line": 8378
+    },
+    {
+      "signature": "System.Void TaleWorlds.Core.Game::BeginLoading(TaleWorlds.Core.GameManagerBase)",
+      "genericParameters": [],
+      "parameters": [
+        "TaleWorlds.Core.GameManagerBase gameManager"
+      ],
+      "access": "Private, HideBySig",
+      "token": 100665216,
+      "assembly": "D:/SteamLibrary/steamapps/common/Mount & Blade II Bannerlord/bin/Win64_Shipping_Client/TaleWorlds.Core.dll",
+      "sha256": "3e5cece8ca42faf3fdde27632519ed2a6f86d1ec6d1a742867729f00001689bf",
+      "line": 8415
+    },
+    {
+      "signature": "System.Void TaleWorlds.Core.Game::RegisterTypes(TaleWorlds.Core.GameType,TaleWorlds.ObjectSystem.MBObjectManager,TaleWorlds.Core.GameManagerBase)",
+      "genericParameters": [],
+      "parameters": [
+        "TaleWorlds.Core.GameType gameType",
+        "TaleWorlds.ObjectSystem.MBObjectManager objectManager",
+        "TaleWorlds.Core.GameManagerBase gameManager"
+      ],
+      "access": "Public, Static, HideBySig",
+      "token": 100665229,
+      "assembly": "D:/SteamLibrary/steamapps/common/Mount & Blade II Bannerlord/bin/Win64_Shipping_Client/TaleWorlds.Core.dll",
+      "sha256": "3e5cece8ca42faf3fdde27632519ed2a6f86d1ec6d1a742867729f00001689bf",
+      "line": 8479
+    },
+    {
+      "signature": "System.Void SandBox.SandBoxGameManager::DoLoadingForGameManager(TaleWorlds.Core.GameManagerLoadingSteps,TaleWorlds.Core.GameManagerLoadingSteps&)",
+      "genericParameters": [],
+      "parameters": [
+        "TaleWorlds.Core.GameManagerLoadingSteps gameManagerLoadingStep",
+        "TaleWorlds.Core.GameManagerLoadingSteps& nextStep"
+      ],
+      "access": "Family, Virtual, HideBySig",
+      "token": 100663573,
+      "assembly": "D:/SteamLibrary/steamapps/common/Mount & Blade II Bannerlord/Modules/SandBox/bin/Win64_Shipping_Client/SandBox.dll",
+      "sha256": "587c6e94c425745c1478f632f3b66226ff8298666cb27e8e6d9a62488df5956a",
+      "line": 9222
+    },
+    {
+      "signature": "System.Void SandBox.SandBoxSubModule::OnGameInitializationFinished(TaleWorlds.Core.Game)",
+      "genericParameters": [],
+      "parameters": [
+        "TaleWorlds.Core.Game game"
+      ],
+      "access": "Public, Virtual, HideBySig",
+      "token": 100663599,
+      "assembly": "D:/SteamLibrary/steamapps/common/Mount & Blade II Bannerlord/Modules/SandBox/bin/Win64_Shipping_Client/SandBox.dll",
+      "sha256": "587c6e94c425745c1478f632f3b66226ff8298666cb27e8e6d9a62488df5956a",
+      "line": 9702
+    },
+    {
+      "signature": "System.Void TaleWorlds.MountAndBlade.GameLoadingState::OnTick(System.Single)",
+      "genericParameters": [],
+      "parameters": [
+        "System.Single dt"
+      ],
+      "access": "Family, Virtual, HideBySig",
+      "token": 100671779,
+      "assembly": "D:/SteamLibrary/steamapps/common/Mount & Blade II Bannerlord/bin/Win64_Shipping_Client/TaleWorlds.MountAndBlade.dll",
+      "sha256": "19387f31557ff840d14f378f6bbdf1d58fcff406ab9ff2294dfbb3e49a50b87e",
+      "line": 10302
+    }
+  ],
+  "unknownsAndRequiredRootChecks": [
+    "No generated campaign object injection or save roundtrip was run. c2 call ordering is traced; runtime support is not asserted.",
+    "Safe generated-object registration before binary reference resolution remains unknown. Type/object manager registration, SaveSystem type definitions and immutable manifest validation are separate concerns.",
+    "No proof that module XML declarations alone override all generated campaign records consistently on saved load; stock loaders may reload/merge records, and non-ready cleanup may remove incomplete generated objects.",
+    "IMBGame.LoadModuleData/StartNew bridge implementation/native asset readiness not established by these managed bodies. No supported arbitrary native scene registration inferred.",
+    "Root probe should log callback ordinal/thread ID, Game/MBObjectManager identity, representative registered IDs before/after callback initialization and XML passes, active module order and selected campaign/mission/naval model types.",
+    "Stop before engine mutation/load if immutable world/save binding is absent/mismatched; do not fallback to Calradia. Verify both new and loaded paths and disposal separately."
+  ],
+  "verification": {
+    "priorMismatches": [],
+    "priorEvidenceChecks": 13,
+    "assemblyHashesRechecked": 9,
+    "writesRestrictedTo": [
+      "evidence/runtime/lifecycle-extension-contract.json",
+      "build/research-lifecycle14/"
+    ],
+    "noGameBuildDeployOrUi": true,
+    "freshInstalledMethods": 598
+  }
+}

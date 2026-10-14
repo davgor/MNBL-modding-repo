@@ -1,0 +1,29 @@
+{
+  "schema": "mnbl.save-load-order",
+  "version": 1,
+  "gameVersion": "v1.4.8.119303",
+  "runtimeEvidence": "evidence/baseline/save-roundtrip-31116-32644.json",
+  "observedFlow": [
+    "MBSaveLoad.LoadSaveGameData(slot) returns successful LoadResult",
+    "SandBoxGameManager(LoadResult) marks LoadingSavedGame and stores result",
+    "MBGameManager.StartNewGame(manager) enters installed loading lifecycle",
+    "Game.LoadSaveGame calls MBSaveLoad.OnStartGame, initializes MBObjectManager, registers types, then LoadResult.InitializeObjects, MBObjectManager.ReInitialize, LoadResult.AfterInitializeObjects and Game.BeginLoading",
+    "SandBoxGameManager.OnLoadFinished restores MapState and saved menu; diagnostic autosave and time guards bracket this callback",
+    "Scene readiness and exact party/time comparison occur in a fresh process"
+  ],
+  "unknown": [
+    "No custom generated campaign object deserialization was tested",
+    "No production generated-world save binding or normal-menu load interception exists",
+    "Native resources and generated object registrations must be available before their actual consumers; this official-content run does not establish the earliest safe custom-registration callback"
+  ],
+  "sourceTraces": [
+    {
+      "path": "build/research-save-baseline/callers.il.txt",
+      "sha256": "19c1fafa4f5a828b303d932832331a674a918fb98ad45a59341862c43f679d70"
+    },
+    {
+      "path": "build/research-save-baseline/save-load.il.txt",
+      "sha256": "d4adcd934b6f3341f9206417038a5ea5839ebbec906e6f989a94578f8832c7fa"
+    }
+  ]
+}

@@ -1,0 +1,539 @@
+{
+ "schema": "mnbl.bootstrap-probe.v1",
+ "ticket": "MMR-18",
+ "utc": "2026-10-13T21:20:00Z",
+ "status": "c1-c3 evidenced for new-game initialization plus two campaign days per world; save/load, UI-driven interactions, settlement visuals and long-run economy unproved",
+ "inputs": {
+  "placement42": "963802f2c06d4cd4b40998b080e04c42e96640f50db0cdd47684b7f20d404cc9",
+  "placement43": "e635214de6567b75e26b76d0274b009d8dcef5d9ff1f672c0cc58d3f17cc7671",
+  "catalogReceipt": "27bca57ee00ae08ab628d049b3409380ea9f1188b2b2aeba9706610fc481f80e",
+  "engineCharacterLiterals": "4295b3bd70b183813480aca662e770502cd577424e1371bd15d934bb5505a27c"
+ },
+ "sources": {
+  "src/MNBL.ProceduralWorld/CampaignBootstrap/GeneratedCampaignDataset.cs": "86422dd8b93f4724df8a239a42a948317dea02cd77944872b05033dbc8158986",
+  "src/MNBL.ProceduralWorld/CampaignBootstrap/GeneratedCampaignRegistration.cs": "2db205676b6ce1358a308a1ebbe430f9078a1de9813af0905482f33cecf64fc7",
+  "src/MNBL.ProceduralWorld/CampaignBootstrap/DiagnosticSandboxBootstrap.cs": "9d1d5b13d6207ad66ca70093a37cee1e682337671c7561e69f806402d8dcd7a1",
+  "src/MNBL.ProceduralWorld/Diagnostics/CampaignBootstrapProbe.cs": "b89f10c70d8c4178ae1a221d40fa453019514c0eec0612ee66c489d4fbd41190",
+  "src/MNBL.ProceduralWorld/Automation/GeneratedCampaignBootProbe.cs": "8f286b1aeec6a5c82a708d08191ad1b5efbf759146386b9e5da303d7c9df140d",
+  "src/MNBL.ProceduralWorld/Automation/GeneratedCampaignGameplay.cs": "9506e993cf6074f4214a0a6b796a090a9188fcc4daa8419f3783f560b8878345",
+  "tools/scenebin/build_bootstrap_world.py": "ac58e2da1a0485d0d4a3fab026d0722e7fa713947b9ef001dcadbaa1c9ef297e",
+  "tools/Watch-ProbeDialogs.ps1": "4c1d6ac20704d7dae251697bba938e00f1edb8ffc3dbbdec91c1444ced87bbce",
+  "tools/Start-OwnedProbe.ps1": "4ec12d8c059f117c46800823446ed553d1db17b1f11a2898f25fe3d015907c2e",
+  "tools/Collect-OwnedProbe.ps1": "f1f8148bf38b79fbee28657852ba32d7f808ce0eb107a688050936f6e7194239"
+ },
+ "runs": [
+  {
+   "pid": 31992,
+   "outcome": "failed: catalog path only existed in Codex package cache",
+   "status": "error",
+   "final": true,
+   "moduleSha256": "1f22dd91da7a7247777f26cd6da5948cfc4f0f661db7926f9b5e7e5e1000cdfc",
+   "result": "evidence/runtime/in-game/generated_campaign-31992.json",
+   "resultSha256": "6699433680410375810c0c1894a2c10c04a62a7dec7abce826ebaaddb1145c1b",
+   "existingSavesChanged": [],
+   "newSaves": [],
+   "worlds": []
+  },
+  {
+   "pid": 8152,
+   "outcome": "failed: census Rows(null) on CampaignObjectManager.Settlements before InitializeOnNewGame; unhandled InvalidOperationException",
+   "status": "running",
+   "final": false,
+   "moduleSha256": "1f22dd91da7a7247777f26cd6da5948cfc4f0f661db7926f9b5e7e5e1000cdfc",
+   "result": "evidence/runtime/in-game/generated_campaign-8152.json",
+   "resultSha256": "2077767ec05b1e309225ed267ddbc28aa5c97788f3834cd296915e24800c1e62",
+   "existingSavesChanged": [],
+   "newSaves": [],
+   "worlds": [
+    {
+     "worldId": "mnbl_0000002a",
+     "completed": false,
+     "validationFailures": null,
+     "sceneName": null,
+     "navFaces": null,
+     "topScreen": null,
+     "normalGameEndCompleted": null,
+     "campaignObjectCounts": null,
+     "identityWitnesses": null
+    }
+   ]
+  },
+  {
+   "pid": 33184,
+   "outcome": "failed: BodyGeneratorView..ctor NRE; facgen_template_test_char_* absent from generated NPCCharacters",
+   "status": "error",
+   "final": true,
+   "moduleSha256": "3eacedb477b3ebcd1d4ef629c75e304d334534f98847185c2969ff83dc63939c",
+   "result": "evidence/runtime/in-game/generated_campaign-33184.json",
+   "resultSha256": "d1da72fd6fe5750329c7fe58017cac02bdd87ef0a61ba25035ecd81021f28fb7",
+   "existingSavesChanged": [],
+   "newSaves": [],
+   "worlds": [
+    {
+     "worldId": "mnbl_0000002a",
+     "completed": false,
+     "validationFailures": null,
+     "sceneName": null,
+     "navFaces": null,
+     "topScreen": null,
+     "normalGameEndCompleted": null,
+     "campaignObjectCounts": null,
+     "identityWitnesses": null
+    }
+   ]
+  },
+  {
+   "pid": 19700,
+   "outcome": "ok: one world",
+   "status": "ok",
+   "final": true,
+   "moduleSha256": "0c1c1e3774f3ae0f8d1770999614338c8a819cce947f61cb42ab7d999f3eda93",
+   "result": "evidence/runtime/in-game/generated_campaign-19700.json",
+   "resultSha256": "ab88142b000c666caa0986f3ee756ea52d1ebd1f0bad9ab5b768220b9d907809",
+   "existingSavesChanged": [],
+   "newSaves": [],
+   "worlds": [
+    {
+     "worldId": "mnbl_0000002a",
+     "completed": true,
+     "validationFailures": [],
+     "sceneName": "mnbl_generated_0000002a",
+     "navFaces": 32768,
+     "topScreen": "NavalDLC.View.Map.NavalMapScreen",
+     "normalGameEndCompleted": null,
+     "campaignObjectCounts": {
+      "settlements": 4,
+      "clans": 3,
+      "kingdoms": 2,
+      "aliveHeroes": 21,
+      "deadOrDisabledHeroes": 0,
+      "parties": 17
+     },
+     "identityWitnesses": {
+      "gameIdentityWitness": 59612065,
+      "campaignIdentityWitness": 2424320,
+      "objectManagerIdentityWitness": 34604622,
+      "campaignObjectManagerIdentityWitness": 30610471
+     }
+    }
+   ]
+  },
+  {
+   "pid": 31308,
+   "outcome": "ok: two worlds in one process",
+   "status": "ok",
+   "final": true,
+   "moduleSha256": "0c1c1e3774f3ae0f8d1770999614338c8a819cce947f61cb42ab7d999f3eda93",
+   "result": "evidence/runtime/in-game/generated_campaign-31308.json",
+   "resultSha256": "2892eef88620259e02fb4707e81f777a1468993fc1bfd9a3154ad01662cd8e69",
+   "existingSavesChanged": [],
+   "newSaves": [],
+   "worlds": [
+    {
+     "worldId": "mnbl_0000002a",
+     "completed": true,
+     "validationFailures": [],
+     "sceneName": "mnbl_generated_0000002a",
+     "navFaces": 32768,
+     "topScreen": "NavalDLC.View.Map.NavalMapScreen",
+     "normalGameEndCompleted": true,
+     "campaignObjectCounts": {
+      "settlements": 4,
+      "clans": 3,
+      "kingdoms": 2,
+      "aliveHeroes": 19,
+      "deadOrDisabledHeroes": 0,
+      "parties": 17
+     },
+     "identityWitnesses": {
+      "gameIdentityWitness": 59612065,
+      "campaignIdentityWitness": 2424320,
+      "objectManagerIdentityWitness": 34604622,
+      "campaignObjectManagerIdentityWitness": 30610471
+     }
+    },
+    {
+     "worldId": "mnbl_0000002b",
+     "completed": true,
+     "validationFailures": [],
+     "sceneName": "mnbl_generated_0000002b",
+     "navFaces": 32768,
+     "topScreen": "NavalDLC.View.Map.NavalMapScreen",
+     "normalGameEndCompleted": null,
+     "campaignObjectCounts": {
+      "settlements": 4,
+      "clans": 3,
+      "kingdoms": 2,
+      "aliveHeroes": 21,
+      "deadOrDisabledHeroes": 0,
+      "parties": 17
+     },
+     "identityWitnesses": {
+      "gameIdentityWitness": 18503448,
+      "campaignIdentityWitness": 31229645,
+      "objectManagerIdentityWitness": 11391575,
+      "campaignObjectManagerIdentityWitness": 14660795
+     }
+    }
+   ]
+  },
+  {
+   "pid": 33084,
+   "outcome": "failed: hourly RetirementCampaignBehavior NRE (diagnosed in 34724), fast-forward",
+   "status": "running",
+   "final": false,
+   "moduleSha256": "8b48dbb16687502bf6f571975a58c1717969b20ab1aab9ee6e781647fd1940d9",
+   "result": "evidence/runtime/in-game/generated_campaign-33084.json",
+   "resultSha256": "437bc7f40c9eca4a66b41f390cb068e52939e665902485d86b661593e9b48282",
+   "existingSavesChanged": [],
+   "newSaves": [],
+   "worlds": [
+    {
+     "worldId": "mnbl_0000002a",
+     "completed": false,
+     "validationFailures": [],
+     "gameplay": {
+      "campaignDaysAdvanced": null,
+      "timeControl": null,
+      "firstChanceExceptions": null,
+      "failures": [],
+      "recruitment": null,
+      "trade": null,
+      "entryProbe": null
+     }
+    }
+   ]
+  },
+  {
+   "pid": 35728,
+   "outcome": "failed: same NRE at normal speed; breadcrumbs showed first ship visual then hourly tick",
+   "status": "running",
+   "final": false,
+   "moduleSha256": "dfdb7669c378ce5f54f7b67218fbff5e84eed52ac0d14c9496b63495eeed91aa",
+   "result": "evidence/runtime/in-game/generated_campaign-35728.json",
+   "resultSha256": "a380cc9f542bec49a73dd846fb66801c613868fcc6f598aed908c2ffe9d5fdb1",
+   "existingSavesChanged": [],
+   "newSaves": [],
+   "worlds": [
+    {
+     "worldId": "mnbl_0000002a",
+     "completed": false,
+     "validationFailures": [],
+     "gameplay": {
+      "campaignDaysAdvanced": null,
+      "timeControl": "UnstoppablePlay",
+      "firstChanceExceptions": null,
+      "failures": [],
+      "recruitment": null,
+      "trade": null,
+      "entryProbe": null
+     }
+    }
+   ]
+  },
+  {
+   "pid": 34724,
+   "outcome": "failed: first-chance trace = RetirementCampaignBehavior.CheckRetirementSettlementVisibility (retirement_retreat absent)",
+   "status": "running",
+   "final": false,
+   "moduleSha256": "430ae1a146adb8d866c0791d08d87744c4552e0d97e3beff5bbe8819efc1a601",
+   "result": "evidence/runtime/in-game/generated_campaign-34724.json",
+   "resultSha256": "2a61e374275be23ee690f16932428ecd7335e2f7eab427eba986a0d2f86f9f06",
+   "existingSavesChanged": [],
+   "newSaves": [],
+   "worlds": [
+    {
+     "worldId": "mnbl_0000002a",
+     "completed": false,
+     "validationFailures": [],
+     "gameplay": {
+      "campaignDaysAdvanced": null,
+      "timeControl": "UnstoppablePlay",
+      "firstChanceExceptions": null,
+      "failures": [],
+      "recruitment": null,
+      "trade": null,
+      "entryProbe": null
+     }
+    }
+   ]
+  },
+  {
+   "pid": 24736,
+   "outcome": "ok: one world, 1 day normal speed, recruitment + purchase",
+   "status": "ok",
+   "final": true,
+   "moduleSha256": "ded4381acbf25d6590566d12a79f85fb76ac69421b1e4bd4cf3bcb607495b4bc",
+   "result": "evidence/runtime/in-game/generated_campaign-24736.json",
+   "resultSha256": "6b0679e9d059be66e2873874ca5aebf5be51f90cf70e9073d2101aa5fdd14c06",
+   "existingSavesChanged": [],
+   "newSaves": [],
+   "worlds": [
+    {
+     "worldId": "mnbl_0000002a",
+     "completed": true,
+     "validationFailures": [],
+     "gameplay": {
+      "campaignDaysAdvanced": 1.0000609849521425,
+      "timeControl": "UnstoppablePlay",
+      "firstChanceExceptions": 0,
+      "failures": [],
+      "recruitment": {
+       "settlement": "mnbl_0000002a_town_1",
+       "notable": "CharacterObject_1",
+       "slot": 0,
+       "troop": "imperial_recruit",
+       "troopCulture": "empire",
+       "cost": 20,
+       "goldBefore": 1000,
+       "countBefore": 0,
+       "goldAfter": 980,
+       "countAfter": 1,
+       "slotCleared": true
+      },
+      "trade": {
+       "settlement": "mnbl_0000002a_town_1",
+       "item": "fish",
+       "price": 6,
+       "townStockBefore": 1054,
+       "partyStockBefore": 0,
+       "goldBefore": 980,
+       "townGoldBefore": 47523,
+       "townStockAfter": 1053,
+       "partyStockAfter": 1,
+       "goldAfter": 974,
+       "townGoldAfter": 47525
+      },
+      "entryProbe": null
+     }
+    }
+   ]
+  },
+  {
+   "pid": 31916,
+   "outcome": "failed: native TaleWorlds.Native.dll+0x4c4897 null read on first lord entering a generated town (fast-forward)",
+   "status": "running",
+   "final": false,
+   "moduleSha256": "ded4381acbf25d6590566d12a79f85fb76ac69421b1e4bd4cf3bcb607495b4bc",
+   "result": "evidence/runtime/in-game/generated_campaign-31916.json",
+   "resultSha256": "87d2776efe93e1b316b62aab465b67413a480652260479272a5ec7313bdfe1eb",
+   "existingSavesChanged": [],
+   "newSaves": [],
+   "worlds": [
+    {
+     "worldId": "mnbl_0000002a",
+     "completed": false,
+     "validationFailures": [],
+     "gameplay": {
+      "campaignDaysAdvanced": null,
+      "timeControl": "UnstoppableFastForward",
+      "firstChanceExceptions": null,
+      "failures": [],
+      "recruitment": null,
+      "trade": null,
+      "entryProbe": null
+     }
+    }
+   ]
+  },
+  {
+   "pid": 35676,
+   "outcome": "failed: deterministic repro; entry at pause ok, faults once time runs with lord inside; childless map_banner_placeholder",
+   "status": "running",
+   "final": false,
+   "moduleSha256": "40cc09206cb8b3ebb6ed18fad1db46fc4b252c1567266b9f07af02cc1fca7234",
+   "result": "evidence/runtime/in-game/generated_campaign-35676.json",
+   "resultSha256": "67bdc0852f50f4232832334240db900e490f2d92196b7ec653ecfff4dbaf6548",
+   "existingSavesChanged": [],
+   "newSaves": [],
+   "worlds": [
+    {
+     "worldId": "mnbl_0000002a",
+     "completed": false,
+     "validationFailures": [],
+     "gameplay": {
+      "campaignDaysAdvanced": null,
+      "timeControl": "UnstoppablePlay",
+      "firstChanceExceptions": null,
+      "failures": [],
+      "recruitment": null,
+      "trade": null,
+      "entryProbe": null
+     }
+    }
+   ]
+  },
+  {
+   "pid": 27472,
+   "outcome": "failed: self-inflicted; diagnostic PartyVisibilityChanged listener threw for party under construction",
+   "status": "running",
+   "final": false,
+   "moduleSha256": "40cc09206cb8b3ebb6ed18fad1db46fc4b252c1567266b9f07af02cc1fca7234",
+   "result": "evidence/runtime/in-game/generated_campaign-27472.json",
+   "resultSha256": "dd4396d9b30d079b50d881ad2cecf0e440981d88975b5fb6cbba449bca95859d",
+   "existingSavesChanged": [],
+   "newSaves": [],
+   "worlds": [
+    {
+     "worldId": "mnbl_0000002a",
+     "completed": false,
+     "validationFailures": [],
+     "gameplay": {
+      "campaignDaysAdvanced": null,
+      "timeControl": "UnstoppableFastForward",
+      "firstChanceExceptions": null,
+      "failures": [],
+      "recruitment": null,
+      "trade": null,
+      "entryProbe": null
+     }
+    }
+   ]
+  },
+  {
+   "pid": 23192,
+   "outcome": "ok: two worlds, entry probe + 2 days fast-forward + recruitment + purchase each, normal EndGame between",
+   "status": "ok",
+   "final": true,
+   "moduleSha256": "3ab256efe35c0a13162eb296a9efec5a60175433a7c1b4efda1ba88139528c63",
+   "result": "evidence/runtime/in-game/generated_campaign-23192.json",
+   "resultSha256": "9aaf842bc0acd1569aab9ac3d97baef7abacb30c9ad583fbc90ff69c5cbac9a4",
+   "existingSavesChanged": [],
+   "newSaves": [],
+   "worlds": [
+    {
+     "worldId": "mnbl_0000002a",
+     "completed": true,
+     "validationFailures": [],
+     "gameplay": {
+      "campaignDaysAdvanced": 2.0000881088053575,
+      "timeControl": "UnstoppableFastForward",
+      "firstChanceExceptions": 0,
+      "failures": [],
+      "recruitment": {
+       "settlement": "mnbl_0000002a_town_1",
+       "notable": "CharacterObject_1",
+       "slot": 0,
+       "troop": "imperial_recruit",
+       "troopCulture": "empire",
+       "cost": 20,
+       "goldBefore": 1000,
+       "countBefore": 0,
+       "goldAfter": 980,
+       "countAfter": 1,
+       "slotCleared": true
+      },
+      "trade": {
+       "settlement": "mnbl_0000002a_town_1",
+       "item": "fish",
+       "price": 6,
+       "townStockBefore": 879,
+       "partyStockBefore": 0,
+       "goldBefore": 980,
+       "townGoldBefore": 52019,
+       "townStockAfter": 878,
+       "partyStockAfter": 1,
+       "goldAfter": 974,
+       "townGoldAfter": 52021
+      },
+      "entryProbe": "ruler party entered and left mnbl_0000002a_town_1 at pause without fault"
+     }
+    },
+    {
+     "worldId": "mnbl_0000002b",
+     "completed": true,
+     "validationFailures": [],
+     "gameplay": {
+      "campaignDaysAdvanced": 2.000036303244997,
+      "timeControl": "UnstoppableFastForward",
+      "firstChanceExceptions": 0,
+      "failures": [],
+      "recruitment": {
+       "settlement": "mnbl_0000002b_town_1",
+       "notable": "CharacterObject_1",
+       "slot": 0,
+       "troop": "imperial_recruit",
+       "troopCulture": "empire",
+       "cost": 20,
+       "goldBefore": 1000,
+       "countBefore": 0,
+       "goldAfter": 980,
+       "countAfter": 1,
+       "slotCleared": true
+      },
+      "trade": {
+       "settlement": "mnbl_0000002b_town_1",
+       "item": "fish",
+       "price": 7,
+       "townStockBefore": 820,
+       "partyStockBefore": 0,
+       "goldBefore": 980,
+       "townGoldBefore": 53847,
+       "townStockAfter": 819,
+       "partyStockAfter": 1,
+       "goldAfter": 973,
+       "townGoldAfter": 53849
+      },
+      "entryProbe": "ruler party entered and left mnbl_0000002b_town_1 at pause without fault"
+     }
+    }
+   ]
+  }
+ ],
+ "criteria": {
+  "c1": {
+   "met": true,
+   "note": "PID23192, both worlds: 2 campaign days fast-forward with zero first-chance exceptions; 9 settlement entries (7 AI-driven, 2 forced by the entry probe); volunteers regenerate (e.g. 19->25), villages produce, town treasuries change. One recruitment (imperial_recruit, 20 gold, roster +1, notable slot cleared) and one market purchase (fish, town stock -1, party +1, gold debited) per world via the installed domain actions RecruitmentVM.OnDone performs / SellItemsAction. Not UI-driven."
+  },
+  "c2": {
+   "met": true,
+   "note": "Final censuses of both worlds: zero official heroes/settlements/clans/kingdoms, zero not-ready characters; 5465 retained templates with provenance versus 19 world-owned instance identities. Identity hashes are diagnostic witnesses only."
+  },
+  "c3": {
+   "met": true,
+   "note": "PID31308 and PID23192: second world after normal EndGame has distinct game/campaign/object-manager witnesses and no first-world settlements, clans, kingdoms or characters. Validate() runs before gameplay only; after gameplay only settlement/clan/kingdom prefix checks run in code. The post-gameplay census was checked offline by an independent reviewer (clean)."
+  }
+ },
+ "knownGaps": [
+  "Town settlement meshes not visible in captures (nameplates only); village mesh visible.",
+  "fighter_sturgia excluded: stock record references a missing EquipmentRoster; Sturgia GetBodyguardOfCulture branch would get null.",
+  "Named naval storyline heroes (naval_storyline_*) are not retained; NavalStorylineData consumers unproved.",
+  "Saved-game registration explicitly throws NotSupportedException.",
+  "Town food falls ~70/day (300->~160 in 2 days): long-run starvation likely; economy not validated beyond 2 days.",
+  "Dialog watcher Safe Mode handling initially fell back to WindowPattern.Close (ineffective); fixed to Win32 BM_CLICK and verified on synthetic dialogs, not yet on a live game dialog.",
+  "Bandit clans (looters, deserters, hideout clans) absent; their behaviors raised no exceptions in 2 days but are unexercised.",
+  "BackstoryCampaignBehavior and RetirementCampaignBehavior are removed in generated mode (hard-coded official heroes / retirement_retreat).",
+  "After campaign initialization the MBObjectManager hero/clan/kingdom/party registries report unavailable (campaign temporary types); censuses rely on CampaignObjectManager lists, which were clean.",
+  "Market purchase: town treasury rose +2 against a price of 6/7; consistent with the installed SellItemsAction tax path but not verified. Buy() only checks that player gold decreased.",
+  "PID23192 startup Safe Mode dialog was not dismissed by the watcher (old UIA version); it was most likely dismissed manually. Watcher replaced with a Win32 version verified on synthetic dialogs.",
+  "Vanilla auto-named party IDs, runtime notable IDs and required aliases repeat across sequential worlds as distinct objects; anything keyed on StringId across worlds (saves, caches) must account for this.",
+  "Alive hero count varies 19-21 for the same seed across runs (runtime notable spawning is not deterministic).",
+  "Excluded official literals still have live consumers beyond the 2-day window: NavalDLC dead_lord_7_1 / naval_storyline_* heroes, GetBodyguardOfCulture fighter_sturgia."
+ ],
+ "fixes": [
+  "Live defaults: SiegeEngineType + SkeletonScale added; each kind must have a ready object.",
+  "Census: CampaignObjectManager lists captured per list (Settlements null before InitializeOnNewGame).",
+  "Engine callbacks in generated mode trace exceptions before rethrow.",
+  "Dataset: 33 IL-referenced reusable NPC characters retained as explicit roots (facgen_template_test_char_0..9 etc.).",
+  "RetirementCampaignBehavior removed in generated mode (hard-coded retirement_retreat).",
+  "Scene builder: banner placeholders get the installed volume_box child; towns get four placeholders (final42b/final43b; only scene.xscene changed).",
+  "Tools: Watch-ProbeDialogs.ps1 auto-dismisses Safe Mode (No) and crash dialogs (never Yes/Send), logs dialog text."
+ ],
+ "independentReview": {
+  "utc": "2026-10-13T21:40:00Z",
+  "verdict": {
+   "c1": "PASS-WITH-CAVEATS",
+   "c2": "PASS-WITH-CAVEATS",
+   "c3": "PASS"
+  },
+  "method": "Read-only subagent; re-derived numbers from raw result JSON (utf-8-sig), observation files, deployment manifests, installed scenes and installed IL; launched nothing.",
+  "corrections": [
+   "7 of 9 settlement entries were AI-driven",
+   "post-gameplay validation is offline only",
+   "MBObjectManager post-init registry unavailability disclosed",
+   "Safe Mode dismissal disclosed",
+   "town treasury +2 disclosed",
+   "behavior removals listed"
+  ]
+ }
+}

@@ -1,0 +1,17 @@
+{
+  "schema": "mnbl.projection-policy",
+  "version": 1,
+  "projection": "periodic-equirectangular",
+  "projectionVersion": 1,
+  "centralMeridianDeg": 0,
+  "logicalWidth": 800,
+  "heightRatio": 0.5,
+  "verticalScale": 0.01,
+  "stripRatio": 0.5,
+  "poleMarginRatio": 0.75,
+  "calibration": {
+    "file": "../calibration/axis-sea-datum/calibration.json",
+    "sha256": "00e7d6b5f64d72388b755ce7323d7517e1e60ed0305294f907f94f9423559019"
+  },
+  "notes": "MMR-25. The complete globe on a flat map with connected east/west edges. x is longitude modulo one turn, W = 800 world units; y is north-to-south latitude, H = W/2, so scale is true on the equator and every meridian. The seam is the source's duplicate column (longitude +/-180, central meridian 0). verticalScale 0.01 world units per metre above effective_config.sea_level (the convention of the MMR-16 generated-seed runs). The calibration file path is relative to this policy file. stripRatio reproduces the R10 seam layout (MMR-63): strips W/2 each side. poleMarginRatio 0.75 (MMR-26) pads 3W/4 beyond each pole line so the physical terrain is square, 2W x 2W = 1600 x 1600, as the proven square surface encoder requires and as the R10 fixture was; it was 0.5 under MMR-25. Width and margin remain tunable by MMR-41 for navigation-cache cost."
+}

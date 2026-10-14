@@ -1,0 +1,196 @@
+{
+  "schema": "mnbl.baseline-performance",
+  "version": 1,
+  "processId": 10828,
+  "accepted": false,
+  "cpu": [
+    {
+      "Name": "Intel(R) Core(TM) Ultra 9 275HX",
+      "NumberOfCores": 24,
+      "NumberOfLogicalProcessors": 24
+    }
+  ],
+  "gpu": [
+    {
+      "Name": "NVIDIA GeForce RTX 5080 Laptop GPU",
+      "DriverVersion": "32.0.16.1692",
+      "CurrentHorizontalResolution": 2560,
+      "CurrentVerticalResolution": 1600
+    },
+    {
+      "Name": "Intel(R) Graphics",
+      "DriverVersion": "32.0.101.8424",
+      "CurrentHorizontalResolution": 2560,
+      "CurrentVerticalResolution": 1600
+    }
+  ],
+  "ramBytes": 33690267648,
+  "engineConfigSha256": "396d1b91b5d086e8931ac0633e7b9353cc50538cb8a5b0be0dfc0a4e86cb65da",
+  "settings": [
+    "texture_filtering = 5",
+    "texture_budget = 3",
+    "texture_quality = 2",
+    "max_framerate = 200",
+    "cheat_mode = 0",
+    "display_width = 1600",
+    "display_height = 1024",
+    "display_mode = 1",
+    "shadowmap_type = 2",
+    "shadowmap_filtering = 1",
+    "shadowmap_resolution = 3",
+    "antialiasing_technique = 5",
+    "display_refresh_rate = 240.0000",
+    "resolution_scale = 100.0000",
+    "antialiasing_technique = 5"
+  ],
+  "scenario": "Stock fwgc.sav cold load -> Thronderlag port -> walk around nord_shipyard -> return",
+  "loadSeconds": null,
+  "frameMilliseconds": null,
+  "simulationMilliseconds": null,
+  "saveSeconds": null,
+  "pending": "No remaining MMR13 measurement blocker. Original stock-only metrics remain null; instrumented fixture is comparison scope, not isolated CPU/GPU costs.",
+  "instrumented": {
+    "scenarioPid": 31116,
+    "loadPid": 32644,
+    "source": "evidence/baseline/save-roundtrip-31116-32644.json",
+    "vanillaRun": false,
+    "newCampaignBootSeconds": 9.432869799999999,
+    "loadToReadySeconds": 9.7409345,
+    "saveSeconds": 1.7940243000000038,
+    "pausedTickIntervals": {
+      "measurement": "Application-tick wall intervals, includes simulation/render scheduling; not isolated CPU or GPU cost",
+      "elapsedSeconds": 10.001167199999998,
+      "samples": 2000,
+      "interruptedByStateChange": false,
+      "meanMilliseconds": 5.000583599999989,
+      "medianMilliseconds": 4.999799999996668,
+      "p95Milliseconds": 5.193599999998355,
+      "maximumMilliseconds": 6.814499999997281
+    },
+    "travelTickIntervals": {
+      "measurement": "Application-tick wall intervals, includes simulation/render scheduling; not isolated CPU or GPU cost",
+      "elapsedSeconds": 12.681978499999996,
+      "samples": 2445,
+      "interruptedByStateChange": true,
+      "meanMilliseconds": 5.186903271983635,
+      "medianMilliseconds": 5.006900000005032,
+      "p95Milliseconds": 5.820999999997412,
+      "maximumMilliseconds": 72.25199999999887
+    },
+    "campaignHoursPerWallSecond": 0.30138292083007323,
+    "villageMission": {
+      "loadSeconds": 1.889857500000005,
+      "scene": "empire_village_003",
+      "module": "$BASE/Modules/SandBoxCore/",
+      "screen": "TaleWorlds.MountAndBlade.View.Screens.MissionScreen",
+      "loadingFinished": true,
+      "mainAgentPresent": true,
+      "evidence": "Active MissionState, matching mission, loaded scene, mission screen, main agent, no pending shaders; screenshot requires visual review."
+    },
+    "townMission": {
+      "loadSeconds": 6.126720499999998,
+      "scene": "empire_town_s",
+      "module": "$BASE/Modules/SandBoxCore/",
+      "screen": "TaleWorlds.MountAndBlade.View.Screens.MissionScreen",
+      "loadingFinished": true,
+      "mainAgentPresent": true,
+      "evidence": "Active MissionState, matching mission, loaded scene, mission screen, main agent, no pending shaders; screenshot requires visual review."
+    },
+    "note": "App-tick wall intervals at 200 FPS cap, not isolated CPU simulation or GPU render time. Travel sampling stops on village arrival; town setup teleported to gate."
+  },
+  "combat": {
+    "pid": 27112,
+    "fieldTicks": {
+      "measurement": "Application-tick wall intervals, includes simulation/render scheduling; not isolated CPU or GPU cost",
+      "elapsedSeconds": 5.001745999999999,
+      "samples": 958,
+      "interruptedByStateChange": false,
+      "meanMilliseconds": 5.221029227557413,
+      "medianMilliseconds": 5.003600000001995,
+      "p95Milliseconds": 5.256300000000991,
+      "maximumMilliseconds": 34.86959999999861
+    },
+    "fieldSimulation": {
+      "deploymentFinished": true,
+      "agents": 26,
+      "ships": 0,
+      "missionResultPresent": false,
+      "missionTimeBefore": 0.03326999768614769,
+      "missionTimeAdvanced": 5.040389899164438
+    },
+    "seaTicks": {
+      "measurement": "Application-tick wall intervals, includes simulation/render scheduling; not isolated CPU or GPU cost",
+      "elapsedSeconds": 10.000772600000001,
+      "samples": 1728,
+      "interruptedByStateChange": false,
+      "meanMilliseconds": 5.787484143518513,
+      "medianMilliseconds": 5.030300000001375,
+      "p95Milliseconds": 6.163399999998376,
+      "maximumMilliseconds": 544.8115999999992
+    },
+    "seaMovement": {
+      "x": 772.2274,
+      "y": 268.133972,
+      "distance": 7.124085149308168,
+      "campaignHours": 2.8576498054899275,
+      "atSea": true,
+      "faceTerrain": "CoastalSea"
+    },
+    "navalTicks": {
+      "measurement": "Application-tick wall intervals, includes simulation/render scheduling; not isolated CPU or GPU cost",
+      "elapsedSeconds": 5.000434499999997,
+      "samples": 964,
+      "interruptedByStateChange": false,
+      "meanMilliseconds": 5.187172717842322,
+      "medianMilliseconds": 4.9986999999944715,
+      "p95Milliseconds": 5.4680000000004725,
+      "maximumMilliseconds": 120.52630000000164
+    },
+    "navalSimulation": {
+      "deploymentFinished": true,
+      "agents": 25,
+      "ships": 2,
+      "missionResultPresent": false,
+      "missionTimeBefore": 0.02199999988079071,
+      "missionTimeAdvanced": 5.002019718289375
+    }
+  },
+  "replay": {
+    "schema": "mnbl.baseline-replay-verification",
+    "verified": true,
+    "processId": 11588,
+    "sourceProcessId": 27112,
+    "capturedUtc": "2026-10-13T14:06:52.2631874Z",
+    "resultSha256": "0adc441ef4cf6de03b0213ef2e314e6f6392777d2918e7768b665a819c401f63",
+    "moduleSha256": "ebacae1c8cd78fb9a505d591255aee4ba4ae7957a8ed0d98d864086a612bec16",
+    "coordinateTolerance": 0.001,
+    "identitiesMatched": true,
+    "routeMatched": true,
+    "reservationReleased": true,
+    "visualReview": "Root inspected all four engine captures: field, port, sea travel, naval",
+    "fieldSimulationSeconds": 5.041249793022871,
+    "navalSimulationSeconds": 5.011529758572578,
+    "seaTravel": {
+      "x": 772.236938,
+      "y": 268.134949,
+      "distance": 7.114513719102012,
+      "campaignHours": 2.853413083124906,
+      "atSea": true,
+      "faceTerrain": "CoastalSea"
+    },
+    "existingSavesChanged": [],
+    "newSaves": [],
+    "limits": [
+      "Instrumented official content; not generated campaign gameplay.",
+      "Enemy campaign AI/encounter isolation is synthetic and released after scenario.",
+      "Ten-second route measurement allows timing variation; post-measurement player relocation pins battle location.",
+      "Exact physics determinism and isolated CPU/GPU cost not claimed."
+    ],
+    "evidence": [
+      "evidence/runtime/in-game/baseline_combat-11588.json",
+      "evidence/runtime/in-game/baseline_combat-11588-observation.json",
+      "evidence/baseline/combat-replay-27112-args.json"
+    ]
+  },
+  "instrumentedReviewPassed": true
+}

@@ -1,0 +1,381 @@
+{
+  "schema": "mnbl.surface-collision-calibration.v1",
+  "utc": "2026-10-13T18:04:29.028366+00:00",
+  "scope": "Offline empirical reference calibration only; no native calls, no tolerance widening, no historical status rewrite; not parent acceptance",
+  "runtimeInput": {
+    "path": "C:\\Users\\davgo\\AppData\\Local\\MNBL.ProceduralWorld\\autorun\\result-32944.json",
+    "sha256": "fa5b32db38af09b360b23ab085031c5aa73b97ca94c7d865ce3a66085487b83a",
+    "processId": 32944,
+    "status": "error",
+    "final": true,
+    "recordedModuleSha256": "db031bfca08eaf2eda9d66e87adef72f298c3ae1768088614b365699bdb05a04"
+  },
+  "model": {
+    "vertexEquation": "0.03 * trunc(encodedWorldHeight / 0.03), truncation toward zero",
+    "arithmetic": "binary64 reference model",
+    "diagonal": "(x,y) -> (x+1,y+1); triangles A-B-D and A-D-C",
+    "ray": "full-grid earliest segment/triangle intersection; no fitted native heights",
+    "sourceHeight": "Untruncated encoded vertices, same MAIN diagonal",
+    "historicalSource": "Original DiagnosticHeightfield anti-diagonal remains unchanged and observable",
+    "runtimeLimits": {
+      "sourceHeightMetres": 0.05,
+      "collisionRayMetres": 0.1,
+      "normalDegrees": 1,
+      "projectionPixels": 2
+    }
+  },
+  "limitations": [
+    "Empirical across the three recorded fields; native implementation/PhysX constant not established.",
+    "Exact native float rounding at 0.03m bin boundaries unresolved.",
+    "Both Scene and SceneView and both zooms share fields; counts are observations, not independent worlds.",
+    "Prospective nonvertex landmarks are not present in PID32944.",
+    "Old result remains error; these offline comparisons do not rewrite or replace it."
+  ],
+  "stages": [
+    {
+      "label": "calibration",
+      "extent": 256,
+      "side": 129,
+      "inputs": [
+        {
+          "path": "C:\\Users\\davgo\\AppData\\Local\\MNBL.ProceduralWorld\\surface-jobs\\c48742f5b72f49d597936052c91ad342\\calibration.bin",
+          "sha256": "69d2cb897d79114536f3f85425fa9f239aabb7e084cfaa0bb34e66d7d811c63b"
+        },
+        {
+          "path": "C:\\Users\\davgo\\AppData\\Local\\MNBL.ProceduralWorld\\surface-jobs\\c48742f5b72f49d597936052c91ad342\\surface\\quantized-heightfield.bin",
+          "sha256": "c8d2012201c6141c73f826a8454950a20f4aedd0621b33cf0cacecea281c78fb"
+        },
+        {
+          "path": "C:\\Users\\davgo\\AppData\\Local\\MNBL.ProceduralWorld\\surface-jobs\\c48742f5b72f49d597936052c91ad342\\surface\\surface.json",
+          "sha256": "892440ca8313aa3d9b5d504d53a4bec18775cf77857979b793f8d7650c75df65"
+        },
+        {
+          "path": "C:\\Users\\davgo\\AppData\\Local\\MNBL.ProceduralWorld\\surface-jobs\\c48742f5b72f49d597936052c91ad342\\surface\\scene.xscene",
+          "sha256": "b98cc6f03ad1553b5af4a9fb7c16385d5856613ccf842d0e8b7ad7cc16589082"
+        },
+        {
+          "path": "C:\\Users\\davgo\\AppData\\Local\\MNBL.ProceduralWorld\\surface-jobs\\c48742f5b72f49d597936052c91ad342\\surface\\terrain.bin",
+          "sha256": "8fbb23e645ca4ee3cf3b693f512c9d1850c103c679ecbc3f2c11d0b7e8aa6b7b"
+        }
+      ],
+      "groups": [
+        {
+          "label": "zoom0",
+          "rays": 62,
+          "hits": 60,
+          "hitMissMismatches": [],
+          "maximumDistanceErrorMetres": 2.4614701658265403e-05,
+          "maximumHistoricalReferenceErrorMetres": 0.20014150605325023,
+          "heightSamples": 10,
+          "maximumHeightPredictionErrorMetres": 1.3732910133512632e-06,
+          "maximumUntruncatedMainHeightDeviationMetres": 0.026117601279430858,
+          "worstRay": {
+            "name": "calibration_200_128:camera",
+            "api": "SceneView"
+          }
+        },
+        {
+          "label": "zoom1",
+          "rays": 58,
+          "hits": 56,
+          "hitMissMismatches": [],
+          "maximumDistanceErrorMetres": 4.82679567426203e-05,
+          "maximumHistoricalReferenceErrorMetres": 0.042719193023696325,
+          "heightSamples": 10,
+          "maximumHeightPredictionErrorMetres": 1.3732910133512632e-06,
+          "maximumUntruncatedMainHeightDeviationMetres": 0.026117601279430858,
+          "worstRay": {
+            "name": "grid_1_127:camera",
+            "api": "SceneView"
+          }
+        },
+        {
+          "label": "cursor0",
+          "rays": 4,
+          "hits": 4,
+          "hitMissMismatches": [],
+          "maximumDistanceErrorMetres": 1.4334381717162614e-06,
+          "maximumHistoricalReferenceErrorMetres": 0.022816263392751814,
+          "heightSamples": 0,
+          "maximumHeightPredictionErrorMetres": 0,
+          "maximumUntruncatedMainHeightDeviationMetres": 0,
+          "worstRay": {
+            "name": "observed_cursor_focus_exclude_moveable",
+            "api": "SceneView"
+          }
+        },
+        {
+          "label": "cursor1",
+          "rays": 4,
+          "hits": 4,
+          "hitMissMismatches": [],
+          "maximumDistanceErrorMetres": 1.6336180749476625e-05,
+          "maximumHistoricalReferenceErrorMetres": 0.010535479948869064,
+          "heightSamples": 0,
+          "maximumHeightPredictionErrorMetres": 0,
+          "maximumUntruncatedMainHeightDeviationMetres": 0,
+          "worstRay": {
+            "name": "observed_cursor_focus_exclude_moveable",
+            "api": "SceneView"
+          }
+        }
+      ]
+    },
+    {
+      "label": "seed42",
+      "extent": 800,
+      "side": 129,
+      "inputs": [
+        {
+          "path": "C:\\Users\\davgo\\AppData\\Local\\MNBL.ProceduralWorld\\jobs\\89794fd838204ac891b5423c9fb87775\\diagnostic\\heightfield.bin",
+          "sha256": "14c4e157ef3bb26ef8d59d4618034bf172decfeb13f45b7bf9420e793b79a7b2"
+        },
+        {
+          "path": "C:\\Users\\davgo\\AppData\\Local\\MNBL.ProceduralWorld\\jobs\\89794fd838204ac891b5423c9fb87775\\surface\\quantized-heightfield.bin",
+          "sha256": "c122c57c9ed97f94bf6a13f695fcef77e37c5502897a8cf46911448b60c0ac99"
+        },
+        {
+          "path": "C:\\Users\\davgo\\AppData\\Local\\MNBL.ProceduralWorld\\jobs\\89794fd838204ac891b5423c9fb87775\\surface\\surface.json",
+          "sha256": "771cee2466eb5b0969154b31bc9706d87f9f1e463dda3294699320dd6ecf4c0d"
+        },
+        {
+          "path": "C:\\Users\\davgo\\AppData\\Local\\MNBL.ProceduralWorld\\jobs\\89794fd838204ac891b5423c9fb87775\\surface\\scene.xscene",
+          "sha256": "93be3750dd4d44998946a20b44948929c717e249e0a4cdfdfc5fc2e2163f9843"
+        },
+        {
+          "path": "C:\\Users\\davgo\\AppData\\Local\\MNBL.ProceduralWorld\\jobs\\89794fd838204ac891b5423c9fb87775\\surface\\terrain.bin",
+          "sha256": "71c97d4d85593461c1cb8284f11b5dbc171fb256603f08f459c5cffa52fa46e8"
+        }
+      ],
+      "groups": [
+        {
+          "label": "zoom0",
+          "rays": 44,
+          "hits": 42,
+          "hitMissMismatches": [],
+          "maximumDistanceErrorMetres": 0.00023002299531071912,
+          "maximumHistoricalReferenceErrorMetres": 0.11069145451366162,
+          "heightSamples": 7,
+          "maximumHeightPredictionErrorMetres": 1.4495849605111744e-06,
+          "maximumUntruncatedMainHeightDeviationMetres": 0.028482387274848975,
+          "worstRay": {
+            "name": "grid_127_127:camera",
+            "api": "SceneView"
+          }
+        },
+        {
+          "label": "zoom1",
+          "rays": 40,
+          "hits": 38,
+          "hitMissMismatches": [],
+          "maximumDistanceErrorMetres": 0.0003368272638226699,
+          "maximumHistoricalReferenceErrorMetres": 0.18183859876869415,
+          "heightSamples": 7,
+          "maximumHeightPredictionErrorMetres": 1.4495849605111744e-06,
+          "maximumUntruncatedMainHeightDeviationMetres": 0.028482387274848975,
+          "worstRay": {
+            "name": "grid_64_32:camera",
+            "api": "SceneView"
+          }
+        },
+        {
+          "label": "cursor0",
+          "rays": 4,
+          "hits": 4,
+          "hitMissMismatches": [],
+          "maximumDistanceErrorMetres": 4.424010558068403e-05,
+          "maximumHistoricalReferenceErrorMetres": 0.06624570275403843,
+          "heightSamples": 0,
+          "maximumHeightPredictionErrorMetres": 0,
+          "maximumUntruncatedMainHeightDeviationMetres": 0,
+          "worstRay": {
+            "name": "observed_cursor_focus_exclude_moveable",
+            "api": "SceneView"
+          }
+        }
+      ]
+    },
+    {
+      "label": "seed43",
+      "extent": 640,
+      "side": 129,
+      "inputs": [
+        {
+          "path": "C:\\Users\\davgo\\AppData\\Local\\MNBL.ProceduralWorld\\jobs\\5fab5bc1cb3247ff85b31cd74f4d6156\\diagnostic\\heightfield.bin",
+          "sha256": "e15ff0e2b4edd91a83513488810640baac36b4474377fd020b35db25f622d3bb"
+        },
+        {
+          "path": "C:\\Users\\davgo\\AppData\\Local\\MNBL.ProceduralWorld\\jobs\\5fab5bc1cb3247ff85b31cd74f4d6156\\surface\\quantized-heightfield.bin",
+          "sha256": "a2f9c401ed72f1a9c04b6df8dd3319ca39a7cd7b63f8515e09ac1b948c39e617"
+        },
+        {
+          "path": "C:\\Users\\davgo\\AppData\\Local\\MNBL.ProceduralWorld\\jobs\\5fab5bc1cb3247ff85b31cd74f4d6156\\surface\\surface.json",
+          "sha256": "bb82586ea37edd1dcf8c6e939a29c8653116a6d86e04d1763531af283de8eb5b"
+        },
+        {
+          "path": "C:\\Users\\davgo\\AppData\\Local\\MNBL.ProceduralWorld\\jobs\\5fab5bc1cb3247ff85b31cd74f4d6156\\surface\\scene.xscene",
+          "sha256": "181a06ccf275544cefd5c973b6bcf86e6b98e43682828c2fc5a58c79ccfe284c"
+        },
+        {
+          "path": "C:\\Users\\davgo\\AppData\\Local\\MNBL.ProceduralWorld\\jobs\\5fab5bc1cb3247ff85b31cd74f4d6156\\surface\\terrain.bin",
+          "sha256": "d241a9e027b56789737055484cfaf2a06817aa13be55d56030f5bfd4151519d1"
+        }
+      ],
+      "groups": [
+        {
+          "label": "zoom0",
+          "rays": 44,
+          "hits": 42,
+          "hitMissMismatches": [],
+          "maximumDistanceErrorMetres": 0.00015960799737513298,
+          "maximumHistoricalReferenceErrorMetres": 0.04660839348596826,
+          "heightSamples": 7,
+          "maximumHeightPredictionErrorMetres": 2.2888183615066282e-07,
+          "maximumUntruncatedMainHeightDeviationMetres": 0.019051453418345687,
+          "worstRay": {
+            "name": "grid_1_127:camera",
+            "api": "SceneView"
+          }
+        },
+        {
+          "label": "zoom1",
+          "rays": 40,
+          "hits": 38,
+          "hitMissMismatches": [],
+          "maximumDistanceErrorMetres": 7.945171125811612e-05,
+          "maximumHistoricalReferenceErrorMetres": 0.11590367813531292,
+          "heightSamples": 7,
+          "maximumHeightPredictionErrorMetres": 2.2888183615066282e-07,
+          "maximumUntruncatedMainHeightDeviationMetres": 0.019051453418345687,
+          "worstRay": {
+            "name": "grid_1_127:camera",
+            "api": "SceneView"
+          }
+        },
+        {
+          "label": "cursor0",
+          "rays": 4,
+          "hits": 4,
+          "hitMissMismatches": [],
+          "maximumDistanceErrorMetres": 8.498743954987731e-05,
+          "maximumHistoricalReferenceErrorMetres": 0.967608881278214,
+          "heightSamples": 0,
+          "maximumHeightPredictionErrorMetres": 0,
+          "maximumUntruncatedMainHeightDeviationMetres": 0,
+          "worstRay": {
+            "name": "observed_cursor_focus_exclude_moveable",
+            "api": "SceneView"
+          }
+        }
+      ]
+    }
+  ],
+  "managedVerification": {
+    "compiler": "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/MSBuild/Current/Bin/Roslyn/csc.exe",
+    "flags": "/nologo /target:exe /platform:x64 /langversion:7.3 /warnaserror",
+    "compiledSources": [
+      "src/MNBL.ProceduralWorld/Diagnostics/DiagnosticHeightfield.cs",
+      "src/MNBL.ProceduralWorld/Diagnostics/RuntimeSurfaceQueries.cs",
+      "tests/RuntimeSurfaceQueryTests.cs"
+    ],
+    "executionCommand": "\"C:\\Users\\davgo\\AppData\\Local\\Temp\\MNBL.RuntimeSurfaceQueryTests-0e2bfdda5cce4cc483f3b941264b1e8a.exe\" \"D:/SteamLibrary/steamapps/common/Mount & Blade II Bannerlord/bin/Win64_Shipping_Client\" \"C:\\Users\\davgo\\AppData\\Local\\MNBL.ProceduralWorld\\autorun\\result-32944.json\"",
+    "executable": "C:\\Users\\davgo\\AppData\\Local\\Temp\\MNBL.RuntimeSurfaceQueryTests-0e2bfdda5cce4cc483f3b941264b1e8a.exe",
+    "sha256": "113a1413e0fc8aff8a165a288260f13f9a9071a3fba4a18c497cc903d32b1398",
+    "outputPath": "C:\\Users\\davgo\\AppData\\Local\\Temp\\MNBL.RuntimeSurfaceQueryTests-0e2bfdda5cce4cc483f3b941264b1e8a.exe.log",
+    "output": "PASS 58 managed checks; no engine/native calls.\nPASS saved receipt: 304 rays, 292 hits, maximum distance error 0.00033682726387951334 m; 654 total managed checks; no native calls or historical result rewrite.",
+    "nativeCallsInvoked": false
+  },
+  "sourceHashes": [
+    {
+      "path": "src/MNBL.ProceduralWorld/Diagnostics/DiagnosticHeightfield.cs",
+      "sha256": "aac9fcb10a0b21a172f5f9b073efdfb604dc86de5108ae43f302b1b6ef600f34"
+    },
+    {
+      "path": "src/MNBL.ProceduralWorld/Diagnostics/RuntimeSurfaceQueries.cs",
+      "sha256": "1a65ab452f66954df71763850f8ca9d44bbed1df4581a6af47c61c17375fedca"
+    },
+    {
+      "path": "tests/RuntimeSurfaceQueryTests.cs",
+      "sha256": "9a5a21ccba55f6f8c240b08b8f365dba06603b7177e652ebc7900db444f9e5b6"
+    },
+    {
+      "path": "src/WorldBridge/surface.cpp",
+      "sha256": "f1a70a26dfa12a3dca341bc07a5b34e970c852e54641ae234adf1d00c027b7c4"
+    }
+  ],
+  "prospectiveLandmarks": {
+    "gridCoordinates": [
+      [
+        50.25,
+        64.6
+      ],
+      [
+        80.75,
+        40.2
+      ]
+    ],
+    "worldScale": "extent/(side-1)",
+    "classification": "preselected before prospective native run; source-main physical height limit 0.05m; collision residual separately recorded"
+  },
+  "hypothesisChecks": {
+    "65535_vs_65536": "Changing the encoder denominator alone left calibration maximum landmark residual 0.0259240264892586m; insufficient.",
+    "floatBounds": "Calibration maxHeight float32 conversion differs by -0.0000008850097685808578m; insufficient.",
+    "nativeRange": "PID12748 metadata native min/max -3 / 39.702999114990234 match encoder bounds, not snapped collision extrema; do not snap metadata bounds.",
+    "floatPrecisionVariants": [
+      {
+        "stage": "calibration",
+        "variant": "float_input",
+        "vertexBinsDifferingFromDoubleModel": 0,
+        "interpretation": "Unsampled-bin differences do not establish native rounding; no blanket rounding equivalence claim."
+      },
+      {
+        "stage": "calibration",
+        "variant": "float_division",
+        "vertexBinsDifferingFromDoubleModel": 1,
+        "interpretation": "Unsampled-bin differences do not establish native rounding; no blanket rounding equivalence claim."
+      },
+      {
+        "stage": "calibration",
+        "variant": "float_reciprocal",
+        "vertexBinsDifferingFromDoubleModel": 0,
+        "interpretation": "Unsampled-bin differences do not establish native rounding; no blanket rounding equivalence claim."
+      },
+      {
+        "stage": "seed42",
+        "variant": "float_input",
+        "vertexBinsDifferingFromDoubleModel": 0,
+        "interpretation": "Unsampled-bin differences do not establish native rounding; no blanket rounding equivalence claim."
+      },
+      {
+        "stage": "seed42",
+        "variant": "float_division",
+        "vertexBinsDifferingFromDoubleModel": 0,
+        "interpretation": "Unsampled-bin differences do not establish native rounding; no blanket rounding equivalence claim."
+      },
+      {
+        "stage": "seed42",
+        "variant": "float_reciprocal",
+        "vertexBinsDifferingFromDoubleModel": 0,
+        "interpretation": "Unsampled-bin differences do not establish native rounding; no blanket rounding equivalence claim."
+      },
+      {
+        "stage": "seed43",
+        "variant": "float_input",
+        "vertexBinsDifferingFromDoubleModel": 0,
+        "interpretation": "Unsampled-bin differences do not establish native rounding; no blanket rounding equivalence claim."
+      },
+      {
+        "stage": "seed43",
+        "variant": "float_division",
+        "vertexBinsDifferingFromDoubleModel": 3,
+        "interpretation": "Unsampled-bin differences do not establish native rounding; no blanket rounding equivalence claim."
+      },
+      {
+        "stage": "seed43",
+        "variant": "float_reciprocal",
+        "vertexBinsDifferingFromDoubleModel": 0,
+        "interpretation": "Unsampled-bin differences do not establish native rounding; no blanket rounding equivalence claim."
+      }
+    ]
+  }
+}

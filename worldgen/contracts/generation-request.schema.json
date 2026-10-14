@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "mnbl.generation-request/1",
+  "title": "MNBL generation request",
+  "description": "What the C# host accepts before any world is generated (worldbridge::identity::load_request; written by worldbridge --new-request). After acceptance the compiler samples no clock and no randomness. Identities: RequestId = sha256('mnbl.request-id/1 mnbl.canonical-json/1\\n' + canonical request); ConfigurationId = sha256('mnbl.configuration-id/1 mnbl.canonical-json/1\\n' + canonical request without campaignInstanceId and seedSource); SourceInputId (per attempt) = sha256('mnbl.source-input-id/1\\nproducer-lock <lock sha256>\\nproducer <binary sha256>\\nrecipe <recipe sha256>\\n'); WorldContentId = sha256('mnbl.world-content-id/1\\n' + sorted lines '<prefix>/<path>\\t<size>\\t<sha256>\\n'). Canonical encoding: mnbl.canonical-json/1 = RFC 8785 (JCS): members sorted by UTF-16 code units, ECMAScript number formatting, minimal string escaping, no whitespace. The recipe given to the producer is the canonical {\"overrides\",\"recipe_version\",\"seed\"} object; its exact UTF-8 bytes are hashed.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "version", "campaignInstanceId", "seedSource", "masterSeed", "recipeVersion", "overrides", "producerLockSha256", "policies", "maxAttempts"],
+  "properties": {
+    "schema": { "const": "mnbl.generation-request" },
+    "version": { "const": 1 },
+    "campaignInstanceId": { "type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$", "description": "Separates campaign sessions; never part of SourceInputId or WorldContentId and never evidence of different geography." },
+    "seedSource": { "enum": ["explicit", "random"], "description": "explicit: the player entered or replays a seed (same-seed replay is always permitted); random: Random World drew a fresh seed from the OS CSPRNG before acceptance." },
+    "masterSeed": { "type": "integer", "minimum": 0, "maximum": 4294967295, "description": "Width of the pinned producer's request seed (FWGC++ request_json.cpp). Probed against the pinned binary by tools/Test-GenerationIdentity.ps1, which records worldgen/contracts/producer-seed-width.json; worldbridge --generate refuses (seed_width_unverified) unless that record names the locked producer sha256." },
+    "recipeVersion": { "const": 3 },
+    "overrides": { "type": "object", "additionalProperties": { "type": ["number", "string", "boolean"] }, "description": "Producer controls by published name; 'seed' and 'recipe_version' are root fields of the recipe, not overrides. Integers must lie within plus or minus 2^53 (9007199254740992): RFC 8785 numbers are IEEE doubles, so a larger integer could not be canonicalized without changing it (refused out_of_range)." },
+    "producerLockSha256": { "type": "string", "pattern": "^[0-9a-f]{64}$", "description": "sha256 of worldgen/producer.lock.json bytes; a new generation refuses a different lock (producer_changed). Accepted campaigns load their frozen bundle instead." },
+    "policies": { "type": "object", "minProperties": 1, "additionalProperties": { "type": "string", "pattern": "^[0-9a-f]{64}$" }, "description": "Accepted policy revisions: policy name -> sha256 of its file. worldbridge --generate requires product-policy, world-quality and source-compatibility and takes its quality gate, source contract and attempt limit only from these bound files." },
+    "maxAttempts": { "type": "integer", "minimum": 1, "maximum": 16, "description": "Explicit attempt ceiling; worldbridge --generate refuses (policy_violation) a value above the bound product policy's maxQualityAttempts (3)." }
+  }
+}

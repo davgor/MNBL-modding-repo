@@ -1,0 +1,153 @@
+﻿{
+    "schema":  "mnbl.producer-process-contract",
+    "version":  1,
+    "utc":  "2026-10-13T21:57:52.9125819Z",
+    "passed":  true,
+    "workDirectory":  "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\build\\research-producer22\\run-58e28deb69d341f0b5bbd7bcde1a7c14",
+    "ctest":  {
+                  "exit":  0,
+                  "log":  [
+                              "1/2 Test #1: reader_contract ..................   Passed    0.06 sec",
+                              "2/2 Test #2: process_contract .................   Passed    1.88 sec",
+                              "100% tests passed, 0 tests failed out of 2"
+                          ]
+              },
+    "lockCheck":  {
+                      "exit":  0,
+                      "summary":  "PASS: 22/22 producer lock checks"
+                  },
+    "bridge":  {
+                   "path":  "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\build\\worldbridge-contract\\Release\\worldbridge.exe",
+                   "sha256":  "1dc1d8d8a4448258d955037f30f74ce0e0b5ba4f0f3f9aae70e212f0a62cc792"
+               },
+    "producer":  {
+                     "path":  "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\build\\producer\\apps\\Release\\fwg.exe",
+                     "sha256":  "564c2629b5b92d49e52cd466a5a1aaa9339380464207ddcae669dd487d2f695e"
+                 },
+    "results":  {
+                    "preflight":  {
+                                      "exit":  0,
+                                      "passed":  true,
+                                      "failedChecks":  [
+
+                                                       ]
+                                  },
+                    "success":  {
+                                    "exit":  0,
+                                    "outcome":  "succeeded",
+                                    "published":  true,
+                                    "stagingRemaining":  false,
+                                    "worldSha256":  "e9264b8d1e0ad5b45af40dca3dcdd54128c22c856a7c11d7acdef3043e5f5c69",
+                                    "matchesAcceptedSeed42Root":  true,
+                                    "stray":  0
+                                },
+                    "refusal":  {
+                                    "exit":  3,
+                                    "outcome":  "refused",
+                                    "field":  "size",
+                                    "code":  "INVALID_INPUT",
+                                    "published":  false
+                                },
+                    "crossFieldRefusal":  {
+                                              "exit":  3,
+                                              "outcome":  "refused",
+                                              "code":  "INVALID_INPUT",
+                                              "fieldIsNull":  true,
+                                              "published":  false
+                                          },
+                    "bracePath":  {
+                                      "exit":  3,
+                                      "outcome":  "refused",
+                                      "field":  "size"
+                                  },
+                    "cancelBeforeLaunch":  {
+                                               "exit":  3,
+                                               "outcome":  "cancelled",
+                                               "launched":  false
+                                           },
+                    "cancellation":  {
+                                         "exit":  3,
+                                         "outcome":  "cancelled",
+                                         "producerPid":  29792,
+                                         "producerStillRunning":  false,
+                                         "published":  false,
+                                         "secondsUntilBridgeReturned":  1.67
+                                     },
+                    "timeout":  {
+                                    "exit":  3,
+                                    "outcome":  "timeout",
+                                    "producerStillRunning":  false,
+                                    "published":  false
+                                },
+                    "pinMismatch":  {
+                                        "exit":  3,
+                                        "outcome":  "pin_mismatch",
+                                        "launched":  false
+                                    },
+                    "missingExecutable":  {
+                                              "exit":  3,
+                                              "outcome":  "missing_executable",
+                                              "launched":  false
+                                          },
+                    "reproducibleBridge":  {
+                                               "first":  "1dc1d8d8a4448258d955037f30f74ce0e0b5ba4f0f3f9aae70e212f0a62cc792",
+                                               "second":  "1dc1d8d8a4448258d955037f30f74ce0e0b5ba4f0f3f9aae70e212f0a62cc792",
+                                               "identical":  true
+                                           }
+                },
+    "sources":  [
+                    {
+                        "path":  "src/WorldBridge/CMakeLists.txt",
+                        "sha256":  "efc7f7b8b44e80de2a0872034f66a73eb3648aa1cf2ec097c100d7dd3dd1470c"
+                    },
+                    {
+                        "path":  "src/WorldBridge/include/worldbridge/json.hpp",
+                        "sha256":  "0635ce1bdf23c2c3f60e66bfd94a1db939ca5d3e2bd35e1fdfd9f5cc2c170e5f"
+                    },
+                    {
+                        "path":  "src/WorldBridge/include/worldbridge/protocol.hpp",
+                        "sha256":  "3baf73858ccc1158807e9f2090c5039d45b29cac9e294675b3caf1a018d06196"
+                    },
+                    {
+                        "path":  "src/WorldBridge/main.cpp",
+                        "sha256":  "897d75307f9a98e0cd3cf75cecaabf7267bc51098e3564719164cd4d88b827a9"
+                    },
+                    {
+                        "path":  "src/WorldBridge/src/producer_process.cpp",
+                        "sha256":  "a7dc3c1ce8ec18682925edfba73a4bf140fdc8bba7791c49ebf2b96ff27a9381"
+                    },
+                    {
+                        "path":  "src/WorldBridge/surface.cpp",
+                        "sha256":  "f1a70a26dfa12a3dca341bc07a5b34e970c852e54641ae234adf1d00c027b7c4"
+                    },
+                    {
+                        "path":  "src/WorldBridge/surface.hpp",
+                        "sha256":  "411fb410005cc97e04a6796a24bb41d55a05403781d4502c29144b373b6728c3"
+                    },
+                    {
+                        "path":  "src/WorldBridge/tests/fake_producer.cpp",
+                        "sha256":  "fa22069673c82613c3a562039fdad75eac1984173b659c4f23eccdbfca5ac6b6"
+                    },
+                    {
+                        "path":  "src/WorldBridge/tests/process_contract_tests.cpp",
+                        "sha256":  "f61a36d7eb4666c2b199e015e8c0fb722550bd16a8e09b37fcde945fcab46e7d"
+                    },
+                    {
+                        "path":  "tests/check_producer_lock.py",
+                        "sha256":  "67f553feaa5c986bb5ac3131936987964af82b881636787361206a52dd73ec68"
+                    },
+                    {
+                        "path":  "tools/Test-ProducerProcess.ps1",
+                        "sha256":  "5124f13cccc3cc0b119a67f2ba09df35f6b501d786b1c791104c0be448f4e1cd"
+                    },
+                    {
+                        "path":  "worldgen/contracts/producer-lock.schema.json",
+                        "sha256":  "2cdb172bcc8ae264cfac5375167463353263052ee999774511100ba0d006a297"
+                    },
+                    {
+                        "path":  "worldgen/producer.lock.json",
+                        "sha256":  "3e9640a2ac2302feb2762a40c90fbc98e0a58063ac19b286dcf626017624aedb"
+                    }
+                ],
+    "scope":  "Bridge-side protocol and supervision only. The C# host still launches the producer directly (GenerationProbe); switching it to --produce is host integration work."
+}

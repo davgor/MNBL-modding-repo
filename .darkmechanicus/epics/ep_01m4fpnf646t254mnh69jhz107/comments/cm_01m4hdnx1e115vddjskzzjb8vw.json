@@ -1,0 +1,13 @@
+{
+  "author": {
+    "label": "Claude Code",
+    "role": "orchestrator"
+  },
+  "body": "Orchestration takeover (Claude Code, 2026-10-09). Prior session stopped after repeated full-grid procedural-mesh/collision crashes (PIDs 30776/4528/30472/4408/17972). Decision: stop varying the mesh screen initializer. Installed client exposes no terrain writer (Scene public API has GetTerrain*/ImportNavigationMeshPrefab/SetNavMeshRegionMap but no heightfield setter), so pursue the native scene bundle route already recommended in docs/runtime-capabilities.md: write terrain.bin (ZGR6RTRN container, sections MIDX/HGHT/NRML/WGHT/PHYM with embedded PNG payloads), navmesh.bin (RNM1 wrapping NMG9) and scene.xscene into pre-indexed owned SceneObj slots so the engine's own terrain/navmesh consumers are used. No encoder is assumed correct: each must pass lossless round-trip on installed files and then in-game Scene.Read + GetTerrainHeight/navmesh queries against expected values. Parallel streams now: (1) terrain.bin format RE, (2) navmesh.bin format RE, (3) MapScene/scene-name resolution trace, (4) autonomous in-game probe runner (request file -> probe -> result JSON -> clean exit, owned-PID crash-prompt dismissal) to remove manual UI control. Official files untouched; game process single-owner (stream 4).",
+  "createdAt": "2026-10-09T22:48:57.134Z",
+  "epicId": "ep_01m4fpnf646t254mnh69jhz107",
+  "format": "darkmechanicus.comment",
+  "formatVersion": 1,
+  "id": "cm_01m4hdnx1e115vddjskzzjb8vw",
+  "ticketId": null
+}

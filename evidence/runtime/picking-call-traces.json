@@ -1,0 +1,24 @@
+{
+  "caller": "System.Void SandBox.View.Map.MapCursor::BeforeTick(System.Single)",
+  "body": [
+    "IL_0022: callvirt SandBox.View.Map.MapCameraView SandBox.View.Map.MapScreen::get_MapCameraView()",
+    "IL_0027: callvirt System.Single SandBox.View.Map.MapCameraView::get_CameraDistance()",
+    "IL_002c: stloc.1",
+    "IL_002d: ldsfld TaleWorlds.Library.Vec3 TaleWorlds.Library.Vec3::Zero",
+    "IL_0032: stloc.2",
+    "IL_0033: ldsfld TaleWorlds.Library.Vec3 TaleWorlds.Library.Vec3::Zero",
+    "IL_0038: stloc.3",
+    "IL_0039: dup",
+    "IL_003a: callvirt TaleWorlds.Engine.SceneView TaleWorlds.Engine.Screens.SceneLayer::get_SceneView()",
+    "IL_003f: ldc.r4 0.5",
+    "IL_0044: ldc.r4 0.5",
+    "IL_0049: newobj System.Void TaleWorlds.Library.Vec2::.ctor(System.Single,System.Single)",
+    "IL_004e: callvirt TaleWorlds.Library.Vec2 TaleWorlds.Engine.SceneView::ScreenPointToViewportPoint(TaleWorlds.Library.Vec2)",
+    "IL_0053: stloc.s V_4",
+    "IL_0055: ldloc.0",
+    "IL_0056: ldloca.s V_2",
+    "IL_0058: ldloca.s V_3",
+    "IL_005a: ldloc.s V_4",
+    "IL_005c: callvirt System.Void TaleWorlds.Engine.Camera::ViewportPointToWorldRay(TaleWorlds.Library.Vec3&,TaleWorlds.Library.Vec3&,TaleWorlds.Library.Vec2)"
+  ]
+}

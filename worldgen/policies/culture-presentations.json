@@ -1,0 +1,20 @@
+{
+  "schema": "mnbl.culture-presentations",
+  "version": 1,
+  "officialCultures": ["empire", "aserai", "sturgia", "vlandia", "battania", "khuzait", "nord"],
+  "civilizations": [
+    {"civilization": "human_maritime", "culture": "empire", "reason": "Mediterranean maritime humans"},
+    {"civilization": "human_desert", "culture": "aserai", "reason": "Persian-inspired desert humans"},
+    {"civilization": "human_cold", "culture": "nord", "reason": "Nordic cold-coast humans (War Sails culture)"},
+    {"civilization": "human_large_island", "culture": "khuzait", "reason": "Eastern-inspired island humans"},
+    {"civilization": "human_rainforest", "culture": "battania", "reason": "forest humans; nearest woodland presentation"},
+    {"civilization": "human_heartland", "culture": "vlandia", "reason": "European heartland humans"},
+    {"civilization": "dwarf", "culture": "sturgia", "reason": "mountain holds; closest highland presentation"},
+    {"civilization": "frosthold_dwarf", "culture": "sturgia", "reason": "cold mountain holds"},
+    {"civilization": "hill_dwarf", "culture": "vlandia", "reason": "pastoral smallfolk farmland"},
+    {"civilization": "elf", "culture": "battania", "reason": "forest specialists"},
+    {"civilization": "gnome", "culture": "empire", "reason": "urban artisans; closest civic presentation"},
+    {"civilization": "tidekin", "culture": "nord", "reason": "sea folk (War Sails culture)"}
+  ],
+  "notes": "Presentation only. Each generated civilization is shown through one official main culture (installed SPCultures, is_main_culture=true, merged catalog campaign_catalog-10212), so its troops, buildings, scenes and character art come from installed assets. Generated culture ids, names and labels are preserved as metadata with provenance. Missing source-specific art never blocks a world. An unlisted civilization is an unresolved mandatory reference and fails the compile. Values that depend on this choice are typed pending slots in campaign.json: each kingdom's troopTreeAndRecruitTemplates and each hero's characterTemplate (MMR-32), and town and village economy (MMR-33). The 12 entries are exactly the generator's civilization registry (FWGC++ generated/content_civilizations.cpp kEntityIds); campaign_semantics_tests checks that."
+}
