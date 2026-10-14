@@ -35,14 +35,31 @@ Run `rn_01m4h4jk5wssr7x79xjmrp8ypg`, epic `ep_01m4fpnf646t254mnh69jhz107`, plan 
 - Projection policy poleMarginRatio 0.5 -> 0.75 (square 1600x1600 physical domain); projection evidence regenerated.
 - Evidence `evidence/fwg/terrain-compile.json` (independent re-derivation of size 129; sizes 129/257/513/1025 fidelity -> source size frozen at 129). Visual probe `native_render-4988` (5 views, slot `mnbl_terrain26_s129` deployed). Found: 75% polar padding; spikes from 2.5x vertical exaggeration.
 
-## MMR-27 campaign semantics — claimed 21:36 UTC, in review
-- `docs/campaign-semantics.md`; `worldbridge --compile-campaign` -> id-map.json + campaign.json (towns/villages/castles/kingdoms/ruling clans/heroes/ports, typed pending slots, provenance). Stable ids `mnbl_<seedhash8>_<kind>_<hash10>`.
-- Policies `worldgen/policies/campaign-content.json` (17 generator hero roles, hamlet roles, statuses, occupations, names, minima) and `culture-presentations.json` (12 civilizations -> official cultures). Schema `worldgen/contracts/id-map.schema.json`.
-- Finding: the ticket's '24-city ceiling' is only the explicit settlement_count cap; inferred-settings worlds place by habitat packing (45 cities at 129). hamlets_per_core is not a hard cap (cores have 5).
-- Evidence `evidence/fwg/campaign-semantics.json` (independent re-derivation for 33/129/257; 513/1025 summarized; repeat identical).
+## MMR-27 campaign semantics — ACCEPTED 2026-10-14 22:44 UTC (review accept-with-fixes, all applied; `evidence/fwg/campaign-review.md`)
+- `docs/campaign-semantics.md`; `worldbridge --compile-campaign` -> id-map.json + campaign.json (towns/villages/castles/kingdoms/ruling clans/heroes/ports, typed pending slots, provenance, exclusions). Stable ids `<prefix>_<kind>_<hash10>`, prefix = hash of the source identity + world.json SHA-256 (distinct per world).
+- Policies `worldgen/policies/campaign-content.json` (17 generator hero roles, hamlet roles, statuses, occupations with installed-template evidence and town/village settlement kind, name templates, minima) and `culture-presentations.json` (12 civilizations -> official cultures). Schema `worldgen/contracts/id-map.schema.json`. The `heroes` block (v6) is now pinned in `source-compatibility.json`; the reader fixture has an empty heroes block.
+- Review fixes that later tickets inherit: harbourmaster -> Merchant (no ShipWright heroes are installed); reeves -> Headman at their hamlet (presence); every hero home, culture and civilization reference is checked; player-adopted (`founded_by`) rows are refused (MMR-30 owns the player faction); land hamlets per core are capped by hamlets_per_core.
+- Finding: the ticket's '24-city ceiling' is only the explicit settlement_count cap; inferred-settings worlds place by habitat packing (45 cities at 129).
+- Evidence `evidence/fwg/campaign-semantics.json`: independent re-derivation of all 5 sizes (19 checks each, incl. installed-template counts via `--game`), repeat identical. Unit 88/88, reader 139/139, CTest 7/7.
+- Flaky: `process_contract` case 19 (grandchild termination) failed once under CPU load (beside the 1025 compile) and passed alone.
+
+## MMR-28 travel graph — CLAIMED 22:44 UTC, paused at the user's break (exploration only, no code written)
+- Attempt at_01m4y9dmnf0g3jcz2p4bmfemfc; the token is in the session scratchpad claims.txt, never in the repo. Lease runs to 2026-10-15 02:44 UTC. If it has lapsed, reconcile or reclaim before starting.
+- Engine contract gathered so far:
+  - navmesh face group = TerrainType (`docs/formats/navmesh-bin.md` §5);
+  - invalid terrain types per navigation type: Default {7,8,10,11,13,14,18,19,21-25}, Naval {1-7,13-17,20-22}, All {7,13,14,21,22};
+  - region switch cost 50/50, embark/disembark threshold 0.5;
+  - each town's gate sits on Plain (1) and its port on CoastalSea (18), on the same island (`evidence/runtime/navigation-probe.json` faces);
+  - OpenSea (19) is required for storms;
+  - no bridges (17/25) are authored yet (an MMR-17 gap).
+- Inputs available:
+  - MMR-25 `--project` objects.json (roads, rivers, hamlet port sea cells);
+  - MMR-26 masks.bin (intent land 0 / ocean 1 / lake 2 / river 3, plus padding);
+  - MMR-27 campaign.json (ports, villages, exclusions).
+- Expected artifacts: travel_graph.cpp, port_compiler.cpp, travel-graph and ports schemas, playability.json, travel_graph_tests.cpp, calibration naval-transitions/.
 
 ## Next
-- After MMR-27: MMR-28 (needs 25/26/27/17) and MMR-30 (needs 27/21). Then MMR-29.
+- Resume MMR-28, then MMR-30 (also ready), then MMR-29.
 
 ## Workflow (user, 2026-10-14)
 - Big batches: all spec changes → one test run → all fixes → one confirming run → done. Fail-soft probes so one run reports everything.

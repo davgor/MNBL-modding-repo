@@ -2941,12 +2941,169 @@
     },
     {
       "createdAt": "2026-10-14T21:36:38.134Z",
+      "decidedAt": "2026-10-14T22:44:01.873Z",
+      "decision": {
+        "decidedBy": "Claude Code",
+        "notes": "The independent review (evidence/fwg/campaign-review.md) returned accept-with-fixes. All must-fix items were applied and re-verified: unit 88/88, reader 139/139, CTest 7/7, independent verifier 19/19 checks on 5 worlds, and a byte-identical repeat.",
+        "outcome": "accepted",
+        "reasons": []
+      },
+      "evidence": {
+        "checks": [
+          {
+            "detail": "88/88 (evidence/fwg/campaign-tests.txt)",
+            "name": "campaign_semantics_tests",
+            "status": "passed"
+          },
+          {
+            "detail": "139/139, including heroes_failed, heroes_version_7 and heroes_system_missing, and campaign_inputs with presence, founded_by and realm race/name",
+            "name": "source_reader_tests",
+            "status": "passed"
+          },
+          {
+            "detail": "7/7 (evidence/fwg/campaign-ctest.log). The first run was 6/7: process_contract case 19 (grandchild termination) failed while the size-1025 compile loaded the CPU, and passed when re-run alone. That is untouched process-supervision code.",
+            "name": "CTest",
+            "status": "passed"
+          },
+          {
+            "detail": "Sizes 33, 129, 257, 513 and 1025 compile (1.1 to 37.2 s); the s129 repeat is byte-identical",
+            "name": "Real-world compiles",
+            "status": "passed"
+          },
+          {
+            "detail": "tools/summarize_campaign.py fully re-derives all 5 sizes, 19/19 checks each. It covers ids/prefix, every reference, joins, occupations and attachments, every name, the producer limits, and installed-template counts from the official modules via --game. The 5 world prefixes are distinct.",
+            "name": "Independent verifier",
+            "status": "passed"
+          },
+          {
+            "detail": "Accept with fixes; all M1-M5 and S1-S11 applied (S3 player rows are refused rather than ignored; S10 documented). See evidence/fwg/campaign-review.md",
+            "name": "Independent review",
+            "status": "passed"
+          }
+        ],
+        "criteria": [
+          {
+            "criterionId": "c1",
+            "met": true,
+            "note": "The independent review recomputed ids for 5 worlds and the post-fix verifier re-derived them again: unique, bounded, traced to source UIDs, with a distinct prefix per world. Collision refusal is tested."
+          },
+          {
+            "criterionId": "c2",
+            "met": true,
+            "note": "Closure holds and every consumed reference is validated (review M2 fixed and tested). Pending slots carry owner tickets, including troops (MMR-32). Engine-graph validation is deferred to MMR-36, as the ticket scopes it."
+          },
+          {
+            "criterionId": "c3",
+            "met": true,
+            "note": "The producer report is required. Placed cities, target, fortress_count and the land-hamlet cap are enforced. The 24-city reading was verified against the pinned FWGC++ by the reviewer. No settlements are invented; minima carry installed-game evidence."
+          },
+          {
+            "criterionId": "c4",
+            "met": true,
+            "note": "Missing names (M5), all four harbour variants (S11), null sovereigns, realm-less roles (M1), unmapped civilizations and 12-civilization coverage are all tested. Presentation-only culture mapping means missing art never blocks a world."
+          }
+        ],
+        "notes": "Lean batch: all review fixes were applied in one batch, followed by one unit/reader/CTest run (plus a CTest re-run alone after one load-induced flake in untouched code) and one compile and verify run."
+      },
+      "failure": null,
+      "fencingToken": 1,
+      "id": "at_01m4y5h2qpvykr540a0dy3mp1w",
+      "kind": "work",
+      "number": 1,
+      "outputs": {
+        "artifacts": [
+          {
+            "hash": null,
+            "label": "Campaign semantics doc",
+            "location": "docs/campaign-semantics.md",
+            "remoteOnly": false
+          },
+          {
+            "hash": null,
+            "label": "Independent verification (5 sizes)",
+            "location": "evidence/fwg/campaign-semantics.json",
+            "remoteOnly": false
+          },
+          {
+            "hash": null,
+            "label": "Independent review + disposition",
+            "location": "evidence/fwg/campaign-review.md",
+            "remoteOnly": false
+          },
+          {
+            "hash": null,
+            "label": "Unit test log",
+            "location": "evidence/fwg/campaign-tests.txt",
+            "remoteOnly": false
+          },
+          {
+            "hash": null,
+            "label": "CTest log",
+            "location": "evidence/fwg/campaign-ctest.log",
+            "remoteOnly": false
+          },
+          {
+            "hash": null,
+            "label": "Compiled research worlds",
+            "location": "build/research-campaign27",
+            "remoteOnly": false
+          }
+        ],
+        "branch": "codex/fwgc-procedural-campaign",
+        "changedFiles": [
+          "src/WorldBridge/include/worldbridge/campaign_compiler.hpp",
+          "src/WorldBridge/include/worldbridge/stable_ids.hpp",
+          "src/WorldBridge/include/worldbridge/source_world.hpp",
+          "src/WorldBridge/src/campaign_compiler.cpp",
+          "src/WorldBridge/src/stable_ids.cpp",
+          "src/WorldBridge/src/source_reader.cpp",
+          "src/WorldBridge/src/main.cpp",
+          "src/WorldBridge/CMakeLists.txt",
+          "src/WorldBridge/tests/campaign_semantics_tests.cpp",
+          "src/WorldBridge/tests/source_reader_tests.cpp",
+          "src/WorldBridge/tests/fixtures/source_contract/make_fixture.py",
+          "src/WorldBridge/tests/fixtures/source_contract/valid/world.json",
+          "worldgen/policies/campaign-content.json",
+          "worldgen/policies/culture-presentations.json",
+          "worldgen/contracts/id-map.schema.json",
+          "worldgen/contracts/source-compatibility.json",
+          "tools/summarize_campaign.py",
+          "docs/campaign-semantics.md",
+          "evidence/fwg/campaign-semantics.json",
+          "evidence/fwg/campaign-tests.txt",
+          "evidence/fwg/campaign-ctest.log",
+          "evidence/fwg/campaign-review.md",
+          "task-notes/claude-handoff-2026-10-14.md"
+        ],
+        "commits": [],
+        "summary": "Campaign semantic compiler (worldbridge --compile-campaign) emitting id-map.json and campaign.json. The intermediate records are towns, villages, castles, kingdoms, synthesized ruling clans and regents, heroes and ports. Each record carries provenance and typed pending slots naming its owner ticket (MMR-28/31/32/33/35/42). Every reference the compiler consumes is validated: realm/city/hamlet/fortress cultures, hero homes, hamlet presences, realms, civilizations and sovereigns.\n\nStable ids are <prefix>_<kind>_<hash10>, 26 characters. The prefix is derived from the source identity plus the world.json SHA-256, so it differs per world. Collisions and repeated (kind, uid) pairs are refused.\n\nPolicies:\n- campaign-content.json covers all 17 generator hero roles, the hamlet roles and statuses, and occupations with installed-template evidence and a town/village settlement kind. It also holds the name templates (validated on load) and the minima with installed-game evidence.\n- culture-presentations.json maps all 12 generator civilizations to official cultures.\n- The heroes block (v6) is pinned in source-compatibility.json.\n\nThe independent review returned accept-with-fixes. All 5 must-fix and 11 should-fix items were applied in one batch (evidence/fwg/campaign-review.md):\n- harbourmaster maps to Merchant, because the installed game has no ShipWright heroes.\n- Keepers and heresiarchs without a realm become Wanderers.\n- Reeves attach to their presence hamlet as Headman.\n- Player-adopted rows are refused.\n- Land hamlets per core are capped by hamlets_per_core.\n- Hero race and presentation are emitted.\n- Exclusions are recorded.\n- An XML-ready localized name is emitted.\n\nFinding: the 24-city ceiling is only the explicit settlement_count cap. Inferred-settings worlds place cities by habitat packing (45 cities at size 129), and the compiler enforces the producer's founding report instead."
+      },
+      "reconciledAt": null,
+      "revisionId": "rv_01m4xazdg471p8ggry5yynj8ye",
+      "state": "accepted",
+      "submittedAt": "2026-10-14T22:43:52.503Z",
+      "supersededAt": null,
+      "ticketContentHash": "sha256:e0c2d6d5fa7c0436cf99da24553526dd4b425f8c9e0816344cdd49ce115840c1",
+      "ticketId": "tk_01m4fqfbgkm2ya34djjgfh9k6t",
+      "updatedAt": "2026-10-14T22:44:01.873Z",
+      "worker": {
+        "catalogRevision": null,
+        "effort": "medium",
+        "hostId": null,
+        "label": "Claude Code",
+        "modelId": "claude-opus-5-5",
+        "rationale": "Semantic compiler in worldbridge: stable bounded Bannerlord ids from source UIDs with a persisted id-map, realm, culture and ownership joins, typed pending template slots, and small-world validity rules from installed-game evidence (MMR-18). Offline tests on the fixture and real exports; no game run expected.",
+        "sessionId": null
+      }
+    },
+    {
+      "createdAt": "2026-10-14T22:44:39.727Z",
       "decidedAt": null,
       "decision": null,
       "evidence": null,
       "failure": null,
       "fencingToken": 1,
-      "id": "at_01m4y5h2qpvykr540a0dy3mp1w",
+      "id": "at_01m4y9dmnf0g3jcz2p4bmfemfc",
       "kind": "work",
       "number": 1,
       "outputs": null,
@@ -2955,16 +3112,16 @@
       "state": "running",
       "submittedAt": null,
       "supersededAt": null,
-      "ticketContentHash": "sha256:e0c2d6d5fa7c0436cf99da24553526dd4b425f8c9e0816344cdd49ce115840c1",
-      "ticketId": "tk_01m4fqfbgkm2ya34djjgfh9k6t",
-      "updatedAt": "2026-10-14T21:57:07.968Z",
+      "ticketContentHash": "sha256:2739fc9e51a21804dde0139649646433bbef53b1ddee4838ebbb4c5b4901092b",
+      "ticketId": "tk_01m4fqfbgkk2fmgh12sbyxsjy7",
+      "updatedAt": "2026-10-14T22:44:53.763Z",
       "worker": {
         "catalogRevision": null,
         "effort": "medium",
         "hostId": null,
         "label": "Claude Code",
         "modelId": "claude-opus-5-5",
-        "rationale": "Semantic compiler in worldbridge: stable bounded Bannerlord ids from source UIDs with a persisted id-map, realm, culture and ownership joins, typed pending template slots, and small-world validity rules from installed-game evidence (MMR-18). Offline tests on the fixture and real exports; no game run expected.",
+        "rationale": "Offline compiler in worldbridge: decode roads to stable UIDs, project routes onto the MMR-25 frame, classify crossings and grades against the MMR-26 compiled terrain intents, derive land components and sea basins from source masks, and bind ports from verified harbour records using the MMR-17 War Sails contract. Emits candidates with pending engine-validation status. Tests on synthetic worlds plus real exports; no game run expected unless MMR-17 left a needed parameter open.",
         "sessionId": null
       }
     }

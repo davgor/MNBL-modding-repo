@@ -112,4 +112,32 @@ All scratch files are in %TEMP%\mmr27-review. Nothing in the repo was changed ap
 
 ## Disposition
 
-(pending: written after the fix batch)
+All 5 must-fix and all 11 should-fix items were applied in one batch, followed by one test run and one compile-and-verify run. Two items deviate from the reviewer's suggested fix, as stated below (S3 player rows, S10).
+
+**Results after the batch:**
+- `campaign_semantics_tests`: 88/88. `source_reader_tests`: 139/139.
+- CTest: 7/7.
+  - The first CTest run had 6/7: `process_contract` case 19 ("descendant terminated with the job") failed while the size-1025 compile was loading the CPU.
+  - Re-run alone, it passed. That code is process supervision, which this ticket did not touch.
+- All five research worlds compile. The independent verifier now fully re-derives every world (33, 129, 257, 513, 1025) at 19/19 checks each; before, only three were re-derived.
+- Each world has its own prefix. The s129 repeat is byte-identical.
+
+| Item | Disposition |
+|---|---|
+| M1 | **Fixed.** keeper and heresiarch gain `withoutRealm: Wanderer`. Confirmed in `heroes.cpp:1376-1380` that home and realm are set together, so a null home means a null realm. Test: a keeper and a heresiarch without home or realm become Wanderers. A policy copy without the rule is refused (`broken_join`) |
+| M2 | **Fixed.**<br>• Any instantiated hero's home must be a generated city (kind `city`, known uid), otherwise `broken_join`. Notables fall back to the realm capital only when they have no home.<br>• Realm, city, hamlet and fortress `culture_id`s must exist. A city's culture must belong to its civilization. Duplicate culture ids are refused (`duplicate_id`).<br>• Hero civilizations are mapped and emitted as `presentation`.<br>• Tests cover 9 new refusals |
+| M3 | **Fixed.**<br>• `source-compatibility.json` pins `heroes: [6]` and requires the `heroes` system.<br>• The reader fixture (`make_fixture.py`) now carries an empty heroes block.<br>• New reader cases: `heroes_failed` → failed_block, `heroes_version_7` → unsupported_version, `heroes_system_missing` → missing_system. `campaign_inputs` now fills the fixture's block |
+| M4 | **Fixed.**<br>• harbourmaster → Merchant (town), and ShipWright is removed from the occupation table.<br>• Every occupation now names its installed evidence, and the loader requires it.<br>• The verifier gains `--game`: it counts is_hero/is_template NPCCharacters per occupation in the official modules, independently of the policy. All used occupations have them: Lord 584, Wanderer 82, Merchant 55, Headman 21, GangLeader 21, Preacher 16.<br>• Docs and policy notes are corrected |
+| M5 | **Fixed.** Test: two nameless cities of realm Aster become "Aster Town" and "Aster Town 2", both marked synthesized |
+| S1 | **Fixed.**<br>• The prefix is `sha256("mnbl.world-prefix/2\n" + sourceIdentity + "\n" + worldSha256)[0:8]`: the source identity document plus the world.json hash. Both are recorded in `id-map.json`, and the schema is updated.<br>• The five research worlds now have five prefixes (`distinctWorldPrefixes: true`).<br>• Docs state it separates worlds but is not a uniqueness proof (MMR-30) |
+| S2 | **Fixed.**<br>• The reader reads `presence`.<br>• Occupations gain a settlement kind (town or village); Headman is village.<br>• Reeves attach to the hamlet they are present at: 17/62/76/89/112 at sizes 33/129/257/513/1025, all of them. The fallback to the home town is recorded in provenance.<br>• `exclude()` moves a removed village's Headman to its town |
+| S3 | **Fixed, one deviation.**<br>• Land (non-harbour-shaped) hamlets per core are enforced against `hamlets_per_core` (max 3 in every world).<br>• The founding report, `fortress_count` and `hamlets_per_core` are now required.<br>• Deviation: player-adopted rows (`founded_by`) are refused (`unsupported_row`) rather than ignored. They sit past every producer limit and belong to the player faction (MMR-30); none occur in generator-only worlds. The reader reads `founded_by` |
+| S4 | **Fixed.**<br>• Heroes emit `raceId` and `presentation`.<br>• Kingdoms emit `civilizationName` and `parentRaceId`, which the reader now reads.<br>• A regent takes its realm's parent race |
+| S5 | **Fixed.** Kingdoms gain a pending `troopTreeAndRecruitTemplates` slot, owner MMR-32. The culture-presentations note now names the actual slots |
+| S6 | **Fixed.**<br>• Records emit `nameLocalizedXml`, produced by `localized_xml()`.<br>• `xml_escape` now drops tab like `localized`.<br>• Tests cover both |
+| S7 | **Fixed.**<br>• `exclusions` (id, kind, uid, reason) are recorded and emitted.<br>• `exclude()` commits only when closure holds.<br>• An excluded id stays reserved in the id map (schema note) |
+| S8 | **Fixed.**<br>• `load_content` refuses unknown placeholders, unbalanced braces, and an ordinal without `{name}` and `{n}` (`invalid_template`).<br>• `fill()` is now a single pass.<br>• Tests cover the checks |
+| S10 | **Documented, not re-keyed** (the reviewer offered either). Docs list the ordinal-built UIDs for MMR-30. Within a world they are unique, and the S1 prefix keeps worlds apart |
+| S11 | **Fixed.** Tests cover the `harbor` and `landing` roles and assert that the culture policy covers exactly the 12 kEntityIds civilizations |
+| Minor | **Fixed.**<br>• The towns minimum evidence is reworded as reasoned from references (smallest boot: 2 kingdoms, 2 towns).<br>• Names are assigned in source-UID order; the verifier now recomputes every name.<br>• The sentinel rule is documented as player-rows-only, and an ungarrisoned fortress without a culture is refused with that reason.<br>• Player-adopted fortresses are refused explicitly (see S3) |
+| Verifier | It also re-derives every reference, every name and the installed-template evidence. It still shares the compiler's reading of the joins, which the unit tests and this review cover |
