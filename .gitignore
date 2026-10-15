@@ -1,6 +1,30 @@
+# Local build output (CMake producer/bridge builds, fixtures, extracted scenes)
 /build/
 /artifacts/
 **/bin/
 **/obj/
+
+# Dark Mechanicus request/claim scratch files written by local tooling
 /tools/*.request.json
 /tools/*.local.json
+
+# Raw in-game probe dumps (screenshots, per-PID JSON/logs). Collect-OwnedProbe.ps1
+# writes them locally; the committed summaries in evidence/runtime/ are the receipts.
+/evidence/runtime/in-game/
+
+# Python bytecode
+__pycache__/
+*.py[cod]
+
+# Visual Studio user state
+.vs/
+*.user
+*.suo
+
+# Claude Code per-user settings
+.claude/settings.local.json
+
+# OS clutter
+Thumbs.db
+desktop.ini
+.DS_Store
