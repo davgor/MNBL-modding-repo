@@ -1,0 +1,24 @@
+# Pull requests into main: every mod folder is registered in config/mods.json, and every release mod whose files
+# changed has a higher Version in its SubModule.xml (that bump is what triggers its release after merge).
+name: Mod checks
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Registry and version bumps
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: python3 tools/ci/mods.py check --base "$BASE_SHA"
+      - name: Release tooling tests
+        run: python3 -m unittest discover -s tests/ci -v

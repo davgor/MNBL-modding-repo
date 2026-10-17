@@ -1,0 +1,41 @@
+{
+  "schema": "mnbl.mod-registry",
+  "version": 1,
+  "notes": "Every Modules/<id>/ and src/<dir>/ must belong to a mod here; tools/ci/mods.py check fails otherwise. A release mod ships when its SubModule.xml Version has no <id>/<version> tag yet. 'owns' lists what ships (sources, module folder, build inputs; not tests): changing any of it, or a file the 'project' csproj embeds, needs a Version bump.",
+  "mods": [
+    {
+      "id": "MNBL.BattleScale",
+      "release": true,
+      "build": "tools/ci/Build-BattleScale.ps1",
+      "owns": [
+        "Modules/MNBL.BattleScale/",
+        "src/MNBL.BattleScale/",
+        "tools/ci/Build-BattleScale.ps1"
+      ]
+    },
+    {
+      "id": "MNBL.ProceduralWorld",
+      "release": true,
+      "build": "tools/ci/Build-ProceduralWorld.ps1",
+      "project": "src/MNBL.ProceduralWorld/MNBL.ProceduralWorld.csproj",
+      "owns": [
+        "Modules/MNBL.ProceduralWorld/",
+        "src/MNBL.ProceduralWorld/",
+        "src/WorldBridge/",
+        "config/runtime-api-lock.json",
+        "tools.lock.json",
+        "tools/ci/Build-ProceduralWorld.ps1"
+      ]
+    },
+    {
+      "id": "MNBL.AgentGrowthProbe",
+      "release": false,
+      "reason": "In-game engine probe used by local tests; not a player-facing mod.",
+      "owns": [
+        "Modules/MNBL.AgentGrowthProbe/",
+        "src/MNBL.AgentGrowthProbe/",
+        "src/MNBL.AgentStorage/"
+      ]
+    }
+  ]
+}

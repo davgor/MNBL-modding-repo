@@ -1,0 +1,64 @@
+# Merges into main: each release mod in config/mods.json whose SubModule.xml Version has no <id>/<version> tag yet
+# is built, zipped and published as a GitHub release under that tag. Mods whose version is already tagged are skipped.
+name: Mod releases
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: mod-releases
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    outputs:
+      mods: ${{ steps.plan.outputs.mods }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Registry
+        run: python3 tools/ci/mods.py check
+      - name: Untagged versions
+        id: plan
+        run: python3 tools/ci/mods.py plan
+
+  release:
+    needs: plan
+    if: needs.plan.outputs.mods != '[]'
+    name: Release ${{ matrix.mod }}
+    runs-on: windows-2022
+    strategy:
+      fail-fast: false
+      matrix:
+        mod: ${{ fromJSON(needs.plan.outputs.mods) }}
+    env:
+      MOD: ${{ matrix.mod }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Reference assemblies
+        run: python tools/ci/mods.py references --out build/ci/references
+      - name: Build
+        run: |
+          $info = python tools/ci/mods.py info $env:MOD | ConvertFrom-Json
+          & (Join-Path $PWD $info.build) -References build/ci/references -Stage "build/ci/stage/$env:MOD" -Work "build/ci/work/$env:MOD"
+      - name: Package
+        id: package
+        run: python tools/ci/mods.py package $env:MOD --stage "build/ci/stage/$env:MOD" --out "build/ci/dist/$env:MOD"
+      - name: Publish
+        env:
+          TAG: ${{ steps.package.outputs.tag }}
+          TITLE: ${{ steps.package.outputs.title }}
+          ZIP: ${{ steps.package.outputs.zip }}
+          CHECKSUM: ${{ steps.package.outputs.sha256 }}
+          NOTES: ${{ steps.package.outputs.notes }}
+        run: |
+          gh release create $env:TAG $env:ZIP $env:CHECKSUM --target $env:GITHUB_SHA --title $env:TITLE --notes-file $env:NOTES --latest=false
+          if ($LASTEXITCODE) { throw "gh release create $env:TAG failed." }
