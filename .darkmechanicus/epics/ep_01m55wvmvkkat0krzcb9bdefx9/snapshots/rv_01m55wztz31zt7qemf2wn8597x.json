@@ -1,0 +1,819 @@
+{
+  "baseRevisionId": null,
+  "bundle": {
+    "edges": [
+      {
+        "from": "tk_01m55wz5yb9acbe9yswn5j6g6g",
+        "to": "tk_01m55wz5yg8b2fzbwx47sj1ve2"
+      },
+      {
+        "from": "tk_01m55wz5yb9acbe9yswn5j6g6g",
+        "to": "tk_01m55wz5ygpv1tkgbw0mrfbe2n"
+      },
+      {
+        "from": "tk_01m55wz5yb9acbe9yswn5j6g6g",
+        "to": "tk_01m55wz5ygkcsc1w4bhkcpge5n"
+      },
+      {
+        "from": "tk_01m55wz5yb9acbe9yswn5j6g6g",
+        "to": "tk_01m55wz5yghvgmg13wgssgces1"
+      },
+      {
+        "from": "tk_01m55wz5yb9acbe9yswn5j6g6g",
+        "to": "tk_01m55wz5ygy4jk4fn82qf2s9jv"
+      },
+      {
+        "from": "tk_01m55wz5ygzj2aq2f7qv3z7jdt",
+        "to": "tk_01m55wz5yghvgmg13wgssgces1"
+      },
+      {
+        "from": "tk_01m55wz5yg8b2fzbwx47sj1ve2",
+        "to": "tk_01m55wz5ygpv1tkgbw0mrfbe2n"
+      },
+      {
+        "from": "tk_01m55wz5yg8b2fzbwx47sj1ve2",
+        "to": "tk_01m55wz5ygkcsc1w4bhkcpge5n"
+      },
+      {
+        "from": "tk_01m55wz5yg8b2fzbwx47sj1ve2",
+        "to": "tk_01m55wz5yghvgmg13wgssgces1"
+      },
+      {
+        "from": "tk_01m55wz5ygpv1tkgbw0mrfbe2n",
+        "to": "tk_01m55wz5ygkcsc1w4bhkcpge5n"
+      },
+      {
+        "from": "tk_01m55wz5ygpv1tkgbw0mrfbe2n",
+        "to": "tk_01m55wz5ygy4jk4fn82qf2s9jv"
+      },
+      {
+        "from": "tk_01m55wz5ygkcsc1w4bhkcpge5n",
+        "to": "tk_01m55wz5ygy4jk4fn82qf2s9jv"
+      },
+      {
+        "from": "tk_01m55wz5yghvgmg13wgssgces1",
+        "to": "tk_01m55wz5ygy4jk4fn82qf2s9jv"
+      },
+      {
+        "from": "tk_01m55wz5yg3bwr0fcspbje0zda",
+        "to": "tk_01m55wz5ygy4jk4fn82qf2s9jv"
+      },
+      {
+        "from": "tk_01m55wz5ygy4jk4fn82qf2s9jv",
+        "to": "tk_01m55wz5yge4ajemjf1mb14j5x"
+      },
+      {
+        "from": "tk_01m55wz5ygx4n91h1qy7p994pn",
+        "to": "tk_01m55wz5yge4ajemjf1mb14j5x"
+      }
+    ],
+    "epic": {
+      "intent": "## Outcome\nA Bannerlord field battle with **100,000 soldiers** runs for 10 minutes of continuous combat on the stock v1.4.8 install, plus the accepted 4,080-slot engine build. The same battle at **2k, 10k, 40k and 100k** produces a recorded FPS profile.\n\n## Design decisions (user, 2026-10-17)\n- **Layered participants.** All 100k soldiers exist, are visible and fight. Soldiers near the camera and the contact front are full engine Agents. The rest are simulated in bulk by the aggregate core and drawn as cheap figures. Soldiers move between the layers as the fighting moves.\n- **Composition:** infantry, archers and cavalry on both sides. Horses are extra and don't count toward the soldier total.\n- **No in-battle native storage growth.** Real-agent capacity is fixed at battle start by the accepted 4,080-slot native build (patched TaleWorlds.Native.dll 392bc9db… plus the managed spawn-admission rewrite).\n- **FPS is recorded, not gated.** The pass bar is that each battle size runs its 10 minutes and tears down cleanly.\n\n## Builds on\n- `src/MNBL.BattleScale/Core/BattleSimulation.cs`: aggregate populations, spawn tickets, promotion/demotion leases.\n- `LayeredBattleMission.cs`: stationary prototype tracking 100k logical troops with 128 real agents.\n- The r13/r14 4,080-slot native build: 4,080 archers / 2,040 rider+horse pairs, 300 s combat, ~49–56 FPS.\n- `VisualCrowdMission.cs`: AgentVisuals crowd that stalled at 2,344. This is evidence that per-soldier AgentVisuals is too heavy for the distant layer.\n\n## Out of scope / shelved\nThe growable-agent-storage track is shelved: the v2 private probe (built and reviewed, never run), Mission adoption, the 12 remaining owner sites, consumer routing and the v6 checker review. It is not part of this epic. Frozen r13/r14 sources, packages and evidence stay unchanged; new work uses new files and output paths.\n\n## Working rules\n- **No game launch before the acceptance node.** Every work ticket is verified offline only.\n- **Lean checks.** A ticket is done when it compiles, the existing BattleScale core test runner still passes, and new pure logic has at most a few targeted assertions. No per-ticket independent reviews, evidence receipts, hash ceremonies or mutation suites. A single review pass happens once, right before the live runs.\n- **Acceptance batching.** Run the whole matrix, fix everything it finds in one batch, then do one confirming matrix run. A third run happens only for a genuinely new blocker.\n- **Shared game install.** Another agent (MNBL procedural-world) uses the same install. Before any deploy or launch, agree on game ownership with that session (CLAIM/OK/RELEASE). Never run while any Bannerlord*/Watchdog process exists. Never touch a process you didn't start. Restore every installed file after each run, because that session pins stock engine DLL hashes.",
+      "ownerRole": "battle-scale",
+      "successCriteria": [
+        {
+          "id": "s1",
+          "text": "A 100,000-soldier battle (two 50,000-soldier sides of infantry, archers and cavalry; horses extra) runs 10 minutes of continuous combat without a crash or hang, then ends and tears down cleanly."
+        },
+        {
+          "id": "s2",
+          "text": "During that battle, real engine Agents fight near the camera and along the contact front, while every other soldier is visible as a distant figure and fights in the aggregate simulation; soldiers move between the two layers as the front moves."
+        },
+        {
+          "id": "s3",
+          "text": "Logical population is conserved for each side throughout: alive + killed + wounded equals the starting count, and no soldier is drawn or simulated twice."
+        },
+        {
+          "id": "s4",
+          "text": "The same battle at 2k, 10k, 40k and 100k soldiers has a recorded FPS profile (mean, median, p95 frame time, min) with real-agent count, alive-per-side and casualties over time, summarized in docs/battle-scale.md."
+        },
+        {
+          "id": "s5",
+          "text": "Every live run leaves the shared install exactly as found (all deployed engine and module files restored) and never ran while another Bannerlord session existed."
+        }
+      ],
+      "title": "100,000-soldier layered battle"
+    },
+    "formatVersion": 1,
+    "policies": {
+      "leaseSeconds": 900,
+      "maxConcurrency": null,
+      "onTicketFailure": "continue_independent",
+      "retryLimit": 3
+    },
+    "rationale": "One sprint, eleven nodes, and live testing only at the end, as the user asked. The 100k comes from layering: the accepted 4,080-slot native build supplies the real Agents near the action; an extended BattleSimulation core plus a cheap distant-figure renderer covers everyone else. That avoids the shelved growable-storage track entirely. The highest risk is the distant-figure technique, which can't be prototyped in game before acceptance, so render-choice must document a fallback, and acceptance may switch to it inside its single fix batch. Per-ticket checks are deliberately minimal: compile, the existing core test runner, and a few targeted assertions. One review pass guards the expensive live runs.",
+    "relations": [],
+    "sprints": [
+      {
+        "checkpoint": {
+          "mode": "human"
+        },
+        "concurrencyCap": null,
+        "entryCriteria": [],
+        "exitCriteria": [
+          {
+            "id": "x1",
+            "text": "The acceptance matrix (2k, 10k, 40k, 100k; 10 minutes each) has passed and its results are in docs/battle-scale.md."
+          }
+        ],
+        "goal": "A 100,000-soldier layered battle runs 10 minutes of combat, and the same battle at 2k, 10k, 40k and 100k has a recorded FPS profile.",
+        "id": "sp_01m55wvmvke39dytq323wqg10q",
+        "ordinal": 1,
+        "ticketIds": [
+          "tk_01m55wz5yb9acbe9yswn5j6g6g",
+          "tk_01m55wz5ygzj2aq2f7qv3z7jdt",
+          "tk_01m55wz5yg8b2fzbwx47sj1ve2",
+          "tk_01m55wz5ygpv1tkgbw0mrfbe2n",
+          "tk_01m55wz5ygkcsc1w4bhkcpge5n",
+          "tk_01m55wz5yghvgmg13wgssgces1",
+          "tk_01m55wz5yg3bwr0fcspbje0zda",
+          "tk_01m55wz5ygy4jk4fn82qf2s9jv",
+          "tk_01m55wz5ygx4n91h1qy7p994pn",
+          "tk_01m55wz5yge4ajemjf1mb14j5x",
+          "tk_01m55wvmvk0k536x6wy1rpds53"
+        ]
+      }
+    ],
+    "tickets": [
+      {
+        "acceptanceCriteria": [
+          {
+            "covers": "tk_01m55wz5ygy4jk4fn82qf2s9jv",
+            "id": "c1",
+            "text": "The 100k battle (two 50,000-soldier sides of infantry, archers and cavalry; horses extra) runs 10 minutes of continuous combat with no crash or hang, then ends and tears down cleanly."
+          },
+          {
+            "covers": "tk_01m55wz5ygkcsc1w4bhkcpge5n",
+            "id": "c2",
+            "text": "In the 100k run, real Agents fight near the camera and along the front, and soldiers swap layers on both sides (promotions and demotions both above zero per side), shown by the receipt and screenshots."
+          },
+          {
+            "covers": "tk_01m55wz5yghvgmg13wgssgces1",
+            "id": "c3",
+            "text": "In the 100k run every non-materialized alive soldier is drawn as a distant figure (figure count matches distant alive soldiers in the receipt), and screenshots show both layers at once."
+          },
+          {
+            "covers": "tk_01m55wz5yg8b2fzbwx47sj1ve2",
+            "id": "c4",
+            "text": "For every recorded second of every run, alive + killed + wounded equals the starting count on each side, and no soldier is both real and distant."
+          },
+          {
+            "covers": "tk_01m55wz5ygpv1tkgbw0mrfbe2n",
+            "id": "c5",
+            "text": "In the 100k run distant formations advance, engage and take casualties in the aggregate simulation on both sides (aggregate casualties above zero per side)."
+          },
+          {
+            "covers": "tk_01m55wz5yg3bwr0fcspbje0zda",
+            "id": "c6",
+            "text": "docs/battle-scale.md has an FPS table (mean, median, p95 frame time, min) plus real-agent and casualty data for 2k, 10k, 40k and 100k, each from a completed 10-minute run."
+          },
+          {
+            "covers": "tk_01m55wz5ygx4n91h1qy7p994pn",
+            "id": "c7",
+            "text": "After every run all deployed engine and module files are restored to their pre-run hashes, and no run started while another Bannerlord session existed."
+          },
+          {
+            "covers": "tk_01m55wz5yb9acbe9yswn5j6g6g",
+            "id": "c8",
+            "text": "The runs use the scene, army mix and budgets in docs/battle-scale-100k.md; any deviation made during the fix batch is recorded there."
+          },
+          {
+            "covers": "tk_01m55wz5ygzj2aq2f7qv3z7jdt",
+            "id": "c9",
+            "text": "docs/battle-scale-100k.md records which distant-figure technique ran in the passing matrix (the chosen one or the fallback)."
+          },
+          {
+            "covers": "tk_01m55wz5yge4ajemjf1mb14j5x",
+            "id": "c10",
+            "text": "The pre-launch review's findings were all fixed or deferred with a reason before the first live run."
+          }
+        ],
+        "body": "This is the epic's only live game testing.\n\n1. Agree on game ownership with the MNBL procedural-world session (send CLAIM, wait for OK, send RELEASE when done). The runner also refuses while any Bannerlord*/Watchdog process exists.\n2. Run the full matrix with the runner: 2k, 10k, 40k and 100k soldiers, 10 minutes of combat each, one process per size.\n3. Fix everything the matrix exposes in one batch, then do one confirming matrix run. A third run happens only for a genuinely new blocker. If the distant-figure technique fails live, switch to the documented fallback inside that same fix batch.\n4. Add the FPS table (mean, median, p95 frame time, min per size), real-agent and casualty curves, screenshots and known limits to docs/battle-scale.md.",
+        "capability": {
+          "constraints": {
+            "dataLocation": null,
+            "environments": [],
+            "maxCostUsd": null,
+            "maxDurationMinutes": null
+          },
+          "context": {
+            "estimatedInputTokens": null,
+            "requiredArtifacts": []
+          },
+          "modalities": [
+            "text"
+          ],
+          "preferences": {
+            "autonomy": null,
+            "cost": null,
+            "latency": null,
+            "modelOverride": null,
+            "quality": null
+          },
+          "reasoning": {
+            "effort": "high",
+            "level": "multi_step",
+            "rationale": ""
+          },
+          "skills": [],
+          "tools": [
+            "repo_read",
+            "repo_write",
+            "shell",
+            "test_execution"
+          ],
+          "workType": "testing"
+        },
+        "expectedArtifacts": [],
+        "id": "tk_01m55wvmvk0k536x6wy1rpds53",
+        "key": "MMR-229",
+        "kind": "acceptance",
+        "optional": false,
+        "priority": "critical",
+        "references": [],
+        "size": "large",
+        "tags": [
+          "battle-scale",
+          "acceptance"
+        ],
+        "title": "Run the 2k / 10k / 40k / 100k battle matrix"
+      },
+      {
+        "acceptanceCriteria": [
+          {
+            "id": "a1",
+            "text": "docs/battle-scale-100k.md states the scene, per-side army mix and block layout, the real-agent budget and burst limit, the active-zone rule, the aggregate combat parameters and the battle/camera script, all as concrete numbers."
+          }
+        ],
+        "body": "Write `docs/battle-scale-100k.md` (one page). It holds the concrete numbers the other tickets build against. Desk work only: no game launch, no code.\n\nDecide and record:\n- **Scene:** pick an installed open-field battle scene with room for two 50,000-soldier sides. Record its usable area and deployment zones. If no scene is wide enough, use the largest one and deploy deeper ranks.\n- **Army template per side:** 50% infantry, 30% archers, 20% cavalry (horses extra), from stock troop templates. Formation block size (target ~500 soldiers), block grid, spacing and facing. The same layout must scale to 2k / 10k / 40k / 100k by block count.\n- **Real-agent budget inside the 4,080 native slots:** active soldiers (a rider plus horse costs 2 slots), headroom for retiring agents and bodies, spawn burst per tick. At 2k every soldier should be a real Agent, which gives the full-fidelity baseline.\n- **Active-zone rule:** a radius around the camera plus every contact on the front inside it. Both sides of an in-zone contact are always real.\n- **Aggregate combat model:** melee attrition per contact with troop-type matchups, archer volleys (range, rate, ammo), cavalry charge impact, killed/wounded split, tick rate. No rout, so fighting continues for the full 10 minutes.\n- **Battle script:** both sides advance and engage. Combat lasts 10 minutes. An automated camera path sweeps the front so soldiers keep swapping layers.",
+        "capability": {
+          "constraints": {
+            "dataLocation": null,
+            "environments": [],
+            "maxCostUsd": null,
+            "maxDurationMinutes": null
+          },
+          "context": {
+            "estimatedInputTokens": null,
+            "requiredArtifacts": []
+          },
+          "modalities": [
+            "text"
+          ],
+          "preferences": {
+            "autonomy": null,
+            "cost": null,
+            "latency": null,
+            "modelOverride": null,
+            "quality": null
+          },
+          "reasoning": {
+            "effort": "high",
+            "level": "deep",
+            "rationale": "Every other ticket builds against these numbers."
+          },
+          "skills": [],
+          "tools": [
+            "repo_read",
+            "repo_write"
+          ],
+          "workType": "architecture"
+        },
+        "expectedArtifacts": [
+          "docs/battle-scale-100k.md"
+        ],
+        "id": "tk_01m55wz5yb9acbe9yswn5j6g6g",
+        "key": "MMR-230",
+        "optional": false,
+        "priority": "critical",
+        "references": [],
+        "size": "small",
+        "tags": [
+          "battle-scale",
+          "design"
+        ],
+        "title": "Freeze the 100k battle layout and budgets"
+      },
+      {
+        "acceptanceCriteria": [
+          {
+            "id": "a1",
+            "text": "The chosen technique, its exact engine API calls, its expected entity/draw-call count at 100k and a fallback technique are written in docs/battle-scale-100k.md."
+          }
+        ],
+        "body": "Pick the technique for drawing up to ~100,000 non-materialized soldiers. Desk research only: the managed engine API (TaleWorlds.Engine Mesh / MetaMesh / GameEntity / Scene / Skeleton / particle and decal systems) from the installed DLLs, plus repo evidence. No game launch.\n\nKnown: `VisualCrowdMission` (one AgentVisuals and skeleton per figure) stalled at 2,344 figures, so per-soldier AgentVisuals is out.\n\nCompare at least:\n- (a) one runtime-built mesh per formation block holding all its figures, with vertex positions rewritten when the block moves;\n- (b) instanced MetaMesh entities;\n- (c) camera-facing impostor quads from a soldier atlas.\n\nJudge them on draw calls and entity count at 100k, CPU cost of moving figures each aggregate tick, how one figure is removed on death or promotion, cavalry (horse) figures, and readability at distance. Record the choice, the exact API calls, and a fallback technique for acceptance to switch to if the first one fails live.",
+        "capability": {
+          "constraints": {
+            "dataLocation": null,
+            "environments": [],
+            "maxCostUsd": null,
+            "maxDurationMinutes": null
+          },
+          "context": {
+            "estimatedInputTokens": null,
+            "requiredArtifacts": []
+          },
+          "modalities": [
+            "text"
+          ],
+          "preferences": {
+            "autonomy": null,
+            "cost": null,
+            "latency": null,
+            "modelOverride": null,
+            "quality": null
+          },
+          "reasoning": {
+            "effort": "high",
+            "level": "deep",
+            "rationale": "The biggest unknown, and it can't be prototyped in game before acceptance."
+          },
+          "skills": [],
+          "tools": [
+            "repo_read",
+            "repo_write",
+            "shell"
+          ],
+          "workType": "investigation"
+        },
+        "expectedArtifacts": [
+          "docs/battle-scale-100k.md (distant figures section)"
+        ],
+        "id": "tk_01m55wz5ygzj2aq2f7qv3z7jdt",
+        "key": "MMR-231",
+        "optional": false,
+        "priority": "critical",
+        "references": [],
+        "size": "small",
+        "tags": [
+          "battle-scale",
+          "rendering",
+          "investigation"
+        ],
+        "title": "Choose how distant soldiers are drawn"
+      },
+      {
+        "acceptanceCriteria": [
+          {
+            "id": "a1",
+            "text": "A 100,000-soldier roster with per-soldier role, health, ammo, state and slot position exists in Core; the core test runner passes with the new conservation and slot-bounds assertions."
+          }
+        ],
+        "body": "In `src/MNBL.BattleScale/Core` (no game or Harmony dependency), add a struct-of-arrays roster for up to 100,000 soldiers, extending the existing formations/ticket/lease model rather than replacing it.\n\nPer soldier: id, side, formation, troop template, role (infantry / archer / cavalry), health, ammo, state (distant / materializing / real / killed / wounded) and slot index in its formation. A formation slot layout maps slot index to world position from the formation's center, facing, frontage and depth. Target ≤ ~64 bytes per soldier.\n\nChecks (lean): it compiles; the existing core test runner (`tests/BattleScale/CoreTests.cs`) still passes; a few new assertions cover population conservation, slot positions staying inside the formation's bounds, and a printed allocation time and memory for 100k.",
+        "capability": {
+          "constraints": {
+            "dataLocation": null,
+            "environments": [],
+            "maxCostUsd": null,
+            "maxDurationMinutes": null
+          },
+          "context": {
+            "estimatedInputTokens": null,
+            "requiredArtifacts": []
+          },
+          "modalities": [
+            "text"
+          ],
+          "preferences": {
+            "autonomy": null,
+            "cost": null,
+            "latency": null,
+            "modelOverride": null,
+            "quality": null
+          },
+          "reasoning": {
+            "effort": "medium",
+            "level": "multi_step",
+            "rationale": ""
+          },
+          "skills": [],
+          "tools": [
+            "repo_read",
+            "repo_write",
+            "shell",
+            "test_execution"
+          ],
+          "workType": "implementation"
+        },
+        "expectedArtifacts": [],
+        "id": "tk_01m55wz5yg8b2fzbwx47sj1ve2",
+        "key": "MMR-232",
+        "optional": false,
+        "priority": "high",
+        "references": [],
+        "size": "medium",
+        "tags": [
+          "battle-scale",
+          "core",
+          "implementation"
+        ],
+        "title": "Add a 100k soldier roster with troop types and slot positions"
+      },
+      {
+        "acceptanceCriteria": [
+          {
+            "id": "a1",
+            "text": "A headless 10-minute 100k battle runs in the core with formations advancing, engaging, firing and taking casualties; conservation and determinism assertions pass and the printed per-tick cost is recorded in the ticket result."
+          }
+        ],
+        "body": "Extend `BattleSimulation` so distant formations move and fight, using the numbers in docs/battle-scale-100k.md:\n- formation orders: advance to, hold, charge, engage target, with movement speed by role;\n- contact detection between enemy formations;\n- melee attrition per contact, archer volleys within range that consume ammo, and cavalry charge impact followed by melee;\n- casualties applied to specific distant soldiers (front ranks first), split into killed and wounded.\n\nSoldiers that are currently real Agents are excluded from aggregate attrition, because the engine resolves their fights. The aggregate runs at a fixed tick rate independent of frame rate and is deterministic for a given seed. Budget: ≤ 2 ms per tick for 100k soldiers / ~200 formations on the dev machine.\n\nChecks (lean): compiles; core runner passes; a few assertions cover per-side conservation every tick and determinism for a seed; a headless 10-minute 100k simulation finishes and prints per-tick cost.",
+        "capability": {
+          "constraints": {
+            "dataLocation": null,
+            "environments": [],
+            "maxCostUsd": null,
+            "maxDurationMinutes": null
+          },
+          "context": {
+            "estimatedInputTokens": null,
+            "requiredArtifacts": []
+          },
+          "modalities": [
+            "text"
+          ],
+          "preferences": {
+            "autonomy": null,
+            "cost": null,
+            "latency": null,
+            "modelOverride": null,
+            "quality": null
+          },
+          "reasoning": {
+            "effort": "high",
+            "level": "deep",
+            "rationale": ""
+          },
+          "skills": [],
+          "tools": [
+            "repo_read",
+            "repo_write",
+            "shell",
+            "test_execution"
+          ],
+          "workType": "implementation"
+        },
+        "expectedArtifacts": [],
+        "id": "tk_01m55wz5ygpv1tkgbw0mrfbe2n",
+        "key": "MMR-233",
+        "optional": false,
+        "priority": "critical",
+        "references": [],
+        "size": "medium",
+        "tags": [
+          "battle-scale",
+          "core",
+          "implementation"
+        ],
+        "title": "Simulate moving, fighting formations in the aggregate core"
+      },
+      {
+        "acceptanceCriteria": [
+          {
+            "id": "a1",
+            "text": "The front-line controller promotes and demotes soldiers within the native budget with cavalry costed at 2 slots; its Core selection logic passes the budget and paired-contact assertions."
+          }
+        ],
+        "body": "Generalize the `LayeredBattleMission` adapter into a front-line controller. Each planning pass it ranks soldiers by distance to the camera and to active contacts.\n- **Promotion:** materialize up to the real-agent budget. A rider plus horse costs 2 slots. Both sides of an in-zone contact materialize together. A promoted soldier spawns with its troop template and equipment at its current slot position, carrying over health and ammo, in the engine formation matching its aggregate formation and order.\n- **Demotion:** soldiers that leave the zone are demoted only after the engine confirms removal.\n- **Write-back:** real deaths and wounds go back to the roster.\n- **Budget:** respect the per-tick burst limit, and gate every spawn on the actual `Mission.AllAgents` count, because retiring agents and bodies still hold slots.\n- **Figures:** signal the distant renderer to hide a soldier's figure on promotion and show it again on demotion.\n\nPut the selection and budget logic in Core so it is testable offline. Checks (lean): compiles; core runner passes; a few assertions cover the cavalry 2-slot cost, the budget never being exceeded, and both sides of a contact being selected together.",
+        "capability": {
+          "constraints": {
+            "dataLocation": null,
+            "environments": [],
+            "maxCostUsd": null,
+            "maxDurationMinutes": null
+          },
+          "context": {
+            "estimatedInputTokens": null,
+            "requiredArtifacts": []
+          },
+          "modalities": [
+            "text"
+          ],
+          "preferences": {
+            "autonomy": null,
+            "cost": null,
+            "latency": null,
+            "modelOverride": null,
+            "quality": null
+          },
+          "reasoning": {
+            "effort": "high",
+            "level": "deep",
+            "rationale": ""
+          },
+          "skills": [],
+          "tools": [
+            "repo_read",
+            "repo_write",
+            "shell",
+            "test_execution"
+          ],
+          "workType": "implementation"
+        },
+        "expectedArtifacts": [],
+        "id": "tk_01m55wz5ygkcsc1w4bhkcpge5n",
+        "key": "MMR-234",
+        "optional": false,
+        "priority": "critical",
+        "references": [],
+        "size": "medium",
+        "tags": [
+          "battle-scale",
+          "mission",
+          "implementation"
+        ],
+        "title": "Swap soldiers between the aggregate and real Agents along the front"
+      },
+      {
+        "acceptanceCriteria": [
+          {
+            "id": "a1",
+            "text": "A distant-figure renderer exists for the chosen technique (fallback selectable); its batch builder assertions show exactly one figure per distant alive soldier."
+          }
+        ],
+        "body": "Implement the technique chosen in the render-choice ticket, with its fallback behind a switch.\n- Figures follow roster slot positions as their blocks move, updated at the aggregate tick rate rather than every frame. They use scene ground height, and cavalry figures show a horse.\n- A figure disappears on death or promotion and reappears on demotion.\n- Per-tick update work is capped so 100k figures don't stall a frame.\n- Add simple pose variety (idle / march / fight) only if the technique makes it cheap.\n\nChecks (lean): compiles; the pure figure-batch builder has a couple of assertions: figure count equals distant alive soldiers, and promoted or killed soldiers are excluded.",
+        "capability": {
+          "constraints": {
+            "dataLocation": null,
+            "environments": [],
+            "maxCostUsd": null,
+            "maxDurationMinutes": null
+          },
+          "context": {
+            "estimatedInputTokens": null,
+            "requiredArtifacts": []
+          },
+          "modalities": [
+            "text"
+          ],
+          "preferences": {
+            "autonomy": null,
+            "cost": null,
+            "latency": null,
+            "modelOverride": null,
+            "quality": null
+          },
+          "reasoning": {
+            "effort": "high",
+            "level": "deep",
+            "rationale": ""
+          },
+          "skills": [],
+          "tools": [
+            "repo_read",
+            "repo_write",
+            "shell",
+            "test_execution"
+          ],
+          "workType": "implementation"
+        },
+        "expectedArtifacts": [],
+        "id": "tk_01m55wz5yghvgmg13wgssgces1",
+        "key": "MMR-235",
+        "optional": false,
+        "priority": "critical",
+        "references": [],
+        "size": "medium",
+        "tags": [
+          "battle-scale",
+          "rendering",
+          "implementation"
+        ],
+        "title": "Draw every non-materialized soldier as a distant figure"
+      },
+      {
+        "acceptanceCriteria": [
+          {
+            "id": "a1",
+            "text": "The recorder writes per-second FPS and battle-state samples, raw frame intervals, a run summary and three screenshots to the run folder."
+          }
+        ],
+        "body": "Add an in-mission recorder that writes a JSON receipt to the run folder.\n- **Every second:** FPS mean / median / p95 frame time / min from the raw frame intervals; real humans and horses; distant figures drawn; alive / killed / wounded per side; promotions and demotions; aggregate tick cost; process working set.\n- **Run summary:** battle size, scene, combat duration and totals. Raw frame intervals are kept.\n- **Screenshots:** three per run: start, close-up of the front, wide view.\n\nChecks (lean): compiles; one assertion on the median/p95 math.",
+        "capability": {
+          "constraints": {
+            "dataLocation": null,
+            "environments": [],
+            "maxCostUsd": null,
+            "maxDurationMinutes": null
+          },
+          "context": {
+            "estimatedInputTokens": null,
+            "requiredArtifacts": []
+          },
+          "modalities": [
+            "text"
+          ],
+          "preferences": {
+            "autonomy": null,
+            "cost": null,
+            "latency": null,
+            "modelOverride": null,
+            "quality": null
+          },
+          "reasoning": {
+            "effort": "medium",
+            "level": "routine",
+            "rationale": ""
+          },
+          "skills": [],
+          "tools": [
+            "repo_read",
+            "repo_write",
+            "shell",
+            "test_execution"
+          ],
+          "workType": "implementation"
+        },
+        "expectedArtifacts": [],
+        "id": "tk_01m55wz5yg3bwr0fcspbje0zda",
+        "key": "MMR-236",
+        "optional": false,
+        "priority": "high",
+        "references": [],
+        "size": "small",
+        "tags": [
+          "battle-scale",
+          "telemetry",
+          "implementation"
+        ],
+        "title": "Record FPS and battle state every second"
+      },
+      {
+        "acceptanceCriteria": [
+          {
+            "id": "a1",
+            "text": "The battle mission builds, takes the battle size as a launch argument, runs the 10-minute script and tears everything down at the end."
+          }
+        ],
+        "body": "Write a new mission file; `LayeredBattleMission` stays as the historical prototype. The mission:\n1. Loads the chosen scene and builds two armies at the size given by a launch argument (2000 / 10000 / 40000 / 100000).\n2. Places the formation blocks and materializes the initial real set at the first contact zone.\n3. Each tick, runs the aggregate simulation, the front-line controller, the distant renderer and the recorder.\n4. Issues both sides' orders (advance, then engage) and runs the automated camera path.\n5. After 10 minutes of combat, ends the mission and tears down: all agents and figures are removed and the roster released.\n\nAlso add an interactive main-menu entry. All engine calls stay on the mission thread.\n\nCheck (lean): the module builds against the pinned game DLLs.",
+        "capability": {
+          "constraints": {
+            "dataLocation": null,
+            "environments": [],
+            "maxCostUsd": null,
+            "maxDurationMinutes": null
+          },
+          "context": {
+            "estimatedInputTokens": null,
+            "requiredArtifacts": []
+          },
+          "modalities": [
+            "text"
+          ],
+          "preferences": {
+            "autonomy": null,
+            "cost": null,
+            "latency": null,
+            "modelOverride": null,
+            "quality": null
+          },
+          "reasoning": {
+            "effort": "high",
+            "level": "multi_step",
+            "rationale": ""
+          },
+          "skills": [],
+          "tools": [
+            "repo_read",
+            "repo_write",
+            "shell"
+          ],
+          "workType": "implementation"
+        },
+        "expectedArtifacts": [],
+        "id": "tk_01m55wz5ygy4jk4fn82qf2s9jv",
+        "key": "MMR-237",
+        "optional": false,
+        "priority": "critical",
+        "references": [],
+        "size": "medium",
+        "tags": [
+          "battle-scale",
+          "mission",
+          "implementation"
+        ],
+        "title": "Assemble the layered battle mission"
+      },
+      {
+        "acceptanceCriteria": [
+          {
+            "id": "a1",
+            "text": "The package and runner exist; preflight passes against the real install and the inert checks show files are restored on failure and nothing deploys while a game runs."
+          }
+        ],
+        "body": "**Package.** Use a new package path; the r13/r14 packages stay untouched. It holds the module DLL, SubModule.xml, and these copied unchanged from the accepted r14 package: the patched `TaleWorlds.Native.dll` (392bc9db…) and the spawn-admission-rewritten `TaleWorlds.MountAndBlade.dll`. Don't re-run the native patcher or the Cecil rewrite.\n\n**Runner.** Keep it lean, reusing patterns from `tools/Test-NativePoolInGame.ps1` and `tools/battle-scale/Test-ElementProbeInGameV2.ps1`. It must work on Windows PowerShell 5.1, because no PowerShell 7 is installed. It:\n- refuses while any Bannerlord*/Watchdog process exists, and holds `build/battle-scale/native-test.lock`;\n- backs up and deploys the engine and module files;\n- runs the four sizes one after another, one game process each, with a timeout;\n- declines only its own game's Safe Mode prompt;\n- collects each receipt;\n- restores every deployed file after every run, including on failure;\n- verifies the patched build's watchdog shutdown with the existing `native-watchdog-shutdown-contract.json` via `Test-NativeExitContract.ps1`.\n\nChecks (lean): preflight-only mode passes against the real install; a handful of inert checks cover restore-on-failure and refusing while a game runs.",
+        "capability": {
+          "constraints": {
+            "dataLocation": null,
+            "environments": [],
+            "maxCostUsd": null,
+            "maxDurationMinutes": null
+          },
+          "context": {
+            "estimatedInputTokens": null,
+            "requiredArtifacts": []
+          },
+          "modalities": [
+            "text"
+          ],
+          "preferences": {
+            "autonomy": null,
+            "cost": null,
+            "latency": null,
+            "modelOverride": null,
+            "quality": null
+          },
+          "reasoning": {
+            "effort": "medium",
+            "level": "multi_step",
+            "rationale": ""
+          },
+          "skills": [],
+          "tools": [
+            "repo_read",
+            "repo_write",
+            "shell",
+            "test_execution"
+          ],
+          "workType": "implementation"
+        },
+        "expectedArtifacts": [],
+        "id": "tk_01m55wz5ygx4n91h1qy7p994pn",
+        "key": "MMR-238",
+        "optional": false,
+        "priority": "high",
+        "references": [],
+        "size": "medium",
+        "tags": [
+          "battle-scale",
+          "runner",
+          "implementation"
+        ],
+        "title": "Package the battle with the 4,080-slot engine build and automate the size matrix"
+      },
+      {
+        "acceptanceCriteria": [
+          {
+            "id": "a1",
+            "text": "Every finding of the single review pass is fixed or explicitly deferred with a reason in the ticket result."
+          }
+        ],
+        "body": "The epic's single review: one pass over its whole diff. Look only for what would waste a live run or harm the shared install:\n- unhandled exceptions on the mission thread, or engine calls off it;\n- double-drawn or leaked soldiers, and population drift between the layers;\n- teardown gaps;\n- runner restore and foreign-session paths.\n\nFix findings directly. Report only a short findings list; no receipts or re-review rounds.",
+        "capability": {
+          "constraints": {
+            "dataLocation": null,
+            "environments": [],
+            "maxCostUsd": null,
+            "maxDurationMinutes": null
+          },
+          "context": {
+            "estimatedInputTokens": null,
+            "requiredArtifacts": []
+          },
+          "modalities": [
+            "text"
+          ],
+          "preferences": {
+            "autonomy": null,
+            "cost": null,
+            "latency": null,
+            "modelOverride": null,
+            "quality": null
+          },
+          "reasoning": {
+            "effort": "medium",
+            "level": "multi_step",
+            "rationale": ""
+          },
+          "skills": [],
+          "tools": [
+            "repo_read",
+            "repo_write",
+            "shell",
+            "test_execution"
+          ],
+          "workType": "review"
+        },
+        "expectedArtifacts": [],
+        "id": "tk_01m55wz5yge4ajemjf1mb14j5x",
+        "key": "MMR-239",
+        "optional": false,
+        "priority": "high",
+        "references": [],
+        "size": "small",
+        "tags": [
+          "battle-scale",
+          "review"
+        ],
+        "title": "One review pass before the live runs"
+      }
+    ]
+  },
+  "contentHash": "sha256:6da7022c2b61050ad0cac1aad551bae470bb33e0b8636850a78d3bfe2b8911e6",
+  "createdAt": "2026-10-17T21:41:19.971Z",
+  "epicId": "ep_01m55wvmvkkat0krzcb9bdefx9",
+  "format": "darkmechanicus.plan-snapshot",
+  "formatVersion": 1,
+  "number": 1,
+  "revisionId": "rv_01m55wztz31zt7qemf2wn8597x",
+  "savedAt": "2026-10-17T21:41:19.971Z"
+}

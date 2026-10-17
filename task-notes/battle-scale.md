@@ -1,4 +1,14 @@
-# Active continuation: growable live agent storage
+# SUPERSEDED 2026-10-17: Dark Mechanicus epic "100,000-soldier layered battle"
+
+The user redirected battle-scale work to epic ep_01m55wvmvkkat0krzcb9bdefx9 (one sprint, MMR-229 acceptance). The 100k soldiers are layered: real Agents near the action use the accepted 4,080-slot native build, and everyone else is simulated in bulk and drawn as distant figures. In-battle native storage growth was dropped. The live game is tested only at acceptance: a 2k/10k/40k/100k matrix, 10 minutes each, with FPS recorded. Per-ticket checks are lean.
+
+The growable-storage track below is SHELVED, not completed:
+- The v2 private probe package (build/element-probe-host-v2, profile ec237e2d…) was built and independently accepted, with post-review fixes self-checked, but never run live.
+- The v6 owner-checker independent review was stopped by a safety classifier before a verdict.
+- The stock watchdog contract is evidence/engine-extension/native-original-watchdog-shutdown-contract.json (ce986872…).
+- The crashes folder under C:\ProgramData\Mount and Blade II Bannerlord is a junction to a missing workshop cache (item 3717685432). The v2 runner handles it; the junction itself is left as found.
+
+# (Shelved) Active continuation: growable live agent storage
 
 **PAUSED at user request, 2026-10-17.** Resume from [the saved handoff](agent-growth-handoff-2026-10-17.md). No owned game or REA helper remains active; both private runtime deployments were restored. Live growth is incomplete. Relocated native binding is accepted offline, but v2 host/runner and a positive live probe remain unfinished. Worker checkpoints and exact next actions are in the handoff; assignments below are historical.
 
