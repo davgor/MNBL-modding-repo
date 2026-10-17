@@ -1,4 +1,4 @@
-param([Parameter(Mandatory=$true)][string]$Probe, [string]$ArgsJson='{}', [ValidateRange(60,1800)][int]$ProbeTimeoutSeconds=900)
+param([Parameter(Mandatory=$true)][string]$Probe, [string]$ArgsJson='{}', [ValidateRange(60,3600)][int]$ProbeTimeoutSeconds=900)
 $ErrorActionPreference='Stop'
 if (Get-Process Bannerlord,Watchdog -ErrorAction SilentlyContinue) { throw 'Game already running.' }
 $root='D:\SteamLibrary\steamapps\common\Mount & Blade II Bannerlord'

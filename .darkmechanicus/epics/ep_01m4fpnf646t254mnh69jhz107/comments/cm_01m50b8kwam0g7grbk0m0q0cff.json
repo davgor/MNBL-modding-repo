@@ -1,0 +1,13 @@
+{
+  "author": {
+    "label": "Claude Code",
+    "role": "orchestrator"
+  },
+  "body": "From MMR-35 (accepted): every hull a generated shipyard builds has a chain verified against the installed files. It runs from the mission ship through its nested prefab (`NavalDLC/AssetPackages/nested_prefabs_packed.xml`) to the deck navmesh its `MissionShip` script names (`NavMeshPrefabs/<NavMeshPrefabName>.bin`), plus slots and siege engines.\n\nWhat was not verified is mission-time: crew, captain and reinforcement spawn points (`sp_troop_captain`, `sp_troop_crew_spawn`, `sp_troop_inner_deck`/`outer_deck`, `spawnpoint_ship_reinforcement`) live in the prefab's nested links and resolve only when a naval mission builds the ship. `GameEntity.PrefabExists` is false for every ship prefab on the campaign map (run 6636). A naval battle or raid on a generated world should check these.",
+  "createdAt": "2026-10-15T17:55:21.098Z",
+  "epicId": "ep_01m4fpnf646t254mnh69jhz107",
+  "format": "darkmechanicus.comment",
+  "formatVersion": 1,
+  "id": "cm_01m50b8kwam0g7grbk0m0q0cff",
+  "ticketId": "tk_01m4fqfbgky87f416pgnyj9xsz"
+}

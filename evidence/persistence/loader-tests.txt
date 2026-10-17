@@ -1,0 +1,43 @@
+ok    compatibility: the same build loads with no note
+ok    compatibility: a save without build keys (before MMR-48) loads, its reconstruction verified instead
+ok    compatibility: a different contract refuses (incompatible build)
+ok    compatibility: a different saveIds refuses (incompatible build)
+ok    compatibility: a different worldIdentity refuses (incompatible build)
+ok    compatibility: a different game refuses (incompatible build)
+ok    compatibility: a different naval refuses (incompatible build)
+ok    compatibility: a save whose keys omit the game version refuses
+ok    compatibility: a different module build, backend or cache key loads with a note each (the rebuilt world is verified)
+ok    documents: the rebuilt documents equal to the package's load
+ok    documents: a document rebuilt differently, or one too many, refuses (not rebuildable)
+ok    documents: a document missing from the rebuild refuses
+ok    scene: every file with the package's hash is installed
+ok    scene: no folder, or no file of it, is missing (re-installed from the bundle)
+ok    scene: a partial folder or a changed file is different (refused: an installed scene is never patched or rewritten)
+ok    rebuilt values: an equal value, or one the save did not record, loads
+ok    rebuilt values: a different coordinate frame or climate refuses
+ok    routing: a save without a world binding always loads as installed
+ok    routing: a generated save's call goes on to the world loader (after the installed checks and prompts)
+ok    routing: the preload screen's repeated calls for the save it already started, and calls while the installed prompt is up, are ignored (one load per Continue)
+ok    busy: from the main menu, or from a campaign on its map, a load may start
+ok    busy: another load, a generation job (named by its phase), an activation, or a running campaign off its map refuses the load
+ok    stall: an engine thread busy for 15 minutes (the first load's navigation caches take about 6.5) is never taken for stopped
+ok    stall: an engine thread with no processor time is taken for stopped after 120 s (at 125 s)
+ok    stall: a busy window resets the idle run (100 s idle, busy, 95 s idle is not stopped)
+ok    stall: a trickle below the per-window threshold is idle (measured per window, not cumulatively; stopped at 125 s)
+ok    stall: a poll unanswered past the deadline is stopped whatever the processor does (a loop that never returns)
+ok    refusal missing-world: a title and a message saying nothing was changed
+ok    refusal damaged-world: a title and a message saying nothing was changed
+ok    refusal damaged-save: a title and a message saying nothing was changed
+ok    refusal incompatible-build: a title and a message saying nothing was changed
+ok    refusal not-rebuildable: a title and a message saying nothing was changed
+ok    refusal not-generated: a title and a message saying nothing was changed
+ok    refusal busy: a title and a message saying nothing was changed
+ok    refusal save-unavailable: a title and a message saying nothing was changed
+ok    refusal load-failed: a title and a message saying nothing was changed
+ok    refusals say what to do: copy the world with the save, or use the version the campaign was made with
+ok    lifetime scope: every tracked static at zero is the baseline
+ok    lifetime scope: what a world holds is named with its count
+ok    lifetime scope: a count that throws is held (-1), never taken for the baseline
+ok    lifetime scope: tracking a name again replaces it
+ok    lifetime scope: a tracked static needs a name and a count
+42/42 checks passed

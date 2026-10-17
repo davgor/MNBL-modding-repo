@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "status": "passed-isolated-machine-emulation",
+  "command": "python tests/BattleScale/test_ranged_guard_emulation.py",
+  "tests": 8,
+  "failures": 0,
+  "elapsedSeconds": 37.401,
+  "gameExecuted": false,
+  "nativeLibraryLoaded": false,
+  "validPagePairCases": 16512,
+  "checks": [
+    "All general registers and continuation preserved for both guards on all valid first/last page pairs",
+    "Actual proposal bytes reconstruct inclusive-end arithmetic; no handwritten stand-in for edited prefix",
+    "33-bit inclusive end rejects capacity overflow and uint32 wrap",
+    "Invalid/reversed paths fail with UD2",
+    "Original zero-count bypass preserved",
+    "All29 shifts,2allocations,2initializer spans and upload descriptor agree"
+  ],
+  "sourceHashes": {
+    "tests/BattleScale/test_ranged_guard_emulation.py": "c4762e2a9c39233d6e806fa10cb204da9aeb16a003f8a50efbff6f214892d682",
+    "tools/battle-scale/audit_ranged_stall.py": "306ddcd4b23a32e65d5d2990c395db4c63895df2982644fa34f085b0874ce767",
+    "evidence/engine-extension/native-ranged-page-patch.json": "fa4326fbc08fbb9b2c84fbd549e1f136ef6ba1181fa1923b48c09def43d027e3",
+    "evidence/engine-extension/native-ranged-stall-review.json": "663020fd6e3d21642df6b30f9b471069d6dc0b26fbb468a539b4765fd8728740",
+    "evidence/engine-extension/native-ranged-guard-independent-review.json": "8d954cf636fbff3058821fb7e2e07e0ed866696120f4e7c678dfbb2e2f86a8a5"
+  }
+}

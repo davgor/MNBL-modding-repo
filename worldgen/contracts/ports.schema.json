@@ -1,0 +1,273 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "mnbl.ports/1",
+  "title": "MNBL port candidates",
+  "description": "ports.json written by worldbridge --compile-travel (MMR-28), canonical JSON. One entry per town with at least one kept harbour village (MMR-27 ports). A port comes only from a producer harbour record on an open basin, never from a shore cell; it serves its gate: the coast pair of the gate's own land component nearest the gate, never a pair another town holds, with the port cell at most maxPortGateCells from the gate cell (the installed War Sails envelope). The chosen candidate is the valid one nearest the gate, then with the highest harbour quality, then by village UID. Towns on an open coast without a harbour record are listed in coastalTownsWithoutHarbourRecord. Every port is pending engine validation (MMR-38 host checks portFace and portGate).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "version",
+    "engineValidation",
+    "inputs",
+    "ports",
+    "coastalTownsWithoutHarbourRecord"
+  ],
+  "$defs": {
+    "cell": {
+      "type": "array",
+      "prefixItems": [
+        {
+          "type": "integer",
+          "minimum": 0
+        },
+        {
+          "type": "integer",
+          "minimum": 0
+        }
+      ],
+      "minItems": 2,
+      "maxItems": 2
+    },
+    "point": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "x",
+        "y"
+      ],
+      "properties": {
+        "x": {
+          "type": "number"
+        },
+        "y": {
+          "type": "number"
+        }
+      }
+    },
+    "candidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "village",
+        "villageUid",
+        "seaNode",
+        "status",
+        "quality"
+      ],
+      "properties": {
+        "village": {
+          "type": "string"
+        },
+        "villageUid": {
+          "type": "string"
+        },
+        "seaNode": {
+          "type": "integer"
+        },
+        "status": {
+          "enum": [
+            "valid",
+            "invalid"
+          ]
+        },
+        "reason": {
+          "type": "string",
+          "description": "invalid only: harbour_village_excluded, town_unplaceable, sea_node_not_navigable, closed_basin, basin_not_reachable_from_gate, port_pair_taken, port_too_far_from_gate (with the distance)",
+          "pattern": "^(harbour_village_excluded|town_unplaceable|sea_node_not_navigable|closed_basin|basin_not_reachable_from_gate|port_pair_taken|port_too_far_from_gate( \\(.*\\))?)$"
+        },
+        "harbourCell": {
+          "$ref": "#/$defs/cell"
+        },
+        "seaCell": {
+          "$ref": "#/$defs/cell",
+          "description": "the port: a navigable cell sharing an edge with landCell"
+        },
+        "landCell": {
+          "$ref": "#/$defs/cell",
+          "description": "the land entrance (embark and disembark) in the gate's land component"
+        },
+        "seaPoint": {
+          "$ref": "#/$defs/point"
+        },
+        "landPoint": {
+          "$ref": "#/$defs/point"
+        },
+        "harbourShiftCells": {
+          "type": "number",
+          "description": "producer sea point to the harbour cell"
+        },
+        "gateDistanceCells": {
+          "type": "number",
+          "description": "port cell to gate cell"
+        },
+        "basin": {
+          "type": "integer"
+        },
+        "quality": {
+          "type": "number"
+        },
+        "entranceDistanceCells": {
+          "type": "number",
+          "description": "land entrance to gate cell"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "valid"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "harbourCell",
+              "seaCell",
+              "landCell",
+              "seaPoint",
+              "landPoint",
+              "harbourShiftCells",
+              "gateDistanceCells",
+              "entranceDistanceCells",
+              "basin"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "invalid"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "reason"
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "properties": {
+    "schema": {
+      "const": "mnbl.ports"
+    },
+    "version": {
+      "const": 1
+    },
+    "engineValidation": {
+      "const": "pending"
+    },
+    "inputs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "worldSha256",
+        "sourceIdentity",
+        "projectionSha256",
+        "terrainMasksSha256",
+        "terrainHeightfieldSha256",
+        "idMapSha256",
+        "playabilitySha256",
+        "navalTransitionsSha256",
+        "terrainSide"
+      ],
+      "properties": {
+        "worldSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "projectionSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "terrainMasksSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "terrainHeightfieldSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "idMapSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "playabilitySha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "navalTransitionsSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "sourceIdentity": {
+          "type": "string"
+        },
+        "terrainSide": {
+          "type": "integer"
+        }
+      },
+      "description": "the same inputs block as travel-graph.json"
+    },
+    "ports": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "town",
+          "townUid",
+          "valid",
+          "candidates"
+        ],
+        "properties": {
+          "town": {
+            "type": "string"
+          },
+          "townUid": {
+            "type": "string"
+          },
+          "valid": {
+            "type": "boolean"
+          },
+          "chosen": {
+            "$ref": "#/$defs/candidate"
+          },
+          "candidates": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/candidate"
+            }
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "valid": {
+                  "const": true
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "chosen"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "coastalTownsWithoutHarbourRecord": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

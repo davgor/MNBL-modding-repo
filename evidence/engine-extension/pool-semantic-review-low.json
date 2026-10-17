@@ -1,0 +1,970 @@
+{
+  "schemaVersion": 1,
+  "status": "bounded-static-review-not-patch-approval",
+  "targetSha256": "2a5e0e0b15513ebb7052d747a621b82c50ee834553eba283b33bbbc33766e12a",
+  "sites": [
+    {
+      "address": "0x1801375d1",
+      "procedure": "0x180137540",
+      "bytes": "488bbcca182ba700",
+      "instruction": "mov rdi, qword ptr [rdx + rcx*8 + 0xa72b18]",
+      "evidenceIds": [
+        "ev_c9e323fa8cefab7b03aa9fd31da4cd977413ee1d08c5dc6f0c5efa5ed9e5aca8"
+      ],
+      "classification": "exclude-image-table",
+      "reason": "Ghidra resolves access to image-resident DAT/PTR table; numeric displacement is not a Mission field."
+    },
+    {
+      "address": "0x18018b675",
+      "procedure": "0x18018b650",
+      "bytes": "48899c24200a8100",
+      "instruction": "mov qword ptr [rsp + 0x810a20], rbx",
+      "evidenceIds": [
+        "ev_05426d07caf2c10638768bf392d584443ceef874ada043941f63193c5d7274cd"
+      ],
+      "classification": "exclude-stack",
+      "reason": "RSP/RBP-relative save in a separate large local stack frame."
+    },
+    {
+      "address": "0x18018b687",
+      "procedure": "0x18018b650",
+      "bytes": "488985e0088100",
+      "instruction": "mov qword ptr [rbp + 0x8108e0], rax",
+      "evidenceIds": [
+        "ev_05426d07caf2c10638768bf392d584443ceef874ada043941f63193c5d7274cd"
+      ],
+      "classification": "exclude-stack",
+      "reason": "RSP/RBP-relative save in a separate large local stack frame."
+    },
+    {
+      "address": "0x18018ba78",
+      "procedure": "0x18018b650",
+      "bytes": "488b8de0088100",
+      "instruction": "mov rcx, qword ptr [rbp + 0x8108e0]",
+      "evidenceIds": [
+        "ev_05426d07caf2c10638768bf392d584443ceef874ada043941f63193c5d7274cd"
+      ],
+      "classification": "exclude-stack",
+      "reason": "RSP/RBP-relative save in a separate large local stack frame."
+    },
+    {
+      "address": "0x18018ba87",
+      "procedure": "0x18018b650",
+      "bytes": "488b9c24200a8100",
+      "instruction": "mov rbx, qword ptr [rsp + 0x810a20]",
+      "evidenceIds": [
+        "ev_05426d07caf2c10638768bf392d584443ceef874ada043941f63193c5d7274cd"
+      ],
+      "classification": "exclude-stack",
+      "reason": "RSP/RBP-relative save in a separate large local stack frame."
+    },
+    {
+      "address": "0x180198187",
+      "procedure": "0x180197530",
+      "bytes": "00937e190001",
+      "instruction": "add byte ptr [rbx + 0x100197e], dl",
+      "evidenceIds": [
+        "ev_23a7e77632b8ca322de729a1f46d484f76b40cadada0d3ac7bf4df2097efcaa8",
+        "ev_55f13a851f239d9b4480deaa09f3f76b08a9076c704a8c008696e94889405bf0"
+      ],
+      "classification": "exclude-jump-table-data",
+      "reason": "Candidate198187 lies after final RET19804c and is absent from Ghidra instruction listing; switch data."
+    },
+    {
+      "address": "0x1801ce93f",
+      "procedure": "0x1801ce8c0",
+      "bytes": "488b8fa0078100",
+      "instruction": "mov rcx, qword ptr [rdi + 0x8107a0]",
+      "evidenceIds": [
+        "ev_4643d5e7ef479e2292340e00b9e4ecae742ce1ffa7d2f11b12db0c71665bbedc"
+      ],
+      "classification": "exclude-separate-scene-resource",
+      "reason": "Separate object constructor30eae0/destructor30f050 and Scene+0x628 access; this is not inline Mission storage."
+    },
+    {
+      "address": "0x1801ce9ad",
+      "procedure": "0x1801ce8c0",
+      "bytes": "488b8fa0078100",
+      "instruction": "mov rcx, qword ptr [rdi + 0x8107a0]",
+      "evidenceIds": [
+        "ev_4643d5e7ef479e2292340e00b9e4ecae742ce1ffa7d2f11b12db0c71665bbedc"
+      ],
+      "classification": "exclude-separate-scene-resource",
+      "reason": "Separate object constructor30eae0/destructor30f050 and Scene+0x628 access; this is not inline Mission storage."
+    },
+    {
+      "address": "0x1801cea90",
+      "procedure": "0x1801cea60",
+      "bytes": "80bd9806810000",
+      "instruction": "cmp byte ptr [rbp + 0x810698], 0",
+      "evidenceIds": [
+        "ev_1e1c04acbe475e94a92fbc259eea678e5b6b986f6e3355d9f593d6b27d3a08fc"
+      ],
+      "classification": "exclude-separate-scene-resource",
+      "reason": "Separate object constructor30eae0/destructor30f050 and Scene+0x628 access; this is not inline Mission storage."
+    },
+    {
+      "address": "0x1801cebd1",
+      "procedure": "0x1801ceba0",
+      "bytes": "80b89806810000",
+      "instruction": "cmp byte ptr [rax + 0x810698], 0",
+      "evidenceIds": [
+        "ev_74d24a9efba17bfcb57557a8f4bcf6aa973e6386b8d703990223c8ed17dc0e51"
+      ],
+      "classification": "exclude-separate-scene-resource",
+      "reason": "Separate object constructor30eae0/destructor30f050 and Scene+0x628 access; this is not inline Mission storage."
+    },
+    {
+      "address": "0x1801d9033",
+      "procedure": "0x1801d8f80",
+      "bytes": "80b89806810000",
+      "instruction": "cmp byte ptr [rax + 0x810698], 0",
+      "evidenceIds": [
+        "ev_a86909fae9ba7925536903ebf81eaf6a269f235dcf1df2314bd72c9c29541eea"
+      ],
+      "classification": "exclude-separate-scene-resource",
+      "reason": "Separate object constructor30eae0/destructor30f050 and Scene+0x628 access; this is not inline Mission storage."
+    },
+    {
+      "address": "0x1801d922f",
+      "procedure": "0x1801d8f80",
+      "bytes": "80b89806810000",
+      "instruction": "cmp byte ptr [rax + 0x810698], 0",
+      "evidenceIds": [
+        "ev_a86909fae9ba7925536903ebf81eaf6a269f235dcf1df2314bd72c9c29541eea"
+      ],
+      "classification": "exclude-separate-scene-resource",
+      "reason": "Separate object constructor30eae0/destructor30f050 and Scene+0x628 access; this is not inline Mission storage."
+    },
+    {
+      "address": "0x1801da988",
+      "procedure": "0x1801da870",
+      "bytes": "80b99806810000",
+      "instruction": "cmp byte ptr [rcx + 0x810698], 0",
+      "evidenceIds": [
+        "ev_8168be73b61271f12ac3d666cc1a3d92d021f3a4c0a099a396e4fd23286af029"
+      ],
+      "classification": "exclude-separate-scene-resource",
+      "reason": "Separate object constructor30eae0/destructor30f050 and Scene+0x628 access; this is not inline Mission storage."
+    },
+    {
+      "address": "0x1801daa55",
+      "procedure": "0x1801da870",
+      "bytes": "488b89a0078100",
+      "instruction": "mov rcx, qword ptr [rcx + 0x8107a0]",
+      "evidenceIds": [
+        "ev_8168be73b61271f12ac3d666cc1a3d92d021f3a4c0a099a396e4fd23286af029"
+      ],
+      "classification": "exclude-separate-scene-resource",
+      "reason": "Separate object constructor30eae0/destructor30f050 and Scene+0x628 access; this is not inline Mission storage."
+    },
+    {
+      "address": "0x1801e8b29",
+      "procedure": "0x1801e8b00",
+      "bytes": "80bb9806810000",
+      "instruction": "cmp byte ptr [rbx + 0x810698], 0",
+      "evidenceIds": [
+        "ev_d8657c418704a76d9e45fd88d3f8ec53f43594b0ff0b93f35b9dfac012b9a873"
+      ],
+      "classification": "exclude-separate-scene-resource",
+      "reason": "Separate object constructor30eae0/destructor30f050 and Scene+0x628 access; this is not inline Mission storage."
+    },
+    {
+      "address": "0x1801e8b59",
+      "procedure": "0x1801e8b00",
+      "bytes": "488b8ba0078100",
+      "instruction": "mov rcx, qword ptr [rbx + 0x8107a0]",
+      "evidenceIds": [
+        "ev_d8657c418704a76d9e45fd88d3f8ec53f43594b0ff0b93f35b9dfac012b9a873"
+      ],
+      "classification": "exclude-separate-scene-resource",
+      "reason": "Separate object constructor30eae0/destructor30f050 and Scene+0x628 access; this is not inline Mission storage."
+    },
+    {
+      "address": "0x1801e8b65",
+      "procedure": "0x1801e8b00",
+      "bytes": "488b83a0078100",
+      "instruction": "mov rax, qword ptr [rbx + 0x8107a0]",
+      "evidenceIds": [
+        "ev_d8657c418704a76d9e45fd88d3f8ec53f43594b0ff0b93f35b9dfac012b9a873"
+      ],
+      "classification": "exclude-separate-scene-resource",
+      "reason": "Separate object constructor30eae0/destructor30f050 and Scene+0x628 access; this is not inline Mission storage."
+    },
+    {
+      "address": "0x180249890",
+      "procedure": "0x180249480",
+      "bytes": "4d8b94c1e087af00",
+      "instruction": "mov r10, qword ptr [r9 + rax*8 + 0xaf87e0]",
+      "evidenceIds": [
+        "ev_7ec5ceaf47de38b60773f267bfd713ac492a520fcea2197e9b2d649415a01596"
+      ],
+      "classification": "exclude-image-table",
+      "reason": "Ghidra resolves access to image-resident DAT/PTR table; numeric displacement is not a Mission field."
+    },
+    {
+      "address": "0x18030eba5",
+      "procedure": "0x18030eae0",
+      "bytes": "498dbfa0068100",
+      "instruction": "lea rdi, [r15 + 0x8106a0]",
+      "evidenceIds": [
+        "ev_7c761cd0665fe69e42baf8260c6dce6ff12362f612a38b4af512b90dbf471b97"
+      ],
+      "classification": "exclude-separate-scene-resource",
+      "reason": "Separate object constructor30eae0/destructor30f050 and Scene+0x628 access; this is not inline Mission storage."
+    },
+    {
+      "address": "0x18030ebc3",
+      "procedure": "0x18030eae0",
+      "bytes": "498d8fc0068100",
+      "instruction": "lea rcx, [r15 + 0x8106c0]",
+      "evidenceIds": [
+        "ev_7c761cd0665fe69e42baf8260c6dce6ff12362f612a38b4af512b90dbf471b97"
+      ],
+      "classification": "exclude-separate-scene-resource",
+      "reason": "Separate object constructor30eae0/destructor30f050 and Scene+0x628 access; this is not inline Mission storage."
+    },
+    {
+      "address": "0x18030ebeb",
+      "procedure": "0x18030eae0",
+      "bytes": "498d8f40078100",
+      "instruction": "lea rcx, [r15 + 0x810740]",
+      "evidenceIds": [
+        "ev_7c761cd0665fe69e42baf8260c6dce6ff12362f612a38b4af512b90dbf471b97"
+      ],
+      "classification": "exclude-separate-scene-resource",
+      "reason": "Separate object constructor30eae0/destructor30f050 and Scene+0x628 access; this is not inline Mission storage."
+    },
+    {
+      "address": "0x18030ed82",
+      "procedure": "0x18030eae0",
+      "bytes": "4589af90078100",
+      "instruction": "mov dword ptr [r15 + 0x810790], r13d",
+      "evidenceIds": [
+        "ev_7c761cd0665fe69e42baf8260c6dce6ff12362f612a38b4af512b90dbf471b97"
+      ],
+      "classification": "exclude-separate-scene-resource",
+      "reason": "Separate object constructor30eae0/destructor30f050 and Scene+0x628 access; this is not inline Mission storage."
+    },
+    {
+      "address": "0x18030ed89",
+      "procedure": "0x18030eae0",
+      "bytes": "4588af99068100",
+      "instruction": "mov byte ptr [r15 + 0x810699], r13b",
+      "evidenceIds": [
+        "ev_7c761cd0665fe69e42baf8260c6dce6ff12362f612a38b4af512b90dbf471b97"
+      ],
+      "classification": "exclude-separate-scene-resource",
+      "reason": "Separate object constructor30eae0/destructor30f050 and Scene+0x628 access; this is not inline Mission storage."
+    },
+    {
+      "address": "0x18030ed90",
+      "procedure": "0x18030eae0",
+      "bytes": "4188b798068100",
+      "instruction": "mov byte ptr [r15 + 0x810698], sil",
+      "evidenceIds": [
+        "ev_7c761cd0665fe69e42baf8260c6dce6ff12362f612a38b4af512b90dbf471b97"
+      ],
+      "classification": "exclude-separate-scene-resource",
+      "reason": "Separate object constructor30eae0/destructor30f050 and Scene+0x628 access; this is not inline Mission storage."
+    },
+    {
+      "address": "0x18030edae",
+      "procedure": "0x18030eae0",
+      "bytes": "4588af98068100",
+      "instruction": "mov byte ptr [r15 + 0x810698], r13b",
+      "evidenceIds": [
+        "ev_7c761cd0665fe69e42baf8260c6dce6ff12362f612a38b4af512b90dbf471b97"
+      ],
+      "classification": "exclude-separate-scene-resource",
+      "reason": "Separate object constructor30eae0/destructor30f050 and Scene+0x628 access; this is not inline Mission storage."
+    },
+    {
+      "address": "0x18030edcb",
+      "procedure": "0x18030eae0",
+      "bytes": "4d89afa0078100",
+      "instruction": "mov qword ptr [r15 + 0x8107a0], r13",
+      "evidenceIds": [
+        "ev_7c761cd0665fe69e42baf8260c6dce6ff12362f612a38b4af512b90dbf471b97"
+      ],
+      "classification": "exclude-separate-scene-resource",
+      "reason": "Separate object constructor30eae0/destructor30f050 and Scene+0x628 access; this is not inline Mission storage."
+    },
+    {
+      "address": "0x18030ee11",
+      "procedure": "0x18030eae0",
+      "bytes": "4d89b798078100",
+      "instruction": "mov qword ptr [r15 + 0x810798], r14",
+      "evidenceIds": [
+        "ev_7c761cd0665fe69e42baf8260c6dce6ff12362f612a38b4af512b90dbf471b97"
+      ],
+      "classification": "exclude-separate-scene-resource",
+      "reason": "Separate object constructor30eae0/destructor30f050 and Scene+0x628 access; this is not inline Mission storage."
+    },
+    {
+      "address": "0x18030eec6",
+      "procedure": "0x18030eae0",
+      "bytes": "498987a0078100",
+      "instruction": "mov qword ptr [r15 + 0x8107a0], rax",
+      "evidenceIds": [
+        "ev_7c761cd0665fe69e42baf8260c6dce6ff12362f612a38b4af512b90dbf471b97"
+      ],
+      "classification": "exclude-separate-scene-resource",
+      "reason": "Separate object constructor30eae0/destructor30f050 and Scene+0x628 access; this is not inline Mission storage."
+    },
+    {
+      "address": "0x18030f0da",
+      "procedure": "0x18030f050",
+      "bytes": "488bbba0078100",
+      "instruction": "mov rdi, qword ptr [rbx + 0x8107a0]",
+      "evidenceIds": [
+        "ev_aaebf5e90c0023fc12b3c8eee5f9b50dc626fdfc42ee78cb2a5aeb91d8868700"
+      ],
+      "classification": "exclude-separate-scene-resource",
+      "reason": "Separate object constructor30eae0/destructor30f050 and Scene+0x628 access; this is not inline Mission storage."
+    },
+    {
+      "address": "0x18030f166",
+      "procedure": "0x18030f050",
+      "bytes": "4889b3a0078100",
+      "instruction": "mov qword ptr [rbx + 0x8107a0], rsi",
+      "evidenceIds": [
+        "ev_aaebf5e90c0023fc12b3c8eee5f9b50dc626fdfc42ee78cb2a5aeb91d8868700"
+      ],
+      "classification": "exclude-separate-scene-resource",
+      "reason": "Separate object constructor30eae0/destructor30f050 and Scene+0x628 access; this is not inline Mission storage."
+    },
+    {
+      "address": "0x18030f186",
+      "procedure": "0x18030f050",
+      "bytes": "488d8b40078100",
+      "instruction": "lea rcx, [rbx + 0x810740]",
+      "evidenceIds": [
+        "ev_aaebf5e90c0023fc12b3c8eee5f9b50dc626fdfc42ee78cb2a5aeb91d8868700"
+      ],
+      "classification": "exclude-separate-scene-resource",
+      "reason": "Separate object constructor30eae0/destructor30f050 and Scene+0x628 access; this is not inline Mission storage."
+    },
+    {
+      "address": "0x18030f199",
+      "procedure": "0x18030f050",
+      "bytes": "488d8bc0068100",
+      "instruction": "lea rcx, [rbx + 0x8106c0]",
+      "evidenceIds": [
+        "ev_aaebf5e90c0023fc12b3c8eee5f9b50dc626fdfc42ee78cb2a5aeb91d8868700"
+      ],
+      "classification": "exclude-separate-scene-resource",
+      "reason": "Separate object constructor30eae0/destructor30f050 and Scene+0x628 access; this is not inline Mission storage."
+    },
+    {
+      "address": "0x18030f1b6",
+      "procedure": "0x18030f050",
+      "bytes": "488d83a0068100",
+      "instruction": "lea rax, [rbx + 0x8106a0]",
+      "evidenceIds": [
+        "ev_aaebf5e90c0023fc12b3c8eee5f9b50dc626fdfc42ee78cb2a5aeb91d8868700"
+      ],
+      "classification": "exclude-separate-scene-resource",
+      "reason": "Separate object constructor30eae0/destructor30f050 and Scene+0x628 access; this is not inline Mission storage."
+    },
+    {
+      "address": "0x18030f283",
+      "procedure": "0x18030f230",
+      "bytes": "80b99806810000",
+      "instruction": "cmp byte ptr [rcx + 0x810698], 0",
+      "evidenceIds": [
+        "ev_6e23d83fcb958fced078edb809384142177431e8c1f7f9c6de2287c5992cdef4"
+      ],
+      "classification": "exclude-separate-scene-resource",
+      "reason": "Separate object constructor30eae0/destructor30f050 and Scene+0x628 access; this is not inline Mission storage."
+    },
+    {
+      "address": "0x18030f2b2",
+      "procedure": "0x18030f230",
+      "bytes": "83b19007810001",
+      "instruction": "xor dword ptr [rcx + 0x810790], 1",
+      "evidenceIds": [
+        "ev_6e23d83fcb958fced078edb809384142177431e8c1f7f9c6de2287c5992cdef4"
+      ],
+      "classification": "exclude-separate-scene-resource",
+      "reason": "Separate object constructor30eae0/destructor30f050 and Scene+0x628 access; this is not inline Mission storage."
+    },
+    {
+      "address": "0x18030f2b9",
+      "procedure": "0x18030f230",
+      "bytes": "8b8190078100",
+      "instruction": "mov eax, dword ptr [rcx + 0x810790]",
+      "evidenceIds": [
+        "ev_6e23d83fcb958fced078edb809384142177431e8c1f7f9c6de2287c5992cdef4"
+      ],
+      "classification": "exclude-separate-scene-resource",
+      "reason": "Separate object constructor30eae0/destructor30f050 and Scene+0x628 access; this is not inline Mission storage."
+    },
+    {
+      "address": "0x18030f2e1",
+      "procedure": "0x18030f230",
+      "bytes": "488b8198078100",
+      "instruction": "mov rax, qword ptr [rcx + 0x810798]",
+      "evidenceIds": [
+        "ev_6e23d83fcb958fced078edb809384142177431e8c1f7f9c6de2287c5992cdef4"
+      ],
+      "classification": "exclude-separate-scene-resource",
+      "reason": "Separate object constructor30eae0/destructor30f050 and Scene+0x628 access; this is not inline Mission storage."
+    },
+    {
+      "address": "0x18030f387",
+      "procedure": "0x18030f230",
+      "bytes": "488bb798078100",
+      "instruction": "mov rsi, qword ptr [rdi + 0x810798]",
+      "evidenceIds": [
+        "ev_6e23d83fcb958fced078edb809384142177431e8c1f7f9c6de2287c5992cdef4"
+      ],
+      "classification": "exclude-separate-scene-resource",
+      "reason": "Separate object constructor30eae0/destructor30f050 and Scene+0x628 access; this is not inline Mission storage."
+    },
+    {
+      "address": "0x18030f461",
+      "procedure": "0x18030f230",
+      "bytes": "488bb798078100",
+      "instruction": "mov rsi, qword ptr [rdi + 0x810798]",
+      "evidenceIds": [
+        "ev_6e23d83fcb958fced078edb809384142177431e8c1f7f9c6de2287c5992cdef4"
+      ],
+      "classification": "exclude-separate-scene-resource",
+      "reason": "Separate object constructor30eae0/destructor30f050 and Scene+0x628 access; this is not inline Mission storage."
+    },
+    {
+      "address": "0x18030fabc",
+      "procedure": "0x18030f700",
+      "bytes": "0fb68798068100",
+      "instruction": "movzx eax, byte ptr [rdi + 0x810698]",
+      "evidenceIds": [
+        "ev_0da7be67972c5688d4d1ba39e97a43ea80ff169e762e97a6c2cb247370bdada2"
+      ],
+      "classification": "exclude-separate-scene-resource",
+      "reason": "Separate object constructor30eae0/destructor30f050 and Scene+0x628 access; this is not inline Mission storage."
+    },
+    {
+      "address": "0x1803118fb",
+      "procedure": "0x18030f700",
+      "bytes": "4c8db7c0068100",
+      "instruction": "lea r14, [rdi + 0x8106c0]",
+      "evidenceIds": [
+        "ev_0da7be67972c5688d4d1ba39e97a43ea80ff169e762e97a6c2cb247370bdada2"
+      ],
+      "classification": "exclude-separate-scene-resource",
+      "reason": "Separate object constructor30eae0/destructor30f050 and Scene+0x628 access; this is not inline Mission storage."
+    },
+    {
+      "address": "0x180311bea",
+      "procedure": "0x180311b90",
+      "bytes": "4438b998068100",
+      "instruction": "cmp byte ptr [rcx + 0x810698], r15b",
+      "evidenceIds": [
+        "ev_b670da1963403c0d0fedc669dec006aaabd02d0c54dae43f6bce01b0832ac0d8"
+      ],
+      "classification": "exclude-separate-scene-resource",
+      "reason": "Separate object constructor30eae0/destructor30f050 and Scene+0x628 access; this is not inline Mission storage."
+    },
+    {
+      "address": "0x18031292e",
+      "procedure": "0x180312920",
+      "bytes": "80b99806810000",
+      "instruction": "cmp byte ptr [rcx + 0x810698], 0",
+      "evidenceIds": [
+        "ev_c3b44cd673cc30b7c7efc1c41dfa40d7273957564a8510957f7c5ad6bb338ba7"
+      ],
+      "classification": "exclude-separate-scene-resource",
+      "reason": "Separate object constructor30eae0/destructor30f050 and Scene+0x628 access; this is not inline Mission storage."
+    },
+    {
+      "address": "0x180312963",
+      "procedure": "0x180312920",
+      "bytes": "80b99906810000",
+      "instruction": "cmp byte ptr [rcx + 0x810699], 0",
+      "evidenceIds": [
+        "ev_c3b44cd673cc30b7c7efc1c41dfa40d7273957564a8510957f7c5ad6bb338ba7"
+      ],
+      "classification": "exclude-separate-scene-resource",
+      "reason": "Separate object constructor30eae0/destructor30f050 and Scene+0x628 access; this is not inline Mission storage."
+    },
+    {
+      "address": "0x180312d42",
+      "procedure": "0x180312c80",
+      "bytes": "488b8ea0078100",
+      "instruction": "mov rcx, qword ptr [rsi + 0x8107a0]",
+      "evidenceIds": [
+        "ev_66e3780afb28c4f428ec29ccb3d6d3f35e94c06eaf4b85ce3308d26bdd6374c1"
+      ],
+      "classification": "exclude-separate-scene-resource",
+      "reason": "Separate object constructor30eae0/destructor30f050 and Scene+0x628 access; this is not inline Mission storage."
+    },
+    {
+      "address": "0x180312de0",
+      "procedure": "0x180312c80",
+      "bytes": "488b8ea0078100",
+      "instruction": "mov rcx, qword ptr [rsi + 0x8107a0]",
+      "evidenceIds": [
+        "ev_66e3780afb28c4f428ec29ccb3d6d3f35e94c06eaf4b85ce3308d26bdd6374c1"
+      ],
+      "classification": "exclude-separate-scene-resource",
+      "reason": "Separate object constructor30eae0/destructor30f050 and Scene+0x628 access; this is not inline Mission storage."
+    },
+    {
+      "address": "0x180312e2f",
+      "procedure": "0x180312c80",
+      "bytes": "488b8ea0078100",
+      "instruction": "mov rcx, qword ptr [rsi + 0x8107a0]",
+      "evidenceIds": [
+        "ev_66e3780afb28c4f428ec29ccb3d6d3f35e94c06eaf4b85ce3308d26bdd6374c1"
+      ],
+      "classification": "exclude-separate-scene-resource",
+      "reason": "Separate object constructor30eae0/destructor30f050 and Scene+0x628 access; this is not inline Mission storage."
+    },
+    {
+      "address": "0x1803131ea",
+      "procedure": "0x1803131e0",
+      "bytes": "80b99906810000",
+      "instruction": "cmp byte ptr [rcx + 0x810699], 0",
+      "evidenceIds": [
+        "ev_e465490119bdf5d2f67978857735378ce3d7ef5c784325f65161eebf805847aa"
+      ],
+      "classification": "exclude-separate-scene-resource",
+      "reason": "Separate object constructor30eae0/destructor30f050 and Scene+0x628 access; this is not inline Mission storage."
+    },
+    {
+      "address": "0x18032141f",
+      "procedure": "0x1803212f0",
+      "bytes": "488b8ec0068100",
+      "instruction": "mov rcx, qword ptr [rsi + 0x8106c0]",
+      "evidenceIds": [
+        "ev_3b07c92f030f9c94705f6e51f37a4f024a72b7eaad3e50baaf9c5119a710ed43"
+      ],
+      "classification": "exclude-separate-scene-resource",
+      "reason": "Separate object constructor30eae0/destructor30f050 and Scene+0x628 access; this is not inline Mission storage."
+    },
+    {
+      "address": "0x18032142b",
+      "procedure": "0x1803212f0",
+      "bytes": "4889bec0068100",
+      "instruction": "mov qword ptr [rsi + 0x8106c0], rdi",
+      "evidenceIds": [
+        "ev_3b07c92f030f9c94705f6e51f37a4f024a72b7eaad3e50baaf9c5119a710ed43"
+      ],
+      "classification": "exclude-separate-scene-resource",
+      "reason": "Separate object constructor30eae0/destructor30f050 and Scene+0x628 access; this is not inline Mission storage."
+    },
+    {
+      "address": "0x18044df21",
+      "procedure": "0x18044deb0",
+      "bytes": "4d8b94c0709aa700",
+      "instruction": "mov r10, qword ptr [r8 + rax*8 + 0xa79a70]",
+      "evidenceIds": [
+        "ev_4f4beda7609cd08494b46635659dc360dbefff588f00b095aa8048868586aeea"
+      ],
+      "classification": "exclude-image-table",
+      "reason": "Assembly immediately establishes R8/R10=imagebase180000000 before lookup of image tablea79a70."
+    },
+    {
+      "address": "0x18044e9c7",
+      "procedure": "0x18044deb0",
+      "bytes": "4d8b94c2709aa700",
+      "instruction": "mov r10, qword ptr [r10 + rax*8 + 0xa79a70]",
+      "evidenceIds": [
+        "ev_4f4beda7609cd08494b46635659dc360dbefff588f00b095aa8048868586aeea"
+      ],
+      "classification": "exclude-image-table",
+      "reason": "Assembly immediately establishes R8/R10=imagebase180000000 before lookup of image tablea79a70."
+    },
+    {
+      "address": "0x1804a5642",
+      "procedure": "0x1804a5460",
+      "bytes": "0fb6ac0d0893a700",
+      "instruction": "movzx ebp, byte ptr [rbp + rcx + 0xa79308]",
+      "evidenceIds": [
+        "ev_aa2050a181c9d6e9bafe1d37f951d6af2d1bd62db125448038683f1cd292f2c3"
+      ],
+      "classification": "exclude-image-table",
+      "reason": "Image format conversion uses DAT180a79308/DAT180a7b2f0 lookup table."
+    },
+    {
+      "address": "0x1804a5f85",
+      "procedure": "0x1804a5460",
+      "bytes": "4c8db6f0b2a700",
+      "instruction": "lea r14, [rsi + 0xa7b2f0]",
+      "evidenceIds": [
+        "ev_aa2050a181c9d6e9bafe1d37f951d6af2d1bd62db125448038683f1cd292f2c3"
+      ],
+      "classification": "exclude-image-table",
+      "reason": "Image format conversion uses DAT180a79308/DAT180a7b2f0 lookup table."
+    },
+    {
+      "address": "0x1804c310b",
+      "procedure": "0x1804c30d0",
+      "bytes": "488d9f40078100",
+      "instruction": "lea rbx, [rdi + 0x810740]",
+      "evidenceIds": [
+        "ev_39c08d2a968fee0cd141c720735fde9b84def59be6dc35da4389278173f57516"
+      ],
+      "classification": "exclude-separate-scene-resource",
+      "reason": "Separate object constructor30eae0/destructor30f050 and Scene+0x628 access; this is not inline Mission storage."
+    },
+    {
+      "address": "0x1804c312d",
+      "procedure": "0x1804c30d0",
+      "bytes": "488b8fa8068100",
+      "instruction": "mov rcx, qword ptr [rdi + 0x8106a8]",
+      "evidenceIds": [
+        "ev_39c08d2a968fee0cd141c720735fde9b84def59be6dc35da4389278173f57516"
+      ],
+      "classification": "exclude-separate-scene-resource",
+      "reason": "Separate object constructor30eae0/destructor30f050 and Scene+0x628 access; this is not inline Mission storage."
+    },
+    {
+      "address": "0x1804c3134",
+      "procedure": "0x1804c30d0",
+      "bytes": "48398fa0068100",
+      "instruction": "cmp qword ptr [rdi + 0x8106a0], rcx",
+      "evidenceIds": [
+        "ev_39c08d2a968fee0cd141c720735fde9b84def59be6dc35da4389278173f57516"
+      ],
+      "classification": "exclude-separate-scene-resource",
+      "reason": "Separate object constructor30eae0/destructor30f050 and Scene+0x628 access; this is not inline Mission storage."
+    },
+    {
+      "address": "0x1804c3174",
+      "procedure": "0x1804c30d0",
+      "bytes": "488987a8068100",
+      "instruction": "mov qword ptr [rdi + 0x8106a8], rax",
+      "evidenceIds": [
+        "ev_39c08d2a968fee0cd141c720735fde9b84def59be6dc35da4389278173f57516"
+      ],
+      "classification": "exclude-separate-scene-resource",
+      "reason": "Separate object constructor30eae0/destructor30f050 and Scene+0x628 access; this is not inline Mission storage."
+    },
+    {
+      "address": "0x1804c3250",
+      "procedure": "0x1804c3210",
+      "bytes": "488d9f40078100",
+      "instruction": "lea rbx, [rdi + 0x810740]",
+      "evidenceIds": [
+        "ev_d7d7d96c799c729d1799a60853fce99b59e9721799687a7f7c635a9ad31f4543"
+      ],
+      "classification": "exclude-separate-scene-resource",
+      "reason": "Separate object constructor30eae0/destructor30f050 and Scene+0x628 access; this is not inline Mission storage."
+    },
+    {
+      "address": "0x1804c3272",
+      "procedure": "0x1804c3210",
+      "bytes": "488d8fa0068100",
+      "instruction": "lea rcx, [rdi + 0x8106a0]",
+      "evidenceIds": [
+        "ev_d7d7d96c799c729d1799a60853fce99b59e9721799687a7f7c635a9ad31f4543"
+      ],
+      "classification": "exclude-separate-scene-resource",
+      "reason": "Separate object constructor30eae0/destructor30f050 and Scene+0x628 access; this is not inline Mission storage."
+    },
+    {
+      "address": "0x18053d549",
+      "procedure": "0x18053cf90",
+      "bytes": "8b848330d1ad00",
+      "instruction": "mov eax, dword ptr [rbx + rax*4 + 0xadd130]",
+      "evidenceIds": [
+        "ev_c0ca4dded89f5c858348556d2f047d00cc7994c95cc36ed422f5eec728baaecc"
+      ],
+      "classification": "exclude-image-table",
+      "reason": "Ghidra resolves access to image-resident DAT/PTR table; numeric displacement is not a Mission field."
+    },
+    {
+      "address": "0x18053d559",
+      "procedure": "0x18053cf90",
+      "bytes": "8b848330d1ad00",
+      "instruction": "mov eax, dword ptr [rbx + rax*4 + 0xadd130]",
+      "evidenceIds": [
+        "ev_c0ca4dded89f5c858348556d2f047d00cc7994c95cc36ed422f5eec728baaecc"
+      ],
+      "classification": "exclude-image-table",
+      "reason": "Ghidra resolves access to image-resident DAT/PTR table; numeric displacement is not a Mission field."
+    },
+    {
+      "address": "0x18053d569",
+      "procedure": "0x18053cf90",
+      "bytes": "8b848330d1ad00",
+      "instruction": "mov eax, dword ptr [rbx + rax*4 + 0xadd130]",
+      "evidenceIds": [
+        "ev_c0ca4dded89f5c858348556d2f047d00cc7994c95cc36ed422f5eec728baaecc"
+      ],
+      "classification": "exclude-image-table",
+      "reason": "Ghidra resolves access to image-resident DAT/PTR table; numeric displacement is not a Mission field."
+    },
+    {
+      "address": "0x18053d57d",
+      "procedure": "0x18053cf90",
+      "bytes": "8b848330d1ad00",
+      "instruction": "mov eax, dword ptr [rbx + rax*4 + 0xadd130]",
+      "evidenceIds": [
+        "ev_c0ca4dded89f5c858348556d2f047d00cc7994c95cc36ed422f5eec728baaecc"
+      ],
+      "classification": "exclude-image-table",
+      "reason": "Ghidra resolves access to image-resident DAT/PTR table; numeric displacement is not a Mission field."
+    },
+    {
+      "address": "0x18053d5c4",
+      "procedure": "0x18053cf90",
+      "bytes": "418b848630d1ad00",
+      "instruction": "mov eax, dword ptr [r14 + rax*4 + 0xadd130]",
+      "evidenceIds": [
+        "ev_c0ca4dded89f5c858348556d2f047d00cc7994c95cc36ed422f5eec728baaecc"
+      ],
+      "classification": "exclude-image-table",
+      "reason": "Ghidra resolves access to image-resident DAT/PTR table; numeric displacement is not a Mission field."
+    },
+    {
+      "address": "0x18053f9a1",
+      "procedure": "0x18053f5b0",
+      "bytes": "418b8c9730d5ad00",
+      "instruction": "mov ecx, dword ptr [r15 + rdx*4 + 0xadd530]",
+      "evidenceIds": [
+        "ev_842a580f6be7feb52caba001e7ead8f82705951b72bf31633a2a353fbe886ef1"
+      ],
+      "classification": "exclude-image-table",
+      "reason": "Ghidra resolves access to image-resident DAT/PTR table; numeric displacement is not a Mission field."
+    },
+    {
+      "address": "0x18053f9f5",
+      "procedure": "0x18053f5b0",
+      "bytes": "418b8c9730d5ad00",
+      "instruction": "mov ecx, dword ptr [r15 + rdx*4 + 0xadd530]",
+      "evidenceIds": [
+        "ev_842a580f6be7feb52caba001e7ead8f82705951b72bf31633a2a353fbe886ef1"
+      ],
+      "classification": "exclude-image-table",
+      "reason": "Ghidra resolves access to image-resident DAT/PTR table; numeric displacement is not a Mission field."
+    },
+    {
+      "address": "0x18053fa49",
+      "procedure": "0x18053f5b0",
+      "bytes": "418b8c9730d5ad00",
+      "instruction": "mov ecx, dword ptr [r15 + rdx*4 + 0xadd530]",
+      "evidenceIds": [
+        "ev_842a580f6be7feb52caba001e7ead8f82705951b72bf31633a2a353fbe886ef1"
+      ],
+      "classification": "exclude-image-table",
+      "reason": "Ghidra resolves access to image-resident DAT/PTR table; numeric displacement is not a Mission field."
+    },
+    {
+      "address": "0x18053fa9d",
+      "procedure": "0x18053f5b0",
+      "bytes": "418b8c9730d5ad00",
+      "instruction": "mov ecx, dword ptr [r15 + rdx*4 + 0xadd530]",
+      "evidenceIds": [
+        "ev_842a580f6be7feb52caba001e7ead8f82705951b72bf31633a2a353fbe886ef1"
+      ],
+      "classification": "exclude-image-table",
+      "reason": "Ghidra resolves access to image-resident DAT/PTR table; numeric displacement is not a Mission field."
+    },
+    {
+      "address": "0x18053fb06",
+      "procedure": "0x18053f5b0",
+      "bytes": "418b8c9730d5ad00",
+      "instruction": "mov ecx, dword ptr [r15 + rdx*4 + 0xadd530]",
+      "evidenceIds": [
+        "ev_842a580f6be7feb52caba001e7ead8f82705951b72bf31633a2a353fbe886ef1"
+      ],
+      "classification": "exclude-image-table",
+      "reason": "Ghidra resolves access to image-resident DAT/PTR table; numeric displacement is not a Mission field."
+    },
+    {
+      "address": "0x18056e901",
+      "procedure": "0x18056e8e0",
+      "bytes": "83b8d848040102",
+      "instruction": "cmp dword ptr [rax + 0x10448d8], 2",
+      "evidenceIds": [
+        "ev_e8d9e6db72efc64ac04bf09056e389c98d5cbf4f7ba5c595290fc2b94880f74c"
+      ],
+      "classification": "mission-relative",
+      "reason": "Owner loaded from current Mission global DAT_180da9d60; reviewed pseudocode follows owner through aliases.",
+      "missionBaseBiasBytes": 0
+    },
+    {
+      "address": "0x18056e90e",
+      "procedure": "0x18056e8e0",
+      "bytes": "80b88048040100",
+      "instruction": "cmp byte ptr [rax + 0x1044880], 0",
+      "evidenceIds": [
+        "ev_e8d9e6db72efc64ac04bf09056e389c98d5cbf4f7ba5c595290fc2b94880f74c"
+      ],
+      "classification": "mission-relative",
+      "reason": "Owner loaded from current Mission global DAT_180da9d60; reviewed pseudocode follows owner through aliases.",
+      "missionBaseBiasBytes": 0
+    },
+    {
+      "address": "0x180574137",
+      "procedure": "0x1805740f0",
+      "bytes": "48638a384a1801",
+      "instruction": "movsxd rcx, dword ptr [rdx + 0x1184a38]",
+      "evidenceIds": [
+        "ev_e02ac7cd7dbe5fded3f6be3c92237534991205135975d92ca0494a21e928d76e"
+      ],
+      "classification": "mission-relative",
+      "reason": "Owner loaded from current Mission global DAT_180da9d60; reviewed pseudocode follows owner through aliases.",
+      "missionBaseBiasBytes": 0
+    },
+    {
+      "address": "0x180574359",
+      "procedure": "0x1805742b0",
+      "bytes": "4863b3384a1801",
+      "instruction": "movsxd rsi, dword ptr [rbx + 0x1184a38]",
+      "evidenceIds": [
+        "ev_871e8b74e3934eda4142db6fcb48dba735cd2ff0e4771e929b3f06e200b156a0"
+      ],
+      "classification": "mission-relative",
+      "reason": "Owner loaded from current Mission global DAT_180da9d60; reviewed pseudocode follows owner through aliases.",
+      "missionBaseBiasBytes": 0
+    },
+    {
+      "address": "0x180574425",
+      "procedure": "0x1805742b0",
+      "bytes": "486383384a1801",
+      "instruction": "movsxd rax, dword ptr [rbx + 0x1184a38]",
+      "evidenceIds": [
+        "ev_871e8b74e3934eda4142db6fcb48dba735cd2ff0e4771e929b3f06e200b156a0"
+      ],
+      "classification": "mission-relative",
+      "reason": "Owner loaded from current Mission global DAT_180da9d60; reviewed pseudocode follows owner through aliases.",
+      "missionBaseBiasBytes": 0
+    },
+    {
+      "address": "0x1805756a0",
+      "procedure": "0x180575660",
+      "bytes": "4863bb44da6200",
+      "instruction": "movsxd rdi, dword ptr [rbx + 0x62da44]",
+      "evidenceIds": [
+        "ev_6a24884038589e1ff28f64c5c3d6cf7de467f2319aa875062ae2c106d78727d0"
+      ],
+      "classification": "mission-relative",
+      "reason": "Owner loaded from current Mission global DAT_180da9d60; reviewed pseudocode follows owner through aliases.",
+      "missionBaseBiasBytes": 0
+    },
+    {
+      "address": "0x180575929",
+      "procedure": "0x1805758f0",
+      "bytes": "8bb344da6200",
+      "instruction": "mov esi, dword ptr [rbx + 0x62da44]",
+      "evidenceIds": [
+        "ev_0712037ca10cd9d8be35e0010a3329b13f55da03e089ea96536d34cfbfc15d43"
+      ],
+      "classification": "mission-relative",
+      "reason": "Owner loaded from current Mission global DAT_180da9d60; reviewed pseudocode follows owner through aliases.",
+      "missionBaseBiasBytes": 0
+    },
+    {
+      "address": "0x18057599f",
+      "procedure": "0x1805758f0",
+      "bytes": "0fbf847b50ca6200",
+      "instruction": "movsx eax, word ptr [rbx + rdi*2 + 0x62ca50]",
+      "evidenceIds": [
+        "ev_0712037ca10cd9d8be35e0010a3329b13f55da03e089ea96536d34cfbfc15d43"
+      ],
+      "classification": "mission-relative",
+      "reason": "Owner loaded from current Mission global DAT_180da9d60; reviewed pseudocode follows owner through aliases.",
+      "missionBaseBiasBytes": 0
+    },
+    {
+      "address": "0x18059e529",
+      "procedure": "0x18059e4b0",
+      "bytes": "48638f44da6200",
+      "instruction": "movsxd rcx, dword ptr [rdi + 0x62da44]",
+      "evidenceIds": [
+        "ev_bf79ce5f1670daaed70a4a160179f0b364d3e7fbaf4cfbea5cc2578279d60fe0"
+      ],
+      "classification": "mission-relative",
+      "reason": "Owner loaded from current Mission global DAT_180da9d60; reviewed pseudocode follows owner through aliases.",
+      "missionBaseBiasBytes": 0
+    },
+    {
+      "address": "0x1806e4fa8",
+      "classification": "exclude-deque-index-arithmetic",
+      "evidenceIds": [
+        "ev_0c4e09c631bf0ced361dde4e0c0379de861d7b63f8533d10e856afa5f3a70372"
+      ],
+      "reason": "Signed deque indexing adds and subtracts0x1000000 around division-by-eight; not a Mission-relative field."
+    },
+    {
+      "address": "0x18059e63c",
+      "procedure": "0x18059e4b0",
+      "bytes": "420fbf847f009d6200",
+      "instruction": "movsx eax, word ptr [rdi + r15*2 + 0x629d00]",
+      "evidenceIds": [
+        "ev_9fec1eff5a53ecabb15cfd4605f3a3afe6debe2773c03feae59d22887fb4f2ff"
+      ],
+      "classification": "pool-relative",
+      "poolStride": 3168,
+      "reason": "MOV RDI,[current Mission]59e522 then ADD RDI,2d50 at59e530; pool metadata is relative to primary pool."
+    },
+    {
+      "address": "0x18059e645",
+      "procedure": "0x18059e4b0",
+      "bytes": "8b8ff4ac6200",
+      "instruction": "mov ecx, dword ptr [rdi + 0x62acf4]",
+      "evidenceIds": [
+        "ev_9fec1eff5a53ecabb15cfd4605f3a3afe6debe2773c03feae59d22887fb4f2ff"
+      ],
+      "classification": "pool-relative",
+      "poolStride": 3168,
+      "reason": "MOV RDI,[current Mission]59e522 then ADD RDI,2d50 at59e530; pool metadata is relative to primary pool."
+    },
+    {
+      "address": "0x18059e68a",
+      "procedure": "0x18059e4b0",
+      "bytes": "8b8ff4ac6200",
+      "instruction": "mov ecx, dword ptr [rdi + 0x62acf4]",
+      "evidenceIds": [
+        "ev_9fec1eff5a53ecabb15cfd4605f3a3afe6debe2773c03feae59d22887fb4f2ff"
+      ],
+      "classification": "pool-relative",
+      "poolStride": 3168,
+      "reason": "MOV RDI,[current Mission]59e522 then ADD RDI,2d50 at59e530; pool metadata is relative to primary pool."
+    },
+    {
+      "address": "0x18059e6c1",
+      "procedure": "0x18059e4b0",
+      "bytes": "0fbf9c5f009d6200",
+      "instruction": "movsx ebx, word ptr [rdi + rbx*2 + 0x629d00]",
+      "evidenceIds": [
+        "ev_9fec1eff5a53ecabb15cfd4605f3a3afe6debe2773c03feae59d22887fb4f2ff"
+      ],
+      "classification": "pool-relative",
+      "poolStride": 3168,
+      "reason": "MOV RDI,[current Mission]59e522 then ADD RDI,2d50 at59e530; pool metadata is relative to primary pool."
+    },
+    {
+      "address": "0x18059e6c9",
+      "procedure": "0x18059e4b0",
+      "bytes": "3b9ff4ac6200",
+      "instruction": "cmp ebx, dword ptr [rdi + 0x62acf4]",
+      "evidenceIds": [
+        "ev_9fec1eff5a53ecabb15cfd4605f3a3afe6debe2773c03feae59d22887fb4f2ff"
+      ],
+      "classification": "pool-relative",
+      "poolStride": 3168,
+      "reason": "MOV RDI,[current Mission]59e522 then ADD RDI,2d50 at59e530; pool metadata is relative to primary pool."
+    },
+    {
+      "address": "0x18059e6dc",
+      "procedure": "0x18059e4b0",
+      "bytes": "8b8ff4ac6200",
+      "instruction": "mov ecx, dword ptr [rdi + 0x62acf4]",
+      "evidenceIds": [
+        "ev_9fec1eff5a53ecabb15cfd4605f3a3afe6debe2773c03feae59d22887fb4f2ff"
+      ],
+      "classification": "pool-relative",
+      "poolStride": 3168,
+      "reason": "MOV RDI,[current Mission]59e522 then ADD RDI,2d50 at59e530; pool metadata is relative to primary pool."
+    }
+  ],
+  "limitations": [
+    "Only listed operands reviewed; computed addresses and external pointer contracts are not exhausted.",
+    "Current Mission global provenance corroborated by registered callbacks and native lifecycle, not a universal register data-flow proof."
+  ]
+}

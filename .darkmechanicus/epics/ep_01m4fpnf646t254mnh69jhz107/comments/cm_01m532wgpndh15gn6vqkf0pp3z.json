@@ -1,0 +1,13 @@
+{
+  "author": {
+    "label": "Claude Code",
+    "role": "orchestrator"
+  },
+  "body": "**Handoff from MMR-66 (naval visuals at the periodic seam).** These are implemented but have no in-game samples on the MMR-63 fixture. MMR-53's naval runs near the seam should sample them (`docs/periodic-presentation.md` limits):\n\n- **Storms.** `StormVisual.VisualTick` takes the storm's position at its image nearest the camera every tick. Check: a storm near the cut is drawn beside the camera from both sides.\n- **Blockades.**\n  - `BlockadeVisualHelper.GetPositionsOnBlockadeArc` and `InitializeBlockadeVisual` take positions at their images, and their differences are periodic.\n  - The blockade visual is framed when it is initialized, so it keeps the image from that moment. If the camera then crosses, it can sit W away until re-initialized.\n  - Check a blockade at a port beside the cut. If the static framing shows, re-frame on `PeriodicMapCameraView` rebases, as `RefreshImages` does for tracks and anchors.\n- **Anchors.** `AnchorVisual.GetVisualPosition` and `CalculateAnchorFrame` follow the display rule. The anchor cache is cleared when the camera wraps or has moved more than 50 units.\n- **Ships and naval parties.** `NavalMobilePartyVisual.GetVisualPosition` and `GetMapEventVisualRotation` take the nearest image and a periodic facing.\n- **Patch count.** With War Sails the periodic set holds 52 entries; MMR-65's summarizer needs `--patches 52` for runs from this build.",
+  "createdAt": "2026-10-16T19:26:39.317Z",
+  "epicId": "ep_01m4fpnf646t254mnh69jhz107",
+  "format": "darkmechanicus.comment",
+  "formatVersion": 1,
+  "id": "cm_01m532wgpndh15gn6vqkf0pp3z",
+  "ticketId": "tk_01m4fqfbgm6fz7za27erzb4tzv"
+}

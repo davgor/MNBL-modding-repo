@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "status": "offline-storage-tests-passed-engine-integration-not-tested",
+  "compiler": "MSVC14.44.35207 x64 /std:c++20 /W4 /WX",
+  "runs": [
+    {
+      "command": "cmd /d /c tools\\battle-scale\\Test-StableAgentStorage.cmd",
+      "configuration": "/MD /O2",
+      "exitCode": 0
+    },
+    {
+      "command": "cmd /d /c build\\agent-storage\\test-asan.cmd",
+      "configuration": "/MD /Zi /fsanitize=address /Od",
+      "exitCode": 0
+    }
+  ],
+  "observedChecks": [
+    "2040->4080->6120 five-pool stable object addresses and payload",
+    "exhaustion, boundary free/reuse, generation invalidation",
+    "15 allocation-failure points and45 constructor-failure points: rollback and successful retry",
+    "66049 slots, wide index lookup and exhaustion, arithmetic overflow rejection",
+    "reader blocks growth and close, atomic capacity publication, lease retains storage after owner destruction, reverse teardown"
+  ],
+  "inputs": [
+    {
+      "path": "src/MNBL.AgentStorage/StableAgentStorage.hpp",
+      "sha256": "f66b1b11e3194c74c9cd1658dc6f33871252f8ca08eecad261d6797cb0e9f787"
+    },
+    {
+      "path": "tests/AgentStorage/stable_storage_tests.cpp",
+      "sha256": "c4a6b70a4a615e24588c3a19d9ae508a511bcb7a99b38071b7cd64ce10469213"
+    },
+    {
+      "path": "tools/battle-scale/Test-StableAgentStorage.cmd",
+      "sha256": "594f188323f80f7d73389a1009441209c6fa667fcc9873b5d9af06cc6d24a3e4"
+    },
+    {
+      "path": "build/agent-storage/test-asan.cmd",
+      "sha256": "65043844e8c3f6f1fd3a3a7c00e1d7133f2a3ab28036649e80a3b63e98ae4d04"
+    },
+    {
+      "path": "build/agent-storage/stable_storage_tests.exe",
+      "sha256": "a8f3e4c6c1c5bab804653ea936021df34e6f5f8556b937e84d170f0bc295f930"
+    },
+    {
+      "path": "build/agent-storage/stable_storage_asan.exe",
+      "sha256": "651946febcb6c4c0aeee5e597be72d9eb211f3061e02f55988c10fe5d3289e03"
+    }
+  ],
+  "limitations": [
+    "Objects are test Headers, not Bannerlord Agent instances.",
+    "Engine workers do not automatically participate in this storage lock.",
+    "No native patch deployed or game launched."
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "author": {
+    "label": "Claude Code",
+    "role": "orchestrator"
+  },
+  "body": "**Handoff from MMR-65 (seam route execution and periodic spatial queries, `docs/periodic-movement.md`).**\n- **The view sites are yours.** The consumer audit (`evidence/world/periodic-consumers.tsv`) classifies these as `view`, left planar for MMR-66:\n  - 37 measure sites: SandBox.View, NavalDLC.View, ViewModelCollection, `QuestHelper.AddMapArrowFromPointToTarget`;\n  - the atmosphere grid interpolation (`AtmosphereGrid.GetInterpolatedStateInfo`, cosmetic);\n  - 154 native scene calls and 18 Vec3 distances in view code.\n- **Gameplay side is done.** Campaign positions stay canonical. `PeriodicSeam` rebases parties, their paths and the player's camera fields on the same tick. Picking still enters through `MapState.ProcessTravel` (MMR-63's prefix canonicalizes the click). Native terrain picking at the seam and the remaining camera fields (`_lastUsedIdealCameraTarget`) remain yours.\n- **Regenerating the table.** If a view consumer must become periodic, add a rule in `tools/periodic/build_spatial_table.py` and regenerate. Never edit `PeriodicSpatialTable.cs` by hand: the transpiler refuses the whole set on a count mismatch.",
+  "createdAt": "2026-10-16T16:22:06.340Z",
+  "epicId": "ep_01m4fpnf646t254mnh69jhz107",
+  "format": "darkmechanicus.comment",
+  "formatVersion": 1,
+  "id": "cm_01m52rak84pvjeq60d005zmy3w",
+  "ticketId": "tk_01m4fr2f4ketqh6dd1jd7yt95j"
+}

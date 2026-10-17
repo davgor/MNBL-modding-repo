@@ -1,0 +1,78 @@
+ok    flat ground above the datum is land
+ok    sea: the main-diagonal centre is below the datum, whatever the other corners
+ok    sea when the diagonal mean is negative even with one corner above the datum
+ok    an off-diagonal low corner does not make a sea cell
+ok    lake: a main-diagonal corner carries lake intent (both cells sharing it)
+ok    river: a main-diagonal corner carries river intent
+ok    below-datum lake corners still give sea (the datum rule comes first)
+ok    mountain: (max - min corner) / spacing above mountainSlope
+ok    slope at or below mountainSlope stays land
+ok    a grid with the wrong sample count -> grid_mismatch
+ok    the calibration carries the MMR-17 invalid-terrain sets, region switch costs, embark threshold and the installed port-gate envelope
+ok    the policy loads with its pinned values
+ok    a byte-identical copy with its calibration loads with the same hash
+ok    policy land_as_sea -> face_group_mismatch
+ok    policy mountain_walkable -> face_group_mismatch
+ok    policy unknown_face_group -> unmapped_category
+ok    policy calibration_altered -> calibration_mismatch
+ok    policy unknown_member -> unknown_field
+ok    policy bridge_kind -> unmapped_category
+ok    policy port_gate_zero -> out_of_range
+ok    policy fraction_range -> out_of_range
+ok    two islands: two land components, one open basin, status ok
+ok    the port serves the gate: the coast pair of the gate's component nearest the gate, on the harbour's basin
+ok    both groups are player-safe; the main group holds the smallest town UID on a tie
+ok    transitions: one per port and one coast edge per group and basin, all pending engine validation
+ok    host checks cover gates, village faces and routes, ports and their gate distance, the sea route and islands
+ok    a settlement at its cell centre keeps that point; no collisions
+ok    an island town without a port is reachable but cannot return: quality.unreachable_town names its UID
+ok    a shore without a harbour record is never a port
+ok    a lake-only basin and a two-cell sea pocket are closed basins
+ok    harbours on closed basins are invalid ports (closed_basin)
+ok    a road across a river joins two land components through one required bridge
+ok    the crossing is a producer-reported river bridge candidate with a host check
+ok    without the road the far town is unreachable (no ports): rejected
+ok    a crossing kind the policy does not list joins nothing
+ok    a road over a ridge carves one pass (recorded, with a host check) and joins the land
+ok    one pass among 6 mountain cells exceeds maxPassFraction 0.1: rejected
+ok    with passes disabled the ridge blocks the road and the far town is unreachable
+ok    a town on a mountain cell gets it as its footprint
+ok    a town on a sea cell snaps to the nearest land cell within maxSnapCells
+ok    footprints and snaps beyond their fractions reject the world
+ok    a footprint walled in by mountains gets a two-cell access pass to the nearest land
+ok    beyond maxAccessCells the footprint stays walled in, the two towns are split and the world is rejected
+ok    a town with no land within reach is unplaceable: rejected
+ok    a village outside its town's land group is excluded with the reason
+ok    1 of 3 villages excluded exceeds maxExcludedVillageFraction 0.1: rejected, naming the UID
+ok    a castle on a portless island is excluded; one on the main island is kept
+ok    1 of 2 castles excluded exceeds maxExcludedCastleFraction 0.25: rejected
+ok    a sea node touching only land shifts one cell to the sea (recorded harbour_shift)
+ok    a sea node three cells inland is not navigable: invalid port
+ok    land across the seam is one component (columns wrap)
+ok    cell distance takes the nearest seam image
+ok    OpenSea cells lie at least 4 cells from land; nearer sea is coastal
+ok    a pole passage splits the road: the river the unsplit road would bridge is never crossed
+ok    two towns never share a port pair: the second finds it held (port_pair_taken)
+ok    a coast three cells from the gate is beyond maxPortGateCells (port_too_far_from_gate)
+ok    a harbour on an open basin the gate's component does not touch is invalid (basin_not_reachable_from_gate)
+ok    an excluded harbour village yields no port (harbour_village_excluded); the town keeps its other harbour
+ok    a harbour of an unplaceable town is invalid (town_unplaceable)
+ok    a short lake crossing on a road is a joining bridge candidate
+ok    a sea crossing is recorded as coast but never joins land: sea is crossed through ports
+ok    a river crossing longer than bridges.maxCells joins nothing
+ok    required bridges beyond maxRequired reject the world, naming the road's towns
+ok    a pass bound reason names the road's towns
+ok    footprint and snap bound reasons name the settlements
+ok    1 harbour shift of 2 harbours exceeds maxHarbourShiftFraction 0.1, naming the village
+ok    a harbour shift records the sea-node cell it starts from
+ok    a footprint on a road is recorded once, as a footprint with its host check, never as a pass
+ok    every producer river crossing gets an outcome: matched, or no compiled water
+ok    a corner point takes the first land cell touching it and is clamped a quarter cell inside it
+ok    two villages on one point are a recorded collision with a host check
+ok    a transition on a seam column gets a seamTransition host check
+ok    the documents are deterministic
+ok    cells.bin holds classes and OpenSea flags; the graph is pending engine validation
+ok    a village bound to an unknown town -> broken_join
+ok    a road naming an unknown town -> broken_join
+ok    duplicate settlement ids -> duplicate_id
+77/77 checks passed

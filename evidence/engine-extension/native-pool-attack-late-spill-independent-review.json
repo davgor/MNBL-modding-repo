@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "status": "accepted-two-exact-late-reload-contracts",
+  "targetSha256": "2a5e0e0b15513ebb7052d747a621b82c50ee834553eba283b33bbbc33766e12a",
+  "reviewedArtifact": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\evidence\\engine-extension\\native-pool-attack-late-spill-review.json",
+  "reviewedArtifactSha256": "60672f0e6c0922a78ec80ef26a10219f683fbf277198c52f93bb903662e938cc",
+  "originalInstructionEntriesMatched": 3146,
+  "predecessorInstructions": 2236,
+  "completeRawHelpers": 29,
+  "retainedCalleeTextsMatched": 46,
+  "callSitesReviewed": 103,
+  "approvedReloads": [
+    "0x1805caef7",
+    "0x1805cb53f"
+  ],
+  "initialStoreDominanceStatesPerReload": 2207,
+  "findings": [],
+  "review": [
+    "Reviewed all103 call effects against retained bodies, argument setup, and earlier independently reviewed local-output contracts. Boundary174810 output startsRSP1b0 immediately after saved1a8..1af; no negative output stores. 5c8d30 and354fe0 outputs match actual register/stackargument positions.",
+    "Independently matched full29rawhelper bodies, including allcold paths. Newly retained external helpers consume only explicitly supplied object/scalar arguments, no incoming higher-stack pointers;689490 uses its own local output,361500 uses external objects andlocks.",
+    "Candidate countRSPb0 has onlyzero andincrement writes, loop0..14 givescount0..15. Threeindexedstores and28non-stack-base stores were individually traced: fixedlocalcopyRSP200..2eb, positive candidatearray offsets, andexternalR14 object. No computedstore aliases savedMission.",
+    "6956c0 dispatches four producers; each resets bytecount and performs at most127iterations with at mostone increment each. Signed resultingwriteindex0..126 keepswrites nonnegative. This proves separation from savedMission, not per-candidate buffer capacity.",
+    "Sort input array has5/6 QWORDs; depth4 bypasses partition and guarded insertion never writes beforebegin. Polygon headers reference allocatedheap backing. Allsubsequentgeometryoutput extents remain outside savedMission.",
+    "5cbdd0 writes4/4/1/1 nativeoutput bytes; manageddelegate60 at table208 forwards onlySingle&,Single&,Boolean& withU1 marshaling. OriginalNativeObjectPointer values andinteger referencecountIDs cannot alias the savedhome.",
+    "Independent complete-function reverseCFG proves initialstore5c8f73 dominates eachlate reload, including loops reaching those reloads through subsequentcalls. Allotherdirect memory writes include semantic SIMD-store detection."
+  ],
+  "limitations": [
+    "Only exact two saved-Mission reloads approved; downstream ownership remains all-predecessorCFG proof responsibility.",
+    "Installed ABI and bounded profile only. Does not certify broader candidate-contact capacity, complete pool patch runtime safety or performance. No game launch or deployment."
+  ],
+  "gameExecuted": false
+}

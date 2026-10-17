@@ -1,0 +1,1142 @@
+{
+  "schemaVersion": 1,
+  "status": "independent-guard-review-passed",
+  "nativeSourceSha256": "2a5e0e0b15513ebb7052d747a621b82c50ee834553eba283b33bbbc33766e12a",
+  "proposalSha256": "663020fd6e3d21642df6b30f9b471069d6dc0b26fbb468a539b4765fd8728740",
+  "scriptSha256": "22de91fc515f689113bbded49d5b1962f618b258fea5a3b8c67d52ffc69658c0",
+  "gameExecuted": false,
+  "nativeFileWritten": false,
+  "guards": [
+    {
+      "start": "0x23f617",
+      "end": "0x23f640",
+      "validPagePairsAllRegistersEqual": 8256,
+      "invalidCases": [
+        {
+          "first": 0,
+          "last": 128,
+          "trapRva": "0x23f61c"
+        },
+        {
+          "first": 127,
+          "last": 128,
+          "trapRva": "0x23f61c"
+        },
+        {
+          "first": 128,
+          "last": 128,
+          "trapRva": "0x23f61c"
+        },
+        {
+          "first": 0,
+          "last": 255,
+          "trapRva": "0x23f61c"
+        },
+        {
+          "first": 0,
+          "last": 2097151,
+          "trapRva": "0x23f61c"
+        },
+        {
+          "first": 1,
+          "last": 0,
+          "trapRva": "0x23f623"
+        },
+        {
+          "first": 127,
+          "last": 126,
+          "trapRva": "0x23f623"
+        },
+        {
+          "first": 4294967295,
+          "last": 127,
+          "trapRva": "0x23f623"
+        }
+      ],
+      "replacementInstructions": [
+        {
+          "rva": "0x23f617",
+          "bytes": "83fd7f",
+          "asm": "cmp ebp, 0x7f"
+        },
+        {
+          "rva": "0x23f61a",
+          "bytes": "7602",
+          "asm": "jbe 0x18023f61e"
+        },
+        {
+          "rva": "0x23f61c",
+          "bytes": "0f0b",
+          "asm": "ud2 "
+        },
+        {
+          "rva": "0x23f61e",
+          "bytes": "483bf5",
+          "asm": "cmp rsi, rbp"
+        },
+        {
+          "rva": "0x23f621",
+          "bytes": "7602",
+          "asm": "jbe 0x18023f625"
+        },
+        {
+          "rva": "0x23f623",
+          "bytes": "0f0b",
+          "asm": "ud2 "
+        },
+        {
+          "rva": "0x23f625",
+          "bytes": "488d9c3708040000",
+          "asm": "lea rbx, [rdi + rsi + 0x408]"
+        },
+        {
+          "rva": "0x23f62d",
+          "bytes": "482bee",
+          "asm": "sub rbp, rsi"
+        },
+        {
+          "rva": "0x23f630",
+          "bytes": "4c8d7cc708",
+          "asm": "lea r15, [rdi + rax*8 + 8]"
+        },
+        {
+          "rva": "0x23f635",
+          "bytes": "48ffc5",
+          "asm": "inc rbp"
+        },
+        {
+          "rva": "0x23f638",
+          "bytes": "90",
+          "asm": "nop "
+        },
+        {
+          "rva": "0x23f639",
+          "bytes": "90",
+          "asm": "nop "
+        },
+        {
+          "rva": "0x23f63a",
+          "bytes": "90",
+          "asm": "nop "
+        },
+        {
+          "rva": "0x23f63b",
+          "bytes": "90",
+          "asm": "nop "
+        },
+        {
+          "rva": "0x23f63c",
+          "bytes": "90",
+          "asm": "nop "
+        },
+        {
+          "rva": "0x23f63d",
+          "bytes": "90",
+          "asm": "nop "
+        },
+        {
+          "rva": "0x23f63e",
+          "bytes": "90",
+          "asm": "nop "
+        },
+        {
+          "rva": "0x23f63f",
+          "bytes": "90",
+          "asm": "nop "
+        }
+      ]
+    },
+    {
+      "start": "0x89a0f",
+      "end": "0x89a18",
+      "validPagePairsAllRegistersEqual": 8256,
+      "invalidCases": [
+        {
+          "first": 0,
+          "last": 128,
+          "trapRva": "0x89a15"
+        },
+        {
+          "first": 127,
+          "last": 128,
+          "trapRva": "0x89a15"
+        },
+        {
+          "first": 128,
+          "last": 128,
+          "trapRva": "0x89a15"
+        },
+        {
+          "first": 0,
+          "last": 255,
+          "trapRva": "0x89a15"
+        },
+        {
+          "first": 0,
+          "last": 2097151,
+          "trapRva": "0x89a15"
+        }
+      ],
+      "replacementInstructions": [
+        {
+          "rva": "0x89a0f",
+          "bytes": "4883fd7f",
+          "asm": "cmp rbp, 0x7f"
+        },
+        {
+          "rva": "0x89a13",
+          "bytes": "7602",
+          "asm": "jbe 0x180089a17"
+        },
+        {
+          "rva": "0x89a15",
+          "bytes": "0f0b",
+          "asm": "ud2 "
+        },
+        {
+          "rva": "0x89a17",
+          "bytes": "90",
+          "asm": "nop "
+        }
+      ]
+    }
+  ],
+  "inclusiveEndArithmeticCases": [
+    {
+      "allocator": "0x23f605",
+      "oldCount": 0,
+      "requested": 1,
+      "accepted": true
+    },
+    {
+      "allocator": "0x23f605",
+      "oldCount": 1,
+      "requested": 1,
+      "accepted": true
+    },
+    {
+      "allocator": "0x23f605",
+      "oldCount": 16383,
+      "requested": 1,
+      "accepted": true
+    },
+    {
+      "allocator": "0x23f605",
+      "oldCount": 16384,
+      "requested": 1,
+      "accepted": true
+    },
+    {
+      "allocator": "0x23f605",
+      "oldCount": 2097151,
+      "requested": 1,
+      "accepted": true
+    },
+    {
+      "allocator": "0x23f605",
+      "oldCount": 2097152,
+      "requested": 1,
+      "accepted": false
+    },
+    {
+      "allocator": "0x23f605",
+      "oldCount": 2147483647,
+      "requested": 1,
+      "accepted": false
+    },
+    {
+      "allocator": "0x23f605",
+      "oldCount": 4294967294,
+      "requested": 1,
+      "accepted": false
+    },
+    {
+      "allocator": "0x23f605",
+      "oldCount": 4294967295,
+      "requested": 1,
+      "accepted": false
+    },
+    {
+      "allocator": "0x23f605",
+      "oldCount": 0,
+      "requested": 2,
+      "accepted": true
+    },
+    {
+      "allocator": "0x23f605",
+      "oldCount": 1,
+      "requested": 2,
+      "accepted": true
+    },
+    {
+      "allocator": "0x23f605",
+      "oldCount": 16383,
+      "requested": 2,
+      "accepted": true
+    },
+    {
+      "allocator": "0x23f605",
+      "oldCount": 16384,
+      "requested": 2,
+      "accepted": true
+    },
+    {
+      "allocator": "0x23f605",
+      "oldCount": 2097151,
+      "requested": 2,
+      "accepted": false
+    },
+    {
+      "allocator": "0x23f605",
+      "oldCount": 2097152,
+      "requested": 2,
+      "accepted": false
+    },
+    {
+      "allocator": "0x23f605",
+      "oldCount": 2147483647,
+      "requested": 2,
+      "accepted": false
+    },
+    {
+      "allocator": "0x23f605",
+      "oldCount": 4294967294,
+      "requested": 2,
+      "accepted": false
+    },
+    {
+      "allocator": "0x23f605",
+      "oldCount": 4294967295,
+      "requested": 2,
+      "accepted": false
+    },
+    {
+      "allocator": "0x23f605",
+      "oldCount": 0,
+      "requested": 16383,
+      "accepted": true
+    },
+    {
+      "allocator": "0x23f605",
+      "oldCount": 1,
+      "requested": 16383,
+      "accepted": true
+    },
+    {
+      "allocator": "0x23f605",
+      "oldCount": 16383,
+      "requested": 16383,
+      "accepted": true
+    },
+    {
+      "allocator": "0x23f605",
+      "oldCount": 16384,
+      "requested": 16383,
+      "accepted": true
+    },
+    {
+      "allocator": "0x23f605",
+      "oldCount": 2097151,
+      "requested": 16383,
+      "accepted": false
+    },
+    {
+      "allocator": "0x23f605",
+      "oldCount": 2097152,
+      "requested": 16383,
+      "accepted": false
+    },
+    {
+      "allocator": "0x23f605",
+      "oldCount": 2147483647,
+      "requested": 16383,
+      "accepted": false
+    },
+    {
+      "allocator": "0x23f605",
+      "oldCount": 4294967294,
+      "requested": 16383,
+      "accepted": false
+    },
+    {
+      "allocator": "0x23f605",
+      "oldCount": 4294967295,
+      "requested": 16383,
+      "accepted": false
+    },
+    {
+      "allocator": "0x23f605",
+      "oldCount": 0,
+      "requested": 16384,
+      "accepted": true
+    },
+    {
+      "allocator": "0x23f605",
+      "oldCount": 1,
+      "requested": 16384,
+      "accepted": true
+    },
+    {
+      "allocator": "0x23f605",
+      "oldCount": 16383,
+      "requested": 16384,
+      "accepted": true
+    },
+    {
+      "allocator": "0x23f605",
+      "oldCount": 16384,
+      "requested": 16384,
+      "accepted": true
+    },
+    {
+      "allocator": "0x23f605",
+      "oldCount": 2097151,
+      "requested": 16384,
+      "accepted": false
+    },
+    {
+      "allocator": "0x23f605",
+      "oldCount": 2097152,
+      "requested": 16384,
+      "accepted": false
+    },
+    {
+      "allocator": "0x23f605",
+      "oldCount": 2147483647,
+      "requested": 16384,
+      "accepted": false
+    },
+    {
+      "allocator": "0x23f605",
+      "oldCount": 4294967294,
+      "requested": 16384,
+      "accepted": false
+    },
+    {
+      "allocator": "0x23f605",
+      "oldCount": 4294967295,
+      "requested": 16384,
+      "accepted": false
+    },
+    {
+      "allocator": "0x23f605",
+      "oldCount": 0,
+      "requested": 16385,
+      "accepted": true
+    },
+    {
+      "allocator": "0x23f605",
+      "oldCount": 1,
+      "requested": 16385,
+      "accepted": true
+    },
+    {
+      "allocator": "0x23f605",
+      "oldCount": 16383,
+      "requested": 16385,
+      "accepted": true
+    },
+    {
+      "allocator": "0x23f605",
+      "oldCount": 16384,
+      "requested": 16385,
+      "accepted": true
+    },
+    {
+      "allocator": "0x23f605",
+      "oldCount": 2097151,
+      "requested": 16385,
+      "accepted": false
+    },
+    {
+      "allocator": "0x23f605",
+      "oldCount": 2097152,
+      "requested": 16385,
+      "accepted": false
+    },
+    {
+      "allocator": "0x23f605",
+      "oldCount": 2147483647,
+      "requested": 16385,
+      "accepted": false
+    },
+    {
+      "allocator": "0x23f605",
+      "oldCount": 4294967294,
+      "requested": 16385,
+      "accepted": false
+    },
+    {
+      "allocator": "0x23f605",
+      "oldCount": 4294967295,
+      "requested": 16385,
+      "accepted": false
+    },
+    {
+      "allocator": "0x23f605",
+      "oldCount": 0,
+      "requested": 2097152,
+      "accepted": true
+    },
+    {
+      "allocator": "0x23f605",
+      "oldCount": 1,
+      "requested": 2097152,
+      "accepted": false
+    },
+    {
+      "allocator": "0x23f605",
+      "oldCount": 16383,
+      "requested": 2097152,
+      "accepted": false
+    },
+    {
+      "allocator": "0x23f605",
+      "oldCount": 16384,
+      "requested": 2097152,
+      "accepted": false
+    },
+    {
+      "allocator": "0x23f605",
+      "oldCount": 2097151,
+      "requested": 2097152,
+      "accepted": false
+    },
+    {
+      "allocator": "0x23f605",
+      "oldCount": 2097152,
+      "requested": 2097152,
+      "accepted": false
+    },
+    {
+      "allocator": "0x23f605",
+      "oldCount": 2147483647,
+      "requested": 2097152,
+      "accepted": false
+    },
+    {
+      "allocator": "0x23f605",
+      "oldCount": 4294967294,
+      "requested": 2097152,
+      "accepted": false
+    },
+    {
+      "allocator": "0x23f605",
+      "oldCount": 4294967295,
+      "requested": 2097152,
+      "accepted": false
+    },
+    {
+      "allocator": "0x23f605",
+      "oldCount": 0,
+      "requested": 2147483648,
+      "accepted": false
+    },
+    {
+      "allocator": "0x23f605",
+      "oldCount": 1,
+      "requested": 2147483648,
+      "accepted": false
+    },
+    {
+      "allocator": "0x23f605",
+      "oldCount": 16383,
+      "requested": 2147483648,
+      "accepted": false
+    },
+    {
+      "allocator": "0x23f605",
+      "oldCount": 16384,
+      "requested": 2147483648,
+      "accepted": false
+    },
+    {
+      "allocator": "0x23f605",
+      "oldCount": 2097151,
+      "requested": 2147483648,
+      "accepted": false
+    },
+    {
+      "allocator": "0x23f605",
+      "oldCount": 2097152,
+      "requested": 2147483648,
+      "accepted": false
+    },
+    {
+      "allocator": "0x23f605",
+      "oldCount": 2147483647,
+      "requested": 2147483648,
+      "accepted": false
+    },
+    {
+      "allocator": "0x23f605",
+      "oldCount": 4294967294,
+      "requested": 2147483648,
+      "accepted": false
+    },
+    {
+      "allocator": "0x23f605",
+      "oldCount": 4294967295,
+      "requested": 2147483648,
+      "accepted": false
+    },
+    {
+      "allocator": "0x23f605",
+      "oldCount": 0,
+      "requested": 4294967295,
+      "accepted": false
+    },
+    {
+      "allocator": "0x23f605",
+      "oldCount": 1,
+      "requested": 4294967295,
+      "accepted": false
+    },
+    {
+      "allocator": "0x23f605",
+      "oldCount": 16383,
+      "requested": 4294967295,
+      "accepted": false
+    },
+    {
+      "allocator": "0x23f605",
+      "oldCount": 16384,
+      "requested": 4294967295,
+      "accepted": false
+    },
+    {
+      "allocator": "0x23f605",
+      "oldCount": 2097151,
+      "requested": 4294967295,
+      "accepted": false
+    },
+    {
+      "allocator": "0x23f605",
+      "oldCount": 2097152,
+      "requested": 4294967295,
+      "accepted": false
+    },
+    {
+      "allocator": "0x23f605",
+      "oldCount": 2147483647,
+      "requested": 4294967295,
+      "accepted": false
+    },
+    {
+      "allocator": "0x23f605",
+      "oldCount": 4294967294,
+      "requested": 4294967295,
+      "accepted": false
+    },
+    {
+      "allocator": "0x23f605",
+      "oldCount": 4294967295,
+      "requested": 4294967295,
+      "accepted": false
+    },
+    {
+      "allocator": "0x899fd",
+      "oldCount": 0,
+      "requested": 1,
+      "accepted": true
+    },
+    {
+      "allocator": "0x899fd",
+      "oldCount": 1,
+      "requested": 1,
+      "accepted": true
+    },
+    {
+      "allocator": "0x899fd",
+      "oldCount": 16383,
+      "requested": 1,
+      "accepted": true
+    },
+    {
+      "allocator": "0x899fd",
+      "oldCount": 16384,
+      "requested": 1,
+      "accepted": true
+    },
+    {
+      "allocator": "0x899fd",
+      "oldCount": 2097151,
+      "requested": 1,
+      "accepted": true
+    },
+    {
+      "allocator": "0x899fd",
+      "oldCount": 2097152,
+      "requested": 1,
+      "accepted": false
+    },
+    {
+      "allocator": "0x899fd",
+      "oldCount": 2147483647,
+      "requested": 1,
+      "accepted": false
+    },
+    {
+      "allocator": "0x899fd",
+      "oldCount": 4294967294,
+      "requested": 1,
+      "accepted": false
+    },
+    {
+      "allocator": "0x899fd",
+      "oldCount": 4294967295,
+      "requested": 1,
+      "accepted": false
+    },
+    {
+      "allocator": "0x899fd",
+      "oldCount": 0,
+      "requested": 2,
+      "accepted": true
+    },
+    {
+      "allocator": "0x899fd",
+      "oldCount": 1,
+      "requested": 2,
+      "accepted": true
+    },
+    {
+      "allocator": "0x899fd",
+      "oldCount": 16383,
+      "requested": 2,
+      "accepted": true
+    },
+    {
+      "allocator": "0x899fd",
+      "oldCount": 16384,
+      "requested": 2,
+      "accepted": true
+    },
+    {
+      "allocator": "0x899fd",
+      "oldCount": 2097151,
+      "requested": 2,
+      "accepted": false
+    },
+    {
+      "allocator": "0x899fd",
+      "oldCount": 2097152,
+      "requested": 2,
+      "accepted": false
+    },
+    {
+      "allocator": "0x899fd",
+      "oldCount": 2147483647,
+      "requested": 2,
+      "accepted": false
+    },
+    {
+      "allocator": "0x899fd",
+      "oldCount": 4294967294,
+      "requested": 2,
+      "accepted": false
+    },
+    {
+      "allocator": "0x899fd",
+      "oldCount": 4294967295,
+      "requested": 2,
+      "accepted": false
+    },
+    {
+      "allocator": "0x899fd",
+      "oldCount": 0,
+      "requested": 16383,
+      "accepted": true
+    },
+    {
+      "allocator": "0x899fd",
+      "oldCount": 1,
+      "requested": 16383,
+      "accepted": true
+    },
+    {
+      "allocator": "0x899fd",
+      "oldCount": 16383,
+      "requested": 16383,
+      "accepted": true
+    },
+    {
+      "allocator": "0x899fd",
+      "oldCount": 16384,
+      "requested": 16383,
+      "accepted": true
+    },
+    {
+      "allocator": "0x899fd",
+      "oldCount": 2097151,
+      "requested": 16383,
+      "accepted": false
+    },
+    {
+      "allocator": "0x899fd",
+      "oldCount": 2097152,
+      "requested": 16383,
+      "accepted": false
+    },
+    {
+      "allocator": "0x899fd",
+      "oldCount": 2147483647,
+      "requested": 16383,
+      "accepted": false
+    },
+    {
+      "allocator": "0x899fd",
+      "oldCount": 4294967294,
+      "requested": 16383,
+      "accepted": false
+    },
+    {
+      "allocator": "0x899fd",
+      "oldCount": 4294967295,
+      "requested": 16383,
+      "accepted": false
+    },
+    {
+      "allocator": "0x899fd",
+      "oldCount": 0,
+      "requested": 16384,
+      "accepted": true
+    },
+    {
+      "allocator": "0x899fd",
+      "oldCount": 1,
+      "requested": 16384,
+      "accepted": true
+    },
+    {
+      "allocator": "0x899fd",
+      "oldCount": 16383,
+      "requested": 16384,
+      "accepted": true
+    },
+    {
+      "allocator": "0x899fd",
+      "oldCount": 16384,
+      "requested": 16384,
+      "accepted": true
+    },
+    {
+      "allocator": "0x899fd",
+      "oldCount": 2097151,
+      "requested": 16384,
+      "accepted": false
+    },
+    {
+      "allocator": "0x899fd",
+      "oldCount": 2097152,
+      "requested": 16384,
+      "accepted": false
+    },
+    {
+      "allocator": "0x899fd",
+      "oldCount": 2147483647,
+      "requested": 16384,
+      "accepted": false
+    },
+    {
+      "allocator": "0x899fd",
+      "oldCount": 4294967294,
+      "requested": 16384,
+      "accepted": false
+    },
+    {
+      "allocator": "0x899fd",
+      "oldCount": 4294967295,
+      "requested": 16384,
+      "accepted": false
+    },
+    {
+      "allocator": "0x899fd",
+      "oldCount": 0,
+      "requested": 16385,
+      "accepted": true
+    },
+    {
+      "allocator": "0x899fd",
+      "oldCount": 1,
+      "requested": 16385,
+      "accepted": true
+    },
+    {
+      "allocator": "0x899fd",
+      "oldCount": 16383,
+      "requested": 16385,
+      "accepted": true
+    },
+    {
+      "allocator": "0x899fd",
+      "oldCount": 16384,
+      "requested": 16385,
+      "accepted": true
+    },
+    {
+      "allocator": "0x899fd",
+      "oldCount": 2097151,
+      "requested": 16385,
+      "accepted": false
+    },
+    {
+      "allocator": "0x899fd",
+      "oldCount": 2097152,
+      "requested": 16385,
+      "accepted": false
+    },
+    {
+      "allocator": "0x899fd",
+      "oldCount": 2147483647,
+      "requested": 16385,
+      "accepted": false
+    },
+    {
+      "allocator": "0x899fd",
+      "oldCount": 4294967294,
+      "requested": 16385,
+      "accepted": false
+    },
+    {
+      "allocator": "0x899fd",
+      "oldCount": 4294967295,
+      "requested": 16385,
+      "accepted": false
+    },
+    {
+      "allocator": "0x899fd",
+      "oldCount": 0,
+      "requested": 2097152,
+      "accepted": true
+    },
+    {
+      "allocator": "0x899fd",
+      "oldCount": 1,
+      "requested": 2097152,
+      "accepted": false
+    },
+    {
+      "allocator": "0x899fd",
+      "oldCount": 16383,
+      "requested": 2097152,
+      "accepted": false
+    },
+    {
+      "allocator": "0x899fd",
+      "oldCount": 16384,
+      "requested": 2097152,
+      "accepted": false
+    },
+    {
+      "allocator": "0x899fd",
+      "oldCount": 2097151,
+      "requested": 2097152,
+      "accepted": false
+    },
+    {
+      "allocator": "0x899fd",
+      "oldCount": 2097152,
+      "requested": 2097152,
+      "accepted": false
+    },
+    {
+      "allocator": "0x899fd",
+      "oldCount": 2147483647,
+      "requested": 2097152,
+      "accepted": false
+    },
+    {
+      "allocator": "0x899fd",
+      "oldCount": 4294967294,
+      "requested": 2097152,
+      "accepted": false
+    },
+    {
+      "allocator": "0x899fd",
+      "oldCount": 4294967295,
+      "requested": 2097152,
+      "accepted": false
+    },
+    {
+      "allocator": "0x899fd",
+      "oldCount": 0,
+      "requested": 2147483648,
+      "accepted": false
+    },
+    {
+      "allocator": "0x899fd",
+      "oldCount": 1,
+      "requested": 2147483648,
+      "accepted": false
+    },
+    {
+      "allocator": "0x899fd",
+      "oldCount": 16383,
+      "requested": 2147483648,
+      "accepted": false
+    },
+    {
+      "allocator": "0x899fd",
+      "oldCount": 16384,
+      "requested": 2147483648,
+      "accepted": false
+    },
+    {
+      "allocator": "0x899fd",
+      "oldCount": 2097151,
+      "requested": 2147483648,
+      "accepted": false
+    },
+    {
+      "allocator": "0x899fd",
+      "oldCount": 2097152,
+      "requested": 2147483648,
+      "accepted": false
+    },
+    {
+      "allocator": "0x899fd",
+      "oldCount": 2147483647,
+      "requested": 2147483648,
+      "accepted": false
+    },
+    {
+      "allocator": "0x899fd",
+      "oldCount": 4294967294,
+      "requested": 2147483648,
+      "accepted": false
+    },
+    {
+      "allocator": "0x899fd",
+      "oldCount": 4294967295,
+      "requested": 2147483648,
+      "accepted": false
+    },
+    {
+      "allocator": "0x899fd",
+      "oldCount": 0,
+      "requested": 4294967295,
+      "accepted": false
+    },
+    {
+      "allocator": "0x899fd",
+      "oldCount": 1,
+      "requested": 4294967295,
+      "accepted": false
+    },
+    {
+      "allocator": "0x899fd",
+      "oldCount": 16383,
+      "requested": 4294967295,
+      "accepted": false
+    },
+    {
+      "allocator": "0x899fd",
+      "oldCount": 16384,
+      "requested": 4294967295,
+      "accepted": false
+    },
+    {
+      "allocator": "0x899fd",
+      "oldCount": 2097151,
+      "requested": 4294967295,
+      "accepted": false
+    },
+    {
+      "allocator": "0x899fd",
+      "oldCount": 2097152,
+      "requested": 4294967295,
+      "accepted": false
+    },
+    {
+      "allocator": "0x899fd",
+      "oldCount": 2147483647,
+      "requested": 4294967295,
+      "accepted": false
+    },
+    {
+      "allocator": "0x899fd",
+      "oldCount": 4294967294,
+      "requested": 4294967295,
+      "accepted": false
+    },
+    {
+      "allocator": "0x899fd",
+      "oldCount": 4294967295,
+      "requested": 4294967295,
+      "accepted": false
+    }
+  ],
+  "rawDirectBranchCandidates": [
+    {
+      "sourceRva": "0x899ed",
+      "bytes": "7424",
+      "targetRva": "0x89a13"
+    },
+    {
+      "sourceRva": "0x89a14",
+      "bytes": "e200",
+      "targetRva": "0x89a16"
+    },
+    {
+      "sourceRva": "0x23f62f",
+      "bytes": "7f08",
+      "targetRva": "0x23f639"
+    }
+  ],
+  "candidateClassification": "Three candidates are operand bytes in exact original MOV/JA/LEA instructions; no actual incoming direct target found.",
+  "falseCandidateInstructionProofs": [
+    {
+      "sourceRva": "0x899ed",
+      "bytes": "7424",
+      "targetRva": "0x89a13",
+      "instructionRva": "0x899eb",
+      "instructionBytes": "4889742450",
+      "runtimeFragmentStart": "0x899d0"
+    },
+    {
+      "sourceRva": "0x89a14",
+      "bytes": "e200",
+      "targetRva": "0x89a16",
+      "instructionRva": "0x89a12",
+      "instructionBytes": "0f87e2000000",
+      "runtimeFragmentStart": "0x899d0"
+    },
+    {
+      "sourceRva": "0x23f62f",
+      "bytes": "7f08",
+      "targetRva": "0x23f639",
+      "instructionRva": "0x23f62d",
+      "instructionBytes": "4c8d7f08",
+      "runtimeFragmentStart": "0x23f437"
+    }
+  ],
+  "absoluteVa64AndRva32LiteralHits": [],
+  "unwindFragments": [
+    {
+      "guard": "0x23f617",
+      "fragmentStart": "0x23f437",
+      "fragmentEnd": "0x23f876",
+      "unwindRva": "0xbf6f5c"
+    },
+    {
+      "guard": "0x89a0f",
+      "fragmentStart": "0x899d0",
+      "fragmentEnd": "0x89a18",
+      "unwindRva": "0xb978cc"
+    }
+  ],
+  "conclusions": [
+    "All8256 valid first/last page pairs preserve every general register and destination for each guard.",
+    "144 upstream unsigned-count cases accept only oldCount+request<=2097152; 64-bit inclusive-end arithmetic prevents32-bit wrap.",
+    "Both guards perform no memory writes before their continuation; invalid cases trap withUD2 before any pointer/flag indexing.",
+    "Secondary allocator nonzero-count entry makes first<=last mathematically guaranteed after wide addition. Original zero-count early return remains outside edits.",
+    "Existing XADD increments count before guard; rejection is process failfast, not recoverable exhaustion.",
+    "No stack/save instruction position changes, no actual incoming direct branch, and noVA64/RVA32 materialized interior address found."
+  ],
+  "limitations": [
+    "No claim of arbitrary dynamically computed indirect-target completeness.",
+    "This receipt reviews guards and their arithmetic/control-flow, not every payload-size consumer or asynchronous GPU lifetime.",
+    "No game execution or patched-file deployment performed."
+  ]
+}

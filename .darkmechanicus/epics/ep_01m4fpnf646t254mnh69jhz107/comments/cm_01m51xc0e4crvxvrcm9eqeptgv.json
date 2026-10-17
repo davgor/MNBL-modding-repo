@@ -1,0 +1,13 @@
+{
+  "author": {
+    "label": "Claude Code",
+    "role": "orchestrator"
+  },
+  "body": "MMR-64 handoff (periodic coordinates, `docs/periodic-coordinates.md`).\n- **Placement frame.** Production campaign factories emit logical settlement positions with no strip or pole-margin offset. Place every settlement, gate, port and dropoff at `PeriodicWorldCoordinates.ToPhysical(logical)`; the result is canonical physical x in [strip, strip + W).\n- **Where the coordinates come from.** Build the bundle's coordinates with `PeriodicWorldCoordinates.FromSurface(WorldSurface)`; the projection's `periodicLayout` gives the strip and pole margin.\n- **Positions and keys.** Keep every campaign position canonical. Build any position key from the canonical object (`LocationKey`), never from a display copy: single-precision copies can land in the neighbouring 1/1024 quantum.\n- **Nearest-settlement checks.** Use the periodic metric. `SettlementHelper.FindNearestSettlementToPoint` and the distance helpers are now patched; `PeriodicDistanceModel.LowerBound` is a lower bound only.",
+  "createdAt": "2026-10-16T08:31:01.060Z",
+  "epicId": "ep_01m4fpnf646t254mnh69jhz107",
+  "format": "darkmechanicus.comment",
+  "formatVersion": 1,
+  "id": "cm_01m51xc0e4crvxvrcm9eqeptgv",
+  "ticketId": "tk_01m4fqfbgkkntdvg7kaxc9k8yz"
+}

@@ -1,0 +1,766 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "mnbl.travel-graph/1",
+  "title": "MNBL static travel graph",
+  "description": "travel-graph.json written by worldbridge --compile-travel (MMR-28), canonical JSON. Static candidates only: engineValidation stays 'pending' and every transition and host check is pending until MMR-38 builds the faces and runs the checks. Cells are [row, col] of the canonical navigation grid (cells.bin, see grid); points are logical campaign coordinates (projection.json). Repairs and exclusions name stable source UIDs.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "version",
+    "status",
+    "engineValidation",
+    "reasons",
+    "inputs",
+    "grid",
+    "landComponents",
+    "groups",
+    "mainGroup",
+    "basins",
+    "settlements",
+    "positionCollisions",
+    "engine",
+    "roads",
+    "requiredBridges",
+    "transitions",
+    "exclusions",
+    "repairs",
+    "hostChecks"
+  ],
+  "$defs": {
+    "cell": {
+      "type": "array",
+      "prefixItems": [
+        {
+          "type": "integer",
+          "minimum": 0
+        },
+        {
+          "type": "integer",
+          "minimum": 0
+        }
+      ],
+      "minItems": 2,
+      "maxItems": 2
+    },
+    "point": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "x",
+        "y"
+      ],
+      "properties": {
+        "x": {
+          "type": "number"
+        },
+        "y": {
+          "type": "number"
+        }
+      }
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "counts": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "integer",
+        "minimum": 0
+      }
+    },
+    "ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "ints": {
+      "type": "array",
+      "items": {
+        "type": "integer"
+      }
+    }
+  },
+  "properties": {
+    "schema": {
+      "const": "mnbl.travel-graph"
+    },
+    "version": {
+      "const": 1
+    },
+    "status": {
+      "enum": [
+        "ok",
+        "rejected"
+      ]
+    },
+    "engineValidation": {
+      "const": "pending"
+    },
+    "reasons": {
+      "type": "array",
+      "description": "Empty when status is ok. Each code is a quality.* code (worldgen/policies/world-quality.json declares which are retried).",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "code",
+          "message",
+          "uids"
+        ],
+        "properties": {
+          "code": {
+            "type": "string",
+            "pattern": "^quality\\."
+          },
+          "message": {
+            "type": "string"
+          },
+          "uids": {
+            "$ref": "#/$defs/ids"
+          }
+        }
+      }
+    },
+    "inputs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "worldSha256",
+        "sourceIdentity",
+        "projectionSha256",
+        "terrainMasksSha256",
+        "terrainHeightfieldSha256",
+        "idMapSha256",
+        "playabilitySha256",
+        "navalTransitionsSha256",
+        "terrainSide"
+      ],
+      "properties": {
+        "worldSha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "sourceIdentity": {
+          "type": "string"
+        },
+        "projectionSha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "terrainMasksSha256": {
+          "$ref": "#/$defs/sha256",
+          "description": "equals the MMR-26 masks.bin of the same world and policies"
+        },
+        "terrainHeightfieldSha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "idMapSha256": {
+          "$ref": "#/$defs/sha256",
+          "description": "equals the MMR-27 id-map.json"
+        },
+        "playabilitySha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "navalTransitionsSha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "terrainSide": {
+          "type": "integer"
+        }
+      }
+    },
+    "grid": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "cols",
+        "rows",
+        "spacing",
+        "columnOffset",
+        "rowOffset",
+        "coordinates",
+        "compiledClasses",
+        "classes",
+        "openSeaCells",
+        "cellsSha256"
+      ],
+      "properties": {
+        "cols": {
+          "type": "integer",
+          "minimum": 4
+        },
+        "rows": {
+          "type": "integer",
+          "minimum": 2
+        },
+        "spacing": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "columnOffset": {
+          "type": "integer"
+        },
+        "rowOffset": {
+          "type": "integer"
+        },
+        "coordinates": {
+          "type": "string"
+        },
+        "compiledClasses": {
+          "$ref": "#/$defs/counts",
+          "description": "cell classes before repairs (land, mountain, sea, lake, river)"
+        },
+        "classes": {
+          "$ref": "#/$defs/counts",
+          "description": "cell classes after repairs, as cells.bin holds them"
+        },
+        "openSeaCells": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "cellsSha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "landComponents": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "cells",
+          "group",
+          "towns",
+          "villages",
+          "castles"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "cells": {
+            "type": "integer"
+          },
+          "group": {
+            "type": "integer"
+          },
+          "towns": {
+            "$ref": "#/$defs/ids"
+          },
+          "villages": {
+            "$ref": "#/$defs/ids"
+          },
+          "castles": {
+            "$ref": "#/$defs/ids"
+          }
+        }
+      }
+    },
+    "groups": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "lands",
+          "towns",
+          "portBasins",
+          "coastBasins",
+          "reachableFromMain",
+          "returnsToMain",
+          "playerSafe"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "lands": {
+            "$ref": "#/$defs/ints"
+          },
+          "towns": {
+            "type": "integer"
+          },
+          "portBasins": {
+            "$ref": "#/$defs/ints"
+          },
+          "coastBasins": {
+            "$ref": "#/$defs/ints"
+          },
+          "reachableFromMain": {
+            "type": "boolean"
+          },
+          "returnsToMain": {
+            "type": "boolean"
+          },
+          "playerSafe": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "mainGroup": {
+      "type": "integer"
+    },
+    "basins": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "cells",
+          "sea",
+          "lake",
+          "river",
+          "openSea",
+          "open",
+          "ports"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "cells": {
+            "type": "integer"
+          },
+          "sea": {
+            "type": "integer"
+          },
+          "lake": {
+            "type": "integer"
+          },
+          "river": {
+            "type": "integer"
+          },
+          "openSea": {
+            "type": "integer"
+          },
+          "open": {
+            "type": "boolean"
+          },
+          "ports": {
+            "$ref": "#/$defs/ids"
+          }
+        }
+      }
+    },
+    "settlements": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "uid",
+          "kind",
+          "method",
+          "sourcePoint"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "uid": {
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "town",
+              "village",
+              "castle"
+            ]
+          },
+          "method": {
+            "enum": [
+              "direct",
+              "footprint",
+              "snap",
+              "unplaceable"
+            ]
+          },
+          "sourcePoint": {
+            "$ref": "#/$defs/point"
+          },
+          "cell": {
+            "$ref": "#/$defs/cell"
+          },
+          "point": {
+            "$ref": "#/$defs/point",
+            "description": "the source point clamped into the cell, a quarter cell inside its edges"
+          },
+          "shiftCells": {
+            "type": "number"
+          },
+          "land": {
+            "type": "integer"
+          },
+          "group": {
+            "type": "integer"
+          }
+        }
+      }
+    },
+    "positionCollisions": {
+      "type": "array",
+      "description": "settlement ids that share one emitted point (each a distinctPositions host check)",
+      "items": {
+        "$ref": "#/$defs/ids"
+      }
+    },
+    "engine": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "regionSwitchCostLandToSea",
+        "regionSwitchCostSeaToLand",
+        "embarkDisembarkThreshold",
+        "installedPortGateMax",
+        "maxPortGateUnits",
+        "contract"
+      ],
+      "properties": {
+        "regionSwitchCostLandToSea": {
+          "type": "integer"
+        },
+        "regionSwitchCostSeaToLand": {
+          "type": "integer"
+        },
+        "embarkDisembarkThreshold": {
+          "type": "number"
+        },
+        "installedPortGateMax": {
+          "type": "number",
+          "description": "largest gate-to-port distance of the installed War Sails towns"
+        },
+        "maxPortGateUnits": {
+          "type": "number"
+        },
+        "contract": {
+          "type": "string"
+        }
+      }
+    },
+    "roads": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "index",
+          "from",
+          "to",
+          "fromUid",
+          "toUid",
+          "cells",
+          "compiledClasses",
+          "passes",
+          "maxGrade",
+          "polePassages",
+          "sameGroup",
+          "crossings",
+          "producerCrossings",
+          "producerPoleCrossings"
+        ],
+        "properties": {
+          "index": {
+            "type": "integer"
+          },
+          "from": {
+            "type": "string"
+          },
+          "to": {
+            "type": "string"
+          },
+          "fromUid": {
+            "type": "string"
+          },
+          "toUid": {
+            "type": "string"
+          },
+          "cells": {
+            "type": "integer"
+          },
+          "compiledClasses": {
+            "$ref": "#/$defs/counts"
+          },
+          "passes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/cell"
+            }
+          },
+          "maxGrade": {
+            "type": "number"
+          },
+          "polePassages": {
+            "type": "integer"
+          },
+          "sameGroup": {
+            "type": "boolean"
+          },
+          "crossings": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "kind",
+                "cells",
+                "producerReported",
+                "lands",
+                "joins"
+              ],
+              "properties": {
+                "kind": {
+                  "enum": [
+                    "river",
+                    "lake",
+                    "coast",
+                    "blocked"
+                  ]
+                },
+                "cells": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/$defs/cell"
+                  }
+                },
+                "producerReported": {
+                  "type": "boolean"
+                },
+                "lands": {
+                  "$ref": "#/$defs/ints"
+                },
+                "joins": {
+                  "type": "boolean"
+                }
+              }
+            }
+          },
+          "producerCrossings": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "piece",
+                "step",
+                "outcome"
+              ],
+              "properties": {
+                "piece": {
+                  "type": "integer"
+                },
+                "step": {
+                  "type": "integer"
+                },
+                "outcome": {
+                  "enum": [
+                    "matched",
+                    "no_compiled_water"
+                  ]
+                }
+              }
+            }
+          },
+          "producerPoleCrossings": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "producer-reported crossings on a step touching a pole node (no step to rasterize)"
+          }
+        }
+      }
+    },
+    "requiredBridges": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "transitions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "kind",
+          "group",
+          "basin",
+          "landCell",
+          "seaCell",
+          "landPoint",
+          "seaPoint",
+          "coastPairs",
+          "status"
+        ],
+        "properties": {
+          "kind": {
+            "enum": [
+              "port",
+              "coast"
+            ]
+          },
+          "town": {
+            "type": "string"
+          },
+          "group": {
+            "type": "integer"
+          },
+          "basin": {
+            "type": "integer"
+          },
+          "landCell": {
+            "$ref": "#/$defs/cell"
+          },
+          "seaCell": {
+            "$ref": "#/$defs/cell"
+          },
+          "landPoint": {
+            "$ref": "#/$defs/point"
+          },
+          "seaPoint": {
+            "$ref": "#/$defs/point"
+          },
+          "coastPairs": {
+            "type": "integer"
+          },
+          "status": {
+            "const": "pendingEngineValidation"
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "const": "port"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "town"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "exclusions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "uid",
+          "kind",
+          "reason"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "uid": {
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "village",
+              "castle"
+            ]
+          },
+          "reason": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "repairs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "kind",
+          "subject",
+          "detail",
+          "cell",
+          "distanceCells"
+        ],
+        "properties": {
+          "kind": {
+            "enum": [
+              "pass",
+              "access",
+              "footprint",
+              "snap",
+              "harbour_shift"
+            ]
+          },
+          "subject": {
+            "type": "string"
+          },
+          "detail": {
+            "type": "string"
+          },
+          "cell": {
+            "$ref": "#/$defs/cell"
+          },
+          "from": {
+            "$ref": "#/$defs/cell",
+            "description": "where the repair started: the source cell of a snap, the footprint of an access pass, the sea-node cell of a harbour shift"
+          },
+          "distanceCells": {
+            "type": "number"
+          }
+        }
+      }
+    },
+    "hostChecks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "check",
+          "subject",
+          "expected",
+          "status"
+        ],
+        "properties": {
+          "check": {
+            "enum": [
+              "gateFace",
+              "settlementFace",
+              "villageRoute",
+              "portFace",
+              "portGate",
+              "bridge",
+              "pass",
+              "footprint",
+              "landRoute",
+              "seaRoute",
+              "seamTransition",
+              "distinctPositions",
+              "openSea",
+              "islands",
+              "padding"
+            ]
+          },
+          "subject": {
+            "type": "string"
+          },
+          "expected": {
+            "type": "string"
+          },
+          "status": {
+            "const": "pending"
+          }
+        }
+      }
+    }
+  }
+}

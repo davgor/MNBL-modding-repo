@@ -15,6 +15,7 @@ using TaleWorlds.CampaignSystem.Party;
 using TaleWorlds.CampaignSystem.Settlements;
 using TaleWorlds.Library;
 using TaleWorlds.ModuleManager;
+using MNBL.ProceduralWorld.Surface;
 
 namespace MNBL.ProceduralWorld.CampaignBootstrap
 {
@@ -35,8 +36,8 @@ namespace MNBL.ProceduralWorld.CampaignBootstrap
             internal string SceneName;
         }
         // Weak scene keys: no static retention of a previous campaign/map/cache.
-        private static readonly ConditionalWeakTable<DiagnosticMapScene, State> States =
-            new ConditionalWeakTable<DiagnosticMapScene, State>();
+        private static readonly ConditionalWeakTable<GeneratedMapScene, State> States =
+            new ConditionalWeakTable<GeneratedMapScene, State>();
 
         private static void Require(bool value, string message)
         {
@@ -51,24 +52,25 @@ namespace MNBL.ProceduralWorld.CampaignBootstrap
             return f;
         }
         private static FieldInfo MapField(string name, Type type) { return Field(typeof(MapScene), name, type); }
-        private static string OwnedScene(DiagnosticMapScene map)
+        private static string OwnedScene(GeneratedMapScene map)
         {
             Require(map != null, "map is missing");
             Require(Campaign.Current != null && Object.ReferenceEquals(Campaign.Current.MapSceneWrapper, map),
                 "map is not the active campaign wrapper");
             Require(map.Scene != null, "scene has not been read");
             string name = map.Scene.GetName();
-            DiagnosticMapSceneCreator.ValidateSceneName(name);
-            Require(name.StartsWith("mnbl_generated_", StringComparison.Ordinal), "not a generated bootstrap scene");
+            GeneratedMapSceneCreator.ValidateSceneName(name);
+            // A fixture slot (mnbl_generated_*) or a compiled world's content-addressed scene (MMR-45's activation).
+            Require(name.StartsWith("mnbl_generated_", StringComparison.Ordinal) || SceneNames.IsWorldScene(name), "not a generated bootstrap or world scene");
             string module = (map.Scene.GetModulePath() ?? "").Replace('\\', '/').TrimEnd('/');
-            string expected = System.IO.Path.GetFullPath(ModuleHelper.GetModuleFullPath(DiagnosticMapSceneCreator.ModuleId))
+            string expected = System.IO.Path.GetFullPath(ModuleHelper.GetModuleFullPath(GeneratedMapSceneCreator.ModuleId))
                 .Replace('\\', '/').TrimEnd('/');
-            Require(String.Equals(module, "$BASE/Modules/" + DiagnosticMapSceneCreator.ModuleId, StringComparison.OrdinalIgnoreCase) ||
+            Require(String.Equals(module, "$BASE/Modules/" + GeneratedMapSceneCreator.ModuleId, StringComparison.OrdinalIgnoreCase) ||
                     String.Equals(module, expected, StringComparison.OrdinalIgnoreCase), "scene is not in the owned module: " + module);
             return name;
         }
 
-        public static void PrepareWeather(DiagnosticMapScene map, float extent, GeneratedClimate climate,
+        public static void PrepareWeather(GeneratedMapScene map, float extent, GeneratedClimate climate,
             Dictionary<string, object> report, Action<string> trace)
         {
             if (report == null || trace == null) throw new ArgumentNullException("report/trace");
@@ -112,6 +114,10 @@ namespace MNBL.ProceduralWorld.CampaignBootstrap
                 Campaign.Current.DefaultWeatherNodeDimension = WeatherDimension;
                 row["snowRainBytes"] = dry.Length; row["windFloats"] = calm.Length;
                 if (climate != null) { row["climatePattern"] = climate.Pattern; row["windSha256"] = climate.WindSha256; row["precipitationSha256"] = climate.PrecipitationSha256; }
+                // MMR-39: managers whose Init ran before the colour-grade patch get the generated grid here (the postfix covers later ones).
+                row["colorGrade"] = !GeneratedColorGrade.Applied ? "unpatched" : GeneratedColorGrade.Neutral ? "neutral" : "generated";
+                row["colorGradeSha256"] = GeneratedColorGrade.GridSha256; row["colorGradeManagers"] = GeneratedColorGrade.Managers(map.Scene).Count;
+                row["colorGradeReplacedAtPrepare"] = GeneratedColorGrade.ReplaceInScene(map.Scene);
                 trace("generated_weather_create_rain_texture_begin:" + name);
                 // Exact public call made by installed MapScene weather initialization.
                 // Do NOT use Texture.CreateFromByteArray/GetPixelData or import a flow map.
@@ -129,13 +135,15 @@ namespace MNBL.ProceduralWorld.CampaignBootstrap
             finally { row["elapsedMilliseconds"] = watch.Elapsed.TotalMilliseconds; }
         }
 
-        public static void RegisterNavigationCaches(DiagnosticMapScene map, string worldId,
+        public static void RegisterNavigationCaches(GeneratedMapScene map, string worldId,
             Dictionary<string, object> report, Action<string> trace)
         {
             if (report == null || trace == null) throw new ArgumentNullException("report/trace");
             string name = OwnedScene(map);
-            DiagnosticMapSceneCreator.ValidateSceneName(worldId);
-            Require(name == "mnbl_generated_" + worldId.Substring("mnbl_".Length), "world/scene identity mismatch");
+            GeneratedMapSceneCreator.ValidateSceneName(worldId);
+            // A fixture slot (mnbl_generated_<seed>) carries the MMR-33 fixture contract below; a compiled world's scene (MMR-45) does not.
+            bool fixture = !SceneNames.IsWorldScene(name);
+            Require(!fixture || name == "mnbl_generated_" + worldId.Substring("mnbl_".Length), "world/scene identity mismatch");
             State state;
             Require(States.TryGetValue(map, out state) && state.WeatherPrepared, "weather must be prepared before AfterLoad");
             Require(state.ThreadId == Thread.CurrentThread.ManagedThreadId && state.SceneName == name,
@@ -147,7 +155,7 @@ namespace MNBL.ProceduralWorld.CampaignBootstrap
                 ["status"] = "validating", ["worldId"] = worldId, ["scene"] = name,
                 ["threadId"] = state.ThreadId, ["caches"] = rows,
                 ["serialized"] = false, ["deserialized"] = false, ["officialCachesRead"] = false,
-                ["scope"] = "Fresh caches for four generated settlements; native queries run synchronously. Not generated-route gameplay acceptance."
+                ["scope"] = "The world's caches for its generated settlements (MMR-41: reused from their published copy under the same key, else generated and published); native queries run synchronously."
             };
             report["generatedNavigationCaches"] = row;
             var watch = Stopwatch.StartNew();
@@ -175,52 +183,65 @@ namespace MNBL.ProceduralWorld.CampaignBootstrap
                     typeof(Dictionary<MobileParty.NavigationType, MapDistanceModel.INavigationCache>));
                 var cacheDictionary = (IDictionary)cacheField.GetValue(distance);
                 Require(cacheDictionary != null && cacheDictionary.Count == 0, "distance model already has caches; refusing to replace retained world state");
-                var settlements = Settlement.All.OrderBy(s => s.StringId, StringComparer.Ordinal).ToArray();
-                string[] expected = { worldId+"_town_1", worldId+"_town_2", worldId+"_village_1", worldId+"_village_2" };
-                Require(settlements.Length == 4 && settlements.Select(s => s.StringId).SequenceEqual(expected),
-                        "Settlement.All must contain exactly the four expected generated IDs");
+                // The retirement retreat (an MMR-34 world alias) is checked by the startup audit, not as a placed settlement.
+                var settlements = Settlement.All.Where(s => s.StringId != "retirement_retreat").OrderBy(s => s.StringId, StringComparer.Ordinal).ToArray();
+                // The four generated settlements, plus (MMR-33 settlement fixtures, all three or none) the first world's castle, its
+                // village and a hideout.
+                var expectedIds = new List<string> { worldId+"_town_1", worldId+"_town_2", worldId+"_village_1", worldId+"_village_2" };
+                bool fixtures = settlements.Any(s => s.StringId == worldId+"_castle_1");
+                if (fixtures) expectedIds.AddRange(new[] { worldId+"_castle_1", worldId+"_village_3", worldId+"_hideout_1" });
+                // MMR-34 startup fixtures: a hideout of each other bandit culture.
+                if (settlements.Any(s => s.StringId == worldId+"_hideout_2")) expectedIds.AddRange(new[] { worldId+"_hideout_2", worldId+"_hideout_3", worldId+"_hideout_4", worldId+"_hideout_5" });
+                string[] expected = expectedIds.OrderBy(x => x, StringComparer.Ordinal).ToArray();
+                Require(!fixture || settlements.Select(s => s.StringId).SequenceEqual(expected),
+                        "Settlement.All must contain exactly the expected generated IDs (four, or seven with the settlement fixtures)");
                 var placementRows = new List<Dictionary<string, object>>();
                 row["settlements"] = placementRows;
                 for (int i=0; i<settlements.Length; ++i)
                 {
-                    var s = settlements[i]; bool town = i < 2;
-                    Require(town ? s.IsTown && s.HasPort : s.IsVillage && !s.HasPort, "settlement type/port contract changed: " + s.StringId);
-                    if (!town) Require(s.Village.Bound != null && s.Village.Bound.StringId == worldId+"_town_"+(i-1), "village binding mismatch");
+                    var s = settlements[i];
+                    string id = s.StringId.StartsWith(worldId + "_", StringComparison.Ordinal) ? s.StringId.Substring(worldId.Length + 1) : s.StringId;
+                    string kind = s.IsTown ? "town" : s.IsCastle ? "castle" : s.IsHideout ? "hideout" : "village";
+                    bool town = s.IsTown;
+                    if (fixture)
+                    {
+                        if (kind == "town") Require(id.StartsWith("town_", StringComparison.Ordinal) && s.HasPort, "settlement type/port contract changed: " + s.StringId);
+                        else if (kind == "castle") Require(id.StartsWith("castle_", StringComparison.Ordinal) && !s.HasPort, "castle fixture contract changed: " + s.StringId);
+                        else if (kind == "hideout") Require(id.StartsWith("hideout_", StringComparison.Ordinal) && !s.HasPort, "hideout fixture contract changed: " + s.StringId);
+                        else
+                        {
+                            // MMR-42: a harbour village (its scene places a main_map_village_dropoff for it, MMR-40) is built with its port.
+                            Require(id.StartsWith("village_", StringComparison.Ordinal) && (!s.HasPort || HasDropOff(map, s.StringId)), "settlement type/port contract changed: " + s.StringId);
+                            string bound = id == "village_3" ? worldId+"_castle_1" : worldId+"_town_"+id.Substring("village_".Length);
+                            Require(s.Village.Bound != null && s.Village.Bound.StringId == bound, "village binding mismatch");
+                        }
+                    }
                     ValidatePoint(s.Position, state.Extent, "settlement " + s.StringId);
                     ValidatePoint(s.GatePosition, state.Extent, "gate " + s.StringId);
                     var placement = new Dictionary<string, object> {
-                        ["id"] = s.StringId, ["kind"] = town ? "town" : "village",
+                        ["id"] = s.StringId, ["kind"] = kind,
                         ["position"] = new[] { s.Position.X, s.Position.Y },
                         ["gate"] = new[] { s.GatePosition.X, s.GatePosition.Y }, ["hasPort"] = s.HasPort
                     };
                     placementRows.Add(placement);
-                    if (town)
+                    if (town && s.HasPort)
                     {
                         ValidatePoint(s.PortPosition, state.Extent, "port " + s.StringId);
                         Require(s.PortPosition.X != s.GatePosition.X || s.PortPosition.Y != s.GatePosition.Y, "port equals land gate");
                         placement["port"] = new[] { s.PortPosition.X, s.PortPosition.Y };
                     }
                 }
-                foreach (var type in new[] { MobileParty.NavigationType.Default, MobileParty.NavigationType.Naval, MobileParty.NavigationType.All })
-                {
-                    var step = new Dictionary<string, object> { ["navigationType"] = type.ToString(), ["status"] = "constructing" };
-                    rows.Add(step);
-                    trace("generated_navigation_construct:" + worldId + ":" + type);
-                    var cache = new SandBoxNavigationCache(type);
-                    var timer = Stopwatch.StartNew();
-                    step["status"] = "generating";
-                    trace("generated_navigation_generate_begin:" + worldId + ":" + type);
-                    cache.GenerateCacheData();
-                    step["generationMilliseconds"] = timer.Elapsed.TotalMilliseconds;
-                    step["status"] = "registering";
-                    trace("generated_navigation_register_begin:" + worldId + ":" + type);
-                    timer.Restart();
-                    distance.RegisterDistanceCache(type, cache); // includes FinalizeInitialization
-                    step["registrationMilliseconds"] = timer.Elapsed.TotalMilliseconds;
-                    Require(Object.ReferenceEquals(cacheDictionary[type], cache), "registered cache identity mismatch");
-                    step["status"] = "registered";
-                    trace("generated_navigation_registered:" + worldId + ":" + type);
-                }
+                // MMR-41: the world's caches are read back from their published copy when the key matches, else generated and published
+                // (WorldNavigationCache). options: the probe's ("navigationCacheOptions": verify, fault).
+                // War Sails sets harbour villages' ports from the scene's drop-off entities when its map scene wrapper starts, after AfterLoad
+                // (NavalMapSceneWrapper.InitializeDropOffLocations: each main_map_village_dropoff entity's parent names its village; the port is
+                // the entity's global position, at sea). The same ports are set here first, so the caches and their key hold them.
+                row["dropOffPorts"] = ApplyDropOffPorts(map);
+                object options; report.TryGetValue("navigationCacheOptions", out options);
+                var cache = WorldNavigationCache.Acquire(map, name, worldId, distance, cacheDictionary, trace, options as IDictionary<string, object>);
+                row["navigationCache"] = cache;
+                foreach (var step in (List<Dictionary<string, object>>)cache["caches"]) rows.Add(step);
+                row["serialized"] = cache.ContainsKey("published"); row["deserialized"] = (string)cache["status"] == "reused";
                 Require(cacheDictionary.Count == 3, "unexpected cache count after registration");
                 row["status"] = "registered";
             }
@@ -231,6 +252,45 @@ namespace MNBL.ProceduralWorld.CampaignBootstrap
                 throw;
             }
             finally { row["elapsedMilliseconds"] = watch.Elapsed.TotalMilliseconds; }
+        }
+
+        // Whether the scene places a drop-off entity for this village (parent named by the village, else the entity named <village>_dropoff).
+        private static bool HasDropOff(GeneratedMapScene map, string village)
+        {
+            foreach (var entity in map.Scene.FindEntitiesWithTag("main_map_village_dropoff"))
+            {
+                var parent = entity.Parent;
+                if ((parent != null && parent.Name == village) || entity.Name == village + "_dropoff") return true;
+            }
+            return false;
+        }
+
+        private static List<Dictionary<string, object>> ApplyDropOffPorts(GeneratedMapScene map)
+        {
+            var rows = new List<Dictionary<string, object>>();
+            foreach (var entity in map.Scene.FindEntitiesWithTag("main_map_village_dropoff"))
+            {
+                // War Sails matches the entity's parent name against Village.All, which is still empty at AfterLoad (runs 17060, 17064); the same
+                // village is the settlement of that name (Settlement.All is populated), else the factory's child name (<village id>_dropoff). The
+                // campaign-start key check confirms the result.
+                var parent = entity.Parent;
+                string parentName = parent == null ? null : parent.Name;
+                Func<string, Settlement> village = id => { var s = id == null ? null : Settlement.Find(id); return s != null && s.IsVillage ? s : null; };
+                var settlement = village(parentName);
+                string matchedBy = settlement != null ? "parent" : null;
+                if (settlement == null && entity.Name != null && entity.Name.EndsWith("_dropoff", StringComparison.Ordinal))
+                {
+                    settlement = village(entity.Name.Substring(0, entity.Name.Length - "_dropoff".Length));
+                    if (settlement != null) matchedBy = "entity name";
+                }
+                var row = new Dictionary<string, object> { ["entity"] = entity.Name, ["parent"] = parentName, ["village"] = settlement == null ? null : settlement.StringId, ["matchedBy"] = matchedBy };
+                rows.Add(row);
+                if (settlement == null) continue;
+                var at = entity.GlobalPosition.AsVec2;
+                settlement.SetPortPosition(new CampaignVec2(at, false));
+                row["port"] = new[] { at.X, at.Y };
+            }
+            return rows;
         }
 
         private static void ValidatePoint(CampaignVec2 point, float extent, string label)

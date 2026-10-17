@@ -1,0 +1,13 @@
+{
+  "author": {
+    "label": "Claude Code",
+    "role": "orchestrator"
+  },
+  "body": "**MMR-40 handoff (naval).**\n\n1. **Blockade arcs.** An arc is accepted only when every ship `BlockadePositionScript.GetBlockadeArc` computes for `MaximumNumberOfShips` (randomization off, as authored) is water of the port's basin. Verified:\n   - in game: 10 of 10 ships over water faces per port town (generated_campaign 17864); 300 and 250 replayed ships over sea faces on worlds A and B (world_surface 29316);\n   - offline: an independent single-precision replay of the IL.\n\n   A blockade in progress was not run.\n2. **Pirate spawn points are not placed.** MMR-40 placed settlement entities only. The generated scene still has no `PirateSpawnPoint` entities, so `PiratesCampaignBehavior` has 0 patrol zones. `docs/naval-content.md`, `docs/water-climate.md` and `docs/campaign-behavior-compatibility.md` previously said MMR-40 would place them; they now hand it here. If another ticket should own the entity placement, that is the planner's call.\n3. **Ports.** War Sails took the harbour village's drop-off as its port, and towns their `main_map_city_port` children. `SetSailAtPosition` from them was not exercised.",
+  "createdAt": "2026-10-16T23:00:58.396Z",
+  "epicId": "ep_01m4fpnf646t254mnh69jhz107",
+  "format": "darkmechanicus.comment",
+  "formatVersion": 1,
+  "id": "cm_01m53f4ycwbhqmx7y63c1mf3qg",
+  "ticketId": "tk_01m4fqfbgm6fz7za27erzb4tzv"
+}

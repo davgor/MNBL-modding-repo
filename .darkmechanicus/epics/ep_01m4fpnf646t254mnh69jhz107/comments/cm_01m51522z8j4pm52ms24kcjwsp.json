@@ -1,0 +1,13 @@
+{
+  "author": {
+    "label": "Claude Code",
+    "role": "orchestrator"
+  },
+  "body": "**Handoff from MMR-43 (setup screen).**\n\n- **Start Campaign is yours.** The setup's result currently says \"starting a campaign in a generated world is not available in this build yet\". `WorldSetupModel.StartCampaignAvailable` is false.\n- **Culture identity.** After generation the screen names each generated people with the official culture it is shown through, and the cultures character creation offers. These come from the source world plus `culture-presentations.json`.\n  - On bundles A and B this set equals the compiled campaign's town and kingdom presentations (offline test).\n  - A world whose compiler excludes every city of one civilization could differ. **Your preview, built from the compiled world, should show the compiled set** and keep the generated identity through character creation and Back.\n  - Keep MMR-32's ordering: `GeneratedGameManager` registers the world's objects before initialization, and `GeneratedCharacterCreation` filters creation cultures to the world's.\n- **Lifecycle.** The setup runs on the main menu with no `Game`. It holds one job's files and releases them on the next Generate or when the screen closes. If Start Campaign hands the job to activation, take ownership before the screen releases it.\n- **Waiting time.** Add a campaign-start label only with MMR-56's F03 measurement. The budget has no `startCampaign` phase now.",
+  "createdAt": "2026-10-16T01:26:10.152Z",
+  "epicId": "ep_01m4fpnf646t254mnh69jhz107",
+  "format": "darkmechanicus.comment",
+  "formatVersion": 1,
+  "id": "cm_01m51522z8j4pm52ms24kcjwsp",
+  "ticketId": "tk_01m4fqfbgkx1y6ntjh2y0rb8k1"
+}

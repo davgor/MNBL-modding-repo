@@ -1,0 +1,61 @@
+{
+  "schema": "mnbl.periodic-coordinates-policy",
+  "version": "mmr64/1",
+  "distanceVersion": "mmr64/1",
+  "owner": "MMR-64",
+  "code": [
+    "src/MNBL.ProceduralWorld/World/PeriodicWorldCoordinates.cs",
+    "src/MNBL.ProceduralWorld/World/PeriodicDistanceModel.cs"
+  ],
+  "axis": "x",
+  "frames": {
+    "physical": "native scene XY; terrain [0, extent]^2",
+    "logical": "campaign XY without strips: x in [0, W) periodic with period W, y in [0, H]; 0 is the north pole line, H the south pole line",
+    "fromPhysical": "logical = (canonicalX(physical.x) - originX, physical.y - originY); originX = strip, originY = poleMargin",
+    "canonicalPhysicalX": "[originX, originX + W); a value within rounding of originX + W returns originX"
+  },
+  "tieRule": {
+    "name": "east",
+    "deltaX": "the signed shortest difference b - a lies in (-W/2, W/2]; an exact half-width difference resolves east (+)",
+    "images": "a location's copies are canonical + k*W, k in {0, +1, -1}, inside [0, extent]",
+    "paths": "PeriodicDistanceModel.ShortestOverImages: the cheapest native path over the placements; within 1e-3 the earlier placement wins, so the answer does not depend on which copy the caller passed. The navigation validator tries the same placements in the same order and keeps the shortest found path (MMR-38's rule)",
+    "consumers": "runtime consumers use these rules: PeriodicWorld, PeriodicPatches, PeriodicSeam (through PeriodicWorld), GeneratedMapScene, NavigationPlan, GeneratedBattleTerrain. Two data generators (SettlementFactory.Dist, GeneratedSpawnModel.CellMap.Distance) compute their own unsigned wrapped magnitude min(|dx|, W - |dx|) for logical cells in [0, W), which equals |DeltaX| there and has no tie; they are left unchanged so generated data stays byte-identical. The C++ projection's wrap_delta rounds half away from zero; it differs only at |dx| = W/2, which its only caller (path splitting of graph edges, at most W/(gridSide-1) long) never reaches",
+    "placements": "a path query to a target tries three displacements D: DeltaX, then DeltaX + W and DeltaX - W by |D|, ties east (positive) first; each is placed inside the terrain with the target's copy at start + D, or, when that copy lies outside, the start moved by the fewest whole widths. Every |D| < W is representable in a terrain of 2W with strips of W/2, so a route the long way around is never dropped; a route whose path leaves the terrain cannot be represented"
+  },
+  "metric": {
+    "name": "planar-equirectangular",
+    "rule": "straight-line distances in the logical frame with x periodic; movement costs are the engine's path costs on the campaign navmesh over periodic images",
+    "lowerBound": "the wrapped geometric distance bounds a path cost from below; it prunes and orders, and is never reused as a cost or a reachability answer",
+    "partyLegs": "the installed distance models' straight party legs (CampaignVec2.Distance) become the wrapped geometric distance: the installed semantics (a straight leg), made periodic"
+  },
+  "distortion": {
+    "eastWest": "map / sphere east-west scale = 1/cos(latitude)",
+    "at30deg": 1.155,
+    "at60deg": 2.0,
+    "at80deg": 5.759,
+    "poleLine": "unbounded (one source node replicated across the row)",
+    "northSouth": "true scale along meridians",
+    "decision": "accepted: no geographic movement metric. East-west travel near the poles costs up to 1/cos(latitude) more map distance than on the sphere; the pole bands are ocean or padding in generated worlds, the projection already records the distortion (projection.json horizontal.eastWestDistortion), and the runtime proof (MMR-63 run 12348) moved, routed and fought on the planar metric. A world that needs polar land travel needs another projection, not a runtime metric.",
+    "runtimeProof": "evidence/runtime/world-wrap-probe.json (MMR-63, run 12348); evidence/runtime/periodic-coordinates.json (MMR-64)"
+  },
+  "poles": {
+    "rule": "logical y <= 0 is the north pole line and y >= H the south one (padding beyond repeats them); every x on a pole line is one location",
+    "aliases": "the source's single pole node replicated across its row: location keys and source uids drop x on a pole line ('N', 'S')",
+    "connectivity": "north and south are never connected; no artificial north/south portal; full source coverage, no regional crop"
+  },
+  "identity": {
+    "displayCopies": "a display copy is the canonical location shifted by a whole number of widths; it has no gameplay identity: campaign objects are canonical and keep their ids",
+    "locationKey": "canonical logical x and y quantized at 1/1024 (x modulo the period); 'N' / 'S' on the pole lines. Keys are built from canonical campaign state (an object's own position), never from a display point: copies computed in double give the same key, a copy rounded to single precision can fall in the neighbouring quantum (measured offline: evidence/runtime/periodic-coordinates-tests.json singlePrecisionCopyKeyDisagreement)",
+    "sourceUid": "the nearest source grid node: 'r<row>c<column>' with the column modulo gridSide - 1; 'N' / 'S' for the pole nodes",
+    "cacheKey": "<version>|<identity prefix>|<capability>|<from key><L|S>><to key><L|S>; directed, never reordered (land to sea is not sea to land). The installed settlement cache itself stores one value per unordered pair (NavigationCacheElement.Sort): its distances are symmetric, and direction enters through War Sails' transition adjustment and the region switch costs of path queries",
+    "facePointers": "native face pointers and face indices are session-local and never part of a key"
+  },
+  "participation": {
+    "policyIdentity": "FrameIdentity = SHA-256 of FrameText (coordinate version, tie rule, canonical range, poles, quantum, layout); Identity = SHA-256 of PolicyText (FrameText plus the metric, the distance version and the placement rule)",
+    "saveHeader": "WorldIdentity 'coordinatePolicy' = FrameIdentity (or 'none'): a save is refused only when its coordinates would mean something else, never for a distance-model change; RequireMatch refuses a periodic save made under another frame or none, and a header that disagrees with the package on periodicity. Build and RequireMatch read the coordinates through one factory (PeriodicWorld.FromPlacement)",
+    "navigationReport": "'coordinatePolicyVersion' and 'coordinatePolicy' (Identity); NavigationGate refuses a report made under another policy version",
+    "generationJob": "the job record's 'coordinatePolicy' (Identity) and 'coordinatePolicyVersion' artifacts",
+    "battleTerrainMap": "the periodic block rule records Identity",
+    "patches": "PeriodicPatches applies all or nothing; DiagnosticSandboxBootstrap preflights the whole set before a periodic campaign starts; a world whose Load-time Apply still fails is frozen (PeriodicSeamBehavior locks campaign time)"
+  }
+}

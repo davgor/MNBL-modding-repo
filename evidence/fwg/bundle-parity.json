@@ -1,0 +1,683 @@
+{
+  "schema": "mnbl.evidence.bundle-parity",
+  "version": 1,
+  "ticket": "MMR-29",
+  "generatedUtc": "2026-10-15T06:24:26Z",
+  "baseline": {
+    "worldContentId": "d5ac827d5b8b3b02533770ef6a8b9ce395a67f8e92bea32f8f30fc65f144c44f"
+  },
+  "validators": [
+    "worldbridge --inspect-bundle",
+    "WorldDataBundleTests.exe --verify",
+    "summarize_bundle.verify_bundle"
+  ],
+  "variants": [
+    {
+      "variant": "baseline",
+      "expected": "valid",
+      "agree": true,
+      "verdicts": {
+        "worldbridge": {
+          "verdict": "valid",
+          "firstProblem": null
+        },
+        "csharp": {
+          "verdict": "valid",
+          "firstProblem": null
+        },
+        "python": {
+          "verdict": "valid",
+          "firstProblem": null
+        }
+      }
+    },
+    {
+      "variant": "a trailing separator",
+      "expected": "valid",
+      "agree": true,
+      "verdicts": {
+        "worldbridge": {
+          "verdict": "valid",
+          "firstProblem": null
+        },
+        "csharp": {
+          "verdict": "valid",
+          "firstProblem": null
+        },
+        "python": {
+          "verdict": "valid",
+          "firstProblem": null
+        }
+      }
+    },
+    {
+      "variant": "a pretty-printed manifest (resealed)",
+      "expected": "valid",
+      "agree": true,
+      "verdicts": {
+        "worldbridge": {
+          "verdict": "valid",
+          "firstProblem": null
+        },
+        "csharp": {
+          "verdict": "valid",
+          "firstProblem": null
+        },
+        "python": {
+          "verdict": "valid",
+          "firstProblem": null
+        }
+      }
+    },
+    {
+      "variant": "a missing file",
+      "expected": "invalid",
+      "agree": true,
+      "verdicts": {
+        "worldbridge": {
+          "verdict": "invalid",
+          "firstProblem": "missing file source/world.json"
+        },
+        "csharp": {
+          "verdict": "invalid",
+          "firstProblem": "missing file source/world.json"
+        },
+        "python": {
+          "verdict": "invalid",
+          "firstProblem": "missing file source/world.json"
+        }
+      }
+    },
+    {
+      "variant": "an extra file",
+      "expected": "invalid",
+      "agree": true,
+      "verdicts": {
+        "worldbridge": {
+          "verdict": "invalid",
+          "firstProblem": "unlisted file compiled/extra.bin"
+        },
+        "csharp": {
+          "verdict": "invalid",
+          "firstProblem": "unlisted file compiled/extra.bin"
+        },
+        "python": {
+          "verdict": "invalid",
+          "firstProblem": "unlisted file compiled/extra.bin"
+        }
+      }
+    },
+    {
+      "variant": "an edited file",
+      "expected": "invalid",
+      "agree": true,
+      "verdicts": {
+        "worldbridge": {
+          "verdict": "invalid",
+          "firstProblem": "hash differs: compiled/terrain/heightfield.bin"
+        },
+        "csharp": {
+          "verdict": "invalid",
+          "firstProblem": "hash differs: compiled/terrain/heightfield.bin"
+        },
+        "python": {
+          "verdict": "invalid",
+          "firstProblem": "hash differs: compiled/terrain/heightfield.bin"
+        }
+      }
+    },
+    {
+      "variant": "a resized file",
+      "expected": "invalid",
+      "agree": true,
+      "verdicts": {
+        "worldbridge": {
+          "verdict": "invalid",
+          "firstProblem": "size differs: compiled/terrain/heightfield.bin"
+        },
+        "csharp": {
+          "verdict": "invalid",
+          "firstProblem": "size differs: compiled/terrain/heightfield.bin"
+        },
+        "python": {
+          "verdict": "invalid",
+          "firstProblem": "size differs: compiled/terrain/heightfield.bin"
+        }
+      }
+    },
+    {
+      "variant": "an unsealed bundle",
+      "expected": "invalid",
+      "agree": true,
+      "verdicts": {
+        "worldbridge": {
+          "verdict": "invalid",
+          "firstProblem": "DATA_READY is missing: the bundle was never sealed"
+        },
+        "csharp": {
+          "verdict": "invalid",
+          "firstProblem": "DATA_READY is missing: the bundle was never sealed"
+        },
+        "python": {
+          "verdict": "invalid",
+          "firstProblem": "DATA_READY is missing: the bundle was never sealed"
+        }
+      }
+    },
+    {
+      "variant": "an edited manifest not resealed",
+      "expected": "invalid",
+      "agree": true,
+      "verdicts": {
+        "worldbridge": {
+          "verdict": "invalid",
+          "firstProblem": "DATA_READY names a different manifest"
+        },
+        "csharp": {
+          "verdict": "invalid",
+          "firstProblem": "DATA_READY names a different manifest"
+        },
+        "python": {
+          "verdict": "invalid",
+          "firstProblem": "DATA_READY names a different manifest"
+        }
+      }
+    },
+    {
+      "variant": "an empty DATA_READY",
+      "expected": "invalid",
+      "agree": true,
+      "verdicts": {
+        "worldbridge": {
+          "verdict": "invalid",
+          "firstProblem": "DATA_READY is not valid JSON: truncated_json: Unexpected end of JSON"
+        },
+        "csharp": {
+          "verdict": "invalid",
+          "firstProblem": "InvalidDataException: Unexpected end of JSON."
+        },
+        "python": {
+          "verdict": "invalid",
+          "firstProblem": "JSONDecodeError: Expecting value: line 1 column 1 (char 0)"
+        }
+      }
+    },
+    {
+      "variant": "a manifest that is not an object",
+      "expected": "invalid",
+      "agree": true,
+      "verdicts": {
+        "worldbridge": {
+          "verdict": "invalid",
+          "firstProblem": "manifest is not mnbl.world-bundle version 1"
+        },
+        "csharp": {
+          "verdict": "invalid",
+          "firstProblem": "InvalidDataException: Expected a JSON object."
+        },
+        "python": {
+          "verdict": "invalid",
+          "firstProblem": "manifest is not an object"
+        }
+      }
+    },
+    {
+      "variant": "an activation receipt inside",
+      "expected": "invalid",
+      "agree": true,
+      "verdicts": {
+        "worldbridge": {
+          "verdict": "invalid",
+          "firstProblem": "unlisted file activation-receipt.json (activation receipts never live in a bundle)"
+        },
+        "csharp": {
+          "verdict": "invalid",
+          "firstProblem": "unlisted file activation-receipt.json (activation receipts never live in a bundle)"
+        },
+        "python": {
+          "verdict": "invalid",
+          "firstProblem": "unlisted file activation-receipt.json (activation receipts never live in a bundle)"
+        }
+      }
+    },
+    {
+      "variant": "wrong totals (resealed)",
+      "expected": "invalid",
+      "agree": true,
+      "verdicts": {
+        "worldbridge": {
+          "verdict": "invalid",
+          "firstProblem": "manifest totals do not match the inventory"
+        },
+        "csharp": {
+          "verdict": "invalid",
+          "firstProblem": "manifest totals do not match the inventory"
+        },
+        "python": {
+          "verdict": "invalid",
+          "firstProblem": "manifest totals do not match the inventory"
+        }
+      }
+    },
+    {
+      "variant": "an unsorted inventory (resealed)",
+      "expected": "invalid",
+      "agree": true,
+      "verdicts": {
+        "worldbridge": {
+          "verdict": "invalid",
+          "firstProblem": "inventory is not sorted and unique at compiled/campaign/campaign.json"
+        },
+        "csharp": {
+          "verdict": "invalid",
+          "firstProblem": "inventory is not sorted and unique at compiled/campaign/campaign.json"
+        },
+        "python": {
+          "verdict": "invalid",
+          "firstProblem": "inventory is not sorted and unique at compiled/campaign/campaign.json"
+        }
+      }
+    },
+    {
+      "variant": "no policies (resealed)",
+      "expected": "invalid",
+      "agree": true,
+      "verdicts": {
+        "worldbridge": {
+          "verdict": "invalid",
+          "firstProblem": "manifest policies are missing"
+        },
+        "csharp": {
+          "verdict": "invalid",
+          "firstProblem": "manifest policies are missing"
+        },
+        "python": {
+          "verdict": "invalid",
+          "firstProblem": "manifest policies are missing"
+        }
+      }
+    },
+    {
+      "variant": "no validation (resealed)",
+      "expected": "invalid",
+      "agree": true,
+      "verdicts": {
+        "worldbridge": {
+          "verdict": "invalid",
+          "firstProblem": "the static validation did not pass"
+        },
+        "csharp": {
+          "verdict": "invalid",
+          "firstProblem": "the static validation did not pass"
+        },
+        "python": {
+          "verdict": "invalid",
+          "firstProblem": "the static validation did not pass"
+        }
+      }
+    },
+    {
+      "variant": "version as a string (resealed)",
+      "expected": "invalid",
+      "agree": true,
+      "verdicts": {
+        "worldbridge": {
+          "verdict": "invalid",
+          "firstProblem": "manifest is not mnbl.world-bundle version 1"
+        },
+        "csharp": {
+          "verdict": "invalid",
+          "firstProblem": "manifest is not mnbl.world-bundle version 1"
+        },
+        "python": {
+          "verdict": "invalid",
+          "firstProblem": "manifest is not mnbl.world-bundle version 1"
+        }
+      }
+    },
+    {
+      "variant": "bytes as a string (resealed)",
+      "expected": "invalid",
+      "agree": true,
+      "verdicts": {
+        "worldbridge": {
+          "verdict": "invalid",
+          "firstProblem": "an inventory row is malformed"
+        },
+        "csharp": {
+          "verdict": "invalid",
+          "firstProblem": "an inventory row is malformed"
+        },
+        "python": {
+          "verdict": "invalid",
+          "firstProblem": "an inventory row is malformed"
+        }
+      }
+    },
+    {
+      "variant": "bytes with a fraction (resealed)",
+      "expected": "invalid",
+      "agree": true,
+      "verdicts": {
+        "worldbridge": {
+          "verdict": "invalid",
+          "firstProblem": "an inventory row is malformed"
+        },
+        "csharp": {
+          "verdict": "invalid",
+          "firstProblem": "an inventory row is malformed"
+        },
+        "python": {
+          "verdict": "invalid",
+          "firstProblem": "an inventory row is malformed"
+        }
+      }
+    },
+    {
+      "variant": "a case-variant extra row (resealed)",
+      "expected": "invalid",
+      "agree": true,
+      "verdicts": {
+        "worldbridge": {
+          "verdict": "invalid",
+          "firstProblem": "missing file source/World.json"
+        },
+        "csharp": {
+          "verdict": "invalid",
+          "firstProblem": "missing file source/World.json"
+        },
+        "python": {
+          "verdict": "invalid",
+          "firstProblem": "missing file source/World.json"
+        }
+      }
+    },
+    {
+      "variant": "a rejected static validation (resealed)",
+      "expected": "invalid",
+      "agree": true,
+      "verdicts": {
+        "worldbridge": {
+          "verdict": "invalid",
+          "firstProblem": "the static validation did not pass"
+        },
+        "csharp": {
+          "verdict": "invalid",
+          "firstProblem": "the static validation did not pass"
+        },
+        "python": {
+          "verdict": "invalid",
+          "firstProblem": "the static validation did not pass"
+        }
+      }
+    },
+    {
+      "variant": "a report path outside the bundle (resealed)",
+      "expected": "invalid",
+      "agree": true,
+      "verdicts": {
+        "worldbridge": {
+          "verdict": "invalid",
+          "firstProblem": "the validation report does not match its manifest hash"
+        },
+        "csharp": {
+          "verdict": "invalid",
+          "firstProblem": "the validation report does not match its manifest hash"
+        },
+        "python": {
+          "verdict": "invalid",
+          "firstProblem": "the validation report does not match its manifest hash"
+        }
+      }
+    },
+    {
+      "variant": "a repeated key (resealed)",
+      "expected": "invalid",
+      "agree": true,
+      "verdicts": {
+        "worldbridge": {
+          "verdict": "invalid",
+          "firstProblem": "manifest.json is not valid JSON: duplicate_key: Duplicate key"
+        },
+        "csharp": {
+          "verdict": "invalid",
+          "firstProblem": "InvalidDataException: Repeated key 'policies'."
+        },
+        "python": {
+          "verdict": "invalid",
+          "firstProblem": "ValueError: repeated key 'policies'"
+        }
+      }
+    },
+    {
+      "variant": "a single-quoted key (resealed)",
+      "expected": "invalid",
+      "agree": true,
+      "verdicts": {
+        "worldbridge": {
+          "verdict": "invalid",
+          "firstProblem": "manifest.json is not valid JSON: invalid_json: Expected a key after ','"
+        },
+        "csharp": {
+          "verdict": "invalid",
+          "firstProblem": "InvalidDataException: Expected a double-quoted key at offset 2056."
+        },
+        "python": {
+          "verdict": "invalid",
+          "firstProblem": "JSONDecodeError: Expecting property name enclosed in double quotes: line 1 column 2057 (char 2056)"
+        }
+      }
+    },
+    {
+      "variant": "a NaN value (resealed)",
+      "expected": "invalid",
+      "agree": true,
+      "verdicts": {
+        "worldbridge": {
+          "verdict": "invalid",
+          "firstProblem": "manifest.json is not valid JSON: invalid_json: Unexpected character"
+        },
+        "csharp": {
+          "verdict": "invalid",
+          "firstProblem": "InvalidDataException: Invalid JSON value at offset 2890."
+        },
+        "python": {
+          "verdict": "invalid",
+          "firstProblem": "ValueError: not JSON: NaN"
+        }
+      }
+    },
+    {
+      "variant": "a byte-order mark (resealed)",
+      "expected": "invalid",
+      "agree": true,
+      "verdicts": {
+        "worldbridge": {
+          "verdict": "invalid",
+          "firstProblem": "manifest.json is not valid JSON: invalid_json: Unexpected character"
+        },
+        "csharp": {
+          "verdict": "invalid",
+          "firstProblem": "InvalidDataException: Invalid JSON value at offset 0."
+        },
+        "python": {
+          "verdict": "invalid",
+          "firstProblem": "JSONDecodeError: Unexpected UTF-8 BOM (decode using utf-8-sig): line 1 column 1 (char 0)"
+        }
+      }
+    },
+    {
+      "variant": "an inventory path escaping the bundle (resealed)",
+      "expected": "invalid",
+      "agree": true,
+      "verdicts": {
+        "worldbridge": {
+          "verdict": "invalid",
+          "firstProblem": "unsafe inventory path compiled/../x"
+        },
+        "csharp": {
+          "verdict": "invalid",
+          "firstProblem": "unsafe inventory path compiled/../x"
+        },
+        "python": {
+          "verdict": "invalid",
+          "firstProblem": "unsafe inventory path compiled/../x"
+        }
+      }
+    },
+    {
+      "variant": "an inventory path longer than 120 bytes (resealed)",
+      "expected": "invalid",
+      "agree": true,
+      "verdicts": {
+        "worldbridge": {
+          "verdict": "invalid",
+          "firstProblem": "unsafe inventory path compiled/xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+        },
+        "csharp": {
+          "verdict": "invalid",
+          "firstProblem": "unsafe inventory path compiled/xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+        },
+        "python": {
+          "verdict": "invalid",
+          "firstProblem": "unsafe inventory path compiled/xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+        }
+      }
+    },
+    {
+      "variant": "a DOS device name, consistent bundle",
+      "expected": "invalid",
+      "agree": true,
+      "verdicts": {
+        "worldbridge": {
+          "verdict": "invalid",
+          "firstProblem": "unsafe inventory path compiled/con.json"
+        },
+        "csharp": {
+          "verdict": "invalid",
+          "firstProblem": "unsafe inventory path compiled/con.json"
+        },
+        "python": {
+          "verdict": "invalid",
+          "firstProblem": "unsafe inventory path compiled/con.json"
+        }
+      }
+    },
+    {
+      "variant": "a required file missing, consistent bundle",
+      "expected": "invalid",
+      "agree": true,
+      "verdicts": {
+        "worldbridge": {
+          "verdict": "invalid",
+          "firstProblem": "missing required file compiled/travel/cells.bin"
+        },
+        "csharp": {
+          "verdict": "invalid",
+          "firstProblem": "missing required file compiled/travel/cells.bin"
+        },
+        "python": {
+          "verdict": "invalid",
+          "firstProblem": "missing required file compiled/travel/cells.bin"
+        }
+      }
+    },
+    {
+      "variant": "manifest engine differs from compiled/compatibility.json (resealed)",
+      "expected": "invalid",
+      "agree": true,
+      "verdicts": {
+        "worldbridge": {
+          "verdict": "invalid",
+          "firstProblem": "manifest engine or requiredCapabilities differ from compiled/compatibility.json"
+        },
+        "csharp": {
+          "verdict": "invalid",
+          "firstProblem": "manifest engine or requiredCapabilities differ from compiled/compatibility.json"
+        },
+        "python": {
+          "verdict": "invalid",
+          "firstProblem": "manifest engine or requiredCapabilities differ from compiled/compatibility.json"
+        }
+      }
+    },
+    {
+      "variant": "a junction at the top level",
+      "expected": "invalid",
+      "agree": true,
+      "verdicts": {
+        "worldbridge": {
+          "verdict": "invalid",
+          "firstProblem": "linked directory extra"
+        },
+        "csharp": {
+          "verdict": "invalid",
+          "firstProblem": "linked directory extra"
+        },
+        "python": {
+          "verdict": "invalid",
+          "firstProblem": "linked directory extra"
+        }
+      }
+    },
+    {
+      "variant": "a junction inside compiled/",
+      "expected": "invalid",
+      "agree": true,
+      "verdicts": {
+        "worldbridge": {
+          "verdict": "invalid",
+          "firstProblem": "linked directory compiled/linked"
+        },
+        "csharp": {
+          "verdict": "invalid",
+          "firstProblem": "linked directory compiled/linked"
+        },
+        "python": {
+          "verdict": "invalid",
+          "firstProblem": "linked directory compiled/linked"
+        }
+      }
+    },
+    {
+      "variant": "a hard-linked file",
+      "expected": "invalid",
+      "agree": true,
+      "verdicts": {
+        "worldbridge": {
+          "verdict": "invalid",
+          "firstProblem": "hard-linked file policies/playability.json"
+        },
+        "csharp": {
+          "verdict": "invalid",
+          "firstProblem": "hard-linked file policies/playability.json"
+        },
+        "python": {
+          "verdict": "invalid",
+          "firstProblem": "hard-linked file policies/playability.json"
+        }
+      }
+    },
+    {
+      "variant": "another directory name",
+      "expected": "invalid",
+      "agree": true,
+      "verdicts": {
+        "worldbridge": {
+          "verdict": "invalid",
+          "firstProblem": "the directory name is not the worldContentId"
+        },
+        "csharp": {
+          "verdict": "invalid",
+          "firstProblem": "the directory name is not the worldContentId"
+        },
+        "python": {
+          "verdict": "invalid",
+          "firstProblem": "the directory name is not the worldContentId"
+        }
+      }
+    }
+  ],
+  "agreed": 35,
+  "total": 35
+}

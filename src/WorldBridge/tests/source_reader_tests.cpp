@@ -296,6 +296,14 @@ void refusals() {
     refuse("route_with_one_node", [&](const fs::path& d) { replace_after(d / W, "\"roads\"", "\"routes\": []", "\"routes\": [{\"from\": 0, \"to\": 1, \"nodes\": [6]}]"); return any("invalid_record"); });
     refuse("route_without_nodes", [&](const fs::path& d) { replace_after(d / W, "\"roads\"", "\"routes\": []", "\"routes\": [{\"from\": 0, \"to\": 1}]"); return any("missing_field"); });
     refuse("route_node_as_string", [&](const fs::path& d) { replace_after(d / W, "\"roads\"", "\"routes\": []", "\"routes\": [{\"from\": 0, \"to\": 1, \"nodes\": [6, \"7\"]}]"); return any("wrong_type"); });
+    // MMR-28: producer-reported river crossings on roads ([node, node] steps).
+    accept("road_river_crossings", [&](const fs::path& d) {
+        replace_after(d / W, "\"roads\"", "\"routes\": []", "\"routes\": [{\"from\": 0, \"to\": 1, \"nodes\": [6, 7, 8], \"river_crossings\": [[7, 8]]}, {\"from\": 1, \"to\": 0, \"nodes\": [8, 7], \"river_crossings\": []}]");
+    }, [](const SourceWorld& w) {
+        return w.routes.size() == 2 && w.routes[0].river_crossings == std::vector<std::pair<std::int64_t, std::int64_t>>{{7, 8}} && w.routes[1].river_crossings.empty();
+    });
+    refuse("road_river_crossing_with_one_node", [&](const fs::path& d) { replace_after(d / W, "\"roads\"", "\"routes\": []", "\"routes\": [{\"from\": 0, \"to\": 1, \"nodes\": [6, 7], \"river_crossings\": [[7]]}]"); return any("invalid_record"); });
+    refuse("road_river_crossing_with_three_nodes", [&](const fs::path& d) { replace_after(d / W, "\"roads\"", "\"routes\": []", "\"routes\": [{\"from\": 0, \"to\": 1, \"nodes\": [6, 7], \"river_crossings\": [[6, 7, 8]]}]"); return any("limit_exceeded"); });
     refuse("river_segment_with_three_nodes", [&](const fs::path& d) { replace_after(d / W, "\"water\"", "\"nodes\": 25", "\"nodes\": 25, \"river_segments\": [[1, 2, 3]]"); return any("limit_exceeded"); });
     refuse("river_segment_with_one_node", [&](const fs::path& d) { replace_after(d / W, "\"water\"", "\"nodes\": 25", "\"nodes\": 25, \"river_segments\": [[1]]"); return any("invalid_record"); });
     refuse("realm_without_capital", [&](const fs::path& d) { replace_after(d / W, "\"heroes\": {", "\"realms\": []", "\"realms\": [{\"uid\": \"r\", \"name\": \"R\", \"civilization_id\": \"g\", \"culture_id\": \"c\", \"city_uids\": []}]"); return any("missing_field"); });

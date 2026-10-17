@@ -1,0 +1,1108 @@
+{
+ "schema": "mnbl.naval-content",
+ "version": 1,
+ "notes": "MMR-35 generated ports, fleets and naval faction records (docs/naval-content.md). Owner: NavalContentFactory (src/MNBL.ProceduralWorld/Campaign/NavalContentFactory.cs). Every value comes from the installed campaign and the installed War Sails campaign map scene; no Calradia coordinate or settlement id is carried into a generated world. Scene entities (port markers, blockade arcs, village drop-offs, pirate spawn points) are intents for MMR-40, which places the map entities.",
+ "streams": {
+  "rule": "value(stream, version, world prefix, entity, draw) = first 8 bytes of sha256(\"mnbl.naval-stream/1\\n\" + stream + \"\\n\" + version + \"\\n\" + prefix + \"\\n\" + entity + \"\\n\" + draw), big-endian; construction only",
+  "pirates": 1
+ },
+ "water": {
+  "rule": "water cells are the travel cells of class sea, lake or river (cells.bin), joined by shared edges with columns wrapping; a water component takes the MMR-28 basin id of the port and coast transitions on it; a component is open when it holds a sea cell and at least minOpenCells cells (the MMR-28 rule). A sea cell is open sea when every cell within openSeaCells (Chebyshev) is sea",
+  "minOpenCells": 16,
+  "openSeaCells": 4,
+  "playabilitySha256": "67343ec09ad3fee82022f007462b7e295fc72d04b67759c8b5114d713a66efc1"
+ },
+ "shipyards": {
+  "rule": "every port town on an open basin gets building_shipyard (BuildingsCampaignBehavior adds it at game start for IsTown && HasPort anyway, at its start level 1, and CanTownCreateShipFromHull dereferences it); its level follows the installed port towns' shares, assigned in order of the port's harbour quality (the MMR-28 chosen candidate), best first: the top share level 3, then 2, the rest 1. The 3 installed port towns without a shipyard in XML count at level 1, the level the game gives them at start (town_A7, town_S2, town_V7)",
+  "installed": {
+   "1": 19,
+   "2": 1,
+   "3": 9
+  },
+  "shares": {
+   "3": 0.3103,
+   "2": 0.0345,
+   "1": 0.6552
+  },
+  "hullTiers": {
+   "light": 1,
+   "medium": 2,
+   "heavy": 3
+  }
+ },
+ "hulls": {
+  "rule": "a shipyard builds the hulls of its town's culture (CultureObject.AvailableShipHulls) whose tier is at most its level (heavy needs level 3), weighted by production_build_weight (ShipProductionCampaignBehavior.CreateShip); every hull resolves its mission ship and ship slots",
+  "cultures": {
+   "aserai": {
+    "central_light_ship": {
+     "type": "light",
+     "tier": 1,
+     "productionWeight": 2.0,
+     "missionShip": "ship_meditlight",
+     "prefab": "meditlight_ship_nested",
+     "deckNavmesh": "meditlight_ship",
+     "slots": [
+      "hull",
+      "side",
+      "oars",
+      "sail"
+     ],
+     "crew": {
+      "skeletal": 8,
+      "total": 30
+     }
+    },
+    "eastern_heavy_ship": {
+     "type": "heavy",
+     "tier": 3,
+     "productionWeight": 2.0,
+     "missionShip": "ship_lightdromon",
+     "prefab": "lightdromon_ship_nested",
+     "deckNavmesh": "lightdromon_ship_navmesh",
+     "slots": [
+      "fore",
+      "aft",
+      "bow",
+      "hull",
+      "side",
+      "deck",
+      "sail",
+      "roof"
+     ],
+     "crew": {
+      "skeletal": 30,
+      "total": 94
+     }
+    },
+    "aserai_heavy_ship": {
+     "type": "heavy",
+     "tier": 3,
+     "productionWeight": 3.0,
+     "missionShip": "ship_meditheavy",
+     "prefab": "meditheavy_ship_nested",
+     "deckNavmesh": "meditheavy_ship_navmesh",
+     "slots": [
+      "fore",
+      "aft",
+      "bow",
+      "hull",
+      "side",
+      "deck",
+      "sail",
+      "roof"
+     ],
+     "crew": {
+      "skeletal": 36,
+      "total": 112
+     }
+    },
+    "eastern_medium_ship": {
+     "type": "medium",
+     "tier": 2,
+     "productionWeight": 5.0,
+     "missionShip": "ship_meditmedium",
+     "prefab": "meditmedium_ship_nested",
+     "deckNavmesh": "meditmedium_navmesh",
+     "slots": [
+      "aft",
+      "hull",
+      "deck",
+      "oars",
+      "sail",
+      "roof"
+     ],
+     "crew": {
+      "skeletal": 18,
+      "total": 60
+     }
+    },
+    "eastern_trade_ship": {
+     "type": "light",
+     "tier": 1,
+     "productionWeight": 2.0,
+     "missionShip": "ship_dhow",
+     "prefab": "dhow_ship_nested",
+     "deckNavmesh": "dhow_ship_navmesh",
+     "slots": [
+      "hull",
+      "deck",
+      "sail",
+      "oars"
+     ],
+     "crew": {
+      "skeletal": 6,
+      "total": 16
+     }
+    }
+   },
+   "battania": {
+    "western_light_ship": {
+     "type": "light",
+     "tier": 1,
+     "productionWeight": 4.0,
+     "missionShip": "ship_galley",
+     "prefab": "galley_ship_nested",
+     "deckNavmesh": "galley_ship_navmesh",
+     "slots": [
+      "side",
+      "hull",
+      "oars",
+      "sail"
+     ],
+     "crew": {
+      "skeletal": 8,
+      "total": 32
+     }
+    },
+    "western_medium_ship": {
+     "type": "medium",
+     "tier": 2,
+     "productionWeight": 2.0,
+     "missionShip": "ship_cog",
+     "prefab": "cog_ship_nested",
+     "deckNavmesh": "cog_ship_navmesh",
+     "slots": [
+      "aft",
+      "deck",
+      "oars",
+      "sail",
+      "side"
+     ],
+     "crew": {
+      "skeletal": 18,
+      "total": 60
+     }
+    },
+    "battanian_light_ship": {
+     "type": "light",
+     "tier": 1,
+     "productionWeight": 2.0,
+     "missionShip": "ship_catship",
+     "prefab": "catship_ship_nested",
+     "deckNavmesh": "catship_ship_navmesh",
+     "slots": [
+      "deck",
+      "oars",
+      "sail"
+     ],
+     "crew": {
+      "skeletal": 10,
+      "total": 36
+     }
+    },
+    "northern_trade_ship": {
+     "type": "light",
+     "tier": 1,
+     "productionWeight": 2.0,
+     "missionShip": "ship_knarr",
+     "prefab": "knarr_ship_nested",
+     "deckNavmesh": "knarr_ship_navmesh",
+     "slots": [
+      "side",
+      "deck",
+      "oars",
+      "sail"
+     ],
+     "crew": {
+      "skeletal": 6,
+      "total": 18
+     }
+    },
+    "western_trade_ship": {
+     "type": "medium",
+     "tier": 2,
+     "productionWeight": 2.0,
+     "missionShip": "ship_trade_cog",
+     "prefab": "trade_cog_ship_nested",
+     "deckNavmesh": "trade_cog_ship_nested",
+     "slots": [
+      "deck",
+      "oars",
+      "sail"
+     ],
+     "crew": {
+      "skeletal": 8,
+      "total": 30
+     }
+    },
+    "battanian_medium_ship": {
+     "type": "medium",
+     "tier": 2,
+     "productionWeight": 2.0,
+     "missionShip": "ship_catship_medium",
+     "prefab": "catship_medium_ship_nested",
+     "deckNavmesh": "catship_medium_navmesh",
+     "slots": [
+      "deck",
+      "oars",
+      "sail",
+      "side",
+      "medium_fore"
+     ],
+     "crew": {
+      "skeletal": 20,
+      "total": 50
+     }
+    }
+   },
+   "empire": {
+    "empire_heavy_ship": {
+     "type": "heavy",
+     "tier": 3,
+     "productionWeight": 2.0,
+     "missionShip": "ship_dromon",
+     "prefab": "dromon_ship_nested",
+     "deckNavmesh": "dromon_ship_navmesh",
+     "slots": [
+      "fore",
+      "aft",
+      "bow",
+      "hull",
+      "side",
+      "deck",
+      "sail",
+      "roof"
+     ],
+     "crew": {
+      "skeletal": 44,
+      "total": 120
+     }
+    },
+    "empire_medium_ship": {
+     "type": "medium",
+     "tier": 2,
+     "productionWeight": 3.0,
+     "missionShip": "ship_liburna",
+     "prefab": "liburna_ship_nested",
+     "deckNavmesh": "liburna_ship_navmesh",
+     "slots": [
+      "bow",
+      "hull",
+      "side",
+      "deck",
+      "oars",
+      "sail"
+     ],
+     "crew": {
+      "skeletal": 24,
+      "total": 60
+     }
+    },
+    "central_light_ship": {
+     "type": "light",
+     "tier": 1,
+     "productionWeight": 2.0,
+     "missionShip": "ship_meditlight",
+     "prefab": "meditlight_ship_nested",
+     "deckNavmesh": "meditlight_ship",
+     "slots": [
+      "hull",
+      "side",
+      "oars",
+      "sail"
+     ],
+     "crew": {
+      "skeletal": 8,
+      "total": 30
+     }
+    },
+    "eastern_trade_ship": {
+     "type": "light",
+     "tier": 1,
+     "productionWeight": 2.0,
+     "missionShip": "ship_dhow",
+     "prefab": "dhow_ship_nested",
+     "deckNavmesh": "dhow_ship_navmesh",
+     "slots": [
+      "hull",
+      "deck",
+      "sail",
+      "oars"
+     ],
+     "crew": {
+      "skeletal": 6,
+      "total": 16
+     }
+    },
+    "western_light_ship": {
+     "type": "light",
+     "tier": 1,
+     "productionWeight": 4.0,
+     "missionShip": "ship_galley",
+     "prefab": "galley_ship_nested",
+     "deckNavmesh": "galley_ship_navmesh",
+     "slots": [
+      "side",
+      "hull",
+      "oars",
+      "sail"
+     ],
+     "crew": {
+      "skeletal": 8,
+      "total": 32
+     }
+    },
+    "eastern_heavy_ship": {
+     "type": "heavy",
+     "tier": 3,
+     "productionWeight": 2.0,
+     "missionShip": "ship_lightdromon",
+     "prefab": "lightdromon_ship_nested",
+     "deckNavmesh": "lightdromon_ship_navmesh",
+     "slots": [
+      "fore",
+      "aft",
+      "bow",
+      "hull",
+      "side",
+      "deck",
+      "sail",
+      "roof"
+     ],
+     "crew": {
+      "skeletal": 30,
+      "total": 94
+     }
+    },
+    "empire_trade_ship": {
+     "type": "medium",
+     "tier": 2,
+     "productionWeight": 2.0,
+     "missionShip": "ship_corbita",
+     "prefab": "corbita_ship_nested",
+     "deckNavmesh": "corbita_ship_navmesh",
+     "slots": [
+      "deck",
+      "oars",
+      "sail",
+      "hull"
+     ],
+     "crew": {
+      "skeletal": 10,
+      "total": 35
+     }
+    }
+   },
+   "khuzait": {
+    "khuzait_heavy_ship": {
+     "type": "heavy",
+     "tier": 3,
+     "productionWeight": 2.0,
+     "missionShip": "ship_xebec",
+     "prefab": "xebec_ship_nested",
+     "deckNavmesh": "xebec_ship_navmesh",
+     "slots": [
+      "fore",
+      "aft",
+      "hull",
+      "side",
+      "deck",
+      "sail",
+      "roof",
+      "bow"
+     ],
+     "crew": {
+      "skeletal": 32,
+      "total": 100
+     }
+    },
+    "eastern_medium_ship": {
+     "type": "medium",
+     "tier": 2,
+     "productionWeight": 5.0,
+     "missionShip": "ship_meditmedium",
+     "prefab": "meditmedium_ship_nested",
+     "deckNavmesh": "meditmedium_navmesh",
+     "slots": [
+      "aft",
+      "hull",
+      "deck",
+      "oars",
+      "sail",
+      "roof"
+     ],
+     "crew": {
+      "skeletal": 18,
+      "total": 60
+     }
+    },
+    "eastern_heavy_ship": {
+     "type": "heavy",
+     "tier": 3,
+     "productionWeight": 2.0,
+     "missionShip": "ship_lightdromon",
+     "prefab": "lightdromon_ship_nested",
+     "deckNavmesh": "lightdromon_ship_navmesh",
+     "slots": [
+      "fore",
+      "aft",
+      "bow",
+      "hull",
+      "side",
+      "deck",
+      "sail",
+      "roof"
+     ],
+     "crew": {
+      "skeletal": 30,
+      "total": 94
+     }
+    },
+    "central_light_ship": {
+     "type": "light",
+     "tier": 1,
+     "productionWeight": 2.0,
+     "missionShip": "ship_meditlight",
+     "prefab": "meditlight_ship_nested",
+     "deckNavmesh": "meditlight_ship",
+     "slots": [
+      "hull",
+      "side",
+      "oars",
+      "sail"
+     ],
+     "crew": {
+      "skeletal": 8,
+      "total": 30
+     }
+    },
+    "eastern_trade_ship": {
+     "type": "light",
+     "tier": 1,
+     "productionWeight": 2.0,
+     "missionShip": "ship_dhow",
+     "prefab": "dhow_ship_nested",
+     "deckNavmesh": "dhow_ship_navmesh",
+     "slots": [
+      "hull",
+      "deck",
+      "sail",
+      "oars"
+     ],
+     "crew": {
+      "skeletal": 6,
+      "total": 16
+     }
+    }
+   },
+   "nord": {
+    "northern_light_ship": {
+     "type": "light",
+     "tier": 1,
+     "productionWeight": 4.0,
+     "missionShip": "ship_lightlongship",
+     "prefab": "lightlongship_ship_nested",
+     "deckNavmesh": "lightlongship_ship_navmesh",
+     "slots": [
+      "side",
+      "deck",
+      "oars",
+      "sail"
+     ],
+     "crew": {
+      "skeletal": 8,
+      "total": 32
+     }
+    },
+    "northern_medium_ship": {
+     "type": "medium",
+     "tier": 2,
+     "productionWeight": 1.5,
+     "missionShip": "ship_longship",
+     "prefab": "longship_ship_nested",
+     "deckNavmesh": "longship_ship_nested",
+     "slots": [
+      "side",
+      "deck",
+      "oars",
+      "sail"
+     ],
+     "crew": {
+      "skeletal": 22,
+      "total": 54
+     }
+    },
+    "nord_medium_ship": {
+     "type": "heavy",
+     "tier": 3,
+     "productionWeight": 3.0,
+     "missionShip": "ship_drakkar",
+     "prefab": "drakkar_ship_nested",
+     "deckNavmesh": "drakkar_ship_navmesh",
+     "slots": [
+      "side",
+      "deck",
+      "oars",
+      "sail"
+     ],
+     "crew": {
+      "skeletal": 32,
+      "total": 106
+     }
+    },
+    "northern_trade_ship": {
+     "type": "light",
+     "tier": 1,
+     "productionWeight": 2.0,
+     "missionShip": "ship_knarr",
+     "prefab": "knarr_ship_nested",
+     "deckNavmesh": "knarr_ship_navmesh",
+     "slots": [
+      "side",
+      "deck",
+      "oars",
+      "sail"
+     ],
+     "crew": {
+      "skeletal": 6,
+      "total": 18
+     }
+    },
+    "nord_mediumballista_ship": {
+     "type": "medium",
+     "tier": 2,
+     "productionWeight": 1.5,
+     "missionShip": "nord_mediumballista_ship",
+     "prefab": "nordheavy_ship_nested",
+     "deckNavmesh": "nordheavy_ship_navmesh",
+     "slots": [
+      "side",
+      "deck",
+      "oars",
+      "sail",
+      "medium_fore"
+     ],
+     "crew": {
+      "skeletal": 18,
+      "total": 52
+     }
+    }
+   },
+   "sturgia": {
+    "northern_medium_ship": {
+     "type": "medium",
+     "tier": 2,
+     "productionWeight": 1.5,
+     "missionShip": "ship_longship",
+     "prefab": "longship_ship_nested",
+     "deckNavmesh": "longship_ship_nested",
+     "slots": [
+      "side",
+      "deck",
+      "oars",
+      "sail"
+     ],
+     "crew": {
+      "skeletal": 22,
+      "total": 54
+     }
+    },
+    "northern_light_ship": {
+     "type": "light",
+     "tier": 1,
+     "productionWeight": 4.0,
+     "missionShip": "ship_lightlongship",
+     "prefab": "lightlongship_ship_nested",
+     "deckNavmesh": "lightlongship_ship_navmesh",
+     "slots": [
+      "side",
+      "deck",
+      "oars",
+      "sail"
+     ],
+     "crew": {
+      "skeletal": 8,
+      "total": 32
+     }
+    },
+    "sturgia_heavy_ship": {
+     "type": "heavy",
+     "tier": 3,
+     "productionWeight": 3.0,
+     "missionShip": "ship_sturgianheavylongship",
+     "prefab": "sturgian_heavy_longship_nested",
+     "deckNavmesh": "sturgian_heavy_longship_nested",
+     "slots": [
+      "aft",
+      "side",
+      "deck",
+      "oars",
+      "sail",
+      "roof",
+      "bow"
+     ],
+     "crew": {
+      "skeletal": 36,
+      "total": 96
+     }
+    },
+    "northern_trade_ship": {
+     "type": "light",
+     "tier": 1,
+     "productionWeight": 2.0,
+     "missionShip": "ship_knarr",
+     "prefab": "knarr_ship_nested",
+     "deckNavmesh": "knarr_ship_navmesh",
+     "slots": [
+      "side",
+      "deck",
+      "oars",
+      "sail"
+     ],
+     "crew": {
+      "skeletal": 6,
+      "total": 18
+     }
+    },
+    "nord_mediumballista_ship": {
+     "type": "medium",
+     "tier": 2,
+     "productionWeight": 1.5,
+     "missionShip": "nord_mediumballista_ship",
+     "prefab": "nordheavy_ship_nested",
+     "deckNavmesh": "nordheavy_ship_navmesh",
+     "slots": [
+      "side",
+      "deck",
+      "oars",
+      "sail",
+      "medium_fore"
+     ],
+     "crew": {
+      "skeletal": 18,
+      "total": 52
+     }
+    }
+   },
+   "vlandia": {
+    "western_light_ship": {
+     "type": "light",
+     "tier": 1,
+     "productionWeight": 4.0,
+     "missionShip": "ship_galley",
+     "prefab": "galley_ship_nested",
+     "deckNavmesh": "galley_ship_navmesh",
+     "slots": [
+      "side",
+      "hull",
+      "oars",
+      "sail"
+     ],
+     "crew": {
+      "skeletal": 8,
+      "total": 32
+     }
+    },
+    "western_medium_ship": {
+     "type": "medium",
+     "tier": 2,
+     "productionWeight": 2.0,
+     "missionShip": "ship_cog",
+     "prefab": "cog_ship_nested",
+     "deckNavmesh": "cog_ship_navmesh",
+     "slots": [
+      "aft",
+      "deck",
+      "oars",
+      "sail",
+      "side"
+     ],
+     "crew": {
+      "skeletal": 18,
+      "total": 60
+     }
+    },
+    "vlandia_heavy_ship": {
+     "type": "heavy",
+     "tier": 3,
+     "productionWeight": 2.0,
+     "missionShip": "ship_roundship",
+     "prefab": "roundship_nested",
+     "deckNavmesh": "roundship_navmesh",
+     "slots": [
+      "fore",
+      "aft",
+      "hull",
+      "deck",
+      "oars",
+      "sail"
+     ],
+     "crew": {
+      "skeletal": 36,
+      "total": 108
+     }
+    },
+    "western_trade_ship": {
+     "type": "medium",
+     "tier": 2,
+     "productionWeight": 2.0,
+     "missionShip": "ship_trade_cog",
+     "prefab": "trade_cog_ship_nested",
+     "deckNavmesh": "trade_cog_ship_nested",
+     "slots": [
+      "deck",
+      "oars",
+      "sail"
+     ],
+     "crew": {
+      "skeletal": 8,
+      "total": 30
+     }
+    },
+    "battanian_medium_ship": {
+     "type": "medium",
+     "tier": 2,
+     "productionWeight": 2.0,
+     "missionShip": "ship_catship_medium",
+     "prefab": "catship_medium_ship_nested",
+     "deckNavmesh": "catship_medium_navmesh",
+     "slots": [
+      "deck",
+      "oars",
+      "sail",
+      "side",
+      "medium_fore"
+     ],
+     "crew": {
+      "skeletal": 20,
+      "total": 50
+     }
+    }
+   }
+  },
+  "roles": {
+   "aserai": {
+    "fishing_party_template": "fishing_party_template_aserai",
+    "settlement_patrol_template_coastal": "patrol_party_aserai_template_coastal",
+    "shipwright": "shipwright_aserai",
+    "shipyard_worker": "shipyard_worker_aserai",
+    "templateHulls": {
+     "fishing_party_template_aserai": [
+      {
+       "hull": "fishing_ship",
+       "min": 2,
+       "max": 2
+      }
+     ],
+     "patrol_party_aserai_template_coastal": [
+      {
+       "hull": "eastern_medium_ship",
+       "min": 1,
+       "max": 1
+      }
+     ]
+    }
+   },
+   "battania": {
+    "fishing_party_template": "fishing_party_template_battania",
+    "settlement_patrol_template_coastal": "patrol_party_battania_template_coastal",
+    "shipwright": "shipwright_battania",
+    "shipyard_worker": "shipyard_worker_battania",
+    "templateHulls": {
+     "fishing_party_template_battania": [
+      {
+       "hull": "fishing_ship",
+       "min": 2,
+       "max": 2
+      }
+     ],
+     "patrol_party_battania_template_coastal": [
+      {
+       "hull": "western_medium_ship",
+       "min": 1,
+       "max": 1
+      }
+     ]
+    }
+   },
+   "empire": {
+    "fishing_party_template": "fishing_party_template_empire",
+    "settlement_patrol_template_coastal": "patrol_party_empire_template_coastal",
+    "shipwright": "shipwright_empire",
+    "shipyard_worker": "shipyard_worker_empire",
+    "templateHulls": {
+     "fishing_party_template_empire": [
+      {
+       "hull": "fishing_ship",
+       "min": 2,
+       "max": 2
+      }
+     ],
+     "patrol_party_empire_template_coastal": [
+      {
+       "hull": "empire_medium_ship",
+       "min": 1,
+       "max": 1
+      }
+     ]
+    }
+   },
+   "khuzait": {
+    "fishing_party_template": "fishing_party_template_khuzait",
+    "settlement_patrol_template_coastal": "patrol_party_khuzait_template_coastal",
+    "shipwright": "shipwright_khuzait",
+    "shipyard_worker": "shipyard_worker_khuzait",
+    "templateHulls": {
+     "fishing_party_template_khuzait": [
+      {
+       "hull": "fishing_ship",
+       "min": 2,
+       "max": 2
+      }
+     ],
+     "patrol_party_khuzait_template_coastal": [
+      {
+       "hull": "eastern_medium_ship",
+       "min": 1,
+       "max": 1
+      }
+     ]
+    }
+   },
+   "nord": {
+    "fishing_party_template": "fishing_party_template_nord",
+    "settlement_patrol_template_coastal": "patrol_party_nord_template_coastal",
+    "shipwright": "shipwright_nord",
+    "shipyard_worker": "shipyard_worker_nord",
+    "templateHulls": {
+     "fishing_party_template_nord": [
+      {
+       "hull": "fishing_ship",
+       "min": 2,
+       "max": 2
+      }
+     ],
+     "patrol_party_nord_template_coastal": [
+      {
+       "hull": "northern_medium_ship",
+       "min": 1,
+       "max": 1
+      }
+     ]
+    }
+   },
+   "sturgia": {
+    "fishing_party_template": "fishing_party_template_sturgia",
+    "settlement_patrol_template_coastal": "patrol_party_sturgia_template_coastal",
+    "shipwright": "shipwright_sturgia",
+    "shipyard_worker": "shipyard_worker_sturgia",
+    "templateHulls": {
+     "fishing_party_template_sturgia": [
+      {
+       "hull": "fishing_ship",
+       "min": 2,
+       "max": 2
+      }
+     ],
+     "patrol_party_sturgia_template_coastal": [
+      {
+       "hull": "northern_medium_ship",
+       "min": 1,
+       "max": 1
+      }
+     ]
+    }
+   },
+   "vlandia": {
+    "fishing_party_template": "fishing_party_template_vlandia",
+    "settlement_patrol_template_coastal": "patrol_party_vlandia_template_coastal",
+    "shipwright": "shipwright_vlandia",
+    "shipyard_worker": "shipyard_worker_vlandia",
+    "templateHulls": {
+     "fishing_party_template_vlandia": [
+      {
+       "hull": "fishing_ship",
+       "min": 2,
+       "max": 2
+      }
+     ],
+     "patrol_party_vlandia_template_coastal": [
+      {
+       "hull": "western_medium_ship",
+       "min": 1,
+       "max": 1
+      }
+     ]
+    }
+   }
+  }
+ },
+ "blockades": {
+  "rule": "each port town on an open basin gets a blockade intent: the installed BlockadePositionScript parameters (median) and its two arc ends at the installed median offsets from the port, in the frame of the centre-to-port direction (along, left); SiegeEvent activates a blockade when the besieged settlement HasPort and a besieger owns ships, and BlockadeVisualHelper reads the arc from the settlement entity (MMR-40)",
+  "installed": 29,
+  "parameters": {
+   "MaximumNumberOfShips": 10,
+   "NumberOfArcs": 4,
+   "DistanceBetweenShips": 1.555,
+   "Angle": 1.931,
+   "MissionShipId": "dromon_ship_nested",
+   "ShipScaleFactor": 0.045
+  },
+  "arc": {
+   "start": [
+    1.7311,
+    4.2488
+   ],
+   "end": [
+    1.1721,
+    -4.4044
+   ],
+   "measured": 29
+  }
+ },
+ "landings": {
+  "rule": "a harbour village whose MMR-33 port (its MMR-28 harbour cell) is water of an open basin gets a drop-off intent at that port (NavalMapSceneWrapper.InitializeDropOffLocations sets the village port from its main_map_village_dropoff entity); its distance from the centre must stay within the installed maximum plus one cell. A harbour cell on a closed basin or on no water is a named diagnostic, and the village gets no landing",
+  "installed": 72,
+  "installedEntities": 144,
+  "installedVillagePorts": 72,
+  "fromCentre": {
+   "median": 4.241,
+   "maximum": 13.975
+  },
+  "fromXmlPort": {
+   "median": 0.056,
+   "maximum": 0.896,
+   "measured": 144
+  }
+ },
+ "pirates": {
+  "rule": "the installed pirate clans are re-emitted with their installed records and ids as world aliases (PiratesCampaignBehavior finds them structurally: a bandit clan whose culture cannot have settlements and whose default template has ship hulls; NavalDLCVoiceOverModel compares their ids), homed at the generated hideout nearest their first spawn point. Spawn positions: perPortTown x the port towns on open basins, shared over the open basins in proportion to their port towns; each on an open-sea cell at least minPortDistance x spacing from every port and spawnSpacing x radius from every other position, candidates in pirates-stream order; its clan drawn from the installed weights of its nearest port town's culture (pooled for a culture without weights). Each position gets a PirateSpawnPoint zone of radius and, drawn with innerShare, a second zone of innerRadius (radii relative to the installed town spacing), as the installed scene stacks them. With no spawn point a clan spawns nothing (NavalDLCBanditDensityModel caps it at its spawn points)",
+  "clans": {
+   "northern_pirates": {
+    "culture": "looters",
+    "cultureCanHaveSettlement": false,
+    "isBandit": true,
+    "template": "northern_pirates_template",
+    "templateHulls": [
+     {
+      "hull": "northern_light_ship",
+      "min": 2,
+      "max": 3
+     },
+     {
+      "hull": "northern_medium_ship",
+      "min": 1,
+      "max": 1
+     }
+    ],
+    "installedSpawnPoints": 22,
+    "installedPositions": 13
+   },
+   "southern_pirates": {
+    "culture": "southern_pirates",
+    "cultureCanHaveSettlement": false,
+    "isBandit": true,
+    "template": "southern_pirates_template",
+    "templateHulls": [
+     {
+      "hull": "central_light_ship",
+      "min": 2,
+      "max": 3
+     },
+     {
+      "hull": "eastern_medium_ship",
+      "min": 1,
+      "max": 1
+     }
+    ],
+    "installedSpawnPoints": 26,
+    "installedPositions": 15
+   }
+  },
+  "perPortTown": 0.9655,
+  "radius": 0.7476,
+  "innerRadius": 0.4485,
+  "innerShare": 0.7143,
+  "minPortDistance": 0.131,
+  "spawnSpacing": 1.0,
+  "cultureWeights": {
+   "aserai": {
+    "southern_pirates": 5
+   },
+   "battania": {
+    "northern_pirates": 1
+   },
+   "empire": {
+    "northern_pirates": 2,
+    "southern_pirates": 6
+   },
+   "khuzait": {
+    "southern_pirates": 1
+   },
+   "nord": {
+    "northern_pirates": 6
+   },
+   "sturgia": {
+    "northern_pirates": 2
+   },
+   "vlandia": {
+    "northern_pirates": 2,
+    "southern_pirates": 3
+   }
+  },
+  "installed": {
+   "spawnPoints": 48,
+   "positions": 28,
+   "positionsWithInnerZone": 20,
+   "portTowns": 29,
+   "spacing": 66.88,
+   "radius": 50.0,
+   "innerRadius": 30.0,
+   "portDistance": {
+    "minimum": 0.0991,
+    "p10": 0.131,
+    "median": 0.5406
+   }
+  }
+ },
+ "fleets": {
+  "rule": "a clan may hold ships only when its home settlement's land group holds a port town on an open basin (its parties can reach an anchor). The installed ShipTradeCampaignBehavior buys ships for a clan with a fixed chance (0.5 a day, and at the new game's follow-ups) from its map faction's fiefs, else 20% of the time from any non-hostile town, for a party ShipDistributionModel.CanPartyTakeShip accepts, with no reachability check; it sells when the clan holds more than ClanShipOwnershipModel.GetIdealShipNumberForClan. The generated ShipDistributionModel refuses ships to the parties of a clan without a reachable port (and fleet transfers to them), and the generated ClanShipOwnershipModel gives such a clan an ideal fleet of 0, so any ship it still holds is sold; both delegate every other clan to the installed models. A kingdom is coastal when one of its towns is such a port town, else landlocked (named reason). Initial ships come from the installed path: ShipProductionCampaignBehavior builds them at shipyards and ShipTradeCampaignBehavior sells them to clan parties (ChangeShipOwnerAction), during the new game's follow-ups"
+ },
+ "quality": {
+  "rule": "a world whose naval content cannot be built is refused (NavalContentFactory.NavalException) with these codes; a refusal is retryable only when every code is",
+  "codes": {
+   "quality.naval_policy": {
+    "retryable": false,
+    "meaning": "the naval policy is malformed, or disagrees with the installed catalog it is given (culture hull lists, culture naval roles, pirate templates)"
+   },
+   "quality.naval_catalog": {
+    "retryable": false,
+    "meaning": "an installed hull, slot, mission ship, template or pirate clan the world needs is missing"
+   },
+   "quality.naval_unreachable_island": {
+    "retryable": true,
+    "meaning": "a land group with towns has no port or coast transition to an open basin"
+   },
+   "quality.naval_port": {
+    "retryable": true,
+    "meaning": "a port town's or harbour village's port is not water of an open basin, or a village port is beyond the installed drop-off envelope"
+   }
+  }
+ },
+ "provenance": {
+  "catalogReceipt": "evidence/runtime/in-game/campaign_catalog-10212.json",
+  "settlementsSha256": "9183ca8d67e545ab7c25bdab3618cf4155d234c11c8efccd5e21756962c51d1e",
+  "factionsSha256": "475abbc0bb59bbc3432ad9b570901e9693a7ba19d3d66bab2488cb0c63cf9a1d",
+  "culturesSha256": "dd46f888a88ead9332dff93b86b514f480ce0611f590c4d740d651db6db89df6",
+  "shipHullsSha256": "cb4ccad9e9fef85e681224720dc4e266a9f58c089380d096f239311286b4c657",
+  "partyTemplatesSha256": "8e287865e862ca1c9fa66207f48118efa648379e7ba61ee5b377c8c1b432604b",
+  "mapScene": "<game>/Modules/NavalDLC/SceneObj/Main_map/scene.xscene",
+  "mapSceneSha256": "1fb8bb08210a377fb727dc9e69454f0368254f28f317cb81c5db2569e3862ebc",
+  "nestedPrefabsSha256": "b1d6e8af0aaf64a1f91ecc87ee5b7db140f62093fedf4da269daa1025c57ca27",
+  "siegeEngines": [
+   "bow_ram_lvl1",
+   "bow_reinforced_ram_lvl2",
+   "bow_reinforced_ram_lvl3",
+   "bow_wavebreaker_ram_lvl2",
+   "bow_wavebreaker_ram_lvl3",
+   "fore_ballista",
+   "fore_ballista_fire",
+   "fore_heavy_ballista_iron",
+   "fore_heavy_ballista_pot",
+   "fore_heavy_ballista_stone",
+   "fore_mangonel",
+   "fore_multi_ballista_fire",
+   "fore_multi_ballista_stone"
+  ]
+ }
+}

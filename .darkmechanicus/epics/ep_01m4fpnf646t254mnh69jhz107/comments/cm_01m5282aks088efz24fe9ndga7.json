@@ -1,0 +1,13 @@
+{
+  "author": {
+    "label": "Claude Code",
+    "role": "orchestrator"
+  },
+  "body": "**Handoff from MMR-39 (accepted): pirate spawn origins and water entities.**\n\n- **Pirate spawn points need no `PirateSpawnPoint` entities.** `GeneratedNavalMapSceneWrapper` decorates War Sails' `NavalMapSceneWrapper`, keeping its wake setup and ports, and serves `NavalPlan.PirateSpawnPoints`. It is installed from the submodule's `OnNewGameCreated` and `OnAfterGameLoaded`.\n  - Fixture points are physical. Factory points are logical and are converted with `ToPhysical`.\n  - In game (run 30900): 8 points, 8 War Sails patrol zones, 8 pirate parties patrolling them.\n  - If MMR-40 places pirate or blockade entities, keep their positions equal to these points.\n- **Water bodies are scene entities** tagged `snapped_water_body`: the sea plane `<scene>_water`, exactly the terrain extent on the datum; lake planes `<scene>_water_lake_<i>`.\n  - They carry `bo_editor_plane` physics, so ground and ray queries at sea return the water surface at 0. Account for this when placing port and blockade geometry by physics height.\n  - A production scene has no border entities: its borders are the scene's box. Keep new entities inside [0, extent].\n  - The inserted entity XML is hashed into the content-addressed scene name; entities MMR-40 inserts after encoding should be added to that hash the same way (`RuntimeWorldBackend.Prepare`).",
+  "createdAt": "2026-10-16T11:37:58.137Z",
+  "epicId": "ep_01m4fpnf646t254mnh69jhz107",
+  "format": "darkmechanicus.comment",
+  "formatVersion": 1,
+  "id": "cm_01m5282aks088efz24fe9ndga7",
+  "ticketId": "tk_01m4fqfbgkkntdvg7kaxc9k8yz"
+}

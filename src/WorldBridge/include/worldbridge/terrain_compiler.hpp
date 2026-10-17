@@ -88,6 +88,15 @@ struct Compiled {
 // encoder cuts every node from the one grid (surface.cpp terrain()); the evidence verifies them on the encoded file.
 Compiled compile(const SourceLayers& layers, const projection::Projection& projection, const MaterialPolicy& policy, const Import& import, int side);
 
+// The bytes of heightfield.bin ("MNBLHF01", u32 side, side^2 little-endian binary64 z) and masks.bin ("MNBLMK01", u32
+// side, then the biome, intent, landform and padding planes, side^2 bytes each), exactly as --compile-terrain writes them.
+std::string heightfield_bytes(const Compiled& compiled);
+std::string masks_bytes(const Compiled& compiled);
+// weights.bin ("MNBLWT01", u32 side, side^2 rock_k bytes) and height-q16.bin ("MNBLQ16B", u32 side, binary64 hmin and hmax,
+// side^2 big-endian 16-bit codes), exactly as --compile-terrain writes them.
+std::string weights_bytes(const Compiled& compiled);
+std::string q16_bytes(const Compiled& compiled);
+
 // worldbridge --compile-terrain SPLIT --contract FILE --projection-policy FILE --materials FILE --import FILE --side N --out NEW_DIRECTORY
 int compile_terrain_main(int argc, char** argv);
 

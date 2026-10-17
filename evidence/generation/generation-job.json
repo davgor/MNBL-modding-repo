@@ -1,0 +1,247 @@
+{
+ "schema": "mnbl.evidence.generation-job-summary",
+ "version": 1,
+ "ticket": "MMR-44",
+ "run": {
+  "path": "evidence/runtime/in-game/generation_job-21316.json",
+  "sha256": "176a254d1c33171d84090f617e10d88b848669ac4bd754d008c52dee109a4970",
+  "pid": 21316,
+  "moduleSha256": "66c6b1f21fba6b5befc45bc949c01918e1906ead20ccaed18522e1392242df75",
+  "utc": "2026-10-16T03:06:41.1113515Z"
+ },
+ "earlierRuns": [
+  {
+   "path": "evidence/runtime/in-game/generation_job-30220.json",
+   "pid": 30220,
+   "status": "error",
+   "failures": [
+    "the full pipeline reaches review",
+    "at review the bundle is published and verified, the scene installed, the navigation validated on the engine"
+   ],
+   "moduleSha256": "42523b007c38a5cb2202ca00b57c2555b1a9b3a7564c1251f4e9ab4554128d0e"
+  },
+  {
+   "path": "evidence/runtime/in-game/generation_job-27272.json",
+   "pid": 27272,
+   "status": "ok",
+   "failures": [],
+   "moduleSha256": "7d201fe0fc61afd6ca2cdad048706e454474745a6b3e530d9b6efa7119ef0453"
+  },
+  {
+   "path": "evidence/runtime/in-game/generation_job-27284.json",
+   "pid": 27284,
+   "status": "ok",
+   "failures": [],
+   "moduleSha256": "7a153262569b58f62916b8904921abfd0dc36b0735db54175acaa0c536b713a0"
+  },
+  {
+   "path": "evidence/runtime/in-game/generation_job-29872.json",
+   "pid": 29872,
+   "status": "ok",
+   "failures": [],
+   "moduleSha256": "a72e7c0a098dc5589207a284552ebd46e2e3b7a88758165e70d0144bae186556"
+  }
+ ],
+ "offline": {
+  "path": "evidence/generation/job-state-machine-tests.json",
+  "sha256": "ce3e356a787d87c046894f8c219285af25568dd1ea7456b2ab9fe213641fe50e",
+  "checks": 17,
+  "failures": 0
+ },
+ "pipeline": {
+  "seconds": 28.3337325,
+  "phaseSeconds": {
+   "ValidatingRequest": 0.187,
+   "GeneratingSource": 10.804,
+   "Compiling": 8.018,
+   "ValidatingData": 0.305,
+   "BuildingScene": 7.987,
+   "RegisteringCampaign": 0.001,
+   "ValidatingRuntime": 1.013,
+   "ReadyForReview": null
+  },
+  "maxFrameGapSeconds": 0.2701843000000004
+ },
+ "jobs": [
+  {
+   "label": "full pipeline",
+   "phase": "ReadyForReview",
+   "triggeredAt": null,
+   "seconds": 28.3337325,
+   "maxFrameGapSeconds": 0.2701843000000004,
+   "errorCategory": null,
+   "errorCode": null,
+   "cleanup": [
+    "released world generation 1",
+    "released bundle f596b58cdcfc18798542fdef5a4d9c9f6d84abddca1425af8d0b87f521191d2d",
+    "released job directory"
+   ],
+   "generatorProcessesAfter": 0
+  },
+  {
+   "label": "cancel during source generation",
+   "phase": "Cancelled",
+   "triggeredAt": "GeneratingSource",
+   "seconds": 2.2925603999999993,
+   "maxFrameGapSeconds": 0.03489989999999921,
+   "errorCategory": null,
+   "errorCode": null,
+   "cleanup": [
+    "released job directory"
+   ],
+   "generatorProcessesAfter": 0
+  },
+  {
+   "label": "cancel during compilation",
+   "phase": "Cancelled",
+   "triggeredAt": "Compiling",
+   "seconds": 14.2699326,
+   "maxFrameGapSeconds": 0.39396630000000243,
+   "errorCategory": null,
+   "errorCode": null,
+   "cleanup": [
+    "released bundle staging",
+    "released job directory"
+   ],
+   "generatorProcessesAfter": 0
+  },
+  {
+   "label": "cancel with the scene install queued",
+   "phase": "Cancelled",
+   "triggeredAt": "BuildingScene",
+   "seconds": 26.402462000000007,
+   "maxFrameGapSeconds": 0.40736930000000626,
+   "errorCategory": null,
+   "errorCode": null,
+   "cleanup": [
+    "released world generation 2",
+    "released bundle f596b58cdcfc18798542fdef5a4d9c9f6d84abddca1425af8d0b87f521191d2d",
+    "released job directory"
+   ],
+   "generatorProcessesAfter": 0
+  },
+  {
+   "label": "cancel after the inspection world was constructed",
+   "phase": "Cancelled",
+   "triggeredAt": "ValidatingRuntime",
+   "seconds": 26.532137200000008,
+   "maxFrameGapSeconds": 0.3931461000000098,
+   "errorCategory": null,
+   "errorCode": null,
+   "cleanup": [
+    "released inspection world",
+    "released world generation 3",
+    "released bundle f596b58cdcfc18798542fdef5a4d9c9f6d84abddca1425af8d0b87f521191d2d",
+    "released job directory"
+   ],
+   "generatorProcessesAfter": 0
+  },
+  {
+   "label": "producer crash",
+   "phase": "Failed",
+   "triggeredAt": "GeneratingSource",
+   "seconds": 2.2543086000000017,
+   "maxFrameGapSeconds": 0.04151390000001243,
+   "errorCategory": "BadSource",
+   "errorCode": "generate.crashed",
+   "cleanup": [
+    "released job directory"
+   ],
+   "generatorProcessesAfter": 0
+  }
+ ],
+ "limits": [
+  "Campaign registration, commit and play are MMR-45 (R07: registration inside the new game); RegisteringCampaign reports that and does nothing.",
+  "The preview and its Start Campaign action are MMR-46; jobs stop at ReadyForReview.",
+  "Engine items are single native calls: navigation validation holds the engine thread up to about 0.7 s.",
+  "The producer crash is a killed fwg process, not a natural crash."
+ ],
+ "checks": [
+  {
+   "name": "the probe completed every step without a failure",
+   "passed": true,
+   "detail": "status ok, failures []"
+  },
+  {
+   "name": "c1: progress covers the whole pipeline in order, each phase timed",
+   "passed": true,
+   "detail": "ValidatingRequest 0.2s > GeneratingSource 10.8s > Compiling 8.0s > ValidatingData 0.3s > BuildingScene 8.0s > RegisteringCampaign 0.0s > ValidatingRuntime 1.0s"
+  },
+  {
+   "name": "c1: the events say what each phase did (attempts, bundle, navigation) and that campaign registration happens at campaign start",
+   "passed": true,
+   "detail": "phase_started, request_accepted, phase_started, attempt_running, attempt_running, source_accepted, phase_started, compiling_world, bundle_published, phase_started, bundle_verified, phase_started, modelling_surface, installing_scene, phase_started, registration_at_campaign_start, phase_started, constructing_scene, navigation_face_table, navigation_faces, navigation_routes, navigation_verified, ready_for_review"
+  },
+  {
+   "name": "c1: the game kept responding in every scenario (largest frame gap 0.407 s, under 0.5 s; longest engine item 0.159 s); every event in order and logged",
+   "passed": true,
+   "detail": "23 events"
+  },
+  {
+   "name": "c2: cancel during source generation (source group, at GeneratingSource): Cancelled, own resources released, no generator process, files gone",
+   "passed": true,
+   "detail": "released job directory"
+  },
+  {
+   "name": "c2: cancel during compilation (compilation group, at Compiling): Cancelled, own resources released, no generator process, files gone",
+   "passed": true,
+   "detail": "released bundle staging; released job directory"
+  },
+  {
+   "name": "c2: cancel with the scene install queued (engine group, at BuildingScene): Cancelled, own resources released, no generator process, files gone",
+   "passed": true,
+   "detail": "released world generation 2; released bundle f596b58cdcfc18798542fdef5a4d9c9f6d84abddca1425af8d0b87f521191d2d; released job directory"
+  },
+  {
+   "name": "c2: cancel after the inspection world was constructed (engine group, at ValidatingRuntime): Cancelled, own resources released, no generator process, files gone",
+   "passed": true,
+   "detail": "released inspection world; released world generation 3; released bundle f596b58cdcfc18798542fdef5a4d9c9f6d84abddca1425af8d0b87f521191d2d; released job directory"
+  },
+  {
+   "name": "c2/c3: the queued scene install of the cancelled job never ran (withdrawn or dropped)",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "name": "c2: the constructed inspection world was torn down on the engine thread",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "name": "c2: a killed producer fails the job as a bad source (generate.crashed); no generator process left",
+   "passed": true,
+   "detail": "GenerationFailure: BadSource generate.crashed (worldbridge --generate exit 3; attempt failure mechanical, producer crashed; producer.crashed: Producer did not produce a publishable world)"
+  },
+  {
+   "name": "a Random World seed reaches the request as seedSource random",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "name": "c3: a cancelled job's late engine callback, posted while a later job ran, was dropped unrun",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "name": "c3: thread affinity: no stage on the engine thread, every engine item on it",
+   "passed": true,
+   "detail": "longest engine item 0.159 s (construct mnbl_world_f596b58cdcfc1879_5f1b6d84e320)"
+  },
+  {
+   "name": "c2: at the end the main menu is usable, no generator process runs and no bundle staging is left",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "name": "the offline job tests pass",
+   "passed": true,
+   "detail": "17 checks"
+  },
+  {
+   "name": "the progress-event contract names every phase and protocol version 1",
+   "passed": true,
+   "detail": ""
+  }
+ ],
+ "passed": true
+}

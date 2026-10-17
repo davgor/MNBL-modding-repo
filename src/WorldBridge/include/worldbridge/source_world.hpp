@@ -12,6 +12,7 @@
 #include <map>
 #include <optional>
 #include <string>
+#include <utility>
 #include <vector>
 #include "worldbridge/json_stream.hpp"
 
@@ -115,6 +116,7 @@ struct Route {          // roads.routes[]: a node path through the sphere graph
     std::int64_t from = 0, to = 0;  // settlement site ids
     double length_m = 0;
     std::vector<std::int64_t> nodes;
+    std::vector<std::pair<std::int64_t, std::int64_t>> river_crossings;  // producer-reported [node, node] steps (bridge candidates)
 };
 
 struct RiverSegment {   // water.river_segments[]: [node, receiver node]

@@ -1,0 +1,66 @@
+{
+  "schemaVersion": 1,
+  "status": "passed-isolated-transactional-storage-fixtures",
+  "reviewedSources": {
+    "src/MNBL.AgentStorage/NativeAgentTransactionStorage.hpp": "d841c488922dffa5a68d986e3be255f030c270fc3ce5bcbbba82d6366b8d79b2",
+    "src/MNBL.AgentStorage/OwnedNativeAgentStorage.hpp": "48ed25a67d5f796d69bece7c63b9c4bdd3430249da910fa600b12bc403e5fe8d",
+    "src/MNBL.AgentStorage/NativeElementFactory.hpp": "50a28d26a76edc95b5e059b4e036c936cddd8679b10719215b7b4201e146420d",
+    "src/MNBL.AgentStorage/AgentDomainStorage.hpp": "c5d9ee96a5109438fdfff03287ee8f8a32130835212afef47f2b2044638b5274",
+    "src/MNBL.AgentStorage/StableAgentStorage.hpp": "34555749bbfdf9ad318a02aea660f36cfe57ee9183e856df48c216ebf8503458",
+    "tests/AgentStorage/native_agent_transaction_tests.cpp": "e2cbb865517bf84207e623c9fbca5ec3ce57d0912eb5dbef787ba6d8fbbcbd7e",
+    "tools/battle-scale/Test-NativeAgentTransactions.cmd": "4ca4338dfd2c3b580b851fe94857efd71757277d7e504332bcadb9f0e029751b",
+    "tools/battle-scale/verify_native_agent_transactions.py": "b7765ac46dfec5e7c4978f86910f48460419350302b56257c34959e65a75c60d",
+    "evidence/engine-extension/native-agent-allocation-independent-review.json": "dad72cbc5558526044e3ca34fc841c4b3a3d702984434b763ecbfc144ac19c51"
+  },
+  "executables": {
+    "build/agent-storage/native_agent_transaction_tests.exe": "c84c9ddb61b5601cb2c7e9c6326b88d49eef408ebd9e1bcc9f888da7e17b0654",
+    "build/agent-storage/native_agent_transaction_asan.exe": "2b5787af8db69918ffd9f2af8c9252f86cb9d2fe3d5173dcd30bc5595e93f0ad"
+  },
+  "execution": {
+    "returnCode": 0,
+    "stdout": "native_agent_transaction_tests.cpp\nPASS native-transaction fixtures assertions=5004 resets=753 cleanups=753 failures=35\nnative_agent_transaction_tests.cpp\nPASS native-transaction fixtures assertions=5004 resets=753 cleanups=753 failures=35\n",
+    "stderr": "",
+    "configurations": [
+      "MSVC x64 optimized /O2",
+      "MSVC x64 AddressSanitizer /O1"
+    ],
+    "assertionsPerBuild": 5004,
+    "resetCallbacksPerBuild": 753,
+    "cleanupCallbacksPerBuild": 753,
+    "injectedHostAllocationOrBeforeConstructorFailuresPerBuild": 35,
+    "modelOperationsPerBuild": 1200,
+    "modelBlockSizes": [
+      1,
+      3,
+      63,
+      64,
+      65
+    ]
+  },
+  "contracts": [
+    "An outer shared_mutex is retained alongside Owner and the backend lease. Member destruction unlocks the backend first, outer gate second, and releases Owner last.",
+    "All grow/adopt/acquire/acquire_at/release/close operations use the exclusive outer gate. No raw backend reference is exposed.",
+    "Per-domain min-heaps select the globally lowest free index, preserving older holes when capacity grows and after out-of-order releases. Explicit allocation uses backend acquire_at.",
+    "Heap capacity reservations occur before backend growth. Adoption builds both pending free heaps before backend adoption. Exceptions preserve published payloads, logical capacity, occupancy and free-index contents.",
+    "Reset completes under the exclusive gate after ledger acquisition and before the new handle is observable through a wrapper read lease.",
+    "Required cleanup executes with still-valid identity before backend release. Invalid/stale/domain-forged handles do not invoke cleanup.",
+    "Release, active explicit close and active final-owner destruction were checked with the next host allocation configured to fail; none allocated.",
+    "Close drains both active domains through persistent cleanup callbacks before payload/default destruction. Final moved lease retains callback and runtime owners through this cleanup.",
+    "Generation-max release is excluded from the free heap according to the accepted backend retirement policy; no generation wrapping is introduced."
+  ],
+  "limitations": [
+    "Constructors, destructor and transitions in this test are synthetic fixtures. No actual native activation, reset, removal or Mission adoption is implemented by these callbacks.",
+    "This gate coordinates only accesses routed through this wrapper. Original engine readers, jobs, retained pointers, active native metadata publication and safe snapshot boundaries remain unproved.",
+    "Callbacks must be nonreentrant, nonescaping, nonfailing and persistently owned. noexcept does not contain SEH; actual engine teardown requires a separate proven adapter.",
+    "The public wrapper must remain alive through in-flight method calls. A thread holding a lease must not invoke mutation, including try_close, on the same instance because the shared_mutex is nonrecursive.",
+    "Read leases protect storage lifetime/publication, not concurrent payload writes. Concurrent mutators through read leases need additional synchronization.",
+    "Min-heap explicit deletion/reheapification and backend acquire_at may be O(N). This prototype has no production performance certification.",
+    "Generation-max retirement is structurally handled but not reached by 2^64 lifetime iterations in the tests. No private backend state was forged to claim that runtime coverage.",
+    "Wide indices are retained in the API; these fixtures do not establish native signed-short compatibility or exercise a live engine index above 32767.",
+    "Host allocation and before-constructor failures are injected; partially executed native constructor exceptions are not contained or tested.",
+    "Borrowed occupied snapshots are supplied by the fixture; their native header consistency, ownership and quiescence remain caller obligations."
+  ],
+  "acceptedBackendFactoryChanged": false,
+  "gameLaunched": false,
+  "enginePatchApproved": false
+}

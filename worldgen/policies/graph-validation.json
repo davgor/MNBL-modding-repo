@@ -1,0 +1,163 @@
+{
+ "schema": "mnbl.graph-validation",
+ "version": 1,
+ "rule": "CampaignGraphValidator refuses a staged generated campaign with any diagnostic, before it registers; the codes are its diagnostic classes (graph.*); a refusal is never retryable on its own (it is a factory or policy defect, not a seed)",
+ "registeredTypes": [
+  "BannerEffect",
+  "BodyProperty",
+  "BuildingType",
+  "CharacterAttribute",
+  "Concept",
+  "CraftingPiece",
+  "CraftingTemplate",
+  "Culture",
+  "EquipmentRoster",
+  "Faction",
+  "Figurehead",
+  "Hero",
+  "Hideout",
+  "Incident",
+  "IssueEffect",
+  "Item",
+  "ItemCategory",
+  "ItemModifier",
+  "ItemModifierGroup",
+  "Kingdom",
+  "LocationComplexTemplate",
+  "MenuContext",
+  "MissionShip",
+  "MobileParty",
+  "Monster",
+  "MusicInstrument",
+  "MusicTrack",
+  "NPCCharacter",
+  "PartyTemplate",
+  "Perk",
+  "Policy",
+  "RetirementSettlementComponent",
+  "Scales",
+  "Settlement",
+  "ShipHull",
+  "ShipPhysicsReference",
+  "ShipSlot",
+  "ShipUpgradePiece",
+  "SiegeEngineType",
+  "SiegeStrategy",
+  "Skill",
+  "SkillEffect",
+  "SkillSet",
+  "Town",
+  "Trait",
+  "Village",
+  "VillageType",
+  "WeaponDescription",
+  "WorkshopType",
+  "feat"
+ ],
+ "worldTypes": [
+  "Faction",
+  "Hero",
+  "Kingdom",
+  "Settlement"
+ ],
+ "reusableTypes": [
+  "Culture",
+  "EquipmentRoster",
+  "LocationComplexTemplate",
+  "NPCCharacter",
+  "PartyTemplate",
+  "WorkshopType"
+ ],
+ "settlementComponents": [
+  "Hideout",
+  "RetirementSettlementComponent",
+  "Town",
+  "Village"
+ ],
+ "deliveredOwners": [
+  "MMR-27",
+  "MMR-28",
+  "MMR-31",
+  "MMR-32",
+  "MMR-33",
+  "MMR-35",
+  "MMR-42"
+ ],
+ "deferredOwners": {},
+ "policies": [
+  "worldgen/policies/culture-presentations.json",
+  "worldgen/policies/economy.json",
+  "worldgen/policies/factions.json",
+  "worldgen/policies/naval-content.json",
+  "worldgen/policies/rosters.json",
+  "worldgen/policies/startup.json",
+  "worldgen/templates/settlements/prototypes.json",
+  "worldgen/policies/mission-scenes.json",
+  "worldgen/templates/cultures/aserai.json",
+  "worldgen/templates/cultures/battania.json",
+  "worldgen/templates/cultures/contract.json",
+  "worldgen/templates/cultures/empire.json",
+  "worldgen/templates/cultures/khuzait.json",
+  "worldgen/templates/cultures/nord.json",
+  "worldgen/templates/cultures/sturgia.json",
+  "worldgen/templates/cultures/vlandia.json"
+ ],
+ "requiredInventory": [
+  "worldgen/policies/graph-validation.json",
+  "runtime:catalogReceipt",
+  "runtime:liveDefaults"
+ ],
+ "dispositions": {
+  "dissolved": "MMR-31: a realm with no town after the compiler and travel exclusions, and its clans",
+  "bounded": "MMR-32: a source hero beyond the bound the roster policy keeps",
+  "notInstantiated": "MMR-27/32: a source hero the compiler or the hero factory does not instantiate",
+  "excluded": "MMR-27: a compiler exclusion (campaign.json exclusions)"
+ },
+ "runtimeHeroes": {
+  "notableOccupations": [
+   "Artisan",
+   "GangLeader",
+   "Headman",
+   "Merchant",
+   "Preacher",
+   "RuralNotable"
+  ],
+  "companionOccupations": [
+   "Wanderer"
+  ]
+ },
+ "pendingRuntime": [
+  "W05: runtime settlement, gate and port positions on the generated scene and its navigation mesh (not checked here)",
+  "U03: runtime route reachability between generated settlements (not checked here)"
+ ],
+ "positionTolerance": 0.01,
+ "codes": {
+  "graph.policy": "the validation policy is malformed",
+  "graph.malformed_input": "a staged document without a root, a record element or component without an id, or a disposition, id-map entry, exclusion or slot without its keys",
+  "graph.reference_type": "a reference naming an object of another type than its property holds",
+  "graph.disposition": "a disposition that is not a policy outcome, gives no reason, or contradicts a staged object",
+  "graph.source_mismatch": "a staged record that disagrees with its compiler record (kind, village binding, port)",
+  "graph.unknown_type": "a staged record of an element with no supported or registered object type",
+  "graph.duplicate_id": "the same Type.id staged twice",
+  "graph.unknown_object": "a staged record that is neither generated (world prefix), a world alias nor a permitted re-emitted template",
+  "graph.unexpected_vanilla": "an installed Calradia settlement, clan, kingdom or hero, or the character of a Calradia hero, staged in the generated world",
+  "graph.official_reference": "a reference to an installed Calradia world instance (or hero character) the world does not stage; world aliases count only when staged",
+  "graph.malformed_reference": "a reference value the installed loaders cannot parse",
+  "graph.unresolved_reference": "a reference resolving to nothing staged, installed or verified as a live default",
+  "graph.ownership": "a kingdom without its ruler, ruling clan or capital; a clan without its leader; a fief without an owner",
+  "graph.hero_role": "a hero without its hero character or clan; a ruler, clan leader or noble clan member who is not a Lord",
+  "graph.settlement_component": "a settlement without exactly one component of a supported kind, the location complex every installed settlement of its kind has, or its village type",
+  "graph.village_binding": "a village not bound to a town or castle of the world",
+  "graph.port": "a port town without a shipyard, or a shipyard without a town port",
+  "graph.troop_upgrade": "a cycle in the upgrade tree of a character the world stages or reaches",
+  "graph.party_intent": "a clan with lords but no fortified home, a bandit clan without a home, a runtime hero without an installed template of its occupation or a home of its kind, a runtime relation to no hero of the world",
+  "graph.fixed_position": "a settlement, start point or spawn position at an installed Calradia coordinate (settlement, gate, port or start point)",
+  "graph.silent_discard": "a compiler record with neither a generated object nor an explicit disposition",
+  "graph.pending_slot": "a compiler slot still pending whose owner is delivered (or not deferred), or claimed resolved while the staged graph lacks it",
+  "graph.policy_identity": "a resolving policy or required inventory missing from the identity snapshot"
+ },
+ "provenance": {
+  "objectTypeScan": "evidence/runtime/object-type-registrations.txt",
+  "objectTypeScanSha256": "fa0a56e3b6caaaa03958af55d30f3c9ddd3976b0b2b6cbac46d591696d05ae38"
+ }
+}

@@ -1,0 +1,1314 @@
+{
+ "schema": "mnbl.evidence.activation-matrix",
+ "version": 1,
+ "ticket": "MMR-45",
+ "generated": "2026-10-17T08:49:09.183814+00:00",
+ "boundaries": [
+  "Admit",
+  "VerifyData",
+  "VerifyRuntime",
+  "BuildWorld",
+  "PromotePackage",
+  "StartCampaign",
+  "PostBuild",
+  "BindIdentity",
+  "PublishSave",
+  "WriteReceipt"
+ ],
+ "offline": {
+  "file": "evidence/generation/activation-tests.json",
+  "sha256": "0cf373cc136a9a1c5a28eb6dc9e8d326aaefae9f3cb438af16a4dc9ae2b8ff93",
+  "checks": 240,
+  "failures": 0,
+  "matrix": [
+   {
+    "boundary": "Admit",
+    "mode": "injected failure",
+    "recoverable": false,
+    "recovery": [],
+    "label": "failure at Admit",
+    "outcome": "failed",
+    "saveBound": 0,
+    "receipt": false,
+    "packagePresent": false,
+    "earlierWorldIntact": true,
+    "failedAt": "Admit",
+    "rollback": []
+   },
+   {
+    "boundary": "VerifyData",
+    "mode": "injected failure",
+    "recoverable": false,
+    "recovery": [],
+    "label": "failure at VerifyData",
+    "outcome": "failed",
+    "saveBound": 0,
+    "receipt": false,
+    "packagePresent": false,
+    "earlierWorldIntact": true,
+    "failedAt": "VerifyData",
+    "rollback": [
+     "Admit"
+    ]
+   },
+   {
+    "boundary": "VerifyRuntime",
+    "mode": "injected failure",
+    "recoverable": false,
+    "recovery": [],
+    "label": "failure at VerifyRuntime",
+    "outcome": "failed",
+    "saveBound": 0,
+    "receipt": false,
+    "packagePresent": false,
+    "earlierWorldIntact": true,
+    "failedAt": "VerifyRuntime",
+    "rollback": [
+     "VerifyData",
+     "Admit"
+    ]
+   },
+   {
+    "boundary": "BuildWorld",
+    "mode": "injected failure",
+    "recoverable": false,
+    "recovery": [],
+    "label": "failure at BuildWorld",
+    "outcome": "failed",
+    "saveBound": 0,
+    "receipt": false,
+    "packagePresent": false,
+    "earlierWorldIntact": true,
+    "failedAt": "BuildWorld",
+    "rollback": [
+     "VerifyRuntime",
+     "VerifyData",
+     "Admit"
+    ]
+   },
+   {
+    "boundary": "PromotePackage",
+    "mode": "injected failure",
+    "recoverable": false,
+    "recovery": [],
+    "label": "failure at PromotePackage",
+    "outcome": "failed",
+    "saveBound": 0,
+    "receipt": false,
+    "packagePresent": false,
+    "earlierWorldIntact": true,
+    "failedAt": "PromotePackage",
+    "rollback": [
+     "BuildWorld",
+     "VerifyRuntime",
+     "VerifyData",
+     "Admit"
+    ]
+   },
+   {
+    "boundary": "PromotePackage",
+    "mode": "failure inside the work",
+    "recoverable": false,
+    "recovery": [],
+    "label": "failure inside PromotePackage",
+    "outcome": "failed",
+    "saveBound": 0,
+    "receipt": false,
+    "packagePresent": false,
+    "earlierWorldIntact": true,
+    "failedAt": "PromotePackage",
+    "rollback": [
+     "PromotePackage",
+     "BuildWorld",
+     "VerifyRuntime",
+     "VerifyData",
+     "Admit"
+    ]
+   },
+   {
+    "boundary": "PromotePackage",
+    "mode": "failure inside the work, partial work left to the undo",
+    "recoverable": false,
+    "recovery": [],
+    "label": "failure inside (host leaves its partial work) PromotePackage",
+    "outcome": "failed",
+    "saveBound": 0,
+    "receipt": false,
+    "packagePresent": false,
+    "earlierWorldIntact": true,
+    "failedAt": "PromotePackage",
+    "rollback": [
+     "PromotePackage",
+     "BuildWorld",
+     "VerifyRuntime",
+     "VerifyData",
+     "Admit"
+    ]
+   },
+   {
+    "boundary": "StartCampaign",
+    "mode": "injected failure",
+    "recoverable": false,
+    "recovery": [],
+    "label": "failure at StartCampaign",
+    "outcome": "failed",
+    "saveBound": 0,
+    "receipt": false,
+    "packagePresent": false,
+    "earlierWorldIntact": true,
+    "failedAt": "StartCampaign",
+    "rollback": [
+     "PromotePackage",
+     "BuildWorld",
+     "VerifyRuntime",
+     "VerifyData",
+     "Admit"
+    ]
+   },
+   {
+    "boundary": "StartCampaign",
+    "mode": "failure inside the work",
+    "recoverable": false,
+    "recovery": [],
+    "label": "failure inside StartCampaign",
+    "outcome": "failed",
+    "saveBound": 0,
+    "receipt": false,
+    "packagePresent": false,
+    "earlierWorldIntact": true,
+    "failedAt": "StartCampaign",
+    "rollback": [
+     "StartCampaign",
+     "PromotePackage",
+     "BuildWorld",
+     "VerifyRuntime",
+     "VerifyData",
+     "Admit"
+    ]
+   },
+   {
+    "boundary": "StartCampaign",
+    "mode": "failure inside the work, partial work left to the undo",
+    "recoverable": false,
+    "recovery": [],
+    "label": "failure inside (host leaves its partial work) StartCampaign",
+    "outcome": "failed",
+    "saveBound": 0,
+    "receipt": false,
+    "packagePresent": false,
+    "earlierWorldIntact": true,
+    "failedAt": "StartCampaign",
+    "rollback": [
+     "StartCampaign",
+     "PromotePackage",
+     "BuildWorld",
+     "VerifyRuntime",
+     "VerifyData",
+     "Admit"
+    ]
+   },
+   {
+    "boundary": "PostBuild",
+    "mode": "injected failure",
+    "recoverable": false,
+    "recovery": [],
+    "label": "failure at PostBuild",
+    "outcome": "failed",
+    "saveBound": 0,
+    "receipt": false,
+    "packagePresent": false,
+    "earlierWorldIntact": true,
+    "failedAt": "PostBuild",
+    "rollback": [
+     "StartCampaign",
+     "PromotePackage",
+     "BuildWorld",
+     "VerifyRuntime",
+     "VerifyData",
+     "Admit"
+    ]
+   },
+   {
+    "boundary": "PostBuild",
+    "mode": "failure inside the work",
+    "recoverable": false,
+    "recovery": [],
+    "label": "failure inside PostBuild",
+    "outcome": "failed",
+    "saveBound": 0,
+    "receipt": false,
+    "packagePresent": false,
+    "earlierWorldIntact": true,
+    "failedAt": "PostBuild",
+    "rollback": [
+     "PostBuild",
+     "StartCampaign",
+     "PromotePackage",
+     "BuildWorld",
+     "VerifyRuntime",
+     "VerifyData",
+     "Admit"
+    ]
+   },
+   {
+    "boundary": "BindIdentity",
+    "mode": "injected failure",
+    "recoverable": false,
+    "recovery": [],
+    "label": "failure at BindIdentity",
+    "outcome": "failed",
+    "saveBound": 0,
+    "receipt": false,
+    "packagePresent": false,
+    "earlierWorldIntact": true,
+    "failedAt": "BindIdentity",
+    "rollback": [
+     "PostBuild",
+     "StartCampaign",
+     "PromotePackage",
+     "BuildWorld",
+     "VerifyRuntime",
+     "VerifyData",
+     "Admit"
+    ]
+   },
+   {
+    "boundary": "PublishSave",
+    "mode": "injected failure",
+    "recoverable": false,
+    "recovery": [],
+    "label": "failure at PublishSave",
+    "outcome": "failed",
+    "saveBound": 0,
+    "receipt": false,
+    "packagePresent": false,
+    "earlierWorldIntact": true,
+    "failedAt": "PublishSave",
+    "rollback": [
+     "BindIdentity",
+     "PostBuild",
+     "StartCampaign",
+     "PromotePackage",
+     "BuildWorld",
+     "VerifyRuntime",
+     "VerifyData",
+     "Admit"
+    ]
+   },
+   {
+    "boundary": "WriteReceipt",
+    "mode": "injected failure",
+    "recoverable": true,
+    "recovery": [
+     "committed"
+    ],
+    "label": "failure at WriteReceipt",
+    "outcome": "committed",
+    "saveBound": 1,
+    "receipt": true,
+    "packagePresent": true,
+    "earlierWorldIntact": true,
+    "failedAt": null,
+    "rollback": []
+   },
+   {
+    "boundary": "Admit",
+    "mode": "process stop after the boundary",
+    "packageKept": false,
+    "recovery": [
+     "abandoned"
+    ],
+    "label": "process stop after Admit",
+    "outcome": "abandoned",
+    "saveBound": 0,
+    "receipt": false,
+    "packagePresent": false,
+    "earlierWorldIntact": true,
+    "failedAt": null,
+    "rollback": []
+   },
+   {
+    "boundary": "VerifyData",
+    "mode": "process stop after the boundary",
+    "packageKept": false,
+    "recovery": [
+     "abandoned"
+    ],
+    "label": "process stop after VerifyData",
+    "outcome": "abandoned",
+    "saveBound": 0,
+    "receipt": false,
+    "packagePresent": false,
+    "earlierWorldIntact": true,
+    "failedAt": null,
+    "rollback": []
+   },
+   {
+    "boundary": "VerifyRuntime",
+    "mode": "process stop after the boundary",
+    "packageKept": false,
+    "recovery": [
+     "abandoned"
+    ],
+    "label": "process stop after VerifyRuntime",
+    "outcome": "abandoned",
+    "saveBound": 0,
+    "receipt": false,
+    "packagePresent": false,
+    "earlierWorldIntact": true,
+    "failedAt": null,
+    "rollback": []
+   },
+   {
+    "boundary": "BuildWorld",
+    "mode": "process stop after the boundary",
+    "packageKept": false,
+    "recovery": [
+     "abandoned"
+    ],
+    "label": "process stop after BuildWorld",
+    "outcome": "abandoned",
+    "saveBound": 0,
+    "receipt": false,
+    "packagePresent": false,
+    "earlierWorldIntact": true,
+    "failedAt": null,
+    "rollback": []
+   },
+   {
+    "boundary": "PromotePackage",
+    "mode": "process stop after the boundary",
+    "packageKept": true,
+    "recovery": [
+     "abandoned"
+    ],
+    "label": "process stop after PromotePackage",
+    "outcome": "abandoned",
+    "saveBound": 0,
+    "receipt": false,
+    "packagePresent": true,
+    "earlierWorldIntact": true,
+    "failedAt": null,
+    "rollback": []
+   },
+   {
+    "boundary": "StartCampaign",
+    "mode": "process stop after the boundary",
+    "packageKept": true,
+    "recovery": [
+     "abandoned"
+    ],
+    "label": "process stop after StartCampaign",
+    "outcome": "abandoned",
+    "saveBound": 0,
+    "receipt": false,
+    "packagePresent": true,
+    "earlierWorldIntact": true,
+    "failedAt": null,
+    "rollback": []
+   },
+   {
+    "boundary": "PostBuild",
+    "mode": "process stop after the boundary",
+    "packageKept": true,
+    "recovery": [
+     "abandoned"
+    ],
+    "label": "process stop after PostBuild",
+    "outcome": "abandoned",
+    "saveBound": 0,
+    "receipt": false,
+    "packagePresent": true,
+    "earlierWorldIntact": true,
+    "failedAt": null,
+    "rollback": []
+   },
+   {
+    "boundary": "BindIdentity",
+    "mode": "process stop after the boundary",
+    "packageKept": true,
+    "recovery": [
+     "abandoned"
+    ],
+    "label": "process stop after BindIdentity",
+    "outcome": "abandoned",
+    "saveBound": 0,
+    "receipt": false,
+    "packagePresent": true,
+    "earlierWorldIntact": true,
+    "failedAt": null,
+    "rollback": []
+   },
+   {
+    "boundary": "PublishSave",
+    "mode": "process stop after the boundary",
+    "packageKept": false,
+    "recovery": [
+     "committed"
+    ],
+    "label": "process stop after PublishSave",
+    "outcome": "committed",
+    "saveBound": 1,
+    "receipt": true,
+    "packagePresent": true,
+    "earlierWorldIntact": true,
+    "failedAt": null,
+    "rollback": []
+   },
+   {
+    "boundary": "WriteReceipt",
+    "mode": "process stop after the boundary",
+    "packageKept": false,
+    "recovery": [
+     "committed"
+    ],
+    "label": "process stop after WriteReceipt",
+    "outcome": "committed",
+    "saveBound": 1,
+    "receipt": true,
+    "packagePresent": true,
+    "earlierWorldIntact": true,
+    "failedAt": null,
+    "rollback": []
+   },
+   {
+    "boundary": "PublishSave",
+    "mode": "process stop inside PublishSave before the engine save",
+    "packageKept": true,
+    "recovery": [
+     "abandoned"
+    ],
+    "label": "process stop inside PublishSave before the engine save",
+    "outcome": "abandoned",
+    "saveBound": 0,
+    "receipt": false,
+    "packagePresent": true,
+    "earlierWorldIntact": true,
+    "failedAt": null,
+    "rollback": []
+   },
+   {
+    "boundary": "PublishSave",
+    "mode": "process stop inside PublishSave after the engine save",
+    "packageKept": false,
+    "recovery": [
+     "committed"
+    ],
+    "label": "process stop inside PublishSave after the engine save",
+    "outcome": "committed",
+    "saveBound": 1,
+    "receipt": true,
+    "packagePresent": true,
+    "earlierWorldIntact": true,
+    "failedAt": null,
+    "rollback": []
+   },
+   {
+    "boundary": "PublishSave",
+    "mode": "the initial save cannot be read back (publication unresolved)",
+    "packageKept": false,
+    "recovery": [
+     "committed"
+    ],
+    "label": "the initial save cannot be read back (publication unresolved)",
+    "outcome": "committed",
+    "saveBound": 1,
+    "receipt": true,
+    "packagePresent": true,
+    "earlierWorldIntact": true,
+    "failedAt": null,
+    "rollback": [
+     "PublishSave (kept)",
+     "BindIdentity",
+     "PostBuild",
+     "StartCampaign",
+     "PromotePackage (kept)",
+     "BuildWorld (kept)",
+     "VerifyRuntime (kept)",
+     "VerifyData (kept)",
+     "Admit (kept)"
+    ]
+   },
+   {
+    "boundary": "PublishSave",
+    "mode": "the initial save is torn",
+    "packageKept": false,
+    "recovery": [],
+    "label": "the initial save is torn",
+    "outcome": "failed",
+    "saveBound": 0,
+    "receipt": false,
+    "packagePresent": false,
+    "earlierWorldIntact": true,
+    "failedAt": "PublishSave",
+    "rollback": [
+     "PublishSave",
+     "BindIdentity",
+     "PostBuild",
+     "StartCampaign",
+     "PromotePackage",
+     "BuildWorld",
+     "VerifyRuntime",
+     "VerifyData",
+     "Admit"
+    ]
+   },
+   {
+    "boundary": "PublishSave",
+    "mode": "another campaign's save holds the reserved name",
+    "packageKept": false,
+    "recovery": [],
+    "label": "another campaign's save holds the reserved name",
+    "outcome": "failed",
+    "saveBound": 0,
+    "receipt": false,
+    "packagePresent": false,
+    "earlierWorldIntact": true,
+    "failedAt": "PublishSave",
+    "rollback": [
+     "PublishSave",
+     "BindIdentity",
+     "PostBuild",
+     "StartCampaign",
+     "PromotePackage",
+     "BuildWorld",
+     "VerifyRuntime",
+     "VerifyData",
+     "Admit"
+    ]
+   },
+   {
+    "boundary": "PublishSave",
+    "mode": "the journal write after the published save fails",
+    "recovery": [
+     "committed"
+    ],
+    "label": "journal write fault after publication",
+    "outcome": "committed",
+    "saveBound": 1,
+    "receipt": true,
+    "packagePresent": true,
+    "earlierWorldIntact": true,
+    "failedAt": null,
+    "rollback": []
+   },
+   {
+    "boundary": "PublishSave",
+    "mode": "injected failure, BindIdentity's undo fails",
+    "recovery": [],
+    "label": "undo failure",
+    "outcome": "failed",
+    "saveBound": 0,
+    "receipt": false,
+    "packagePresent": false,
+    "earlierWorldIntact": true,
+    "failedAt": "PublishSave",
+    "rollback": [
+     "BindIdentity (not undone)",
+     "PostBuild",
+     "StartCampaign",
+     "PromotePackage",
+     "BuildWorld",
+     "VerifyRuntime",
+     "VerifyData",
+     "Admit"
+    ]
+   },
+   {
+    "boundary": "PostBuild",
+    "mode": "injected failure, same world content as the earlier world",
+    "recovery": [],
+    "label": "same world, failure at PostBuild",
+    "outcome": "failed",
+    "saveBound": 0,
+    "receipt": false,
+    "packagePresent": true,
+    "earlierWorldIntact": true,
+    "failedAt": "PostBuild",
+    "rollback": [
+     "StartCampaign",
+     "PromotePackage",
+     "BuildWorld",
+     "VerifyRuntime",
+     "VerifyData",
+     "Admit"
+    ]
+   },
+   {
+    "boundary": "none",
+    "mode": "second campaign of the same world",
+    "recovery": [],
+    "label": "same world, second campaign",
+    "outcome": "committed",
+    "saveBound": 1,
+    "receipt": true,
+    "packagePresent": true,
+    "earlierWorldIntact": true,
+    "failedAt": null,
+    "rollback": []
+   },
+   {
+    "boundary": "none",
+    "mode": "an activation after an unreadable and a quarantined journal",
+    "recovery": [],
+    "label": "activation after quarantine",
+    "outcome": "committed",
+    "saveBound": 1,
+    "receipt": true,
+    "packagePresent": true,
+    "earlierWorldIntact": true,
+    "failedAt": null,
+    "rollback": []
+   }
+  ]
+ },
+ "compiled": {
+  "file": "evidence/generation/compiled-world-tests.json",
+  "sha256": "c04dc77ee49a6f728d4c70b2867c2ad58390d2aff7cc9fb14e02223576d0d1f3",
+  "checks": 8,
+  "failures": 0,
+  "record": {
+   "worldId": "mnbl_1609fb72",
+   "worldPrefix": "mnbl_1609fb72_",
+   "layoutSha256": "bc3004a4b2b80473f88a1bbdd905b531b8b17b1549bfd821b0250a7071fadf8f",
+   "declared": 1345,
+   "settlements": {
+    "town": 45,
+    "castle": 26,
+    "village": 215
+   },
+   "hideouts": 72,
+   "heroes": 241,
+   "clans": 92,
+   "kingdoms": 40,
+   "creationCultures": [
+    "aserai",
+    "battania",
+    "empire",
+    "khuzait",
+    "nord",
+    "sturgia",
+    "vlandia"
+   ],
+   "reemittedTemplates": 5541,
+   "optionalAbsent": 1881,
+   "positionsMoved": 547,
+   "positionMismatches": [],
+   "familyProblems": [],
+   "documents": {
+    "Factions": "f1c2888a8eb09a20ceb0518de1eff344679dd19e22a0376588bf38c051ed920b",
+    "Heroes": "b366ec0868b26c3fec3b99270643847a16df661e686d45bfea5bd74ca2c5ba29",
+    "Kingdoms": "19e5ac2d66a6de466ef7c24e44aa09e4a93636c24c176331595621960eb62daf",
+    "LocationComplexTemplates": "ec623b86da352db47aed20e8ee1830aef634d99d2a7f7df996eac91edd389d04",
+    "NPCCharacters": "afb211c57e4cedf1a73f01bdf59aa2f3204f136e58a7b54144a14662c0ae9e11",
+    "SPCultures": "231312fb904715e6cde3a22d2c336b42e636bf518587aa8e1cfa529c2d953c2b",
+    "Settlements": "f8afff7c421ded29dc637b2351872d2217ded5bafeeb4cf2c5de4b8dd338837e",
+    "WorkshopTypes": "9641a7924390c28a85864e5fd78518cd723f4169062382fcfb97a3f2024d8e29"
+   },
+   "landlocked": 0,
+   "pirateSpawnPoints": 53,
+   "graph": {
+    "ok": true,
+    "sha256": "a8275a2f9b47d1ff26cd82142c5f54b8a5cd05e0fee8f1b53c86a7573b9ee278",
+    "census": {
+     "aliases": {
+      "Faction": 10,
+      "Hero": 1,
+      "NPCCharacter": 1,
+      "RetirementSettlementComponent": 1,
+      "Settlement": 1
+     },
+     "defaultsReferenced": {
+      "BuildingType": 24,
+      "ItemCategory": 56,
+      "Policy": 10,
+      "SiegeEngineType": 12,
+      "SkeletonScale": 6,
+      "Skill": 21,
+      "Trait": 9,
+      "VillageType": 23
+     },
+     "generated": {
+      "Faction": 92,
+      "Hero": 241,
+      "Hideout": 72,
+      "Kingdom": 40,
+      "NPCCharacter": 241,
+      "Settlement": 358,
+      "Town": 71,
+      "Village": 215
+     },
+     "locationComplexRequired": [
+      "castle",
+      "hideout",
+      "retirementsettlementcomponent",
+      "town",
+      "village"
+     ],
+     "positionsChecked": {
+      "settlements": 359,
+      "spawnPoints": 491
+     },
+     "reemittedTemplates": {
+      "Culture": 7,
+      "LocationComplexTemplate": 6,
+      "NPCCharacter": 907,
+      "WorkshopType": 12
+     },
+     "slots": {
+      "castles garrison resolved": 26,
+      "castles position resolved": 26,
+      "castles prototypeAndScenes resolved": 26,
+      "clans banner resolved": 40,
+      "clans tier resolved": 40,
+      "clans vassalClans resolved": 40,
+      "heroes ageTraitsAndFamily moot": 35,
+      "heroes ageTraitsAndFamily resolved": 292,
+      "heroes characterTemplate moot": 35,
+      "heroes characterTemplate resolved": 292,
+      "heroes occupation resolved": 327,
+      "kingdoms bannerAndColors resolved": 40,
+      "kingdoms culture resolved": 40,
+      "kingdoms policies resolved": 40,
+      "kingdoms troopTreeAndRecruitTemplates resolved": 40,
+      "ports navalFacility resolved": 30,
+      "ports portSite resolved": 30,
+      "ports shipyardAndFleet resolved": 30,
+      "towns culture resolved": 45,
+      "towns garrison resolved": 45,
+      "towns position resolved": 45,
+      "towns prosperityAndEconomy resolved": 45,
+      "towns prototypeAndScenes resolved": 45,
+      "villages hearth resolved": 215,
+      "villages position resolved": 215,
+      "villages villageType resolved": 215
+     },
+     "sources": {
+      "castle staged": 26,
+      "clan staged": 40,
+      "hero bounded": 35,
+      "hero notInstantiated": 12,
+      "hero runtime intent": 200,
+      "hero staged": 92,
+      "kingdom staged": 40,
+      "town staged": 45,
+      "village excluded": 6,
+      "village staged": 215
+     },
+     "templatesReferenced": {
+      "BodyProperty": 74,
+      "CraftingPiece": 952,
+      "CraftingTemplate": 12,
+      "Culture": 10,
+      "EquipmentRoster": 222,
+      "Item": 1125,
+      "ItemModifierGroup": 19,
+      "MissionShip": 22,
+      "Monster": 2,
+      "PartyTemplate": 110,
+      "ShipHull": 22,
+      "ShipPhysicsReference": 1,
+      "ShipSlot": 10,
+      "ShipUpgradePiece": 76,
+      "SkillSet": 228,
+      "WeaponDescription": 22
+     },
+     "unexpectedVanilla": {},
+     "unknown": {},
+     "upgradeTreesChecked": 174,
+     "villagesRebound": 44
+    },
+    "deferredSlots": 0,
+    "optionalAbsent": 1881,
+    "pendingRuntime": [
+     "W05: runtime settlement, gate and port positions on the generated scene and its navigation mesh (not checked here)",
+     "U03: runtime route reachability between generated settlements (not checked here)"
+    ],
+    "policyIdentity": {
+     "policies": {
+      "runtime:catalogReceipt": "52ef38f9c57d203663498c09bba7915686d1d7514915be6ae3af1635446092c8",
+      "runtime:liveDefaults": "2a80fec77beb93f9cc83083c24ac55f6228333aef9018370ee4d43b5956f458b",
+      "worldgen/policies/culture-presentations.json": "efe9ba962fe7c1fe2ed7386ba04a2f39bb22222b52691ef21c3133728b781c3b",
+      "worldgen/policies/economy.json": "30fecc08f226411c1d04bafe75ba757b91a1af345642450c5ad40df2cfe7efa4",
+      "worldgen/policies/factions.json": "e66882c4d18f85d2e423a48d0d93c0da94e0779476dd88b0ad8cd9e119ea9cd3",
+      "worldgen/policies/graph-validation.json": "ca985082c1813a935ba164bfcc48defff9c2d9ed790f30127dc7fcb6e7535c76",
+      "worldgen/policies/mission-scenes.json": "b5c29519521efa68c6579e6a5417aadbb639ab2e0a98e378fd66d62977ce916e",
+      "worldgen/policies/naval-content.json": "f8af37983c763ca0381121e70de6b6a8ee787c958450bf9fbb01af317eb50a3d",
+      "worldgen/policies/rosters.json": "c32092fefeb8791cb58f7cdc805fa4468b1d485873b094f9b8bd0bfcc8e4dfdd",
+      "worldgen/policies/startup.json": "1289a878f32a62d3f060e8d15bb0f202016478aca7dd0f7655c937257052de2d",
+      "worldgen/templates/cultures/aserai.json": "7c2558ae154f2a995901f7f1034f6151011c64fd92bfbc075b57dd14dd77dfb6",
+      "worldgen/templates/cultures/battania.json": "1afc8ae4885e03bcecbaa030ab09c3155d7b9517eec8246a6609bcc555e741a1",
+      "worldgen/templates/cultures/contract.json": "5d6a980bba1a7f697a95d7615eb7aed476e40b83dabe6b28fbf1de257684382a",
+      "worldgen/templates/cultures/empire.json": "1348fe2dbd4779396a523a53ecb2ffde854462848e108d0a977cb383660f3182",
+      "worldgen/templates/cultures/khuzait.json": "cad907b273ac5d7ebb8d648ad80f3f48480b670faffd5968740114505577640b",
+      "worldgen/templates/cultures/nord.json": "c7713fdf2975f93a77e77ad9cc990803326b38098458e62c174815b876be49d3",
+      "worldgen/templates/cultures/sturgia.json": "8bca083fb86cfccc07462e8b57e3d15d9ffa8b7c53c3db905fe95d62a3d93403",
+      "worldgen/templates/cultures/vlandia.json": "ffd3c5ae6d42ac83b06e510ef54e3d23d8a33b35919082d97685db57ddc0e4e2",
+      "worldgen/templates/settlements/prototypes.json": "9520391d53b48a5c707e8ca1be04c5015d4299085f3e7f0a7605efa730911b62"
+     },
+     "sha256": "cc0912a54ef3230f24573b967c6c19c90c0ad94c4acec238280de3fe25820ea2"
+    },
+    "inputs": {
+     "defaultsSha256": "2a80fec77beb93f9cc83083c24ac55f6228333aef9018370ee4d43b5956f458b",
+     "documents": [
+      "SPCultures 49ba2a5380f0b0e427ecefa517b874b167ec7953b4a670a8f8c80b9429fcfe84",
+      "NPCCharacters afb211c57e4cedf1a73f01bdf59aa2f3204f136e58a7b54144a14662c0ae9e11",
+      "Heroes b366ec0868b26c3fec3b99270643847a16df661e686d45bfea5bd74ca2c5ba29",
+      "Kingdoms 19e5ac2d66a6de466ef7c24e44aa09e4a93636c24c176331595621960eb62daf",
+      "Factions f1c2888a8eb09a20ceb0518de1eff344679dd19e22a0376588bf38c051ed920b",
+      "WorkshopTypes 9641a7924390c28a85864e5fd78518cd723f4169062382fcfb97a3f2024d8e29",
+      "LocationComplexTemplates ec623b86da352db47aed20e8ee1830aef634d99d2a7f7df996eac91edd389d04",
+      "Settlements 30afd5e1145a5175f72210cbb16f8b6597da9268f19d3326af7d1c2aaee8e7da"
+     ]
+    },
+    "diagnosticCount": 0,
+    "codes": [],
+    "diagnostics": []
+   }
+  }
+ },
+ "commit": {
+  "run": {
+   "file": "evidence/runtime/in-game/world_activation-43676.json",
+   "sha256": "8ea74d3a857bc12ac32fe2d1343b09dbb4180c865ea784f839dff326434c7a8f",
+   "processId": 43676,
+   "probe": "world_activation",
+   "status": "ok",
+   "moduleSha256": "fc11425efa3db588ad7f233a558a6f164d968d9c208b4f563471456f752f1fcd",
+   "args": {
+    "seed": 42,
+    "gameplayDays": 1,
+    "secondFault": "BindIdentity",
+    "campaignTimeoutSeconds": 3000
+   },
+   "error": null
+  },
+  "startupActivationRecovery": [
+   {
+    "instance": "6b1287172c7246a8be73a19d9d00d287",
+    "worldContentId": "f596b58cdcfc18798542fdef5a4d9c9f6d84abddca1425af8d0b87f521191d2d",
+    "outcome": "abandoned",
+    "note": "before the world package's promotion was journaled (a package written by then is kept, unbound)"
+   }
+  ],
+  "activation": {
+   "jobPhase": "Playing",
+   "instance": "e13670cc1aaa42f5967c1cc09ad3f84f",
+   "journalState": "committed",
+   "failedAt": null,
+   "phases": [
+    "Admit",
+    "VerifyData",
+    "VerifyRuntime",
+    "BuildWorld",
+    "PromotePackage",
+    "StartCampaign",
+    "PostBuild",
+    "BindIdentity",
+    "PublishSave",
+    "WriteReceipt"
+   ],
+   "rollback": [],
+   "evidence": {
+    "C07": "a8275a2f9b47d1ff26cd82142c5f54b8a5cd05e0fee8f1b53c86a7573b9ee278",
+    "W02": "6cd6809eb285810d5f9462e514cf822bf4b4a28530c98675c4cb30d33b6d61ba",
+    "W03": "c0658df6deee3c167c90e7ff8f2addf675e0b8d4cd02e43359784d50894d9790",
+    "W04": "aa68366c4da505eaf4aa7ae1fe1581405998e49b8ea888306fd0a155c8c43d5c",
+    "W05": "66443c2848e00eae1163c4dff31ee6984214c151751a3ecb54d04c62beaa1a1c"
+   },
+   "error": null,
+   "generateSeconds": 32.9655445,
+   "commitSeconds": 21.084879100000002,
+   "boundarySeconds": {
+    "Admit": 0.007,
+    "VerifyData": 0.178,
+    "VerifyRuntime": 0.256,
+    "BuildWorld": 7.953,
+    "PromotePackage": 0.043,
+    "StartCampaign": 9.552,
+    "PostBuild": 0.796,
+    "BindIdentity": 0.031,
+    "PublishSave": 1.98
+   },
+   "atMainMenu": null,
+   "savesBound": null,
+   "worldObjectsLeft": null,
+   "cleanup": [
+    "released world generation 1"
+   ]
+  },
+  "receipt": {
+   "activatedBy": "U03",
+   "campaignInstanceId": "e13670cc-1aaa-42f5-967c-1cc09ad3f84f",
+   "manifestSha256": "c92f7c32a3ed81a6de0ddd2db75be2459ed153c5f96dc952f34966624a86c9c1",
+   "runtimeDerivedBundleSha256": "8bb5d9c3bc99c6071fe671e3f82a68fc55537238f893afa9c39299268b4d0b27",
+   "schema": "mnbl.activation-receipt",
+   "validations": {
+    "C07": {
+     "evidenceSha256": "a8275a2f9b47d1ff26cd82142c5f54b8a5cd05e0fee8f1b53c86a7573b9ee278",
+     "status": "passed"
+    },
+    "W02": {
+     "evidenceSha256": "6cd6809eb285810d5f9462e514cf822bf4b4a28530c98675c4cb30d33b6d61ba",
+     "status": "passed"
+    },
+    "W03": {
+     "evidenceSha256": "c0658df6deee3c167c90e7ff8f2addf675e0b8d4cd02e43359784d50894d9790",
+     "status": "passed"
+    },
+    "W04": {
+     "evidenceSha256": "aa68366c4da505eaf4aa7ae1fe1581405998e49b8ea888306fd0a155c8c43d5c",
+     "status": "passed"
+    },
+    "W05": {
+     "evidenceSha256": "66443c2848e00eae1163c4dff31ee6984214c151751a3ecb54d04c62beaa1a1c",
+     "status": "passed"
+    }
+   },
+   "version": 1,
+   "worldContentId": "f596b58cdcfc18798542fdef5a4d9c9f6d84abddca1425af8d0b87f521191d2d",
+   "sha256": "ea6903592f244874581603e855330e2861e5d23df920d75b59da748aa791a7e6"
+  },
+  "saveJournal": {
+   "instance": "e13670cc1aaa42f5967c1cc09ad3f84f",
+   "worldId": "mnbl_1609fb72",
+   "package": "mnbl_1609fb72-e6618804864a",
+   "contentId": "f596b58cdcfc18798542fdef5a4d9c9f6d84abddca1425af8d0b87f521191d2d",
+   "saveName": "mnbl_1609fb72_start_e13670cc1aaa",
+   "state": "published",
+   "uniqueGameId": "SlQZWgGc4Gvt",
+   "note": "read back bound to this instance (the engine reported the save)",
+   "transitions": 2
+  },
+  "saveHeader": {
+   "readable": true,
+   "bodyWhole": true,
+   "instance": "e13670cc1aaa42f5967c1cc09ad3f84f",
+   "package": "mnbl_1609fb72-e6618804864a",
+   "contentId": "f596b58cdcfc18798542fdef5a4d9c9f6d84abddca1425af8d0b87f521191d2d"
+  },
+  "gameplay": {
+   "campaignDaysAdvanced": 1.0003363194409758,
+   "realSecondsForTime": 22.4430684,
+   "stalls": [],
+   "failures": [],
+   "timeControl": "UnstoppableFastForward",
+   "playerIgnoredUntilDays": 91079.37496207407
+  },
+  "second": {
+   "jobPhase": "Failed",
+   "instance": "49ae9696cca944dc911094b6dfa96e35",
+   "journalState": "failed",
+   "failedAt": "BindIdentity",
+   "phases": [
+    "Admit",
+    "VerifyData",
+    "VerifyRuntime",
+    "BuildWorld",
+    "PromotePackage",
+    "StartCampaign",
+    "PostBuild"
+   ],
+   "rollback": [
+    {
+     "boundary": "PostBuild",
+     "undone": true
+    },
+    {
+     "boundary": "StartCampaign",
+     "undone": true
+    },
+    {
+     "boundary": "PromotePackage",
+     "undone": true
+    },
+    {
+     "boundary": "BuildWorld",
+     "undone": true
+    },
+    {
+     "boundary": "VerifyRuntime",
+     "undone": true
+    },
+    {
+     "boundary": "VerifyData",
+     "undone": true
+    },
+    {
+     "boundary": "Admit",
+     "undone": true
+    }
+   ],
+   "evidence": {
+    "C07": "a8275a2f9b47d1ff26cd82142c5f54b8a5cd05e0fee8f1b53c86a7573b9ee278",
+    "W02": "6cd6809eb285810d5f9462e514cf822bf4b4a28530c98675c4cb30d33b6d61ba",
+    "W03": "c0658df6deee3c167c90e7ff8f2addf675e0b8d4cd02e43359784d50894d9790",
+    "W04": "aa68366c4da505eaf4aa7ae1fe1581405998e49b8ea888306fd0a155c8c43d5c",
+    "W05": "66443c2848e00eae1163c4dff31ee6984214c151751a3ecb54d04c62beaa1a1c"
+   },
+   "error": "ActivationException: Activation failed at BindIdentity: injected fault at BindIdentity",
+   "generateSeconds": 32.25641719999999,
+   "commitSeconds": 17.328269700000007,
+   "boundarySeconds": {
+    "Admit": 0.004,
+    "VerifyData": 0.171,
+    "VerifyRuntime": 0.243,
+    "BuildWorld": 6.71,
+    "PromotePackage": 0.039,
+    "StartCampaign": 6.934,
+    "PostBuild": 0.333
+   },
+   "atMainMenu": true,
+   "savesBound": 0,
+   "worldObjectsLeft": 0,
+   "cleanup": [
+    "activation 49ae9696cca944dc911094b6dfa96e35 rolled back at BindIdentity: Activation failed at BindIdentity: injected fault at BindIdentity",
+    "released world generation 3"
+   ]
+  },
+  "firstWorldSnapshot": {
+   "package/documents/Factions.xml": "f1c2888a8eb09a20ceb0518de1eff344679dd19e22a0376588bf38c051ed920b",
+   "package/documents/Heroes.xml": "b366ec0868b26c3fec3b99270643847a16df661e686d45bfea5bd74ca2c5ba29",
+   "package/documents/Kingdoms.xml": "19e5ac2d66a6de466ef7c24e44aa09e4a93636c24c176331595621960eb62daf",
+   "package/documents/LocationComplexTemplates.xml": "ec623b86da352db47aed20e8ee1830aef634d99d2a7f7df996eac91edd389d04",
+   "package/documents/NPCCharacters.xml": "afb211c57e4cedf1a73f01bdf59aa2f3204f136e58a7b54144a14662c0ae9e11",
+   "package/documents/SPCultures.xml": "231312fb904715e6cde3a22d2c336b42e636bf518587aa8e1cfa529c2d953c2b",
+   "package/documents/Settlements.xml": "f8afff7c421ded29dc637b2351872d2217ded5bafeeb4cf2c5de4b8dd338837e",
+   "package/documents/WorkshopTypes.xml": "9641a7924390c28a85864e5fd78518cd723f4169062382fcfb97a3f2024d8e29",
+   "package/placement.json": "abcfc59437abcb3b2386dc47b8a51eb9356f87026cbbd9054f16d430546857dc",
+   "package/world.json": "e6618804864a37bd498d0edcfcd7ce426da695eb61379cfd68cf554ce7405e90",
+   "activation/receipt.json": "ea6903592f244874581603e855330e2861e5d23df920d75b59da748aa791a7e6",
+   "activation/runtime-derived.json": "8bb5d9c3bc99c6071fe671e3f82a68fc55537238f893afa9c39299268b4d0b27",
+   "activation/journal": "964dd28a9cdc88711c2cc8eaf62ccea2565448ddedf5c00dfca89c43d7308b09",
+   "save/header": "UniqueGameId=SlQZWgGc4Gvt;mnbl.world.climate=source:mmr39/1:83dbef87fd97acbf;mnbl.world.contentId=f596b58cdcfc18798542fdef5a4d9c9f6d84abddca1425af8d0b87f521191d2d;mnbl.world.coordinatePolicy=158296e8d66ba5fc0c64645e2b0f89f0160cd725f826ee500ae2c1c98e70eb5a;mnbl.world.documentsSha256=0f071d1c06f1267502eac099122691035ec7fcfc1b6a1cdf201f91de6a29aab2;mnbl.world.id=mnbl_1609fb72;mnbl.world.instance=e13670cc1aaa42f5967c1cc09ad3f84f;mnbl.world.manifestSha256=e6618804864a37bd498d0edcfcd7ce426da695eb61379cfd68cf554ce7405e90;mnbl.world.navMeshCrc=334295674;mnbl.world.package=mnbl_1609fb72-e6618804864a;mnbl.world.periodic=true;mnbl.world.placementSha256=abcfc59437abcb3b2386dc47b8a51eb9356f87026cbbd9054f16d430546857dc;mnbl.world.scene=mnbl_world_f596b58cdcfc1879_171df43a3a14;mnbl.world.sceneFilesSha256=53409e6579d23fee909096a01eb73be7a0689e9fad45bf427a3413d3307c7981;mnbl.world.sceneXmlCrc=146201570;mnbl.world.schema=mnbl.world-identity.v1;mnbl.world.seed=42",
+   "save/bodyWhole": true,
+   "save/journal": "published"
+  }
+ },
+ "stops": [
+  {
+   "stop": {
+    "file": "evidence/runtime/in-game/world_activation-49176.json",
+    "sha256": "49146e949d4532289042a786bdbfe2d84e6281334e3a9e55db2f5475adc6785e",
+    "processId": 49176,
+    "probe": "world_activation",
+    "status": "running",
+    "moduleSha256": "fc11425efa3db588ad7f233a558a6f164d968d9c208b4f563471456f752f1fcd",
+    "args": {
+     "seed": 42,
+     "stopInside": "PublishSave",
+     "gameplayDays": 0,
+     "campaignTimeoutSeconds": 1500
+    },
+    "error": null
+   },
+   "recovered": {
+    "file": "evidence/runtime/in-game/world_activation-26876.json",
+    "sha256": "b0d528b089b2d0e717d8ddf923100b48654579a4e955dd33793ec8134aae8eb1",
+    "processId": 26876,
+    "probe": "world_activation",
+    "status": "running",
+    "moduleSha256": "fc11425efa3db588ad7f233a558a6f164d968d9c208b4f563471456f752f1fcd",
+    "args": {
+     "seed": 42,
+     "stopInside": "PromotePackage",
+     "gameplayDays": 0,
+     "campaignTimeoutSeconds": 1500
+    },
+    "error": null
+   },
+   "stoppedInside": "PublishSave",
+   "instance": null,
+   "recovery": [
+    {
+     "instance": "7c2bb569b9b4437281fce1e5dc74e121",
+     "worldContentId": "f596b58cdcfc18798542fdef5a4d9c9f6d84abddca1425af8d0b87f521191d2d",
+     "outcome": "committed",
+     "receiptSha256": "2e73defab5e02ad5cd75dc962c089e43d0eeeae2eed8de3e3d0c57895e1604fb"
+    }
+   ]
+  },
+  {
+   "stop": {
+    "file": "evidence/runtime/in-game/world_activation-26876.json",
+    "sha256": "b0d528b089b2d0e717d8ddf923100b48654579a4e955dd33793ec8134aae8eb1",
+    "processId": 26876,
+    "probe": "world_activation",
+    "status": "running",
+    "moduleSha256": "fc11425efa3db588ad7f233a558a6f164d968d9c208b4f563471456f752f1fcd",
+    "args": {
+     "seed": 42,
+     "stopInside": "PromotePackage",
+     "gameplayDays": 0,
+     "campaignTimeoutSeconds": 1500
+    },
+    "error": null
+   },
+   "recovered": {
+    "file": "evidence/runtime/in-game/world_activation-43676.json",
+    "sha256": "8ea74d3a857bc12ac32fe2d1343b09dbb4180c865ea784f839dff326434c7a8f",
+    "processId": 43676,
+    "probe": "world_activation",
+    "status": "ok",
+    "moduleSha256": "fc11425efa3db588ad7f233a558a6f164d968d9c208b4f563471456f752f1fcd",
+    "args": {
+     "seed": 42,
+     "gameplayDays": 1,
+     "secondFault": "BindIdentity",
+     "campaignTimeoutSeconds": 3000
+    },
+    "error": null
+   },
+   "stoppedInside": "PromotePackage",
+   "instance": null,
+   "recovery": [
+    {
+     "instance": "6b1287172c7246a8be73a19d9d00d287",
+     "worldContentId": "f596b58cdcfc18798542fdef5a4d9c9f6d84abddca1425af8d0b87f521191d2d",
+     "outcome": "abandoned",
+     "note": "before the world package's promotion was journaled (a package written by then is kept, unbound)"
+    }
+   ]
+  }
+ ],
+ "history": [
+  {
+   "file": "evidence/runtime/in-game/world_activation-26432.json",
+   "sha256": "ffc192aa1be71ebf31c062b38493695a8714df4ffa86a0a79d7d08405de66c6f",
+   "processId": 26432,
+   "probe": "world_activation",
+   "status": "ok",
+   "moduleSha256": "c13aeba887308c8e889984d6f8e1bcb4f96af3e2ca8c6dec04a10fd6c38540bf",
+   "args": {
+    "seed": 42,
+    "gameplayDays": 1,
+    "secondFault": "PostBuild",
+    "campaignTimeoutSeconds": 3000
+   },
+   "error": null
+  },
+  {
+   "file": "evidence/runtime/in-game/world_activation-22472.json",
+   "sha256": "cf5c92122bdd3798d2de801749b60d42b3bc3ef6d7f28c974a49407511ac9403",
+   "processId": 22472,
+   "probe": "world_activation",
+   "status": "ok",
+   "moduleSha256": "4f4bb7f8d628e55d83874bf14a46a15fe5df9c16d824a2bdfa2c8dbc83c252b4",
+   "args": {
+    "seed": 42,
+    "gameplayDays": 1,
+    "secondFault": "PostBuild",
+    "campaignTimeoutSeconds": 3000
+   },
+   "error": null
+  },
+  {
+   "file": "evidence/runtime/in-game/world_activation-3352.json",
+   "sha256": "b4dfc5d0238144a15eaaf621245aa0af057d10910957e8da8c019fd528fedcb6",
+   "processId": 3352,
+   "probe": "world_activation",
+   "status": "ok",
+   "moduleSha256": "967741f9702fc4c4642edf53ce970afd73a038ac472b298024c53cb960273400",
+   "args": {
+    "seed": 42,
+    "stopInside": "PublishSave",
+    "gameplayDays": 0,
+    "campaignTimeoutSeconds": 1500
+   },
+   "error": null
+  },
+  {
+   "file": "evidence/runtime/in-game/world_activation-9404.json",
+   "sha256": "bdddf8cf146a1f3d536e5d0cc4bcea4e2b9db4a1748d5bd96cf0496fdb10d7f5",
+   "processId": 9404,
+   "probe": "world_activation",
+   "status": "ok",
+   "moduleSha256": "1bfd5c8ff66d4a4b0c562121e300f71f30f1acd0a1da674b9eb892dbac4bfcf3",
+   "args": {
+    "seed": 42,
+    "gameplayDays": 1,
+    "secondFault": "PostBuild",
+    "campaignTimeoutSeconds": 3000
+   },
+   "error": null
+  }
+ ],
+ "checks": [
+  {
+   "name": "offlineHarnessPassed",
+   "passed": true,
+   "detail": "240 checks, 0 failures"
+  },
+  {
+   "name": "offlineFailureAtEveryBoundary",
+   "passed": true,
+   "detail": "injected failures at Admit, VerifyData, VerifyRuntime, BuildWorld, PromotePackage, StartCampaign, PostBuild, BindIdentity, PublishSave, WriteReceipt"
+  },
+  {
+   "name": "offlineStopAfterEveryBoundary",
+   "passed": true,
+   "detail": "process stops after Admit, VerifyData, VerifyRuntime, BuildWorld, PromotePackage, StartCampaign, PostBuild, BindIdentity, PublishSave, WriteReceipt"
+  },
+  {
+   "name": "offlineEarlierWorldsIntact",
+   "passed": true,
+   "detail": "35 cases, every earlier committed world unchanged"
+  },
+  {
+   "name": "offlineNoAmbiguousBinding",
+   "passed": true,
+   "detail": "a save is bound to an instance exactly when its activation committed with a receipt"
+  },
+  {
+   "name": "compiledWorldPassed",
+   "passed": true,
+   "detail": "8 checks, 0 failures"
+  },
+  {
+   "name": "commitRunPassed",
+   "passed": true,
+   "detail": "run 43676: ok; failures []"
+  },
+  {
+   "name": "activationCommitted",
+   "passed": true,
+   "detail": "journal committed, job Playing, phases Admit > VerifyData > VerifyRuntime > BuildWorld > PromotePackage > StartCampaign > PostBuild > BindIdentity > PublishSave > WriteReceipt"
+  },
+  {
+   "name": "receiptBindsInstance",
+   "passed": true,
+   "detail": "receipt ea6903592f24 binds f596b58cdcfc to e13670cc-1aaa-42f5-967c-1cc09ad3f84f"
+  },
+  {
+   "name": "initialSavePublished",
+   "passed": true,
+   "detail": "save mnbl_1609fb72_start_e13670cc1aaa: published, whole True, bound to e13670cc1aaa42f5967c1cc09ad3f84f"
+  },
+  {
+   "name": "campaignPlays",
+   "passed": true,
+   "detail": "campaign time advanced 1.000 of 1 days, 0 stalls, failures []"
+  },
+  {
+   "name": "secondActivationRolledBack",
+   "passed": true,
+   "detail": "failed at BindIdentity; saves bound 0; objects left 0"
+  },
+  {
+   "name": "committedWorldUnchanged",
+   "passed": true,
+   "detail": "16 package, receipt, save and journal hashes compared"
+  },
+  {
+   "name": "stopInsidePublishSaveRecovered",
+   "passed": true,
+   "detail": "stopped inside PublishSave (instance None); the next start recovered it: [{'instance': '7c2bb569b9b4437281fce1e5dc74e121', 'worldContentId': 'f596b58cdcfc18798542fdef5a4d9c9f6d84abddca1425af8d0b87f521191d2d', 'outcome': 'committed', 'receiptSha256': '2e73defab5e02ad5cd75dc962c089e43d0eeeae2eed8de3e3d0c57895e1604fb'}]"
+  },
+  {
+   "name": "stopInsidePromotePackageRecovered",
+   "passed": true,
+   "detail": "stopped inside PromotePackage (instance None); the next start recovered it: [{'instance': '6b1287172c7246a8be73a19d9d00d287', 'worldContentId': 'f596b58cdcfc18798542fdef5a4d9c9f6d84abddca1425af8d0b87f521191d2d', 'outcome': 'abandoned', 'note': \"before the world package's promotion was journaled (a package written by then is kept, unbound)\"}]"
+  }
+ ],
+ "passed": true
+}

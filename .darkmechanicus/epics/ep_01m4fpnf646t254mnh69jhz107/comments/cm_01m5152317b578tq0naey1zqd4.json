@@ -1,0 +1,13 @@
+{
+  "author": {
+    "label": "Claude Code",
+    "role": "orchestrator"
+  },
+  "body": "**Handoff from MMR-43 (setup screen).**\n\n- **The screen reads `worldgen/policies/one-shot-budget.json`.** It is status provisional and embedded in the module. A budget edit now makes the build receipt stale, so rebuild before deploying.\n- **What it states.** \"Generating the world takes about N seconds\", where N is the largest `generateWorld` measurement rounded up to `roundToSeconds`. A phase without a measurement is never promised.\n- **Current values.**\n  - 11.2 and 12.7 s from MMR-21.\n  - 13.75 and 15.37 s: the setup's interim job, from job directory creation to `result.json`.\n  - That makes about 20 s; run 28596 measured 15.9 s from Confirm to result.\n- **Values deliberately excluded.**\n  - The earlier 20.1 and 26.7 s included an engine-thread parse, since removed.\n  - The `startCampaign` phase (42.1 and 82.8 s from non-periodic fixtures) was removed: starting is not offered (MMR-46).\n- **When you measure F03 end to end:**\n  - replace the values;\n  - add the campaign-start phase together with MMR-46's action;\n  - update `rule`.\n- **Probe check.** The `world_setup` probe fails a run that exceeds the stated generation time, so a slower new measurement must enter the budget.",
+  "createdAt": "2026-10-16T01:26:10.215Z",
+  "epicId": "ep_01m4fpnf646t254mnh69jhz107",
+  "format": "darkmechanicus.comment",
+  "formatVersion": 1,
+  "id": "cm_01m5152317b578tq0naey1zqd4",
+  "ticketId": "tk_01m4fqfbgmw4wvsvp7fy58y1xk"
+}

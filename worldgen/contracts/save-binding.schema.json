@@ -1,0 +1,137 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "mnbl.save-binding/1",
+  "title": "MNBL save binding contract",
+  "description": "MMR-48. How a generated campaign's saves name their immutable world and the build that wrote them, how each save's publication is journaled, how a save is exported with its world, and the ledger of module-fixed save definitions. A save is found by its header (read at the main menu before anything deserializes), never by its file name, so autosave slots, Save As copies, quick saves over older files and renamed or copied files all carry their binding; there is no sidecar. Immutable world content is stored once per identity (bundles/<worldContentId>, worlds/<worldId>-<manifest12>) and referenced by every save and campaign instance that uses it; mutable campaign state lives only in the game's save. Derived artifacts (the installed map scene, navigation caches) are rebuilt from the bundle and versioned apart (NavigationCacheKey).",
+  "oneOf": [
+    { "$ref": "#/$defs/header" },
+    { "$ref": "#/$defs/saveJournal" },
+    { "$ref": "#/$defs/initialSaveJournal" },
+    { "$ref": "#/$defs/saveExport" },
+    { "$ref": "#/$defs/saveTypeLedger" }
+  ],
+  "$defs": {
+    "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "instance": { "type": "string", "pattern": "^[0-9a-f]{32}$" },
+    "worldId": { "type": "string", "pattern": "^[A-Za-z0-9_]{1,64}$" },
+    "contentId": { "type": "string", "pattern": "^([0-9a-f]{64}|none)$" },
+    "package": { "type": "string", "pattern": "^[A-Za-z0-9_]{1,64}-[0-9a-f]{12}$" },
+    "saveName": { "type": "string", "pattern": "^[^\\\\/:*?\"<>|\\x00-\\x1f]{1,200}$" },
+    "state": { "enum": ["intent", "published", "abandoned", "removed", "conflict"] },
+    "history": {
+      "type": "array", "minItems": 1,
+      "items": { "type": "object", "required": ["state", "utc", "note"],
+                 "properties": { "state": { "$ref": "#/$defs/state" }, "utc": { "type": "string" }, "note": { "type": "string" } } }
+    },
+    "header": {
+      "description": "The save header entries this module writes through CampaignEvents.CollectMetadataEntriesEvent in every save mode (WorldIdentityBehavior), beside the game's own keys. mnbl.world.* is the world binding (WorldIdentity, MMR-19/62); mnbl.save.* the build that wrote the save (SaveBindingContract, MMR-48), present whenever the binding is.",
+      "type": "object",
+      "required": ["mnbl.world.schema", "mnbl.world.id", "mnbl.world.manifestSha256", "mnbl.world.package", "mnbl.world.instance", "mnbl.world.contentId", "mnbl.save.contract"],
+      "properties": {
+        "mnbl.world.schema": { "const": "mnbl.world-identity.v1" },
+        "mnbl.world.id": { "$ref": "#/$defs/worldId" },
+        "mnbl.world.manifestSha256": { "$ref": "#/$defs/sha256" },
+        "mnbl.world.package": { "$ref": "#/$defs/package" },
+        "mnbl.world.instance": { "$ref": "#/$defs/instance" },
+        "mnbl.world.contentId": { "$ref": "#/$defs/contentId" },
+        "mnbl.world.placementSha256": { "$ref": "#/$defs/sha256" },
+        "mnbl.world.sceneFilesSha256": { "$ref": "#/$defs/sha256" },
+        "mnbl.world.documentsSha256": { "$ref": "#/$defs/sha256" },
+        "mnbl.save.contract": { "const": "mnbl.save-binding.v1" },
+        "mnbl.save.module": { "type": "string" },
+        "mnbl.save.moduleAssemblySha256": { "type": "string" },
+        "mnbl.save.game": { "type": "string" },
+        "mnbl.save.naval": { "type": "string" },
+        "mnbl.save.backend": { "type": "string" },
+        "mnbl.save.navigationCache": { "type": "string" },
+        "mnbl.save.saveIds": { "type": "string", "pattern": "^[0-9]+/v[0-9]+$" },
+        "mnbl.save.worldIdentity": { "const": "mnbl.world-identity.v1" }
+      }
+    },
+    "saveJournal": {
+      "description": "One later save's journal (SaveJournal): <store>/saves/journal/later/<id>.json. Written durably (DurableFile) before the engine writes the file (WorldSaveBinding's prefix on MBSaveLoad.OverwriteSaveAux), resolved by reading the save back after OnSaveOver or at the next start (SaveReadback).",
+      "type": "object", "additionalProperties": false,
+      "required": ["schema", "id", "kind", "instance", "worldId", "manifestSha256", "contentId", "package", "saveName", "prior", "state", "history"],
+      "properties": {
+        "schema": { "const": "mnbl.save-journal.v1" },
+        "id": { "type": "string", "pattern": "^[0-9]{8}T[0-9]{9}Z-[0-9a-f]{8}$" },
+        "kind": { "enum": ["saveAs", "quickSave", "autoSave", "ironman"] },
+        "instance": { "$ref": "#/$defs/instance" },
+        "worldId": { "$ref": "#/$defs/worldId" },
+        "manifestSha256": { "$ref": "#/$defs/sha256" },
+        "contentId": { "$ref": "#/$defs/contentId" },
+        "package": { "$ref": "#/$defs/package" },
+        "saveName": { "$ref": "#/$defs/saveName" },
+        "prior": { "type": "object", "additionalProperties": false, "required": ["exists", "length", "writtenUtcTicks"],
+                   "description": "the file that had the name when the intent was written: a later save's name is not reserved, so only a file changed since then can be this save's write",
+                   "properties": { "exists": { "type": "boolean" }, "length": { "type": "integer" }, "writtenUtcTicks": { "type": "string", "pattern": "^[0-9]+$" } } },
+        "state": { "$ref": "#/$defs/state" },
+        "uniqueGameId": { "type": ["string", "null"] },
+        "reportedSuccess": { "type": ["boolean", "null"] },
+        "reportedName": { "type": ["string", "null"] },
+        "history": { "$ref": "#/$defs/history" }
+      }
+    },
+    "initialSaveJournal": {
+      "description": "The initial save's journal (EarlyWorldBindingStore, MMR-62): <store>/saves/journal/<instance>.json; its name is reserved.",
+      "type": "object", "additionalProperties": false,
+      "required": ["schema", "instance", "worldId", "manifestSha256", "contentId", "package", "saveName", "state", "history"],
+      "properties": {
+        "schema": { "const": "mnbl.initial-save-journal.v1" },
+        "instance": { "$ref": "#/$defs/instance" },
+        "worldId": { "$ref": "#/$defs/worldId" },
+        "manifestSha256": { "$ref": "#/$defs/sha256" },
+        "contentId": { "$ref": "#/$defs/contentId" },
+        "package": { "$ref": "#/$defs/package" },
+        "saveName": { "$ref": "#/$defs/saveName" },
+        "state": { "$ref": "#/$defs/state" },
+        "uniqueGameId": { "type": ["string", "null"] },
+        "history": { "$ref": "#/$defs/history" }
+      }
+    },
+    "saveExport": {
+      "description": "export.json of a save export (WorldSaveTransfer): the saves with the world packages and data bundles they need, every file with its length and SHA-256. Imported without regeneration.",
+      "type": "object", "additionalProperties": false,
+      "required": ["schema", "createdUtc", "saves", "worlds", "bundles", "evidence", "files", "derived"],
+      "properties": {
+        "schema": { "const": "mnbl.save-export.v2" },
+        "createdUtc": { "type": "string" },
+        "saves": { "type": "array", "minItems": 1, "items": { "type": "object", "additionalProperties": false,
+            "required": ["name", "file", "worldId", "manifestSha256", "instance", "contentId", "package", "compatibility"],
+            "properties": { "name": { "$ref": "#/$defs/saveName" }, "file": { "type": "string", "pattern": "^saves/[^/]+\\.sav$" }, "worldId": { "$ref": "#/$defs/worldId" },
+                            "manifestSha256": { "$ref": "#/$defs/sha256" }, "instance": { "type": ["string", "null"] }, "contentId": { "$ref": "#/$defs/contentId" },
+                            "package": { "$ref": "#/$defs/package" }, "uniqueGameId": { "type": ["string", "null"] }, "compatibility": { "type": "object" } } } },
+        "worlds": { "type": "array", "items": { "type": "object", "additionalProperties": false, "required": ["package", "worldId", "manifestSha256"],
+            "properties": { "package": { "$ref": "#/$defs/package" }, "worldId": { "$ref": "#/$defs/worldId" }, "manifestSha256": { "$ref": "#/$defs/sha256" } } } },
+        "bundles": { "type": "array", "items": { "type": "object", "additionalProperties": false, "required": ["contentId"], "properties": { "contentId": { "$ref": "#/$defs/sha256" } } } },
+        "evidence": { "type": "array", "description": "MMR-49: each compiled campaign's activation evidence (evidence/<instance>/<file>), which a load restores when the store lacks it.",
+          "items": { "type": "object", "additionalProperties": false, "required": ["instance", "files"],
+            "properties": { "instance": { "type": "string", "pattern": "^[0-9a-f]{32}$" }, "files": { "type": "array", "items": { "enum": ["navigation.json", "playability.json", "settlement-layout.json"] } } } } },
+        "files": { "type": "array", "items": { "type": "object", "additionalProperties": false, "required": ["path", "length", "sha256"],
+            "properties": { "path": { "type": "string", "pattern": "^(saves|worlds|bundles|evidence)/[^\\\\:]+$" }, "length": { "type": "integer" }, "sha256": { "$ref": "#/$defs/sha256" } } } },
+        "derived": { "type": "string" }
+      }
+    },
+    "saveTypeLedger": {
+      "description": "worldgen/contracts/save-type-ledger.json: the module-fixed save definitions, versioned and append-only.",
+      "type": "object", "additionalProperties": false,
+      "required": ["schema", "version", "module", "rule", "saveIdBase", "reservedRange", "entries"],
+      "properties": {
+        "schema": { "const": "mnbl.save-type-ledger" },
+        "version": { "const": 1 },
+        "module": { "const": "MNBL.ProceduralWorld" },
+        "rule": { "type": "string" },
+        "saveIdBase": { "type": "integer" },
+        "reservedRange": { "type": "object", "required": ["first", "last"], "properties": { "first": { "type": "integer" }, "last": { "type": "integer" } } },
+        "entries": { "type": "array", "minItems": 1, "items": { "type": "object", "additionalProperties": false,
+            "required": ["entry", "moduleVersion", "tickets", "saveIdsVersion", "definers", "typeIds", "syncData", "headerKeys"],
+            "properties": { "entry": { "type": "integer" }, "moduleVersion": { "type": "string" }, "tickets": { "type": "array" }, "saveIdsVersion": { "type": "integer" },
+                            "definers": { "type": "array" }, "typeIds": { "type": "array" },
+                            "syncData": { "type": "array", "items": { "type": "object", "required": ["behavior", "key", "type", "since"],
+                                "properties": { "key": { "type": "string", "pattern": "^_mnbl[A-Za-z0-9]+$" } } } },
+                            "headerKeys": { "type": "object", "required": ["mnbl.world.", "mnbl.save."] },
+                            "note": { "type": "string" } } } }
+      }
+    }
+  }
+}

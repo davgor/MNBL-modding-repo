@@ -22,6 +22,8 @@
 #include "worldbridge/projected_world.hpp"
 #include "worldbridge/terrain_compiler.hpp"
 #include "worldbridge/campaign_compiler.hpp"
+#include "worldbridge/travel_graph.hpp"
+#include "worldbridge/world_bundle.hpp"
 #include "worldbridge/attempt_schedule.hpp"
 #define NOMINMAX
 #define WIN32_LEAN_AND_MEAN
@@ -194,6 +196,22 @@ int main(int argc, char** argv) {
                 std::cerr << "{\"refused\":true,\"code\":" << escape(error.code) << ",\"message\":" << escape(error.message)
                           << ",\"file\":" << escape(error.where.file) << ",\"offset\":" << error.where.offset << ",\"line\":" << error.where.line
                           << ",\"column\":" << error.where.column << ",\"path\":" << escape(error.where.path) << "}" << std::endl;
+                return 2;
+            }
+        }
+        if (argc > 2 && (std::string(argv[1]) == "--bundle" || std::string(argv[1]) == "--inspect-bundle")) {
+            try { return std::string(argv[1]) == "--bundle" ? worldbridge::bundle::bundle_main(argc, argv) : worldbridge::bundle::inspect_main(argc, argv); }
+            catch (const worldbridge::json::Error& error) {
+                std::cerr << "{\"refused\":true,\"code\":" << escape(error.code) << ",\"message\":" << escape(error.message)
+                          << ",\"file\":" << escape(error.where.file) << ",\"path\":" << escape(error.where.path) << "}" << std::endl;
+                return 2;
+            }
+        }
+        if (argc > 2 && std::string(argv[1]) == "--compile-travel") {
+            try { return worldbridge::travel::compile_travel_main(argc, argv); }
+            catch (const worldbridge::json::Error& error) {
+                std::cerr << "{\"refused\":true,\"code\":" << escape(error.code) << ",\"message\":" << escape(error.message)
+                          << ",\"file\":" << escape(error.where.file) << ",\"path\":" << escape(error.where.path) << "}" << std::endl;
                 return 2;
             }
         }

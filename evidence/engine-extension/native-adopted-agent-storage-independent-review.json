@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "status": "accepted-bounded-offline-adoption-storage-not-engine-integration",
+  "reviewedUtc": "2026-10-17T17:32:34.175424+00:00",
+  "scope": "Independent review of borrowed first-block adoption, inactive physical access, explicit index acquisition, highwater and lifetime integration into two-domain storage. No engine, installed file or game access. Historical single-ledger prototype and prior reviews unchanged.",
+  "reviewedSourceSha256": {
+    "src/MNBL.AgentStorage/AgentDomainStorage.hpp": "722e5d7e0883af22499fb02b068e54e7fddef6eee0185796020ed89d9361f7b6",
+    "src/MNBL.AgentStorage/StableAgentStorage.hpp": "34555749bbfdf9ad318a02aea660f36cfe57ee9183e856df48c216ebf8503458",
+    "tests/AgentStorage/agent_domain_storage_tests.cpp": "f8b6ebbf9c31aab5df46dbf3c0832f275b892ff028e7150b023563415c7895df",
+    "tests/AgentStorage/adopted_agent_storage_tests.cpp": "48d057fb0d5e9432c1eba49fc0b3dff647647db71654da1df9efef5cc541a445",
+    "tools/battle-scale/Test-AdoptedAgentStorage.cmd": "1adb7f79dcc65486eb9e52432a3ada8bf6e98265529258f775ea9163a890b1ce",
+    "build/agent-storage/adoption_independent_tests.cpp": "639cd131ac19101612cb029e63465c806b94f91d3fd32b4159f81d4e780f1338",
+    "build/agent-storage/adopted_fixture_copy.cpp": "79d6b113f565554dbb01aa10724ba46ebab8098d76c8833665ab0dd54cd24fb5",
+    "build/agent-storage/adoption-independent.cmd": "e922319b76d404674bb02fad9d9b957e0e9bda07770d989994a9bd26fe4ff096"
+  },
+  "findings": [],
+  "checks": [
+    "All first-block pointers remain borrowed: no construction/destruction/free callback; owned suffix rollback and teardown use reverse order.",
+    "Two independently rebuilt free chains retain distinct occupancy, generation and highwater; explicit index acquisition removes exactly one free-chain entry.",
+    "Adoption validates five non-null nonoverlapping nonoverflowing ranges, duplicate/out-of-range indices and empty/open state before publishing capacity. Metadata allocation exceptions precede state publication.",
+    "Shared read leases retain State and borrowed owner; both explicit close and final State destruction clear owned suffixes before releasing original owner.",
+    "Physical access deliberately permits inactive records but rejects invalid pool, closed state and indices beyond capacity; it does not establish Agent occupancy or ownership."
+  ],
+  "tests": [
+    {
+      "command": "tools/battle-scale/Test-AdoptedAgentStorage.cmd",
+      "exitCode": 0,
+      "configurations": [
+        "MSVC /O2 /W4 /WX",
+        "MSVC ASAN /Od /Zi /W4 /WX"
+      ],
+      "coverage": [
+        "2040 -> 4080 -> 6120 five-pool stable addresses and independent domains",
+        "75 baseline suffix fault points plus 75 adopted suffix fault points",
+        "66049 indices per domain, signed16 and unsigned16 boundaries",
+        "borrowed inactive records, explicit5000 admission in both domains, independent highwater shrink",
+        "invalid adoption inputs, closed accesses, read barrier and lease-held destruction"
+      ]
+    },
+    {
+      "command": "build/agent-storage/adoption-independent.cmd",
+      "exitCode": 0,
+      "configuration": "MSVC ASAN /Od /Zi /W4 /WX",
+      "operations": 10000,
+      "seed": "0x952182",
+      "coverage": "Independent two-vector model of mixed acquire/acquire_at/release/grow/current, per-domain live/highwater/generation, all five physical objects each step, borrowed lifetime retained through owned destructor callbacks",
+      "output": "PASS independent 10000-operation two-domain model: acquire/acquire_at/release/grow/current/highwater/physical; borrowed owner outlives all suffix destruction"
+    }
+  ],
+  "limitations": [
+    "Synthetic records/callbacks only: actual native allocator replacement, engine lifetime barrier and authoritative occupancy snapshots remain unimplemented.",
+    "Borrowed buffers size/alignment/lifetime and callback nonreentrancy are caller contracts; numeric range checks cannot prove them. Generation imports begin at1 and do not decode native generation metadata.",
+    "Free indices are rebuilt in ascending order, not imported native ordering. acquire_at and highwater shrink can scan O(capacity); no engine-scale performance claim.",
+    "Read lease must cover entire native record access; resolver-only lease is insufficient. Physical access bypasses domain/occupied checks intentionally.",
+    "Secondary companion relationship remains unproven; domain1 permits only pool1."
+  ]
+}

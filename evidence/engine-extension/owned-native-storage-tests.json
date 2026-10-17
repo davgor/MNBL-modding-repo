@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "status": "passed-owned-native-storage-lifetime-tests",
+  "createdAtUtc": "2026-10-17T18:35:31.999737+00:00",
+  "sources": {
+    "src/MNBL.AgentStorage/OwnedNativeAgentStorage.hpp": "48ed25a67d5f796d69bece7c63b9c4bdd3430249da910fa600b12bc403e5fe8d",
+    "src/MNBL.AgentStorage/NativeElementFactory.hpp": "50a28d26a76edc95b5e059b4e036c936cddd8679b10719215b7b4201e146420d",
+    "src/MNBL.AgentStorage/AgentDomainStorage.hpp": "c5d9ee96a5109438fdfff03287ee8f8a32130835212afef47f2b2044638b5274",
+    "src/MNBL.AgentStorage/StableAgentStorage.hpp": "34555749bbfdf9ad318a02aea660f36cfe57ee9183e856df48c216ebf8503458",
+    "tests/AgentStorage/owned_native_storage_tests.cpp": "a1b00067e3e62d6854d6dbeaa1a31f6ad48a752e490ee72e48eaf42953e53bfc",
+    "tests/AgentStorage/native_element_factory_tests.cpp": "088e66be2b293a26cbe0a636c34eb5861df6cb9a807a4a39763ccfe4a3828a2d",
+    "build/agent-storage/native_element_machine_code.hpp": "75c5a69d27cbd706cc93fa50b5dec8f268caa51007aef75bb6e47c1c958ba9ae",
+    "tools/battle-scale/Test-OwnedNativeStorage.cmd": "6860ebe793a1ab46b2f1cd39f6e45853ca3ebafdd69b19761da68607034f5b1d",
+    "tools/battle-scale/verify_owned_native_storage.py": "627264e675fa85ff0c7bb6b34930c0ff3e389c26cb8409e736859eca2e37438a"
+  },
+  "outputs": {
+    "build/agent-storage/owned_native_storage_tests.exe": "8a5fb647532069e80cf74ae668bbd3d24f13801266dfacb33ee74ad571446138",
+    "build/agent-storage/owned_native_storage_asan.exe": "b7cf3501c56a0392e991c8aef5fad4f97f0d3170d67a33306a3de3981e33202b"
+  },
+  "exitCode": 0,
+  "stdout": "owned_native_storage_tests.cpp\nPASS owned native storage: retained factory/module through moved lease;wrapper destroyed before lease;rollback;close;exact final destruction order.\nowned_native_storage_tests.cpp\nPASS owned native storage: retained factory/module through moved lease;wrapper destroyed before lease;rollback;close;exact final destruction order.\n",
+  "stderr": "",
+  "checks": [
+    "Optimized and ASAN tests retain factory/runtime owner when public storage wrapper is destroyed before its moved read lease.",
+    "Lease stays usable; final lease releases lock, then native objects, then callback factory/module owner exactly once.",
+    "Rollback and explicit close preserve callback lifetime; domain/index/iteration methods forward to accepted backend.",
+    "Copying or move-assigning leases is disabled to prevent premature owner replacement."
+  ],
+  "limitations": [
+    "Main Agent ctor/dtor remain synthetic in this test; actual companion slice executes.",
+    "Owning the callback/module lifetime does not own engine workers or native Mission lifecycle. Adopted arrays still require a valid external lifetime owner and mutation barrier.",
+    "Raw payload pointers remain usable only for their retained lease/barrier duration."
+  ],
+  "gameLaunched": false,
+  "enginePatchApproved": false
+}

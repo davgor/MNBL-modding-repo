@@ -1,0 +1,79 @@
+ok    a saveAs save: intent durable before the write, published after its readback bound to this instance and whole, its UniqueGameId recorded
+ok    the saveAs journal is a save-binding.schema.json saveJournal
+ok    a quickSave save: intent durable before the write, published after its readback bound to this instance and whole, its UniqueGameId recorded
+ok    the quickSave journal is a save-binding.schema.json saveJournal
+ok    a autoSave save: intent durable before the write, published after its readback bound to this instance and whole, its UniqueGameId recorded
+ok    the autoSave journal is a save-binding.schema.json saveJournal
+ok    a ironman save: intent durable before the write, published after its readback bound to this instance and whole, its UniqueGameId recorded
+ok    the ironman journal is a save-binding.schema.json saveJournal
+      schema saveJournal: $.kind: not one of the allowed values
+ok    the initial-save journal is a save-binding.schema.json initialSaveJournal; a later-save journal of an unknown kind is not a saveJournal
+ok    a quick save over the campaign's earlier save records the file it replaces and is published
+ok    a reported failure with no file is abandoned
+ok    a save the game refused before writing (an empty reported name) is abandoned; the file that had the name is unchanged and kept
+ok    refusals write nothing: a binding without a campaign instance, a name that is not a plain file name, an unknown kind, a process without the store lock
+ok    a renamed, corrupt, unknown-kind or prior-less journal is unreadable and never acted on; the valid one is resolved (a conflict: another campaign's save, kept)
+ok    each unreadable save journal is a gap in the reference index
+ok    pruning keeps the newest 64 resolved journals
+ok    without the store lock nothing is pruned; an intent is never pruned
+ok    interrupted: every intent is a pending save in the reference index, so the world it names is retained
+ok    interrupted: with the save list unreadable every intent stays unresolved and nothing is deleted
+ok    interrupted before the write, over another campaign's save: abandoned; the earlier file kept
+ok    interrupted a torn header (a new file): removed, deleted
+ok    interrupted a torn header over another campaign's save: removed, deleted
+ok    interrupted this campaign's whole header before torn game data: removed, deleted
+ok    interrupted after the write: published (flushed)
+ok    interrupted after the write over another campaign's save: published
+ok    interrupted the file changed to another campaign's save: conflict, kept
+ok    interrupted the file changed to an unbound save: conflict, kept
+ok    interrupted: the torn temporary journal is ignored (staging), never read as a journal
+ok    interrupted: the startup cleanup removes the torn temporary journal
+ok    interrupted: a second recovery changes nothing
+ok    interrupted: after recovery the index is complete: no pending save, no unreadable save left
+ok    interrupted: when whether the file changed cannot be told, or its game data could not be read, nothing is deleted (unresolved)
+ok    a whole save another process holds open (exclusively, or writing with shared access as a sync client does) is never deleted: its intent stays unresolved, and is published once the file is released
+ok    a header that could not be opened is unknown, never torn, even under a reserved name (the initial save)
+ok    a stale intent is superseded by a newer journal under the same name (only the newest resolves the file), and a file written long after an intent is never that save's (kept)
+ok    a Save As name with leading or trailing spaces, or 150 characters long, is journaled and published; a name with a path separator is refused
+ok    with every save kind bound, an index built without the initial-save or later-save journals has a gap for each and retains everything
+ok    index: every save kind is bound (SaveKindsBound); bound saves found by header, whatever their names
+ok    index: one immutable world referenced by two separate campaigns (three saves): the package and the bundle count 3 references and 2 campaign instances
+ok    index: a later save in flight keeps its world
+ok    index: with discovery complete an unreferenced world may go; a referenced one stays
+ok    index: a save the player renamed is still found by its header (no sidecar to follow its name)
+ok    index: an unreadable save is still a gap, and nothing is deletable while there is one
+ok    compatibility: every mnbl.save.* key, the contract version and the fixed save id base
+ok    compatibility: an empty or multi-line value is refused
+ok    compatibility: read back from a header; a difference from the running build is named; a pre-MMR-48 save lacks every key
+ok    the header entries are a save-binding.schema.json header
+ok    the ledger is a save-binding.schema.json saveTypeLedger
+ok    ledger: entry 1 is unchanged from its frozen fixture (entries are append-only across module versions)
+ok    ledger: entries are numbered 1..n in order
+ok    ledger: the code's save id base and version (SaveIds) are the ledger's, inside the reserved range
+ok    ledger: the module defines no SaveableTypeDefiner (a world binding is header strings), as the ledger records
+ok    ledger: every SyncData key in the module is a string literal (never derived from a world) and is listed: _mnblStartupIntentHeroes, _mnblStartupIntentIds
+ok    ledger: the header keys (WorldIdentity.Keys, SaveBindingContract.Keys) are the ledger's
+ok    ledger: no per-world generated object id appears among the fixed save definitions
+ok    c2 (regression guard): journaling two campaigns' saves of changing game states writes nothing under worlds/ or bundles/ (the trees hash the same)
+ok    control: one changed byte in a bundle file changes the tree hash the c2 checks compare
+ok    export refuses a compiled campaign whose activation evidence is missing (it could not load elsewhere), and writes nothing
+ok    export: two campaigns' saves with the one world they share, its package and bundle once, every file listed with its hash; no staging left
+ok    export: each campaign's activation evidence (navigation, playability, settlement layout reports) is exported with its saves
+ok    export.json is a save-binding.schema.json saveExport
+ok    export reads the store only
+ok    export refuses a save of no generated world, a missing save and an existing destination, and writes nothing
+ok    export refuses, before writing anything, a destination whose files would pass the Windows path limit
+ok    verify refuses changed activation evidence, and a compiled campaign's save without its evidence (even with the manifest edited to match)
+ok    verify refuses a changed byte, an unlisted file, a missing file, a path leaving the export, a save row naming another campaign than its header, and a listed save file no save row names
+ok    an export whose copy does not verify is removed before it takes its name (no folder left, a retry is not refused as existing)
+ok    import: the package and bundle copied into the empty store, both saves imported; the world counts 2 references from 2 campaigns; nothing regenerated
+ok    import: each campaign's activation evidence is restored where a load reads it (activations/<instance>/evidence), byte for byte; no temporary file left
+ok    import: the imported save reads back whole and bound to its campaign and world; the package and bundle in the store verify; no staging left
+ok    import never replaces a save: the same names are refused and nothing is written
+ok    dedup: imported again under new names, the identical package and bundle are reused (stored once); 4 references from the same 2 campaigns
+ok    dedup: the identical activation evidence is reused
+ok    import refuses a store holding different activation evidence for a campaign; nothing is written
+ok    import refuses a store holding a different bundle under the content id, and a store whose lock a running game holds; nothing is written
+ok    a crash mid-import leaves staging the startup cleanup removes and a temporary save file the next import removes; the import then completes
+ok    c2/c3 (regression guard): the source's immutable content is unchanged throughout, and the target holds it byte for byte
+77/77 checks passed

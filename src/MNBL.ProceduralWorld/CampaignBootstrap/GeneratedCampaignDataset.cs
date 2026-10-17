@@ -21,11 +21,14 @@ namespace MNBL.ProceduralWorld.CampaignBootstrap
             public double GateX { get; private set; } public double GateY { get; private set; }
             public double PortX { get; private set; } public double PortY { get; private set; }
             public double VillageX { get; private set; } public double VillageY { get; private set; }
+            // MMR-42: a harbour village's port (the placement's harbour village; its scene carries a drop-off entity, so the campaign gives
+            // it a port): the fixture village is built with it, so it takes a coastal, seaborne-raid capable prototype. Null: inland.
+            public double? VillagePortX { get; private set; } public double? VillagePortY { get; private set; }
             public Placement(double townX, double townY, double gateX, double gateY,
-                double portX, double portY, double villageX, double villageY)
+                double portX, double portY, double villageX, double villageY, double? villagePortX = null, double? villagePortY = null)
             {
                 TownX = townX; TownY = townY; GateX = gateX; GateY = gateY;
-                PortX = portX; PortY = portY; VillageX = villageX; VillageY = villageY;
+                PortX = portX; PortY = portY; VillageX = villageX; VillageY = villageY; VillagePortX = villagePortX; VillagePortY = villagePortY;
             }
         }
         public sealed class Options
@@ -37,6 +40,16 @@ namespace MNBL.ProceduralWorld.CampaignBootstrap
             // Reusable NPCCharacter IDs that installed code looks up by string literal. The reference
             // closure cannot discover them; each still passes the template/world-hero classification.
             public ReadOnlyCollection<string> EngineCharacterIds { get; private set; }
+            // MMR-33: when set, the first world's settlements are built by SettlementFactory (the world's own builder) and gain a castle,
+            // a castle-bound village and a hideout: the in-game settlement fixtures.
+            public SettlementFixtures Fixtures { get; set; }
+            // MMR-34: when set (requires Fixtures), the first world also supplies the startup: the installed land bandit clans as world
+            // aliases homed at hideouts, the retirement retreat, every creation culture's start at the fixture town's gate, and a runtime
+            // plan of notables, companions and a relation (records built by GeneratedCampaignInitializer's shared builders).
+            public StartupFixtures Startup { get; set; }
+            // MMR-35: when set (requires Fixtures), the first world also carries the naval fixtures: the installed pirate clans as world aliases
+            // homed at the fixture hideout (records from NavalContentFactory's builder), and the fleet rule (FixtureNavalPlan).
+            public bool Naval { get; set; }
             public Options(string cultureId, string heroTemplateId, string townPrototypeId,
                 string villagePrototypeId, double extent, Placement first, Placement second,
                 IEnumerable<string> engineCharacterIds = null)
@@ -45,6 +58,35 @@ namespace MNBL.ProceduralWorld.CampaignBootstrap
                 TownPrototypeId = townPrototypeId; VillagePrototypeId = villagePrototypeId;
                 Extent = extent; First = first; Second = second;
                 EngineCharacterIds = (engineCharacterIds ?? new string[0]).ToList().AsReadOnly();
+            }
+        }
+        // MMR-33 fixtures: the economy policy and prototypes, and three land points of the generated map (from the placement's own
+        // navigation tests) for the castle, its village and the hideout.
+        public sealed class SettlementFixtures
+        {
+            public IDictionary<string, object> Economy { get; private set; }
+            public IDictionary<string, object> Prototypes { get; private set; }
+            public double CastleX { get; private set; } public double CastleY { get; private set; }
+            public double VillageX { get; private set; } public double VillageY { get; private set; }
+            public double HideoutX { get; private set; } public double HideoutY { get; private set; }
+            // MMR-42: the mission scene catalogue the fixture factory checks its picks against (null offline: no contract check).
+            internal MNBL.ProceduralWorld.Missions.MissionScenes MissionScenes { get; private set; }
+            internal SettlementFixtures(IDictionary<string, object> economy, IDictionary<string, object> prototypes, double castleX, double castleY,
+                double villageX, double villageY, double hideoutX, double hideoutY, MNBL.ProceduralWorld.Missions.MissionScenes missionScenes = null)
+            {
+                Economy = economy; Prototypes = prototypes; CastleX = castleX; CastleY = castleY; VillageX = villageX; VillageY = villageY; HideoutX = hideoutX; HideoutY = hideoutY;
+                MissionScenes = missionScenes;
+            }
+        }
+        // MMR-34 startup fixtures: verified land points of the generated map for the retirement retreat and for one hideout of each
+        // bandit culture the fixture hideout (forest) does not cover (desert, mountain, sea raiders, steppe).
+        public sealed class StartupFixtures
+        {
+            public double RetreatX { get; private set; } public double RetreatY { get; private set; }
+            public ReadOnlyCollection<double[]> HideoutPoints { get; private set; }
+            public StartupFixtures(double retreatX, double retreatY, IEnumerable<double[]> hideoutPoints)
+            {
+                RetreatX = retreatX; RetreatY = retreatY; HideoutPoints = hideoutPoints.ToList().AsReadOnly();
             }
         }
         public sealed class Document
@@ -85,6 +127,26 @@ namespace MNBL.ProceduralWorld.CampaignBootstrap
         // Hash of sorted, LF-separated typed default IDs, not proof of live registry availability.
         public string DefaultReferencesSha256 { get; private set; }
         public ReadOnlyCollection<string> DeclaredDefaultReferences { get; private set; }
+        // MMR-33 fixtures: settlement id -> the vanilla map prefab its entity is made from (the generated scene has none for them).
+        public ReadOnlyDictionary<string, string> FixtureEntityPrefabs { get; private set; }
+        // MMR-34: the runtime plan GeneratedStartupBehavior instantiates (null without startup fixtures).
+        internal MNBL.ProceduralWorld.CampaignRegistry.GeneratedCampaignInitializer.StartupPlan StartupPlan { get; private set; }
+        // MMR-34: every creation culture's planned start point (culture -> x, y) and town, and the installed start points none may keep
+        // (empty without startup fixtures; without them only the selected culture is re-emitted, at StartX/StartY).
+        public ReadOnlyDictionary<string, double[]> StartPoints { get; private set; }
+        public string StartTown { get; private set; }
+        public ReadOnlyDictionary<string, double[]> InstalledStartPoints { get; private set; }
+        // MMR-35: the fleet rule of a world with naval fixtures (null without them).
+        internal MNBL.ProceduralWorld.CampaignRegistry.NavalContentFactory.NavalPlan NavalPlan { get; private set; }
+        // The fixture world's fleet rule. Both towns are port towns on the fixture's one sea, so by NavalContentFactory.Roles' rule no clan is
+        // landlocked; the fixture declares clan 2 landlocked anyway, so the in-game audit sees the rule act on a real clan through the new
+        // game's ship production and trade (clan 1 and the player stay coastal).
+        internal static MNBL.ProceduralWorld.CampaignRegistry.NavalContentFactory.NavalPlan FixtureNavalPlan(string world)
+        {
+            var plan = new MNBL.ProceduralWorld.CampaignRegistry.NavalContentFactory.NavalPlan();
+            plan.Landlocked.Add(world + "_clan_2");
+            return plan;
+        }
         private GeneratedCampaignDataset() { }
 
         private sealed class Record
@@ -139,29 +201,8 @@ namespace MNBL.ProceduralWorld.CampaignBootstrap
                     Fail("Not an allowed engine-default reference: " + reference);
                 defaults.Add(reference);
             }
-            var catalog = new Dictionary<string, Record>(StringComparer.Ordinal);
-            var sourceDocs = new Dictionary<string, XmlDocument>(StringComparer.Ordinal);
-            foreach (var source in mergedSources.OrderBy(p => p.Key, StringComparer.Ordinal))
-            {
-                if (source.Value == null || source.Value.DocumentElement == null || source.Value.DocumentType != null)
-                    Fail("Missing root or forbidden DTD in merged source " + source.Key);
-                var doc = Parse(source.Value.OuterXml); sourceDocs.Add(source.Key, doc);
-                string expectedRoot = source.Key == "SiegeEngines" ? "SiegeEngineTypes" : source.Key;
-                if (doc.DocumentElement.Name != expectedRoot && !(source.Key == "partyTemplates" && doc.DocumentElement.Name == "MBPartyTemplates"))
-                    Fail("Merged source/root mismatch: " + source.Key + " / " + doc.DocumentElement.Name);
-                string sourceHash = Hash(doc.OuterXml);
-                foreach (var element in Children(doc.DocumentElement))
-                {
-                    if (!element.HasAttribute("id")) continue;
-                    string type = ElementType(element.Name);
-                    string id = element.GetAttribute("id"); CheckId(id);
-                    string key = type + "." + id;
-                    if (catalog.ContainsKey(key)) Fail("Duplicate merged object " + key + "; supply stock merged XML, not concatenated records.");
-                    catalog.Add(key, new Record { Key = key, Source = source.Key, SourceHash = sourceHash, Element = element });
-                }
-            }
-            foreach (string required in new[] { "NPCCharacters", "Heroes", "SPCultures", "partyTemplates", "EquipmentRosters", "Settlements", "WorkshopTypes", "LocationComplexTemplates" })
-                if (!sourceDocs.ContainsKey(required)) Fail("Required merged source missing: " + required);
+            Dictionary<string, XmlDocument> sourceDocs;
+            var catalog = Catalog(mergedSources, out sourceDocs);
             var culture = Require(catalog, "Culture." + options.CultureId);
             var heroTemplate = Require(catalog, "NPCCharacter." + options.HeroTemplateId);
             if (!True(heroTemplate.Element, "is_template") || heroTemplate.Element.GetAttribute("occupation") != "Lord" ||
@@ -209,75 +250,56 @@ namespace MNBL.ProceduralWorld.CampaignBootstrap
                     "Village " + suffix + " " + world, culture.Key, null, world + "_town_" + suffix,
                     i == 1 ? options.First : options.Second);
             }
+            var fixturePrefabs = new Dictionary<string, string>(StringComparer.Ordinal);
+            double[] townGate = null;
+            if (options.Fixtures != null) townGate = AddFixtures(docs["Settlements"], options, world, sourceDocs["Settlements"], defaults, catalog, generated, fixturePrefabs);
+            MNBL.ProceduralWorld.CampaignRegistry.GeneratedCampaignInitializer.StartupPlan startupPlan = null;
+            var startPoints = new Dictionary<string, double[]>(StringComparer.Ordinal); var installedStarts = new Dictionary<string, double[]>(StringComparer.Ordinal);
+            double startX = options.First.GateX, startY = options.First.GateY;
+            if (options.Startup != null)
+            {
+                if (options.Fixtures == null) Fail("Startup fixtures need the settlement fixtures (the bandit clans' home is the fixture hideout).");
+                startupPlan = AddStartupFixtures(docs, options, world, sourceDocs, catalog, generated, defaults, fixturePrefabs, townGate, startPoints, installedStarts);
+                startX = townGate[0]; startY = townGate[1];
+            }
+            MNBL.ProceduralWorld.CampaignRegistry.NavalContentFactory.NavalPlan navalPlan = null;
+            if (options.Naval)
+            {
+                if (options.Fixtures == null) Fail("Naval fixtures need the settlement fixtures (the pirate clans' home is the fixture hideout).");
+                foreach (var clan in new[] { "northern_pirates", "southern_pirates" })
+                {
+                    var record = sourceDocs["Factions"].DocumentElement.SelectSingleNode("Faction[@id='" + clan + "']") as XmlElement;
+                    if (record == null) Fail("Installed pirate clan " + clan + " is missing.");
+                    docs["Factions"].DocumentElement.AppendChild(MNBL.ProceduralWorld.CampaignRegistry.GeneratedCampaignInitializer.BanditClanRecord(docs["Factions"], record, world + "_hideout_1"));
+                    generated.Add("Faction." + clan);
+                }
+                navalPlan = FixtureNavalPlan(world);
+            }
             AddCharacter(docs["NPCCharacters"], heroTemplate.Element, "main_hero", "Traveler " + world);
             Add(docs["Heroes"], "Hero", "id", "main_hero", "faction", "Faction.player_faction");
             AddClan(docs["Factions"], "player_faction", "main_hero", world + "_town_1", culture.Key, null, "Traveler " + world, "0");
             generated.UnionWith(new[] { "NPCCharacter.main_hero", "Hero.main_hero", "Faction.player_faction" });
+            // An alias (the player, and with startup fixtures the bandit clans and the retreat) replaces the official definition.
             foreach (string key in generated)
-                if (catalog.ContainsKey(key) && key != "NPCCharacter.main_hero" && key != "Hero.main_hero" && key != "Faction.player_faction")
+                if (catalog.ContainsKey(key) && !MNBL.ProceduralWorld.CampaignRegistry.CampaignIdentity.IsAlias(key.Substring(key.IndexOf('.') + 1)))
                     Fail("Generated identity collides with source: " + key);
 
-            var used = new HashSet<string>(StringComparer.Ordinal);
-            var provenance = new List<Provenance>();
-            var optionalAbsent = new HashSet<string>(StringComparer.Ordinal);
-            var cultureRoles = new HashSet<string>(StringComparer.Ordinal);
-            foreach (var record in catalog.Values.Where(r => r.Source == "SPCultures"))
-                foreach (XmlAttribute attribute in record.Element.Attributes)
-                    if (attribute.Value.StartsWith("NPCCharacter.", StringComparison.Ordinal)) cultureRoles.Add(attribute.Value);
-            Action<string, string> visit = null;
-            visit = (reference, reason) =>
-            {
-                if (reference.StartsWith("?", StringComparison.Ordinal)) {
-                    int separator = reference.IndexOf('|');
-                    string optionalContract = reference.Substring(1, separator - 1);
-                    reference = reference.Substring(separator + 1);
-                    if (!catalog.ContainsKey(reference) && !defaults.Contains(reference)) {
-                        optionalAbsent.Add(reference + " from " + reason + "; installed " + optionalContract + " permits a missing target");
-                        return;
-                    }
-                }
-                if (generated.Contains(reference)) return;
-                string type = reference.Split('.')[0];
-                if (WorldTypes.Contains(type)) Fail("Official world-instance dependency forbidden: " + reference + " from " + reason);
-                if (!used.Add(reference)) return;
-                Record record;
-                if (!catalog.TryGetValue(reference, out record))
-                {
-                    if (!defaults.Contains(reference)) Fail("Unresolved dependency " + reference + " from " + reason);
-                    provenance.Add(new Provenance(reference, "caller-verified-default-declarations; live readiness not asserted",
-                        Hash(String.Join("\n", defaults.OrderBy(x => x, StringComparer.Ordinal))), "", reason)); return;
-                }
-                if (type == "NPCCharacter" && (catalog.ContainsKey("Hero." + record.Element.GetAttribute("id")) ||
-                    (True(record.Element, "is_hero") && !True(record.Element, "is_template") && !cultureRoles.Contains(reference))))
-                    Fail("Named/world hero cannot be retained as a reusable NPC template: " + reference + " from " + reason);
-                provenance.Add(new Provenance(reference, record.Source, record.SourceHash, Hash(record.Element.OuterXml), reason +
-                    (type == "NPCCharacter" && True(record.Element, "is_hero") && !True(record.Element, "is_template")
-                    ? "; explicit culture NPC role, no matching Hero instance (is_hero alone is not a live-world classification)" : "")));
-                foreach (string dependency in Dependencies(record.Element)) visit(dependency, reference);
-            };
-            // These stock categories have already loaded before the registration hook. Include their
-            // references even if this world's instances use only one culture; do not leave presumed NPCs.
-            foreach (string source in new[] { "SPCultures", "partyTemplates", "EquipmentRosters", "WorkshopTypes", "LocationComplexTemplates" })
-                foreach (var record in catalog.Values.Where(r => r.Source == source).OrderBy(r => r.Key, StringComparer.Ordinal)) visit(record.Key, "stock category " + source);
-            visit(heroTemplate.Key, "generated ruler/player prototype");
-            foreach (string id in options.EngineCharacterIds.OrderBy(x => x, StringComparer.Ordinal))
-                visit("NPCCharacter." + id, "installed code string-literal lookup");
-            foreach (var document in docs.Values)
-                foreach (var element in Children(document.DocumentElement))
-                    foreach (string dependency in Dependencies(element)) visit(dependency, "generated " + element.GetAttribute("id"));
-            foreach (string reference in used.Where(k => k.StartsWith("NPCCharacter.", StringComparison.Ordinal)).OrderBy(k => k, StringComparer.Ordinal))
-            {
-                var source = Require(catalog, reference).Element;
-                // Generated player replaces the official definition, never both.
-                docs["NPCCharacters"].DocumentElement.InsertBefore(docs["NPCCharacters"].ImportNode(source, true), docs["NPCCharacters"].DocumentElement.FirstChild);
-            }
+            var roots = StockRoots(catalog).Concat(new[] { new KeyValuePair<string, string>(heroTemplate.Key, "generated ruler/player prototype") })
+                .Concat(options.EngineCharacterIds.OrderBy(x => x, StringComparer.Ordinal).Select(id => new KeyValuePair<string, string>("NPCCharacter." + id, "installed code string-literal lookup")))
+                .Concat(startupPlan == null ? new KeyValuePair<string, string>[0] :
+                    startupPlan.Notables.Concat(startupPlan.Companions).Select(h => h.Template).Distinct().OrderBy(x => x, StringComparer.Ordinal).Select(t => new KeyValuePair<string, string>("NPCCharacter." + t, "MMR-34 startup plan template")));
+            var closure = Close(catalog, generated, defaults, roots, docs.Values);
+            var provenance = closure.Provenance; var optionalAbsent = closure.OptionalAbsent;
+            EmitTemplates(docs["NPCCharacters"], catalog, closure);
             var ordered = new List<Document>();
             foreach (string id in new[] { "SPCultures", "NPCCharacters", "Heroes", "Kingdoms", "Factions", "WorkshopTypes", "LocationComplexTemplates", "Settlements" })
                 ordered.Add(new Document(id, docs.ContainsKey(id) ? docs[id] : sourceDocs[id]));
-            var aliases = new[] { "NPCCharacter.main_hero", "Hero.main_hero", "Faction.player_faction", "MobileParty.player_party" };
+            var aliases = new[] { "NPCCharacter.main_hero", "Hero.main_hero", "Faction.player_faction", "MobileParty.player_party" }
+                .Concat(generated.Where(k => MNBL.ProceduralWorld.CampaignRegistry.CampaignIdentity.IsAlias(k.Substring(k.IndexOf('.') + 1)) && !k.EndsWith(".main_hero", StringComparison.Ordinal) && k != "Faction.player_faction"))
+                .OrderBy(x => x, StringComparer.Ordinal).ToArray();
             return new GeneratedCampaignDataset {
                 WorldId = world, CultureId = options.CultureId, SceneName = "mnbl_generated_" + seed.ToString("x8", CultureInfo.InvariantCulture),
-                Extent = options.Extent, StartX = options.First.GateX, StartY = options.First.GateY,
+                Extent = options.Extent, StartX = startX, StartY = startY,
                 Documents = ordered.AsReadOnly(), Templates = provenance.OrderBy(p => p.Reference, StringComparer.Ordinal).ToList().AsReadOnly(),
                 Prototypes = new[] { town, village, heroTemplate }.Select(r => new Provenance(r.Key, r.Source, r.SourceHash, Hash(r.Element.OuterXml),
                     "structure/assets only; new identity and geography; source world record is not registered")).ToList().AsReadOnly(),
@@ -291,8 +313,148 @@ namespace MNBL.ProceduralWorld.CampaignBootstrap
                     "Preflight validates modeled XML object-reference fields, not every possible future/modded XML schema; unrecognized source categories fail closed."
                 }), OptionalReferencesAbsent = optionalAbsent.OrderBy(x => x, StringComparer.Ordinal).ToList().AsReadOnly(),
                 DefaultReferencesSha256 = Hash(String.Join("\n", defaults.OrderBy(x => x, StringComparer.Ordinal))),
-                DeclaredDefaultReferences = defaults.OrderBy(x => x, StringComparer.Ordinal).ToList().AsReadOnly()
+                DeclaredDefaultReferences = defaults.OrderBy(x => x, StringComparer.Ordinal).ToList().AsReadOnly(),
+                FixtureEntityPrefabs = new ReadOnlyDictionary<string, string>(fixturePrefabs),
+                StartupPlan = startupPlan, NavalPlan = navalPlan, StartPoints = new ReadOnlyDictionary<string, double[]>(startPoints), StartTown = startupPlan == null ? null : world + "_town_1",
+                InstalledStartPoints = new ReadOnlyDictionary<string, double[]>(installedStarts)
             };
+        }
+        // MMR-33: the first world's town and village rebuilt by SettlementFactory.Element (same ids, owner and positions), plus a castle of
+        // the same clan, a village bound to the castle and a forest-bandit hideout, each from an installed prototype of its culture and kind.
+        // Returns the fixture town's gate.
+        private static double[] AddFixtures(XmlDocument settlements, Options options, string world, XmlDocument installed, HashSet<string> defaults,
+            Dictionary<string, Record> catalog, HashSet<string> generated, Dictionary<string, string> prefabs)
+        {
+            var f = options.Fixtures;
+            var factory = new MNBL.ProceduralWorld.CampaignRegistry.SettlementFactory(f.Economy, f.Prototypes, installed, key => defaults.Contains(key) || catalog.ContainsKey(key), f.MissionScenes);
+            var p = options.First;
+            string town = world + "_town_1", village = world + "_village_1", castle = world + "_castle_1", castleVillage = world + "_village_3", hideout = world + "_hideout_1", clan = world + "_clan_1";
+            // Gates distinct from the centres (the world's settlements stage the gate at the centre until MMR-40 places gates), so the
+            // in-game check can tell a gate from a centre: 0.3 of a cell (1.875) inside the centre's own verified land cell, the town's
+            // toward its port, the castle's east.
+            const double gateOffset = 1.875;
+            double toPort = Math.Sqrt((p.PortX - p.TownX) * (p.PortX - p.TownX) + (p.PortY - p.TownY) * (p.PortY - p.TownY));
+            if (!(toPort > gateOffset)) Fail("Fixture town port is not away from the town centre.");
+            double townGateX = p.TownX + gateOffset * (p.PortX - p.TownX) / toPort, townGateY = p.TownY + gateOffset * (p.PortY - p.TownY) / toPort;
+            // MMR-40: a placement whose gates the settlement layout resolved (tools/Build-FixtureSettlements.ps1) gives the town its resolved gate.
+            if (p.GateX != p.TownX || p.GateY != p.TownY) { townGateX = p.GateX; townGateY = p.GateY; }
+            var intents = new[] {
+                factory.Fixture(town, "town", "Harbor 1 " + world, options.CultureId, clan, null, p.TownX, p.TownY, townGateX, townGateY, p.PortX, p.PortY, 3600, 0, null),
+                factory.Fixture(castle, "castle", "Castle 1 " + world, options.CultureId, clan, null, f.CastleX, f.CastleY, f.CastleX + gateOffset, f.CastleY, null, null, 700, 0, null),
+                factory.Fixture(village, "village", "Village 1 " + world, options.CultureId, null, town, p.VillageX, p.VillageY, p.VillageX, p.VillageY, p.VillagePortX, p.VillagePortY, 0, 300, "wheat_farm"),
+                factory.Fixture(castleVillage, "village", "Village 3 " + world, options.CultureId, null, castle, f.VillageX, f.VillageY, f.VillageX, f.VillageY, null, null, 0, 250, "cattle_farm"),
+                factory.Hideout(hideout, "Hideout 1 " + world, "forest_bandits", f.HideoutX, f.HideoutY) };
+            foreach (var id in new[] { town, village })
+            {
+                var old = settlements.DocumentElement.SelectSingleNode("Settlement[@id='" + id + "']");
+                if (old == null) Fail("Fixture settlement " + id + " was not built by the dataset.");
+                settlements.DocumentElement.RemoveChild(old);
+            }
+            // Towns and castles first, then the villages bound to them, then the hideout (the MMR-30 ReadyAt rule).
+            var first = settlements.DocumentElement.FirstChild;
+            foreach (var s in intents.Where(x => x.Kind == "town" || x.Kind == "castle"))
+                settlements.DocumentElement.InsertBefore(MNBL.ProceduralWorld.CampaignRegistry.SettlementFactory.Element(settlements, s, factory.Prototype(s.Prototype)), first);
+            foreach (var s in intents.Where(x => x.Kind == "village" || x.Kind == "hideout"))
+                settlements.DocumentElement.AppendChild(MNBL.ProceduralWorld.CampaignRegistry.SettlementFactory.Element(settlements, s, factory.Prototype(s.Prototype)));
+            generated.UnionWith(new[] { "Settlement." + castle, "Town." + castle + "_component", "Settlement." + castleVillage, "Village." + castleVillage + "_component",
+                                        "Settlement." + hideout, "Hideout." + hideout + "_component" });
+            foreach (var s in intents.Where(x => x.Id == castle || x.Id == castleVillage || x.Id == hideout))
+            {
+                if (s.MapPrefab == null) Fail("Fixture settlement " + s.Id + " prototype " + s.Prototype + " has no map prefab.");
+                prefabs[s.Id] = s.MapPrefab;
+            }
+            return new[] { townGateX, townGateY };
+        }
+        // MMR-34: what the startup supplies, on the fixture world, through GeneratedCampaignInitializer's shared record builders and rules.
+        // One hideout of every bandit culture BanditSpawnCampaignBehavior spawns for (the fixture forest hideout and four more; it reads its
+        // hideouts-by-culture map unchecked, run 37036); the installed land bandit clans (world aliases) homed by the initializer's rule
+        // (the first hideout of their culture, else the first: looters and deserters at the forest one); the installed retirement retreat
+        // (alias) at a verified land point with the nearest town's culture; every creation culture re-emitted with its start at the fixture
+        // town's gate (so no installed start point survives); and a runtime plan built as the MMR-32 rules build the full world's: notables
+        // meeting the installed targets (town: 2 merchants, 2 gang leaders, an artisan; village: a headman and 2 rural notables) from the
+        // culture's installed notable templates, the companions the installed loop creates (0.6 x towns) from its installed wanderer
+        // templates, and one ruler relation.
+        private static MNBL.ProceduralWorld.CampaignRegistry.GeneratedCampaignInitializer.StartupPlan AddStartupFixtures(Dictionary<string, XmlDocument> docs, Options options,
+            string world, Dictionary<string, XmlDocument> sourceDocs, Dictionary<string, Record> catalog, HashSet<string> generated, HashSet<string> defaults,
+            Dictionary<string, string> prefabs, double[] townGate, Dictionary<string, double[]> startPoints, Dictionary<string, double[]> installedStarts)
+        {
+            var factory = new MNBL.ProceduralWorld.CampaignRegistry.SettlementFactory(options.Fixtures.Economy, options.Fixtures.Prototypes, sourceDocs["Settlements"],
+                key => defaults.Contains(key) || catalog.ContainsKey(key), options.Fixtures.MissionScenes);
+            var hideouts = new List<MNBL.ProceduralWorld.CampaignRegistry.SettlementFactory.SettlementIntent> {
+                factory.Hideout(world + "_hideout_1", "Hideout 1 " + world, "forest_bandits", options.Fixtures.HideoutX, options.Fixtures.HideoutY) };   // emitted by AddFixtures
+            var extra = new[] { "desert_bandits", "mountain_bandits", "sea_raiders", "steppe_bandits" };
+            if (options.Startup.HideoutPoints.Count != extra.Length) Fail("Startup fixtures need " + extra.Length + " hideout points.");
+            for (int i = 0; i < extra.Length; i++)
+            {
+                string id = world + "_hideout_" + (i + 2).ToString(CultureInfo.InvariantCulture);
+                var p = options.Startup.HideoutPoints[i];
+                var h = factory.Hideout(id, "Hideout " + (i + 2) + " " + world, extra[i], p[0], p[1]);
+                docs["Settlements"].DocumentElement.AppendChild(MNBL.ProceduralWorld.CampaignRegistry.SettlementFactory.Element(docs["Settlements"], h, factory.Prototype(h.Prototype)));
+                generated.UnionWith(new[] { "Settlement." + id, "Hideout." + id + "_component" });
+                if (h.MapPrefab == null) Fail("Fixture hideout " + id + " prototype " + h.Prototype + " has no map prefab.");
+                prefabs[id] = h.MapPrefab;
+                hideouts.Add(h);
+            }
+            foreach (var clan in new[] { "looters", "deserters", "sea_raiders", "mountain_bandits", "forest_bandits", "desert_bandits", "steppe_bandits" })
+            {
+                var record = sourceDocs["Factions"].DocumentElement.SelectSingleNode("Faction[@id='" + clan + "']") as XmlElement;
+                if (record == null) Fail("Installed bandit clan " + clan + " is missing.");
+                var home = MNBL.ProceduralWorld.CampaignRegistry.GeneratedCampaignInitializer.BanditHome(record.GetAttribute("culture").Split('.').Last(), hideouts);
+                docs["Factions"].DocumentElement.AppendChild(MNBL.ProceduralWorld.CampaignRegistry.GeneratedCampaignInitializer.BanditClanRecord(docs["Factions"], record, home));
+                generated.Add("Faction." + clan);
+            }
+            var retreat = sourceDocs["Settlements"].DocumentElement.SelectSingleNode("Settlement[@id='retirement_retreat']") as XmlElement;
+            if (retreat == null) Fail("The installed retirement retreat is missing.");
+            var towns = new[] { 1, 2 }.Select(i => { var p = i == 1 ? options.First : options.Second;
+                return new MNBL.ProceduralWorld.CampaignRegistry.SettlementFactory.SettlementIntent { Id = world + "_town_" + i, Culture = options.CultureId, X = p.TownX, Y = p.TownY }; }).ToList();
+            string retreatCulture = MNBL.ProceduralWorld.CampaignRegistry.GeneratedCampaignInitializer.NearestTownCulture(options.Startup.RetreatX, options.Startup.RetreatY, towns,
+                (x1, y1, x2, y2) => Math.Sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2)));
+            docs["Settlements"].DocumentElement.AppendChild(MNBL.ProceduralWorld.CampaignRegistry.GeneratedCampaignInitializer.RetreatRecord(docs["Settlements"], retreat,
+                options.Startup.RetreatX, options.Startup.RetreatY, retreatCulture));
+            generated.Add("Settlement.retirement_retreat"); generated.Add("RetirementSettlementComponent.retirement_component");
+            // Every creation culture starts at the fixture town's gate (the selected culture's own record is replaced).
+            var creation = MNBL.ProceduralWorld.CampaignRegistry.GeneratedCampaignInitializer.CreationCultures(sourceDocs["SPCultures"]);
+            if (!creation.Contains(options.CultureId)) Fail("The selected culture " + options.CultureId + " is not a creation culture.");
+            foreach (var old in docs["SPCultures"].DocumentElement.ChildNodes.OfType<XmlElement>().ToList()) docs["SPCultures"].DocumentElement.RemoveChild(old);
+            foreach (var id in creation)
+            {
+                var record = (XmlElement)sourceDocs["SPCultures"].DocumentElement.SelectSingleNode("Culture[@id='" + id + "']");
+                installedStarts[id] = new[] { Double.Parse(record.GetAttribute("start_point_position_x"), CultureInfo.InvariantCulture), Double.Parse(record.GetAttribute("start_point_position_y"), CultureInfo.InvariantCulture) };
+                docs["SPCultures"].DocumentElement.AppendChild(MNBL.ProceduralWorld.CampaignRegistry.GeneratedCampaignInitializer.StartCultureRecord(docs["SPCultures"], record, townGate[0], townGate[1]));
+                startPoints[id] = new[] { townGate[0], townGate[1] };
+            }
+
+            var culture = sourceDocs["SPCultures"].DocumentElement.SelectSingleNode("Culture[@id='" + options.CultureId + "']") as XmlElement;
+            var notableTemplates = culture == null ? new List<string>() : culture.SelectNodes("notable_templates/template").OfType<XmlElement>().Select(t => t.GetAttribute("name").Split('.').Last()).ToList();
+            var characters = sourceDocs["NPCCharacters"].DocumentElement.ChildNodes.OfType<XmlElement>().ToDictionary(e => e.GetAttribute("id"), StringComparer.Ordinal);
+            Func<string, string> templateOf = occupation => {
+                var id = notableTemplates.FirstOrDefault(t => characters.ContainsKey(t) && characters[t].GetAttribute("occupation") == occupation);
+                if (id == null) Fail("Culture " + options.CultureId + " has no installed " + occupation + " notable template.");
+                return id; };
+            var plan = new MNBL.ProceduralWorld.CampaignRegistry.GeneratedCampaignInitializer.StartupPlan();
+            var targets = new Dictionary<string, string[]> {
+                ["town"] = new[] { "Merchant", "Merchant", "GangLeader", "GangLeader", "Artisan" },
+                ["village"] = new[] { "Headman", "RuralNotable", "RuralNotable" } };
+            var homes = new[] { "town_1", "town_2", "village_1", "village_2", "village_3" };
+            foreach (var home in homes)
+            {
+                var occupations = targets[home.StartsWith("town_", StringComparison.Ordinal) ? "town" : "village"];
+                for (int i = 0; i < occupations.Length; i++)
+                    plan.Notables.Add(new MNBL.ProceduralWorld.CampaignRegistry.GeneratedCampaignInitializer.HeroPlan {
+                        Id = "fixture-notable:" + home + ":" + i, Uid = "notable:" + world + "_" + home + ":" + occupations[i] + ":" + i, Template = templateOf(occupations[i]),
+                        Settlement = world + "_" + home, Name = occupations[i] + " " + (i + 1) + " of " + home.Replace('_', ' '), Occupation = occupations[i], Age = 35 + 3 * i });
+            }
+            var wanderers = characters.Values.Where(e => e.GetAttribute("occupation") == "Wanderer" && e.GetAttribute("is_template") == "true" && e.GetAttribute("culture") == "Culture." + options.CultureId)
+                .Select(e => e.GetAttribute("id")).OrderBy(x => x, StringComparer.Ordinal).ToList();
+            int companions = 0;
+            for (int i = 0; (float)i < 0.6f * 2; i++) companions++;   // the installed loop over 2 towns
+            if (wanderers.Count < companions) Fail("Culture " + options.CultureId + " has fewer installed wanderer templates than companions.");
+            for (int i = 0; i < companions; i++)
+                plan.Companions.Add(new MNBL.ProceduralWorld.CampaignRegistry.GeneratedCampaignInitializer.HeroPlan {
+                    Id = "fixture-companion:" + i, Uid = "companion:" + i, Template = wanderers[i], Settlement = world + "_town_" + (i + 1),
+                    Name = "Wanderer " + (i + 1) + " " + world, Occupation = "Wanderer", Age = 28 + i });
+            plan.Relations.Add(new MNBL.ProceduralWorld.CampaignRegistry.GeneratedCampaignInitializer.RelationPlan { A = world + "_ruler_1", B = world + "_ruler_2", Value = -23 });
+            return plan;
         }
         private const string Banner = "11.4.4.4345.4345.764.764.1.0.0.163.5.5.512.512.764.764.1.0.0";
         private static void AddClan(XmlDocument doc, string id, string hero, string home, string culture, string kingdom, string name, string tier)
@@ -329,6 +491,149 @@ namespace MNBL.ProceduralWorld.CampaignBootstrap
                 var node = prototype.SelectSingleNode(child); if (node != null) e.AppendChild(doc.ImportNode(node, true));
             }
         }
+        // The merged installed documents as records by typed key (Type.id), and their parsed copies.
+        private static Dictionary<string, Record> Catalog(IDictionary<string, XmlDocument> mergedSources, out Dictionary<string, XmlDocument> sourceDocs)
+        {
+            var catalog = new Dictionary<string, Record>(StringComparer.Ordinal);
+            sourceDocs = new Dictionary<string, XmlDocument>(StringComparer.Ordinal);
+            foreach (var source in mergedSources.OrderBy(p => p.Key, StringComparer.Ordinal))
+            {
+                if (source.Value == null || source.Value.DocumentElement == null || source.Value.DocumentType != null)
+                    Fail("Missing root or forbidden DTD in merged source " + source.Key);
+                var doc = Parse(source.Value.OuterXml); sourceDocs.Add(source.Key, doc);
+                string expectedRoot = source.Key == "SiegeEngines" ? "SiegeEngineTypes" : source.Key;
+                if (doc.DocumentElement.Name != expectedRoot && !(source.Key == "partyTemplates" && doc.DocumentElement.Name == "MBPartyTemplates"))
+                    Fail("Merged source/root mismatch: " + source.Key + " / " + doc.DocumentElement.Name);
+                string sourceHash = Hash(doc.OuterXml);
+                foreach (var element in Children(doc.DocumentElement))
+                {
+                    if (!element.HasAttribute("id")) continue;
+                    string type = ElementType(element.Name);
+                    string id = element.GetAttribute("id"); CheckId(id);
+                    string key = type + "." + id;
+                    if (catalog.ContainsKey(key)) Fail("Duplicate merged object " + key + "; supply stock merged XML, not concatenated records.");
+                    catalog.Add(key, new Record { Key = key, Source = source.Key, SourceHash = sourceHash, Element = element });
+                }
+            }
+            foreach (string required in new[] { "NPCCharacters", "Heroes", "SPCultures", "partyTemplates", "EquipmentRosters", "Settlements", "WorkshopTypes", "LocationComplexTemplates" })
+                if (!sourceDocs.ContainsKey(required)) Fail("Required merged source missing: " + required);
+            return catalog;
+        }
+
+        // The installed records a world's documents need re-emitted (MMR-18): every reference reachable from the roots (in order) and from the
+        // generated documents' records, through the installed loaders' reference schema, minus the world's own objects and the verified engine
+        // defaults. Official world instances (lords, kingdoms, settlements) are refused, as is an official hero kept as a template.
+        private sealed class Closure
+        {
+            internal readonly HashSet<string> Used = new HashSet<string>(StringComparer.Ordinal);
+            internal readonly List<Provenance> Provenance = new List<Provenance>();
+            internal readonly HashSet<string> OptionalAbsent = new HashSet<string>(StringComparer.Ordinal);
+        }
+        private static Closure Close(Dictionary<string, Record> catalog, HashSet<string> generated, HashSet<string> defaults, IEnumerable<KeyValuePair<string, string>> roots, IEnumerable<XmlDocument> generatedDocs)
+        {
+            var result = new Closure();
+            var used = result.Used; var provenance = result.Provenance; var optionalAbsent = result.OptionalAbsent;
+            var cultureRoles = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var record in catalog.Values.Where(r => r.Source == "SPCultures"))
+                foreach (XmlAttribute attribute in record.Element.Attributes)
+                    if (attribute.Value.StartsWith("NPCCharacter.", StringComparison.Ordinal)) cultureRoles.Add(attribute.Value);
+            Action<string, string> visit = null;
+            visit = (reference, reason) =>
+            {
+                if (reference.StartsWith("?", StringComparison.Ordinal)) {
+                    int separator = reference.IndexOf('|');
+                    string optionalContract = reference.Substring(1, separator - 1);
+                    reference = reference.Substring(separator + 1);
+                    if (!catalog.ContainsKey(reference) && !defaults.Contains(reference)) {
+                        optionalAbsent.Add(reference + " from " + reason + "; installed " + optionalContract + " permits a missing target");
+                        return;
+                    }
+                }
+                if (generated.Contains(reference)) return;
+                string type = reference.Split('.')[0];
+                if (WorldTypes.Contains(type)) Fail("Official world-instance dependency forbidden: " + reference + " from " + reason);
+                if (!used.Add(reference)) return;
+                Record record;
+                if (!catalog.TryGetValue(reference, out record))
+                {
+                    if (!defaults.Contains(reference)) Fail("Unresolved dependency " + reference + " from " + reason);
+                    provenance.Add(new Provenance(reference, "caller-verified-default-declarations; live readiness not asserted",
+                        Hash(String.Join("\n", defaults.OrderBy(x => x, StringComparer.Ordinal))), "", reason)); return;
+                }
+                if (type == "NPCCharacter" && (catalog.ContainsKey("Hero." + record.Element.GetAttribute("id")) ||
+                    (True(record.Element, "is_hero") && !True(record.Element, "is_template") && !cultureRoles.Contains(reference))))
+                    Fail("Named/world hero cannot be retained as a reusable NPC template: " + reference + " from " + reason);
+                provenance.Add(new Provenance(reference, record.Source, record.SourceHash, Hash(record.Element.OuterXml), reason +
+                    (type == "NPCCharacter" && True(record.Element, "is_hero") && !True(record.Element, "is_template")
+                    ? "; explicit culture NPC role, no matching Hero instance (is_hero alone is not a live-world classification)" : "")));
+                foreach (string dependency in Dependencies(record.Element)) visit(dependency, reference);
+            };
+            foreach (var root in roots) visit(root.Key, root.Value);
+            foreach (var document in generatedDocs)
+                foreach (var element in Children(document.DocumentElement))
+                    foreach (string dependency in Dependencies(element)) visit(dependency, "generated " + element.GetAttribute("id"));
+            return result;
+        }
+
+        // These stock categories have already loaded before the registration hook. Include their references even if a world's instances use
+        // only some cultures; do not leave presumed NPCs.
+        private static IEnumerable<KeyValuePair<string, string>> StockRoots(Dictionary<string, Record> catalog)
+        {
+            foreach (string source in new[] { "SPCultures", "partyTemplates", "EquipmentRosters", "WorkshopTypes", "LocationComplexTemplates" })
+                foreach (var record in catalog.Values.Where(r => r.Source == source).OrderBy(r => r.Key, StringComparer.Ordinal))
+                    yield return new KeyValuePair<string, string>(record.Key, "stock category " + source);
+        }
+
+        // Re-emits every used installed NPC template at the head of the generated NPCCharacters document (a generated alias replaces the
+        // official definition, never both).
+        private static void EmitTemplates(XmlDocument characters, Dictionary<string, Record> catalog, Closure closure)
+        {
+            foreach (string reference in closure.Used.Where(k => k.StartsWith("NPCCharacter.", StringComparison.Ordinal)).OrderBy(k => k, StringComparer.Ordinal))
+            {
+                var source = Require(catalog, reference).Element;
+                characters.DocumentElement.InsertBefore(characters.ImportNode(source, true), characters.DocumentElement.FirstChild);
+            }
+        }
+
+        // MMR-45: a compiled world's documents for the new game, in RegistrationPlan.NewGameOrder: its own documents (SPCultures with the
+        // creation cultures' generated start points, NPCCharacters, Heroes, Kingdoms, Factions, Settlements: the factories' records, merged)
+        // with the installed records they need re-emitted by the same closure as the fixture world (stock categories, the engine's
+        // literal NPC lookups, the startup plan's templates, every generated record's references), and the installed WorkshopTypes and
+        // LocationComplexTemplates whole. generated: the world's declared objects (Type.id); an official key among them must be an alias.
+        internal static List<KeyValuePair<string, XmlDocument>> CompiledWorldDocuments(IDictionary<string, XmlDocument> mergedSources, IEnumerable<string> verifiedDefaultReferences,
+            IDictionary<string, XmlDocument> worldDocuments, IEnumerable<string> generatedKeys, IEnumerable<string> planTemplates, out List<Provenance> templates, out List<string> optionalAbsent)
+        {
+            var defaults = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var reference in verifiedDefaultReferences)
+            {
+                var match = Typed.Match(reference ?? "");
+                if (!match.Success || !DefaultTypes.Contains(match.Groups[1].Value)) Fail("Not an allowed engine-default reference: " + reference);
+                defaults.Add(reference);
+            }
+            Dictionary<string, XmlDocument> sourceDocs;
+            var catalog = Catalog(mergedSources, out sourceDocs);
+            var generated = new HashSet<string>(generatedKeys, StringComparer.Ordinal);
+            foreach (string key in generated)
+                if (catalog.ContainsKey(key) && !MNBL.ProceduralWorld.CampaignRegistry.CampaignIdentity.IsAlias(key.Substring(key.IndexOf('.') + 1)))
+                    Fail("Generated identity collides with source: " + key);
+            var docs = new Dictionary<string, XmlDocument>(StringComparer.Ordinal);
+            foreach (string root in new[] { "SPCultures", "NPCCharacters", "Heroes", "Kingdoms", "Factions", "Settlements" })
+            {
+                XmlDocument d;
+                if (!worldDocuments.TryGetValue(root, out d) || d == null || d.DocumentElement == null || d.DocumentElement.Name != root) Fail("The compiled world has no " + root + " document.");
+                docs[root] = Parse(d.OuterXml);
+            }
+            var roots = StockRoots(catalog)
+                .Concat(InstalledEngineCharacterIds.OrderBy(x => x, StringComparer.Ordinal).Select(id => new KeyValuePair<string, string>("NPCCharacter." + id, "installed code string-literal lookup")))
+                .Concat(planTemplates.Distinct().OrderBy(x => x, StringComparer.Ordinal).Select(t => new KeyValuePair<string, string>("NPCCharacter." + t, "MMR-34 startup plan template")));
+            var closure = Close(catalog, generated, defaults, roots, docs.Values);
+            EmitTemplates(docs["NPCCharacters"], catalog, closure);
+            templates = closure.Provenance.OrderBy(x => x.Reference, StringComparer.Ordinal).ToList();
+            optionalAbsent = closure.OptionalAbsent.OrderBy(x => x, StringComparer.Ordinal).ToList();
+            return MNBL.ProceduralWorld.CampaignRegistry.RegistrationPlan.NewGameOrder
+                .Select(id => new KeyValuePair<string, XmlDocument>(id, docs.ContainsKey(id) ? docs[id] : Parse(sourceDocs[id].OuterXml))).ToList();
+        }
+
         private static void ValidatePrototype(Record r, string kind, string culture)
         {
             if (r.Element.GetAttribute("culture") != culture || r.Element.SelectSingleNode("Components/" + kind) == null ||
@@ -337,64 +642,16 @@ namespace MNBL.ProceduralWorld.CampaignBootstrap
             if (kind == "Town" && True(c, "is_castle")) Fail("Town prototype is a castle: " + r.Key);
             if (Children((XmlElement)r.Element.SelectSingleNode("Components")).Count() != 1) Fail("Multiple prototype components unsupported: " + r.Key);
         }
+        // The installed loaders' references (shared with CampaignGraphValidator, MMR-36); a malformed value fails the preflight.
         private static IEnumerable<string> Dependencies(XmlElement root)
         {
-            foreach (XmlElement e in root.SelectNodes("descendant-or-self::*"))
-                foreach (XmlAttribute a in e.Attributes)
-                {
-                    if (e == root && a.Name == "id") continue;
-                    string value = a.Value;
-                    var match = Typed.Match(value);
-                    if (match.Success) { yield return value; continue; }
-                    if (Regex.IsMatch(value, @"^[A-Z][A-Za-z0-9_]*\.", RegexOptions.CultureInvariant))
-                        Fail("Malformed typed reference " + value + " at " + root.Name + "/" + e.Name + "/@" + a.Name);
-                    if (new[] { "culture", "faction", "owner", "super_faction", "bound", "village_type", "complex_template", "skill_template", "troop" }.Contains(a.Name)
-                        && value.Length != 0)
-                        Fail("Expected a typed reference at " + root.Name + "/" + e.Name + "/@" + a.Name + ": " + value);
-                    string prefix = null;
-                    if (a.Name == "id" && e != root) {
-                        switch (e.Name) {
-                            case "EquipmentSet": prefix = "EquipmentRoster"; break;
-                            case "skill": prefix = "?PropertyOwner.Deserialize IL_0063|Skill"; break;
-                            case "Trait": prefix = "?PropertyOwner.Deserialize IL_0063|Trait"; break;
-                            case "policy": prefix = "Policy"; break;
-                            case "Building": prefix = "BuildingType"; break;
-                            case "ShipSlot": prefix = "ShipSlot"; break;
-                            case "ShipUpgradePiece": prefix = "ShipUpgradePiece"; break;
-                            case "WeaponDescription": prefix = "WeaponDescription"; break;
-                            case "AvailablePiece": prefix = root.Name == "WeaponDescription" ? "?WeaponDescription.Deserialize IL_01af|CraftingPiece" : "CraftingPiece"; break;
-                        }
-                    }
-                    if (a.Name == "mission_ship") prefix = "MissionShip";
-                    if (a.Name == "ship_physics_reference_id") prefix = "ShipPhysicsReference";
-                    if (a.Name == "modifier_group") prefix = "ItemModifierGroup";
-                    if (a.Name == "modifier_group" && e.ParentNode != null && e.ParentNode.Name == "ItemComponent")
-                        prefix = "?ItemComponent.Deserialize IL_0037 / Equipment.GetRandomizedEquipment IL_0031 null guard|ItemModifierGroup";
-                    if (a.Name == "crafting_template") prefix = "CraftingTemplate";
-                    if (a.Name == "item_category") prefix = "ItemCategory";
-                    if (a.Name == "base_monster") prefix = "Monster";
-                    if (a.Name == "skeleton_scale") prefix = "SkeletonScale";
-                    if (a.Name == "piece_id" || (e.Name == "Piece" && a.Name == "id")) prefix = "CraftingPiece";
-                    if (a.Name == "piece_id" && e.Name == "UsablePiece" && root.Name == "CraftingTemplate") prefix = "?CraftingTemplate.Deserialize IL_0398|CraftingPiece";
-                    // Despite its name, installed WorkshopType.Deserialize IL_0201 resolves ItemCategory.
-                    if (a.Name == "input_item") {
-                        if (e.Attributes[0] != a) Fail("Workshop input_item must be first: installed loader uses the first attribute value.");
-                        prefix = "ItemCategory";
-                    }
-                    if (a.Name == "default_character_creation_body_property") prefix = "BodyProperty";
-                    if (prefix != null && value.Length > 0) { CheckId(value); yield return prefix + "." + value; }
-                }
+            return MNBL.ProceduralWorld.CampaignRegistry.ReferenceSchema.Dependencies(root, Fail).ToList();
         }
         private static string ElementType(string element)
         {
-            if (element == "MBPartyTemplate") return "PartyTemplate";
-            if (element == "CraftedItem") return "Item";
-            // Explicit supported object catalog, including read-only world sources used for exclusion/prototypes.
-            if (new[] { "NPCCharacter", "Hero", "Culture", "Kingdom", "Faction", "Settlement", "Item", "EquipmentRoster",
-                "WorkshopType", "LocationComplexTemplate", "BodyProperty", "SkillSet", "ShipHull", "ShipSlot", "ShipUpgradePiece",
-                "ShipPhysicsReference", "MissionShip", "CraftingPiece", "CraftingTemplate", "WeaponDescription", "Monster",
-                "ItemCategory", "Skeleton", "SkeletonScale", "BannerIcon", "MusicInstrument", "MusicTrack", "ItemModifier", "ItemModifierGroup", "SiegeEngineType" }.Contains(element)) return element;
-            Fail("Unsupported source object element " + element + "; supply its explicit schema before accepting it."); return null;
+            var type = MNBL.ProceduralWorld.CampaignRegistry.ReferenceSchema.ElementType(element);
+            if (type == null) Fail("Unsupported source object element " + element + "; supply its explicit schema before accepting it.");
+            return type;
         }
         private static Record Require(Dictionary<string, Record> catalog, string key)
         { Record r; if (!catalog.TryGetValue(key, out r)) Fail("Required source object missing: " + key); return r; }

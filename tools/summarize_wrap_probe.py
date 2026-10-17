@@ -79,14 +79,8 @@ def leg_ok(record):
                 and record.get('canonicalThroughout'))
 
 
-def main():
-    ap = argparse.ArgumentParser()
-    ap.add_argument('--accepted', required=True)
-    ap.add_argument('--history', action='append', default=[])
-    ap.add_argument('--out', required=True)
-    a = ap.parse_args()
-    accepted = load(a.accepted)
-    w = wrap_report(accepted)
+def mmr63_checks(w, expected_patches=11):
+    # The MMR-63 checks of one wrap report (MMR-64 reuses them as its regression with its own patch count).
     width = w['geometry']['width']
     travel = {r['leg']: r for r in w.get('travel', [])}
     seam = w.get('seamEncounter', {})
@@ -122,10 +116,27 @@ def main():
                                        for r in [travel.get(n) for n in LEGS if n.startswith('player')] + [picking.get('travel')]),
         'saveNearSeamCanonical': bool(save.get('saveSucceeded')) and bool(save.get('deserialized')) and reloaded.get('mismatched') == 0
                                  and reloaded.get('nonCanonical') == 0 and reloaded.get('parties') == reloaded.get('liveParties'),
-        'patchesApplied': w.get('patchError') is None and len(w.get('patches', [])) == 11,
+        'patchesApplied': w.get('patchError') is None and len(w.get('patches', [])) == expected_patches,
         'noNonCanonicalPartiesAtEnd': w.get('nonCanonicalPartiesAtEnd') == [],
         'noFailures': w.get('failures') == [],
     }
+    return checks
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument('--accepted', required=True)
+    ap.add_argument('--history', action='append', default=[])
+    ap.add_argument('--out', required=True)
+    a = ap.parse_args()
+    accepted = load(a.accepted)
+    w = wrap_report(accepted)
+    width = w['geometry']['width']
+    checks = mmr63_checks(w)
+    travel = {r['leg']: r for r in w.get('travel', [])}
+    seam = w.get('seamEncounter', {})
+    picking = w.get('picking', {})
+    save = w.get('seamSave', {})
     summary = {
         'schema': 'mnbl.world-wrap-evidence', 'version': 1, 'ticket': 'MMR-63',
         'generatedUtc': datetime.datetime.now(datetime.timezone.utc).isoformat(),

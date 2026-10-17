@@ -1,0 +1,176 @@
+{
+  "schema": "mnbl.evidence.save-transfer-real",
+  "version": 1,
+  "ticket": "MMR-48",
+  "what": "tools/Transfer-WorldSave.ps1 on a real save of the per-user store (read only): the initial save of a committed seed-42 campaign exported with its world package and data bundle, then imported into an empty temporary store and save folder, again under a new name (the world reused), and a third time under the same name (refused). Then tools/Inspect-World.ps1 on the temporary store.",
+  "save": "mnbl_1609fb72_start_0e304e2a6749",
+  "timings": {
+    "exportSeconds": 6.0,
+    "importSeconds": 5.0,
+    "note": "wall clock of the tool run, compilation excluded; measured by the calling shell"
+  },
+  "export": {
+    "directory": "%TEMP%\\mnbl48t\\exports\\real-initial-save",
+    "saves": [
+      "mnbl_1609fb72_start_0e304e2a6749"
+    ],
+    "worlds": [
+      "mnbl_1609fb72-2e32a5cbddca"
+    ],
+    "bundles": [
+      "f596b58cdcfc18798542fdef5a4d9c9f6d84abddca1425af8d0b87f521191d2d"
+    ],
+    "files": 902,
+    "bytes": 149633247,
+    "verified": true
+  },
+  "import1": {
+    "export": "%TEMP%\\mnbl48t\\exports\\real-initial-save",
+    "saves": [
+      {
+        "from": "mnbl_1609fb72_start_0e304e2a6749",
+        "name": "mnbl_1609fb72_start_0e304e2a6749",
+        "instance": "0e304e2a67494cfeb384333c6b6f6dc1",
+        "package": "mnbl_1609fb72-2e32a5cbddca",
+        "contentId": "f596b58cdcfc18798542fdef5a4d9c9f6d84abddca1425af8d0b87f521191d2d"
+      }
+    ],
+    "packages": {
+      "mnbl_1609fb72-2e32a5cbddca": "copied"
+    },
+    "bundles": {
+      "f596b58cdcfc18798542fdef5a4d9c9f6d84abddca1425af8d0b87f521191d2d": "copied"
+    },
+    "removedTemporaries": [],
+    "countsBefore": {
+      "packages": {},
+      "bundles": {}
+    },
+    "countsAfter": {
+      "packages": {
+        "mnbl_1609fb72-2e32a5cbddca": {
+          "references": 1,
+          "saves": 1,
+          "pending": 0,
+          "active": 0,
+          "instances": 1
+        }
+      },
+      "bundles": {
+        "f596b58cdcfc18798542fdef5a4d9c9f6d84abddca1425af8d0b87f521191d2d": {
+          "references": 1,
+          "saves": 1,
+          "pending": 0,
+          "active": 0,
+          "instances": 1
+        }
+      }
+    },
+    "indexComplete": true,
+    "regenerated": false
+  },
+  "import2": {
+    "export": "%TEMP%\\mnbl48t\\exports\\real-initial-save",
+    "saves": [
+      {
+        "from": "mnbl_1609fb72_start_0e304e2a6749",
+        "name": "moved copy",
+        "instance": "0e304e2a67494cfeb384333c6b6f6dc1",
+        "package": "mnbl_1609fb72-2e32a5cbddca",
+        "contentId": "f596b58cdcfc18798542fdef5a4d9c9f6d84abddca1425af8d0b87f521191d2d"
+      }
+    ],
+    "packages": {
+      "mnbl_1609fb72-2e32a5cbddca": "reused"
+    },
+    "bundles": {
+      "f596b58cdcfc18798542fdef5a4d9c9f6d84abddca1425af8d0b87f521191d2d": "reused"
+    },
+    "removedTemporaries": [],
+    "countsBefore": {
+      "packages": {
+        "mnbl_1609fb72-2e32a5cbddca": {
+          "references": 1,
+          "saves": 1,
+          "pending": 0,
+          "active": 0,
+          "instances": 1
+        }
+      },
+      "bundles": {
+        "f596b58cdcfc18798542fdef5a4d9c9f6d84abddca1425af8d0b87f521191d2d": {
+          "references": 1,
+          "saves": 1,
+          "pending": 0,
+          "active": 0,
+          "instances": 1
+        }
+      }
+    },
+    "countsAfter": {
+      "packages": {
+        "mnbl_1609fb72-2e32a5cbddca": {
+          "references": 2,
+          "saves": 2,
+          "pending": 0,
+          "active": 0,
+          "instances": 1
+        }
+      },
+      "bundles": {
+        "f596b58cdcfc18798542fdef5a4d9c9f6d84abddca1425af8d0b87f521191d2d": {
+          "references": 2,
+          "saves": 2,
+          "pending": 0,
+          "active": 0,
+          "instances": 1
+        }
+      }
+    },
+    "indexComplete": true,
+    "regenerated": false
+  },
+  "import3": {
+    "refused": "Nothing was imported: save mnbl_1609fb72_start_0e304e2a6749: a save of that name exists (an import never replaces a save; give it another name)"
+  },
+  "inspection": {
+    "bundles": [
+      {
+        "directory": "f596b58cdcfc18798542fdef5a4d9c9f6d84abddca1425af8d0b87f521191d2d",
+        "status": "valid",
+        "referencedBySaves": [
+          "mnbl_1609fb72_start_0e304e2a6749",
+          "moved copy"
+        ],
+        "gameVersion": "v1.4.8.119303",
+        "navalVersion": "v1.2.8.119303"
+      }
+    ],
+    "saves": [
+      {
+        "name": "mnbl_1609fb72_start_0e304e2a6749",
+        "instance": "0e304e2a67494cfeb384333c6b6f6dc1",
+        "contentId": "f596b58cdcfc18798542fdef5a4d9c9f6d84abddca1425af8d0b87f521191d2d",
+        "bundle": "valid",
+        "packagePresent": true,
+        "loadable": true
+      },
+      {
+        "name": "moved copy",
+        "instance": "0e304e2a67494cfeb384333c6b6f6dc1",
+        "contentId": "f596b58cdcfc18798542fdef5a4d9c9f6d84abddca1425af8d0b87f521191d2d",
+        "bundle": "valid",
+        "packagePresent": true,
+        "loadable": true
+      }
+    ],
+    "summary": {
+      "bundles": {
+        "valid": 1
+      },
+      "savesBound": 2,
+      "savesLoadable": 2,
+      "unfinishedJobs": 0
+    }
+  }
+}

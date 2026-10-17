@@ -6,6 +6,7 @@ using MNBL.ProceduralWorld.CampaignBootstrap;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
+using MNBL.ProceduralWorld.Surface;
 
 namespace MNBL.ProceduralWorld.Diagnostics
 {
@@ -18,7 +19,7 @@ namespace MNBL.ProceduralWorld.Diagnostics
         private static readonly HashSet<TerrainType> Water = new HashSet<TerrainType> { TerrainType.Water, TerrainType.Lake, TerrainType.River,
             TerrainType.Fording, TerrainType.CoastalSea, TerrainType.OpenSea };
 
-        internal static Dictionary<string, object> Capture(ProbeContext context, DiagnosticMapScene map)
+        internal static Dictionary<string, object> Capture(ProbeContext context, GeneratedMapScene map)
         {
             var r = new Dictionary<string, object>(); var failures = new List<string>(); r["failures"] = failures;
             var scene = map.Scene; var size = map.GetTerrainSize();

@@ -1,0 +1,98 @@
+{
+  "schemaVersion": 1,
+  "binarySha256": "2a5e0e0b15513ebb7052d747a621b82c50ee834553eba283b33bbbc33766e12a",
+  "records": [
+    {
+      "evidence_id": "ev_6e7aa335c92163da8aa4b802d3cf2f40f0284d1c9e745000053780beb7df311f",
+      "subject": {
+        "name": "backup-0",
+        "digest": {
+          "sha256": "2a5e0e0b15513ebb7052d747a621b82c50ee834553eba283b33bbbc33766e12a"
+        },
+        "local_path": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\build\\battle-scale\\native-run-20261017-065749-08e99ed9\\backup-0",
+        "format": "pe",
+        "architecture": "x86_64"
+      },
+      "provider": {
+        "id": "ghidra",
+        "name": "Ghidra",
+        "version": "12.1.4"
+      },
+      "analysis_profile": {
+        "provider": {
+          "id": "ghidra",
+          "name": "Ghidra",
+          "version": "12.1.4"
+        },
+        "parameters": {
+          "target_kind": "executable",
+          "target_format": "pe",
+          "executable_role": "shared-library",
+          "managed": false,
+          "native_aot_metadata": {
+            "contract_revision": "rtr-9.1-x64-pe-read-only-v3",
+            "source_bytes": 134217728,
+            "work_units": 67108864,
+            "working_memory_bytes": 67108864,
+            "report_bytes": 4194304
+          },
+          "architecture": "x86_64",
+          "available_architectures": [
+            "x86_64"
+          ],
+          "import_mode": "ephemeral-source-immutable",
+          "pdb_observations": "program-info-v1",
+          "annotation_policy": "atomic-function-entry-metadata-v1",
+          "load_image_observations": "source-mappings-entry-context-v2",
+          "function_body_evidence": "complete-inclusive-ranges-v1",
+          "function_references": "complete-body-and-entry-reference-manager-v2",
+          "call_relationship_coverage": "function-body-call-coverage-v5",
+          "function_dossier_coverage": "observed-facets-and-call-relationships-v1",
+          "string_inventory_evidence": "defined-data-coverage-v1",
+          "location_resolution": "explicit-address-exact-entry-symbol-first-v3",
+          "procedure_file_offset_resolution": "address-first-unique-target-source-mapping-v2",
+          "instruction_flow_evidence": "decoded-return-pcode-v1",
+          "instruction_references": "exact-address-incoming-v1",
+          "function_boundary_observations": "ghidra-function-boundary-limitations-v3",
+          "no_return_repair": "disabled-windows-p0",
+          "process_launch": "official-headless-script-v1",
+          "jump_table_evidence": "typed-case-default-blocks-v1",
+          "decompiler_jump_loads": true,
+          "loader": "auto-from-header",
+          "language_id": "auto-from-header",
+          "compiler_spec_id": "auto-default",
+          "analyzer_preset": "ghidra-default"
+        },
+        "digest": "dcc676845881c04a2d22833fb35d26569462e033daee5e99a95edac5aa61ac05"
+      },
+      "predicate_type": "rea.analysis",
+      "operation": "procedure_pseudo_code",
+      "parameters": {
+        "procedure": "0x180690170"
+      },
+      "raw_result": {
+        "value": "\r\n/* WARNING: Function: __security_check_cookie replaced with injection: security_check_cookie */\r\n\r\nvoid FUN_180690170(undefined8 param_1,int param_2,undefined4 *param_3,undefined4 *param_4)\r\n\r\n{\r\n  int iVar1;\r\n  undefined4 local_118 [64];\r\n  ulonglong local_18;\r\n  \r\n  local_18 = DAT_180cff388 ^ (ulonglong)local_118;\r\n  local_118[4] = 0x3f76f3b3;\r\n  iVar1 = param_2 + -1;\r\n  if (0x1f < param_2 + -1) {\r\n    iVar1 = 0x1f;\r\n  }\r\n  local_118[8] = 0x3f46bcfb;\r\n  local_118[6] = 0x3f5da220;\r\n  local_118[0xc] = 0x3f20d3fb;\r\n  local_118[10] = 0x3f3275d4;\r\n  local_118[0x10] = 0x3f050176;\r\n  local_118[0xe] = 0x3f11bd7e;\r\n  local_118[0x14] = 0x3ee334ec;\r\n  local_118[0x12] = 0x3ef4c354;\r\n  local_118[0x16] = 0x3ed4d11b;\r\n  local_118[0x18] = 0x3ec9197a;\r\n  local_118[0x1a] = 0x3ebf9c00;\r\n  local_118[0x1c] = 0x3eb7f4d5;\r\n  local_118[0x1e] = 0x3eb1ce73;\r\n  local_118[0x20] = 0x3eace0d5;\r\n  local_118[0x22] = 0x3ea8f021;\r\n  local_118[0x24] = 0x3ea5cb17;\r\n  local_118[0x26] = 0x3ea34985;\r\n  local_118[0x28] = 0x3ea14ad0;\r\n  local_118[0x2a] = 0x3e9fb4a5;\r\n  local_118[0x2c] = 0x3e9e71da;\r\n  local_118[0x2e] = 0x3e9d7178;\r\n  local_118[0x30] = 0x3e9ca5ee;\r\n  local_118[0x32] = 0x3e9c0465;\r\n  local_118[0] = 0x3f800000;\r\n  local_118[1] = 5;\r\n  local_118[2] = 0x3f800000;\r\n  local_118[3] = 5;\r\n  local_118[5] = 5;\r\n  local_118[7] = 6;\r\n  local_118[9] = 6;\r\n  local_118[0xb] = 6;\r\n  local_118[0xd] = 6;\r\n  local_118[0xf] = 7;\r\n  local_118[0x11] = 7;\r\n  local_118[0x13] = 7;\r\n  local_118[0x15] = 8;\r\n  local_118[0x17] = 8;\r\n  local_118[0x19] = 8;\r\n  local_118[0x1b] = 8;\r\n  local_118[0x1d] = 9;\r\n  local_118[0x1f] = 9;\r\n  local_118[0x21] = 9;\r\n  local_118[0x23] = 9;\r\n  local_118[0x25] = 9;\r\n  local_118[0x27] = 9;\r\n  local_118[0x29] = 9;\r\n  local_118[0x2b] = 9;\r\n  local_118[0x2d] = 9;\r\n  local_118[0x2f] = 9;\r\n  local_118[0x31] = 9;\r\n  local_118[0x33] = 9;\r\n  local_118[0x36] = 0x3e9b1e95;\r\n  local_118[0x34] = 0x3e9b843d;\r\n  local_118[0x38] = 0x3e9acdf7;\r\n  local_118[0x3a] = 0x3e9a8e0a;\r\n  local_118[0x3c] = 0x3e9a5b5c;\r\n  local_118[0x3e] = 0x3e9a332d;\r\n  local_118[0x35] = 9;\r\n  local_118[0x37] = 10;\r\n  local_118[0x39] = 10;\r\n  local_118[0x3b] = 10;\r\n  local_118[0x3d] = 10;\r\n  local_118[0x3f] = 10;\r\n  *param_3 = local_118[(longlong)iVar1 * 2 + 1];\r\n  *param_4 = local_118[(longlong)iVar1 * 2];\r\n  return;\r\n}\r\n\r\n",
+        "limitations": []
+      },
+      "normalized_result": "\r\n/* WARNING: Function: __security_check_cookie replaced with injection: security_check_cookie */\r\n\r\nvoid FUN_180690170(undefined8 param_1,int param_2,undefined4 *param_3,undefined4 *param_4)\r\n\r\n{\r\n  int iVar1;\r\n  undefined4 local_118 [64];\r\n  ulonglong local_18;\r\n  \r\n  local_18 = DAT_180cff388 ^ (ulonglong)local_118;\r\n  local_118[4] = 0x3f76f3b3;\r\n  iVar1 = param_2 + -1;\r\n  if (0x1f < param_2 + -1) {\r\n    iVar1 = 0x1f;\r\n  }\r\n  local_118[8] = 0x3f46bcfb;\r\n  local_118[6] = 0x3f5da220;\r\n  local_118[0xc] = 0x3f20d3fb;\r\n  local_118[10] = 0x3f3275d4;\r\n  local_118[0x10] = 0x3f050176;\r\n  local_118[0xe] = 0x3f11bd7e;\r\n  local_118[0x14] = 0x3ee334ec;\r\n  local_118[0x12] = 0x3ef4c354;\r\n  local_118[0x16] = 0x3ed4d11b;\r\n  local_118[0x18] = 0x3ec9197a;\r\n  local_118[0x1a] = 0x3ebf9c00;\r\n  local_118[0x1c] = 0x3eb7f4d5;\r\n  local_118[0x1e] = 0x3eb1ce73;\r\n  local_118[0x20] = 0x3eace0d5;\r\n  local_118[0x22] = 0x3ea8f021;\r\n  local_118[0x24] = 0x3ea5cb17;\r\n  local_118[0x26] = 0x3ea34985;\r\n  local_118[0x28] = 0x3ea14ad0;\r\n  local_118[0x2a] = 0x3e9fb4a5;\r\n  local_118[0x2c] = 0x3e9e71da;\r\n  local_118[0x2e] = 0x3e9d7178;\r\n  local_118[0x30] = 0x3e9ca5ee;\r\n  local_118[0x32] = 0x3e9c0465;\r\n  local_118[0] = 0x3f800000;\r\n  local_118[1] = 5;\r\n  local_118[2] = 0x3f800000;\r\n  local_118[3] = 5;\r\n  local_118[5] = 5;\r\n  local_118[7] = 6;\r\n  local_118[9] = 6;\r\n  local_118[0xb] = 6;\r\n  local_118[0xd] = 6;\r\n  local_118[0xf] = 7;\r\n  local_118[0x11] = 7;\r\n  local_118[0x13] = 7;\r\n  local_118[0x15] = 8;\r\n  local_118[0x17] = 8;\r\n  local_118[0x19] = 8;\r\n  local_118[0x1b] = 8;\r\n  local_118[0x1d] = 9;\r\n  local_118[0x1f] = 9;\r\n  local_118[0x21] = 9;\r\n  local_118[0x23] = 9;\r\n  local_118[0x25] = 9;\r\n  local_118[0x27] = 9;\r\n  local_118[0x29] = 9;\r\n  local_118[0x2b] = 9;\r\n  local_118[0x2d] = 9;\r\n  local_118[0x2f] = 9;\r\n  local_118[0x31] = 9;\r\n  local_118[0x33] = 9;\r\n  local_118[0x36] = 0x3e9b1e95;\r\n  local_118[0x34] = 0x3e9b843d;\r\n  local_118[0x38] = 0x3e9acdf7;\r\n  local_118[0x3a] = 0x3e9a8e0a;\r\n  local_118[0x3c] = 0x3e9a5b5c;\r\n  local_118[0x3e] = 0x3e9a332d;\r\n  local_118[0x35] = 9;\r\n  local_118[0x37] = 10;\r\n  local_118[0x39] = 10;\r\n  local_118[0x3b] = 10;\r\n  local_118[0x3d] = 10;\r\n  local_118[0x3f] = 10;\r\n  *param_3 = local_118[(longlong)iVar1 * 2 + 1];\r\n  *param_4 = local_118[(longlong)iVar1 * 2];\r\n  return;\r\n}\r\n\r\n",
+      "confidence": "observed",
+      "authority": "shipped-artifact",
+      "environment": null,
+      "limitations": [
+        "The session serves operations only after Ghidra reports default auto-analysis complete; incomplete analysis does not expose partial results.",
+        "The imported Program and temporary project are ephemeral and deleted on close. Annotation operations edit session database metadata; original executable bytes are never written.",
+        "Cancelling an active Ghidra request terminates its ephemeral database and discards session annotations. The selected target remains open; the next provider query imports the original artifact again.",
+        "Default-space addresses use lowercase 0x-prefixed hexadecimal; other address spaces use <percent-encoded-space>:0x<hex>.",
+        "Pseudocode is Ghidra decompiler output, not original source and not text-equivalent to Hopper output.",
+        "External functions and functions without an analyzable body return null; other decompiler failures remain explicit.",
+        "Windows Ghidra P0 accepts native x86 and x86-64 PE applications and DLLs, and explicitly selected raw 6502 images; managed, hostile, sensitive, and mutable-path targets are unsupported.",
+        "The Windows bridge uses authenticated IPv4 loopback because Node path-based IPC does not expose Java AF_UNIX sockets; the endpoint file contains no bearer token.",
+        "Windows sessions require the matching packaged Windows x64 native addon, local NTFS targets and runtimes, and Windows 10 or later. Native handles enforce path admission, private DACLs, and Job Object ownership automatically.",
+        "The target references PDB TaleWorlds.Native.pdb (GUID 2029ba6e-176d-498a-903c-b56d1af1370c, age (hex) 1, signature unknown, version RSDS); Ghidra reports load state unknown. Original names and types may be missing; an empty name search does not prove a procedure is absent. Use list_procedures and address-based analysis to inspect recovered functions. REA does not admit a caller-selected PDB companion."
+      ],
+      "relationship_coverage": null,
+      "locations": [],
+      "evidence_links": []
+    }
+  ]
+}

@@ -5,7 +5,7 @@
 The selection is automatic and needs no intermediate human approval:
 - every mandatory runtime capability R01–R05 and R08–R10 has accepted evidence on this backend;
 - the limits, unresolved items and failures below are each scoped to the dependent ticket that owns them;
-- one composition is still unobserved: loading a navmesh and settlement entities from a scene registered after launch. It is assigned to MMR-45, with a bounded fallback.
+- loading a navmesh and settlement entities from a scene registered after launch, then booting a campaign on it, is observed by MMR-45. The generation job installs and registers the world's scene in the running game, and the activation boots the campaign on it with its navmesh and baked settlement entities: world_activation runs 22472, 9404 and 43676 (`docs/world-activation.md`).
 
 Acceptance of this ticket satisfies the MMR-21 prerequisite of MMR-25, MMR-29 and MMR-30 (see "Release of dependent work").
 
@@ -24,7 +24,7 @@ Acceptance of this ticket satisfies the MMR-21 prerequisite of MMR-25, MMR-29 an
 | Procedural meshes + managed map adapter | rejected | Meshes supply no native heightfield or navmesh. The historical raycast crash and the native picking/face bypasses (`HandleLeftMouseButtonClick` IL_007c `Scene.DoesPathExistBetweenFaces`) have no supported replacement. |
 | Navigation prefab replacement inside an indexed scene | rejected as a backend | A strict subset: it covers navigation only, and established no route rebuild, cache invalidation or seam connectivity. Its one observed step, PID 25128 rewriting a navigation file whose name was indexed before startup, rewrites a fixed name. The selected backend forbids that for loaded scenes (names are immutable), and newly created filenames imported 0 faces in that era (PIDs 29364, 14300). It survives only as the fallback in "Still unsupported or unresolved mandatory operations". |
 
-**Tradeoff.** This is the smallest supported surface that covers every capability: one owned scene folder and one owned map-scene class per world, the installed load and registration hooks, and Harmony patches only where a periodic world needs them. It costs private-field writes on `SandBox.MapScene` (listed under "Workarounds") and a per-world navigation-cache build on every load (see "Provisional limits").
+**Tradeoff.** This is the smallest supported surface that covers every capability: one owned scene folder and one owned map-scene class per world, the installed load and registration hooks, and Harmony patches only where a periodic world needs them. It costs private-field writes on `SandBox.MapScene` (listed under "Workarounds") and a per-world navigation-cache build on the first load of each world, which MMR-41 publishes and later loads read back (see "Provisional limits").
 
 ## Contract-to-evidence matrix
 
@@ -42,11 +42,11 @@ Absent evidence is never marked passed. "IL" means the behaviour was read from i
 | R02 | Runtime terrain rendering, heights, ground, rays and picking on freshly generated terrain registered after launch | passed with limits | MMR-16: `evidence/runtime/surface-probe.json`, `runtime_surface-32896*`, review `surface-coverage-review.json` (`trueCurrentBlockers: []`). In one process, seeds 42 (800 m) and 43 (640 m) were generated, encoded, installed under fresh names and registered at runtime (`Utilities.PairSceneNameToModuleName`). Party grounding passed in `sandbox_boot-25008` | **Exact native bin-boundary rounding is unresolved** (MMR-37). **The combined terrain-node exports crash natively** (PID 27392); they are withheld and have no gameplay consumer. **Constraint:** a loaded scene's `terrain.bin` cannot be replaced (file lock), so names are immutable. **Superseded:** the 0.2002 m grazing-ray error recorded for PIDs 34660/12748 was a historical reference model (`legacySourceReferenceError`, "historical_untruncated_anti_diagonal_observation_only"). The same ray (`calibration_200_128:camera`) has `referenceError` 3.8e-05 m in the accepted run 32896 |
 | R03 | Generated land and War Sails routes on runtime geometry; player and AI movement; obstruction | passed with limits | MMR-17: `evidence/runtime/navigation-probe.json` (run 2248, two worlds). Land travel and naval sailing re-ran on `174fcb0a` (runs 24212 and 31624) | **Navmesh loading from a scene registered after launch is unobserved.** Every route ran on scene slots installed before launch with `tools/Deploy-SceneSlots.ps1` (MMR-45). The obstruction test toggled faces with `Scene.SetAbilityOfFacesWithId`, which renumbers islands; the probe's `RefreshFaceCaches` refreshes only `MobileParty` positions, not gate and port positions (probe-only; MMR-38). The player's return voyage was not run. No bridges, no stitching, and AI ship choice was scripted |
 | R04 | Generated campaign objects register before initialization; no official world objects survive; two worlds in one process | passed with limits | MMR-18: `evidence/runtime/bootstrap-probe.json` (runs 31308, 23192, 24736). Registration re-ran on `174fcb0a` (24212, 31624; census 4 settlements, 3 clans, 2 kingdoms in every world) | `BackstoryCampaignBehavior` and `RetirementCampaignBehavior` are removed in generated mode. 33 engine-literal NPC templates are retained. `fighter_sturgia` is excluded (its stock record references a missing EquipmentRoster). Excluded literals still have live consumers beyond the 2-day window: NavalDLC `dead_lord_7_1`/`naval_storyline_*` and `GetBodyguardOfCulture` (MMR-34). Town meshes were not visible in captures (nameplates only; MMR-40). Town food falls about 70/day (MMR-33). No bandit clans (MMR-34) |
-| R05 | Save identity read before generated references deserialize; cold-restart load of two worlds without regeneration | passed with limits | MMR-19: `evidence/runtime/two-world-load-matrix.json` (runs 31624 and 8256; 0 snapshot differences, 0 dataset builds) | Normal-menu load routing or refusal is MMR-49: a vanilla-manager load of a generated save is unsafe. No re-save after load and no alternating same-process load matrix (MMR-49). Anchors and storms are outside the snapshot (MMR-49). Autosave and failed save are evaluated from IL only. Refusal fixtures are MMR-50. Scene-slot ownership and package location are MMR-48/62. 30 handled first-chance exceptions per load, source unknown (MMR-49) |
+| R05 | Save identity read before generated references deserialize; cold-restart load of two worlds without regeneration | passed with limits | MMR-19: `evidence/runtime/two-world-load-matrix.json` (runs 31624 and 8256; 0 snapshot differences, 0 dataset builds). MMR-62 (`docs/save-binding.md`, `evidence/persistence/initial-save-recovery.json`, runs 33696 and 19888): the header binds the campaign instance and data bundle; the initial save is journaled, read back whole and flushed before it counts as published (Ironman included); a publication killed after the engine save and torn or unbound saves under the reserved name recover at the next start; the reference index fails closed; abandoned staging is removed under a process-wide store lock | Normal-menu load routing or refusal is MMR-49: a vanilla-manager load of a generated save is unsafe. No re-save after load and no alternating same-process load matrix (MMR-49). Anchors and storms are outside the snapshot (MMR-49). Autosave and failed save are evaluated from IL only. Refusal fixtures are MMR-50. Package location is resolved by world id and manifest hash (MMR-62); a fixture world's scene slot still lives outside its package, and scene installation and reinstallation belong to MMR-45/49. Only the initial save is journaled; the later save kinds are MMR-48. 30 handled first-chance exceptions per load, source unknown (MMR-49) |
 | R06 | No ticket in the saved plan carries the `r06` tag, so nothing is mapped to it. The former MMR-20 provisional limits are recorded in this document | — | — | — |
-| R08 | Generated wind/flow, storm spawn area and snow/rain bound to and read by native and War Sails consumers; replaced on a world switch | passed with limits | MMR-59: `evidence/runtime/environment-rebind-probe.json` (run 24212) | The binding writes private fields (see "Native data contracts"; MMR-39 decides the production path). Storm spawn scale is still Calradia's (MMR-39). Storms need OpenSea faces. The terrain snow texture is unsupported (cosmetic; MMR-39). Authored `flowmap.dds` is untested. The saved weather-node index is MMR-49. Native resource release is unverified (MMR-49). **Storm and weather wrap across a periodic seam is not implemented** (MMR-65) |
+| R08 | Generated wind/flow, storm spawn area and snow/rain bound to and read by native and War Sails consumers; replaced on a world switch | passed with limits | MMR-59: `evidence/runtime/environment-rebind-probe.json` (run 24212). MMR-39: `evidence/world/water-climate.json` (runs 27432, 30900, save/load 25508; `world_surface` 32884) | MMR-39 decided the production path: the private-field contract stays, behind the load-time checks (see "Native data contracts"). MMR-39 synthesizes the fields from the source world (`docs/water-climate.md`); scales storm spawning by node area and gates it to the canonical range between the pole lines; wraps storms and weather across a periodic seam; and binds a generated colour grade. Storms need OpenSea faces. The terrain snow texture is unsupported (cosmetic; no safe texture path). Authored `flowmap.dds` is untested. The saved weather-node index is MMR-49. Native resource release is unverified (MMR-49). A production campaign's climate binding (`FromSynthesis`) and colour-grade manager are MMR-45's activation. Non-virtual planar storm checks near the seam are MMR-65 |
 | R09 | Generated terrain survives land and naval mission transitions; battle scenes from the generated map patch | passed with limits | MMR-60: `evidence/runtime/mission-transition-probe.json` (run 22868, module `19fa06b0…`; earlier runs including 33472 are history). A field battle at the periodic seam entered and returned in run 12348 (R10) | Only 8 installed battle indices serve both land and naval cells. Mountain, Forest and Snow need substitution rules or more scenes (MMR-42). Location scenes come from settlement prototypes (MMR-42). Mission terrain is the stock template's. The battle-index map does not wrap (see R10). The MMR-60 note that periodic seams block R07 is resolved by R10's encounter-direction and seam-battle evidence; the non-wrapping patch map is a scene-pattern discontinuity, not a correctness failure, because parties are always canonical |
-| R10 | Periodic east/west topology for routes, distances, movement, encounters, camera follow, picking, saves and weather; poles | passed with limits | MMR-63: `evidence/runtime/world-wrap-probe.json` (run 12348): routes, distances, travel both ways, proximity and visibility, engine encounter, a field battle and return, camera follow, a strip click through `ProcessTravel`, and a save deserialized near the seam | **Inferred, not observed:** terrain picking at the seam (`picking.click.path`: "the scene pick itself is not simulated"; MMR-66). **Unresolved:** pole identity (MMR-64); resuming a periodic save and cold-loading a periodic world (the seam save was only deserialized; MMR-49); storm and weather wrap (MMR-65); a naval encounter at the seam; armies, sieges, raids and embark/disembark at the seam (MMR-65); tracks and the camera x-clamp. **IL-predicted failures:** army members steer the long way across the seam (MMR-65). **Planar or heuristic:** three direct `LocatorGrid` callers and `FindPointAroundPosition` (MMR-65); the camera-field heuristic, which misses `_lastUsedIdealCameraTarget`, plus labels, selection and party visual copies (MMR-66); the save-instant canonical window and `BehaviorTarget` (MMR-49); the tie-rule conflict and the remaining planar heuristics (MMR-64). **The battle-index map does not wrap:** edge cells clamp and its 16-cell blocks restart at x = 0 (MMR-64 with MMR-42). Polar distortion needs a projection or acceptance (MMR-64). **Test coverage:** the locator image pass was tested from the east side only; AI destination choice is shown only indirectly |
+| R10 | Periodic east/west topology for routes, distances, movement, encounters, camera follow, picking, saves and weather; poles | passed with limits | MMR-63: `evidence/runtime/world-wrap-probe.json` (run 12348): routes, distances, travel both ways, proximity and visibility, engine encounter, a field battle and return, camera follow, a strip click through `ProcessTravel`, and a save deserialized near the seam. MMR-64: `evidence/runtime/periodic-coordinates.json` (run 6292, `docs/periodic-coordinates.md`): one coordinate contract and tie rule, the whole `MapDistanceModel` and the distance helpers covered and periodic across the seam, long-way routes, the closest entrance near the seam, the wrapped battle-terrain map, the coordinate frame in the save header, and the MMR-63 checks rerun. MMR-65: `evidence/world/periodic-movement.json` (run 14144, `docs/periodic-movement.md`): the periodic radius query from canonical and strip centres, direct party, settlement and track grid searches, battle joiners across the seam, moving-target pursuit, a land army and a fleet with attached members, route cancellation at the seam, ports entered both ways and a circumnavigation with route costs the short way, with no transition at the cut; 98 audited consumers transpiled (161 calls), 27 inlining callers recompiled, and the MMR-63 checks rerun. MMR-66: `evidence/world/periodic-camera-picking.json` (run 33944, `docs/periodic-presentation.md`): one canonical camera rebased by whole widths before the native camera is written, following the player across both edges and panned through the seam by its target and by injected axis input with the native camera on its frame, fast moves the short way, teleport and reset on the party, a native terrain pick in the strip ordering the canonical point, a settlement display copy picked through the engine's own resolution path to the canonical town, nameplates, decals and tracks at the images beside the camera, strip twins aligned at the seam and both ports, a town menu and a seam battle left with the camera on the canonical party, and 20 camera wraps without growth of copies or visual registrations; 52 patch entries, and the MMR-63 checks rerun | **Inferred, not observed:** mouse dragging (it pivots on the rebased `_clickedPosition`; MMR-66 limits); blockade, storm and anchor visuals at the seam and the encyclopedia's map navigation (code paths without in-game samples; MMR-66 limits). **Unresolved:** resuming a periodic save and cold-loading a periodic world (the seam save was only deserialized; MMR-49); a naval encounter at the seam (MMR-53); sieges, raids and embarking or disembarking at a coast at the seam were not run in game (their spatial calls are audited and transpiled; MMR-65 limits); siege machines are not drawn on a settlement's display copy (MMR-42). **Resolved by MMR-65:** army members crossing the seam beside their leader (land and sea); the direct `LocatorGrid` callers and `FindPointAroundPosition` (periodic); the planar spatial consumers outside the distance surface (audited: 98 transpiled, the rest classified); tracks across the seam; the storm checks MMR-39 left planar are transpiled and its possibly missed damage tick is addressed by strip-centred image passes (the strip-centre query is tested; storm damage itself was not rerun). **Resolved by MMR-66:** the camera fields (one canonical camera replaces the field heuristic), the camera x-clamp (never reached), terrain and object picking at the seam, labels, decals, tracks and settlement display copies bound to canonical identities. **Planar:** distance-sorted interface lists, behaviour texts and map step sounds near the cut (MMR-66 limits); the save-instant canonical window and `BehaviorTarget` (MMR-49). Routes whose path leaves the terrain cannot be represented (MMR-64). **Resolved by MMR-64:** pole identity (pole aliases), the tie rule, the battle-index map wrap, and polar distortion (accepted, `worldgen/policies/periodic-coordinates.json`). **Test coverage:** the locator image pass is tested from both sides and from a strip centre (MMR-65); AI destination choice is shown only indirectly |
 
 **Whole-world periodic navigation has not failed.** Cross-seam routes, movement, encounters and distances were demonstrated in the shipping client (R10). It is not complete either: the items above are owned work, not a reason to ship disconnected edges.
 
@@ -75,7 +75,7 @@ No evidence was found to contradict another, so nothing was rerun.
    - The bundle is written to `Modules/MNBL.ProceduralWorld/SceneObj/<fresh mnbl_ name>`.
    - Then `Utilities.PairSceneNameToModuleName(name, module)` registers it, and `Utilities.TryGetFullFilePathOfScene` must resolve to the installed folder.
    - Names are immutable: never rewrite a loaded or previously loaded scene.
-   - Whether a navmesh and entities load from such a name is unobserved (MMR-45).
+   - A navmesh and entities load from such a name in game (MMR-45: runs 22472, 9404, 43676).
 3. **Game manager.** A `SandBoxGameManager` subclass. New game: `SandBoxGameManager(CampaignCreatorDelegate)`. Load: `SandBoxGameManager(LoadResult)`.
 4. **Models** (from IL, not exercised: `src/` has no `AddModel` call).
    - Override `InitializeGameStarter`, call `base`, then append models through `CampaignGameStarter.AddModel`. The last assignable model wins.
@@ -90,9 +90,9 @@ No evidence was found to contradict another, so nothing was rerun.
    - `AfterLoad` builds the navigation caches and the battle-index map.
    - Periodic worlds also re-implement `GetPathBetweenAIFaces` and `GetPathDistanceBetweenAIFaces`.
    - Callers that use these members through the interface reach the re-implementation.
-   - **Callers that bypass the interface:** the map screen's native raycast and selection, and `Scene.DoesPathExistBetweenFaces` (`HandleLeftMouseButtonClick` IL_007c). `backend-callsite-matrix.json` counts 32 direct native call sites. They act on the same native scene, so they see generated geometry but no periodic images (MMR-66).
+   - **Callers that bypass the interface:** the map screen's native raycast and selection, and `Scene.DoesPathExistBetweenFaces` (`HandleLeftMouseButtonClick` IL_007c). `backend-callsite-matrix.json` counts 32 direct native call sites. They act on the same native scene and see generated geometry. MMR-66 made the strips' picks resolve canonically: a terrain click stores the canonical image, and a settlement's display copy resolves to the settlement (`docs/periodic-presentation.md`).
 9. **Save identity.** `CampaignEvents.CollectMetadataEntriesEvent` writes the `mnbl.world.*` keys. `MBSaveLoad.GetSaveFileWithName(name).MetaData` reads them at the main menu, before `LoadSaveGameData`.
-10. **Harmony** (Bannerlord.Harmony, decision 002). The eleven periodic patches of MMR-63, applied only while a periodic world is loaded and removed in `Destroy`.
+10. **Harmony** (Bannerlord.Harmony, decision 002). The periodic patches: MMR-63's eleven plus MMR-64's closest-settlement order and distance helpers (16 entries). They are preflighted before a periodic campaign starts, applied all or nothing only while a periodic world is loaded, and removed in `Destroy`.
 
 ### Native data contracts
 
@@ -122,7 +122,7 @@ No evidence was found to contradict another, so nothing was rerun.
   - **The binding writes private `SandBox.MapScene` fields.**
     - Their names and types are checked when the map loads, and every consumer is proven to read them.
     - This is accepted here as the diagnostic contract for continuing work.
-    - Production must keep it behind the same load-time contract check, or replace it with a public path (`Scene.GetWindFlowMapData`, or a wind-only `INavalMapSceneWrapper` decorator). MMR-39 decides.
+    - Production must keep it behind the same load-time contract check, or replace it with a public path (`Scene.GetWindFlowMapData`, or a wind-only `INavalMapSceneWrapper` decorator). **MMR-39 decided: the private-field contract stays, behind the load-time checks.** No public write path exists, `Scene.GetWindFlowMapData` reads the authored flowmap, and a wind-only decorator would not reach the weather model's snow and rain (`docs/water-climate.md`).
 - **Save identity (MMR-19):**
   - 13 `mnbl.world.*` metadata keys;
   - an immutable world package: `world.json` pins every hash, including the five scene files;
@@ -134,7 +134,7 @@ No evidence was found to contradict another, so nothing was rerun.
 - All world binding (scene read, weather fields, region map, navigation caches, battle-index map) happens synchronously inside `IMapScene.Load`/`AfterLoad` on the campaign loading thread, before any campaign tick.
 - Navigation and distance data are never mutated while campaign simulation runs: the installed movement uses `TWParallel` readers with no mutation contract.
   - The MMR-17 face-ability toggle broke this rule as a probe step only.
-  - A runtime obstruction feature needs a supported, complete equivalent (MMR-38).
+  - MMR-38 decided there is no runtime obstruction: barriers are static Mountain faces in the built navmesh (`docs/runtime-navigation.md`).
 - Engine statics (`Campaign.MapDiagonal`, bounds, path-cost limits) keep the previous world's values until the next map load. Nothing may read them before `LoadMapScene`.
 - **World switch.**
   - A normal `MBGameManager.EndGame` returns to the menu, and the next world binds everything in its own `Load`.
@@ -177,6 +177,14 @@ Order from `lifecycle-extension-contract.json`; the generated steps were observe
   - A mission neither disposes nor recreates the map scene: the wrapper, native scene pointer, battle map, navmesh and settlements are identical before and after.
   - The party returns within vanilla `TeleportPartyToOutSideOfEncounterRadius` bounds (1.25 × the encounter radius: 0.625 on land, 1.875 at sea) and stays in its land/sea domain.
 
+### Campaign navigation of compiled worlds (MMR-38)
+
+The R07 native path carries the campaign navmesh: `RuntimeWorldBackend.Prepare` builds `navmesh.bin` from the bundle's travel cells. It has typed faces from the installed TerrainType enum, Bridge decks over UnderBridge faces, no faces beyond the poles, and periodic strips. The world is checked against the travel graph before encoding and through the engine once loaded (`world_navigation`, `evidence/world/navigation-routes.json`); a world that fails either check is refused. Engine facts observed there:
+- the installed `MapScene.Load` order (disable the faces invalid for All, then read) does not disable faces read afterwards; campaign path queries exclude the invalid types explicitly;
+- `FaceIslandIndex` is not All connectivity: a mountain-closed pocket shares its surroundings' island;
+- `GetPathDistanceBetweenAIFaces` includes 50 per embark or disembark;
+- a store-mode LZ4 navmesh with zeroed scratch fields loads.
+
 ### Periodic-world strategy (R10)
 
 The requested capability is a whole-globe map with connected east/west edges. It is delivered on the selected backend in four layers. Run 12348 observed each layer except where an item is marked.
@@ -184,21 +192,21 @@ The requested capability is a whole-globe map with connected east/west edges. It
 1. **Geometry.**
    - The terrain is twice the logical width, with W/2 strips that copy the opposite side.
    - Rendering and the camera therefore see continuous terrain at the seam; the camera followed across it in every player leg.
-   - Native terrain picking at the seam is inferred from the same geometry, not observed. The strip click was driven through `ProcessTravel` (MMR-66).
+   - Native terrain picking in the strips was observed by MMR-66 (run 33944): a ray into the strip hits the twin terrain and its click orders the canonical point.
 2. **Routing.**
-   - `GetPathBetweenAIFaces`/`GetPathDistanceBetweenAIFaces` on the owned map scene answer with the target's nearest image (as given, +W or −W).
-   - The native pathfinder cannot cross the seam: a continent cut by it is two native islands. The strips are W/2 wide, so the image of every shortest seam-crossing route lies inside the terrain.
+   - `GetPathBetweenAIFaces`/`GetPathDistanceBetweenAIFaces` on the owned map scene answer with the cheapest placement (MMR-64 `PeriodicDistanceModel.ShortestOverImages`: three displacements by |D|, ties east; the start moved by whole widths when the target's copy lies outside the terrain).
+   - The native pathfinder cannot cross the seam: a continent cut by it is two native islands. The strips are W/2 wide, so the image of every shortest seam-crossing route lies inside the terrain; a route the long way around starts from a moved start (MMR-64).
    - The settlement navigation cache is built through these queries, so settlement distances are periodic without replacing the distance model.
 3. **Canonical state.**
    - A per-tick pass rebases parties that leave [W/2, 3W/2) by ±W and canonicalizes their order targets.
    - `ProcessTravel` and `FindReachablePointAroundPosition` return canonical points.
    - A save made 0.0002 from the seam deserialized with 0 non-canonical positions. Resuming from it is MMR-49.
-4. **Planar checks made periodic.** The eleven Harmony patches cover locatable search, interaction, visibility, encounter direction, distance models and placement.
+4. **Planar checks made periodic.** The periodic Harmony patch entries (sixteen from MMR-63/64; twenty with MMR-65's placements and spatial table; 52 with MMR-66's presentation entries when War Sails is installed) cover locatable search, interaction, visibility, encounter direction, distance models, placement, the closest-settlement order and the distance helpers (MMR-63, MMR-64).
 
 What remains is owned, not optional:
-- **MMR-65:** army formation steering, direct `LocatorGrid` callers, point-around spawns, storm and weather wrap, and armies, sieges, raids and embarkation at the seam;
-- **MMR-66:** labels, selection, render copies, the remaining camera fields and native picking;
-- **MMR-64:** tie rules, the remaining planar heuristics, battle-map wrapping, pole identity and polar distortion;
+- **MMR-65 (done):** route execution and diagnostics, the periodic radius query, the audited spatial consumers, armies and fleets across the seam (`docs/periodic-movement.md`); sieges, raids and coastal embarkation at the seam are audited, not run in game;
+- **MMR-66 (done):** one canonical camera, the display rule for visuals, decals and nameplates, settlement display copies bound to canonical identities and native picking in the strips (`docs/periodic-presentation.md`); blockades, storms and anchors at the seam have no in-game samples;
+- **MMR-64 (done):** one tie rule, the distance-surface and helper coverage, battle-map wrapping, pole identity and the accepted polar distortion (`docs/periodic-coordinates.md`); the planar consumers outside the distance surface are MMR-65's;
 - **MMR-49:** the save-instant window and resuming a periodic save;
 - **MMR-53:** a naval encounter at the seam, with naval gameplay.
 
@@ -256,7 +264,7 @@ A failure of any of these is a failed requested capability. Disconnected edges a
   - `_scene`, the bounds caches and `_terrainSize`;
   - `_battleTerrainIndexMap` with its width and height;
   - `_windFlowMapData`, `_snowAndRainData` and `_snowAndRainDataTextureWidth/Height`.
-- **Eleven Harmony patches** for periodic worlds (MMR-63 table). `LocatorGrid<T>` itself cannot be patched.
+- **Fifty-two periodic Harmony patch entries with War Sails** (MMR-63 table, MMR-64 additions, MMR-65's canonical placements and spatial table: 98 methods transpiled, 27 callers recompiled; MMR-66's 32 presentation entries on SandBox.View, SandBox.ViewModelCollection and NavalDLC.View, reached by name). MMR-65's summarizer needs `--patches 52` for runs from this build. `LocatorGrid<T>` and the generic `NavigationCache<T>` methods cannot be patched; direct grid searches go through wrappers. A world whose pole margin is not above 101 units is refused (the periodic measures tell positions from offsets by it).
 - **The world package and identity** are written for every generated world at creation.
 
 **Probe-only setup (not product behaviour):**
@@ -293,25 +301,23 @@ The installed members the backend calls, by group. Signatures are recorded in se
 
 | Operation | State | Reproducer or source | Dependent scope |
 |---|---|---|---|
-| Load navmesh and settlement entities from a scene registered after launch, then boot a campaign in one pass | unresolved. Not observed; historical fresh-name navigation imports returned 0 faces | PIDs 29364 and 14300; `backend-callsite-matrix.json` `explicitUnknowns` | MMR-45, with MMR-29/40 for in-process composition. **Bounded fallback:** a pool of slot names indexed at startup, each written once before its first load (PID 25128 imported rewritten bytes from such a name) |
-| Load a generated save from the normal menu | unsafe today: the vanilla manager would re-read official XML | IL (`SandBoxSaveHelper.TryLoadSave` → vanilla `SandBoxGameManager(LoadResult)`) | MMR-49 (routing or refusal), MMR-62 |
+| Load navmesh and settlement entities from a scene registered after launch, then boot a campaign in one pass | passed (MMR-45): world A's scene, installed and registered by the generation job in the running game, boots a campaign with its navmesh (navigation caches built over it) and every baked settlement entity (none made at run time): world_activation runs 22472, 9404, 43676. Historical fresh-name navigation imports had returned 0 faces | PIDs 29364 and 14300; `backend-callsite-matrix.json` `explicitUnknowns` | MMR-45, with MMR-29/40 for in-process composition. **Bounded fallback:** a pool of slot names indexed at startup, each written once before its first load (PID 25128 imported rewritten bytes from such a name) |
+| Load a generated save from the normal menu | unsafe today: the vanilla manager would re-read official XML | IL (`SandBoxSaveHelper.TryLoadSave` → vanilla `SandBoxGameManager(LoadResult)`) | MMR-49 (routing or refusal; MMR-62's binding and index are what it reads) |
 | Re-save after load; alternating loads in one process | not run | MMR-19 limits | MMR-49 |
 | Autosave and failed save with the identity | IL only | `GetSaveMetaData` (all save modes); `FileDriver.Save` IL_008c | MMR-49 |
 | Resume a periodic save; cold-load a periodic world | not run (the seam save was only deserialized) | `world-wrap-probe.json` `seamSave.reloaded.scope` | MMR-49 |
 | Canonical state at the save instant; `BehaviorTarget` | not implemented | MMR-63 limits | MMR-49 |
-| Army members across the seam | failure predicted from IL | `MobileParty.DoUpdatePosition` IL_00ff–0112 | MMR-65 |
-| Direct `LocatorGrid` callers; `FindPointAroundPosition` spawns | planar | MMR-63 patch table | MMR-65 |
-| Storm and weather wrap across the seam | not implemented | MMR-59/63 limits | MMR-65 |
-| Armies, sieges, raids and embark/disembark at the seam | not run | MMR-63 limits | MMR-65 |
-| Naval encounter at the seam | not run | MMR-63 limits | MMR-53, MMR-65 |
-| Native terrain picking at the seam; map labels, selection, party visual copies; the remaining camera fields | inferred or not implemented | `picking.click.path`; MMR-63 limits | MMR-66 |
-| One periodic tie rule (`DeltaX` east-wins vs `NearestTargetImage` as-given) | inconsistent | `PeriodicWorld.cs` | MMR-64 |
-| Battle-index map wrap at the seam | not implemented (discontinuity only) | MMR-60 edge checks | MMR-64, MMR-42 |
-| Pole identity; polar projection | unresolved | fixture placement `polarDistortion` | MMR-64 (with MMR-25) |
+| Storm and weather wrap across the seam | implemented (MMR-39); the planar storm checks near the seam are transpiled and strip-centred searches get their image pass (MMR-65; the strip-centre query is tested, storm damage was not rerun) | `evidence/world/water-climate.json` (run 27432); `evidence/world/periodic-consumers.tsv` | none |
+| Sieges, raids and embarking or disembarking at a coast at the seam | not run in game; their spatial calls are audited and transpiled (siege camp positions, raid and patrol searches, transition points) | `docs/periodic-movement.md` limits | MMR-42 (sieges with settlements), MMR-53 (naval) |
+| Naval encounter at the seam | not run | MMR-63 limits | MMR-53 |
+| Native terrain picking at the seam; map labels, selection, display copies; the camera fields | implemented and observed (MMR-66) | `evidence/world/periodic-camera-picking.json` (run 33944) | none |
+| Mouse dragging across the seam; blockade, storm and anchor visuals at the seam; encyclopedia map navigation | implemented, not observed in game | `docs/periodic-presentation.md` limits | MMR-53 (blockades and storms) |
+| Siege machines on a settlement's display copy; distance-sorted interface lists near the cut | not drawn; planar | `docs/periodic-presentation.md` limits | MMR-42 (sieges) |
+| Routes whose path leaves the terrain; a small table method inlined into code compiled before the patch under a large `AggressiveInlining` caller | not representable; not covered by the recompile closure | `docs/periodic-coordinates.md`; `docs/periodic-movement.md` limits | none |
 | Location scenes for generated settlements; Mountain/Forest/Snow battle scenes | prototype scenes and substitutions | MMR-60 limits | MMR-42 |
-| Weather binding through a supported path | private-field contract | MMR-59 | MMR-39 |
-| Terrain snow cover from the generated field | unsupported: no safe texture-creation path proven | MMR-59 limits | MMR-39 (cosmetic) |
-| Runtime navigation obstruction | probe-only face toggle with incomplete cache refresh | `navigation-probe.json` `knownGaps[0]` | MMR-38 |
+| Weather binding through a supported path | private-field contract kept as the production path (MMR-39 decision) | `docs/water-climate.md` | none; MMR-45 binds production worlds at activation |
+| Terrain snow cover from the generated field | unsupported: no safe texture-creation path proven; snow weather and season scaling work (MMR-39) | MMR-59 limits, `docs/water-climate.md` | none (cosmetic) |
+| Runtime navigation obstruction | not provided: barriers are static Mountain faces (MMR-38) | `evidence/world/navigation-routes.json` (fixture barrier and ring) | none |
 | Combined terrain-node exports | native crash | PID 27392 | none (no consumer; withheld) |
 | Native resource release on world switch | unverified (not observable from managed code) | — | MMR-49 |
 
@@ -360,7 +366,7 @@ All campaign runs used catalog receipt `27bca57ee00ae08a…`.
 | Conversion (surface encoder, in game) | 72–87 ms | The offline fixture encoder is not timed |
 | Runtime scene install, register, read (seed 42, MMR-16; step-start markers) | file install 31 ms; register and resolve 21 ms; `Scene.Read` 47 ms; optimize ≤ 20 ms | |
 | Offline campaign-scene construction (`tools/scenebin`) | **not recorded** | The receipts have no timestamps. The stage moves in game under MMR-26/28/29/40, which must time it |
-| Navigation caches (Default, Naval, All) per world | 32,768 faces, 800 m: 34.7–36.0 s. 32,768 faces, 640 m: 71.5–74.5 s. Periodic, 131,072 faces: **566.8 s** (All alone 419.0 s) | Rebuilt on every save load and never serialized. With the same face count the 640 m worlds take 2.1× longer (Naval 4.2×) |
+| Navigation caches (Default, Naval, All) per world | 32,768 faces, 800 m: 34.7–36.0 s. 32,768 faces, 640 m: 71.5–74.5 s. Periodic, 131,072 faces: **566.8 s** (All alone 419.0 s; 565.8 s under MMR-41, run 6152) | With the same face count the 640 m worlds take 2.1× longer (Naval 4.2×). Since MMR-41 (`docs/playability.md`) they are built once per world and keyed input set, published, and read back on later loads: 21 ms on a fixture (run 32740) and 95 ms on the periodic fixture (run 35828). The real-scale cost (hundreds of settlements) is unmeasured until MMR-45/MMR-56 |
 | Campaign bootstrap (loading screen → map active) | new game 42.1–43.7 s (800 m) and 79.6–82.8 s (640 m); periodic new game **575.4 s**; save load 39.7 s and 75.0 s | Navigation is 82–98.5% of it. Loading screen → owned creator installed (all submodule registration and campaign initialization; on load also package verification and deserialization): 2.0–3.9 s. The whole `IMapScene.Load` (scene creation and read, weather, caches, optimize): 0.13–0.41 s, which includes weather setup (0.04–0.24 s). Battle-index map: 0.05–0.34 s |
 | Load-only steps (8256) | 22 ms to verify the world package, 215 ms to deserialize | |
 | Mission load (MMR-60, MMR-63) | field 0.94–1.80 s, settlement 2.20–2.21 s, naval 1.46–1.49 s, seam battle 1.72 s; teardown 0.32–0.47 s | Up to 84 agents and 2 ships |
@@ -392,9 +398,10 @@ All campaign runs used catalog receipt `27bca57ee00ae08a…`.
 1. **The navigation cache build is the binding cost.**
    - In the one pair available, 4× the faces took 16× the time. That pair also differs in geography, so the scaling law is not established.
    - The same face count took twice as long at 640 m as at 800 m.
-   - A periodic new game at 131,072 faces took 9.6 minutes. A periodic save load was not measured; it is inferred to cost about the same, because the caches are rebuilt on every load.
-   - Provisional limit: worlds of 32,768 faces, at most 75 s per load.
-   - A periodic production world at the fixture's size needs a faster build or a serialized per-world cache (MMR-41) to reach an acceptable load time. This is a performance limit, not a failed capability.
+   - A periodic new game at 131,072 faces took 9.6 minutes.
+   - MMR-41 publishes each world's caches under a key of every input, and later loads of an unchanged world read them back: 95 ms on the periodic fixture instead of 566 s (runs 6152 and 35828). The first campaign start of a world still pays the build.
+   - Provisional limit: worlds of 32,768 faces, at most 75 s for the first load, and a periodic fixture-sized world about 9.5 minutes for its first load only.
+   - The first-load cost at real settlement counts is unmeasured (MMR-45, MMR-56). This is a performance limit, not a failed capability.
 2. **Generation:** about 13 s and 300 MiB of producer memory at size 129, with about 170 MB of staging output per world.
 3. **Per-world disk:** about 3.6 MB of package plus about 6–10 MB of scene files, outside the save. Each save is about 120 KB.
 4. **Game-process memory, frame time and in-memory geometry are unknown.** No limit is stated for them; MMR-56 measures them.
@@ -410,12 +417,19 @@ The ticket asks that working probe code be promoted rather than rebuilt. The pro
 | `CampaignBootstrap/DiagnosticSandboxBootstrap.cs` (new-game and load managers) | R04, R05 | MMR-30, MMR-45, MMR-49 |
 | `CampaignBootstrap/GeneratedCampaignDataset.cs`, `GeneratedCampaignRegistration.cs` | R04 | MMR-30, MMR-31–36 |
 | `CampaignBootstrap/GeneratedBattleTerrain.cs` | R09 | MMR-42 |
-| `CampaignBootstrap/GeneratedClimate.cs`, `GeneratedMapSupport.PrepareWeather` | R08 | MMR-39 |
-| `CampaignBootstrap/PeriodicWorld.cs`, `PeriodicSeam.cs`, `PeriodicPatches.cs` | R10 | MMR-64, MMR-65, MMR-66 |
-| `CampaignBootstrap/WorldIdentity.cs`, `WorldIdentityBehavior.cs`, `GeneratedWorldPackage.cs` | R05 | MMR-48, MMR-62, MMR-49 |
-| `tools/scenebin/*.py` (offline campaign-scene composition) | fixtures for R03–R10 | moved in-process by MMR-26, MMR-28, MMR-29, MMR-40 |
+| `CampaignBootstrap/GeneratedClimate.cs`, `GeneratedMapSupport.PrepareWeather` | R08 | MMR-39 (done: schema v2, `FromSynthesis`, colour grade); MMR-45 (production activation) |
+| `CampaignBootstrap/PeriodicWorld.cs`, `PeriodicSeam.cs`, `PeriodicPatches.cs` | R10 | MMR-64, MMR-65, MMR-66 (done) |
+| `UI/PeriodicMapCameraView.cs`, `World/PeriodicMapPresentation.cs` | R10 presentation | MMR-66 (done); MMR-40 builds settlement entities the display copies clone |
+| `CampaignBootstrap/PeriodicSpatialQueries.cs`, `PeriodicSpatialTable.cs` (generated by `tools/periodic/`), `PeriodicRouteExecutor.cs` | R10 | MMR-65 (done); MMR-41 reads the route diagnostics; MMR-66 (done) the view sites |
+| `CampaignBootstrap/WorldIdentity.cs`, `WorldIdentityBehavior.cs`, `GeneratedWorldPackage.cs` | R05 | MMR-62 (done: binding keys, resolution by id and hash; `Persistence/` holds the journal, index and cleanup), MMR-48, MMR-49 |
+| `tools/scenebin/*.py` (offline campaign-scene composition) | fixtures for R03–R10 | moved in-process by MMR-26, MMR-28, MMR-29, MMR-40 (done: settlement entities, gates, ports, blockade arcs and siege geometry baked by `World/SettlementEntityFactory.cs` from `World/SettlementPositionResolver.cs`, checked in `RuntimeStage` by `World/SettlementEntityChecks.cs`; `docs/settlement-entities.md`) |
 
 The probes themselves (`Diagnostics/*Probe.cs`) and the summarizers stay as regression harnesses.
+
+**Promoted by MMR-37 (2026-10-15, `docs/runtime-surface.md`).**
+- `DiagnosticMapScene` and its creator are now `World/GeneratedMapScene.cs` (`GeneratedMapScene`, `GeneratedMapSceneCreator`), with guarded height, normal, bounds, map-patch and face-height members and a generation token.
+- The runtime encoding and installation sequence is reimplemented in `World/RuntimeWorldBackend.cs`. It builds worlds from MMR-29 bundles and adds content-addressed scenes, generations, a resource ledger and disposal.
+- `RuntimeSurfaceSequenceProbe` stays as the R02 regression harness.
 
 ## Release of dependent work
 

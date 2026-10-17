@@ -1,0 +1,27 @@
+{
+  "schema": "mnbl.save-type-ledger",
+  "version": 1,
+  "module": "MNBL.ProceduralWorld",
+  "rule": "Module-fixed save definitions only: SaveableTypeDefiner base and type/container ids, SyncData keys and save header keys. They are constants of the module, versioned here and never derived from a world, seed or campaign. Per-world generated object ids (mnbl_<8 hex>_..., CampaignIdentity) are StringIds inside a campaign's game data and never appear in this ledger. Entries are append-only: an id or key, once listed, keeps its meaning; a change of a saved shape gets a new id or key, a new entry and a migration (MMR-50). tests/Persistence/fixtures/save-type-ledger.v1.json is entry 1 frozen; SaveBindingTests checks the ledger still begins with it and its last entry matches the code.",
+  "saveIdBase": 7910000,
+  "reservedRange": { "first": 7910000, "last": 7919999 },
+  "entries": [
+    {
+      "entry": 1,
+      "moduleVersion": "v0.0.1",
+      "tickets": ["MMR-30", "MMR-34", "MMR-48"],
+      "saveIdsVersion": 1,
+      "definers": [],
+      "typeIds": [],
+      "syncData": [
+        { "behavior": "MNBL.ProceduralWorld.CampaignRegistry.GeneratedStartupBehavior", "key": "_mnblStartupIntentIds", "type": "System.Collections.Generic.List<System.String>", "since": "MMR-34" },
+        { "behavior": "MNBL.ProceduralWorld.CampaignRegistry.GeneratedStartupBehavior", "key": "_mnblStartupIntentHeroes", "type": "System.Collections.Generic.List<TaleWorlds.CampaignSystem.Hero>", "since": "MMR-34" }
+      ],
+      "headerKeys": {
+        "mnbl.world.": ["schema", "id", "seed", "scene", "package", "manifestSha256", "placementSha256", "sceneFilesSha256", "documentsSha256", "periodic", "coordinatePolicy", "climate", "sceneXmlCrc", "navMeshCrc", "instance", "contentId"],
+        "mnbl.save.": ["contract", "module", "moduleAssemblySha256", "game", "naval", "backend", "navigationCache", "saveIds", "worldIdentity"]
+      },
+      "note": "The module defines no saveable types: a world binding is header strings, and the only campaign data the module saves are two SyncData lists of installed types."
+    }
+  ]
+}

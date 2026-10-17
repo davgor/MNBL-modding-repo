@@ -467,6 +467,11 @@ namespace MNBL.ProceduralWorld.Diagnostics
                 }
                 if (!(bool)expected["deterministic"]) failures.Add("Generated patch does not resolve to exactly one battle scene: " + expected["rule"]);
                 if (!(bool)row["sceneMatchesPatch"]) failures.Add("Mission scene " + mission["scene"] + " differs from the generated patch's scene " + expected["scene"]);
+                // MMR-42: the mismatch guard saw this battle's scene choice and found it agreeing with the generated patch.
+                var guard = MNBL.ProceduralWorld.Missions.MissionScenePatches.LastOpening(mission["scene"] as string);
+                row["mismatchGuard"] = guard;
+                if (guard == null) failures.Add("The battle scene guard did not observe the scene choice of " + mission["scene"] + ".");
+                else if (!Equals(guard["agrees"], true)) failures.Add("The battle scene guard flagged the choice: " + guard["problem"]);
             }
         }
 
@@ -519,17 +524,12 @@ namespace MNBL.ProceduralWorld.Diagnostics
             return row;
         }
 
-        // The scene DefaultSceneModel.GetBattleSceneForMapPatch must open for this patch, by its own rule.
+        // The scene DefaultSceneModel.GetBattleSceneForMapPatch must open for this patch, by its own rule: MMR-42's one implementation
+        // (BattleTable.ExpectedScene, shared with the battle map and the mismatch guard; a list naming one distinct scene is deterministic).
         private static Dictionary<string, object> ExpectedScene(int sceneIndex, bool naval, TerrainType terrainAtPosition)
         {
-            var scenes = GameSceneDataManager.Instance.SingleplayerBattleScenes;
-            var matching = scenes.Where(s => s.MapIndices != null && s.MapIndices.Contains(sceneIndex) && s.IsNaval == naval).ToList();
-            var row = new Dictionary<string, object> { ["sceneIndex"] = sceneIndex, ["naval"] = naval, ["candidates"] = matching.Select(s => s.SceneID).ToArray() };
-            if (matching.Count == 1) { row["scene"] = matching[0].SceneID; row["deterministic"] = true; row["rule"] = "single scene lists the index"; }
-            else if (matching.Count > 1 && naval && matching.Count(s => s.Terrain == terrainAtPosition) == 1)
-            { row["scene"] = matching.Single(s => s.Terrain == terrainAtPosition).SceneID; row["deterministic"] = true; row["rule"] = "single naval scene of terrain " + terrainAtPosition; }
-            else { row["scene"] = null; row["deterministic"] = false; row["rule"] = matching.Count == 0 ? "no scene lists index " + sceneIndex + " (random fallback)" : "random among " + matching.Count; }
-            return row;
+            var e = MNBL.ProceduralWorld.CampaignBootstrap.GeneratedBattleTerrain.Resolver().Table.ExpectedScene(sceneIndex, naval, (int)terrainAtPosition);
+            return new Dictionary<string, object> { ["sceneIndex"] = sceneIndex, ["naval"] = naval, ["candidates"] = e.Candidates, ["scene"] = e.Scene, ["deterministic"] = e.Deterministic, ["rule"] = e.Rule };
         }
 
         private static Dictionary<string, object> BattleMap()

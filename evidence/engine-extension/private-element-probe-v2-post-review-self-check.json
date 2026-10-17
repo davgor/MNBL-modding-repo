@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 1,
+  "status": "self-verified-post-review-nonblocking-fixes",
+  "baseReview": {
+    "path": "evidence/engine-extension/private-element-probe-v2-fix-review.json",
+    "sha256": "a91f826874a132d9335abe8cc2add3de584a188044ddf941c5ab9fea98009ac1",
+    "status": "accepted-private-element-probe-v2-package",
+    "reviewedProfileSha256": "9134055f63f79a070194e7c81e13e6c8f03056a37ef485057ce0752188f84ec3"
+  },
+  "currentProfileSha256": "ec237e2dd8decf2416b83342ff795e5bd89aa4a26bb22dcde8878975cbd6434c",
+  "profileDelta": "Only the runner pin changed; host, native DLL, SubModule.xml, contract and all providers are identical to the reviewed profile.",
+  "packageFiles": {
+    "MNBL.AgentGrowthProbe.dll": "57c5b680beeca06c73847130100c44c7931a6b4f0f603c5b4d90fb1a4ce0de7d",
+    "MNBL.NativeElementProbe.dll": "9d1f6a512dd63c833d44a4fd0bf0e7f5ede9750dcb022ef50608144306347d05",
+    "SubModule.xml": "694ad34c5690853aec036821c53fbb8e524029fcd91254b4d6e003bf0196cb23"
+  },
+  "runnerSha256": "afd2c35dbd75e4dfb96525e9b883f1cd048eb5b34bfa783a676b6dae54171cc3",
+  "inertTestsSha256": "19cdfe38d7451108d73219edc01eb7b4c02459863643b6c9e5f63aa28a898242",
+  "inertReceiptSha256": "37652d68b53aba30083848d673d7bfbaa846c9484addf929d30b79d0edcd950c",
+  "fixes": [
+    {
+      "finding": "NF1 should-fix",
+      "fix": "liveCommandsVerified additionally requires cleanHost: the runner is the -File script of a host whose arguments before -File include -NoProfile and no -Command/-EncodedCommand. No caller scope or profile exists there to define substitutes (Where-Object, Get-Command or any other).",
+      "verified": [
+        "In-session & invocation preflight: Live commands False",
+        "powershell.exe -NoProfile -File preflight: Live commands True",
+        "powershell.exe -File (profile loaded) preflight: Live commands False",
+        "All 41 inert scenarios assert cleanHost=false and liveCommandsVerified=false"
+      ]
+    },
+    {
+      "finding": "NF2 nit",
+      "fix": "StopOwnedWatchdog reads Process.Handle before the identity check.",
+      "verified": [
+        "Reflection on this shell's own process: haveProcessHandle False->True after Handle; m_processHandle identical after StartTime; GetProcessHandle(PROCESS_TERMINATE) returns the same cached SafeProcessHandle. No process was terminated."
+      ]
+    },
+    {
+      "finding": "NF3 nit",
+      "fix": "Crash directory transition absent->listable (stock watchdog creates it) is allowed after launch; every entry in the new directory then counts as new. All other state changes still fail.",
+      "verified": [
+        "crash-dir-created-empty passes",
+        "crash-dir-created-with-dump fails: Crash dump/report entries appeared"
+      ]
+    },
+    {
+      "finding": "NF4 nit",
+      "fix": "Emptiness re-checked after the fresh-window wait; deletion via non-recursive [IO.Directory]::Delete, which throws rather than prompts.",
+      "verified": [
+        "success scenarios assert both created module directories are removed"
+      ]
+    },
+    {
+      "finding": "PS5.1 -File regression found during NF1 verification",
+      "fix": "RunRoot/LeasePath defaults moved from param block into body; Windows PowerShell -File leaves $PSScriptRoot empty in param defaults.",
+      "verified": [
+        "clean-host preflight passes"
+      ]
+    }
+  ],
+  "limitations": [
+    "Self-verification by the implementing session, per the one-review-per-ticket rule for non-blocking findings.",
+    "No game launch, deployment or process control occurred."
+  ],
+  "gameLaunched": false,
+  "installedFilesChanged": false
+}

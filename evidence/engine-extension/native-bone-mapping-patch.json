@@ -1,0 +1,1053 @@
+{
+  "status": "concrete-review-only; independent-machine-tests-and-integration-required",
+  "sourceSha256": "2a5e0e0b15513ebb7052d747a621b82c50ee834553eba283b33bbbc33766e12a",
+  "sources": {
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\build\\battle-scale\\native-run-20261017-065749-08e99ed9\\backup-0": "2a5e0e0b15513ebb7052d747a621b82c50ee834553eba283b33bbbc33766e12a",
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\evidence\\engine-extension\\native-renderer-stall-ghidra-evidence.json": "6df4bdf94e88c78fb5318c78ec2fee2953b01d6ba3695fd0414a157bd478d5f5",
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\tools\\battle-scale\\audit_bone_mapping_patch.py": "b8cb1426fa1fc577b21a26b228f1e0b053bc4c622adbfe2d00c31f63a800a1f8"
+  },
+  "edits": [
+    {
+      "rva": "0x886c8",
+      "fileOffset": 555720,
+      "originalBytes": "c1e80b",
+      "replacementBytes": "c1e80e",
+      "purpose": "Bone-mapping page geometry: 2048 -> 16384 DWORD entries.",
+      "originalInstructions": [
+        {
+          "address": "0x1800886c8",
+          "bytes": "c1e80b",
+          "mnemonic": "shr",
+          "operands": "eax, 0xb"
+        }
+      ],
+      "candidateInstructions": [
+        {
+          "address": "0x1800886c8",
+          "bytes": "c1e80e",
+          "mnemonic": "shr",
+          "operands": "eax, 0xe"
+        }
+      ]
+    },
+    {
+      "rva": "0x886d1",
+      "fileOffset": 555729,
+      "originalBytes": "49c1ef0b",
+      "replacementBytes": "49c1ef0e",
+      "purpose": "Bone-mapping page geometry: 2048 -> 16384 DWORD entries.",
+      "originalInstructions": [
+        {
+          "address": "0x1800886d1",
+          "bytes": "49c1ef0b",
+          "mnemonic": "shr",
+          "operands": "r15, 0xb"
+        }
+      ],
+      "candidateInstructions": [
+        {
+          "address": "0x1800886d1",
+          "bytes": "49c1ef0e",
+          "mnemonic": "shr",
+          "operands": "r15, 0xe"
+        }
+      ]
+    },
+    {
+      "rva": "0x886d5",
+      "fileOffset": 555733,
+      "originalBytes": "4d3bf70f8781000000488d9d080100004d2bfe4903de4c8d6d0849ffc74d8d6cc500",
+      "replacementBytes": "4183ff2072020f0b4d39fe777d4a8d9c35080100004d2bfe4c8d6cc50849ffc79090",
+      "purpose": "Reject last mapping page >=32 with UD2 before any page-table access; retain original first>last skip.",
+      "originalInstructions": [
+        {
+          "address": "0x1800886d5",
+          "bytes": "4d3bf7",
+          "mnemonic": "cmp",
+          "operands": "r14, r15"
+        },
+        {
+          "address": "0x1800886d8",
+          "bytes": "0f8781000000",
+          "mnemonic": "ja",
+          "operands": "0x18008875f"
+        },
+        {
+          "address": "0x1800886de",
+          "bytes": "488d9d08010000",
+          "mnemonic": "lea",
+          "operands": "rbx, [rbp + 0x108]"
+        },
+        {
+          "address": "0x1800886e5",
+          "bytes": "4d2bfe",
+          "mnemonic": "sub",
+          "operands": "r15, r14"
+        },
+        {
+          "address": "0x1800886e8",
+          "bytes": "4903de",
+          "mnemonic": "add",
+          "operands": "rbx, r14"
+        },
+        {
+          "address": "0x1800886eb",
+          "bytes": "4c8d6d08",
+          "mnemonic": "lea",
+          "operands": "r13, [rbp + 8]"
+        },
+        {
+          "address": "0x1800886ef",
+          "bytes": "49ffc7",
+          "mnemonic": "inc",
+          "operands": "r15"
+        },
+        {
+          "address": "0x1800886f2",
+          "bytes": "4d8d6cc500",
+          "mnemonic": "lea",
+          "operands": "r13, [r13 + rax*8]"
+        }
+      ],
+      "candidateInstructions": [
+        {
+          "address": "0x1800886d5",
+          "bytes": "4183ff20",
+          "mnemonic": "cmp",
+          "operands": "r15d, 0x20"
+        },
+        {
+          "address": "0x1800886d9",
+          "bytes": "7202",
+          "mnemonic": "jb",
+          "operands": "0x1800886dd"
+        },
+        {
+          "address": "0x1800886db",
+          "bytes": "0f0b",
+          "mnemonic": "ud2",
+          "operands": ""
+        },
+        {
+          "address": "0x1800886dd",
+          "bytes": "4d39fe",
+          "mnemonic": "cmp",
+          "operands": "r14, r15"
+        },
+        {
+          "address": "0x1800886e0",
+          "bytes": "777d",
+          "mnemonic": "ja",
+          "operands": "0x18008875f"
+        },
+        {
+          "address": "0x1800886e2",
+          "bytes": "4a8d9c3508010000",
+          "mnemonic": "lea",
+          "operands": "rbx, [rbp + r14 + 0x108]"
+        },
+        {
+          "address": "0x1800886ea",
+          "bytes": "4d2bfe",
+          "mnemonic": "sub",
+          "operands": "r15, r14"
+        },
+        {
+          "address": "0x1800886ed",
+          "bytes": "4c8d6cc508",
+          "mnemonic": "lea",
+          "operands": "r13, [rbp + rax*8 + 8]"
+        },
+        {
+          "address": "0x1800886f2",
+          "bytes": "49ffc7",
+          "mnemonic": "inc",
+          "operands": "r15"
+        },
+        {
+          "address": "0x1800886f5",
+          "bytes": "90",
+          "mnemonic": "nop",
+          "operands": ""
+        },
+        {
+          "address": "0x1800886f6",
+          "bytes": "90",
+          "mnemonic": "nop",
+          "operands": ""
+        }
+      ]
+    },
+    {
+      "rva": "0x8870a",
+      "fileOffset": 555786,
+      "originalBytes": "ba00200000",
+      "replacementBytes": "ba00000100",
+      "purpose": "Bone-mapping allocation/upload page bytes: 8192 -> 65536.",
+      "originalInstructions": [
+        {
+          "address": "0x18008870a",
+          "bytes": "ba00200000",
+          "mnemonic": "mov",
+          "operands": "edx, 0x2000"
+        }
+      ],
+      "candidateInstructions": [
+        {
+          "address": "0x18008870a",
+          "bytes": "ba00000100",
+          "mnemonic": "mov",
+          "operands": "edx, 0x10000"
+        }
+      ]
+    },
+    {
+      "rva": "0x88778",
+      "fileOffset": 555896,
+      "originalBytes": "c1e90b",
+      "replacementBytes": "c1e90e",
+      "purpose": "Bone-mapping page geometry: 2048 -> 16384 DWORD entries.",
+      "originalInstructions": [
+        {
+          "address": "0x180088778",
+          "bytes": "c1e90b",
+          "mnemonic": "shr",
+          "operands": "ecx, 0xb"
+        }
+      ],
+      "candidateInstructions": [
+        {
+          "address": "0x180088778",
+          "bytes": "c1e90e",
+          "mnemonic": "shr",
+          "operands": "ecx, 0xe"
+        }
+      ]
+    },
+    {
+      "rva": "0x8877b",
+      "fileOffset": 555899,
+      "originalBytes": "c1e80b",
+      "replacementBytes": "c1e80e",
+      "purpose": "Bone-mapping page geometry: 2048 -> 16384 DWORD entries.",
+      "originalInstructions": [
+        {
+          "address": "0x18008877b",
+          "bytes": "c1e80b",
+          "mnemonic": "shr",
+          "operands": "eax, 0xb"
+        }
+      ],
+      "candidateInstructions": [
+        {
+          "address": "0x18008877b",
+          "bytes": "c1e80e",
+          "mnemonic": "shr",
+          "operands": "eax, 0xe"
+        }
+      ]
+    },
+    {
+      "rva": "0x88792",
+      "fileOffset": 555922,
+      "originalBytes": "c1e00b",
+      "replacementBytes": "c1e00e",
+      "purpose": "Bone-mapping page geometry: 2048 -> 16384 DWORD entries.",
+      "originalInstructions": [
+        {
+          "address": "0x180088792",
+          "bytes": "c1e00b",
+          "mnemonic": "shl",
+          "operands": "eax, 0xb"
+        }
+      ],
+      "candidateInstructions": [
+        {
+          "address": "0x180088792",
+          "bytes": "c1e00e",
+          "mnemonic": "shl",
+          "operands": "eax, 0xe"
+        }
+      ]
+    },
+    {
+      "rva": "0x887db",
+      "fileOffset": 555995,
+      "originalBytes": "c1e90b",
+      "replacementBytes": "c1e90e",
+      "purpose": "Bone-mapping page geometry: 2048 -> 16384 DWORD entries.",
+      "originalInstructions": [
+        {
+          "address": "0x1800887db",
+          "bytes": "c1e90b",
+          "mnemonic": "shr",
+          "operands": "ecx, 0xb"
+        }
+      ],
+      "candidateInstructions": [
+        {
+          "address": "0x1800887db",
+          "bytes": "c1e90e",
+          "mnemonic": "shr",
+          "operands": "ecx, 0xe"
+        }
+      ]
+    },
+    {
+      "rva": "0x887e2",
+      "fileOffset": 556002,
+      "originalBytes": "c1e00b",
+      "replacementBytes": "c1e00e",
+      "purpose": "Bone-mapping page geometry: 2048 -> 16384 DWORD entries.",
+      "originalInstructions": [
+        {
+          "address": "0x1800887e2",
+          "bytes": "c1e00b",
+          "mnemonic": "shl",
+          "operands": "eax, 0xb"
+        }
+      ],
+      "candidateInstructions": [
+        {
+          "address": "0x1800887e2",
+          "bytes": "c1e00e",
+          "mnemonic": "shl",
+          "operands": "eax, 0xe"
+        }
+      ]
+    },
+    {
+      "rva": "0x89925",
+      "fileOffset": 560421,
+      "originalBytes": "488d99080100004803de4c8d710848ffc74d8d34c6660f1f440000",
+      "replacementBytes": "8d1c3783fb1f76020f0b488d9c31080100004c8d74c10848ffc790",
+      "purpose": "Reject last matrix page >=32 with UD2 before any page-table access; retain matrix page size and prior first>last skip.",
+      "originalInstructions": [
+        {
+          "address": "0x180089925",
+          "bytes": "488d9908010000",
+          "mnemonic": "lea",
+          "operands": "rbx, [rcx + 0x108]"
+        },
+        {
+          "address": "0x18008992c",
+          "bytes": "4803de",
+          "mnemonic": "add",
+          "operands": "rbx, rsi"
+        },
+        {
+          "address": "0x18008992f",
+          "bytes": "4c8d7108",
+          "mnemonic": "lea",
+          "operands": "r14, [rcx + 8]"
+        },
+        {
+          "address": "0x180089933",
+          "bytes": "48ffc7",
+          "mnemonic": "inc",
+          "operands": "rdi"
+        },
+        {
+          "address": "0x180089936",
+          "bytes": "4d8d34c6",
+          "mnemonic": "lea",
+          "operands": "r14, [r14 + rax*8]"
+        },
+        {
+          "address": "0x18008993a",
+          "bytes": "660f1f440000",
+          "mnemonic": "nop",
+          "operands": "word ptr [rax + rax]"
+        }
+      ],
+      "candidateInstructions": [
+        {
+          "address": "0x180089925",
+          "bytes": "8d1c37",
+          "mnemonic": "lea",
+          "operands": "ebx, [rdi + rsi]"
+        },
+        {
+          "address": "0x180089928",
+          "bytes": "83fb1f",
+          "mnemonic": "cmp",
+          "operands": "ebx, 0x1f"
+        },
+        {
+          "address": "0x18008992b",
+          "bytes": "7602",
+          "mnemonic": "jbe",
+          "operands": "0x18008992f"
+        },
+        {
+          "address": "0x18008992d",
+          "bytes": "0f0b",
+          "mnemonic": "ud2",
+          "operands": ""
+        },
+        {
+          "address": "0x18008992f",
+          "bytes": "488d9c3108010000",
+          "mnemonic": "lea",
+          "operands": "rbx, [rcx + rsi + 0x108]"
+        },
+        {
+          "address": "0x180089937",
+          "bytes": "4c8d74c108",
+          "mnemonic": "lea",
+          "operands": "r14, [rcx + rax*8 + 8]"
+        },
+        {
+          "address": "0x18008993c",
+          "bytes": "48ffc7",
+          "mnemonic": "inc",
+          "operands": "rdi"
+        },
+        {
+          "address": "0x18008993f",
+          "bytes": "90",
+          "mnemonic": "nop",
+          "operands": ""
+        }
+      ]
+    },
+    {
+      "rva": "0x1e09e1",
+      "fileOffset": 1965537,
+      "originalBytes": "c1eb0b",
+      "replacementBytes": "c1eb0e",
+      "purpose": "Bone-mapping page geometry: 2048 -> 16384 DWORD entries.",
+      "originalInstructions": [
+        {
+          "address": "0x1801e09e1",
+          "bytes": "c1eb0b",
+          "mnemonic": "shr",
+          "operands": "ebx, 0xb"
+        }
+      ],
+      "candidateInstructions": [
+        {
+          "address": "0x1801e09e1",
+          "bytes": "c1eb0e",
+          "mnemonic": "shr",
+          "operands": "ebx, 0xe"
+        }
+      ]
+    },
+    {
+      "rva": "0x1e09e6",
+      "fileOffset": 1965542,
+      "originalBytes": "c1e30b",
+      "replacementBytes": "c1e30e",
+      "purpose": "Bone-mapping page geometry: 2048 -> 16384 DWORD entries.",
+      "originalInstructions": [
+        {
+          "address": "0x1801e09e6",
+          "bytes": "c1e30b",
+          "mnemonic": "shl",
+          "operands": "ebx, 0xb"
+        }
+      ],
+      "candidateInstructions": [
+        {
+          "address": "0x1801e09e6",
+          "bytes": "c1e30e",
+          "mnemonic": "shl",
+          "operands": "ebx, 0xe"
+        }
+      ]
+    },
+    {
+      "rva": "0x1e0b34",
+      "fileOffset": 1965876,
+      "originalBytes": "48c7856002000000200000",
+      "replacementBytes": "48c7856002000000000100",
+      "purpose": "Bone-mapping allocation/upload page bytes: 8192 -> 65536.",
+      "originalInstructions": [
+        {
+          "address": "0x1801e0b34",
+          "bytes": "48c7856002000000200000",
+          "mnemonic": "mov",
+          "operands": "qword ptr [rbp + 0x260], 0x2000"
+        }
+      ],
+      "candidateInstructions": [
+        {
+          "address": "0x1801e0b34",
+          "bytes": "48c7856002000000000100",
+          "mnemonic": "mov",
+          "operands": "qword ptr [rbp + 0x260], 0x10000"
+        }
+      ]
+    }
+  ],
+  "editCount": 13,
+  "mappingCapacityEntries": 524288,
+  "matrixCapacityEntries": 262144,
+  "mappingPageBytes": 65536,
+  "matrixPageBytes": 524288,
+  "headerLayoutChanged": false,
+  "failureSemantics": "UD2 is an intentional abnormal termination, never a successful test result. Counter reservation precedes the guard; no out-of-range page publication follows it.",
+  "guardLimits": "Bounds the page-table accesses for ordinary positive reservations and preserves existing zero/first>last branches. Does not certify malformed render objects, allocator failure, or arbitrary injected code.",
+  "incomingControlFlow": {
+    "scan": "Every byte of all executable sections for relative CALL/JMP/Jcc/loop and RIP-relative LEA; exact RVA32/VA64 literals over entire image.",
+    "directCandidates": [
+      {
+        "sourceRva": "0x886b1",
+        "targetRva": "0x886d7",
+        "bytes": "7424",
+        "classification": "non-boundary bytes inside original instruction",
+        "containingInstruction": {
+          "address": "0x1800886af",
+          "bytes": "4c89742428",
+          "mnemonic": "mov",
+          "operands": "qword ptr [rsp + 0x28], r14"
+        }
+      },
+      {
+        "sourceRva": "0x886b9",
+        "targetRva": "0x886df",
+        "bytes": "7c24",
+        "classification": "non-boundary bytes inside original instruction",
+        "containingInstruction": {
+          "address": "0x1800886b7",
+          "bytes": "4c897c2420",
+          "mnemonic": "mov",
+          "operands": "qword ptr [rsp + 0x20], r15"
+        }
+      },
+      {
+        "sourceRva": "0x886c3",
+        "targetRva": "0x886e9",
+        "bytes": "7c24",
+        "classification": "non-boundary bytes inside original instruction",
+        "containingInstruction": {
+          "address": "0x1800886c1",
+          "bytes": "458d7c24ff",
+          "mnemonic": "lea",
+          "operands": "r15d, [r12 - 1]"
+        }
+      },
+      {
+        "sourceRva": "0x89931",
+        "targetRva": "0x8993b",
+        "bytes": "7108",
+        "classification": "non-boundary bytes inside original instruction",
+        "containingInstruction": {
+          "address": "0x18008992f",
+          "bytes": "4c8d7108",
+          "mnemonic": "lea",
+          "operands": "r14, [rcx + 8]"
+        }
+      }
+    ],
+    "ripLeaCandidates": [],
+    "addressLiterals": [
+      {
+        "kind": "rva32",
+        "targetRva": "0x886e8",
+        "fileOffset": "0x11db85",
+        "classification": "opcode/relative displacement bytes of an unrelated direct CALL",
+        "containingInstruction": {
+          "address": "0x18011e785",
+          "bytes": "e886080000",
+          "mnemonic": "call",
+          "operands": "0x18011f010"
+        }
+      }
+    ],
+    "relocationOverlaps": [],
+    "limitation": "Opaque synthesized indirect destinations cannot be disproven by an absence scan."
+  },
+  "unwind": [
+    {
+      "window": [
+        "0x886d5",
+        "0x886f7"
+      ],
+      "chain": [
+        {
+          "begin": "0x886af",
+          "end": "0x88769",
+          "unwindRva": "0xb97374",
+          "decoded": [
+            "[UNWIND_INFO]",
+            "0xB95D74   0x0   Version:                       0x1       ",
+            "0xB95D74   0x0   Flags:                         0x4       ",
+            "0xB95D75   0x1   SizeOfProlog:                  0xD       ",
+            "0xB95D76   0x2   CountOfCodes:                  0x4       ",
+            "0xB95D77   0x3   FrameRegister:                 0x0       ",
+            "0xB95D77   0x3   FrameOffset:                   0x0       ",
+            "0xB95D80   0xC   FunctionEntry:                 0x884D3   ",
+            "Flags: UNW_FLAG_CHAININFO",
+            "Unwind codes: .SAVEREG R15, 0x20; .SAVEREG R14, 0x28"
+          ]
+        },
+        {
+          "begin": "0x884d3",
+          "end": "0x886af",
+          "unwindRva": "0xb97360",
+          "decoded": [
+            "[UNWIND_INFO]",
+            "0xB95D60   0x0   Version:                       0x1       ",
+            "0xB95D60   0x0   Flags:                         0x4       ",
+            "0xB95D61   0x1   SizeOfProlog:                  0x5       ",
+            "0xB95D62   0x2   CountOfCodes:                  0x2       ",
+            "0xB95D63   0x3   FrameRegister:                 0x0       ",
+            "0xB95D63   0x3   FrameOffset:                   0x0       ",
+            "0xB95D68   0x8   FunctionEntry:                 0x884C6   ",
+            "Flags: UNW_FLAG_CHAININFO",
+            "Unwind codes: .SAVEREG R13, 0x30"
+          ]
+        },
+        {
+          "begin": "0x884c6",
+          "end": "0x884d3",
+          "unwindRva": "0xb97348",
+          "decoded": [
+            "[UNWIND_INFO]",
+            "0xB95D48   0x0   Version:                       0x1       ",
+            "0xB95D48   0x0   Flags:                         0x4       ",
+            "0xB95D49   0x1   SizeOfProlog:                  0xA       ",
+            "0xB95D4A   0x2   CountOfCodes:                  0x4       ",
+            "0xB95D4B   0x3   FrameRegister:                 0x0       ",
+            "0xB95D4B   0x3   FrameOffset:                   0x0       ",
+            "0xB95D54   0xC   FunctionEntry:                 0x88483   ",
+            "Flags: UNW_FLAG_CHAININFO",
+            "Unwind codes: .SAVEREG R12, 0x38; .SAVEREG RBP, 0x58"
+          ]
+        },
+        {
+          "begin": "0x88483",
+          "end": "0x884c6",
+          "unwindRva": "0xb97334",
+          "decoded": [
+            "[UNWIND_INFO]",
+            "0xB95D34   0x0   Version:                       0x1       ",
+            "0xB95D34   0x0   Flags:                         0x4       ",
+            "0xB95D35   0x1   SizeOfProlog:                  0x5       ",
+            "0xB95D36   0x2   CountOfCodes:                  0x2       ",
+            "0xB95D37   0x3   FrameRegister:                 0x0       ",
+            "0xB95D37   0x3   FrameOffset:                   0x0       ",
+            "0xB95D3C   0x8   FunctionEntry:                 0x8845F   ",
+            "Flags: UNW_FLAG_CHAININFO",
+            "Unwind codes: .SAVEREG RBX, 0x50"
+          ]
+        },
+        {
+          "begin": "0x8845f",
+          "end": "0x88483",
+          "unwindRva": "0xb97320",
+          "decoded": [
+            "[UNWIND_INFO]",
+            "0xB95D20   0x0   Version:                       0x1       ",
+            "0xB95D20   0x0   Flags:                         0x4       ",
+            "0xB95D21   0x1   SizeOfProlog:                  0x5       ",
+            "0xB95D22   0x2   CountOfCodes:                  0x2       ",
+            "0xB95D23   0x3   FrameRegister:                 0x0       ",
+            "0xB95D23   0x3   FrameOffset:                   0x0       ",
+            "0xB95D28   0x8   FunctionEntry:                 0x88440   ",
+            "Flags: UNW_FLAG_CHAININFO",
+            "Unwind codes: .SAVEREG RSI, 0x60"
+          ]
+        },
+        {
+          "begin": "0x88440",
+          "end": "0x8845f",
+          "unwindRva": "0xb97318",
+          "decoded": [
+            "[UNWIND_INFO]",
+            "0xB95D18   0x0   Version:                       0x1       ",
+            "0xB95D18   0x0   Flags:                         0x0       ",
+            "0xB95D19   0x1   SizeOfProlog:                  0x6       ",
+            "0xB95D1A   0x2   CountOfCodes:                  0x2       ",
+            "0xB95D1B   0x3   FrameRegister:                 0x0       ",
+            "0xB95D1B   0x3   FrameOffset:                   0x0       ",
+            "Flags: ",
+            "Unwind codes: .ALLOCSTACK 0x40; .PUSHREG RDI"
+          ]
+        }
+      ],
+      "proof": "All original save instructions/prolog positions remain untouched; neither replacement changes RSP or saved registers in memory."
+    },
+    {
+      "window": [
+        "0x89925",
+        "0x89940"
+      ],
+      "chain": [
+        {
+          "begin": "0x89918",
+          "end": "0x899b0",
+          "unwindRva": "0xb978a4",
+          "decoded": [
+            "[UNWIND_INFO]",
+            "0xB962A4   0x0   Version:                       0x1       ",
+            "0xB962A4   0x0   Flags:                         0x4       ",
+            "0xB962A5   0x1   SizeOfProlog:                  0xD       ",
+            "0xB962A6   0x2   CountOfCodes:                  0x4       ",
+            "0xB962A7   0x3   FrameRegister:                 0x0       ",
+            "0xB962A7   0x3   FrameOffset:                   0x0       ",
+            "0xB962B0   0xC   FunctionEntry:                 0x898D0   ",
+            "Flags: UNW_FLAG_CHAININFO",
+            "Unwind codes: .SAVEREG R14, 0x28; .SAVEREG RBX, 0x40"
+          ]
+        },
+        {
+          "begin": "0x898d0",
+          "end": "0x89918",
+          "unwindRva": "0xb97890",
+          "decoded": [
+            "[UNWIND_INFO]",
+            "0xB96290   0x0   Version:                       0x1       ",
+            "0xB96290   0x0   Flags:                         0x0       ",
+            "0xB96291   0x1   SizeOfProlog:                  0x25      ",
+            "0xB96292   0x2   CountOfCodes:                  0x8       ",
+            "0xB96293   0x3   FrameRegister:                 0x0       ",
+            "0xB96293   0x3   FrameOffset:                   0x0       ",
+            "Flags: ",
+            "Unwind codes: .SAVEREG R15, 0x20; .SAVEREG RDI, 0x50; .SAVEREG RSI, 0x48; .ALLOCSTACK 0x30; .PUSHREG RBP"
+          ]
+        }
+      ],
+      "proof": "All original save instructions/prolog positions remain untouched; neither replacement changes RSP or saved registers in memory."
+    }
+  ],
+  "evidenceIds": [
+    "ev_70bee16fde214426269422c1c8d2c3b42f8f277216b81ea4fd32de4903af0194",
+    "ev_8df04eaa7479f0504b4ab945a19daf4eac083e6405a585a81ca91265e4369a92",
+    "ev_9d28704b52a8e5d37eaa22490048b0710d6117199610cf45fc91aec7eea4320e",
+    "ev_af2c2970a6e5a8d259c592e6bd652805489948d62c8517692dd0516150603f96"
+  ],
+  "commandType12": {
+    "evidence": "case 0xc:\r\n    lVar20 = *(longlong *)(param_1.QuadPart + 0xa0);\r\n    lVar16 = *(longlong *)(DAT_180d96cf8 + 0x1cd8);\r\n    *(undefined4 *)(lVar20 + 0x174) = *(undefined4 *)(DAT_180d96cf0 + 0x28c);\r\n    plVar8 = *(longlong **)(lVar16 + 0x8420);\r\n    local_210 = local_158;\r\n    lVar16 = 0;\r\n    local_218 = (ulonglong)local_218._4_4_ << 0x20;\r\n    iVar11 = (**(code **)(*plVar8 + 0x70))(plVar8,*(undefined8 *)(lVar20 + 0x10),0,4);\r\n    if (iVar11 < 0) {\r\n      FUN_18025f160(iVar11,\"d3d_device_context_->Map at rglGPU_device::lock_buffer Failed!\");\r\n    }\r\n    uVar15 = *(undefined8 *)(param_1.QuadPart + 0xb0);\r\n    pvVar25 = local_158[0];\r\n    for (iVar11 = *(int *)(param_1.QuadPart + 0xb8); 0 < iVar11; iVar11 = iVar11 - iVar22) {\r\n      iVar22 = (int)uVar15;\r\n      iVar24 = iVar11;\r\n      if (iVar22 < iVar11) {\r\n        iVar24 = iVar22;\r\n      }\r\n      memcpy(pvVar25,*(void **)(lVar16 + *(longlong *)(param_1.QuadPart + 0xa8)),(longlong)iVar24);\r\n      pvVar25 = (void *)((longlong)pvVar25 + (longlong)iVar24);\r\n      lVar16 = lVar16 + 8;\r\n    }\r\n    plVar8 = *(longlong **)(*(longlong *)(DAT_180d96cf8 + 0x1cd8) + 0x8420);\r\n    pcVar7 = *(code **)(*plVar8 + 0x78);\r\n    *(undefined4 *)(lVar20 + 0x174) = *(undefined4 *)(DAT_180d96cf0 + 0x28c);\r\n    (*pcVar7)(plVar8,*(undefined8 *)(lVar20 + 0x10),0);\r\n    break;\r\n  ",
+    "instructions": [
+      {
+        "address": "0x180176770",
+        "bytes": "4d8baea0000000",
+        "mnemonic": "mov",
+        "operands": "r13, qword ptr [r14 + 0xa0]"
+      },
+      {
+        "address": "0x180176777",
+        "bytes": "488b057a05c200",
+        "mnemonic": "mov",
+        "operands": "rax, qword ptr [rip + 0xc2057a]"
+      },
+      {
+        "address": "0x18017677e",
+        "bytes": "488b90d81c0000",
+        "mnemonic": "mov",
+        "operands": "rdx, qword ptr [rax + 0x1cd8]"
+      },
+      {
+        "address": "0x180176785",
+        "bytes": "488b056405c200",
+        "mnemonic": "mov",
+        "operands": "rax, qword ptr [rip + 0xc20564]"
+      },
+      {
+        "address": "0x18017678c",
+        "bytes": "8b888c020000",
+        "mnemonic": "mov",
+        "operands": "ecx, dword ptr [rax + 0x28c]"
+      },
+      {
+        "address": "0x180176792",
+        "bytes": "41898d74010000",
+        "mnemonic": "mov",
+        "operands": "dword ptr [r13 + 0x174], ecx"
+      },
+      {
+        "address": "0x180176799",
+        "bytes": "488b8a20840000",
+        "mnemonic": "mov",
+        "operands": "rcx, qword ptr [rdx + 0x8420]"
+      },
+      {
+        "address": "0x1801767a0",
+        "bytes": "488b01",
+        "mnemonic": "mov",
+        "operands": "rax, qword ptr [rcx]"
+      },
+      {
+        "address": "0x1801767a3",
+        "bytes": "488d55e0",
+        "mnemonic": "lea",
+        "operands": "rdx, [rbp - 0x20]"
+      },
+      {
+        "address": "0x1801767a7",
+        "bytes": "4889542428",
+        "mnemonic": "mov",
+        "operands": "qword ptr [rsp + 0x28], rdx"
+      },
+      {
+        "address": "0x1801767ac",
+        "bytes": "33ff",
+        "mnemonic": "xor",
+        "operands": "edi, edi"
+      },
+      {
+        "address": "0x1801767ae",
+        "bytes": "897c2420",
+        "mnemonic": "mov",
+        "operands": "dword ptr [rsp + 0x20], edi"
+      },
+      {
+        "address": "0x1801767b2",
+        "bytes": "448d4f04",
+        "mnemonic": "lea",
+        "operands": "r9d, [rdi + 4]"
+      },
+      {
+        "address": "0x1801767b6",
+        "bytes": "4533c0",
+        "mnemonic": "xor",
+        "operands": "r8d, r8d"
+      },
+      {
+        "address": "0x1801767b9",
+        "bytes": "498b5510",
+        "mnemonic": "mov",
+        "operands": "rdx, qword ptr [r13 + 0x10]"
+      },
+      {
+        "address": "0x1801767bd",
+        "bytes": "ff5070",
+        "mnemonic": "call",
+        "operands": "qword ptr [rax + 0x70]"
+      },
+      {
+        "address": "0x1801767c0",
+        "bytes": "85c0",
+        "mnemonic": "test",
+        "operands": "eax, eax"
+      },
+      {
+        "address": "0x1801767c2",
+        "bytes": "790e",
+        "mnemonic": "jns",
+        "operands": "0x1801767d2"
+      },
+      {
+        "address": "0x1801767c4",
+        "bytes": "488d1535999800",
+        "mnemonic": "lea",
+        "operands": "rdx, [rip + 0x989935]"
+      },
+      {
+        "address": "0x1801767cb",
+        "bytes": "8bc8",
+        "mnemonic": "mov",
+        "operands": "ecx, eax"
+      },
+      {
+        "address": "0x1801767cd",
+        "bytes": "e88e890e00",
+        "mnemonic": "call",
+        "operands": "0x18025f160"
+      },
+      {
+        "address": "0x1801767d2",
+        "bytes": "4c8b7de0",
+        "mnemonic": "mov",
+        "operands": "r15, qword ptr [rbp - 0x20]"
+      },
+      {
+        "address": "0x1801767d6",
+        "bytes": "4d8ba6b0000000",
+        "mnemonic": "mov",
+        "operands": "r12, qword ptr [r14 + 0xb0]"
+      },
+      {
+        "address": "0x1801767dd",
+        "bytes": "418bb6b8000000",
+        "mnemonic": "mov",
+        "operands": "esi, dword ptr [r14 + 0xb8]"
+      },
+      {
+        "address": "0x1801767e4",
+        "bytes": "85f6",
+        "mnemonic": "test",
+        "operands": "esi, esi"
+      },
+      {
+        "address": "0x1801767e6",
+        "bytes": "7e38",
+        "mnemonic": "jle",
+        "operands": "0x180176820"
+      },
+      {
+        "address": "0x1801767e8",
+        "bytes": "0f1f840000000000",
+        "mnemonic": "nop",
+        "operands": "dword ptr [rax + rax]"
+      },
+      {
+        "address": "0x1801767f0",
+        "bytes": "8bc6",
+        "mnemonic": "mov",
+        "operands": "eax, esi"
+      },
+      {
+        "address": "0x1801767f2",
+        "bytes": "443be6",
+        "mnemonic": "cmp",
+        "operands": "r12d, esi"
+      },
+      {
+        "address": "0x1801767f5",
+        "bytes": "410f4cc4",
+        "mnemonic": "cmovl",
+        "operands": "eax, r12d"
+      },
+      {
+        "address": "0x1801767f9",
+        "bytes": "4863d8",
+        "mnemonic": "movsxd",
+        "operands": "rbx, eax"
+      },
+      {
+        "address": "0x1801767fc",
+        "bytes": "498b96a8000000",
+        "mnemonic": "mov",
+        "operands": "rdx, qword ptr [r14 + 0xa8]"
+      },
+      {
+        "address": "0x180176803",
+        "bytes": "4c8bc3",
+        "mnemonic": "mov",
+        "operands": "r8, rbx"
+      },
+      {
+        "address": "0x180176806",
+        "bytes": "488b1417",
+        "mnemonic": "mov",
+        "operands": "rdx, qword ptr [rdi + rdx]"
+      },
+      {
+        "address": "0x18017680a",
+        "bytes": "498bcf",
+        "mnemonic": "mov",
+        "operands": "rcx, r15"
+      },
+      {
+        "address": "0x18017680d",
+        "bytes": "e88fc98600",
+        "mnemonic": "call",
+        "operands": "0x1809e31a1"
+      },
+      {
+        "address": "0x180176812",
+        "bytes": "4c03fb",
+        "mnemonic": "add",
+        "operands": "r15, rbx"
+      },
+      {
+        "address": "0x180176815",
+        "bytes": "412bf4",
+        "mnemonic": "sub",
+        "operands": "esi, r12d"
+      },
+      {
+        "address": "0x180176818",
+        "bytes": "488d7f08",
+        "mnemonic": "lea",
+        "operands": "rdi, [rdi + 8]"
+      },
+      {
+        "address": "0x18017681c",
+        "bytes": "85f6",
+        "mnemonic": "test",
+        "operands": "esi, esi"
+      },
+      {
+        "address": "0x18017681e",
+        "bytes": "7fd0",
+        "mnemonic": "jg",
+        "operands": "0x1801767f0"
+      },
+      {
+        "address": "0x180176820",
+        "bytes": "488b05d104c200",
+        "mnemonic": "mov",
+        "operands": "rax, qword ptr [rip + 0xc204d1]"
+      },
+      {
+        "address": "0x180176827",
+        "bytes": "488b88d81c0000",
+        "mnemonic": "mov",
+        "operands": "rcx, qword ptr [rax + 0x1cd8]"
+      },
+      {
+        "address": "0x18017682e",
+        "bytes": "488b8920840000",
+        "mnemonic": "mov",
+        "operands": "rcx, qword ptr [rcx + 0x8420]"
+      },
+      {
+        "address": "0x180176835",
+        "bytes": "488b01",
+        "mnemonic": "mov",
+        "operands": "rax, qword ptr [rcx]"
+      },
+      {
+        "address": "0x180176838",
+        "bytes": "4c8b4878",
+        "mnemonic": "mov",
+        "operands": "r9, qword ptr [rax + 0x78]"
+      },
+      {
+        "address": "0x18017683c",
+        "bytes": "488b05ad04c200",
+        "mnemonic": "mov",
+        "operands": "rax, qword ptr [rip + 0xc204ad]"
+      },
+      {
+        "address": "0x180176843",
+        "bytes": "8b908c020000",
+        "mnemonic": "mov",
+        "operands": "edx, dword ptr [rax + 0x28c]"
+      },
+      {
+        "address": "0x180176849",
+        "bytes": "41899574010000",
+        "mnemonic": "mov",
+        "operands": "dword ptr [r13 + 0x174], edx"
+      },
+      {
+        "address": "0x180176850",
+        "bytes": "4533c0",
+        "mnemonic": "xor",
+        "operands": "r8d, r8d"
+      },
+      {
+        "address": "0x180176853",
+        "bytes": "498b5510",
+        "mnemonic": "mov",
+        "operands": "rdx, qword ptr [r13 + 0x10]"
+      },
+      {
+        "address": "0x180176857",
+        "bytes": "41ffd1",
+        "mnemonic": "call",
+        "operands": "r9"
+      },
+      {
+        "address": "0x18017685a",
+        "bytes": "e932080000",
+        "mnemonic": "jmp",
+        "operands": "0x180177091"
+      }
+    ],
+    "proof": "Consumer reads pageBytes from command+B0, totalBytes+B8, copies min(remaining,pageBytes), advances page pointer by8; no embedded2048 capacity. Layout/lifetime ownership unchanged."
+  },
+  "unchanged": {
+    "zeroCountBypass": "886a0 TEST R12D; 886a3 JNE886af; else ESI=-1; JMP88769",
+    "mappingLoopStart": "0x886f7",
+    "mappingSkip": "0x8875f",
+    "matrixLoopStart": "0x89940",
+    "ctorDtor": "32 pointer slots and128-byte header unchanged; shared constructor/destructor remain intact."
+  }
+}

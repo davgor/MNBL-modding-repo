@@ -1,0 +1,13 @@
+{
+  "author": {
+    "label": "Claude Code",
+    "role": "orchestrator"
+  },
+  "body": "**Handoff from MMR-44 (generation job).** See `docs/generation-job.md`.\n\n- **The commit seam.** `GenerationCoordinator.Commit(job, ICommitStage)` runs from ReadyForReview only. Your stage's `Commit(job)` runs on a worker. Engine work goes through `job.Engine(label, work, discard)` (bounded engine-thread items carrying the job ticket) or `job.Teardown`. `Recover(job, error)` runs before the job fails. Committing is never cancelled.\n- **What a job at ReadyForReview holds** (owned resources are released in reverse order unless your commit calls `job.Disown(name)`):\n  - **`bundle <WorldContentId>`:** a bundle this job published under `SubModule.Store/bundles`. A reused bundle is not owned.\n  - **`world generation N`:** the `GenerationToken` that `SceneStage` began (`job.Get<GenerationToken>(\"generation\")`). `GeneratedMapScene.Load` begins its own generation, so decide whether to retire or disown this one.\n  - **Artifacts:** `bundleDirectory`, `bundle` (the verified `WorldDataBundle`), `worldContentId`, `manifestSha256`, `sceneName`, `navmeshSha256`, `navigationReport`, `navigationActivatable`, `requestId`, `attemptSeed`.\n- **The scene.** It is installed and registered (`SceneObj/<sceneName>`) and validated in an inspection scene that is already disposed. The persisted navigation report is what `NavigationGate.Require` checks at map load.\n- **R07 order.** Campaign registration must happen inside the new game's `RegisterSubModuleObjects` (the job's RegisteringCampaign phase only reports this).\n- **Forward risk.** Every install sweeps other worlds' scene folders this process has not used, so loading a saved world must re-install its scene from its bundle.\n- **One job at a time.** `Start` refuses while a job is unfinished or still being released (`GenerationBusyException`, `AwaitIdle`).",
+  "createdAt": "2026-10-16T03:19:57.459Z",
+  "epicId": "ep_01m4fpnf646t254mnh69jhz107",
+  "format": "darkmechanicus.comment",
+  "formatVersion": 1,
+  "id": "cm_01m51bje8jskyva55m3k8kp3gc",
+  "ticketId": "tk_01m4fqfbgknga8wqn5seq3j94d"
+}

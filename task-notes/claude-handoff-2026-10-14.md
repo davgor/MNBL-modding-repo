@@ -43,23 +43,140 @@ Run `rn_01m4h4jk5wssr7x79xjmrp8ypg`, epic `ep_01m4fpnf646t254mnh69jhz107`, plan 
 - Evidence `evidence/fwg/campaign-semantics.json`: independent re-derivation of all 5 sizes (19 checks each, incl. installed-template counts via `--game`), repeat identical. Unit 88/88, reader 139/139, CTest 7/7.
 - Flaky: `process_contract` case 19 (grandchild termination) failed once under CPU load (beside the 1025 compile) and passed alone.
 
-## MMR-28 travel graph — CLAIMED 22:44 UTC, paused at the user's break (exploration only, no code written)
-- Attempt at_01m4y9dmnf0g3jcz2p4bmfemfc; the token is in the session scratchpad claims.txt, never in the repo. Lease runs to 2026-10-15 02:44 UTC. If it has lapsed, reconcile or reclaim before starting.
-- Engine contract gathered so far:
-  - navmesh face group = TerrainType (`docs/formats/navmesh-bin.md` §5);
-  - invalid terrain types per navigation type: Default {7,8,10,11,13,14,18,19,21-25}, Naval {1-7,13-17,20-22}, All {7,13,14,21,22};
-  - region switch cost 50/50, embark/disembark threshold 0.5;
-  - each town's gate sits on Plain (1) and its port on CoastalSea (18), on the same island (`evidence/runtime/navigation-probe.json` faces);
-  - OpenSea (19) is required for storms;
-  - no bridges (17/25) are authored yet (an MMR-17 gap).
-- Inputs available:
-  - MMR-25 `--project` objects.json (roads, rivers, hamlet port sea cells);
-  - MMR-26 masks.bin (intent land 0 / ocean 1 / lake 2 / river 3, plus padding);
-  - MMR-27 campaign.json (ports, villages, exclusions).
-- Expected artifacts: travel_graph.cpp, port_compiler.cpp, travel-graph and ports schemas, playability.json, travel_graph_tests.cpp, calibration naval-transitions/.
+## MMR-28 travel graph — ACCEPTED 2026-10-15 05:20 UTC (review accept-with-fixes, all applied; `evidence/fwg/travel-review.md`)
+- `docs/travel-graph.md`; `worldbridge --compile-travel` -> travel-graph.json + ports.json + cells.bin + campaign.json (MMR-27 records after exclusions, with MMR-28 position/portSite slots resolved). The terrain and campaign are compiled in memory; the recorded hashes equal the MMR-26/27 artifacts.
+- Policy `worldgen/policies/playability.json`; engine contract `worldgen/calibration/naval-transitions/naval-transitions.json` (MMR-17 run 2248 + the installed War Sails port-gate envelope, max 10.97 units); schemas travel-graph and ports.
+- Ports serve the gate: the coast pair of the gate's land component nearest the gate, within 2 cells, never shared. Coast crossings never join land; bridges are river/lake runs of at most 2 cells.
+- Generation driver: a request binding playability and the 5 compiler policies runs the gate per attempt. Each attempt keeps travel/ outputs, and its reasons carry UIDs. The 4 travel codes are retryable; compiler refusals fail at once (`evidence/fwg/travel-gate.json`, 6/6).
+- Size 129 accepted: 30/44 ports, 6 village exclusions, 11 player-safe groups. The other sizes are rejected for resolution reasons (outside MMR-26's frozen size).
+- Unit 77/77, reader 142/142, CTest 8/8; verifier 22/22 on all 5 sizes; repeat identical.
+
+## MMR-29 world data bundle — ACCEPTED 2026-10-15 06:25 UTC (review: 0 blockers, 4 majors, all fixed; `evidence/fwg/bundle-review.md`)
+- `docs/world-bundle.md`. `worldbridge --bundle` → `<root>/<WorldContentId>` (source/, compiled/ incl. `compatibility.json`, policies/, manifest.json, DATA_READY last). `--inspect-bundle` validates without the game.
+- WorldContentId covers compatibility (game/War Sails versions, capabilities): a game update gives a new bundle. Reuse only when valid and equal apart from provenance (`source.recipe`, `source.producer`, `compiler`, `engine.runtimeLockSha256`); otherwise `bundle_conflict`. Roots deeper than 73 chars are refused (`path_too_long`); the staging dir is validated before the rename (`staging_invalid`).
+- C# host: `CampaignBootstrap/WorldDataBundle.cs` (pure managed; Open / OpenForSave / ReadVerified; saves bind by WorldContentId). Not wired into any construction path yet (MMR-37/44).
+- Three validators (C++ validate, C# Verify, Python `summarize_bundle.verify_bundle`) share rules; `tools/test_bundle_parity.py` (run by `tools/Test-WorldDataBundle.ps1`) must stay 35/35 when any of them changes.
+- Real bundle: `build/research-bundle29/bundles/f596b58c…` (889 files, 143.7 MB); `build/research-bundle29/run.sh` republishes it.
+
+## MMR-30 campaign registry — ACCEPTED 2026-10-15 08:31 UTC (review: 0 blockers, 5 majors, 9 minors, all fixed; `evidence/fwg/registry-review.md`)
+- `docs/campaign-registry.md`. `src/MNBL.ProceduralWorld/Campaign/`: `CampaignIdentity`, `RegistrationPlan`, `CampaignObjectRegistry` (pure managed), `MBObjectStore`/`CampaignLists` (TaleWorlds adapters), `GeneratedGameManager` (promoted manager; `DiagnosticSandboxBootstrap` derives from it). Namespace is `MNBL.ProceduralWorld.CampaignRegistry` (a namespace named `Campaign` would shadow TaleWorlds' `Campaign`).
+- Engine facts that later tickets must respect (installed IL + runs): an early village silently loses its trade-bound link (no throw); `Hero.Deserialize` needs its NPCCharacter; after init Hero/Faction/Kingdom/MobileParty leave MBObjectManager (settlements stay); during a load the saved clans/heroes/kingdoms are in the CampaignObjectManager lists, not ready until the load finishes; `MBObjectManager.GetObject(string,string)` asserts on unknown element names (use typed lookups; map in `evidence/runtime/object-type-registrations.txt`).
+- Closure modes: Registration (before default lists), Replay (load), Settled (probes at map / after load). Census v2 origins: thisWorld, thisWorldDerived, otherWorlds (prefix or embedded), aliases, official, runtimeCreated.
+- `SaveIds.Base` 7,910,000 (clear of 153 scanned definers incl. Workshop; `tools/Scan-SaveDefiners.ps1`). MMR-50 owns the definers.
+- Offline `tools/Test-CampaignRegistry.ps1` 54/54; in game runs 21584 + 21872 (`tools/summarize_registry_probe.py` 16/16). A refused load hangs the game (MMR-49). Post-load trade bounds differ from new game: comment on MMR-33.
+- In-game reproduce: Build.ps1, Deploy-Dev.ps1, Start-OwnedProbe generated_campaign (worldCount 2, saveProbe 1, args in `evidence/runtime/two-world-load-matrix.json` reproduce), Collect, generated_save_load with the oracle path exactly as recorded (backslashes), Collect.
+
+## MMR-31 faction definitions — ACCEPTED 2026-10-15 09:16 UTC (review: 1 blocker, 1 major, 9 minors, 3 nits, all fixed; `evidence/fwg/factions-review.md`)
+- `docs/factions.md`.
+  - Code: `Campaign/FactionFactory.cs` (pure managed). `Build(campaign, idMap, factions policy, presentations, templates)` returns intents plus the Kingdoms and Factions XmlDocuments and DeclaredKeys for the MMR-30 registry.
+  - Policy: `worldgen/policies/factions.json`, written by `tools/make_factions_policy.py`.
+  - Culture contract: `worldgen/templates/cultures/` (contract v2), written by `tools/Scan-CultureContract.ps1`.
+- Facts C03 (MMR-32) must use:
+  - Write Heroes.xml `faction` from the intents' `affiliations`, not from the compiler's `hero.clan`: that still names the ruling clan for all 52 vassal founders. `Kingdom.Deserialize` sets RulingClan from the owner's clan, and `Clan.Deserialize→SetLeader` moves a leader into the clan it leads.
+  - Ruler relations (`relations[].rulerRelation`, −20..20) are hero relation intents for C03 to apply once the heroes exist.
+  - Never write a negative kingdom relationship value: `Kingdom.Deserialize` declares war on any value below 0.
+- Size 129 (the real world in the bundle):
+  - 40 kingdoms (8 regents), 40 ruling clans and 52 vassal clans, covering all 92 lords.
+  - Every ruling clan holds only its ruler.
+  - 132 banners, all unique; 2 realms renamed with the ordinal.
+- Tests: `tools/Test-Factions.ps1 -Bundle build/research-bundle29/bundles/f596b58c…` gives 29/29. No in-game run, because nothing is registered until C03/C04 exist.
+
+## MMR-32 heroes and rosters — ACCEPTED 2026-10-15 10:52 UTC (review: 0 blockers, 6 majors, 10 minors, nits, all fixed; `evidence/fwg/heroes-review.md`)
+- `docs/heroes.md`.
+  - Pure: `Campaign/HeroFactory.cs`, `CharacterTemplateResolver.cs`.
+  - Game: `HeroBodies.cs` (explicit bodies), `GeneratedCharacterCreation.cs` (creation culture filter plus a guarded Harmony prefix on the culture screen's sort).
+  - Probe: `Automation/HeroBodiesProbe.cs`.
+  - Policy: `worldgen/policies/rosters.json`, written by `tools/make_rosters_policy.py`.
+- What it produces:
+  - Lords and synthesized spouses and heirs are XML. Women wear their culture's female lord rosters.
+  - Notables and companions are runtime intents for MMR-34 (`CreateSpecialHero` + `SetName`, with an intent-id map).
+  - All 765 MMR-32-owned compiler slots are resolved.
+- Size 129:
+  - 241 XML heroes (92 lords, 88 spouses, 61 heirs; 114 women);
+  - 909 notables;
+  - 28 companions, from the installed float loop.
+- Tests: `tools/Test-Characters.ps1` gives 19/19.
+- In game, `tools/summarize_character_creation.py` gives 43/43 over two runs:
+  - run 17280: 7 cultures, plus 241 engine-drawn bodies;
+  - run 27608: empire and sturgia only.
+- Run 18560 crashed: the installed `SortCultureList` uses `Single` on the six vanilla cultures. That is why the sort prefix exists.
+- Probe args: `creationAudit=1`, `restrictCreationCultures` and `creationCultures` (same list), `heroBundle`, `repo`.
+
+## MMR-33 settlements and economy — ACCEPTED 2026-10-15 13:01 UTC (review: 0 blockers, 5 majors, 12 minors, nits, all fixed; `evidence/fwg/settlements-review.md`)
+- `docs/settlements.md`.
+  - Pure: `Campaign/SettlementFactory.cs`; `Element()` is shared by the world and the fixtures.
+  - Probe: `Automation/SettlementFixturesProbe.cs`, with the fixture entity shim in `DiagnosticMapScene.AddNewEntityToMapScene`.
+  - Policy: `worldgen/policies/economy.json` (v2), written by `tools/make_economy_policy.py`.
+  - Prototypes: `worldgen/templates/settlements/prototypes.json`, written by `tools/make_settlement_templates.py`. Village prototypes are split into coastal and inland.
+- Binding: compiler town, then a distance pass (1.02× the town spacing, else remote within the engine's 3× trade limit), then castles take villages from their garrison town, then from the fullest town of their kingdom.
+- Balance, food and fishing rules:
+  - The balance band (villages and hearth per fief within 0.75-1.5× installed) and a town food minimum (10 a day) are refused when violated.
+  - The food table comes from the IL and is checked in game; grapes are food.
+  - Harbour villages get ports at their MMR-28 harbour cells, and fishing types need a port.
+- Size 129:
+  - 45 towns, 26 castles, 215 villages;
+  - 5 distance rebinds (3 to another kingdom), 2 remote villages, 39 castle rebinds;
+  - 80 village ports, 1 food redraw.
+- Tests: `tools/Test-Settlements.ps1` gives 22/22, including a full-world `RegistrationPlan.FromDocuments`.
+  - Settlements are clean.
+  - The 150 hero family forward references (MMR-32; vanilla Heroes.xml has 127) are outside MMR-30's two-pass list, for MMR-45.
+- In game: `tools/summarize_settlement_fixtures.py` gives 13/13 on run 37100. Run 30552 found the grape food error.
+- Probe arg: `settlementFixtures=<repo>`. The run requires the policies made from the catalog's Settlements.
+- Earlier failed runs:
+  - 35960: the closure refused castle-village trade bounds; the MMR-30 store was fixed;
+  - 34416: hung in GeneratedMapSupport with four settlements;
+  - 36452: `SettlementVisual` NRE, which led to the entity shim.
+
+## MMR-34 startup, spawns and behaviour compatibility — ACCEPTED 2026-10-15 15:47 UTC
+- `docs/campaign-behavior-compatibility.md`; review and disposition in `evidence/fwg/startup-review.md`.
+- Scan and inventory:
+  - `tools/Scan-CampaignBehaviors.ps1` and `tools/BehaviorScan/BehaviorScan.cs` read the IL of 515 behaviour and model types (TaleWorlds.Core and TaleWorlds.MountAndBlade models included) into `evidence/fwg/behavior-scan.json`. Predicate lookups record the world ids their lambda compares (`lambda:"town_ES4"`).
+  - `tools/make_compatibility_inventory.py` writes `worldgen/policies/campaign-compatibility.json`: 446 retained, 23 adapted, 12 inactive, 34 excluded.
+- Startup:
+  - Pure: `Campaign/GeneratedCampaignInitializer.cs` with `worldgen/policies/startup.json` (`tools/make_startup_policy.py`).
+  - Starts for all 7 creation cultures (with fallbacks); 72 hideouts at size 129.
+  - Refusals carry `quality.startup_*` codes from startup.json. Not yet called by generation: MMR-45 wires it, MMR-44 records the codes.
+  - The record builders are shared with the fixture world (`GeneratedCampaignDataset.AddStartupFixtures`).
+- Runtime:
+  - `GeneratedStartupBehavior.cs`: intents, relations and name restore; first names; stale-campaign guard; traced problems.
+  - `GeneratedPatches.cs`: the manifest (creation, startup, world, periodic) and the version guard. The world transpiler `mnbl.proceduralworld.world` fixes the wanderer introduction's `town_ES4` NRE.
+  - `GeneratedGameManager.OnGameEnd`: teardown record (`LastTeardown`).
+  - The package records `suppliesStartup` and `fixturePrefabs`, so a load restores both.
+- Tests: `tools/Test-SpawnPolicy.ps1` 18/18; registry 57/57; settlements 22/22.
+- In game: runs 39816 (audit and saves) and 14820 (cold load). `tools/summarize_startup_audit.py RUN OUT LOAD` gives 36/36.
+  - MMR-19's exact snapshot comparison flags 8 path-state values of moving AI parties after the 2-day window, re-derived on load. Reported, left to MMR-62.
+- Crash causes found:
+  - `BanditSpawnCampaignBehavior` needs a hideout of every bandit culture (run 37036);
+  - the gameplay probe stalls on bandit encounters (39908), fixed with `IgnoreByOtherPartiesTill`; the save travel uses the same;
+  - entering a town without an encounter crashes the town menu (31864);
+  - loading a fixture world without its prefab map crashes `SettlementVisual` (35880).
+- Environment note: the game's `C:\ProgramData\Mount and Blade II Bannerlord\crashes` is a symlink to a missing Workshop cache, so the watchdog writes no dumps. Use the probe's first-chance tracing instead.
+
+## MMR-35 ports, fleets and naval faction records — ACCEPTED 2026-10-15 17:54 UTC
+- `docs/naval-content.md`; review and disposition in `evidence/fwg/naval-review.md`.
+- Pure: `Campaign/NavalContentFactory.cs` with `worldgen/policies/naval-content.json` (`tools/make_naval_policy.py`: catalog + the installed War Sails Main_map scene + nested prefab and navmesh files).
+- What it produces:
+  - facilities (shipyard levels 9/1/19 shares by harbour quality, passed into `SettlementFactory.Build`; buildable hulls by tier in verified chains; seaward blockade arcs on water; port markers);
+  - landings (refusal if not open-basin water);
+  - coastal and landlocked roles;
+  - pirate aliases with clustered spawn zones;
+  - diagnostics and `quality.naval_*` refusals;
+  - all 60 slots resolved.
+- Runtime: the fleet rule is `GeneratedShipDistributionModel` (refuses buys and transfers) plus `GeneratedClanShipOwnershipModel` (ideal 0, so ships are sold).
+  - Both are added in `GeneratedGameManager.InitializeGameStarter`, before `NavalDLCManager.OnGameStart` builds its model set. Run 7108 showed `OnGameStart` is too late.
+  - The package keeps `navalLandlocked`.
+  - `NavalDLC` is a compile reference (lock compile: true).
+- Tests: `tools/Test-NavalContent.ps1` 15/15.
+- In game: runs 21180 + 10724, `tools/summarize_naval_content.py` 11/11. The fixture declares clan 2 landlocked.
+- Gotchas:
+  - `GameEntity.PrefabExists` is false for ship prefabs on the map;
+  - naval visuals refresh only for visible parties;
+  - a player ship purchase drains the gold the gameplay probe needs (use `ApplyByTransferring`);
+  - the MMR-33 grain 3x check can flake (3.3x once).
+- Inventory now 443/26/12/34.
 
 ## Next
-- Resume MMR-28, then MMR-30 (also ready), then MMR-29.
+- MMR-36 (validate the entire generated campaign graph before activation).
 
 ## Workflow (user, 2026-10-14)
 - Big batches: all spec changes → one test run → all fixes → one confirming run → done. Fail-soft probes so one run reports everything.

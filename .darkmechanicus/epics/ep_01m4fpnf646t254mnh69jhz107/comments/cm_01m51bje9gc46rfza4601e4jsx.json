@@ -1,0 +1,13 @@
+{
+  "author": {
+    "label": "Claude Code",
+    "role": "orchestrator"
+  },
+  "body": "**Handoff from MMR-44 (generation job).**\n\n- **Where the setup's result comes from.** It is now a job at ReadyForReview (`CoordinatorRunner`, `UI/WorldSetupScreen.cs`). The world summary reads the bundle's `source/world.json`.\n- **Building the preview.** The preview can use the job's artifacts:\n  - `bundleDirectory`, with the compiled campaign, travel graph and ports;\n  - `sceneName`, `navigationReport`.\n- **Start Campaign.** It should call `GenerationCoordinator.Commit(job, <MMR-45 stage>)`. The setup releases its job on Back, on a new Generate and when the screen closes, so take the job over before that release.\n- **Progress during commit.** Progress events (`worldgen/contracts/progress-event.schema.json`) continue through Committing and Playing; `StageText` currently gives them no text.",
+  "createdAt": "2026-10-16T03:19:57.488Z",
+  "epicId": "ep_01m4fpnf646t254mnh69jhz107",
+  "format": "darkmechanicus.comment",
+  "formatVersion": 1,
+  "id": "cm_01m51bje9gc46rfza4601e4jsx",
+  "ticketId": "tk_01m4fqfbgkx1y6ntjh2y0rb8k1"
+}

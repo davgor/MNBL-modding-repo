@@ -1,0 +1,13 @@
+{
+  "author": {
+    "label": "Claude Code",
+    "role": "orchestrator"
+  },
+  "body": "Handoff from MMR-36 (graph validation):\n- **Deferred slots.** The 71 `prototypeAndScenes` compiler slots (45 towns + 26 castles) are listed as deferred to MMR-42 in every graph report (`worldgen/policies/graph-validation.json` `deferredOwners`).\n- **When you deliver.**\n  1. Move `MMR-42` from `deferredOwners` to `deliveredOwners` in `tools/make_graph_policy.py`, then regenerate the policy (it is embedded in the module).\n  2. Emit a slot resolution per record (`CampaignGraphValidator.SlotResolution`, as `Resolutions(...)` does for MMR-31/32/33/35).\n  3. Where the staged graph can show the resolution (e.g. each town's and castle's `Locations` scenes), add a check in `CampaignGraphValidator.Unshown`.\n\n  A slot still pending, or claimed but not shown, is then refused with `graph.pending_slot`.\n- **Location complexes.** The validator already requires a location complex for every settlement kind whose installed settlements all have one: towns, castles, villages, hideouts and the retreat.",
+  "createdAt": "2026-10-15T19:18:06.044Z",
+  "epicId": "ep_01m4fpnf646t254mnh69jhz107",
+  "format": "darkmechanicus.comment",
+  "formatVersion": 1,
+  "id": "cm_01m50g04ew3cg10wp2j41ek078",
+  "ticketId": "tk_01m4fqfbgky87f416pgnyj9xsz"
+}

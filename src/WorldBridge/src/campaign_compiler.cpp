@@ -603,25 +603,7 @@ void exclude(Compiled& compiled, const std::string& id, const std::string& reaso
     compiled = std::move(c);
 }
 
-int compile_campaign_main(int argc, char** argv) {
-    const char* usage = "Usage: worldbridge --compile-campaign SPLIT --contract FILE --content FILE --cultures FILE --out NEW_DIRECTORY";
-    if (argc != 11) throw std::runtime_error(usage);
-    std::map<std::string, std::string> o;
-    for (int i = 3; i + 1 < argc; i += 2) {
-        const std::string key = argv[i];
-        static const std::set<std::string> known{"--contract", "--content", "--cultures", "--out"};
-        if (!known.count(key)) throw std::runtime_error("Unknown option " + key + "\n" + usage);
-        if (!o.emplace(key, argv[i + 1]).second) throw std::runtime_error("Repeated option " + key);
-    }
-    const fs::path output = fs::absolute(o["--out"]);
-    fs::path pending = output; pending += ".partial";
-    if (fs::exists(output)) throw std::runtime_error("Output must not already exist");
-    if (fs::exists(pending)) throw std::runtime_error("A previous incomplete output exists: " + pending.string());
-    const auto world = source::read_source(argv[2], source::load_compatibility(o["--contract"]));
-    const auto content = load_content(o["--content"]);
-    const auto cultures = load_cultures(o["--cultures"]);
-    const auto c = compile(world, content, cultures, cjson::sha256_file_hex(fs::path(argv[2]) / "world.json"));
-
+std::string id_map_document(const Compiled& c) {
     Value map = Value::object();
     map.set("schema", str("mnbl.id-map")); map.set("version", Value::integer(1));
     map.set("layoutSeed", str(c.layout_seed)); map.set("sourceIdentity", str(c.source_identity)); map.set("worldSha256", str(c.world_sha256)); map.set("prefix", str(c.prefix));
@@ -629,8 +611,11 @@ int compile_campaign_main(int argc, char** argv) {
     Value entries; entries.kind = Value::Kind::Array;
     for (const auto& e : c.id_map) { Value v = Value::object(); v.set("id", str(e.id)); v.set("kind", str(e.kind)); v.set("uid", str(e.uid)); entries.items.push_back(v); }
     map.set("entries", entries);
-    const std::string map_text = cjson::canonical(map);
+    return cjson::canonical(map);
+}
 
+std::string records_document(const Compiled& c, const ContentPolicy& content, const CulturePolicy& cultures) {
+    const std::string map_text = id_map_document(c);
     Value doc = Value::object();
     doc.set("schema", str("mnbl.campaign-records")); doc.set("version", Value::integer(1));
     doc.set("layoutSeed", str(c.layout_seed)); doc.set("worldSha256", str(c.world_sha256)); doc.set("idMapSha256", str(cjson::sha256_hex(map_text)));
@@ -688,14 +673,41 @@ int compile_campaign_main(int argc, char** argv) {
     counts.set("ports", integer(static_cast<std::int64_t>(c.ports.size()))); counts.set("notInstantiated", integer(static_cast<std::int64_t>(c.not_instantiated.size())));
     counts.set("regents", integer(static_cast<std::int64_t>(std::count_if(c.heroes.begin(), c.heroes.end(), [](const Hero& h) { return h.role == "regent"; }))));
     doc.set("counts", counts);
-    const std::string doc_text = cjson::canonical(doc);
+    return cjson::canonical(doc);
+}
+int compile_campaign_main(int argc, char** argv) {
+    const char* usage = "Usage: worldbridge --compile-campaign SPLIT --contract FILE --content FILE --cultures FILE --out NEW_DIRECTORY";
+    if (argc != 11) throw std::runtime_error(usage);
+    std::map<std::string, std::string> o;
+    for (int i = 3; i + 1 < argc; i += 2) {
+        const std::string key = argv[i];
+        static const std::set<std::string> known{"--contract", "--content", "--cultures", "--out"};
+        if (!known.count(key)) throw std::runtime_error("Unknown option " + key + "\n" + usage);
+        if (!o.emplace(key, argv[i + 1]).second) throw std::runtime_error("Repeated option " + key);
+    }
+    const fs::path output = fs::absolute(o["--out"]);
+    fs::path pending = output; pending += ".partial";
+    if (fs::exists(output)) throw std::runtime_error("Output must not already exist");
+    if (fs::exists(pending)) throw std::runtime_error("A previous incomplete output exists: " + pending.string());
+    const auto world = source::read_source(argv[2], source::load_compatibility(o["--contract"]));
+    const auto content = load_content(o["--content"]);
+    const auto cultures = load_cultures(o["--cultures"]);
+    const auto c = compile(world, content, cultures, cjson::sha256_file_hex(fs::path(argv[2]) / "world.json"));
+    const std::string map_text = id_map_document(c);
+    const std::string doc_text = records_document(c, content, cultures);
 
     fs::create_directories(pending);
     write(pending / "id-map.json", map_text);
     write(pending / "campaign.json", doc_text);
     fs::rename(pending, output);
     Value report = Value::object();
-    report.set("idMapSha256", str(cjson::sha256_hex(map_text))); report.set("campaignSha256", str(cjson::sha256_hex(doc_text))); report.set("counts", counts);
+    report.set("idMapSha256", str(cjson::sha256_hex(map_text))); report.set("campaignSha256", str(cjson::sha256_hex(doc_text)));
+    Value counts = Value::object();
+    for (const auto& [name, n] : std::map<std::string, std::size_t>{{"kingdoms", c.kingdoms.size()}, {"clans", c.clans.size()}, {"heroes", c.heroes.size()}, {"towns", c.towns.size()},
+                                                                      {"villages", c.villages.size()}, {"castles", c.castles.size()}, {"ports", c.ports.size()}, {"notInstantiated", c.not_instantiated.size()}})
+        counts.set(name, integer(static_cast<std::int64_t>(n)));
+    counts.set("regents", integer(static_cast<std::int64_t>(std::count_if(c.heroes.begin(), c.heroes.end(), [](const Hero& h) { return h.role == "regent"; }))));
+    report.set("counts", counts);
     std::cout << cjson::canonical(report) << std::endl;
     return 0;
 }

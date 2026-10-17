@@ -1,0 +1,13 @@
+{
+  "author": {
+    "label": "Claude Code",
+    "role": "orchestrator"
+  },
+  "body": "**MMR-33 handoff: entities, gates, ports, siege geometry**\n\nAll MMR-33 positions are staged (`pendingEngineValidation`):\n- the centre is the MMR-28 point;\n- the gate is the centre (town and castle gates are written explicitly);\n- town ports are the MMR-28 sea point, within the installed port-gate maximum 10.97 plus one cell of the staged gate. 19 of the 30 ports are farther than the installed port-centre maximum (6.96) until gates are placed;\n- harbour-village ports are at the harbour-cell centre.\n\n**Entities.** Each intent carries `mapPrefab`: the prototype's vanilla Main_map `old_prefab_name`. Towns have none, because the vanilla map does not place them as prefabs. The installed `MapScene.AddNewEntityToMapScene` instantiates a prefab named after the settlement id. A generated id has no such prefab, which caused the run 36452 NRE in `SettlementVisual.OnStartup`. The fixture-only shim is `DiagnosticMapScene.AddNewEntityToMapScene` (FixturePrefabs).\n\n**Siege positions** are not written. `Town.Deserialize` leaves the besieger camp positions at identity, and `SettlementVisual.OnStartup` fills siege-engine frames from the map entity's children. They are MMR-40's.\n\nThe in-game fixtures (run 37100) verify that the engine reads distinct gates exactly from the XML.",
+  "createdAt": "2026-10-15T13:01:56.624Z",
+  "epicId": "ep_01m4fpnf646t254mnh69jhz107",
+  "format": "darkmechanicus.comment",
+  "formatVersion": 1,
+  "id": "cm_01m4ztfc0gn240t2yyffwaxafk",
+  "ticketId": "tk_01m4fqfbgkkntdvg7kaxc9k8yz"
+}

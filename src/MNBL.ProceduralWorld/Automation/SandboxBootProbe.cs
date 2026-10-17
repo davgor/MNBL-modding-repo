@@ -10,6 +10,7 @@ using TaleWorlds.Core;
 using TaleWorlds.Engine;
 using TaleWorlds.Library;
 using TaleWorlds.ScreenSystem;
+using MNBL.ProceduralWorld.Surface;
 using Path = System.IO.Path;
 
 namespace MNBL.ProceduralWorld.Automation
@@ -49,10 +50,10 @@ namespace MNBL.ProceduralWorld.Automation
                 yield return null;
             }
             var campaign = Campaign.Current;
-            var wrapper = campaign.MapSceneWrapper as DiagnosticMapScene;
+            var wrapper = campaign.MapSceneWrapper as GeneratedMapScene;
             if (wrapper == null) throw new InvalidOperationException("Generated scene creator was replaced.");
             var scene = wrapper.Scene;
-            if (scene.GetName() != DiagnosticMapSceneCreator.Slot) throw new InvalidOperationException("Wrong scene.");
+            if (scene.GetName() != GeneratedMapSceneCreator.Slot) throw new InvalidOperationException("Wrong scene.");
             context.Outputs["activeState"] = Game.Current.GameStateManager.ActiveState.GetType().FullName;
             context.Outputs["mapWrapper"] = wrapper.GetType().FullName;
             context.Outputs["sceneName"] = scene.GetName();

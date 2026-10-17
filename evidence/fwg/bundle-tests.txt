@@ -1,0 +1,39 @@
+ok    a bundle publishes into <root>/<worldContentId>, validates, is listed, and leaves no staging
+ok    the WorldContentId is identity::world_content over source/, compiled/ and policies/
+ok    the manifest lists every file and DATA_READY names the manifest hash
+ok    a bundle named with a trailing separator validates
+ok    identical content reuses the published bundle and its first manifest, also from another build or recipe (provenance), and never rewrites it
+ok    the same content described differently (not provenance) is refused naming the member, and the bundle is untouched
+ok    a crash at each of 22 boundaries before the rename publishes nothing; the earlier bundle stays valid and listed; the staging is complete only after DATA_READY
+ok    a cancel at each boundary removes the staging and publishes nothing
+ok    a torn staged file before a crash (after DATA_READY too) never validates, even as a candidate, and is never listed
+ok    a crash after the rename leaves a complete, valid bundle beside the earlier one
+ok    a bundle whose data was torn after the rename never validates
+ok    a publish that loses the rename to a concurrent publisher of the same content reuses the winner's bundle
+ok    republishing over a damaged bundle is refused (bundle_conflict) and leaves it untouched
+ok    a staged bundle that fails validation is refused (staging_invalid) and nothing is published
+ok    a root too deep for MAX_PATH is refused before anything is written
+ok    unsafe bundle path refused before writing: compiled/../x
+ok    unsafe bundle path refused before writing: manifest.json
+ok    unsafe bundle path refused before writing: other/x
+ok    unsafe bundle path refused before writing: compiled\x
+ok    unsafe bundle path refused before writing: compiled/a//b
+ok    unsafe bundle path refused before writing: compiled/a?b
+ok    unsafe bundle path refused before writing: compiled/trailing.
+ok    unsafe bundle path refused before writing: compiled/con.json
+ok    unsafe bundle path refused before writing: compiled/x/LPT1
+ok    unsafe bundle path refused before writing: compiled/Aux
+ok    unsafe bundle path refused before writing: compiled/xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+ok    the description cannot set the identity or inventory
+ok    validation refuses missing file (missing file)
+ok    validation refuses extra file (unlisted file)
+ok    validation refuses edited file (hash differs)
+ok    validation refuses resized file (size differs)
+ok    validation refuses an edited manifest (DATA_READY names a different manifest)
+ok    validation refuses an unsealed bundle (never sealed)
+ok    validation refuses an empty DATA_READY (DATA_READY)
+ok    validation refuses an activation receipt inside (activation receipts never live in a bundle)
+ok    validation refuses an edited policy (differs: policies/playability.json)
+ok    a bundle under another name is refused as published, valid as a candidate
+ok    a missing directory is not a bundle
+38/38 checks passed

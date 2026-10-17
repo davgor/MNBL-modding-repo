@@ -133,6 +133,11 @@ std::string xml_escape(const std::string& text);
 std::string localized(const std::string& id, const std::string& name);
 std::string localized_xml(const std::string& id, const std::string& name);
 
+// The canonical id-map.json and campaign.json of a compiled world (after any exclusions), exactly as
+// --compile-campaign writes them.
+std::string id_map_document(const Compiled& compiled);
+std::string records_document(const Compiled& compiled, const ContentPolicy& content, const CulturePolicy& cultures);
+
 // worldbridge --compile-campaign SPLIT --contract FILE --content FILE --cultures FILE --out NEW_DIRECTORY
 int compile_campaign_main(int argc, char** argv);
 

@@ -1,0 +1,13 @@
+{
+  "author": {
+    "label": "Claude Code",
+    "role": "orchestrator"
+  },
+  "body": "**Handoff from MMR-44 (generation job).**\n\n- **Job errors.** They use your categories through `GenerationErrors.Job(category, code, detail)` and `GenerationErrors.Busy`. The codes in use:\n  - `generate.exhausted`, `generate.refused`, `generate.crashed` (and other producer outcomes), `generate.producer_changed`;\n  - `compile.failed`, `compile.travel_rejected`;\n  - `data.rejected`, `runtime.navigation_refused`, `request.refused`, `generation.busy`.\n- **Logs are not durable yet.** Each job keeps `events.jsonl` and `timings.json` (its record) in its directory, and these are deleted when the job is released.\n- **Cleanup left to you** (the job releases only what it owns):\n  - scene store folders, which an install of another world sweeps;\n  - persisted navigation reports (`world-navigation/<scene>.json`);\n  - bundles that later jobs reused;\n  - job directories from earlier R01 and probe runs under `SubModule.Store/jobs`.",
+  "createdAt": "2026-10-16T03:19:57.516Z",
+  "epicId": "ep_01m4fpnf646t254mnh69jhz107",
+  "format": "darkmechanicus.comment",
+  "formatVersion": 1,
+  "id": "cm_01m51bjeacx48gezvvzbyeggb0",
+  "ticketId": "tk_01m4fqfbgkdhbqqf84gy5p5z2b"
+}

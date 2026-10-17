@@ -1,0 +1,113 @@
+{
+  "schemaVersion": 1,
+  "status": "accepted-private-element-probe-v2-package",
+  "statusReason": "The blocking finding B1 is fixed, and skipping the scan is sound. Read-only preflight against the real package reports 'Crash directory: reparse-target-unavailable' and 'Live commands: True'. Dumps cannot be written through the dangling junction (tested on a scratch junction). The stock watchdog runs normally with this junction as its dump directory (two real logs). Any change in the junction's state fails the run. All 39 inert scenarios and the real-log replay pass. No blocking defect was found. One should-fix item remains: S2 is only partly fixed, because substitutes of commands outside the checked list, a substitute Get-Command, or any binary cmdlet still give liveCommandsVerified=true. It needs a deliberate or unusual substitution in the caller session. A direct, clean -Execute invocation is not affected. There are also three nits.",
+  "reviewedProfileSha256": "9134055f63f79a070194e7c81e13e6c8f03056a37ef485057ce0752188f84ec3",
+  "previousReview": {
+    "path": "evidence/engine-extension/private-element-probe-v2-independent-review.json",
+    "status": "rejected-private-element-probe-v2-package",
+    "reviewedProfileSha256": "c37fbe17e5adb0a976a4f0ff8c58e2405e873a3384fc16104af73d8f1beef6f4"
+  },
+  "verifiedHashes": {
+    "packageFiles": {
+      "MNBL.AgentGrowthProbe.dll": "57c5b680beeca06c73847130100c44c7931a6b4f0f603c5b4d90fb1a4ce0de7d",
+      "MNBL.NativeElementProbe.dll": "9d1f6a512dd63c833d44a4fd0bf0e7f5ede9750dcb022ef50608144306347d05",
+      "SubModule.xml": "694ad34c5690853aec036821c53fbb8e524029fcd91254b4d6e003bf0196cb23",
+      "element-probe-profile.json": "9134055f63f79a070194e7c81e13e6c8f03056a37ef485057ce0752188f84ec3"
+    },
+    "hostAndNativeUnchangedFromEarlierReview": true,
+    "profilePinDiffVsEarlierReview": {
+      "tools/battle-scale/Test-ElementProbeInGameV2.ps1": {"old": "ee2d3715f3f7a13883c799246151babc29a97d6b62b8ebf28061a2e1347b2e57", "new": "6bbd22b564de4dc97b23184363c06a0350b478ba7b83360cbaca134c13a1255f"},
+      "otherPins": "The other 11 source pins, 10 provider pins, 3 package files and the exit contract (ce986872...) are identical to the earlier review. All 22 profile pins and the contract were recomputed from disk: 0 mismatches."
+    },
+    "changedFiles": {
+      "tools/battle-scale/Test-ElementProbeInGameV2.ps1": "6bbd22b564de4dc97b23184363c06a0350b478ba7b83360cbaca134c13a1255f",
+      "tests/AgentStorage/managed_host_runner_v2_tests.ps1": "f8677ee641ae836d5b9a5fa6af50aa5e68c05a98c0dde092bfe1614b566713f1"
+    },
+    "unchangedHelper": {"tools/battle-scale/Test-NativeExitContract.ps1": "bd8cc8995a6855676945855154a71145c7dbe883441feab7c68de2aceefd10d4"},
+    "buildReceipt": {
+      "evidence/engine-extension/managed-element-host-v2-offline-build.json": "9ac83c1a0a1f49ddb85a55628abcfac88d422a8fb6b7bb8d1af323fc7e89d66e",
+      "profileSha256Recorded": "9134055f63f79a070194e7c81e13e6c8f03056a37ef485057ce0752188f84ec3",
+      "ManagedElementHostTests.exe": "cf94b554050e51f552cedd52c7cfc04185571605c418ccf2065294de86bf5485 (matches recorded)"
+    },
+    "realLogFixture": {
+      "build/element-probe-host-v2/real-log-fixture-21268/watchdog_log_21268.txt": "c4bc6b4feb69a52f71de6fa97c006e9a6f8c447bc2b4edf3b1df857b5f2db488",
+      "build/element-probe-host-v2/real-log-fixture-21268/rgl_log_21268.txt": "df7c3108877b8d4d1de8416633fe397aa46a5178679d8b02447643a25a3e10aa",
+      "build/element-probe-host-v2/real-log-fixture-21268/rgl_log_errors_21268.txt": "2e08a4d22e9c70a8fd563ef79eee142c023bcfa3b1cb04d01a933e3dd2078e68"
+    },
+    "inertTestEvidence": {
+      "evidence/engine-extension/managed-element-runner-v2-offline-tests.json (before reviewer re-run)": "d93dd6d7f3ab5489e27cb2335d7c4547b63f9c41ff752e0e319d5a86900a21f4",
+      "evidence/engine-extension/managed-element-runner-v2-offline-tests.json (written by reviewer re-run)": "03fb4a97f9b9bc35ae95a0433c207babc15fc1c4c8a1fd3a54f9534e836579a8"
+    }
+  },
+  "checks": [
+    {"check": "Runner -PreflightOnly against the real package (Windows PowerShell 5.1.26100.9711).", "result": "pass", "detail": "Output: 'Private probe v2 preflight passed. Existing Bannerlord/Watchdog sessions: 2. Crash directory: reparse-target-unavailable. Live commands: True.' The 2 sessions were another agent's game (Bannerlord.exe 11568 and its child Watchdog.exe 28324). I only listed them read-only and never touched them. That game has since exited normally through kp."},
+    {"check": "Inert suite re-run.", "result": "pass", "detail": "Output: 'PASS 39 actual-runner v2 inert scenarios + real stock-log replay.' (10.8 s). Suite folder: build/element-probe-host-v2/inert-runner-tests/d95d2d8f8a2d4459859b279f44576d33, with suite-local runs and lease. All 31 failing scenarios were rejected for their intended reasons. The new ones: crash-dir-state-change -> 'Crash directory state changed during the run'; missing-error-log -> 'Missing or stale engine error log'; debugger-held-game -> 1 kill, 1 owned-watchdog stop, restored; unkillable-game -> ownedStillRunning, restore skipped, ledger and backups kept, lease reopened by the test. 7 receipts read passed-inert-substituted-commands and 29 read failed. All have liveCommandsVerified=false."},
+    {"check": "Dangling-junction write behaviour (scratch junction in the scratchpad, then removed).", "result": "pass", "detail": ".NET Framework: Directory.Exists(junction)=True; CreateDirectory(junction\\sub) and File.WriteAllText(junction\\x.dmp) throw DirectoryNotFoundException; CreateDirectory(junction) does not throw and does not create the target. The real crash junction gives the same Exists=True and Get-ChildItem DirectoryNotFoundException."},
+    {"check": "Stock watchdog behaviour with the dangling junction as its dump directory.", "result": "pass", "detail": "Read-only: watchdog_log_21268 (fixture) and watchdog_log_11568 (another agent's session today) both show 'Dump Directory: C:\\ProgramData/Mount and Blade II Bannerlord/crashes', normal startup, then #TW#-kp, [DebuggerConfiguration] -kp, EXIT_PROCESS_DEBUG_EVENT ... Detaching, and 0 exception/dump markers. The contract IL shows Debugger..ctor calls CreateDirectory(m_dump_dir) only when Directory.Exists is false. Exists is true for the junction, so no creation is attempted."},
+    {"check": "Watchdog parent model (earlier limitation).", "result": "pass", "detail": "Read-only CIM listing of the other session: Watchdog.exe 28324 has ParentProcessId = Bannerlord.exe 11568 and was created 1 s after it, at the exact install path. This matches ObserveOwnedWatchdogs (child of the game PID, created no earlier than start - 2 s)."},
+    {"check": "1 ms StartTime vs CIM CreationDate precision (N1/StopOwnedWatchdog).", "result": "pass", "detail": "350 accessible processes compared read-only: max |Get-Process StartTime - Win32_Process CreationDate| = 0.0009 ms; 0 at >= 1 ms. explorer.exe 14196: diff 0 (2026-10-16T06:07:39.4703620Z on both). CIM values are microsecond-truncated (sub-µs digit always 0); StartTime has 100 ns resolution. The 1 ms tolerance has about 1000x margin."},
+    {"check": "Real-log fixture provenance (N6).", "result": "pass", "detail": "Pins match. rgl_log_21268 and rgl_log_errors_21268 are byte-identical to the ProgramData originals. ProgramData watchdog_log_21268.txt has since been deleted (gone after the 15:23 game start), which confirms the earlier N6 risk. The fixture watchdog log equals the copies made by every earlier suite (c4bc6b4f...)."},
+    {"check": "Install unchanged.", "result": "pass", "detail": "Modules/MNBL.AgentGrowthProbe in the install holds only the empty bin/Win64_Shipping_Client tree (timestamps from the v1 runs at 19:01/19:08 UTC). No SubModule.xml or DLLs. Not modified by this review."}
+  ],
+  "fixVerdicts": [
+    {"id": "B1", "verdict": "fixed", "location": "tools/battle-scale/Test-ElementProbeInGameV2.ps1:69, 71-89, 216, 233, 283, 312", "detail": "CrashDirectoryState classifies absent, listable, reparse-listable and reparse-target-unavailable. A non-reparse unlistable directory throws. Preflight records the state at 216, before any deployment. VerifyInputs re-checks it before deployment (237) and before launch (274). NewCrashEntries re-checks it after the run (86). A change in either direction fails the run, so a target re-created mid-run (where dumps could land) cannot go unnoticed. Skipping the scan is sound: a dump cannot be written into a target that does not exist, and the stock watchdog neither re-creates it nor falls over at startup. When the state is unavailable, crash evidence comes from the exit -1 contract (ordered kp markers, no exception/dump markers, engine cleanup milestones) and the clean error log. Regression nit: see NF3 (absent state)."},
+    {"id": "S1", "verdict": "fixed", "location": "tools/battle-scale/Test-ElementProbeInGameV2.ps1:14-16, 25, 227; tests/AgentStorage/managed_host_runner_v2_tests.ps1:10-11, 180-181", "detail": "build/element-probe-host-v2/runs is empty. pre-fix-mock-runs holds 73 folders (61 failed, 12 with the old live status 'passed-private-native-probe-and-verified-shutdown'). Those 12 are now outside the live runs root, but a recursive glob over build/element-probe-host-v2 would still find them. Consumers should keep pinning profileSha256 and liveCommandsVerified. Mock receipts now carry passed-inert-substituted-commands."},
+    {"id": "S2", "verdict": "partially-fixed", "location": "tools/battle-scale/Test-ElementProbeInGameV2.ps1:179-180, 190-204, 392", "detail": "It correctly detects function, alias and script substitutes for the 13 listed names, a Start-ArmedGame that is not the runner's own, and a lease that is not shared. The test asserts the exact substituted list. The real Get-FileHash (Microsoft.PowerShell.Utility.psm1 under $PSHOME) is accepted. A shipped scriptblock re-bound under a new name would still run shipped code. Not detected: see NF1. Re-bound $PSHOME functions are harmless and are not counted against it."},
+    {"id": "S3", "verdict": "fixed", "location": "tools/battle-scale/Test-ElementProbeInGameV2.ps1:321-345", "detail": "The escalation is CloseMainWindow + 10 s, then a re-check of identity, Kill + WaitForExit(30000), then StopOwnedWatchdog for each recorded instance + WaitForExit(30000). If the game is still alive, it sets ownedStillRunning, skips restore (ledger and backups kept) and releases the lease in the inner finally. The WaitForExit() at 301 has no bound, but it runs only after HasExited is true, with no redirected streams, so it returns at once. Design note: with ownedStillRunning the lease is released while private files stay deployed. A later lease holder would back up the v2 files as 'originals'. Recovery from restore-files.json is manual."},
+    {"id": "N1", "verdict": "not-fixed-as-claimed", "location": "tools/battle-scale/Test-ElementProbeInGameV2.ps1:128-135", "detail": "See NF2. The StartTime check and Kill do not share one handle under .NET Framework. The TOCTOU window is the same size as before. Identity matching (name + start time within 1 ms of CIM) is sound."},
+    {"id": "N2", "verdict": "fixed", "location": "tools/battle-scale/Test-ElementProbeInGameV2.ps1:139-148", "detail": "The file is required and LastWriteTimeUtc must be >= launchUtc. The real error logs (21268, 11568) are written about 1-2 s after process creation, so a live run passes. The missing-error-log scenario is rejected."},
+    {"id": "N3", "verdict": "fixed", "location": "tools/battle-scale/Test-ElementProbeInGameV2.ps1:297 with 165-168", "detail": "DeclineSafeMode now gets only $owned.Id. That handle comes from Process.Start, so the PID cannot be reused. The Safe Mode window's owner process has still never been observed (limitation)."},
+    {"id": "N4", "verdict": "fixed", "location": "tools/battle-scale/Test-ElementProbeInGameV2.ps1:276-286", "detail": "Order: waiting FreshWindow, then request creation, CrashNames, a non-waiting Games check that throws, then launch. The inert harness asserts the request is less than 1 minute old at launch. Note: VerifyInputs and the deployed-hash check (274-275) still come before the waiting FreshWindow at 277. If that wait is long, a changed TaleWorlds.Native.dll is not re-checked before launch. This fails safe, because the relocated native binding verifies the loaded image identity in-game."},
+    {"id": "N5", "verdict": "fixed", "location": "tools/battle-scale/Test-ElementProbeInGameV2.ps1:232-233", "detail": "logRoot, runRoot, leasePath, sharedLease and crashDirectory {path,state} are recorded. They are recorded, not enforced. Only the lease path feeds liveCommandsVerified."},
+    {"id": "N6", "verdict": "fixed", "location": "tests/AgentStorage/managed_host_runner_v2_tests.ps1:16-23, 246-259", "detail": "The fixture hashes are pinned and asserted. The replay reads from the fixture. The PID 556 rejection is kept."},
+    {"id": "N7", "verdict": "fixed-with-nit", "location": "tools/battle-scale/Test-ElementProbeInGameV2.ps1:254-258, 369-376", "detail": "Missing directories are recorded shallowest first and removed deepest first, only when empty. The test asserts bin/ is gone and removedDirectories=2. Directory creation (257) is still not immediately preceded by a fresh check (it follows 244, with backup in between). This was the earlier nit and is harmless. See NF4 for the order of the emptiness check and the wait."},
+    {"id": "N8", "verdict": "fixed", "location": "tools/battle-scale/Test-ElementProbeInGameV2.ps1:379-392", "detail": "verifiedShutdown requires a verified result, no forced cleanup and no failure. verifiedShutdownProtocol additionally requires kind reviewed-watchdog-kp-command. normalExitVerified requires exit 0 and kind process-exit-zero. The success-watchdog and success-zero tests assert each flag excludes the other. A failed status never sets any of the three flags."}
+  ],
+  "newFindings": [
+    {
+      "id": "NF1",
+      "severity": "should-fix",
+      "location": "tools/battle-scale/Test-ElementProbeInGameV2.ps1:179-180, 193, 197-198, 204",
+      "summary": "The substitution check covers only 13 names, trusts Get-Command, and accepts any cmdlet. Substitutes outside that scope still yield liveCommandsVerified=true and the live pass status.",
+      "failureScenario": "The runner and helper also call Add-Type, ConvertFrom-Json, ConvertTo-Json, ForEach-Object, Get-Command, Join-Path, New-Object, Out-Null, Set-StrictMode, Sort-Object, Split-Path, Where-Object and Write-Output (found by enumerating the AST). None of these are checked. Demonstrated read-only with -PreflightOnly against the real package while 2 real game processes were running. (1) A caller-scope Where-Object that drops Process rows gave 'Existing Bannerlord/Watchdog sessions: 0 ... Live commands: True'. (2) A caller-scope Get-Process stub plus a caller-scope Get-Command that reports functions as cmdlets gave 'sessions: 0 ... Live commands: True'. The control with only the Get-Process stub correctly gave 'Live commands: False'. (3) Line 197 accepts any CommandType Cmdlet without checking its module or assembly, so a non-Microsoft binary cmdlet named Get-Process (Import-Module of any DLL) passes. This is confirmed from code; I did not demonstrate it, to avoid compiling. With -Execute, cases (1) and (2) would defeat the foreign-session check in the shared install and could still produce 'passed-private-native-probe-and-verified-shutdown'. The comment at 179-180 ('any substitution is detected') is false. Not blocking: it needs a deliberate or unusual substitute in the caller session, and a direct clean invocation is unaffected.",
+      "suggestedFix": "In the runner, build the command list from its own AST (Parser.ParseFile, plus the dot-sourced helper) instead of a hand-kept list. Resolve with Microsoft.PowerShell.Core\\Get-Command. Accept a cmdlet only when its ImplementingType.Assembly is GAC- or $PSHOME-loaded and its ModuleName is an allow-listed Microsoft.PowerShell.* or CimCmdlets module. With -Execute, refuse to run, rather than only marking the run inert, when anything is substituted."
+    },
+    {
+      "id": "NF2",
+      "severity": "nit",
+      "location": "tools/battle-scale/Test-ElementProbeInGameV2.ps1:128-135",
+      "summary": "StopOwnedWatchdog does not kill through the handle it identified with. A Process from Get-Process -Id holds no handle in .NET Framework 4.x.",
+      "failureScenario": "I checked with reflection on a Get-Process -Id object (explorer): the private haveProcessHandle stays False after reading StartTime, HasExited and ProcessName. Process.Kill IL calls GetProcessHandle(Int32), which does OpenProcess by PID, then TerminateProcess, then ReleaseProcessHandle. ProcessName comes from the enumeration snapshot. So the identity read (134) and Kill (135) each open the PID separately. If the owned watchdog exits and its PID is reused between them, the new process is terminated. The window is tiny. It is the same TOCTOU as the original N1, so the comment at 128-129 is inaccurate.",
+      "suggestedFix": "Read $process.Handle first. OpenProcessHandle caches the handle, and StartTime, HasExited, Kill and WaitForExit then all use it. While that handle is open the PID cannot be reused. Then compare StartTime and Kill."
+    },
+    {
+      "id": "NF3",
+      "severity": "nit",
+      "location": "tools/battle-scale/Test-ElementProbeInGameV2.ps1:73-74, 86 (also 69)",
+      "summary": "A crash directory that is absent at preflight makes every live run fail. The stock watchdog creates its dump directory at startup, so the state changes from absent to listable. This is a regression introduced by the B1 fix: before it, absent meant an empty baseline.",
+      "failureScenario": "If the crashes path does not exist, for example after someone deletes today's dangling junction (the earlier review called this the user's decision), preflight records 'absent'. Watchdog Debugger..ctor (contract IL: stfld m_dump_dir from ldarg.3, Directory::Exists, CreateDirectory) creates C:\\ProgramData\\...\\crashes when the game starts, as the logs' 'Dump Directory' line shows. NewCrashEntries then throws 'Crash directory state changed during the run' after a fully successful probe. This fails safe, but wastes the launch. It does not affect this machine today (state reparse-target-unavailable). The mechanism comes from the reviewed IL and logs; I did not observe it at runtime.",
+      "suggestedFix": "Allow the transition from absent to listable when the created directory has no entries, or treat it as a listable baseline with an empty crashBefore."
+    },
+    {
+      "id": "NF4",
+      "severity": "nit",
+      "location": "tools/battle-scale/Test-ElementProbeInGameV2.ps1:371-373",
+      "summary": "The emptiness check runs before the waiting FreshWindow, and Remove-Item has no -Recurse. If the directory gained children during the wait, Remove-Item prompts (interactive host) or throws (non-interactive).",
+      "failureScenario": "Verified in the scratchpad: Remove-Item on a non-empty directory without -Recurse in this NonInteractive host throws PSInvalidOperationException ('Read and Prompt functionality is not available'). The run is then marked not restored even though every file was restored. In an interactive console it would ask the operator whether to delete all the children. This needs something to write into a directory the run just created while the lease is held, so it is practically remote. On this install no directories are created, because bin/Win64_Shipping_Client already exists.",
+      "suggestedFix": "Call FreshWindow first, then check emptiness, then [IO.Directory]::Delete($directory,$false), which throws on non-empty without prompting."
+    }
+  ],
+  "limitations": [
+    "Static and offline only. No game launch, no deployment, no -Execute by the reviewer, and no process was started, stopped or attached to. Other sessions' processes were only listed through Get-Process and CIM, and their log files were read with shared read access. Running the runner's preflight and the inert suite executes its Add-Type, which compiles the dialog helper as part of those sanctioned scripts.",
+    "Read-only preflight runs: 1 clean and 1 control, plus 3 with caller-scope substitutes from a scratchpad harness (s2-preflight-harness.ps1, not in the repo). All were read-only.",
+    "NF1's binary-cmdlet vector is confirmed from code, not demonstrated. NF3's watchdog directory creation is inferred from the reviewed contract IL and the logs' Dump Directory line, not observed.",
+    "In the reparse-target-unavailable state, an exit-0 run has no crash check other than the clean error log, because Confirm-NativeExitContract does not read the watchdog log for exit 0. A watchdog-handled crash ending in exit 0 is not expected with the stock watchdog, but it was not ruled out.",
+    "Whether the stock watchdog's exception logging actually matches the crash-marker regex is inherited from the earlier contract review, not re-derived. Watchdog.exe is a single-file .NET Core bundle, and its WatchdogLib strings were not extracted here.",
+    "The owner process of the Safe Mode dialog and the S3 hang mechanism (termination held by an attached debugger) were not observed. If the dialog belongs to the watchdog, N3 means it is not clicked; the run then times out and is force-cleaned, which fails safe.",
+    "StopOwnedWatchdog mixes Process.StartTime with a CIM-derived local time. During the ambiguous fall-back DST hour (next on 2026-11-01) the two could differ by an hour, so StopOwnedWatchdog would do nothing (it fails safe for foreign processes, but a lingering owned watchdog would then block the pre-restore FreshWindow).",
+    "Re-running the inert suite overwrote evidence/engine-extension/managed-element-runner-v2-offline-tests.json (old and new hashes above) and added suite folder build/element-probe-host-v2/inert-runner-tests/d95d2d8f8a2d4459859b279f44576d33, which contains two test junctions. The scratch junction and the Remove-Item test folders were deleted."
+  ],
+  "gameLaunched": false,
+  "installedFilesChanged": false
+}

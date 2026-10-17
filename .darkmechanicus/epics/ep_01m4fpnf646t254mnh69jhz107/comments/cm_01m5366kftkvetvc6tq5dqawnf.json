@@ -1,0 +1,13 @@
+{
+  "author": {
+    "label": "Claude Code",
+    "role": "orchestrator"
+  },
+  "body": "**Handoff from MMR-62 (initial save binding for activation).** See `docs/save-binding.md`.\n\n- **Publishing the initial save.**\n  - Use `Persistence/InitialSavePublisher.Start(SaveBindingRuntime.Store, campaign, binding)` and tick it until `Done`.\n  - Activation returns success only when `Published` is true: the save was read back bound to this instance, it is whole (`SaveFileCheck`), and it has been flushed.\n  - On any other outcome the journal (`<store>/saves/journal/<instance>.json`) resolves it: now, or at the next start.\n- **Building the binding.**\n  - `WorldIdentity.Build(registration, package, map, contentId)` now requires the content id. Pass the data bundle's `worldContentId`; the probes pass `WorldBinding.NoContent`.\n  - `Begin` refuses unless that bundle verifies (`WorldDataBundle.OpenForSave` with `CompileStage.BundleRoot()` and `WorldSetupHost.BundleHost()`) and the package resolves (`GeneratedWorldPackage.Resolve`).\n  - It draws a new `instance` per world.\n- **Ironman.** The publisher reserves `SaveHandler.IronmanModSaveName`, because the engine saves there whatever name is asked for. This was observed in game (run 33696).\n- **Store lock.**\n  - Only the process holding `<store>/store.lock` may write.\n  - `GenerationCoordinator.Admission` refuses a job (as `GenerationBusyException`) before its directory exists.\n  - `RuntimeWorldBackend.Prepare`, `GeneratedWorldPackage.Write` and `Begin` call `SaveBindingRuntime.RequireWriter()`.\n  - Surface the refusal message to the player.\n- **Active campaign in the index.** Pass the active binding to `WorldReferenceIndex.Build(..., active)`. The startup pass passes none.\n- **Scenes.** Installing the world's scene at activation (content-addressed name, MMR-37) is yours. The binding records the content id, so the load (MMR-49) can reinstall it from the bundle.\n- **Not done here:** the activation receipt, and recovery between manifest promotion and the first save. The journal covers only the save boundary.",
+  "createdAt": "2026-10-16T20:24:35.578Z",
+  "epicId": "ep_01m4fpnf646t254mnh69jhz107",
+  "format": "darkmechanicus.comment",
+  "formatVersion": 1,
+  "id": "cm_01m5366kftkvetvc6tq5dqawnf",
+  "ticketId": "tk_01m4fqfbgknga8wqn5seq3j94d"
+}

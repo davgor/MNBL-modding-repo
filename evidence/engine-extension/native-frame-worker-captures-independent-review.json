@@ -1,0 +1,274 @@
+{
+  "schemaVersion": 1,
+  "status": "accepted-six-exact-worker-capture-contracts",
+  "targetSha256": "2a5e0e0b15513ebb7052d747a621b82c50ee834553eba283b33bbbc33766e12a",
+  "proofSubsetSha256": "46c1cfa773a4173c9aca093188d93975f337d1c620d9a1bae7c8c27ead0b9d45",
+  "reviewedProofs": [
+    {
+      "procedure": "0x1805dfdf0",
+      "entryRegisters": {
+        "r8": "mission-path:0:0"
+      },
+      "entryPointerKind": null,
+      "kind": "exact-Mission-worker-capture",
+      "proof": "Mission value is independently must-proven in RCX at the exact capture store. This stores the first 8 bytes of a 32-byte capture; the exact manager copies that capture unchanged. The retained 1f2de0/fd930/fdc30 dispatch contract passes the std::function context as R8. Capture path offsets are 0:0. Both capture and manager bytes are pinned; source-register provenance is asserted after CFG convergence.",
+      "captureOwner": {
+        "procedure": "0x180708120",
+        "address": "0x180708277",
+        "register": "rcx",
+        "entryContract": {
+          "kind": "retained-registered-receiver",
+          "entryPointerKind": "mission",
+          "entryRegisters": {
+            "rcx": "mission"
+          },
+          "callbackBindings": [
+            {
+              "callbackId": 550,
+              "managedSwitchTarget": "IL_44ac",
+              "managedIl": [
+                "IL_44ac: ldarg.1",
+                "IL_44ad: ldtoken ManagedCallbacks.ScriptingInterfaceOfIMBMission/SetCameraFrameDelegate",
+                "IL_44b2: call System.Type System.Type::GetTypeFromHandle(System.RuntimeTypeHandle)",
+                "IL_44b7: call System.Delegate System.Runtime.InteropServices.Marshal::GetDelegateForFunctionPointer(System.IntPtr,System.Type)",
+                "IL_44bc: castclass ManagedCallbacks.ScriptingInterfaceOfIMBMission/SetCameraFrameDelegate",
+                "IL_44c1: stsfld ManagedCallbacks.ScriptingInterfaceOfIMBMission/SetCameraFrameDelegate ManagedCallbacks.ScriptingInterfaceOfIMBMission::call_SetCameraFrameDelegate",
+                "IL_44c6: ret"
+              ],
+              "name": "IMBMission.SetCameraFrame",
+              "nativeRegistrationEvidenceId": "ev_9e9945bb81c2694f4088be078e0583675691e0d2cfd346c408cc24fb86f5c2b8"
+            }
+          ],
+          "proof": "Managed delegate first parameter is the mission receiver; Win64 scalar/enum/8-byte Vec2 return uses the return register, so receiver remains RCX.",
+          "evidenceIds": [
+            "ev_9e9945bb81c2694f4088be078e0583675691e0d2cfd346c408cc24fb86f5c2b8"
+          ]
+        }
+      },
+      "proofInstructions": [
+        {
+          "address": "0x18070826f",
+          "bytes": "488d45d74889457f48894db7488d4567488945bf488d456f488945c748897dcf488d053a7cedff488945e7488d054f7bedff488945ef440fb60d5fd65f00ba20000000448d42e8488b0deba66900e81e1602000f1045b70f11000f104dc70f114810488945d7488d45d7488944242848c7442420ffffffff41b910000000448bc333d2e8e9aaaeff"
+        },
+        {
+          "address": "0x1805dfed0",
+          "bytes": "40574883ec3048c7442420feffffff48895c2440488bfa488bd9418bc883e9030f849c00000083f9010f84850000004585c074654183e80174204183f8017567488b0248890348c7020000000033c0488b5c24404883c4305fc3440fb60dda597200ba20000000448d42e8488b0d662a7c00e89999140090488b0f0f10010f11000f1049100f11481048890333c0488b5c24404883c4305fc3488b0b4885c97406e8fae216009033c0488b5c24404883c4305fc3488b03488b5c24404883c4305fc3488d05e7b27300488b5c24404883c4305fc3"
+        }
+      ],
+      "evidenceIds": [
+        "ev_85627aff0962d117a450369764fe7c952c58810aa7916dac526543304d5772b7",
+        "ev_28f35d40e762049e0e72ebb2e1d9afd4c545b1325093d5b38eb00a3c4fc6653b"
+      ]
+    },
+    {
+      "procedure": "0x1805e0050",
+      "entryRegisters": {
+        "r8": "mission-path:0"
+      },
+      "entryPointerKind": null,
+      "kind": "exact-Mission-worker-capture",
+      "proof": "Mission value is independently must-proven in RBX at the exact capture store. This stores the first 8 bytes of a 8-byte capture; the exact manager copies that capture unchanged. The retained 1f2de0/fd930/fdc30 dispatch contract passes the std::function context as R8. Capture path offsets are 0. Both capture and manager bytes are pinned; source-register provenance is asserted after CFG convergence.",
+      "captureOwner": {
+        "procedure": "0x1805cde20",
+        "address": "0x1805ce02c",
+        "register": "rbx",
+        "entryContract": {
+          "kind": "direct-established-owner-argument",
+          "entryPointerKind": "mission",
+          "sourceProcedure": "0x1805c37d0",
+          "firstArgument": "param_1",
+          "evidenceIds": [
+            "ev_7f98cb55e222805658367887babec2c45c888d73803b4be5deee49aa165d5ef6",
+            "ev_0903bb131caac6ae01cd6e9d1206055064bfa4ace2b11da20b3d9070aac17a5b",
+            "ev_85627aff0962d117a450369764fe7c952c58810aa7916dac526543304d5772b7"
+          ]
+        }
+      },
+      "proofInstructions": [
+        {
+          "address": "0x1805ce007",
+          "bytes": "488d44244848898424a8000000488d05e52001004889442458488d0529200100488944246048895c2448488d442448488944242848c7442420ffffffff41b901000000448bc533d2e88c4dc2ff"
+        },
+        {
+          "address": "0x1805e0100",
+          "bytes": "458bc84183e90374244183f901741a4585c074124183e80174064183f8017506488b0248890133c0c3488bc1c3488d05ccb07300c3"
+        }
+      ],
+      "evidenceIds": [
+        "ev_85627aff0962d117a450369764fe7c952c58810aa7916dac526543304d5772b7",
+        "ev_4a8e54f8e95e5e4361dfee12f91b1f5488813c4ece1d03ded7d303dbcbb07f1a"
+      ]
+    },
+    {
+      "procedure": "0x1805e0140",
+      "entryRegisters": {
+        "r8": "mission-path:0"
+      },
+      "entryPointerKind": null,
+      "kind": "exact-Mission-worker-capture",
+      "proof": "Mission value is independently must-proven in RBX at the exact capture store. This stores the first 8 bytes of a 16-byte capture; the exact manager copies that capture unchanged. The retained 1f2de0/fd930/fdc30 dispatch contract passes the std::function context as R8. Capture path offsets are 0. Both capture and manager bytes are pinned; source-register provenance is asserted after CFG convergence.",
+      "captureOwner": {
+        "procedure": "0x1805cde20",
+        "address": "0x1805cdfa5",
+        "register": "rbx",
+        "entryContract": {
+          "kind": "direct-established-owner-argument",
+          "entryPointerKind": "mission",
+          "sourceProcedure": "0x1805c37d0",
+          "firstArgument": "param_1",
+          "evidenceIds": [
+            "ev_7f98cb55e222805658367887babec2c45c888d73803b4be5deee49aa165d5ef6",
+            "ev_0903bb131caac6ae01cd6e9d1206055064bfa4ace2b11da20b3d9070aac17a5b",
+            "ev_85627aff0962d117a450369764fe7c952c58810aa7916dac526543304d5772b7"
+          ]
+        }
+      },
+      "proofInstructions": [
+        {
+          "address": "0x1805cdf98",
+          "bytes": "488d44244848898424a800000048895c2438488d8424980000004889442440488d05322201004889442458488d057621010048894424600f104424380f11442448488d442448488944242848c7442420ffffffff41b901000000448bc533d2e8e44dc2ff"
+        },
+        {
+          "address": "0x1805e01f0",
+          "bytes": "458bc84183e90374244183f901741a4585c074124183e80174064183f80175060f10020f110133c0c3488bc1c3488d051cb07300c3"
+        }
+      ],
+      "evidenceIds": [
+        "ev_85627aff0962d117a450369764fe7c952c58810aa7916dac526543304d5772b7",
+        "ev_9648cd1eb42f04bb7b3f2be65e9d00ea06e7251a518eca7f19d5be4b667c771b"
+      ]
+    },
+    {
+      "procedure": "0x1805e0720",
+      "entryRegisters": {
+        "r8": "mission-path:0"
+      },
+      "entryPointerKind": null,
+      "kind": "exact-Mission-worker-capture",
+      "proof": "Mission value is independently must-proven in R13 at the exact capture store. This stores the first 8 bytes of a 8-byte capture; the exact manager copies that capture unchanged. The retained 1f2de0/fd930/fdc30 dispatch contract passes the std::function context as R8. Capture path offsets are 0. Both capture and manager bytes are pinned; source-register provenance is asserted after CFG convergence.",
+      "captureOwner": {
+        "procedure": "0x1805c37d0",
+        "address": "0x1805c4d22",
+        "register": "r13",
+        "entryContract": {
+          "kind": "externally-established-Mission-entry",
+          "evidenceIds": [
+            "ev_7f98cb55e222805658367887babec2c45c888d73803b4be5deee49aa165d5ef6",
+            "ev_0903bb131caac6ae01cd6e9d1206055064bfa4ace2b11da20b3d9070aac17a5b",
+            "ev_85627aff0962d117a450369764fe7c952c58810aa7916dac526543304d5772b7"
+          ],
+          "proof": "572ee0 passes current Mission globalDAT180da9d60 to5d4810.5d4810 forwards unchanged param_1 to5c37d0.",
+          "entryPointerKind": "mission"
+        }
+      },
+      "proofInstructions": [
+        {
+          "address": "0x1805c4cfa",
+          "bytes": "488d85380200004889442460488d0553bb010048898548020000488d0505ba0100488985500200004c89ad38020000488d8538020000488944242848c7442420ffffffff41b902000000448bc633d2e892e0c2ff"
+        },
+        {
+          "address": "0x1805e0860",
+          "bytes": "458bc84183e90374244183f901741a4585c074124183e80174064183f8017506488b0248890133c0c3488bc1c3488d052ca87300c3"
+        }
+      ],
+      "evidenceIds": [
+        "ev_85627aff0962d117a450369764fe7c952c58810aa7916dac526543304d5772b7",
+        "ev_bf641307d09aa7ba00e8bd7544d2e8e85713836a0e699a76e8ef1ec6a6eadbec"
+      ]
+    },
+    {
+      "procedure": "0x1805e0bc0",
+      "entryRegisters": {
+        "r8": "mission-path:0"
+      },
+      "entryPointerKind": null,
+      "kind": "exact-Mission-worker-capture",
+      "proof": "Mission value is independently must-proven in R13 at the exact capture store. This stores the first 8 bytes of a 16-byte capture; the exact manager copies that capture unchanged. The retained 1f2de0/fd930/fdc30 dispatch contract passes the std::function context as R8. Capture path offsets are 0. Both capture and manager bytes are pinned; source-register provenance is asserted after CFG convergence.",
+      "captureOwner": {
+        "procedure": "0x1805c37d0",
+        "address": "0x1805c4a28",
+        "register": "r13",
+        "entryContract": {
+          "kind": "externally-established-Mission-entry",
+          "evidenceIds": [
+            "ev_7f98cb55e222805658367887babec2c45c888d73803b4be5deee49aa165d5ef6",
+            "ev_0903bb131caac6ae01cd6e9d1206055064bfa4ace2b11da20b3d9070aac17a5b",
+            "ev_85627aff0962d117a450369764fe7c952c58810aa7916dac526543304d5772b7"
+          ],
+          "proof": "572ee0 passes current Mission globalDAT180da9d60 to5d4810.5d4810 forwards unchanged param_1 to5c37d0.",
+          "entryPointerKind": "mission"
+        }
+      },
+      "proofInstructions": [
+        {
+          "address": "0x1805c4a1c",
+          "bytes": "488d859801000048894424604c896c2450488d4424404889442458488d05f2c10100488985a8010000488d0574c10100488985b00100000f104424500f118598010000488d8598010000488944242848c7442420ffffffff41b901000000448bc633d2e85ce3c2ff"
+        },
+        {
+          "address": "0x1805e0c30",
+          "bytes": "458bc84183e90374244183f901741a4585c074124183e80174064183f80175060f10020f110133c0c3488bc1c3488d059ca47300c3"
+        }
+      ],
+      "evidenceIds": [
+        "ev_85627aff0962d117a450369764fe7c952c58810aa7916dac526543304d5772b7",
+        "ev_4fb86e864244ec184b69f5949bc56da9b60bcef9afaafbff068c49ddb094bca3"
+      ]
+    },
+    {
+      "procedure": "0x1805e1030",
+      "entryRegisters": {
+        "r8": "mission-path:0:0"
+      },
+      "entryPointerKind": null,
+      "kind": "exact-Mission-worker-capture",
+      "proof": "Mission value is independently must-proven in R13 at the exact capture store. This stores the first 8 bytes of a 24-byte capture; the exact manager copies that capture unchanged. The retained 1f2de0/fd930/fdc30 dispatch contract passes the std::function context as R8. Capture path offsets are 0:0. Both capture and manager bytes are pinned; source-register provenance is asserted after CFG convergence.",
+      "captureOwner": {
+        "procedure": "0x1805c37d0",
+        "address": "0x1805c3f6f",
+        "register": "r13",
+        "entryContract": {
+          "kind": "externally-established-Mission-entry",
+          "evidenceIds": [
+            "ev_7f98cb55e222805658367887babec2c45c888d73803b4be5deee49aa165d5ef6",
+            "ev_0903bb131caac6ae01cd6e9d1206055064bfa4ace2b11da20b3d9070aac17a5b",
+            "ev_85627aff0962d117a450369764fe7c952c58810aa7916dac526543304d5772b7"
+          ],
+          "proof": "572ee0 passes current Mission globalDAT180da9d60 to5d4810.5d4810 forwards unchanged param_1 to5c37d0.",
+          "entryPointerKind": "mission"
+        }
+      },
+      "proofInstructions": [
+        {
+          "address": "0x1805c3f64",
+          "bytes": "488d85f8000000488945004c896d30488d44244048894538488d44244848894540488d05b4d1010048898508010000488d0596d0010048898510010000440fb60d63197400ba18000000448d42f0488b0defe97d00e8225916000f1045300f1100f20f104d40f20f114810488985f8000000488d85f8000000488944242848c7442420ffffffff41b910000000458bc633d2e8e5edc2ff"
+        },
+        {
+          "address": "0x1805e1140",
+          "bytes": "40574883ec3048c7442420feffffff48895c2440488bfa488bd9418bc883e9030f849e00000083f9010f84870000004585c074674183e80174204183f8017569488b0248890348c7020000000033c0488b5c24404883c4305fc3440fb60d6a477200ba18000000448d42f0488b0df6177c00e82987140090488b0f0f10010f1100f20f104910f20f11481048890333c0488b5c24404883c4305fc3488b0b4885c97406e888d016009033c0488b5c24404883c4305fc3488b03488b5c24404883c4305fc3488d05359d7300488b5c24404883c4305fc3"
+        }
+      ],
+      "evidenceIds": [
+        "ev_85627aff0962d117a450369764fe7c952c58810aa7916dac526543304d5772b7",
+        "ev_dcf2b6e23da05f534a72213154b28086a27641ce05346e358cf0937e64f60d6d"
+      ]
+    }
+  ],
+  "approvedSites": [
+    "0x1805dfe33",
+    "0x1805e0078",
+    "0x1805e0173",
+    "0x1805e0763",
+    "0x1805e0be4",
+    "0x1805e1065"
+  ],
+  "findings": [],
+  "review": [
+    "All12 capture/manager byte spans match installedDLL. Source receivercontracts are registered708120 SetCameraFrame, externally proven Missionframe5c37d0, and its direct Missioncallee5cde20. Convergedmust-analysis explicitly checks Missionzero-bias at eachstore before emission.",
+    "Inline8/16-byte captures preserveMission in firstQWORD; heap24/32-byte captures preserveMission in heapfirstQWORD with context firstQWORD pointingtoheap. Fullmanagerscopy/move exactlythese layouts.",
+    "R8 dispatched context leads to one or two dereferences exactlymatching sixworkerentryrawloads. Function pointers atcapture+16/+24 select reviewedmanager/invoker. No numericMissionfield inference isneeded."
+  ],
+  "limitations": [
+    "Exact six capture contracts only; existing dispatcherABI and all-predecessorCFG engine remain dependencies. No gameexecution."
+  ],
+  "gameExecuted": false
+}

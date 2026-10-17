@@ -47,6 +47,19 @@ namespace MNBL.ProceduralWorld
         {
             if (registered) return;
             registered = true;
+            // MMR-62: recover interrupted initial-save publications and remove abandoned staging before the player can open the save list.
+            MNBL.ProceduralWorld.Persistence.SaveBindingRuntime.RunStartup();
+            // MMR-49: what a generated campaign holds in this process, counted against the main menu's baseline.
+            MNBL.ProceduralWorld.CampaignRegistry.WorldLifetimeTrackers.Register();
+            // MMR-49: a generated campaign's save loads through the world loader, never the installed load.
+            try { MNBL.ProceduralWorld.Persistence.LoadRouting.Apply(); }
+            catch (Exception error) { File.AppendAllText(Path.Combine(Store, "module.log"), "load routing: " + error + "\n"); }
+            if (MNBL.ProceduralWorld.Persistence.LoadRouting.GuardError != null) File.AppendAllText(Path.Combine(Store, "module.log"), "load guard: " + MNBL.ProceduralWorld.Persistence.LoadRouting.GuardError + "\n");
+            // MMR-43: the player's entry, beside Sandbox's New Campaign.
+            MNBL.ProceduralWorld.UI.WorldSetupScreen.Register();
+            // The developer diagnostics stay out of the player's main menu: they are registered for a harness probe (GenerationMenuProbe
+            // drives them) or when the store holds a "developer" marker file.
+            if (!AutorunHost.Busy && !File.Exists(Path.Combine(Store, "developer"))) return;
             Add("fwgc_probe_42", "FWGC: Generate probe world (seed 42)", 42, () => Start(42));
             Add("fwgc_probe_43", "FWGC: Generate probe world (seed 43)", 43, () => Start(43));
             Add("fwgc_cancel", "FWGC: Cancel generation", 44, () => cancellation?.Cancel());
@@ -117,7 +130,31 @@ namespace MNBL.ProceduralWorld
             while (messages.TryDequeue(out message)) InformationManager.DisplayMessage(new InformationMessage(message));
             var autorun = AutorunHost.Current;
             if (autorun != null) autorun.Tick(dt);
+            // MMR-37: native calls run on the application tick thread (campaign map loading runs on it too; module load runs on another,
+            // run 27772); it is bound on the first tick, before any world loads. Workers' continuations for it are run here.
+            MNBL.ProceduralWorld.Surface.EngineThread.Bind();
+            MNBL.ProceduralWorld.Surface.EngineWork.Pump();
+            // MMR-44: the generation job's engine-thread items, within their per-tick budget.
+            MNBL.ProceduralWorld.Generation.GenerationRuntime.Scheduler.Pump();
             InteractiveDiagnostics.Tick();
+            // MMR-46: a world handed from the setup screen to the activation; the screen reopens if the player withdraws.
+            MNBL.ProceduralWorld.UI.WorldSetupScreen.TickPending();
+        }
+
+        // MMR-39: War Sails' view has built its naval map-scene wrapper by now (its module loads first); a generated world wraps it with its
+        // pirate spawn points before PiratesCampaignBehavior reads them.
+        public override void OnNewGameCreated(TaleWorlds.Core.Game game, object initializerObject)
+        {
+            base.OnNewGameCreated(game, initializerObject);
+            var manager = game == null ? null : game.GameManager as MNBL.ProceduralWorld.CampaignRegistry.GeneratedGameManager;
+            if (manager != null) manager.InstallNavalSceneWrapper();
+        }
+
+        public override void OnAfterGameLoaded(TaleWorlds.Core.Game game)
+        {
+            base.OnAfterGameLoaded(game);
+            var manager = game == null ? null : game.GameManager as MNBL.ProceduralWorld.CampaignRegistry.GeneratedGameManager;
+            if (manager != null) manager.InstallNavalSceneWrapper();
         }
 
         protected override void OnSubModuleUnloaded()

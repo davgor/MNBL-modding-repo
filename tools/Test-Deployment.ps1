@@ -55,12 +55,13 @@ $fixtureReceipt | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $fixtureRec
 $deploy = "$fixtureRepo/tools/Deploy-Dev.ps1"
 $fixtureBefore = @(Get-ChildItem $fixture -Recurse -File | ForEach-Object { [pscustomobject]@{path=$_.FullName;sha256=Get-MnblHash $_.FullName} })
 $dry = & $deploy -GameRoot $fixtureGame -DryRun | ConvertFrom-Json
-if (!$dry.dryRun -or $dry.files.Count -ne 4 -or $dry.target -ne "$fixtureGame\Modules\MNBL.ProceduralWorld" -or (Test-Path -LiteralPath $dry.target)) {
+$guiFiles = @(Get-ChildItem -LiteralPath "$repo/Modules/MNBL.ProceduralWorld/GUI" -Recurse -File -ErrorAction SilentlyContinue).Count
+if (!$dry.dryRun -or $dry.files.Count -ne (4 + $guiFiles) -or $dry.target -ne "$fixtureGame\Modules\MNBL.ProceduralWorld" -or (Test-Path -LiteralPath $dry.target)) {
     throw 'Dry run mutated destination, ignored non-default root, or returned incorrect manifest'
 }
 $fixtureAfter = @(Get-ChildItem $fixture -Recurse -File | ForEach-Object { [pscustomobject]@{path=$_.FullName;sha256=Get-MnblHash $_.FullName} })
 Assert-MnblSameInputs $fixtureBefore $fixtureAfter 'Dry-run filesystem'
-Write-Output 'PASS: non-default-root dry run is read-only and lists four owned outputs'
+Write-Output "PASS: non-default-root dry run is read-only and lists the four owned outputs and $guiFiles GUI prefab file(s)"
 
 $dllRelative = 'bin/Win64_Shipping_Client/TaleWorlds.CampaignSystem.dll'
 $dll = Join-Path $fixtureGame $dllRelative

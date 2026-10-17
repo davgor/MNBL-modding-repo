@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using MNBL.ProceduralWorld.CampaignBootstrap;
+using MNBL.ProceduralWorld.CampaignRegistry;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.CampaignSystem.Party;
@@ -18,14 +19,19 @@ namespace MNBL.ProceduralWorld.Automation
     // through installed domain actions. No screen is opened, so this is not UI evidence.
     internal static class GeneratedCampaignGameplay
     {
-        internal static IEnumerator Run(ProbeContext context, DiagnosticSandboxBootstrap boot, string worldId,
-            Dictionary<string, object> report, double days, bool fastForward, bool entryProbe)
+        // shelterPlayer (MMR-34): other parties ignore the main party while time runs (MobileParty.IgnoreByOtherPartiesTill, the installed
+        // call used after an escape). With the startup's bandits a world has bandit parties that engage a player waiting at a gate, and this
+        // probe does not play encounters (run 39908 stalled on one). Entering the town without an encounter is not an option: the town menu's
+        // init then dereferences the missing encounter (run 31864).
+        // aliases: the unprefixed ids this world supplies (its dataset's RequiredAliases); any other unprefixed settlement or clan is a leak.
+        internal static IEnumerator Run(ProbeContext context, DiagnosticSandboxBootstrap boot, string worldId, ICollection<string> aliases,
+            Dictionary<string, object> report, double days, bool fastForward, bool entryProbe, bool shelterPlayer = false)
         {
             var failures = new List<string>(); report["failures"] = failures;
             var campaign = Campaign.Current;
             var speed = fastForward ? CampaignTimeControlMode.UnstoppableFastForward : CampaignTimeControlMode.UnstoppablePlay;
             report["timeControl"] = speed.ToString();
-            report["before"] = Snapshot(worldId, failures);
+            report["before"] = Snapshot(worldId, aliases, failures);
             context.Checkpoint();
 
             double startDays = CampaignTime.Now.ToDays, lastDays = startDays;
@@ -71,6 +77,11 @@ namespace MNBL.ProceduralWorld.Automation
                 for (int frame = 0; frame < 30; frame++) { boot.Tick(); yield return null; }
                 crumb("entry_probe_complete");
                 report["entryProbe"] = "ruler party entered and left " + town.StringId + " at pause without fault";
+            }
+            if (shelterPlayer)
+            {
+                MobileParty.MainParty.IgnoreByOtherPartiesTill(CampaignTime.Now + CampaignTime.Days((float)days + 1f));
+                report["playerIgnoredUntilDays"] = (CampaignTime.Now + CampaignTime.Days((float)days + 1f)).ToDays;
             }
             boot.HoldPaused = false;
             DiagnosticSandboxBootstrap.Run(campaign, speed);
@@ -120,11 +131,11 @@ namespace MNBL.ProceduralWorld.Automation
             context.Stage(worldId + ":gameplay_time_paused");
             for (int frame = 0; frame < 5; frame++) { boot.Tick(); yield return null; }
 
-            report["afterTime"] = Snapshot(worldId, failures);
+            report["afterTime"] = Snapshot(worldId, aliases, failures);
             report["recruitment"] = Recruit(campaign, failures);
             context.Checkpoint();
             report["trade"] = Buy(failures);
-            report["afterTransactions"] = Snapshot(worldId, failures);
+            report["afterTransactions"] = Snapshot(worldId, aliases, failures);
             context.Stage(worldId + ":gameplay_transactions_complete");
             context.Checkpoint();
         }
@@ -204,13 +215,13 @@ namespace MNBL.ProceduralWorld.Automation
                 (p.TargetSettlement == null ? "" : ">" + p.TargetSettlement.StringId)));
         }
 
-        private static Dictionary<string, object> Snapshot(string worldId, List<string> failures)
+        private static Dictionary<string, object> Snapshot(string worldId, ICollection<string> aliases, List<string> failures)
         {
             var report = new Dictionary<string, object> { ["campaignDays"] = CampaignTime.Now.ToDays };
             var settlements = new List<object>(); report["settlements"] = settlements;
             foreach (var s in Settlement.All.OrderBy(x => x.StringId, StringComparer.Ordinal))
             {
-                if (!s.StringId.StartsWith(worldId + "_", StringComparison.Ordinal)) failures.Add("Unexpected settlement: " + s.StringId);
+                if (!s.StringId.StartsWith(worldId + "_", StringComparison.Ordinal) && !aliases.Contains(s.StringId)) failures.Add("Unexpected settlement: " + s.StringId);
                 var row = new Dictionary<string, object> {
                     ["id"] = s.StringId, ["ownerClan"] = s.OwnerClan == null ? null : s.OwnerClan.StringId,
                     ["notables"] = s.Notables.OrderBy(n => n.StringId, StringComparer.Ordinal).Select(n => new Dictionary<string, object> {
@@ -233,7 +244,7 @@ namespace MNBL.ProceduralWorld.Automation
                 settlements.Add(row);
             }
             foreach (var clan in Clan.All)
-                if (clan.StringId != "player_faction" && !clan.StringId.StartsWith(worldId + "_", StringComparison.Ordinal)) failures.Add("Unexpected clan: " + clan.StringId);
+                if (!aliases.Contains(clan.StringId) && !clan.StringId.StartsWith(worldId + "_", StringComparison.Ordinal)) failures.Add("Unexpected clan: " + clan.StringId);
             foreach (var kingdom in Kingdom.All)
                 if (!kingdom.StringId.StartsWith(worldId + "_", StringComparison.Ordinal)) failures.Add("Unexpected kingdom: " + kingdom.StringId);
             report["parties"] = MobileParty.All.OrderBy(p => p.StringId, StringComparer.Ordinal).Select(p => new Dictionary<string, object> {

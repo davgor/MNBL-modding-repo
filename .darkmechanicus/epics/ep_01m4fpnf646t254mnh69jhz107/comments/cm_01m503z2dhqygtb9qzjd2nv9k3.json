@@ -1,0 +1,13 @@
+{
+  "author": {
+    "label": "Claude Code",
+    "role": "orchestrator"
+  },
+  "body": "From MMR-34: cold load of generated saves taken after a 2-day gameplay window (run 39816 saves, run 14820 load). MMR-19's exact snapshot comparison flags path state of moving AI parties:\n- world 0: `ruler_2_party_1.nextTarget` moved by about 0.005; `patrol_party_1_party_1.nextTarget` and its saved `_pathLastPosition` moved by about 0.005;\n- world 1: `caravan_template_empire_6.nextTarget` (120, 295) became (207.5, 387.5).\n\nNothing about settlements, heroes, clans, the main party or the startup differs. The MMR-19 acceptance runs saved right after short travel, so few AI parties were mid-path. The likely cause is the engine rebuilding paths on load, so `NextTargetPosition` and `_pathLastPosition` are re-derived. That needs confirming, and the comparison should exclude derived path state or tolerate it. `tools/summarize_startup_audit.py` reports these values and does not count them as MMR-34 failures. Also from MMR-34: the package now records `adapter.dataset.suppliesStartup` and `fixturePrefabs`, which a load needs.",
+  "createdAt": "2026-10-15T15:47:48.273Z",
+  "epicId": "ep_01m4fpnf646t254mnh69jhz107",
+  "format": "darkmechanicus.comment",
+  "formatVersion": 1,
+  "id": "cm_01m503z2dhqygtb9qzjd2nv9k3",
+  "ticketId": "tk_01m4fqvemn1hfc76r82j16f4e4"
+}

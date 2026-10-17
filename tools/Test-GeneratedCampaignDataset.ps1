@@ -7,7 +7,13 @@ $repo=Split-Path $PSScriptRoot
 $out=Join-Path $repo ('build/research-bootstrap18/test-'+[Guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Path $out | Out-Null
 $csc='C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/MSBuild/Current/Bin/Roslyn/csc.exe'
-$paths=@('src/MNBL.ProceduralWorld/CampaignBootstrap/GeneratedCampaignDataset.cs','tests/GeneratedCampaignDatasetTests.cs','tools/Test-GeneratedCampaignDataset.ps1')
+# The dataset and the pure managed campaign builders it uses (MMR-33 SettlementFactory, MMR-34 GeneratedCampaignInitializer, MMR-35
+# NavalContentFactory, MMR-36 ReferenceSchema, and their own dependencies).
+$sources=@('src/MNBL.ProceduralWorld/Campaign/CampaignIdentity.cs','src/MNBL.ProceduralWorld/Campaign/FactionFactory.cs','src/MNBL.ProceduralWorld/Campaign/CharacterTemplateResolver.cs',
+    'src/MNBL.ProceduralWorld/Campaign/HeroFactory.cs','src/MNBL.ProceduralWorld/Campaign/SettlementFactory.cs','src/MNBL.ProceduralWorld/Campaign/VillageBinding.cs','src/MNBL.ProceduralWorld/Missions/MissionScenes.cs','src/MNBL.ProceduralWorld/Campaign/RegistrationPlan.cs',
+    'src/MNBL.ProceduralWorld/Campaign/GeneratedSpawnModel.cs','src/MNBL.ProceduralWorld/Campaign/GeneratedCampaignInitializer.cs','src/MNBL.ProceduralWorld/Campaign/NavalContentFactory.cs',
+    'src/MNBL.ProceduralWorld/Campaign/ReferenceSchema.cs','src/MNBL.ProceduralWorld/CampaignBootstrap/GeneratedCampaignDataset.cs','tests/GeneratedCampaignDatasetTests.cs')
+$paths=$sources+@('tools/Test-GeneratedCampaignDataset.ps1')
 $inputs=@($paths|ForEach-Object { @{path=$_;sha256=(Get-FileHash -LiteralPath (Join-Path $repo $_)).Hash.ToLowerInvariant()} })
 $lock=Get-Content "$repo/config/runtime-api-lock.json" -Raw|ConvertFrom-Json
 $references=@();$referenceEvidence=@()
@@ -23,7 +29,7 @@ $catalogInputs=@()
 if($CatalogDirectory){$catalogInputs=@(Get-ChildItem -LiteralPath $CatalogDirectory -Filter *.xml|ForEach-Object {@{path=$_.FullName;sha256=(Get-FileHash -LiteralPath $_.FullName).Hash.ToLowerInvariant()}})}
 foreach($path in @($DefaultReferences,$DefaultProvenance,$Placement42,$Placement43)|Where-Object {$_}){$catalogInputs+=@{path=(Resolve-Path -LiteralPath $path).Path;sha256=(Get-FileHash -LiteralPath $path).Hash.ToLowerInvariant()}}
 $exe=Join-Path $out 'GeneratedCampaignDatasetTests.exe'
-& $csc /nologo /noconfig /nostdlib+ /target:exe /platform:x64 /langversion:7.3 /warnaserror "/out:$exe" @references "$repo/src/MNBL.ProceduralWorld/CampaignBootstrap/GeneratedCampaignDataset.cs" "$repo/tests/GeneratedCampaignDatasetTests.cs"
+& $csc /nologo /noconfig /nostdlib+ /target:exe /platform:x64 /langversion:7.3 /warnaserror "/out:$exe" @references @($sources|ForEach-Object { Join-Path $repo $_ })
 if($LASTEXITCODE){throw 'Dataset harness compilation failed'}
 & $exe 2>&1 | Tee-Object "$out/checks.log"
 if($LASTEXITCODE){throw 'Dataset managed regression failed'}

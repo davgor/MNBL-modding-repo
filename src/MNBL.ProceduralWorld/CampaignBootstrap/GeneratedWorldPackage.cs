@@ -9,6 +9,7 @@ using System.Text;
 using System.Web.Script.Serialization;
 using System.Xml;
 using TaleWorlds.ModuleManager;
+using MNBL.ProceduralWorld.Surface;
 
 namespace MNBL.ProceduralWorld.CampaignBootstrap
 {
@@ -40,15 +41,19 @@ namespace MNBL.ProceduralWorld.CampaignBootstrap
         public static GeneratedWorldPackage Write(string worldId, string sceneName, uint seed, string placementPath,
             IEnumerable<GeneratedCampaignDataset.Document> documents, string adapterSha256, Dictionary<string, object> datasetFingerprint)
         {
+            MNBL.ProceduralWorld.Persistence.SaveBindingRuntime.RequireWriter();   // MMR-62: only the store lock holder writes staging
             var docs = documents.ToList();
             var placementBytes = File.ReadAllBytes(placementPath);
             var placement = Json(placementBytes);
             var files = new Dictionary<string, byte[]>(StringComparer.Ordinal) { ["placement.json"] = placementBytes };
             object climate;
+            // Every climate file the placement names (wind and snow/rain; MMR-39's v2 colour grade too).
             if (placement.TryGetValue("climate", out climate) && climate != null)
-                foreach (var key in new[] { "wind", "precipitation" })
+                foreach (var key in new[] { "wind", "precipitation", "colorGrade" })
                 {
-                    string name = Convert.ToString(((Dictionary<string, object>)((Dictionary<string, object>)climate)[key])["file"], CultureInfo.InvariantCulture);
+                    object spec;
+                    if (!((Dictionary<string, object>)climate).TryGetValue(key, out spec) || !(spec is Dictionary<string, object>)) continue;
+                    string name = Convert.ToString(((Dictionary<string, object>)spec)["file"], CultureInfo.InvariantCulture);
                     files[name] = File.ReadAllBytes(Path.Combine(Path.GetDirectoryName(Path.GetFullPath(placementPath)), name));
                 }
             // Generator fingerprint: the offline build receipt next to the placement (builder, encoder and source hashes, settings).
@@ -120,8 +125,8 @@ namespace MNBL.ProceduralWorld.CampaignBootstrap
                 if (Sha256(File.ReadAllBytes(path)) != Convert.ToString(file.Value, CultureInfo.InvariantCulture)) throw new InvalidDataException("World package file hash mismatch: " + file.Key);
             }
             string sceneName = Convert.ToString(manifest["sceneName"], CultureInfo.InvariantCulture);
-            DiagnosticMapSceneCreator.ValidateFixture(sceneName);
-            var sceneFolder = Path.Combine(ModuleHelper.GetModuleFullPath(DiagnosticMapSceneCreator.ModuleId), "SceneObj", sceneName);
+            GeneratedMapSceneCreator.ValidateFixture(sceneName);
+            var sceneFolder = Path.Combine(ModuleHelper.GetModuleFullPath(GeneratedMapSceneCreator.ModuleId), "SceneObj", sceneName);
             foreach (var file in (Dictionary<string, object>)manifest["sceneFiles"])
                 if (Sha256(File.ReadAllBytes(Path.Combine(sceneFolder, file.Key))) != Convert.ToString(file.Value, CultureInfo.InvariantCulture))
                     throw new InvalidDataException("Installed scene file differs from the world package: " + file.Key);
@@ -140,6 +145,23 @@ namespace MNBL.ProceduralWorld.CampaignBootstrap
             }
             if (Convert.ToString(package.Placement["worldId"], CultureInfo.InvariantCulture) != package.WorldId) throw new InvalidDataException("Package placement identity differs.");
             return package;
+        }
+
+        // MMR-62: a save's package is resolved by its world id and manifest hash (<Root>/<id>-<manifest12>), never by a path in the header:
+        // an MMR-19 header held the absolute path, user name included. Load then verifies everything and fails closed.
+        public static GeneratedWorldPackage Resolve(MNBL.ProceduralWorld.Persistence.WorldBinding binding)
+        {
+            binding.Validate();
+            return Load(Path.Combine(Root, binding.PackageName), binding.ManifestSha256);
+        }
+
+        // The same from a header's mnbl.world.* values without the prefix (the probes' header dictionaries).
+        public static GeneratedWorldPackage Resolve(IDictionary<string, string> header)
+        {
+            var prefixed = header.ToDictionary(k => MNBL.ProceduralWorld.Persistence.WorldBinding.Prefix + k.Key, k => k.Value, StringComparer.Ordinal);
+            var binding = MNBL.ProceduralWorld.Persistence.WorldBinding.FromHeader(prefixed);
+            if (binding == null) throw new InvalidDataException("The save header names no generated world.");
+            return Resolve(binding);
         }
 
         public IEnumerable<string> DocumentIds { get { return documentFiles.Keys; } }

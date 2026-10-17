@@ -14,6 +14,16 @@ Layout (all coordinates in world units, +X columns, +Y rows):
     never connected and no polar geography is cropped.
   * Settlements exist only at canonical positions. Strips carry visual-only copies of settlement icons
     (no settlement tags or scripts), so no campaign identity is duplicated.
+
+MMR-39 options (water and climate fixture):
+  * --open-sea: sea cells at least OPEN_SEA_CELLS (Chebyshev) from any non-sea cell become face group 19 (TerrainType.OpenSea),
+    the coastal ring stays 18. Distances are measured on the canonical grid with columns wrapping every period, and strips copy
+    their canonical cells, so a strip face has its canonical face's type (War Sails spawns storms only over OpenSea faces).
+  * --pirates N: N pirate spawn points written into the placement (placement['naval']['pirateSpawnPoints']): canonical open-sea
+    cells at least PIRATE_POLE_ROWS rows inside the pole lines (about 60 degrees) and PIRATE_SHORE_CELLS from any non-sea cell, chosen by farthest-point sampling (periodic
+    distance; ties by row then column) from the open-sea cell nearest the canonical centre; northern_pirates north of the equator
+    row, southern_pirates south of it; radius PIRATE_RADIUS. A fixture rule: production spawn points are NavalContentFactory's
+    (MMR-35).
 """
 from __future__ import annotations
 
@@ -39,6 +49,60 @@ SCHEMA = 'mnbl.periodic-placement.v1'
 LOGICAL = 128   # source cells per seam period
 STRIP = 64      # strip cells on each side (W/2)
 SIDE = LOGICAL + 2 * STRIP  # 256 cells -> 257 vertices
+COASTAL, OPEN_SEA = 18, 19
+OPEN_SEA_CELLS = 4
+PIRATE_SHORE_CELLS, PIRATE_RADIUS, PIRATE_POLE_ROWS = 6, 30.0, 21
+
+
+def open_sea(groups):
+    """Periodic open-sea conversion (in place): canonical BFS distance with wrapping columns, copied to the strips."""
+    size = len(groups)
+    canonical = [[groups[r][STRIP + c] for c in range(LOGICAL)] for r in range(size)]
+    distance = [[None] * LOGICAL for _ in range(size)]
+    queue = []
+    for r in range(size):
+        for c in range(LOGICAL):
+            if canonical[r][c] != COASTAL:
+                distance[r][c] = 0
+                queue.append((c, r))
+    head = 0
+    while head < len(queue):
+        c, r = queue[head]; head += 1
+        for dc in (-1, 0, 1):
+            for dr in (-1, 0, 1):
+                n, m = (c + dc) % LOGICAL, r + dr
+                if 0 <= m < size and distance[m][n] is None:
+                    distance[m][n] = distance[r][c] + 1
+                    queue.append((n, m))
+    converted = 0
+    for r in range(size):
+        for pc in range(size):
+            c = (pc - STRIP) % LOGICAL
+            if groups[r][pc] == COASTAL and distance[r][c] is not None and distance[r][c] >= OPEN_SEA_CELLS:
+                groups[r][pc] = OPEN_SEA
+                converted += 1
+    return distance, converted
+
+
+def pirate_points(groups, distance, cell, count):
+    """Farthest-point sampling over canonical open sea between the pole lines (see the module docstring)."""
+    rows = range(STRIP + PIRATE_POLE_ROWS, STRIP + LOGICAL - PIRATE_POLE_ROWS + 1)   # within about 60 degrees of the equator
+    candidates = [(c, r) for r in rows for c in range(LOGICAL)
+                  if groups[r][STRIP + c] == OPEN_SEA and distance[r][c] is not None and distance[r][c] >= PIRATE_SHORE_CELLS]
+    bbw.require(len(candidates) >= count, 'Not enough open sea for %d pirate spawn points' % count)
+    def periodic(a, b):
+        dc = abs(a[0] - b[0]); dc = min(dc, LOGICAL - dc)
+        return math.hypot(dc, a[1] - b[1])
+    centre = (LOGICAL / 2, STRIP + LOGICAL / 2)
+    chosen = [min(candidates, key=lambda cr: (periodic(cr, centre), cr[1], cr[0]))]
+    while len(chosen) < count:
+        chosen.append(max(candidates, key=lambda cr: (min(periodic(cr, o) for o in chosen), -cr[1], -cr[0])))
+    equator = STRIP + LOGICAL / 2
+    points = []
+    for i, (c, r) in enumerate(chosen):
+        points.append(dict(uid='fixture-pirates:%d:%d' % (r, c), clan='northern_pirates' if r < equator else 'southern_pirates',
+                           x=(STRIP + c + .5) * cell, y=(r + .5) * cell, radius=PIRATE_RADIUS, shoreCells=distance[r][c]))
+    return points
 
 
 def read_source(path):
@@ -176,6 +240,12 @@ def build(args):
     bbw.require(seam_error < 1e-9, 'Quantized terrain lost the period (max strip difference %g)' % seam_error)
     groups, centers, slopes, cell_size = bbw.navigation(grid, extent)
     settlements, land, sea, land_sizes, sea_sizes = seam_placements(grid, cell_size, groups, centers, slopes, world_id, ids)
+    open_sea_cells, pirates, sea_distance = 0, [], None
+    if args.open_sea:
+        sea_distance, open_sea_cells = open_sea(groups)
+    if args.pirates:
+        bbw.require(args.open_sea, '--pirates needs --open-sea')
+        pirates = pirate_points(groups, sea_distance, cell_size, args.pirates)
     width, origin = LOGICAL * cell_size, STRIP * cell_size
     plan = dict(schema=bbw.SCHEMA, periodicSchema=SCHEMA, worldId=world_id, sceneName=scene_name, extent=extent, seaLevel=0.,
                 placementPolicy='periodic-seam-v1',
@@ -202,6 +272,12 @@ def build(args):
         planarDx=abs(e['position'][0] - w['position'][0]), periodicDx=width - abs(e['position'][0] - w['position'][0]))
     plan['nav'] = dict(gridSide=SIDE + 1, spacing=cell_size, faces=len(mesh.faces), terrainGroups=dict(Counter(f.group for f in mesh.faces)),
                        landComponents=len(land_sizes), seaComponents=len(sea_sizes), nativeRouteValidated=False)
+    if args.open_sea:
+        plan['nav']['openSea'] = dict(rule='sea cells at least %d cells (Chebyshev, columns periodic) from any non-sea cell are OpenSea (19); strips copy their canonical cells' % OPEN_SEA_CELLS,
+                                      convertedCells=open_sea_cells)
+    if pirates:
+        plan['naval'] = dict(pirateSpawnPoints=pirates,
+                             rule='fixture rule: canonical open sea between the pole lines, at least %d cells from shore, farthest-point sampling from the centre; clan by hemisphere; radius %g. Production points are NavalContentFactory\'s (MMR-35).' % (PIRATE_SHORE_CELLS, PIRATE_RADIUS))
     plan['sourceSha256'] = bbw.sha(source); plan['extendedHeightfieldSha256'] = bbw.sha(extended)
     plan['terrainSha256'] = bbw.sha(folder / 'terrain.bin')
     root = ET.parse(folder / 'scene.xscene').getroot()
@@ -213,7 +289,7 @@ def build(args):
     shutil.copyfile(official_dir / 'atmosphere.xml', folder / 'atmosphere.xml')
     (folder / 'surface.json').replace(out / 'encoder-surface.json')
     plan['sceneFiles'] = {name: bbw.sha(folder / name) for name in bbw.FILES}
-    plan['scope'] = 'MMR-63 periodic-seam diagnostic fixture from FWGC++ seed 42; not product generation.'
+    plan['scope'] = ('MMR-63 periodic-seam diagnostic fixture from FWGC++ seed 42' + (' with MMR-39 open sea and pirate spawn points' if args.open_sea else '') + '; not product generation.')
     bbw.write_json(out / 'placement.json', plan)
     _, _, payload = navmesh_bin.read_navmesh_file(str(folder / 'navmesh.bin'))
     check = navmesh_bin.validate(navmesh_bin.decode_payload(payload))
@@ -237,6 +313,8 @@ def main():
     parser.add_argument('--encoder', default='build/worldbridge/Release/worldbridge.exe')
     parser.add_argument('--game-root', default=build_slot.GAME)
     parser.add_argument('--out', required=True)
+    parser.add_argument('--open-sea', action='store_true', help='MMR-39: periodic OpenSea faces (see the module docstring)')
+    parser.add_argument('--pirates', type=int, default=0, help='MMR-39: write N pirate spawn points (needs --open-sea)')
     args = parser.parse_args()
     print(json.dumps(build(args), indent=2))
 

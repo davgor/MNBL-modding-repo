@@ -24,14 +24,24 @@ namespace MNBL.ProceduralWorld.Automation
                 case "noop": return Noop(context);
                 case "capabilities": return CapabilityProbe.Run(context);
                 case "generation_menu": return GenerationMenuProbe.Run(context);
+                case "generation_job": return GenerationJobProbe.Run(context);
+                case "world_activation": return WorldActivationProbe.Run(context);
                 case "scene_query": return SceneQueryProbe.Run(context);
                 case "scene_sequence": return SceneSequenceProbe.Run(context);
                 case "native_render": return NativeTerrainScreen.Run(context);
                 case "runtime_surface": return RuntimeSurfaceSequenceProbe.Run(context);
+                case "world_surface": return WorldSurfaceProbe.Run(context);
+                case "world_navigation": return WorldNavigationProbe.Run(context);
+                case "world_setup": return WorldSetupProbe.Run(context);
+                case "new_campaign_flow": return NewCampaignFlowProbe.Run(context);
+                case "world_recovery": return WorldRecoveryProbe.Run(context);
+                case "save_binding": return SaveBindingProbe.Run(context);
+                case "two_world_matrix": return TwoWorldMatrixProbe.Run(context);
                 case "sandbox_boot": return SandboxBootProbe.Run(context);
                 case "campaign_catalog": return CampaignCatalogProbe.Run(context);
                 case "generated_campaign": return GeneratedCampaignBootProbe.Run(context);
                 case "generated_save_load": return MNBL.ProceduralWorld.Diagnostics.WorldSaveProbe.Load(context);
+                case "save_recovery": return MNBL.ProceduralWorld.Diagnostics.InitialSaveProbe.Recover(context);
                 case "baseline_scenario": return BaselineScenarioProbe.Run(context);
                 case "baseline_load": return BaselineLoadProbe.Run(context);
                 case "baseline_combat": return BaselineLoadProbe.Run(context,true);
@@ -53,7 +63,7 @@ namespace MNBL.ProceduralWorld.Automation
                     int seed = Seed(parameter, 0);
                     return ScreenProbe(context, () => new HeightfieldProbeScreen(seed), null, 240);
                 }
-                default: throw new ArgumentException("Unknown probe id '" + id + "'. Known: noop, capabilities, generation_menu, scene_query, scene_sequence, native_render, runtime_surface, sandbox_boot, baseline_scenario, baseline_load, baseline_combat, surface, nav, generate:<seed>, render:<seed>, ray:<seed>, grid:<seed>.");
+                default: throw new ArgumentException("Unknown probe id '" + id + "'. Known: noop, capabilities, generation_menu, scene_query, scene_sequence, native_render, runtime_surface, world_surface, world_navigation, world_setup, sandbox_boot, baseline_scenario, baseline_load, baseline_combat, surface, nav, generate:<seed>, render:<seed>, ray:<seed>, grid:<seed>.");
             }
         }
 

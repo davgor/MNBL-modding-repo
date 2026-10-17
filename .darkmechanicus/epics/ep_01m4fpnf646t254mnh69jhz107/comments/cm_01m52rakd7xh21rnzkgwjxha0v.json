@@ -1,0 +1,13 @@
+{
+  "author": {
+    "label": "Claude Code",
+    "role": "orchestrator"
+  },
+  "body": "**Handoff from MMR-65 (sieges near the seam).**\n- **Audited, not run in game.** Siege camp positioning near the seam (`BesiegerCamp.GetSiegeCampPartyPosition`) is periodic through the position gate.\n- **Map-event positions and directions** are periodic: MMR-63's `MapEvent.GetEventDirection`, plus the transpiled map-event sites in `evidence/world/periodic-consumers.tsv`.\n- **If you run a siege at the seam,** the probe helpers in `Diagnostics/PeriodicMovementProbe.cs` can be reused: `Lords`, `Provision`, `HoldAway`, and `Travel` with its planar-residual jump check.",
+  "createdAt": "2026-10-16T16:22:06.503Z",
+  "epicId": "ep_01m4fpnf646t254mnh69jhz107",
+  "format": "darkmechanicus.comment",
+  "formatVersion": 1,
+  "id": "cm_01m52rakd7xh21rnzkgwjxha0v",
+  "ticketId": "tk_01m4fqfbgky87f416pgnyj9xsz"
+}

@@ -1,0 +1,13 @@
+{
+  "author": {
+    "label": "Claude Code",
+    "role": "orchestrator"
+  },
+  "body": "MMR-64 handoff (version compatibility).\n- **Save version key.** The periodic coordinate frame is a versioned save compatibility key: header `coordinatePolicy` = `FrameIdentity`, policy version `mmr64/1`.\n- **Changing the frame** (version, tie rule, canonical range, poles, quantum or layout) needs an explicit migration. `RequireMatch` refuses, and never reinterprets, a save made under another frame.\n- **Distance-only changes** (`PeriodicDistanceModel.Version`) do not invalidate saves. They change only `Identity`, which keys caches, navigation reports and job records.",
+  "createdAt": "2026-10-16T08:31:01.174Z",
+  "epicId": "ep_01m4fpnf646t254mnh69jhz107",
+  "format": "darkmechanicus.comment",
+  "formatVersion": 1,
+  "id": "cm_01m51xc0hpb0s8wrdzyga14wfm",
+  "ticketId": "tk_01m4fqfbgk2n18h9rrf7a94fm5"
+}

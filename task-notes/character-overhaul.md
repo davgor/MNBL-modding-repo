@@ -1,5 +1,50 @@
 # Character overhaul
 
+## REA follow-up — 2026-10-16
+
+Requested: inspect DD2 character creation (installed demo or full game) with REA and determine the Bannerlord integration path. This is investigation, not authorization to launch production from the existing epic.
+
+- R1 (root, accepted): REA inspected installed Core, MountAndBlade and creator view-model assemblies. Artifact hashes, metadata identities, method anchors and call edges are retained in `evidence/character-overhaul/rea-2026-10-16.json`; focused findings are in `bannerlord-static-findings.json` beside it.
+- R2 (/root/dd2_reference, accepted by root): `evidence/character-overhaul/dd2-static-findings.json` records installed demo/full-game identities and scoped local enum evidence. Root read the findings, checked representative source sections, independently recounted the three principal enums and verified the header hash.
+- R3 (root, accepted): integration assessment and next experiment below reconcile the new evidence with the existing P0-P5 plan. `evidence/character-overhaul/verification.json` records source-hash, enum-count and retained-evidence-reference checks.
+- This static feasibility pass is complete. DD2 native implementation, live control mapping, full parity and the mod itself remain unverified/unimplemented. REA reported Ghidra unconfigured, IDA unconfigured and Hopper unsupported on Windows. No native session was opened, game launched, game file changed, tool installed or production epic started.
+
+### New evidence and its meaning
+
+The full game is now Steam build **25920212**; the installed Character Creator & Storage demo is build **24118868**. The demo executable is `D:/SteamLibrary/steamapps/common/Dragons Dogma 2 Character Creator & Storage/DD2CCS.exe`. The full game has existing REFramework files; the demo has no existing loader/dump in the inspected installation. Fresh compatibility is unknown: the full-game historical log includes a crash-dump attempt.
+
+A local full-game `Enums_Internal.hpp` now exists. It contains **610 editor entries, 71 face-edit keys and 35 body-edit keys** at lines 17258, 20178 and 113985 respectively. These are different catalogs, not additive counts of visible human sliders. They include UI headings, presets, adjustment subkeys and nonhuman entries. The header predates the current executable and is not authenticated to its build; use it as an inspection index, not current binary truth.
+
+Named body candidates include torso length, arm length, separate upper/lower muscle and fat, neck length/thickness and chest/waist/pelvis dimensions. Detail candidates include per-eye settings, hair root/tip colors, skin roughness, and layered tattoo placement/roughness/metallic. Names also expose body/face catalogs, clamp and influence maps, material baking and facial-animation components. They do not establish evaluation order, deformation equations, ranges or save compatibility.
+
+REA established these file-backed Bannerlord call edges:
+
+`FaceGenVM.UpdateFace -> BodyGenerator.RefreshFace -> MBBodyProperties.ProduceNumericKeyWithParams -> IMBFaceGen`
+
+`BodyGenerator.SaveCurrentCharacter -> BasicCharacterObject.UpdatePlayerCharacterBodyProperties`
+
+The first path rebuilds packed appearance; the second is a player-appearance update boundary, not proof of completed disk-save persistence. `FaceGenVM` also has undo/redo/reset, parameter refresh and a call to `ClampForMultiplayer`; multiplayer needs its own validation. The current procedural-world `GeneratedCharacterCreation.cs` handles culture choices, not this visual overhaul.
+
+REA confirms eight UInt64 static key fields (512 bits), separate age/weight/build fields and `FaceGenerationParams.Create` allocating **320 float weights**. The existing XML still declares **63 deform keys for each of ten human skins**, all on `human_skeleton`; some keys are hidden/system controls. Neither 320 weights nor 512 packed bits proves spare independently saved controls. Native packing, constraints and deformation remain the decisive unknowns.
+
+Primary REA records: Core fields `ev_c72f2419bcb08e15ad978b07ed21c2b0e15a296cd46553e69696a0a4a7f8751b`; native interface/wrappers `ev_6a0db2ec86951852142de9fdd68ae6f8e3321a553fc006c06a5aa91a9fbca27e`; parameter allocation `ev_0f30c14c9d5abf58d381bbadaf9a0aa147f3aa5ef7c3bf0f4c8503580b3d48b9`; BodyGenerator `ev_dcff05fc6928c038211a919575387a8539e7ffb6404a60b5aff6e3563551c2d9`; FaceGenVM `ev_fc55bcd0947794f7cd5e9d179d6897caaa28f041ded3c692f46e11365f0d8d29`. All are static observations, not executed behavior.
+
+### Recommended integration design (inference, not implemented)
+
+1. **Measure DD2 controls and author Bannerlord equivalents.** Obtain current-build type/object metadata, then record baseline/min/mid/max/restore for visible human options with fixed-camera views. Classify each as geometry, joint transform, surface detail or preset. Similar names are not a numerical conversion formula; a DD2 save cannot yet be translated into Bannerlord appearance.
+2. **Reuse the Bannerlord creator and appearance pipeline where proven.** Wrap its refresh/history/preset flow; map supported controls onto native parameters. For example, DD2 eye-distance and mouth-width keys have plausible native counterparts, but require visual calibration. Preserve native key semantics and existing character identities.
+3. **Separate body and surface extensions.** Arm/torso proportion changes require skeleton, animation, collision and clothing proofs. Independent skin/hair/eye/tattoo parameters need material/compositing and per-character resource isolation. A facial-slider UI does not establish either subsystem. Original heads/bodies/materials and their detail levels remain substantial art work.
+4. **Prove storage before extending it.** Round-trip any added parameter through native packing first. If unsupported, use a versioned mod-owned appearance record keyed to stable characters, with separately proven render application and cache identity. Extra storage alone cannot make the engine deform a mesh. Deterministic troop appearances, aging, portraits, mission spawns and old-save migration remain explicit tests.
+
+The official [asset override documentation](https://moddocs.bannerlord.com/asset-management/asset-types/overriding_assets/) supports replacing mesh/material/texture resources in a module; mesh replacement covers the entire resource. [XML merging](https://moddocs.bannerlord.com/bestpractices/merging_module_xml_files_with_native/) documents `soln_skins`. These support the asset/configuration approach without proving arbitrary runtime morphs. [REFramework Object Explorer](https://cursey.github.io/reframework-book/object_explorer/object_explorer.html) documents inspecting TDB types/fields and generating an offline SDK dump. Rechecked 2026-10-16.
+
+### Smallest decisive experiment
+
+First acquire a current-build creator baseline through the full game's existing REFramework, or use the demo after separately validating its tooling. Inspect `GUICharaEditData`, `CharacterEditManager`, `FaceEditor`, `BodyDetailEditor`, body/face table catalogs and clamp/influence catalogs. Read actual fields/resources before invoking methods. The exact scoped baseline acquisition plan is in the DD2 evidence file; no capture script was installed or run here.
+
+Then measure and recreate one facial control, one difficult body control (arm length), and one surface control (skin roughness) on original diagnostic assets. Require visible minimum/maximum effects, restoration, save/reload, a hero and troop, helmet/armor fit, blinking/speech and mounted animation. If native persistence fails, test the extended-record path; if body or material application fails, resolve that mechanism before expanding production. One working control proves its path only; full coverage still requires the P0 inventory and P1 capacity/composition tests. The existing all-human P2-P5 quality, maturity, equipment and battle-performance gates remain in force.
+
+
 ## Dark Mechanicus planning handoff
 
 User requested a fully vetted Dark Mechanicus epic on 2026-10-09. The epic is saved and technically reviewed; implementation remains unstarted. The user confirmed equivalent DD2 controls and quality with an original asset catalog, rather than reproducing DD2's entire human catalog. Single-player versus multiplayer scope was asked and remains pending; the saved contract gate forbids dependent production from guessing it.

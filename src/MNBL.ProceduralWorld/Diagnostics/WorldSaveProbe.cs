@@ -8,6 +8,7 @@ using System.Reflection;
 using System.Web.Script.Serialization;
 using MNBL.ProceduralWorld.Automation;
 using MNBL.ProceduralWorld.CampaignBootstrap;
+using MNBL.ProceduralWorld.CampaignRegistry;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.CampaignSystem.Map;
@@ -18,6 +19,7 @@ using TaleWorlds.Core;
 using TaleWorlds.Engine;
 using TaleWorlds.Library;
 using TaleWorlds.MountAndBlade;
+using MNBL.ProceduralWorld.Surface;
 using Path = System.IO.Path;
 
 namespace MNBL.ProceduralWorld.Diagnostics
@@ -42,6 +44,8 @@ namespace MNBL.ProceduralWorld.Diagnostics
             var town1 = Settlement.Find(worldId + "_town_1"); var town2 = Settlement.Find(worldId + "_town_2"); var village1 = Settlement.Find(worldId + "_village_1");
             RuntimeMissionProbe.Pause();
             if (main.CurrentSettlement != null) LeaveSettlementAction.ApplyForParty(main);
+            // MMR-34: a world with a startup has bandits; this travel is not an encounter test (MMR-51), so other parties ignore the player.
+            if (registration.StartupEnabled) main.IgnoreByOtherPartiesTill(CampaignTime.Now + CampaignTime.Days(2f));
             var travel = new Dictionary<string, object>(); row["travel"] = travel;
             var land = Run(context, boot, campaign, () => main.SetMoveGoToPoint(village1.GatePosition, MobileParty.NavigationType.Default), 4, travel, "land");
             while (land.MoveNext()) yield return land.Current;
@@ -89,7 +93,13 @@ namespace MNBL.ProceduralWorld.Diagnostics
             var oraclePath = Path.Combine(SubModule.Store, "worldsaves", "oracle-" + context.ProcessId + ".json");
             Directory.CreateDirectory(Path.GetDirectoryName(oraclePath));
             var oracle = File.Exists(oraclePath) ? new ArrayList((object[])new JavaScriptSerializer { MaxJsonLength = Int32.MaxValue }.DeserializeObject(File.ReadAllText(oraclePath))) : new ArrayList();
-            oracle.Add(new Dictionary<string, object> { ["worldId"] = worldId, ["saveName"] = saveName, ["identity"] = boot.Identity.Entries.ToDictionary(k => k.Key, k => (object)k.Value), ["snapshot"] = snapshot });
+            // MMR-34: whether the world supplies the startup, and the startup behaviour's intent map (saved with the campaign).
+            int intents = boot.Startup == null ? -1 : boot.Startup.Map.Count;
+            row["suppliesStartup"] = registration.StartupEnabled; row["startupIntents"] = intents;
+            var landlocked = boot.ShipOwnership == null ? null : boot.ShipOwnership.Landlocked.OrderBy(x => x, StringComparer.Ordinal).Cast<object>().ToList();
+            row["navalLandlocked"] = landlocked;
+            oracle.Add(new Dictionary<string, object> { ["worldId"] = worldId, ["saveName"] = saveName, ["identity"] = boot.Identity.Entries.ToDictionary(k => k.Key, k => (object)k.Value), ["snapshot"] = snapshot,
+                                                        ["suppliesStartup"] = registration.StartupEnabled, ["startupIntents"] = intents, ["navalLandlocked"] = landlocked });
             File.WriteAllText(oraclePath, new JavaScriptSerializer { MaxJsonLength = Int32.MaxValue }.Serialize(oracle));
             row["oracle"] = oraclePath;
             context.Outputs["saveOracle"] = oraclePath;
@@ -193,13 +203,13 @@ namespace MNBL.ProceduralWorld.Diagnostics
             if (!header.ContainsKey("id") || (string)header["id"] != worldId) { failures.Add("The save header does not name this world."); yield break; }
             trace("save_identity_read");
             // 2. The world package, verified by hash before deserializing (fails closed).
-            var package = GeneratedWorldPackage.Load((string)header["package"], (string)header["manifestSha256"]);
+            var package = GeneratedWorldPackage.Resolve(header.ToDictionary(k => k.Key, k => (string)k.Value));
             WorldIdentity.RequireMatch(header.ToDictionary(k => k.Key, k => (string)k.Value), package);
             row["packageVerified"] = true; row["packageNamesHeaderWorld"] = true; row["package"] = package.Directory;
             row["packageManifest"] = new Dictionary<string, object> { ["generator"] = package.Manifest["generator"], ["adapter"] = package.Manifest["adapter"] };
             trace("world_package_verified");
             // 3. Deserialize.
-            var data = MBSaveLoad.LoadSaveGameData(saveName);
+            var data = MNBL.ProceduralWorld.Persistence.LoadRouting.Deserialize(() => MBSaveLoad.LoadSaveGameData(saveName));   // MMR-49: a generated save opens only through the guard's allowance
             row["deserialized"] = data != null && data.Successful;
             if (data == null || !data.Successful) { failures.Add("The save did not deserialize."); yield break; }
             var savedCampaign = ((Game)data.Root).GameType as Campaign;
@@ -217,7 +227,7 @@ namespace MNBL.ProceduralWorld.Diagnostics
             var registration = GeneratedCampaignRegistration.FromInstalledPackage(package);
             var censuses = new List<object>(); var support = new Dictionary<string, object>(); row["censuses"] = censuses; row["mapSupport"] = support;
             var identity = header.Where(k => k.Key != "UniqueGameId").ToDictionary(k => k.Key, k => (string)k.Value);
-            var boot = DiagnosticSandboxBootstrap.StartGeneratedLoad(data, worldId, package.SceneName, () => registration.ReapplyForSavedGame(trace),
+            var boot = DiagnosticSandboxBootstrap.StartGeneratedLoad(data, registration, package.SceneName,
                 census => { censuses.Add(census); context.Checkpoint(); }, support, trace, registration.Periodic, registration.Climate, identity);
             double start = context.Seconds;
             while (!boot.Completed)
@@ -228,7 +238,12 @@ namespace MNBL.ProceduralWorld.Diagnostics
                 yield return null;
             }
             row["savedGameDocuments"] = registration.Report["savedGameDocuments"];
-            var map = Campaign.Current.MapSceneWrapper as DiagnosticMapScene;
+            // MMR-30: once the load finished every generated object must be ready wherever it lives.
+            var registryCensus = registration.RegistryCensus("saved_game_loaded", ClosureMode.Settled);
+            row["registryCensuses"] = boot.RegistryCensuses; row["finalRegistryCensus"] = registryCensus;
+            foreach (var problem in (List<string>)registryCensus["closure"]) failures.Add("Registry closure: " + problem);
+            foreach (var prefix in (List<string>)registryCensus["otherWorldPrefixes"]) failures.Add("Objects of another world after the load: " + prefix);
+            var map = Campaign.Current.MapSceneWrapper as GeneratedMapScene;
             if (map == null || map.Scene.GetName() != package.SceneName) { failures.Add("The loaded map is not the generated scene."); yield break; }
             start = context.Seconds;
             while (!map.Scene.IsLoadingFinished() || Utilities.GetNumberOfShaderCompilationsInProgress() > 0 || context.Seconds - start < 5)
@@ -249,6 +264,39 @@ namespace MNBL.ProceduralWorld.Diagnostics
                 Convert.ToString(savedCrc["navMeshCrc"], CultureInfo.InvariantCulture) != Convert.ToString(live["navMeshCrc"], CultureInfo.InvariantCulture))
                 failures.Add("The live scene CRCs differ from the saved ones (Campaign.CheckMapUpdate would relocate objects).");
             row["identityBehaviorEntries"] = boot.Identity == null ? 0 : boot.Identity.Entries.Count;
+            // MMR-34: a world saved with a startup loads with it: the package restores suppliesStartup, RetirementCampaignBehavior is kept for
+            // the retreat, and the startup behaviour is back with its saved intent map (identical intent ids and live heroes).
+            object savedStartup, savedIntents;
+            bool suppliedAtSave = entry.TryGetValue("suppliesStartup", out savedStartup) && savedStartup is bool && (bool)savedStartup;
+            int intentsAtSave = entry.TryGetValue("startupIntents", out savedIntents) ? Convert.ToInt32(savedIntents, CultureInfo.InvariantCulture) : -1;
+            var retirementKept = Campaign.Current.GetCampaignBehavior<SandBox.CampaignBehaviors.RetirementCampaignBehavior>() != null;
+            var retreat = Settlement.Find("retirement_retreat");
+            var startupRow = new Dictionary<string, object> { ["suppliedAtSave"] = suppliedAtSave, ["restored"] = registration.StartupEnabled, ["retirementBehaviorKept"] = retirementKept,
+                ["retreatComponent"] = retreat == null ? null : retreat.SettlementComponent.GetType().FullName, ["startupBehavior"] = boot.Startup != null,
+                ["intentsAtSave"] = intentsAtSave, ["intentsLoaded"] = boot.Startup == null ? -1 : boot.Startup.Map.Count,
+                ["intentHeroesAlive"] = boot.Startup == null ? -1 : boot.Startup.Map.Count(h => h.Value != null && h.Value.IsAlive),
+                ["worldPatches"] = CampaignRegistry.GeneratedPatches.WorldApplied };
+            row["startup"] = startupRow;
+            if (suppliedAtSave != registration.StartupEnabled) failures.Add("The package did not restore the world's startup (saved " + suppliedAtSave + ", loaded " + registration.StartupEnabled + ").");
+            if (suppliedAtSave && (!retirementKept || retreat == null || !(retreat.SettlementComponent is RetirementSettlementComponent) || boot.Startup == null || boot.Startup.Map.Count != intentsAtSave ||
+                                   boot.Startup.Map.Any(h => h.Value == null)))
+                failures.Add("The loaded startup differs from the saved one: " + new JavaScriptSerializer().Serialize(startupRow));
+            if (!suppliedAtSave && retirementKept) failures.Add("RetirementCampaignBehavior is enabled in a loaded world without a retreat.");
+            if (!CampaignRegistry.GeneratedPatches.WorldApplied) failures.Add("The world patches are not applied on the loaded world.");
+            // MMR-35: a world saved with naval content loads with its fleet rule (the package's landlocked clans, War Sails reading the model).
+            object savedLandlocked;
+            var landlockedAtSave = entry.TryGetValue("navalLandlocked", out savedLandlocked) && savedLandlocked is System.Collections.IEnumerable && !(savedLandlocked is string)
+                ? ((System.Collections.IEnumerable)savedLandlocked).Cast<object>().Select(x => Convert.ToString(x, CultureInfo.InvariantCulture)).OrderBy(x => x, StringComparer.Ordinal).ToList() : null;
+            var landlockedLoaded = boot.ShipOwnership == null ? null : boot.ShipOwnership.Landlocked.OrderBy(x => x, StringComparer.Ordinal).ToList();
+            var models = NavalDLC.NavalDLCManager.Instance == null ? null : NavalDLC.NavalDLCManager.Instance.GameModels;
+            row["naval"] = new Dictionary<string, object> { ["restored"] = registration.NavalEnabled, ["model"] = boot.ShipOwnership != null,
+                ["effective"] = boot.ShipOwnership != null && models != null && ReferenceEquals(models.ClanShipOwnershipModel, boot.ShipOwnership) && ReferenceEquals(models.ShipDistributionModel, boot.ShipDistribution),
+                ["landlockedAtSave"] = landlockedAtSave, ["landlockedLoaded"] = landlockedLoaded,
+                ["landlockedShips"] = landlockedLoaded == null ? 0 : MobileParty.All.Where(p => p.ActualClan != null && landlockedLoaded.Contains(p.ActualClan.StringId)).Sum(p => p.Ships.Count),
+                ["pirateClans"] = Clan.All.Count(c => c.StringId == "northern_pirates" || c.StringId == "southern_pirates") };
+            bool sameLandlocked = (landlockedAtSave == null && landlockedLoaded == null) || (landlockedAtSave != null && landlockedLoaded != null && landlockedAtSave.SequenceEqual(landlockedLoaded));
+            if (registration.NavalEnabled != (boot.ShipOwnership != null) || (registration.NavalEnabled && !(bool)((Dictionary<string, object>)row["naval"])["effective"]) || !sameLandlocked)
+                failures.Add("The loaded world's fleet rule differs from its package: " + new JavaScriptSerializer().Serialize(row["naval"]));
             if (GeneratedCampaignDataset.BuildCount != 0) failures.Add("A dataset was built while loading.");
             // 6. Run campaign time briefly on the loaded world.
             var campaign = Campaign.Current; double hours = CampaignTime.Now.ToHours;

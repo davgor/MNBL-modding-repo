@@ -58,6 +58,8 @@ namespace MNBL.ProceduralWorld.Automation
 
         // True from request claim until the probe finished (or the request expired); menu diagnostics are disabled meanwhile.
         public static bool Busy { get { var host = Current; return host != null && host.phase != Phase.Done; } }
+        // The probe a harness request is running (null when none), for entries that only that probe may drive meanwhile.
+        public static string RunningProbe { get { var host = Current; return host != null && host.phase != Phase.Done ? host.probeId : null; } }
 
         private string lastTopScreen;
 
@@ -79,6 +81,18 @@ namespace MNBL.ProceduralWorld.Automation
             if (!File.Exists(request)) return;
             int pid = Process.GetCurrentProcess().Id;
             var taken = Path.Combine(directory, "request." + pid + ".taken.json");
+            // Windows reuses process ids: an earlier run's files under this id (long finished, since this process holds the id now) are
+            // set aside, never deleted, so this claim can take their names.
+            try
+            {
+                string stale = ".stale-" + DateTime.UtcNow.ToString("yyyyMMddHHmmss", System.Globalization.CultureInfo.InvariantCulture);
+                foreach (var name in new[] { "request." + pid + ".taken.json", "progress-" + pid + ".log", "result-" + pid + ".json" })
+                {
+                    string path = Path.Combine(directory, name);
+                    if (File.Exists(path)) File.Move(path, path + stale);
+                }
+            }
+            catch (Exception failure) { File.AppendAllText(Path.Combine(store, "module.log"), "autorun stale files: " + failure + "\n"); }
             try { File.Move(request, taken); }
             catch (Exception failure)
             {

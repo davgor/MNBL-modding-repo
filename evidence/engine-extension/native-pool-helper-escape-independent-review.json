@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "status": "accepted-bounded-helper-entry-and-default-construction-review",
+  "reviewedArtifact": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\evidence\\engine-extension\\native-pool-helper-escape-review.json",
+  "reviewedArtifactSha256": "2d647f0bda65e2e42eb26d2ff9251c0e47ccfb21e28073d1c8dd0ca8be8c6978",
+  "targetSha256": "2a5e0e0b15513ebb7052d747a621b82c50ee834553eba283b33bbbc33766e12a",
+  "originalInstructionEntriesMatched": 359,
+  "metadataLiteralsVerified": 17,
+  "findings": [],
+  "review": [
+    "All original constructor/helper bytes matched. R15 is zero;696420 receivesEDX explicitlyzero606b23 and onlystoresitsownreceiver;619d20 receivesmemberwhose+30wasjustzeroed606c81, excludingitsreleasevirtual.",
+    "EH iterator constructs six8-byte slots using04dcb0 nullstore. Later release loop sees these sixinitializednullpointers; no interveningwrites publishthem. Atan2f receives only scalarXMMvalues. Mission ownerab8 iszeroed. DefaultAgentconstruction therefore doesnotpublishsecondpoolAgentaddresses.",
+    "All17 literal associations independently checked against actual PE runtimefunction,chainedunwind,orCxxIPstatebytes. Noneis an unexplained gameplay functionpointer registration.",
+    "37 direct branch candidates andzero64-bit RIPLEAmaterializations are bounded discovery evidence; theirabsence doesnotproveabsenceofsplitarithmetic oropaque callbacks."
+  ],
+  "limitations": [
+    "Accepts only bounded constructor and listed entry-reference conclusions. Helpercallerpoolprovenance and computedMissionescape closure remain separate obligations."
+  ],
+  "gameExecuted": false
+}

@@ -18,6 +18,19 @@ function Get-MnblSourceInputs([string]$Repo) {
     $paths += @(Get-ChildItem -LiteralPath "$Repo/src/MNBL.ProceduralWorld" -Recurse -File -Filter '*.cs' |
         Where-Object { $_.FullName -notmatch '[\\/](obj|bin)[\\/]' } |
         ForEach-Object { $_.FullName.Substring($Repo.Length + 1).Replace('\','/') })
+    # Every document the module embeds (the csproj's EmbeddedResource items): editing one, such as the setup screen's waiting-time
+    # budget, makes the build receipt stale like a source change.
+    $project = [xml](Get-Content -LiteralPath "$Repo/src/MNBL.ProceduralWorld/MNBL.ProceduralWorld.csproj" -Raw)
+    foreach ($item in @($project.Project.ItemGroup | ForEach-Object { $_.EmbeddedResource } | Where-Object { $_ })) {
+        $full = [IO.Path]::GetFullPath((Join-Path "$Repo/src/MNBL.ProceduralWorld" $item.Include))
+        if (!$full.StartsWith([IO.Path]::GetFullPath($Repo) + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase)) { throw "Embedded resource outside the repository: $($item.Include)" }
+        $paths += $full.Substring([IO.Path]::GetFullPath($Repo).Length + 1).Replace('\','/')
+    }
+    # MMR-43: the module's Gauntlet prefabs ship with the build.
+    if (Test-Path -LiteralPath "$Repo/Modules/MNBL.ProceduralWorld/GUI") {
+        $paths += @(Get-ChildItem -LiteralPath "$Repo/Modules/MNBL.ProceduralWorld/GUI" -Recurse -File |
+            ForEach-Object { $_.FullName.Substring($Repo.Length + 1).Replace('\','/') })
+    }
     $paths += @(Get-ChildItem -LiteralPath "$Repo/src/WorldBridge" -Recurse -File |
         Where-Object { $_.FullName -notmatch '[\\/](obj|bin|build)[\\/]' } |
         ForEach-Object { $_.FullName.Substring($Repo.Length + 1).Replace('\','/') })

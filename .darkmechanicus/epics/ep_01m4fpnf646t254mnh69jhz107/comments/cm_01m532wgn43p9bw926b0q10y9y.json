@@ -1,0 +1,13 @@
+{
+  "author": {
+    "label": "Claude Code",
+    "role": "orchestrator"
+  },
+  "body": "**Handoff from MMR-66 (settlement display copies).** On a periodic world every settlement gets one display copy at its strip image (`World/PeriodicMapPresentation.cs`, `docs/periodic-presentation.md`). What MMR-40 must keep true:\n\n- **Build time.** The copy is `GameEntity.CopyFrom(scene, settlementEntity, true, false)` of the visual's `StrategicEntity`. It is built once, in a postfix of `SettlementVisual.OnStartup`.\n  - Gates, port and blockade children placed under the settlement's entity *before* `OnStartup` are copied.\n  - Children added later get no mirror. `Sync` pairs originals and mirrors by hierarchy index, truncated to the shorter list.\n  - If MMR-40 adds entities after startup, it must rebuild the copy: remove the record (as `OnPartyRemoved` does) and call `BuildCopy` again.\n- **Identity.**\n  - The copy is named `<settlementId>_display_<east|west>`. Every copy entity is registered in `MapScreen.VisualsOfEntities` to the settlement's own visual, so picks resolve to the canonical settlement.\n  - The copy has no tags, so tag scans (`port`, drop-offs, siege spawns) find only the settlement's entities. Keep gameplay lookups tag- or settlement-based, never by entity name prefix.\n- **Visibility.** The copy mirrors the settlement entities' visibility after `SetSettlementLevelVisibility`, `RefreshWallState`, `RefreshSiegePreparations` and `ValidateIsDirty`. Level and wall meshes must stay children of the settlement entity for this to hold.\n- **Positions.**\n  - Settlement entities must sit at canonical x in [W/2, 3W/2). The strips are W/2 wide, so there is exactly one strip image.\n  - A port whose position lies across the cut from its town is averaged beside the town for the camera by construction. Not fixture-tested.\n- **Fixture copies.** `tools/scenebin/build_periodic_world.py` emits static copies named `<worldId>_display_<id without prefix>_<side>`. The runtime removes them when it builds its own. In-process placement should stop emitting static copies.\n- **Evidence.** Run 33944: 4 copies (19 entities per town, 6 per village), picked through `SelectEntitiesCollidedWith` + `OnVisualIntersected` to the canonical town, with 0 visibility differences.",
+  "createdAt": "2026-10-16T19:26:39.268Z",
+  "epicId": "ep_01m4fpnf646t254mnh69jhz107",
+  "format": "darkmechanicus.comment",
+  "formatVersion": 1,
+  "id": "cm_01m532wgn43p9bw926b0q10y9y",
+  "ticketId": "tk_01m4fqfbgkkntdvg7kaxc9k8yz"
+}

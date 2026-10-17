@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "status": "passed-isolated-segmented-iteration-and-regressions",
+  "createdAtUtc": "2026-10-17T17:59:58.574520+00:00",
+  "sources": {
+    "src/MNBL.AgentStorage/AgentDomainStorage.hpp": "c5d9ee96a5109438fdfff03287ee8f8a32130835212afef47f2b2044638b5274",
+    "src/MNBL.AgentStorage/StableAgentStorage.hpp": "34555749bbfdf9ad318a02aea660f36cfe57ee9183e856df48c216ebf8503458",
+    "tests/AgentStorage/agent_domain_storage_tests.cpp": "f8b6ebbf9c31aab5df46dbf3c0832f275b892ff028e7150b023563415c7895df",
+    "tests/AgentStorage/adopted_agent_storage_tests.cpp": "48d057fb0d5e9432c1eba49fc0b3dff647647db71654da1df9efef5cc541a445",
+    "tests/AgentStorage/segmented_iteration_tests.cpp": "f8a232388bd70fb3c19c3415b1b5180720fb6f2e00b9591e37ebb23e4f11829e",
+    "tools/battle-scale/Test-SegmentedIteration.cmd": "7ae1d486cb94e8f1465abbe517793aaa03d1fd5f101baec973869045de260ce7",
+    "tools/battle-scale/verify_segmented_iteration.py": "0b8c4332cbff2cb6bcbad2d85a601cf4b88ce3e4f5c5aed881779281eb70f821"
+  },
+  "binaries": {
+    "segmented_iteration_tests.exe": "1a23a6921da1255c9ada0fd3fe44cd9afbfe1c2b1bf215bd887ca782984b66e7",
+    "segmented_iteration_asan.exe": "b8461b4d178e84c099ced248864e787d3ddd405e63fefcb9dba3c52802223638",
+    "adopted_bitmap_regression.exe": "eda8bf4b57980653bd30e2cbcce9e65485af155359c148b6229df78342ee593b",
+    "adopted_bitmap_regression_asan.exe": "a96adb545b05f73602472d565fe09349c8ac190cc64bfc5aae5b219b8e0788e1"
+  },
+  "exitCode": 0,
+  "stdout": "segmented_iteration_tests.cpp\nPASS segmented forward/reverse bitmap iteration: 7579 boundary queries;5000 randomized mutations;66049 slots;borrowed adoption;growth;teardown\nSTORAGE BACKEND ONLY: native pointer walks and short-link consumers still require replacement\nsegmented_iteration_tests.cpp\nPASS segmented forward/reverse bitmap iteration: 7579 boundary queries;5000 randomized mutations;66049 slots;borrowed adoption;growth;teardown\nSTORAGE BACKEND ONLY: native pointer walks and short-link consumers still require replacement\nadopted_agent_storage_tests.cpp\nPASS independent domains: primary pools0,2,3,4 and secondary pool1; overlapping indices, 2040 -> 4080 -> 6120, stable five-pool addresses, cross-access rejection, 12 boundary reuses\nPASS atomic shared growth: 15 null allocations, 15 throwing allocations, 45 constructor failures; both old ledgers survive; reverse rollback and retry\nPASS independent old free chains and 66049 indices per domain, beyond signed16 and unsigned16 limits; overflow rejected\nPASS invalid domains, reader barrier, deferred five-pool teardown, closed-domain rejection\nOFFLINE DOMAIN STORAGE ONLY: synthetic callbacks; no engine allocation, native lookup, or secondary companion relationship established\nPASS borrowed original arrays: no relocation or reconstruction; staged growth to6120; explicit allocation, holes, exhaustion, independent highwater; lease-held teardown\nPASS invalid adoption rollback, duplicate/out-of-range occupancy, overlapping/null/overflow arrays, double adoption, closed physical access\nPASS 75 adopted-suffix failure points: original pointers, objects, both ledgers and highwater survive; retry and teardown succeed\nOFFLINE ADOPTION ONLY: synthetic existing records; caller must supply actual engine lifetime and occupancy snapshots\nadopted_agent_storage_tests.cpp\nPASS independent domains: primary pools0,2,3,4 and secondary pool1; overlapping indices, 2040 -> 4080 -> 6120, stable five-pool addresses, cross-access rejection, 12 boundary reuses\nPASS atomic shared growth: 15 null allocations, 15 throwing allocations, 45 constructor failures; both old ledgers survive; reverse rollback and retry\nPASS independent old free chains and 66049 indices per domain, beyond signed16 and unsigned16 limits; overflow rejected\nPASS invalid domains, reader barrier, deferred five-pool teardown, closed-domain rejection\nOFFLINE DOMAIN STORAGE ONLY: synthetic callbacks; no engine allocation, native lookup, or secondary companion relationship established\nPASS borrowed original arrays: no relocation or reconstruction; staged growth to6120; explicit allocation, holes, exhaustion, independent highwater; lease-held teardown\nPASS invalid adoption rollback, duplicate/out-of-range occupancy, overlapping/null/overflow arrays, double adoption, closed physical access\nPASS 75 adopted-suffix failure points: original pointers, objects, both ledgers and highwater survive; retry and teardown succeed\nOFFLINE ADOPTION ONLY: synthetic existing records; caller must supply actual engine lifetime and occupancy snapshots\n",
+  "stderr": "",
+  "checks": [
+    "Per-domain bitmap enumeration crosses arbitrary partial64-bit words and block sizes1/3/63/64/65/67/2040.",
+    "Forward inclusive and reverse exclusive queries match independent sorted occupancy sets; no_slot and closed bounds checked.",
+    "5000 randomized allocate/release operations preserve independent primary/secondary iteration and highwater.",
+    "66049 occupied indices, then alternating deletions, cross signed16/unsigned16 boundaries.",
+    "Borrowed first-block occupancy survives suffix growth and new slots across segment boundaries.",
+    "Current header passes full domain/adoption regressions in optimized and AddressSanitizer builds, including150 callback failure points.",
+    "Payload addresses, ownership and reverse destruction remain unchanged by bitmap metadata."
+  ],
+  "limitations": [
+    "Storage backend with synthetic records only; no engine pointer walk or signed-link consumer is yet rewritten.",
+    "Historical adoption/domain receipts bind earlier header versions; this receipt binds the current bitmap version.",
+    "Caller still needs real engine allocator callbacks, mission lifetime ownership and a validated publication barrier.",
+    "ASAN does not establish absence of data races or whole-engine reader quiescence."
+  ],
+  "enginePatchApproved": false,
+  "gameLaunched": false
+}

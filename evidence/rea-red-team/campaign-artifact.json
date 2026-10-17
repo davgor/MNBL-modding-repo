@@ -1,0 +1,216 @@
+{
+  "evidence_id": "ev_fcfd2e502c8a750b5101e477156f92617b8943d1dc5ec2eef1cb31dcef69a96a",
+  "subject": {
+    "name": "TaleWorlds.CampaignSystem.dll",
+    "digest": {
+      "sha256": "1f8e33e2ed73e6ec653d7629180afb70649ddc6e5bd1657a802a264efda1c3ae"
+    },
+    "local_path": "D:\\SteamLibrary\\steamapps\\common\\Mount & Blade II Bannerlord\\bin\\Win64_Shipping_Client\\TaleWorlds.CampaignSystem.dll",
+    "format": "pe",
+    "architecture": "x86_64"
+  },
+  "provider": {
+    "id": "rea-analysis-view",
+    "name": "REA analysis view projection",
+    "version": "1"
+  },
+  "analysis_profile": null,
+  "predicate_type": "rea.analysis-view",
+  "operation": "inspect_analysis_view",
+  "parameters": {
+    "parent_evidence_id": "ev_c863724fa1b7359c47ea40b0fd0feaeca23d770952313b76486edf1b6a2858c8",
+    "view": {
+      "kind": "summary"
+    }
+  },
+  "raw_result": null,
+  "normalized_result": {
+    "kind": "summary",
+    "view": {
+      "kind": "summary"
+    },
+    "parent_evidence_id": "ev_c863724fa1b7359c47ea40b0fd0feaeca23d770952313b76486edf1b6a2858c8",
+    "parent_operation": "inspect_managed_artifact",
+    "parent_digest": "c863724fa1b7359c47ea40b0fd0feaeca23d770952313b76486edf1b6a2858c8",
+    "view_digest": "df04f5a76a95fe7e92f574694eabda07829591ecc07ac91b685a2790f7eb48fb",
+    "artifact": {
+      "path": "D:\\SteamLibrary\\steamapps\\common\\Mount & Blade II Bannerlord\\bin\\Win64_Shipping_Client\\TaleWorlds.CampaignSystem.dll",
+      "sha256": "1f8e33e2ed73e6ec653d7629180afb70649ddc6e5bd1657a802a264efda1c3ae"
+    },
+    "coverage": {
+      "status": "complete-within-view",
+      "examined": 7086,
+      "total": 7086,
+      "next_offset": null,
+      "exhausted": true
+    },
+    "limitations": [
+      "Static inspection did not load the assembly, resolve dependencies through a CLR, decompile C#, or execute target code."
+    ],
+    "unknowns": [
+      "Collection counts and pages cover producer-returned rows; metadata completeness remains the original metadata status and coverage, not an absence claim about unreturned rows.",
+      "Metadata tokens are build-local coordinates bound to the recorded artifact SHA-256 and module MVID; this view does not load or execute the assembly."
+    ],
+    "summary": {
+      "artifact": {
+        "path": "D:\\SteamLibrary\\steamapps\\common\\Mount & Blade II Bannerlord\\bin\\Win64_Shipping_Client\\TaleWorlds.CampaignSystem.dll",
+        "sha256": "1f8e33e2ed73e6ec653d7629180afb70649ddc6e5bd1657a802a264efda1c3ae",
+        "byte_length": 5469656,
+        "format": "pe"
+      },
+      "pe": {
+        "machine": 34404,
+        "machine_hex": "0x8664",
+        "architecture": "x86_64",
+        "optional_header": "pe32-plus",
+        "section_count": 2,
+        "characteristics": 8226,
+        "cli": {
+          "header_offset": 512,
+          "header_size": 72,
+          "runtime_version": "2.5",
+          "flags": 1,
+          "flag_names": [
+            "il-only"
+          ],
+          "entry_point": {
+            "kind": "none",
+            "value": null
+          },
+          "metadata_rva": 1887140,
+          "metadata_size": 3574116,
+          "resources_rva": 0,
+          "resources_size": 0,
+          "strong_name_rva": 0,
+          "strong_name_size": 0,
+          "managed_native_header_rva": 0,
+          "managed_native_header_size": 0,
+          "ready_to_run_signature": false
+        }
+      },
+      "classification": {
+        "status": "managed",
+        "container": "pe",
+        "runtime_family": "unknown",
+        "implementation": "cil",
+        "managed_architecture": "x86_64",
+        "evidence": [
+          {
+            "code": "cli-header-observed",
+            "detail": "A file-backed PE CLI header and metadata root were admitted.",
+            "file_offset": 512
+          },
+          {
+            "code": "target-framework-observed",
+            "detail": "An assembly-level TargetFrameworkAttribute names .NET Standard, an API specification that does not identify a runtime family.",
+            "file_offset": 2814182
+          },
+          {
+            "code": "managed-architecture-derived",
+            "detail": "Managed architecture x86_64 is derived from PE machine and CLI flags.",
+            "file_offset": 528
+          }
+        ]
+      },
+      "metadata": {
+        "status": "complete",
+        "version": "v4.0.30319",
+        "stream_names": [
+          "#Blob",
+          "#GUID",
+          "#Strings",
+          "#US",
+          "#~"
+        ],
+        "table_row_counts": {
+          "Module": 1,
+          "TypeRef": 431,
+          "TypeDef": 2306,
+          "Field": 9691,
+          "MethodDef": 27182,
+          "Param": 24935,
+          "InterfaceImpl": 563,
+          "MemberRef": 5634,
+          "Constant": 3313,
+          "CustomAttribute": 7078,
+          "ClassLayout": 8,
+          "StandAloneSig": 2936,
+          "EventMap": 5,
+          "Event": 24,
+          "PropertyMap": 791,
+          "Property": 5453,
+          "MethodSemantics": 6775,
+          "MethodImpl": 570,
+          "TypeSpec": 2016,
+          "FieldRVA": 28,
+          "Assembly": 1,
+          "AssemblyRef": 8,
+          "NestedClass": 1076,
+          "GenericParam": 196,
+          "MethodSpec": 1271,
+          "GenericParamConstraint": 36
+        }
+      },
+      "module": {
+        "name": "TaleWorlds.CampaignSystem.dll",
+        "generation": 0,
+        "mvid": "886629fe-6e60-40d7-9a57-8d46017179d9",
+        "enc_id": null,
+        "enc_base_id": null,
+        "token": "0x00000001",
+        "row_offset": 1879696
+      },
+      "assembly": {
+        "name": "TaleWorlds.CampaignSystem",
+        "version": "1.0.0.0",
+        "culture": null,
+        "flags": 0,
+        "hash_algorithm": 32772,
+        "public_key": {
+          "kind": "none",
+          "byte_length": 0,
+          "sha256": null,
+          "token": null
+        },
+        "token": "0x20000001",
+        "row_offset": 3021134
+      },
+      "target_frameworks": [
+        ".NETStandard,Version=v2.0"
+      ],
+      "coverage": {
+        "state": "complete",
+        "issues": []
+      },
+      "limitations": [
+        "Static inspection did not load the assembly, resolve dependencies through a CLR, decompile C#, or execute target code."
+      ],
+      "reported_counts": {
+        "references": 8,
+        "resources": 0,
+        "attributes": 7078
+      },
+      "identity_scope": {
+        "token_identity": "build-local",
+        "requires_artifact_sha256": "1f8e33e2ed73e6ec653d7629180afb70649ddc6e5bd1657a802a264efda1c3ae",
+        "requires_mvid": "886629fe-6e60-40d7-9a57-8d46017179d9"
+      }
+    }
+  },
+  "confidence": "derived",
+  "authority": "shipped-artifact",
+  "environment": null,
+  "limitations": [
+    "Static inspection did not load the assembly, resolve dependencies through a CLR, decompile C#, or execute target code."
+  ],
+  "relationship_coverage": null,
+  "locations": [
+    {
+      "kind": "artifact-path",
+      "path": "D:\\SteamLibrary\\steamapps\\common\\Mount & Blade II Bannerlord\\bin\\Win64_Shipping_Client\\TaleWorlds.CampaignSystem.dll"
+    }
+  ],
+  "evidence_links": [
+    "ev_c863724fa1b7359c47ea40b0fd0feaeca23d770952313b76486edf1b6a2858c8"
+  ]
+}

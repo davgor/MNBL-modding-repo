@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "status": "accepted-bounded-machine-change-for-restricted-runtime-test",
+  "gameExecuted": false,
+  "nativeDllWritten": false,
+  "sourceSha256": "2a5e0e0b15513ebb7052d747a621b82c50ee834553eba283b33bbbc33766e12a",
+  "sources": {
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\evidence\\engine-extension\\native-bone-mapping-patch.json": "e88dfdeebb3222fa1dbbc586cbafce93487396f3dffb8efd6b3ea2de5ebd5104",
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\evidence\\engine-extension\\native-renderer-buffer-lifecycle-review.json": "9a2b8aa99e05e89751a7afdb5966e82c43134e9b426710a739dae074858f9667",
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\tests\\BattleScale\\test_renderer_guard_emulation.py": "b9996ce19059798ffc040ac0e28bf2cd5e18ddb53a74922991315bbfd2591aca",
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\tests\\BattleScale\\test_bone_mapping_geometry.py": "975e12d9353fe4a0a1da1623bb2e0d74da5f8423bd81a5813e03b19b801775a1",
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\tools\\battle-scale\\review_bone_mapping_patch.py": "2f1a1fc955a1daf5eb0ac72de01a896bbb2fe7a9dd5e7e769817ad64cf90a473",
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\tools\\battle-scale\\audit_bone_mapping_patch.py": "b8cb1426fa1fc577b21a26b228f1e0b053bc4c622adbfe2d00c31f63a800a1f8",
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\tools\\battle-scale\\requirements-native-audit.txt": "9cb41cd7a5293c0279ae2ea5d45ed485893676ab22476c8e4f4418d3cd82d741"
+  },
+  "editCount": 13,
+  "machineTestCount": 6,
+  "geometryTestCount": 4,
+  "runs": [
+    {
+      "file": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\tests\\BattleScale\\test_renderer_guard_emulation.py",
+      "exitCode": 0,
+      "output": "......\n----------------------------------------------------------------------\nRan 6 tests in 2.569s\n\nOK\n"
+    },
+    {
+      "file": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\tests\\BattleScale\\test_bone_mapping_geometry.py",
+      "exitCode": 0,
+      "output": "....\n----------------------------------------------------------------------\nRan 4 tests in 0.032s\n\nOK\n"
+    }
+  ],
+  "findings": [],
+  "acceptance": [
+    "Every valid first/last page pair preserves all general registers and the original loop/skip destination in actual x64 emulation.",
+    "Both guards trap with UD2 before page-table setup when the last page is >=32; abnormal termination cannot count as a test pass.",
+    "Original zero mapping reservation bypass and first>last skip remain intact; original unwind saves and stack geometry are unchanged.",
+    "All nine division/remainder/rounding shifts and both allocation/upload byte sizes agree on16384 DWORDs per mapping page.",
+    "Shared32-pointer headers and constructors/destructors retain their original geometry; matrix payload page size is unchanged.",
+    "Type12 GPU upload consumes the descriptor page size and total byte count; no hardcoded2048 remains on that upload branch."
+  ],
+  "limitations": [
+    "This is approval of a bounded machine-code change for an isolated test, not a successful runtime result or production readiness.",
+    "Original asynchronous producer/upload/two-frame reuse ordering is preserved, but this review does not newly prove whole-engine backend synchronization.",
+    "Every-byte relative-branch/address scans cannot exclude arbitrary computed indirect destinations or third-party code.",
+    "The finite capacities remain524288 mapping DWORDs and262144 matrix records; malformed render objects and allocator failure retain existing behavior.",
+    "Parent integration must independently preserve all existing source hashes, isolated provider profile and required native guards."
+  ]
+}

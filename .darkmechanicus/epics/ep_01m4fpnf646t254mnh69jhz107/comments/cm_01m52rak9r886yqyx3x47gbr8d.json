@@ -1,0 +1,13 @@
+{
+  "author": {
+    "label": "Claude Code",
+    "role": "orchestrator"
+  },
+  "body": "**Handoff from MMR-65: route diagnostics for cache verification** (`CampaignBootstrap/PeriodicRouteExecutor.cs`).\n- `Segments(world, party)` lists the party's current path as segments in its own frame, with each seam crossing marked east or west.\n- `Describe(world, party)` adds:\n  - the domain: at sea, navigation capability, desired navigation;\n  - any transition in progress, with its end;\n  - the path length and the longest segment;\n  - the party's rebases.\n- **Directed costs.** MMR-65 checked in game (run 14144) that each 250-unit leg's model cost takes the short way (250.4 to 252.9; the long way is 550). After two crossings, a party's state prices a route as a fresh state does (165.03 both ways). Cache entries must therefore come from the periodic distance model (MMR-64 adapters), never from planar results.\n- **Inlining.** Small campaign methods that callers may have inlined before the patch are recompiled (27 callers). If you add patch targets, keep them out of that class or extend the recompile closure in `tools/periodic/build_spatial_table.py`.",
+  "createdAt": "2026-10-16T16:22:06.392Z",
+  "epicId": "ep_01m4fpnf646t254mnh69jhz107",
+  "format": "darkmechanicus.comment",
+  "formatVersion": 1,
+  "id": "cm_01m52rak9r886yqyx3x47gbr8d",
+  "ticketId": "tk_01m4fqfbgkqzt9n8x2a4fcs4wz"
+}

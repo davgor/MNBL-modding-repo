@@ -1,0 +1,1317 @@
+{
+  "baseRevisionId": "rv_01m5140apa2186b3jqxzk5esgy",
+  "bundle": {
+    "edges": [
+      {
+        "from": "tk_01m513zy42tgtn2z8qetg0ycbv",
+        "to": "tk_01m513zy42rz1cbf5fm17yj1k7"
+      },
+      {
+        "from": "tk_01m513zy42tgtn2z8qetg0ycbv",
+        "to": "tk_01m513zy4280wea68p7q5b9k2w"
+      },
+      {
+        "from": "tk_01m513zy42jrpt4p4xthztdmma",
+        "to": "tk_01m513zy4280wea68p7q5b9k2w"
+      },
+      {
+        "from": "tk_01m513zy4280wea68p7q5b9k2w",
+        "to": "tk_01m513zy42m53yyhsvfmwsrwt3"
+      },
+      {
+        "from": "tk_01m513zy42jrpt4p4xthztdmma",
+        "to": "tk_01m513zy42m53yyhsvfmwsrwt3"
+      },
+      {
+        "from": "tk_01m513zy42rz1cbf5fm17yj1k7",
+        "to": "tk_01m513zy42eg8dme1b45ac77mv"
+      },
+      {
+        "from": "tk_01m513zy42jrpt4p4xthztdmma",
+        "to": "tk_01m513zy42s1e2xwfwe7ptj78y"
+      },
+      {
+        "from": "tk_01m513zy4280wea68p7q5b9k2w",
+        "to": "tk_01m513zy42s1e2xwfwe7ptj78y"
+      },
+      {
+        "from": "tk_01m513zy42eg8dme1b45ac77mv",
+        "to": "tk_01m513zy42zfrfpw8z36yq3yre"
+      },
+      {
+        "from": "tk_01m513zy42s1e2xwfwe7ptj78y",
+        "to": "tk_01m513zy42zfrfpw8z36yq3yre"
+      },
+      {
+        "from": "tk_01m513zy42zfrfpw8z36yq3yre",
+        "to": "tk_01m513zy42n56p8av7cabpy5zx"
+      },
+      {
+        "from": "tk_01m513zy42m53yyhsvfmwsrwt3",
+        "to": "tk_01m513zy42my3xqswjam53jns6"
+      },
+      {
+        "from": "tk_01m513zy42eg8dme1b45ac77mv",
+        "to": "tk_01m513zy42my3xqswjam53jns6"
+      },
+      {
+        "from": "tk_01m513zy42n56p8av7cabpy5zx",
+        "to": "tk_01m513zy42my3xqswjam53jns6"
+      }
+    ],
+    "epic": {
+      "intent": "Extend the FWGC++ procedural campaign (epic ep_01m4fpnf646t254mnh69jhz107) so the player picks one of the generator's peoples in Bannerlord's character creator, and the world is generated while the player is in the creator instead of before it.\n\nUser-confirmed scope (2026-10-15):\n\n- **Every people gets its own selection.** All 12 FWGC++ civilizations are separate creator entries and replace the vanilla culture list for generated campaigns: human_heartland, human_maritime, human_desert, human_cold, human_large_island, human_rainforest, elf, tidekin, dwarf, hill_dwarf, frosthold_dwarf, gnome. Source: `kEntityIds` in FWGC++ `generator/src/generated/content_civilizations.cpp` at the `worldgen/producer.lock.json` commit; parent races (human, elf, dwarf) from `kParentRaces` and `generator/data/heritage-appearance.json`. The list does not depend on what the generated world contains.\n- **Generation happens during character creation.** It starts when the creator opens and runs while the player works through the creator stages. The creator waits only at the end, if generation is still running, with progress, cancel and error handling.\n- **The world does not guarantee the chosen people.** If the world contains them, the player starts among them. If not, the player starts anyway, possibly as the only one of their kin, and the game tells them so once the campaign starts.\n\nOwnership split with the character epic (ep_01m4gbx49w72je0ezgjcfkxtjx, \"DD2-quality character overhaul\"): this epic owns the people registry, the creator's people list, generation timing, starts, the kin notice and the world's people identity. The character epic owns race bodies, heights, ears, skin colour, sliders (including Detailed Character Creation support) and each people's boons. The two meet at the people registry contract (people id → culture id, parent race id, presentation culture, race definition slot, boon set slot). This epic must not hard-code appearance or boon content. Until the character epic fills a slot, the selection shows that people with the installed human body and no boons, the creator audit reports the unfilled slot, and that state is not acceptance of the character epic's outcomes.\n\nKnown constraint to prove first: Sandbox registers campaign objects and the map before `CharacterCreationState`, and the current flow (MMR-43 world setup → generation → registration → creation limited to the presented cultures by MMR-32) generates before creation. Generating during creation needs a proven mechanism, for example hosting the creator before registration and applying its result afterwards, or deferring registration. An unsupported operation is a blocked gate with evidence, not a silent return to generate-first.\n\nUnchanged from the FWGC epic: in-game generation only (no external tool, module publish or restart), save/world binding and War Sails. Future file and type names here are proposed implementation contracts. Saved in Backlog; no run is started.",
+      "ownerRole": null,
+      "successCriteria": [
+        {
+          "id": "s1",
+          "text": "In a generated campaign the character creator lists all 12 FWGC++ peoples as separate selections, whatever the generated world contains, each with its registry name, description and the boons and race body its people registry slots name. No vanilla culture entries are listed for generated campaigns; vanilla Sandbox character creation is unchanged."
+        },
+        {
+          "id": "s2",
+          "text": "World generation starts when the creator opens and runs during its stages. The creator stays responsive within a frame-time budget measured against the vanilla creator. If generation is still running at the last stage, the player sees progress and can cancel; cancel or a producer refusal returns to the setup screen with no partial campaign, temporary state or registered objects. No external tool, module publish or restart is involved."
+        },
+        {
+          "id": "s3",
+          "text": "If the chosen people owns at least one city, the player starts on navigable land near a random one of those cities. If the people has living members but owns no city, the player starts near a random city where one of them lives. If no member or settlement of the people exists, the player starts at a random navigable land spot and, once the campaign starts, a one-time in-game notice says they may be the only one of their kin. Each case is tested on fixed seeds."
+        },
+        {
+          "id": "s4",
+          "text": "Generated realms, clans, heroes and notables of each people carry that people's culture identity, the same one the player can select, while troops, buildings, scenes and clothing still come from the presentation culture. The FWGC epic's campaign coherence (its s4) and naval behaviour (its s5) still pass."
+        },
+        {
+          "id": "s5",
+          "text": "Saves record the player's people, the world identity and whether the kin notice was shown. A cold load restores them without showing the notice again, and the FWGC epic's save binding (its s6) still holds."
+        },
+        {
+          "id": "s6",
+          "text": "A local one-shot run completes character creation for every one of the 12 peoples, including at least one fixed seed where the chosen people is present and one where it is absent, and records build, request, world and save identities plus generation and creator timings. Any observed correctness failure stays failed."
+        }
+      ],
+      "title": "FWGC++ peoples in the character creator, with world generation during creation"
+    },
+    "formatVersion": 1,
+    "policies": {
+      "leaseSeconds": 900,
+      "maxConcurrency": 3,
+      "onTicketFailure": "continue_independent",
+      "retryLimit": 3
+    },
+    "rationale": "Why two sprints: the core risk is the engine lifecycle. Sandbox registers the world before character creation today, so generating during creation is unproven. Sprint 1 traces the sequence, proves generation during an active creator and a 12-people list, and freezes the people registry; sprint 2 builds on the proven mechanism. If the proof picks a different mechanism, sprint 2 is re-planned at the sprint 1 checkpoint rather than built on a guess.\n\nParallelism: the trace and the people contract start together. The generation proof needs only the trace; the people-list proof needs both. In sprint 2, people registration, generation during creation and world identity can proceed in parallel; starts need generation and identity; saves need starts; the automated 12-people scenario joins everything.\n\nCross-epic boundary: the character epic (ep_01m4gbx49w72je0ezgjcfkxtjx) owns race bodies, heights, ears, skin colour, sliders, Detailed Character Creation support and boons, and fills the race and boon slots of the people registry. This epic can complete with unfilled slots shown as the documented fallback; that is not acceptance of the character epic.\n\nUser decisions recorded 2026-10-15: all 12 peoples are selections. The world does not guarantee the chosen people. Start rule: near a random city of the player's people; if the people has members but no city, near a random city where one of them lives; if the people is absent entirely, a random navigable spot plus a one-time notice that the player may be the only one of their kin. \"Only one of their kin\" means the player's people, not the whole parent race. The world's lords, clans and notables carry their people's culture while troops, scenes and buildings keep coming from the borrowed vanilla presentation culture; the user accepted this for now and wants a separate, later epic to hand-craft each people's own content.\n\nNo feature branch is created during planning. Execution setup records a codex/ feature branch before implementation and never merges to main directly.",
+    "relations": [],
+    "sprints": [
+      {
+        "checkpoint": {
+          "mode": "human"
+        },
+        "concurrencyCap": 3,
+        "entryCriteria": [
+          {
+            "id": "n1",
+            "text": "Planning has been saved; execution starts only through the authorized Dark Mechanicus workflow on a recorded feature branch."
+          }
+        ],
+        "exitCriteria": [
+          {
+            "id": "x1",
+            "text": "The current setup → generation → registration → creation → MapState sequence is traced on the pinned build with call sites."
+          },
+          {
+            "id": "x2",
+            "text": "Generation during an active creator and a 12-people creator list are proven in game, or each unsupported operation is recorded as a blocked gate with evidence."
+          },
+          {
+            "id": "x3",
+            "text": "The people registry contract is frozen, tested against the pinned FWGC++ registry and published for the character epic."
+          }
+        ],
+        "goal": "Prove that the world can be generated during an active character creator and that the creator can list all 12 peoples; freeze the people registry contract the character epic consumes.",
+        "id": "sp_01m513vch48v2d5pzhaxcztyg7",
+        "ordinal": 1,
+        "ticketIds": [
+          "tk_01m513zy42tgtn2z8qetg0ycbv",
+          "tk_01m513zy42jrpt4p4xthztdmma",
+          "tk_01m513zy42rz1cbf5fm17yj1k7",
+          "tk_01m513zy4280wea68p7q5b9k2w",
+          "tk_01m513vch4xw9pdndsy9n11829"
+        ]
+      },
+      {
+        "checkpoint": {
+          "mode": "human"
+        },
+        "concurrencyCap": 3,
+        "entryCriteria": [
+          {
+            "id": "n1",
+            "text": "Sprint 1 accepted: the generation-during-creation mechanism and the people contract are proven and saved."
+          }
+        ],
+        "exitCriteria": [
+          {
+            "id": "x1",
+            "text": "All 12 peoples are selectable and complete creation in generated campaigns, independent of world contents."
+          },
+          {
+            "id": "x2",
+            "text": "Generation runs during creation, with the final wait, cancel and refusal handled cleanly."
+          },
+          {
+            "id": "x3",
+            "text": "Starts, the lone-kin notice and save binding pass in the automated 12-people scenario."
+          }
+        ],
+        "goal": "Deliver the 12-people creator for generated campaigns, with generation during creation, people identity in the world, kin-aware starts and save binding.",
+        "id": "sp_01m513zy3v3yfrvg4frs8kkavr",
+        "ordinal": 2,
+        "ticketIds": [
+          "tk_01m513zy42m53yyhsvfmwsrwt3",
+          "tk_01m513zy42eg8dme1b45ac77mv",
+          "tk_01m513zy42s1e2xwfwe7ptj78y",
+          "tk_01m513zy42zfrfpw8z36yq3yre",
+          "tk_01m513zy42n56p8av7cabpy5zx",
+          "tk_01m513zy42my3xqswjam53jns6",
+          "tk_01m513zy3vjcdttv2057j5dr6m"
+        ]
+      }
+    ],
+    "tickets": [
+      {
+        "acceptanceCriteria": [
+          {
+            "covers": "tk_01m513zy42tgtn2z8qetg0ycbv",
+            "id": "a1",
+            "text": "Rerun the sequence-trace probe and compare its output with docs/creation-generation-sequence.md, including every world-reading creator stage."
+          },
+          {
+            "covers": "tk_01m513zy42jrpt4p4xthztdmma",
+            "id": "a2",
+            "text": "Run the people registry tests against the pinned FWGC++ commit and confirm that a deliberately renamed people makes them fail."
+          },
+          {
+            "covers": "tk_01m513zy42rz1cbf5fm17yj1k7",
+            "id": "a3",
+            "text": "Reproduce generation during an active creator, one cancel and one forced refusal, and inspect the frame-time measurements, census and decision record."
+          },
+          {
+            "covers": "tk_01m513zy4280wea68p7q5b9k2w",
+            "id": "a4",
+            "text": "Complete character creation for at least three peoples from different parent races and inspect the 12-entry list, narrative options and an unchanged vanilla Sandbox list."
+          },
+          {
+            "id": "a5",
+            "text": "Read the current project Definition of Done and report every configured check truthfully; verify the combined sprint and record one squashed increment on the epic feature branch."
+          },
+          {
+            "id": "a6",
+            "text": "Sprint 2's tickets match the chosen mechanism, saved and adopted before it dispatches; any blocked gate is recorded with evidence and blocks its dependent work."
+          }
+        ],
+        "body": "Independently verify the sprint. Each covering criterion names the integrated evidence for its work ticket. Reuse only current accepted evidence with matching identities; repeat affected checks after changes. The server implicitly requires all required work in this sprint, so no extra dependency edges are added.\n\nIf the generation-during-creation proof chose a mechanism that changes the sprint 2 tickets, the planner updates, validates and saves the plan, and the orchestrator adopts it at this checkpoint, before sprint 2 dispatches.",
+        "capability": {
+          "constraints": {
+            "dataLocation": "local game and repository",
+            "environments": [
+              "local"
+            ],
+            "maxCostUsd": null,
+            "maxDurationMinutes": null
+          },
+          "context": {
+            "estimatedInputTokens": 40000,
+            "requiredArtifacts": []
+          },
+          "modalities": [
+            "text",
+            "images"
+          ],
+          "preferences": {
+            "autonomy": null,
+            "cost": null,
+            "latency": null,
+            "modelOverride": null,
+            "quality": null
+          },
+          "reasoning": {
+            "effort": "medium",
+            "level": "multi_step",
+            "rationale": "Independent verification of the sprint's proofs and contract."
+          },
+          "skills": [
+            "review",
+            "bannerlord-campaign"
+          ],
+          "tools": [
+            "repo_read",
+            "repo_write",
+            "shell",
+            "test_execution"
+          ],
+          "workType": "testing"
+        },
+        "expectedArtifacts": [],
+        "id": "tk_01m513vch4xw9pdndsy9n11829",
+        "key": "MMR-201",
+        "kind": "acceptance",
+        "optional": false,
+        "priority": "critical",
+        "references": [],
+        "size": "medium",
+        "tags": [
+          "peoples-creator",
+          "acceptance"
+        ],
+        "title": "Verify the generation-during-creation proof and the people contract"
+      },
+      {
+        "acceptanceCriteria": [
+          {
+            "covers": "tk_01m513zy42m53yyhsvfmwsrwt3",
+            "id": "a1",
+            "text": "Run the creation audit on at least two generated seeds with different presented cultures and confirm the same 12 peoples, slot reporting and an unchanged vanilla list."
+          },
+          {
+            "covers": "tk_01m513zy42eg8dme1b45ac77mv",
+            "id": "a2",
+            "text": "Play through creation with generation running, once normally and once forced slow, and reproduce the three cancel points and a refusal; inspect frame times and the census."
+          },
+          {
+            "covers": "tk_01m513zy42s1e2xwfwe7ptj78y",
+            "id": "a3",
+            "text": "Inspect the in-game culture census of a generated world and rerun the FWGC coherence and naval probes on the pinned seeds."
+          },
+          {
+            "covers": "tk_01m513zy42zfrfpw8z36yq3yre",
+            "id": "a4",
+            "text": "Reproduce the three start cases (people owns cities, members without a city, people absent) and confirm the start positions, their navigability and the one-time notice text."
+          },
+          {
+            "covers": "tk_01m513zy42n56p8av7cabpy5zx",
+            "id": "a5",
+            "text": "Save, cold-restart and load both cases plus a pre-epic save, and confirm people and notice state."
+          },
+          {
+            "covers": "tk_01m513zy42my3xqswjam53jns6",
+            "id": "a6",
+            "text": "Rerun the 12-people scenario from clean and compare its evidence with the recorded identities and timings."
+          },
+          {
+            "id": "a7",
+            "text": "Read the current project Definition of Done and report every configured check truthfully; verify the combined sprint and record one squashed increment on the epic feature branch."
+          },
+          {
+            "id": "a8",
+            "text": "All six epic outcomes have current evidence and the final human checkpoint receives the actual playable result; required failures prevent completion."
+          }
+        ],
+        "body": "Independently verify the sprint and the epic outcome. Each covering criterion names the integrated evidence for its work ticket. Reuse only current accepted evidence with matching identities; repeat affected checks after changes. The server implicitly requires all required work in this sprint, so no extra dependency edges are added. Prepare the final human checkpoint with the actual playable result; never fabricate user approval.",
+        "capability": {
+          "constraints": {
+            "dataLocation": "local game and repository",
+            "environments": [
+              "local"
+            ],
+            "maxCostUsd": null,
+            "maxDurationMinutes": null
+          },
+          "context": {
+            "estimatedInputTokens": 50000,
+            "requiredArtifacts": [
+              "evidence/peoples-creator/twelve-peoples-scenario.json"
+            ]
+          },
+          "modalities": [
+            "text",
+            "images"
+          ],
+          "preferences": {
+            "autonomy": null,
+            "cost": null,
+            "latency": null,
+            "modelOverride": null,
+            "quality": null
+          },
+          "reasoning": {
+            "effort": "medium",
+            "level": "multi_step",
+            "rationale": "Independent verification of the integrated sprint and epic outcomes."
+          },
+          "skills": [
+            "review",
+            "bannerlord-campaign"
+          ],
+          "tools": [
+            "repo_read",
+            "repo_write",
+            "shell",
+            "test_execution"
+          ],
+          "workType": "testing"
+        },
+        "expectedArtifacts": [],
+        "id": "tk_01m513zy3vjcdttv2057j5dr6m",
+        "key": "MMR-202",
+        "kind": "acceptance",
+        "optional": false,
+        "priority": "critical",
+        "references": [],
+        "size": "medium",
+        "tags": [
+          "peoples-creator",
+          "acceptance"
+        ],
+        "title": "Accept the 12-people creator with generation during creation"
+      },
+      {
+        "acceptanceCriteria": [
+          {
+            "id": "a1",
+            "text": "Every step from the setup screen to MapState is listed with its installed call site, the v1.4.8 build identity and the world state it needs."
+          },
+          {
+            "id": "a2",
+            "text": "Every creator stage that reads world objects is named, with the earliest point the read happens and whether it could move after world registration."
+          },
+          {
+            "id": "a3",
+            "text": "An automated probe run reproduces the trace, and its run id and evidence path are recorded."
+          }
+        ],
+        "body": "Trace on the pinned v1.4.8 build, from the MMR-43 world setup screen (`WorldSetupScreen`) through generation, the WorldBridge compile, registration (`GeneratedGameManager`), Sandbox campaign initialization, every `CharacterCreationState` stage (culture, face generator, narrative, options, banner editor, clan naming, review), `CharacterCreationManager.ApplyFinalEffects` and start placement, to `MapState`. For each step record what must already exist: campaign objects, the map scene, cultures and their start points, `MBObjectManager` types, the main hero and clan. Name each creator stage that reads world objects (culture-conditioned narrative options, start position, clan and kingdom, banner colours) and say whether that read could happen after world registration. Reuse `DiagnosticSandboxBootstrap` and the MMR-32 creation audit rather than adding a parallel driver.\n\nExecution contract: Listed output paths are proposed implementation contracts, not delivered files. Read the saved epic, the FWGC epic's docs and accepted prerequisite artifacts first. One worker owns the listed source paths; one integration owner controls the shared game install, test saves and module deploy, and live game probes are queued, never raced. Evidence names the exact game build, producer commit, request, world and save identities. Probes are fail-soft and dismiss Bannerlord Safe Mode and crash dialogs automatically. A missing required capability is a blocked gate with evidence, never a placeholder or a silent return to generate-first. Do not author race, appearance or boon content; consume it through the people registry contract.",
+        "capability": {
+          "constraints": {
+            "dataLocation": "local game and repository",
+            "environments": [
+              "local"
+            ],
+            "maxCostUsd": null,
+            "maxDurationMinutes": null
+          },
+          "context": {
+            "estimatedInputTokens": 40000,
+            "requiredArtifacts": [
+              "docs/world-setup.md",
+              "docs/heroes.md",
+              "docs/campaign-behavior-compatibility.md"
+            ]
+          },
+          "modalities": [
+            "text"
+          ],
+          "preferences": {
+            "autonomy": null,
+            "cost": null,
+            "latency": null,
+            "modelOverride": null,
+            "quality": null
+          },
+          "reasoning": {
+            "effort": "medium",
+            "level": "multi_step",
+            "rationale": "Trace an installed call sequence across several subsystems and record it."
+          },
+          "skills": [
+            "csharp",
+            "bannerlord-campaign",
+            "reverse-engineering"
+          ],
+          "tools": [
+            "repo_read",
+            "repo_write",
+            "shell",
+            "test_execution"
+          ],
+          "workType": "investigation"
+        },
+        "expectedArtifacts": [
+          "docs/creation-generation-sequence.md",
+          "evidence/peoples-creator/sequence-trace.json"
+        ],
+        "id": "tk_01m513zy42tgtn2z8qetg0ycbv",
+        "key": "MMR-203",
+        "optional": false,
+        "priority": "high",
+        "references": [
+          {
+            "hash": null,
+            "kind": "file",
+            "label": "New Campaign setup screen (MMR-43)",
+            "location": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\docs\\world-setup.md",
+            "remoteOnly": false
+          },
+          {
+            "hash": null,
+            "kind": "file",
+            "label": "Character creation culture filter (MMR-32)",
+            "location": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\docs\\heroes.md",
+            "remoteOnly": false
+          },
+          {
+            "hash": null,
+            "kind": "file",
+            "label": "Creation cultures and starts",
+            "location": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\docs\\campaign-behavior-compatibility.md",
+            "remoteOnly": false
+          },
+          {
+            "hash": null,
+            "kind": "file",
+            "label": "Probe creator driver",
+            "location": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\src\\MNBL.ProceduralWorld\\CampaignBootstrap\\DiagnosticSandboxBootstrap.cs",
+            "remoteOnly": false
+          }
+        ],
+        "size": "small",
+        "tags": [
+          "peoples-creator",
+          "investigation"
+        ],
+        "title": "Trace the generate-then-create campaign start sequence"
+      },
+      {
+        "acceptanceCriteria": [
+          {
+            "id": "a1",
+            "text": "The registry has exactly the 12 civilizations of kEntityIds at the producer.lock commit; tests fail on any added, removed or renamed people and on a mismatch with culture-presentations.json."
+          },
+          {
+            "id": "a2",
+            "text": "Each people's parent race is read from FWGC++ source data, with the source path and commit cited."
+          },
+          {
+            "id": "a3",
+            "text": "Race definition and boon set slots are typed and documented as owned by the character epic; an unfilled slot has a documented visible fallback that the creator audit reports."
+          }
+        ],
+        "body": "Write the people registry: one entry per FWGC++ civilization in `kEntityIds` at the producer.lock commit, in a fixed selection order. Each entry has the people id, display name and description (from `content_civilizations.cpp`), parent race id (read from FWGC++ civilization and heritage data, not guessed), presentation culture (`worldgen/policies/culture-presentations.json`), the culture StringId this epic registers (proposed `mnbl_people_<id>`), and two typed slots owned by the character epic: race definition and boon set. An unfilled slot resolves to a documented visible fallback (installed human body, no boons) and is reported, never silently defaulted. Add a schema and tests in C++ (next to the culture-presentation check in `campaign_semantics_tests.cpp`) and C# so drift from the generator registry or the presentation policy fails. Document the contract in `docs/peoples.md` as the interface the character epic consumes.\n\nExecution contract: Listed output paths are proposed implementation contracts, not delivered files. Read the saved epic, the FWGC epic's docs and accepted prerequisite artifacts first. One worker owns the listed source paths; one integration owner controls the shared game install, test saves and module deploy, and live game probes are queued, never raced. Evidence names the exact game build, producer commit, request, world and save identities. A missing required capability is a blocked gate with evidence, never a placeholder. Do not author race, appearance or boon content; the slots only name what the character epic delivers.",
+        "capability": {
+          "constraints": {
+            "dataLocation": "local repositories (MNBL and FWGC++)",
+            "environments": [
+              "local"
+            ],
+            "maxCostUsd": null,
+            "maxDurationMinutes": null
+          },
+          "context": {
+            "estimatedInputTokens": 25000,
+            "requiredArtifacts": [
+              "worldgen/policies/culture-presentations.json",
+              "worldgen/producer.lock.json"
+            ]
+          },
+          "modalities": [
+            "text"
+          ],
+          "preferences": {
+            "autonomy": null,
+            "cost": null,
+            "latency": null,
+            "modelOverride": null,
+            "quality": null
+          },
+          "reasoning": {
+            "effort": "medium",
+            "level": "multi_step",
+            "rationale": "Define a cross-epic data contract with drift tests against an external registry."
+          },
+          "skills": [
+            "data-design",
+            "cpp",
+            "csharp"
+          ],
+          "tools": [
+            "repo_read",
+            "repo_write",
+            "shell",
+            "test_execution"
+          ],
+          "workType": "architecture"
+        },
+        "expectedArtifacts": [
+          "worldgen/policies/peoples.json",
+          "worldgen/contracts/peoples.schema.json",
+          "docs/peoples.md",
+          "tests/Campaign/PeopleRegistryTests.cs"
+        ],
+        "id": "tk_01m513zy42jrpt4p4xthztdmma",
+        "key": "MMR-204",
+        "optional": false,
+        "priority": "critical",
+        "references": [
+          {
+            "hash": null,
+            "kind": "file",
+            "label": "Culture presentation policy",
+            "location": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\worldgen\\policies\\culture-presentations.json",
+            "remoteOnly": false
+          },
+          {
+            "hash": null,
+            "kind": "file",
+            "label": "FWGC++ civilization registry (kEntityIds)",
+            "location": "C:\\Users\\davgo\\Documents\\GitHub\\FWGC++\\generator\\src\\generated\\content_civilizations.cpp",
+            "remoteOnly": false
+          },
+          {
+            "hash": null,
+            "kind": "file",
+            "label": "FWGC++ race and people appearance",
+            "location": "C:\\Users\\davgo\\Documents\\GitHub\\FWGC++\\generator\\data\\heritage-appearance.json",
+            "remoteOnly": false
+          },
+          {
+            "hash": null,
+            "kind": "file",
+            "label": "Producer lock",
+            "location": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\worldgen\\producer.lock.json",
+            "remoteOnly": false
+          }
+        ],
+        "size": "small",
+        "tags": [
+          "peoples-creator",
+          "contract"
+        ],
+        "title": "Freeze the people registry contract"
+      },
+      {
+        "acceptanceCriteria": [
+          {
+            "id": "a1",
+            "text": "An in-game probe shows generation progressing while the creator advances through its stages, with frame times measured against the vanilla creator on the same settings."
+          },
+          {
+            "id": "a2",
+            "text": "Cancelling during creation and a forced producer refusal both return to a clean state: the census shows no registered generated objects, temporary files or leftover patches, and a second attempt succeeds."
+          },
+          {
+            "id": "a3",
+            "text": "A creator result made before the world existed is applied to a world registered afterwards, and the main hero's people, appearance, narrative choices, banner and clan name are verified in MapState."
+          },
+          {
+            "id": "a4",
+            "text": "A decision record names the chosen mechanism, the rejected alternatives and the evidence for each."
+          }
+        ],
+        "body": "Prove both halves before implementation. (1) The FWGC++ producer and WorldBridge compile run in the background while `CharacterCreationState` is active: progress reaches the creator, frame time is measured against the vanilla creator on the same settings, cancel works, and a producer refusal is surfaced. (2) The campaign side: the generated world is registered after the creator started, and the creator's result (people, appearance, narrative choices, banner, clan name) is applied to the generated campaign. Candidates include hosting the creator before world registration and replaying its result, or starting the campaign with registration deferred; choose by evidence from the sequence trace. Any engine operation that cannot be done is recorded as a blocked gate with the exact limiting API.\n\nExecution contract: Listed output paths are proposed implementation contracts, not delivered files. Read the saved epic, the FWGC epic's docs and accepted prerequisite artifacts first. One worker owns the listed source paths; one integration owner controls the shared game install, test saves and module deploy, and live game probes are queued, never raced. Evidence names the exact game build, producer commit, request, world and save identities. Probes are fail-soft and dismiss Bannerlord Safe Mode and crash dialogs automatically. A missing required capability is a blocked gate with evidence, never a placeholder or a silent return to generate-first.",
+        "capability": {
+          "constraints": {
+            "dataLocation": "local game and repository",
+            "environments": [
+              "local"
+            ],
+            "maxCostUsd": null,
+            "maxDurationMinutes": null
+          },
+          "context": {
+            "estimatedInputTokens": 60000,
+            "requiredArtifacts": [
+              "docs/creation-generation-sequence.md",
+              "docs/world-setup.md",
+              "docs/runtime-backend-decision.md"
+            ]
+          },
+          "modalities": [
+            "text"
+          ],
+          "preferences": {
+            "autonomy": null,
+            "cost": null,
+            "latency": null,
+            "modelOverride": null,
+            "quality": null
+          },
+          "reasoning": {
+            "effort": "high",
+            "level": "deep",
+            "rationale": "Engine lifecycle reordering with concurrency, cleanup and an unproven registration order."
+          },
+          "skills": [
+            "csharp",
+            "bannerlord-campaign",
+            "harmony",
+            "concurrency"
+          ],
+          "tools": [
+            "repo_read",
+            "repo_write",
+            "shell",
+            "test_execution"
+          ],
+          "workType": "investigation"
+        },
+        "expectedArtifacts": [
+          "docs/decisions/generation-during-creation.md",
+          "evidence/peoples-creator/generation-during-creation/"
+        ],
+        "id": "tk_01m513zy42rz1cbf5fm17yj1k7",
+        "key": "MMR-205",
+        "optional": false,
+        "priority": "critical",
+        "references": [
+          {
+            "hash": null,
+            "kind": "file",
+            "label": "Runtime backend decision",
+            "location": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\docs\\runtime-backend-decision.md",
+            "remoteOnly": false
+          },
+          {
+            "hash": null,
+            "kind": "file",
+            "label": "Generated game manager",
+            "location": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\src\\MNBL.ProceduralWorld\\Campaign\\GeneratedGameManager.cs",
+            "remoteOnly": false
+          },
+          {
+            "hash": null,
+            "kind": "file",
+            "label": "World setup screen",
+            "location": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\src\\MNBL.ProceduralWorld\\UI\\WorldSetupScreen.cs",
+            "remoteOnly": false
+          }
+        ],
+        "size": "medium",
+        "tags": [
+          "peoples-creator",
+          "capability",
+          "investigation"
+        ],
+        "title": "Prove world generation running during an active character creator"
+      },
+      {
+        "acceptanceCriteria": [
+          {
+            "id": "a1",
+            "text": "All 12 peoples are listed in contract order on the pinned build, and character creation completes for each one."
+          },
+          {
+            "id": "a2",
+            "text": "Every narrative menu offers each people at least the options its presentation culture gets, and no stage throws."
+          },
+          {
+            "id": "a3",
+            "text": "A vanilla Sandbox new game still lists the installed cultures unchanged, with none of the people cultures."
+          }
+        ],
+        "body": "Register diagnostic people cultures from the people registry contract that character creation treats as main cultures, while troops, buildings, scenes, clothing and narrative origins delegate to each people's presentation culture. Show all 12 in `CharacterCreationCultureStage`, generalizing the MMR-32 `SortCultureList` prefix. Check that culture-conditioned narrative options (family, childhood, youth, adulthood) resolve through the presentation culture, that each people has a default creation body property and banner colours, and that the list does not depend on which peoples the world contains.\n\nExecution contract: Listed output paths are proposed implementation contracts, not delivered files. Read the saved epic, the FWGC epic's docs and accepted prerequisite artifacts first. One worker owns the listed source paths; one integration owner controls the shared game install, test saves and module deploy, and live game probes are queued, never raced. Evidence names the exact game build, producer commit, request, world and save identities. Probes are fail-soft and dismiss Bannerlord Safe Mode and crash dialogs automatically. A missing required capability is a blocked gate with evidence, never a placeholder.",
+        "capability": {
+          "constraints": {
+            "dataLocation": "local game and repository",
+            "environments": [
+              "local"
+            ],
+            "maxCostUsd": null,
+            "maxDurationMinutes": null
+          },
+          "context": {
+            "estimatedInputTokens": 40000,
+            "requiredArtifacts": [
+              "docs/creation-generation-sequence.md",
+              "worldgen/policies/peoples.json"
+            ]
+          },
+          "modalities": [
+            "text",
+            "images"
+          ],
+          "preferences": {
+            "autonomy": null,
+            "cost": null,
+            "latency": null,
+            "modelOverride": null,
+            "quality": null
+          },
+          "reasoning": {
+            "effort": "medium",
+            "level": "multi_step",
+            "rationale": "Register new cultures and patch an installed UI stage, verified across all creator stages."
+          },
+          "skills": [
+            "csharp",
+            "bannerlord-campaign",
+            "harmony",
+            "gauntlet-ui"
+          ],
+          "tools": [
+            "repo_read",
+            "repo_write",
+            "shell",
+            "test_execution"
+          ],
+          "workType": "investigation"
+        },
+        "expectedArtifacts": [
+          "evidence/peoples-creator/people-list-probe.json"
+        ],
+        "id": "tk_01m513zy4280wea68p7q5b9k2w",
+        "key": "MMR-206",
+        "optional": false,
+        "priority": "high",
+        "references": [
+          {
+            "hash": null,
+            "kind": "file",
+            "label": "Current creation culture filter",
+            "location": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\src\\MNBL.ProceduralWorld\\Campaign\\GeneratedCharacterCreation.cs",
+            "remoteOnly": false
+          }
+        ],
+        "size": "medium",
+        "tags": [
+          "peoples-creator",
+          "capability",
+          "investigation"
+        ],
+        "title": "Prove a 12-people creator list with registered people cultures"
+      },
+      {
+        "acceptanceCriteria": [
+          {
+            "id": "a1",
+            "text": "For every generated seed tested, the creation audit lists exactly the 12 contract peoples, independent of the world's presented cultures."
+          },
+          {
+            "id": "a2",
+            "text": "Each selection shows its slot's boons and race body, or the documented fallback, and the audit reports every unfilled slot."
+          },
+          {
+            "id": "a3",
+            "text": "Vanilla New Campaign lists the installed cultures unchanged."
+          },
+          {
+            "id": "a4",
+            "text": "Docs and tests describe the new list, and the boot probe passes."
+          }
+        ],
+        "body": "Production version of the people-list probe. Register the people cultures from `worldgen/policies/peoples.json` and list all 12 in the creator for every generated campaign, replacing the MMR-32 filter that lists only the cultures a world presents through. Each selection shows its name, description, the boons its boon slot names and the body its race slot names, or the documented fallback while a slot is unfilled. Narrative origins resolve through the presentation culture. Vanilla Sandbox is untouched. Update the creation audit in `GeneratedCampaignBootProbe` (it currently expects the presented cultures), `docs/heroes.md` (Character creation) and `docs/campaign-behavior-compatibility.md`.\n\nExecution contract: Listed output paths are proposed implementation contracts, not delivered files. Read the saved epic and accepted prerequisite artifacts first. One worker owns the listed source paths; one integration owner controls the shared game install, test saves and module deploy, and live game probes are queued, never raced. Evidence names the exact game build, producer commit, request, world and save identities. Probes are fail-soft and dismiss Bannerlord Safe Mode and crash dialogs automatically. Do not author race, appearance or boon content; consume it through the people registry contract.",
+        "capability": {
+          "constraints": {
+            "dataLocation": "local game and repository",
+            "environments": [
+              "local"
+            ],
+            "maxCostUsd": null,
+            "maxDurationMinutes": null
+          },
+          "context": {
+            "estimatedInputTokens": 40000,
+            "requiredArtifacts": [
+              "worldgen/policies/peoples.json",
+              "evidence/peoples-creator/people-list-probe.json"
+            ]
+          },
+          "modalities": [
+            "text",
+            "images"
+          ],
+          "preferences": {
+            "autonomy": null,
+            "cost": null,
+            "latency": null,
+            "modelOverride": null,
+            "quality": null
+          },
+          "reasoning": {
+            "effort": "medium",
+            "level": "multi_step",
+            "rationale": "Productionize a proven registration and UI patch with audits and docs."
+          },
+          "skills": [
+            "csharp",
+            "bannerlord-campaign",
+            "harmony",
+            "gauntlet-ui"
+          ],
+          "tools": [
+            "repo_read",
+            "repo_write",
+            "shell",
+            "test_execution"
+          ],
+          "workType": "implementation"
+        },
+        "expectedArtifacts": [
+          "src/MNBL.ProceduralWorld/Campaign/PeopleCultures.cs",
+          "src/MNBL.ProceduralWorld/Campaign/GeneratedCharacterCreation.cs",
+          "docs/heroes.md",
+          "docs/campaign-behavior-compatibility.md"
+        ],
+        "id": "tk_01m513zy42m53yyhsvfmwsrwt3",
+        "key": "MMR-207",
+        "optional": false,
+        "priority": "high",
+        "references": [
+          {
+            "hash": null,
+            "kind": "file",
+            "label": "Generated campaign boot probe",
+            "location": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\src\\MNBL.ProceduralWorld\\Automation\\GeneratedCampaignBootProbe.cs",
+            "remoteOnly": false
+          }
+        ],
+        "size": "medium",
+        "tags": [
+          "peoples-creator",
+          "implementation"
+        ],
+        "title": "Register the 12 peoples as creator selections"
+      },
+      {
+        "acceptanceCriteria": [
+          {
+            "id": "a1",
+            "text": "In the timed scenario, generation starts when the creator opens and completes during its stages, and creator frame time stays within the budget set by the proof."
+          },
+          {
+            "id": "a2",
+            "text": "With generation forced to be slow, the final stage shows the wait with progress, and the campaign starts when generation finishes."
+          },
+          {
+            "id": "a3",
+            "text": "Cancel at an early stage, mid-creation and during the final wait, and a forced refusal, each leave no partial campaign (census) and allow a new attempt."
+          },
+          {
+            "id": "a4",
+            "text": "Request, attempt and world identity records match the FWGC generation identity contract."
+          }
+        ],
+        "body": "Implement the mechanism the generation-during-creation proof chose. The New Campaign setup screen (MMR-43) collects seed and settings and opens the creator at once; generation starts when the creator opens and runs in the background, with a non-blocking progress indicator in the creator. At the final stage, if generation is still running, the creator waits with progress and cancel. Cancel or a refusal returns to the setup screen with the request kept. The creator's result is applied after registration. Generation identity is recorded with the existing request and attempt contracts (`worldgen/contracts/generation-request.schema.json`, `generation-attempts.schema.json`). Update `docs/world-setup.md`.\n\nExecution contract: Listed output paths are proposed implementation contracts, not delivered files. Read the saved epic and accepted prerequisite artifacts first. One worker owns the listed source paths; one integration owner controls the shared game install, test saves and module deploy, and live game probes are queued, never raced. Evidence names the exact game build, producer commit, request, world and save identities. Probes are fail-soft and dismiss Bannerlord Safe Mode and crash dialogs automatically. A missing required capability is a blocked gate with evidence, never a silent return to generate-first.",
+        "capability": {
+          "constraints": {
+            "dataLocation": "local game and repository",
+            "environments": [
+              "local"
+            ],
+            "maxCostUsd": null,
+            "maxDurationMinutes": null
+          },
+          "context": {
+            "estimatedInputTokens": 60000,
+            "requiredArtifacts": [
+              "docs/decisions/generation-during-creation.md",
+              "docs/world-setup.md"
+            ]
+          },
+          "modalities": [
+            "text",
+            "images"
+          ],
+          "preferences": {
+            "autonomy": null,
+            "cost": null,
+            "latency": null,
+            "modelOverride": null,
+            "quality": null
+          },
+          "reasoning": {
+            "effort": "high",
+            "level": "deep",
+            "rationale": "Background generation tied to the campaign lifecycle, with cancellation and cleanup paths."
+          },
+          "skills": [
+            "csharp",
+            "bannerlord-campaign",
+            "concurrency",
+            "gauntlet-ui"
+          ],
+          "tools": [
+            "repo_read",
+            "repo_write",
+            "shell",
+            "test_execution"
+          ],
+          "workType": "implementation"
+        },
+        "expectedArtifacts": [
+          "src/MNBL.ProceduralWorld/UI/WorldSetupScreen.cs",
+          "src/MNBL.ProceduralWorld/Campaign/CreationGenerationSession.cs",
+          "docs/world-setup.md",
+          "evidence/peoples-creator/generation-during-creation-timings.json"
+        ],
+        "id": "tk_01m513zy42eg8dme1b45ac77mv",
+        "key": "MMR-208",
+        "optional": false,
+        "priority": "critical",
+        "references": [
+          {
+            "hash": null,
+            "kind": "file",
+            "label": "New Campaign setup screen (MMR-43)",
+            "location": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\docs\\world-setup.md",
+            "remoteOnly": false
+          }
+        ],
+        "size": "medium",
+        "tags": [
+          "peoples-creator",
+          "implementation"
+        ],
+        "title": "Run world generation during character creation"
+      },
+      {
+        "acceptanceCriteria": [
+          {
+            "id": "a1",
+            "text": "Every generated kingdom, clan, hero and notable of a civilization carries its people culture, verified by compiler tests and an in-game census."
+          },
+          {
+            "id": "a2",
+            "text": "Recruitment, troop trees, settlement scenes and clothing still come from the presentation culture, with no missing-reference errors in the boot probe."
+          },
+          {
+            "id": "a3",
+            "text": "The FWGC campaign coherence and naval probes still pass on the pinned seeds."
+          },
+          {
+            "id": "a4",
+            "text": "Each field's culture choice is documented with its evidence."
+          }
+        ],
+        "body": "Make the WorldBridge campaign compiler and registration give the kingdoms, clans, heroes and notables of each civilization its people culture, the same one the player can select. Troops, recruitment, buildings, settlement scenes and clothing keep resolving through the presentation culture; decide field by field (settlement culture, notable recruits, encyclopedia, banners) from evidence and document each choice in `docs/campaign-semantics.md`. Update the notes in `culture-presentations.json`, `campaign_semantics_tests.cpp`, `tests/Campaign/RegistrationTests.cs` and graph validation as needed.\n\nExecution contract: Listed output paths are proposed implementation contracts, not delivered files. Read the saved epic, the FWGC epic's docs and accepted prerequisite artifacts first. One worker owns the listed source paths; one integration owner controls the shared game install, test saves and module deploy, and live game probes are queued, never raced. Evidence names the exact game build, producer commit, request, world and save identities. A missing required capability is a blocked gate with evidence, never a placeholder.",
+        "capability": {
+          "constraints": {
+            "dataLocation": "local game and repository",
+            "environments": [
+              "local"
+            ],
+            "maxCostUsd": null,
+            "maxDurationMinutes": null
+          },
+          "context": {
+            "estimatedInputTokens": 70000,
+            "requiredArtifacts": [
+              "docs/campaign-semantics.md",
+              "docs/heroes.md",
+              "worldgen/policies/peoples.json"
+            ]
+          },
+          "modalities": [
+            "text"
+          ],
+          "preferences": {
+            "autonomy": null,
+            "cost": null,
+            "latency": null,
+            "modelOverride": null,
+            "quality": null
+          },
+          "reasoning": {
+            "effort": "high",
+            "level": "deep",
+            "rationale": "Changes culture identity across the compiler, registration and many culture-dependent game systems."
+          },
+          "skills": [
+            "cpp",
+            "csharp",
+            "bannerlord-campaign",
+            "data-design"
+          ],
+          "tools": [
+            "repo_read",
+            "repo_write",
+            "shell",
+            "test_execution"
+          ],
+          "workType": "implementation"
+        },
+        "expectedArtifacts": [
+          "src/WorldBridge/src/campaign_compiler.cpp",
+          "src/WorldBridge/tests/campaign_semantics_tests.cpp",
+          "tests/Campaign/RegistrationTests.cs",
+          "docs/campaign-semantics.md"
+        ],
+        "id": "tk_01m513zy42s1e2xwfwe7ptj78y",
+        "key": "MMR-209",
+        "optional": false,
+        "priority": "high",
+        "references": [
+          {
+            "hash": null,
+            "kind": "file",
+            "label": "Campaign semantics",
+            "location": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\docs\\campaign-semantics.md",
+            "remoteOnly": false
+          },
+          {
+            "hash": null,
+            "kind": "file",
+            "label": "Campaign compiler",
+            "location": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\src\\WorldBridge\\src\\campaign_compiler.cpp",
+            "remoteOnly": false
+          }
+        ],
+        "size": "medium",
+        "tags": [
+          "peoples-creator",
+          "implementation",
+          "worldbridge"
+        ],
+        "title": "Carry each people's culture identity into the generated world"
+      },
+      {
+        "acceptanceCriteria": [
+          {
+            "id": "a1",
+            "text": "On a fixed seed where the chosen people owns cities, the player starts on navigable land near one of them, the city varies across random seeds, and no notice is shown."
+          },
+          {
+            "id": "a2",
+            "text": "On a fixed seed where the people has living members but no city, the player starts near a city where one of them lives, and no notice is shown."
+          },
+          {
+            "id": "a3",
+            "text": "On a fixed seed where the people is absent, the player starts at a random navigable spot in the player-safe main group and sees the notice once at campaign start, naming the people."
+          },
+          {
+            "id": "a4",
+            "text": "The presence cases, the distance used for \"near\" and the random-seed recording are documented and covered by tests."
+          }
+        ],
+        "body": "User-decided start rule (2026-10-15). After registration, pick the start from the chosen people's presence in the generated world:\n\n1. **The people owns at least one city:** start on navigable land near a random one of those cities.\n2. **The people has living members but owns no city:** start near a random city where one of them lives. If a castle or village of the people exists but no member lives in a city, start near a random settlement of the people.\n3. **No living member and no settlement of the people:** start at a random navigable land spot, and once the campaign starts show a one-time in-game notice naming the people and saying the player may be the only one of their kin. Record that it was shown.\n\nRandom choices are random per campaign, with the random seed recorded so tests can reproduce them. Every start must pass the navigability checks of the existing start gates (`docs/campaign-behavior-compatibility.md`, Starts) and lie in the player-safe main group (`docs/travel-graph.md`), so a random spot never strands the player. Document the distance used for \"near\" and the rule in `docs/peoples.md`.\n\nExecution contract: Listed output paths are proposed implementation contracts, not delivered files. Read the saved epic and accepted prerequisite artifacts first. One worker owns the listed source paths; one integration owner controls the shared game install, test saves and module deploy, and live game probes are queued, never raced. Evidence names the exact game build, producer commit, request, world and save identities. Probes are fail-soft and dismiss Bannerlord Safe Mode and crash dialogs automatically.",
+        "capability": {
+          "constraints": {
+            "dataLocation": "local game and repository",
+            "environments": [
+              "local"
+            ],
+            "maxCostUsd": null,
+            "maxDurationMinutes": null
+          },
+          "context": {
+            "estimatedInputTokens": 30000,
+            "requiredArtifacts": [
+              "docs/campaign-behavior-compatibility.md",
+              "docs/travel-graph.md"
+            ]
+          },
+          "modalities": [
+            "text",
+            "images"
+          ],
+          "preferences": {
+            "autonomy": null,
+            "cost": null,
+            "latency": null,
+            "modelOverride": null,
+            "quality": null
+          },
+          "reasoning": {
+            "effort": "medium",
+            "level": "multi_step",
+            "rationale": "Start selection on existing start gates plus a one-time notice."
+          },
+          "skills": [
+            "csharp",
+            "bannerlord-campaign"
+          ],
+          "tools": [
+            "repo_read",
+            "repo_write",
+            "shell",
+            "test_execution"
+          ],
+          "workType": "implementation"
+        },
+        "expectedArtifacts": [
+          "src/MNBL.ProceduralWorld/Campaign/PeopleStartResolver.cs",
+          "docs/peoples.md"
+        ],
+        "id": "tk_01m513zy42zfrfpw8z36yq3yre",
+        "key": "MMR-210",
+        "optional": false,
+        "priority": "high",
+        "references": [
+          {
+            "hash": null,
+            "kind": "file",
+            "label": "Start rules",
+            "location": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\docs\\campaign-behavior-compatibility.md",
+            "remoteOnly": false
+          },
+          {
+            "hash": null,
+            "kind": "file",
+            "label": "Player-safe groups",
+            "location": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\docs\\travel-graph.md",
+            "remoteOnly": false
+          }
+        ],
+        "size": "small",
+        "tags": [
+          "peoples-creator",
+          "implementation"
+        ],
+        "title": "Resolve the player's start and show the lone-kin notice"
+      },
+      {
+        "acceptanceCriteria": [
+          {
+            "id": "a1",
+            "text": "Save, cold restart and load restore the people and notice state for both the present and absent cases."
+          },
+          {
+            "id": "a2",
+            "text": "Alternately loading two campaigns with different peoples and worlds keeps each one correct."
+          },
+          {
+            "id": "a3",
+            "text": "Loading a pre-epic save behaves as documented and tested."
+          }
+        ],
+        "body": "Save the player's people id and whether the kin notice was shown, alongside the world identity. A cold load restores both and never shows the notice again. Test saves made before this epic (world-restricted creation) against the FWGC binding rules and document what happens. A mismatched world still refuses before simulation.\n\nExecution contract: Listed output paths are proposed implementation contracts, not delivered files. Read the saved epic and accepted prerequisite artifacts first. One worker owns the listed source paths; one integration owner controls the shared game install, test saves and module deploy, and live game probes are queued, never raced. Evidence names the exact game build, producer commit, request, world and save identities.",
+        "capability": {
+          "constraints": {
+            "dataLocation": "local game and repository",
+            "environments": [
+              "local"
+            ],
+            "maxCostUsd": null,
+            "maxDurationMinutes": null
+          },
+          "context": {
+            "estimatedInputTokens": 30000,
+            "requiredArtifacts": [
+              "docs/peoples.md"
+            ]
+          },
+          "modalities": [
+            "text"
+          ],
+          "preferences": {
+            "autonomy": null,
+            "cost": null,
+            "latency": null,
+            "modelOverride": null,
+            "quality": null
+          },
+          "reasoning": {
+            "effort": "medium",
+            "level": "multi_step",
+            "rationale": "Extend existing save/world binding with two fields and migration behaviour."
+          },
+          "skills": [
+            "csharp",
+            "bannerlord-campaign",
+            "serialization"
+          ],
+          "tools": [
+            "repo_read",
+            "repo_write",
+            "shell",
+            "test_execution"
+          ],
+          "workType": "implementation"
+        },
+        "expectedArtifacts": [
+          "evidence/peoples-creator/save-binding.json"
+        ],
+        "id": "tk_01m513zy42n56p8av7cabpy5zx",
+        "key": "MMR-211",
+        "optional": false,
+        "priority": "high",
+        "references": [],
+        "size": "small",
+        "tags": [
+          "peoples-creator",
+          "implementation",
+          "saves"
+        ],
+        "title": "Bind the player's people and kin notice to saves"
+      },
+      {
+        "acceptanceCriteria": [
+          {
+            "id": "a1",
+            "text": "All 12 runs complete creation into MapState with the chosen people recorded."
+          },
+          {
+            "id": "a2",
+            "text": "Present and absent seeds are exercised with start and notice assertions, through save and cold load."
+          },
+          {
+            "id": "a3",
+            "text": "Evidence records build, producer, request, world and save identities and timings; any failure stays failed."
+          }
+        ],
+        "body": "Extend the autorun probes (`GeneratedCampaignBootProbe`, `DiagnosticSandboxBootstrap`) to drive the creator once per people with generation during creation, into MapState. Include at least one fixed seed where the chosen people is present and one where it is absent, assert the start and the notice, then save and cold-load. Record build, producer, request, world and save identities and generation and creator timings.\n\nExecution contract: Listed output paths are proposed implementation contracts, not delivered files. Read the saved epic and accepted prerequisite artifacts first. One integration owner controls the shared game install, test saves and module deploy; live game probes are queued, never raced. Probes are fail-soft and dismiss Bannerlord Safe Mode and crash dialogs automatically. Any observed failure stays failed.",
+        "capability": {
+          "constraints": {
+            "dataLocation": "local game and repository",
+            "environments": [
+              "local"
+            ],
+            "maxCostUsd": null,
+            "maxDurationMinutes": null
+          },
+          "context": {
+            "estimatedInputTokens": 40000,
+            "requiredArtifacts": [
+              "docs/peoples.md",
+              "docs/world-setup.md"
+            ]
+          },
+          "modalities": [
+            "text",
+            "images"
+          ],
+          "preferences": {
+            "autonomy": null,
+            "cost": null,
+            "latency": null,
+            "modelOverride": null,
+            "quality": null
+          },
+          "reasoning": {
+            "effort": "medium",
+            "level": "multi_step",
+            "rationale": "Drive the live game through 12 creator runs and two seed cases with assertions."
+          },
+          "skills": [
+            "csharp",
+            "bannerlord-campaign",
+            "test-automation"
+          ],
+          "tools": [
+            "repo_read",
+            "repo_write",
+            "shell",
+            "test_execution"
+          ],
+          "workType": "testing"
+        },
+        "expectedArtifacts": [
+          "evidence/peoples-creator/twelve-peoples-scenario.json"
+        ],
+        "id": "tk_01m513zy42my3xqswjam53jns6",
+        "key": "MMR-212",
+        "optional": false,
+        "priority": "high",
+        "references": [
+          {
+            "hash": null,
+            "kind": "file",
+            "label": "Probe runner",
+            "location": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\tools\\Invoke-InGameProbe.ps1",
+            "remoteOnly": false
+          }
+        ],
+        "size": "medium",
+        "tags": [
+          "peoples-creator",
+          "testing"
+        ],
+        "title": "Automate the 12-people creation scenario"
+      }
+    ]
+  },
+  "contentHash": "sha256:9586a942b7540281f21276c82a4cfb091fd91f143b83d418605249a4fd766199",
+  "createdAt": "2026-10-16T03:05:21.376Z",
+  "epicId": "ep_01m513vch3mz0md6eqybvt1nmh",
+  "format": "darkmechanicus.plan-snapshot",
+  "formatVersion": 1,
+  "number": 2,
+  "revisionId": "rv_01m51aqppzca1g5yh2twn22w9w",
+  "savedAt": "2026-10-16T03:05:21.376Z"
+}

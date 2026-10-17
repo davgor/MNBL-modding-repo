@@ -1,0 +1,97 @@
+{
+  "schemaVersion": 1,
+  "status": "accepted-focused-static-workload-review-runtime-pending",
+  "utc": "2026-10-17T10:04:20.3351155Z",
+  "reviewer": "/root/workload_review",
+  "scope": "Cavalry, ranged, sustained workload implementation only. Excludes public spawn admission implementation and patcher, deployment, native pool patch safety and runtime acceptance.",
+  "sources": [
+    {
+      "sha256": "cbc908148a83dafcc4c65a564a9514edd73f5fa91121a814fdcdad5a05913b4f",
+      "path": "src/MNBL.BattleScale/NativePoolProbeMission.cs"
+    },
+    {
+      "sha256": "41ffcc1abcd7b39ec5cb12ffa326dda77561b6a7c14312d27029dae18240f010",
+      "path": "src/MNBL.BattleScale/Core/NativeProbeWorkload.cs"
+    },
+    {
+      "sha256": "6c72f9d27289318c6a7819b23ec7dcb9a53c269c83af714ceabd380896a0c664",
+      "path": "tests/BattleScale/NativeWorkloadTests.cs"
+    },
+    {
+      "sha256": "5e3191e7388e3a8314d7a055ef5c529d40de0a26f171b98cc8f1d9bbf6d09e73",
+      "path": "src/MNBL.BattleScale/Core/NativePoolProbeCompletion.cs"
+    }
+  ],
+  "tests": [
+    {
+      "kind": "independent-standalone-core-compile-and-run",
+      "command": "Roslyn csc /langversion:7.3 /warnaserror+ NativeProbeWorkload.cs NativeWorkloadTests.cs, isolated output",
+      "targetGameExecuted": false,
+      "assertions": 27,
+      "result": "passed"
+    }
+  ],
+  "findings": [
+    {
+      "status": "resolved",
+      "description": "Resource counter failures previously recorded only an error string and did not block sustained performance acceptance.",
+      "resolution": "NativeResourceCoverage now requires positive memory samples, at least two valid CPU deltas, at least ceil(duration/5) samples, coverage of start/end, and no invalid sample or resourceSamplingError. Combat CPU baseline resets; final forced sample precedes acceptance.",
+      "id": "W1",
+      "severity": "medium"
+    },
+    {
+      "status": "resolved-by-scope-and-stock-lifecycle-evidence",
+      "description": "Historical deleted wrappers are not part of survivor Mission-null verification. Initial recommendation to require every historical Mission reference null was withdrawn after reading stock lifecycle IL.",
+      "resolution": "Survivors-only null gate retained; report explicitly names scope. All-created count is descriptive. No native-property access to historic deleted wrappers.",
+      "id": "W2",
+      "severity": "coverage"
+    }
+  ],
+  "reviewedContracts": [
+    "Cavalry uses 2 physical slots per human, validates actual rider/mount backlinks and 2040 mounted pairs at combat start; even staging threshold 2042 crosses old limit.",
+    "Recycle selects 32 complete cavalry pairs or 64 foot agents, marks all 64 retiring before FadeOut, and verifies exactly 64 callback-released and 64 reused unique indices per requested cycle.",
+    "Cavalry and foot populations are registered individually with duplicate/index bounds and actual AllAgents delta checks.",
+    "Ranged requires bow/arrows and at least two registered human shooters producing actual missile callbacks; no synthetic shooting or casualty counts.",
+    "Sustained duration uses Stopwatch wall time; mission-screen intervals after warmup require observed duration coverage and no sample truncation. Median/p95/p99/max and mean FPS tests cover a known 1000ms outlier.",
+    "Resource counters include private bytes, working set, CPU core equivalents, entity counts, secondary metadata and combat counts.",
+    "Teardown requires all four callbacks, finalized mission pointer, null current mission/state, AllAgents cleared and surviving Agent.Mission cleared over stable application ticks."
+  ],
+  "lifecycleEvidence": {
+    "assemblySha256": "19387f31557ff840d14f378f6bbdf1d58fcff406ab9ff2294dfbb3e49a50b87e",
+    "mvid": "4267abec-e4ba-4746-94b7-47cbe3ba79f8",
+    "assemblyPath": "D:/SteamLibrary/steamapps/common/Mount & Blade II Bannerlord/bin/Win64_Shipping_Client/TaleWorlds.MountAndBlade.dll",
+    "onDeleteIl": [
+      "IL_0000: ldarg.0",
+      "IL_0001: ldc.i4.1",
+      "IL_0002: stfld System.Boolean TaleWorlds.MountAndBlade.Agent::_isDeleted",
+      "IL_0007: ldarg.0",
+      "IL_0008: ldnull",
+      "IL_0009: call System.Void TaleWorlds.MountAndBlade.Agent::set_MissionPeer(TaleWorlds.MountAndBlade.MissionPeer)",
+      "IL_000e: ret"
+    ],
+    "endMissionSurvivorClearIl": [
+      "IL_00af: ldarg.0",
+      "IL_00b0: call TaleWorlds.MountAndBlade.Missions.AgentReadOnlyList TaleWorlds.MountAndBlade.Mission::get_AllAgents()",
+      "IL_00b5: callvirt System.Collections.Generic.List`1/Enumerator<!0> System.Collections.Generic.List`1<TaleWorlds.MountAndBlade.Agent>::GetEnumerator()",
+      "IL_00ba: stloc.3",
+      "IL_00bb: br.s IL_00cf",
+      "IL_00bd: ldloca.s V_3",
+      "IL_00bf: call !0 System.Collections.Generic.List`1/Enumerator<TaleWorlds.MountAndBlade.Agent>::get_Current()",
+      "IL_00c4: dup",
+      "IL_00c5: callvirt System.Void TaleWorlds.MountAndBlade.Agent::OnDelete()",
+      "IL_00ca: callvirt System.Void TaleWorlds.MountAndBlade.Agent::Clear()",
+      "IL_00cf: ldloca.s V_3",
+      "IL_00d1: call System.Boolean System.Collections.Generic.List`1/Enumerator<TaleWorlds.MountAndBlade.Agent>::MoveNext()",
+      "IL_00d6: brtrue.s IL_00bd"
+    ],
+    "conclusion": "Stock OnDelete does not clear Mission. EndMissionInternal clears remaining AllAgents. Historic deleted wrappers must not be subjected to survivor-null ownership criteria."
+  },
+  "limitations": [
+    "Read-only static review and engine-independent tests do not establish cavalry/ranged correctness in game or performance; root must execute both runtime profiles.",
+    "Frame intervals include probe, OS and render-loop overhead and are not GPU timing. No stock baseline comparison performed.",
+    "A 300-second battle allows normal attrition; it is not a guarantee of a constant full-capacity population or continuous ranged fire. Counts and last-shot timing remain reported.",
+    "No additional safety claim for secondary-pool runtime allocation or native asynchronous renderer ordering.",
+    "The 27 helper assertions do not simulate engine callbacks; actual 64-slot recycle, ownership and missile behavior are runtime gates."
+  ],
+  "openBlockingFindings": []
+}

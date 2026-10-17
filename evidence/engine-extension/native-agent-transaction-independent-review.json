@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "status": "accepted-isolated-transaction-storage-publication-and-lifetime",
+  "reviewedReceipt": {
+    "path": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\evidence\\engine-extension\\native-agent-transaction-storage.json",
+    "sha256": "098831ca5fa5073d3ba8acecc4d5c40e9f4fa0e97ef150dba0fd32267609a825"
+  },
+  "sources": {
+    "src/MNBL.AgentStorage/NativeAgentTransactionStorage.hpp": "d841c488922dffa5a68d986e3be255f030c270fc3ce5bcbbba82d6366b8d79b2",
+    "src/MNBL.AgentStorage/OwnedNativeAgentStorage.hpp": "48ed25a67d5f796d69bece7c63b9c4bdd3430249da910fa600b12bc403e5fe8d",
+    "src/MNBL.AgentStorage/NativeElementFactory.hpp": "50a28d26a76edc95b5e059b4e036c936cddd8679b10719215b7b4201e146420d",
+    "src/MNBL.AgentStorage/AgentDomainStorage.hpp": "c5d9ee96a5109438fdfff03287ee8f8a32130835212afef47f2b2044638b5274",
+    "src/MNBL.AgentStorage/StableAgentStorage.hpp": "34555749bbfdf9ad318a02aea660f36cfe57ee9183e856df48c216ebf8503458",
+    "tests/AgentStorage/native_agent_transaction_tests.cpp": "e2cbb865517bf84207e623c9fbca5ec3ce57d0912eb5dbef787ba6d8fbbcbd7e",
+    "tools/battle-scale/Test-NativeAgentTransactions.cmd": "4ca4338dfd2c3b580b851fe94857efd71757277d7e504332bcadb9f0e029751b",
+    "tools/battle-scale/verify_native_agent_transactions.py": "b7765ac46dfec5e7c4978f86910f48460419350302b56257c34959e65a75c60d",
+    "evidence/engine-extension/native-agent-allocation-independent-review.json": "dad72cbc5558526044e3ca34fc841c4b3a3d702984434b763ecbfc144ac19c51",
+    "build/agent-storage/native_agent_transaction_tests.exe": "c84c9ddb61b5601cb2c7e9c6326b88d49eef408ebd9e1bcc9f888da7e17b0654",
+    "build/agent-storage/native_agent_transaction_asan.exe": "2b5787af8db69918ffd9f2af8c9252f86cb9d2fe3d5173dcd30bc5595e93f0ad",
+    "tests/AgentStorage/native_agent_transaction_review.cpp": "27cdbd75511c45a35c0f10b23bb1cf5e06a2830539bfa1143cb6bd0f7c16bf46",
+    "tools/battle-scale/Test-NativeAgentTransactionsReview.cmd": "99cf9aad5f8b2e6eb46de5209c3cfce916fd16e192b4d73e68a8cdc9b34c479e",
+    "tools/battle-scale/review_native_agent_transactions.py": "aa072e75d55ac1ed56fd7a2c963a5063f4d5225edd2743a645d7d7f2489808fe"
+  },
+  "execution": {
+    "exitCode": 0,
+    "stdout": "native_agent_transaction_review.cpp\nPASS native-transaction fixtures assertions=5004 resets=753 cleanups=753 failures=35\nPASS independent concurrent transactions:4workers;2000 acquire/release pairs;57growth steps;1003slots;stablefirstblock;2002balancedtransitions\nnative_agent_transaction_review.cpp\nPASS native-transaction fixtures assertions=5004 resets=753 cleanups=753 failures=35\nPASS independent concurrent transactions:4workers;2000 acquire/release pairs;57growth steps;1003slots;stablefirstblock;2002balancedtransitions\n",
+    "stderr": ""
+  },
+  "outputs": {
+    "build/agent-storage/native_agent_transaction_review.exe": "7b6dde39771e4fca0aa7ea4c3831f433912f7c5002fd59cab78588f196979b80",
+    "build/agent-storage/native_agent_transaction_review_asan.exe": "9a409a18c28b07f7dc7f4bf03b7f97ccc9304cee4908479f4c3ab5de64f999b8"
+  },
+  "additionalPerBuild": {
+    "workerThreads": 4,
+    "acquireReleasePairs": 2000,
+    "concurrentGrowthSteps": 57,
+    "finalCapacity": 1003,
+    "balancedTransitions": 2002
+  },
+  "manualReview": [
+    "Lease member order unlocks inner storage then outer gate before releasing the retained Owner. Moved-from leases remain destructible; no assignment can replace owner under an old lock.",
+    "All mutation uses exclusive outer gate; reset finishes before any wrapper reader sees acquired identity. Cleanup sees still-valid identity and completes before backend release.",
+    "Both heaps reserve physical capacity before backend growth. Failed reserve/backend construction changes only spare capacity. Adoption stages heaps before backend commit, then swaps without allocation.",
+    "Invalid/stale/domain-invalid handles never call cleanup. Retired generation policy matches backend: max-generation live handle is not reinserted on release.",
+    "Close and final-owner destruction drain both domains before default destructors, with persistent transition and module owners retained. Release/drain does not allocate.",
+    "Min-heap deletion and backend explicit-index removal remain linear operations; this is a correctness integration step, not production scaling approval."
+  ],
+  "openFindings": [],
+  "limitations": [
+    "Transitions and constructors in these fixtures are synthetic; no engine activation/removal adapter is certified.",
+    "Gate covers only wrapper clients. Engine job barriers, all native access routing and lifetime of escaped native pointers are unresolved.",
+    "Concurrent stress uses host synchronization and ASAN, not a race detector or exhaustive interleaving proof.",
+    "Callback failure/reentrancy is forbidden by contract, not recovered. Arbitrary SEH is not contained.",
+    "Occupied adoption remains a fixture API; real attachment must use a proved lifecycle boundary."
+  ],
+  "gameLaunched": false,
+  "enginePatchApproved": false
+}

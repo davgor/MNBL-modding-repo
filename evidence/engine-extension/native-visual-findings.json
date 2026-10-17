@@ -1,0 +1,46 @@
+{
+  "artifactSha256": "2a5e0e0b15513ebb7052d747a621b82c50ee834553eba283b33bbbc33766e12a",
+  "registrationEvidence": "ev_9e9945bb81c2694f4088be078e0583675691e0d2cfd346c408cc24fb86f5c2b8",
+  "callbackMapping": [
+    {
+      "site": "0x180643dd4",
+      "address": "0x1806f93b0",
+      "id": 96
+    },
+    {
+      "site": "0x1806449a4",
+      "address": "0x180047bd0",
+      "id": 264
+    },
+    {
+      "site": "0x180644a10",
+      "address": "0x1806fb5e0",
+      "id": 270
+    },
+    {
+      "site": "0x180644c1a",
+      "address": "0x1806fdb60",
+      "id": 299
+    },
+    {
+      "site": "0x180644d28",
+      "address": "0x1806fbdd0",
+      "id": 314
+    },
+    {
+      "site": "0x180644db8",
+      "address": "0x1806fb730",
+      "id": 322
+    }
+  ],
+  "observations": [
+    "Managed callback id96 GetMaximumNumberOfAgents registers VA0x1806f93b0. Native bytes b8 f8 07 00 00 c3 encode MOV EAX,2040; RET. Ghidra did not establish a function boundary for this leaf; bytes and registration are independently retained.",
+    "CreateAgentVisuals id270 registers0x1806fb5e0; allocates0x9c0 bytes then calls0x18061c480 which assigns Agent_visuals vftable. No 2040 comparison occurs in these two inspected bodies; callees and global limits are not fully traced.",
+    "BatchLastLodMeshes id264 points to0x180047bd0, whose inspected body returns immediately. The exposed API is a no-op in this installed build."
+  ],
+  "limitations": [
+    "No agent-cap patch, live detour or complete shared-renderer limit audit performed.",
+    "Addresses are analysis VAs at image base0x180000000, not ASLR runtime addresses.",
+    "Decompiled signatures and type names are inferred; not safe ABIs for invoking native code."
+  ]
+}

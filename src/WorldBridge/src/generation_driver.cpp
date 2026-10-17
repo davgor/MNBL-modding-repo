@@ -3,6 +3,7 @@
 #include "worldbridge/attempt_schedule.hpp"
 #include "worldbridge/protocol.hpp"
 #include "worldbridge/source_world.hpp"
+#include "worldbridge/travel_graph.hpp"
 
 #define NOMINMAX
 #define WIN32_LEAN_AND_MEAN
@@ -12,8 +13,10 @@
 #include <cctype>
 #include <charconv>
 #include <fstream>
+#include <utility>
 #include <iostream>
 #include <map>
+#include <optional>
 #include <sstream>
 #include <stdexcept>
 
@@ -133,6 +136,9 @@ std::uint64_t max_quality_attempts(const fs::path& product_policy) {
 }
 
 const char* const required_policies[] = {"product-policy", "world-quality", "source-compatibility"};
+// Optional static travel gate (MMR-28): a request that binds "playability" binds all six and each attempt's world is
+// compiled in memory; a travel rejection is a quality reason, retried only when world-quality declares its code.
+const char* const travel_policies[] = {"projection", "terrain-materials", "terrain-import", "campaign-content", "culture-presentations", "playability"};
 
 std::string summary(const State& s) {
     Value v = Value::object();
@@ -161,7 +167,8 @@ fs::path attempt_dir(const fs::path& work, const std::string& request_id, int in
 
 int generate_main(const std::vector<std::string>& args) {
     const char* usage = "Usage: worldbridge --generate --request REQ --state STATE --work DIR --lock LOCK --producer EXE --seed-width SEED_WIDTH "
-                        "--policies product-policy=P,world-quality=Q,source-compatibility=C [--threads N] [--cancel-file F] [--timeout-ms N]";
+                        "--policies product-policy=P,world-quality=Q,source-compatibility=C[,projection=..,terrain-materials=..,terrain-import=..,campaign-content=..,culture-presentations=..,playability=..] "
+                        "[--threads N] [--cancel-file F] [--timeout-ms N]";
     auto o = options(args, {"--request", "--state", "--work", "--lock", "--producer", "--seed-width", "--policies", "--threads", "--cancel-file", "--timeout-ms"}, usage);
     for (const char* k : {"--request", "--state", "--work", "--lock", "--producer", "--seed-width", "--policies"}) if (!o.count(k)) throw std::runtime_error(usage);
     // Everything that can be a usage error is decided before the state is touched.
@@ -176,6 +183,13 @@ int generate_main(const std::vector<std::string>& args) {
     for (const char* name : required_policies)
         if (!request.policy_sha256.count(name) || !policies.count(name))
             throw json::Error("missing_field", std::string("The request and --policies must both bind '") + name + "'", json::Location{json::utf8(path_arg(o["--request"])), 0, 1, 1, "$.policies"});
+    std::optional<travel::Policies> travel_gate;
+    if (policies.count("playability")) {
+        for (const char* name : travel_policies)
+            if (!request.policy_sha256.count(name) || !policies.count(name))
+                throw json::Error("missing_field", std::string("A request that binds 'playability' must bind '") + name + "' too", json::Location{json::utf8(path_arg(o["--request"])), 0, 1, 1, "$.policies"});
+        travel_gate = travel::Policies{policies.at("projection"), policies.at("terrain-materials"), policies.at("terrain-import"), policies.at("campaign-content"), policies.at("culture-presentations"), policies.at("playability")};
+    }
     if (fs::exists(state_file)) {
         const State existing = load_state(state_file);
         if (existing.request_id == request.request_id && (existing.status == "accepted" || existing.status == "exhausted" || existing.status == "failed")) {
@@ -250,6 +264,39 @@ int generate_main(const std::vector<std::string>& args) {
             if (harbours < quality.min_harbour_hamlets) result.reasons.push_back({"quality.too_few_harbours", std::to_string(harbours) + " harbour hamlets, need " + std::to_string(quality.min_harbour_hamlets)});
             if (world.castles.size() < quality.min_castles) result.reasons.push_back({"quality.too_few_castles", std::to_string(world.castles.size()) + " castles, need " + std::to_string(quality.min_castles)});
             if (!result.reasons.empty()) { result.failure = Failure::quality; return result; }
+            if (travel_gate) {
+                try {
+                    const auto travel = travel::run(world, dir / "world" / "world.json", *travel_gate);
+                    // Every attempt keeps its travel outputs as evidence; a rejection names its UIDs there and in the reason.
+                    const fs::path out_dir = dir / "travel";
+                    fs::create_directories(out_dir);
+                    for (const auto& [name, bytes] : {std::pair<const char*, const std::string*>{"travel-graph.json", &travel.graph}, {"ports.json", &travel.ports},
+                                                      {"cells.bin", &travel.cells}, {"campaign.json", &travel.campaign}}) {
+                        std::ofstream out(out_dir / name, std::ios::binary | std::ios::trunc);
+                        out.write(bytes->data(), static_cast<std::streamsize>(bytes->size()));
+                        if (!out) throw std::runtime_error("Cannot write the attempt's travel outputs");
+                    }
+                    if (travel.result.status != "ok") {
+                        for (const auto& r : travel.result.reasons) {
+                            std::string described = r.message;
+                            if (!r.uids.empty()) {
+                                described += " [uids:";
+                                for (std::size_t i = 0; i < r.uids.size() && i < 20; ++i) described += " " + r.uids[i];
+                                if (r.uids.size() > 20) described += " (+" + std::to_string(r.uids.size() - 20) + " more in travel/travel-graph.json)";
+                                described += "]";
+                            }
+                            result.reasons.push_back({r.code, described});
+                        }
+                        result.failure = Failure::quality;
+                        return result;
+                    }
+                } catch (const json::Error& e) {
+                    // A compiler refusal is not a world-quality outcome: the generation fails at once.
+                    result.failure = Failure::parser;
+                    result.reasons.push_back({"compiler." + e.code, e.message});
+                    return result;
+                }
+            }
             result.world_content_id = identity::world_content({{"source", dir / "world"}}).id;
         } catch (const json::Error& e) {
             result.failure = Failure::parser;
@@ -263,14 +310,19 @@ int generate_main(const std::vector<std::string>& args) {
 }
 
 int new_request_main(const std::vector<std::string>& args) {
-    const char* usage = "Usage: worldbridge --new-request --out FILE --instance UUID (--seed N | --random 1) --overrides JSON_FILE --lock LOCK "
+    const char* usage = "Usage: worldbridge --new-request --out FILE --instance UUID (--seed N [--seed-source explicit|random] | --random 1) --overrides JSON_FILE --lock LOCK "
                         "--policies product-policy=P,world-quality=Q,source-compatibility=C --max-attempts N";
-    auto o = options(args, {"--out", "--instance", "--seed", "--random", "--overrides", "--lock", "--policies", "--max-attempts"}, usage);
+    auto o = options(args, {"--out", "--instance", "--seed", "--seed-source", "--random", "--overrides", "--lock", "--policies", "--max-attempts"}, usage);
     for (const char* k : {"--out", "--instance", "--overrides", "--lock", "--policies", "--max-attempts"}) if (!o.count(k)) throw std::runtime_error(usage);
     if (o.count("--seed") == o.count("--random")) throw std::runtime_error("Give exactly one of --seed and --random\n" + std::string(usage));
     if (o.count("--random") && o["--random"] != "1") throw std::runtime_error("--random takes the value 1");
     if (!identity::valid_uuid(o["--instance"])) throw std::runtime_error("--instance must be a lowercase RFC 4122 UUID (campaignInstanceId)");
+    // MMR-44: --seed-source random records a seed the host itself drew from the OS CSPRNG before acceptance (the setup screen's Random
+    // World shows the seed before generating); it is provenance only (ConfigurationId excludes seedSource).
+    if (o.count("--seed-source") && (o.count("--random") || (o["--seed-source"] != "explicit" && o["--seed-source"] != "random")))
+        throw std::runtime_error("--seed-source takes explicit or random, and only with --seed\n" + std::string(usage));
     const bool random = o.count("--random") != 0;
+    const std::string seed_source = random ? "random" : (o.count("--seed-source") ? o["--seed-source"] : std::string("explicit"));
     const std::uint64_t seed = random ? identity::new_request_seed() : decimal(o["--seed"], 0, identity::max_seed, "--seed");
     const int attempts = static_cast<int>(decimal(o["--max-attempts"], 1, identity::max_attempt_ceiling, "--max-attempts"));
     // Only requests --generate can run: the three bound policies, within the product policy's attempt ceiling.
@@ -282,7 +334,7 @@ int new_request_main(const std::vector<std::string>& args) {
         throw std::runtime_error("--max-attempts " + std::to_string(attempts) + " exceeds the product policy's maxQualityAttempts " + std::to_string(ceiling));
     std::map<std::string, std::string> hashes;
     for (const auto& [name, path] : policies) hashes[name] = cjson::sha256_file_hex(path);
-    const std::string text = identity::build_request(o["--instance"], random ? "random" : "explicit", static_cast<std::uint32_t>(seed), cjson::parse(path_arg(o["--overrides"])),
+    const std::string text = identity::build_request(o["--instance"], seed_source, static_cast<std::uint32_t>(seed), cjson::parse(path_arg(o["--overrides"])),
                                                      cjson::sha256_file_hex(path_arg(o["--lock"])), hashes, attempts);
     // An accepted request is never overwritten, and only a request that validates is ever published at --out.
     const fs::path out_path = path_arg(o["--out"]), pending = out_path.wstring() + L".pending";

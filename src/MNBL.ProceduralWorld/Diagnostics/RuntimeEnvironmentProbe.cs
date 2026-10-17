@@ -15,6 +15,7 @@ using TaleWorlds.CampaignSystem.Party;
 using TaleWorlds.CampaignSystem.Settlements;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
+using MNBL.ProceduralWorld.Surface;
 
 namespace MNBL.ProceduralWorld.Diagnostics
 {
@@ -51,7 +52,7 @@ namespace MNBL.ProceduralWorld.Diagnostics
                 previousClimate = previousBootstrap = null; previousCandidates = null;
             }
             var campaign = Campaign.Current;
-            var map = campaign.MapSceneWrapper as DiagnosticMapScene;
+            var map = campaign.MapSceneWrapper as GeneratedMapScene;
             if (climate == null || map == null) { failures.Add("The world has no generated climate (placement 'climate') or no owned map scene."); yield break; }
             row["pattern"] = climate.Pattern; row["windVector"] = new[] { climate.WindVector.X, climate.WindVector.Y };
             var scene = (IMapScene)map;
@@ -103,7 +104,7 @@ namespace MNBL.ProceduralWorld.Diagnostics
             catch (Exception e) { section["error"] = e.ToString(); failures.Add(name + ": " + e.GetType().Name + ": " + e.Message); }
         }
 
-        private static IEnumerable<string> Contract(Dictionary<string, object> r, DiagnosticMapScene map, GeneratedClimate climate, float extent)
+        private static IEnumerable<string> Contract(Dictionary<string, object> r, GeneratedMapScene map, GeneratedClimate climate, float extent)
         {
             var wind = (float[])WindField.GetValue(map); var precipitation = (byte[])PrecipitationField.GetValue(map);
             int width = (int)WidthField.GetValue(map), height = (int)HeightField.GetValue(map);
@@ -115,7 +116,7 @@ namespace MNBL.ProceduralWorld.Diagnostics
             r["terrainSize"] = new[] { ((IMapScene)map).GetTerrainSize().X, ((IMapScene)map).GetTerrainSize().Y };
             r["bounds"] = new[] { Campaign.MapMinimumPosition.X, Campaign.MapMinimumPosition.Y, Campaign.MapMaximumPosition.X, Campaign.MapMaximumPosition.Y };
             r["weatherModel"] = Campaign.Current.Models.MapWeatherModel.GetType().FullName;
-            r["binding"] = "SandBox.MapScene private fields written in DiagnosticMapScene.Load before MapWeatherModel.InitializeCaches (GeneratedMapSupport.PrepareWeather)";
+            r["binding"] = "SandBox.MapScene private fields written in GeneratedMapScene.Load before MapWeatherModel.InitializeCaches (GeneratedMapSupport.PrepareWeather)";
             if (windSha != climate.WindSha256) yield return "The scene's wind field is not the generated field.";
             if (precipitationSha != climate.PrecipitationSha256) yield return "The scene's snow/rain field is not the generated field.";
             if (width != GeneratedClimate.WeatherDimension || height != GeneratedClimate.WeatherDimension) yield return "Snow/rain dimensions differ.";
@@ -123,7 +124,7 @@ namespace MNBL.ProceduralWorld.Diagnostics
             if (Math.Abs(Campaign.MapMaximumPosition.X - extent) > .01f || Math.Abs(Campaign.MapMaximumPosition.Y - extent) > .01f) yield return "Campaign bounds are not this world's extent.";
         }
 
-        private static IEnumerable<string> Wind(Dictionary<string, object> r, DiagnosticMapScene map, MapWeatherModel weather, GeneratedClimate climate, Vec2[] points)
+        private static IEnumerable<string> Wind(Dictionary<string, object> r, GeneratedMapScene map, MapWeatherModel weather, GeneratedClimate climate, Vec2[] points)
         {
             var samples = new List<object>(); r["samples"] = samples;
             var problems = new List<string>();
@@ -175,7 +176,7 @@ namespace MNBL.ProceduralWorld.Diagnostics
         }
 
         // The open-sea storm spawn area: NavalDLC keeps the weather-node positions that lie on OpenSea faces.
-        private static IEnumerable<string> StormArea(Dictionary<string, object> r, IMapScene scene, DiagnosticMapScene map, float extent)
+        private static IEnumerable<string> StormArea(Dictionary<string, object> r, IMapScene scene, GeneratedMapScene map, float extent)
         {
             var problems = new List<string>();
             var behaviorType = HarmonyLib.AccessTools.TypeByName("NavalDLC.CampaignBehaviors.StormCampaignBehavior");
@@ -406,7 +407,7 @@ namespace MNBL.ProceduralWorld.Diagnostics
             return null;
         }
 
-        private static IEnumerable<string> Switch(Dictionary<string, object> r, DiagnosticMapScene map, Campaign campaign, GeneratedClimate climate, float extent, string worldId)
+        private static IEnumerable<string> Switch(Dictionary<string, object> r, GeneratedMapScene map, Campaign campaign, GeneratedClimate climate, float extent, string worldId)
         {
             var problems = new List<string>();
             if (previousMap == null) { r["first"] = true; return problems; }
@@ -452,7 +453,7 @@ namespace MNBL.ProceduralWorld.Diagnostics
             if (alive.Count != 0) yield return "Still alive after three full collections: " + String.Join(", ", alive) + ".";
         }
 
-        private static void Remember(DiagnosticMapScene map, Campaign campaign, GeneratedClimate climate, string worldId, Dictionary<string, object> row,
+        private static void Remember(GeneratedMapScene map, Campaign campaign, GeneratedClimate climate, string worldId, Dictionary<string, object> row,
             DiagnosticSandboxBootstrap boot)
         {
             previousClimate = new WeakReference(climate); previousBootstrap = new WeakReference(boot);

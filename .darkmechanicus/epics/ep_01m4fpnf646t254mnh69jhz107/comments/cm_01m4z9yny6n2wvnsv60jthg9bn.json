@@ -1,0 +1,13 @@
+{
+  "author": {
+    "label": "Claude Code",
+    "role": "orchestrator"
+  },
+  "body": "**Open observation from MMR-30 (village trade bounds after a load).**\n\nIn a new generated game, each village is in its bound town's `Town.TradeBoundVillages` right after registration and still at the visible paused map (run 11432, both worlds).\n\nAfter a cold-restart load of the same saves, the towns' `TradeBoundVillages` did **not** list their villages at `saved_game_loaded` (run 2244, `evidence/runtime/in-game/generated_save_load-2244.json`, both worlds, 4 villages).\n\n`Village.Deserialize` (installed IL) removes and re-adds the trade-bound link on a saved-campaign replay, but only when `Bound.IsTown`. The campaign may also re-derive trade bounds after a load. It is unresolved whether vanilla rebuilds them later, or whether a generated load loses them.\n\nThe registry (MMR-30) therefore checks the trade-bound link only at new-game registration. Village trade and economy (MMR-33) should confirm the post-load trade-bound state, for example by comparing `Village.TradeBound` before saving and after loading, and own any fix.",
+  "createdAt": "2026-10-15T08:13:12.518Z",
+  "epicId": "ep_01m4fpnf646t254mnh69jhz107",
+  "format": "darkmechanicus.comment",
+  "formatVersion": 1,
+  "id": "cm_01m4z9yny6n2wvnsv60jthg9bn",
+  "ticketId": "tk_01m4fqfbgksgbv7xng77fw11jg"
+}

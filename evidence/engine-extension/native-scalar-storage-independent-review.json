@@ -1,0 +1,952 @@
+{
+  "schemaVersion": 1,
+  "status": "accepted-isolated-scalar-adapters-not-game-hooks",
+  "reviewedIntegration": {
+    "path": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\evidence\\engine-extension\\native-scalar-storage-integration.json",
+    "sha256": "762d0130b1a79e9ee45174a3bc55787eb4044c8312743528666b02d6251d8fb5"
+  },
+  "reviewedRouteCatalog": {
+    "path": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\evidence\\engine-extension\\native-simple-agent-operation-routes.json",
+    "sha256": "fb5e74eff6c0086c97bfc75da29db2768fce1047ac15aacdb0557933116f2516",
+    "fullReadOnlyReplayMatched": true,
+    "routes": [
+      {
+        "site": 0,
+        "multiplyRva": "0x5c4032",
+        "originalInstructionBytesAndOwnerRecordVerified": true,
+        "productIndexMissionDistinct": true,
+        "continuationFlagsDead": true
+      },
+      {
+        "site": 1,
+        "multiplyRva": "0x5c55c0",
+        "originalInstructionBytesAndOwnerRecordVerified": true,
+        "productIndexMissionDistinct": true,
+        "continuationFlagsDead": true
+      },
+      {
+        "site": 2,
+        "multiplyRva": "0x5d3dac",
+        "originalInstructionBytesAndOwnerRecordVerified": true,
+        "productIndexMissionDistinct": true,
+        "continuationFlagsDead": true
+      },
+      {
+        "site": 3,
+        "multiplyRva": "0x5d3dea",
+        "originalInstructionBytesAndOwnerRecordVerified": true,
+        "productIndexMissionDistinct": true,
+        "continuationFlagsDead": true
+      },
+      {
+        "site": 4,
+        "multiplyRva": "0x5e5e96",
+        "originalInstructionBytesAndOwnerRecordVerified": true,
+        "productIndexMissionDistinct": true,
+        "continuationFlagsDead": true
+      },
+      {
+        "site": 5,
+        "multiplyRva": "0x648262",
+        "originalInstructionBytesAndOwnerRecordVerified": true,
+        "productIndexMissionDistinct": true,
+        "continuationFlagsDead": true
+      },
+      {
+        "site": 6,
+        "multiplyRva": "0x6a59da",
+        "originalInstructionBytesAndOwnerRecordVerified": true,
+        "productIndexMissionDistinct": true,
+        "continuationFlagsDead": true
+      }
+    ]
+  },
+  "reviewedSourceSha256": {
+    "src/MNBL.AgentStorage/AgentDomainStorage.hpp": "c5d9ee96a5109438fdfff03287ee8f8a32130835212afef47f2b2044638b5274",
+    "src/MNBL.AgentStorage/StableAgentStorage.hpp": "34555749bbfdf9ad318a02aea660f36cfe57ee9183e856df48c216ebf8503458",
+    "tools/battle-scale/prepare_segmented_scalar_harness.py": "ac005278fd77d19c385c5d703c3b99a0abeecb1c344ee5ec1cb1eb8a1f675d00",
+    "tests/AgentStorage/native_scalar_harness.cpp": "6ba29910c3b737fc54ebfa53103c6a069d7459e4556cbb15082c6a13a558c798",
+    "tools/battle-scale/Test-NativeScalarHarness.cmd": "4a0b8f303475707fac44555de1ebe1cef5ea3524af9a27e4791aaff2fc5132e3",
+    "tools/battle-scale/verify_native_scalar_harness.py": "32688107bb4765034b9d415ea5ed055d7ff744704f4d8dc934423c4c1dee3f2a",
+    "evidence/engine-extension/native-simple-agent-operation-routes.json": "fb5e74eff6c0086c97bfc75da29db2768fce1047ac15aacdb0557933116f2516"
+  },
+  "verifiedOutputSha256": {
+    "build/agent-storage/scalar_machine_code.hpp": "6b8566845f64dcbf2d16b25331b5d0d6e653fcc0e2cf4fad20c7ea3aacc328f8",
+    "build/agent-storage/native_scalar_harness.exe": "50a40d80fbcc9759fc99228c3a8102c489a4b843f5698f432b0438e20e3d444e",
+    "build/agent-storage/native_scalar_harness_asan.exe": "71f87e3a6d8e1bc20dcae6266fb2d0e9a7a8c7aa63869a53622fb4c516072d0f",
+    "evidence/engine-extension/native-segmented-scalar-replay.json": "0acfadb3a4715f49c0ca17590e1cc2d8f37abb03577f21571074910def49cf84"
+  },
+  "preservedAcceptedInputs": {
+    "tools/battle-scale/prepare_segmented_write_harness.py": "a47b5c69f8304de4c581993d1e3c1cac1596bda0a70b2f89668837670572a581",
+    "tests/AgentStorage/native_write_harness.cpp": "abbcd32675b17e51d26f31df845dcc6c00d2a5aa18be355b9802e5ff8139bcf8",
+    "tools/battle-scale/Test-NativeWriteHarness.cmd": "e251bcb9725ada29340615a5c4398cbac8fd2af66f44e2dd3b6f02563f74a716",
+    "tools/battle-scale/verify_native_write_harness.py": "2dc0433e02ad3eb83441abead51d476e1d1bdca32ecefd287b18a349d401550d",
+    "build/agent-storage/write_machine_code.hpp": "5e2781fc13dfa58720a64c099daab039ffe15fc1c58e7d267eee8c9b2ebbb9c7",
+    "evidence/engine-extension/native-write-storage-integration.json": "d68c5df9246f6b4aa8ada900dd5f58f638061688e7a66a3216268a7b291c55ae",
+    "evidence/engine-extension/native-segmented-write-independent-review.json": "d1381314f5aa9fb6cbad5e4b0021c6a641ddfc3cbdfd06ea86ad609e8111aa9a"
+  },
+  "allVerifiedDependencySha256": {
+    "src/MNBL.AgentStorage/AgentDomainStorage.hpp": "c5d9ee96a5109438fdfff03287ee8f8a32130835212afef47f2b2044638b5274",
+    "src/MNBL.AgentStorage/StableAgentStorage.hpp": "34555749bbfdf9ad318a02aea660f36cfe57ee9183e856df48c216ebf8503458",
+    "tools/battle-scale/prepare_segmented_scalar_harness.py": "ac005278fd77d19c385c5d703c3b99a0abeecb1c344ee5ec1cb1eb8a1f675d00",
+    "tests/AgentStorage/native_scalar_harness.cpp": "6ba29910c3b737fc54ebfa53103c6a069d7459e4556cbb15082c6a13a558c798",
+    "tools/battle-scale/Test-NativeScalarHarness.cmd": "4a0b8f303475707fac44555de1ebe1cef5ea3524af9a27e4791aaff2fc5132e3",
+    "tools/battle-scale/verify_native_scalar_harness.py": "32688107bb4765034b9d415ea5ed055d7ff744704f4d8dc934423c4c1dee3f2a",
+    "evidence/engine-extension/native-simple-agent-operation-routes.json": "fb5e74eff6c0086c97bfc75da29db2768fce1047ac15aacdb0557933116f2516",
+    "build/agent-storage/scalar_machine_code.hpp": "6b8566845f64dcbf2d16b25331b5d0d6e653fcc0e2cf4fad20c7ea3aacc328f8",
+    "build/agent-storage/native_scalar_harness.exe": "50a40d80fbcc9759fc99228c3a8102c489a4b843f5698f432b0438e20e3d444e",
+    "build/agent-storage/native_scalar_harness_asan.exe": "71f87e3a6d8e1bc20dcae6266fb2d0e9a7a8c7aa63869a53622fb4c516072d0f",
+    "evidence/engine-extension/native-segmented-scalar-replay.json": "0acfadb3a4715f49c0ca17590e1cc2d8f37abb03577f21571074910def49cf84",
+    "tools/battle-scale/prepare_segmented_write_harness.py": "a47b5c69f8304de4c581993d1e3c1cac1596bda0a70b2f89668837670572a581",
+    "tests/AgentStorage/native_write_harness.cpp": "abbcd32675b17e51d26f31df845dcc6c00d2a5aa18be355b9802e5ff8139bcf8",
+    "tools/battle-scale/Test-NativeWriteHarness.cmd": "e251bcb9725ada29340615a5c4398cbac8fd2af66f44e2dd3b6f02563f74a716",
+    "tools/battle-scale/verify_native_write_harness.py": "2dc0433e02ad3eb83441abead51d476e1d1bdca32ecefd287b18a349d401550d",
+    "build/agent-storage/write_machine_code.hpp": "5e2781fc13dfa58720a64c099daab039ffe15fc1c58e7d267eee8c9b2ebbb9c7",
+    "evidence/engine-extension/native-write-storage-integration.json": "d68c5df9246f6b4aa8ada900dd5f58f638061688e7a66a3216268a7b291c55ae",
+    "evidence/engine-extension/native-segmented-write-independent-review.json": "d1381314f5aa9fb6cbad5e4b0021c6a641ddfc3cbdfd06ea86ad609e8111aa9a",
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\build\\battle-scale\\native-run-20261017-065749-08e99ed9\\backup-0": "2a5e0e0b15513ebb7052d747a621b82c50ee834553eba283b33bbbc33766e12a",
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\evidence\\engine-extension\\native-live-agent-access-review.json": "b5a0beaa3d4274c01e584975f74107ad0021e3d2197847bc67860d52d6c4bfef",
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\evidence\\engine-extension\\native-offset-use-flow-independent-review.json": "01209e14808a5a15453ab36cf2e510e5ad501ab73cf8a1cf0cd98afe1e4e9b68",
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\evidence\\engine-extension\\native-segmented-agent-consumers.json": "4c85a68076c071143afb3dce3d8071b89ce5164ba1904683a3f49a015f52223c",
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\tools\\battle-scale\\audit_simple_agent_operation_routes.py": "c4b78bc995e55907f0fec0e20f785ba851a49cad6db6fead88b2d15a6fcbb428",
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\tools\\battle-scale\\native_offset_use_flow.py": "8f47af97f5dd2a6caa84feb1df12cfadf21d5fdfd4bd27d2d3088a189165e059",
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\tools\\battle-scale\\patch_native_copy.py": "e61450ea2094b82e153e6c47d3b981fe8faa65f184542efe1b9e19357e842793",
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\evidence\\engine-extension\\native-simple-agent-operation-routes.json": "fb5e74eff6c0086c97bfc75da29db2768fce1047ac15aacdb0557933116f2516",
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\tools\\battle-scale\\prepare_segmented_scalar_harness.py": "ac005278fd77d19c385c5d703c3b99a0abeecb1c344ee5ec1cb1eb8a1f675d00"
+  },
+  "reviewerSourceSha256": "bff7ba88cee63d8f8551c076abdcd91e855f11a313458c079eca7718b1a75a86",
+  "verifiedOriginalByteRows": 3317,
+  "retainedEmulatorCasesReplayed": 112,
+  "additionalIndependentEmulatorCases": [
+    {
+      "site": 0,
+      "index": 0,
+      "scalar": "0x0",
+      "injectedHighStatusWithNonzeroLowValue": false,
+      "exactTrap": false,
+      "fullPayloadSentinelVerified": true,
+      "passed": true
+    },
+    {
+      "site": 0,
+      "index": 2039,
+      "scalar": "0x1",
+      "injectedHighStatusWithNonzeroLowValue": false,
+      "exactTrap": false,
+      "fullPayloadSentinelVerified": true,
+      "passed": true
+    },
+    {
+      "site": 0,
+      "index": 2040,
+      "scalar": "0x7fffffff",
+      "injectedHighStatusWithNonzeroLowValue": false,
+      "exactTrap": false,
+      "fullPayloadSentinelVerified": true,
+      "passed": true
+    },
+    {
+      "site": 0,
+      "index": 4079,
+      "scalar": "0x80000000",
+      "injectedHighStatusWithNonzeroLowValue": false,
+      "exactTrap": false,
+      "fullPayloadSentinelVerified": true,
+      "passed": true
+    },
+    {
+      "site": 0,
+      "index": 4080,
+      "scalar": "0xffffffff",
+      "injectedHighStatusWithNonzeroLowValue": false,
+      "exactTrap": false,
+      "fullPayloadSentinelVerified": true,
+      "passed": true
+    },
+    {
+      "site": 0,
+      "index": 6119,
+      "scalar": "0x0",
+      "injectedHighStatusWithNonzeroLowValue": false,
+      "exactTrap": false,
+      "fullPayloadSentinelVerified": true,
+      "passed": true
+    },
+    {
+      "site": 0,
+      "index": 65536,
+      "scalar": "0x80000000",
+      "injectedHighStatusWithNonzeroLowValue": false,
+      "exactTrap": false,
+      "fullPayloadSentinelVerified": true,
+      "passed": true
+    },
+    {
+      "site": 0,
+      "index": 4294967303,
+      "scalar": "0xffffffff",
+      "injectedHighStatusWithNonzeroLowValue": false,
+      "exactTrap": false,
+      "fullPayloadSentinelVerified": true,
+      "passed": true
+    },
+    {
+      "site": 0,
+      "index": -1,
+      "scalar": "0x0",
+      "injectedHighStatusWithNonzeroLowValue": true,
+      "exactTrap": true,
+      "fullPayloadSentinelVerified": true,
+      "passed": true
+    },
+    {
+      "site": 0,
+      "index": -2,
+      "scalar": "0x0",
+      "injectedHighStatusWithNonzeroLowValue": true,
+      "exactTrap": true,
+      "fullPayloadSentinelVerified": true,
+      "passed": true
+    },
+    {
+      "site": 0,
+      "index": 9223372036854775807,
+      "scalar": "0x0",
+      "injectedHighStatusWithNonzeroLowValue": true,
+      "exactTrap": true,
+      "fullPayloadSentinelVerified": true,
+      "passed": true
+    },
+    {
+      "site": 1,
+      "index": 0,
+      "scalar": "0x0",
+      "injectedHighStatusWithNonzeroLowValue": false,
+      "exactTrap": false,
+      "fullPayloadSentinelVerified": true,
+      "passed": true
+    },
+    {
+      "site": 1,
+      "index": 2039,
+      "scalar": "0x1",
+      "injectedHighStatusWithNonzeroLowValue": false,
+      "exactTrap": false,
+      "fullPayloadSentinelVerified": true,
+      "passed": true
+    },
+    {
+      "site": 1,
+      "index": 2040,
+      "scalar": "0x7fffffff",
+      "injectedHighStatusWithNonzeroLowValue": false,
+      "exactTrap": false,
+      "fullPayloadSentinelVerified": true,
+      "passed": true
+    },
+    {
+      "site": 1,
+      "index": 4079,
+      "scalar": "0x80000000",
+      "injectedHighStatusWithNonzeroLowValue": false,
+      "exactTrap": false,
+      "fullPayloadSentinelVerified": true,
+      "passed": true
+    },
+    {
+      "site": 1,
+      "index": 4080,
+      "scalar": "0xffffffff",
+      "injectedHighStatusWithNonzeroLowValue": false,
+      "exactTrap": false,
+      "fullPayloadSentinelVerified": true,
+      "passed": true
+    },
+    {
+      "site": 1,
+      "index": 6119,
+      "scalar": "0x0",
+      "injectedHighStatusWithNonzeroLowValue": false,
+      "exactTrap": false,
+      "fullPayloadSentinelVerified": true,
+      "passed": true
+    },
+    {
+      "site": 1,
+      "index": 65536,
+      "scalar": "0x80000000",
+      "injectedHighStatusWithNonzeroLowValue": false,
+      "exactTrap": false,
+      "fullPayloadSentinelVerified": true,
+      "passed": true
+    },
+    {
+      "site": 1,
+      "index": 4294967303,
+      "scalar": "0xffffffff",
+      "injectedHighStatusWithNonzeroLowValue": false,
+      "exactTrap": false,
+      "fullPayloadSentinelVerified": true,
+      "passed": true
+    },
+    {
+      "site": 1,
+      "index": -1,
+      "scalar": "0x0",
+      "injectedHighStatusWithNonzeroLowValue": true,
+      "exactTrap": true,
+      "fullPayloadSentinelVerified": true,
+      "passed": true
+    },
+    {
+      "site": 1,
+      "index": -2,
+      "scalar": "0x0",
+      "injectedHighStatusWithNonzeroLowValue": true,
+      "exactTrap": true,
+      "fullPayloadSentinelVerified": true,
+      "passed": true
+    },
+    {
+      "site": 1,
+      "index": 9223372036854775807,
+      "scalar": "0x0",
+      "injectedHighStatusWithNonzeroLowValue": true,
+      "exactTrap": true,
+      "fullPayloadSentinelVerified": true,
+      "passed": true
+    },
+    {
+      "site": 2,
+      "index": 0,
+      "scalar": "0x0",
+      "injectedHighStatusWithNonzeroLowValue": false,
+      "exactTrap": false,
+      "fullPayloadSentinelVerified": true,
+      "passed": true
+    },
+    {
+      "site": 2,
+      "index": 2039,
+      "scalar": "0x1",
+      "injectedHighStatusWithNonzeroLowValue": false,
+      "exactTrap": false,
+      "fullPayloadSentinelVerified": true,
+      "passed": true
+    },
+    {
+      "site": 2,
+      "index": 2040,
+      "scalar": "0x7fffffff",
+      "injectedHighStatusWithNonzeroLowValue": false,
+      "exactTrap": false,
+      "fullPayloadSentinelVerified": true,
+      "passed": true
+    },
+    {
+      "site": 2,
+      "index": 4079,
+      "scalar": "0x80000000",
+      "injectedHighStatusWithNonzeroLowValue": false,
+      "exactTrap": false,
+      "fullPayloadSentinelVerified": true,
+      "passed": true
+    },
+    {
+      "site": 2,
+      "index": 4080,
+      "scalar": "0xffffffff",
+      "injectedHighStatusWithNonzeroLowValue": false,
+      "exactTrap": false,
+      "fullPayloadSentinelVerified": true,
+      "passed": true
+    },
+    {
+      "site": 2,
+      "index": 6119,
+      "scalar": "0x0",
+      "injectedHighStatusWithNonzeroLowValue": false,
+      "exactTrap": false,
+      "fullPayloadSentinelVerified": true,
+      "passed": true
+    },
+    {
+      "site": 2,
+      "index": 65536,
+      "scalar": "0x80000000",
+      "injectedHighStatusWithNonzeroLowValue": false,
+      "exactTrap": false,
+      "fullPayloadSentinelVerified": true,
+      "passed": true
+    },
+    {
+      "site": 2,
+      "index": 4294967303,
+      "scalar": "0xffffffff",
+      "injectedHighStatusWithNonzeroLowValue": false,
+      "exactTrap": false,
+      "fullPayloadSentinelVerified": true,
+      "passed": true
+    },
+    {
+      "site": 2,
+      "index": -1,
+      "scalar": "0x0",
+      "injectedHighStatusWithNonzeroLowValue": true,
+      "exactTrap": true,
+      "fullPayloadSentinelVerified": true,
+      "passed": true
+    },
+    {
+      "site": 2,
+      "index": -2,
+      "scalar": "0x0",
+      "injectedHighStatusWithNonzeroLowValue": true,
+      "exactTrap": true,
+      "fullPayloadSentinelVerified": true,
+      "passed": true
+    },
+    {
+      "site": 2,
+      "index": 9223372036854775807,
+      "scalar": "0x0",
+      "injectedHighStatusWithNonzeroLowValue": true,
+      "exactTrap": true,
+      "fullPayloadSentinelVerified": true,
+      "passed": true
+    },
+    {
+      "site": 3,
+      "index": 0,
+      "scalar": "0x0",
+      "injectedHighStatusWithNonzeroLowValue": false,
+      "exactTrap": false,
+      "fullPayloadSentinelVerified": true,
+      "passed": true
+    },
+    {
+      "site": 3,
+      "index": 2039,
+      "scalar": "0x1",
+      "injectedHighStatusWithNonzeroLowValue": false,
+      "exactTrap": false,
+      "fullPayloadSentinelVerified": true,
+      "passed": true
+    },
+    {
+      "site": 3,
+      "index": 2040,
+      "scalar": "0x7fffffff",
+      "injectedHighStatusWithNonzeroLowValue": false,
+      "exactTrap": false,
+      "fullPayloadSentinelVerified": true,
+      "passed": true
+    },
+    {
+      "site": 3,
+      "index": 4079,
+      "scalar": "0x80000000",
+      "injectedHighStatusWithNonzeroLowValue": false,
+      "exactTrap": false,
+      "fullPayloadSentinelVerified": true,
+      "passed": true
+    },
+    {
+      "site": 3,
+      "index": 4080,
+      "scalar": "0xffffffff",
+      "injectedHighStatusWithNonzeroLowValue": false,
+      "exactTrap": false,
+      "fullPayloadSentinelVerified": true,
+      "passed": true
+    },
+    {
+      "site": 3,
+      "index": 6119,
+      "scalar": "0x0",
+      "injectedHighStatusWithNonzeroLowValue": false,
+      "exactTrap": false,
+      "fullPayloadSentinelVerified": true,
+      "passed": true
+    },
+    {
+      "site": 3,
+      "index": 65536,
+      "scalar": "0x80000000",
+      "injectedHighStatusWithNonzeroLowValue": false,
+      "exactTrap": false,
+      "fullPayloadSentinelVerified": true,
+      "passed": true
+    },
+    {
+      "site": 3,
+      "index": 4294967303,
+      "scalar": "0xffffffff",
+      "injectedHighStatusWithNonzeroLowValue": false,
+      "exactTrap": false,
+      "fullPayloadSentinelVerified": true,
+      "passed": true
+    },
+    {
+      "site": 3,
+      "index": -1,
+      "scalar": "0x0",
+      "injectedHighStatusWithNonzeroLowValue": true,
+      "exactTrap": true,
+      "fullPayloadSentinelVerified": true,
+      "passed": true
+    },
+    {
+      "site": 3,
+      "index": -2,
+      "scalar": "0x0",
+      "injectedHighStatusWithNonzeroLowValue": true,
+      "exactTrap": true,
+      "fullPayloadSentinelVerified": true,
+      "passed": true
+    },
+    {
+      "site": 3,
+      "index": 9223372036854775807,
+      "scalar": "0x0",
+      "injectedHighStatusWithNonzeroLowValue": true,
+      "exactTrap": true,
+      "fullPayloadSentinelVerified": true,
+      "passed": true
+    },
+    {
+      "site": 4,
+      "index": 0,
+      "scalar": "0x0",
+      "injectedHighStatusWithNonzeroLowValue": false,
+      "exactTrap": false,
+      "fullPayloadSentinelVerified": true,
+      "passed": true
+    },
+    {
+      "site": 4,
+      "index": 2039,
+      "scalar": "0x1",
+      "injectedHighStatusWithNonzeroLowValue": false,
+      "exactTrap": false,
+      "fullPayloadSentinelVerified": true,
+      "passed": true
+    },
+    {
+      "site": 4,
+      "index": 2040,
+      "scalar": "0x7fffffff",
+      "injectedHighStatusWithNonzeroLowValue": false,
+      "exactTrap": false,
+      "fullPayloadSentinelVerified": true,
+      "passed": true
+    },
+    {
+      "site": 4,
+      "index": 4079,
+      "scalar": "0x80000000",
+      "injectedHighStatusWithNonzeroLowValue": false,
+      "exactTrap": false,
+      "fullPayloadSentinelVerified": true,
+      "passed": true
+    },
+    {
+      "site": 4,
+      "index": 4080,
+      "scalar": "0xffffffff",
+      "injectedHighStatusWithNonzeroLowValue": false,
+      "exactTrap": false,
+      "fullPayloadSentinelVerified": true,
+      "passed": true
+    },
+    {
+      "site": 4,
+      "index": 6119,
+      "scalar": "0x0",
+      "injectedHighStatusWithNonzeroLowValue": false,
+      "exactTrap": false,
+      "fullPayloadSentinelVerified": true,
+      "passed": true
+    },
+    {
+      "site": 4,
+      "index": 65536,
+      "scalar": "0x80000000",
+      "injectedHighStatusWithNonzeroLowValue": false,
+      "exactTrap": false,
+      "fullPayloadSentinelVerified": true,
+      "passed": true
+    },
+    {
+      "site": 4,
+      "index": 4294967303,
+      "scalar": "0xffffffff",
+      "injectedHighStatusWithNonzeroLowValue": false,
+      "exactTrap": false,
+      "fullPayloadSentinelVerified": true,
+      "passed": true
+    },
+    {
+      "site": 4,
+      "index": -1,
+      "scalar": "0x0",
+      "injectedHighStatusWithNonzeroLowValue": true,
+      "exactTrap": true,
+      "fullPayloadSentinelVerified": true,
+      "passed": true
+    },
+    {
+      "site": 4,
+      "index": -2,
+      "scalar": "0x0",
+      "injectedHighStatusWithNonzeroLowValue": true,
+      "exactTrap": true,
+      "fullPayloadSentinelVerified": true,
+      "passed": true
+    },
+    {
+      "site": 4,
+      "index": 9223372036854775807,
+      "scalar": "0x0",
+      "injectedHighStatusWithNonzeroLowValue": true,
+      "exactTrap": true,
+      "fullPayloadSentinelVerified": true,
+      "passed": true
+    },
+    {
+      "site": 5,
+      "index": 0,
+      "scalar": "0x0",
+      "injectedHighStatusWithNonzeroLowValue": false,
+      "exactTrap": false,
+      "fullPayloadSentinelVerified": true,
+      "passed": true
+    },
+    {
+      "site": 5,
+      "index": 2039,
+      "scalar": "0x1",
+      "injectedHighStatusWithNonzeroLowValue": false,
+      "exactTrap": false,
+      "fullPayloadSentinelVerified": true,
+      "passed": true
+    },
+    {
+      "site": 5,
+      "index": 2040,
+      "scalar": "0x7fffffff",
+      "injectedHighStatusWithNonzeroLowValue": false,
+      "exactTrap": false,
+      "fullPayloadSentinelVerified": true,
+      "passed": true
+    },
+    {
+      "site": 5,
+      "index": 4079,
+      "scalar": "0x80000000",
+      "injectedHighStatusWithNonzeroLowValue": false,
+      "exactTrap": false,
+      "fullPayloadSentinelVerified": true,
+      "passed": true
+    },
+    {
+      "site": 5,
+      "index": 4080,
+      "scalar": "0xffffffff",
+      "injectedHighStatusWithNonzeroLowValue": false,
+      "exactTrap": false,
+      "fullPayloadSentinelVerified": true,
+      "passed": true
+    },
+    {
+      "site": 5,
+      "index": 6119,
+      "scalar": "0x0",
+      "injectedHighStatusWithNonzeroLowValue": false,
+      "exactTrap": false,
+      "fullPayloadSentinelVerified": true,
+      "passed": true
+    },
+    {
+      "site": 5,
+      "index": 65536,
+      "scalar": "0x80000000",
+      "injectedHighStatusWithNonzeroLowValue": false,
+      "exactTrap": false,
+      "fullPayloadSentinelVerified": true,
+      "passed": true
+    },
+    {
+      "site": 5,
+      "index": 4294967303,
+      "scalar": "0xffffffff",
+      "injectedHighStatusWithNonzeroLowValue": false,
+      "exactTrap": false,
+      "fullPayloadSentinelVerified": true,
+      "passed": true
+    },
+    {
+      "site": 5,
+      "index": -1,
+      "scalar": "0x0",
+      "injectedHighStatusWithNonzeroLowValue": true,
+      "exactTrap": true,
+      "fullPayloadSentinelVerified": true,
+      "passed": true
+    },
+    {
+      "site": 5,
+      "index": -2,
+      "scalar": "0x0",
+      "injectedHighStatusWithNonzeroLowValue": true,
+      "exactTrap": true,
+      "fullPayloadSentinelVerified": true,
+      "passed": true
+    },
+    {
+      "site": 5,
+      "index": 9223372036854775807,
+      "scalar": "0x0",
+      "injectedHighStatusWithNonzeroLowValue": true,
+      "exactTrap": true,
+      "fullPayloadSentinelVerified": true,
+      "passed": true
+    },
+    {
+      "site": 6,
+      "index": 0,
+      "scalar": "0x0",
+      "injectedHighStatusWithNonzeroLowValue": false,
+      "exactTrap": false,
+      "fullPayloadSentinelVerified": true,
+      "passed": true
+    },
+    {
+      "site": 6,
+      "index": 2039,
+      "scalar": "0x1",
+      "injectedHighStatusWithNonzeroLowValue": false,
+      "exactTrap": false,
+      "fullPayloadSentinelVerified": true,
+      "passed": true
+    },
+    {
+      "site": 6,
+      "index": 2040,
+      "scalar": "0x7fffffff",
+      "injectedHighStatusWithNonzeroLowValue": false,
+      "exactTrap": false,
+      "fullPayloadSentinelVerified": true,
+      "passed": true
+    },
+    {
+      "site": 6,
+      "index": 4079,
+      "scalar": "0x80000000",
+      "injectedHighStatusWithNonzeroLowValue": false,
+      "exactTrap": false,
+      "fullPayloadSentinelVerified": true,
+      "passed": true
+    },
+    {
+      "site": 6,
+      "index": 4080,
+      "scalar": "0xffffffff",
+      "injectedHighStatusWithNonzeroLowValue": false,
+      "exactTrap": false,
+      "fullPayloadSentinelVerified": true,
+      "passed": true
+    },
+    {
+      "site": 6,
+      "index": 6119,
+      "scalar": "0x0",
+      "injectedHighStatusWithNonzeroLowValue": false,
+      "exactTrap": false,
+      "fullPayloadSentinelVerified": true,
+      "passed": true
+    },
+    {
+      "site": 6,
+      "index": 65536,
+      "scalar": "0x80000000",
+      "injectedHighStatusWithNonzeroLowValue": false,
+      "exactTrap": false,
+      "fullPayloadSentinelVerified": true,
+      "passed": true
+    },
+    {
+      "site": 6,
+      "index": 4294967303,
+      "scalar": "0xffffffff",
+      "injectedHighStatusWithNonzeroLowValue": false,
+      "exactTrap": false,
+      "fullPayloadSentinelVerified": true,
+      "passed": true
+    },
+    {
+      "site": 6,
+      "index": -1,
+      "scalar": "0x0",
+      "injectedHighStatusWithNonzeroLowValue": true,
+      "exactTrap": true,
+      "fullPayloadSentinelVerified": true,
+      "passed": true
+    },
+    {
+      "site": 6,
+      "index": -2,
+      "scalar": "0x0",
+      "injectedHighStatusWithNonzeroLowValue": true,
+      "exactTrap": true,
+      "fullPayloadSentinelVerified": true,
+      "passed": true
+    },
+    {
+      "site": 6,
+      "index": 9223372036854775807,
+      "scalar": "0x0",
+      "injectedHighStatusWithNonzeroLowValue": true,
+      "exactTrap": true,
+      "fullPayloadSentinelVerified": true,
+      "passed": true
+    }
+  ],
+  "independentUnwindMetadataParsing": [
+    {
+      "site": 0,
+      "frame": "stub",
+      "savedNonvolatiles": 8,
+      "frameBytes": 264,
+      "independentlyParsed": true
+    },
+    {
+      "site": 0,
+      "frame": "entry",
+      "savedNonvolatiles": 8,
+      "frameBytes": 264,
+      "independentlyParsed": true
+    },
+    {
+      "site": 1,
+      "frame": "stub",
+      "savedNonvolatiles": 8,
+      "frameBytes": 264,
+      "independentlyParsed": true
+    },
+    {
+      "site": 1,
+      "frame": "entry",
+      "savedNonvolatiles": 8,
+      "frameBytes": 264,
+      "independentlyParsed": true
+    },
+    {
+      "site": 2,
+      "frame": "stub",
+      "savedNonvolatiles": 8,
+      "frameBytes": 264,
+      "independentlyParsed": true
+    },
+    {
+      "site": 2,
+      "frame": "entry",
+      "savedNonvolatiles": 8,
+      "frameBytes": 264,
+      "independentlyParsed": true
+    },
+    {
+      "site": 3,
+      "frame": "stub",
+      "savedNonvolatiles": 8,
+      "frameBytes": 264,
+      "independentlyParsed": true
+    },
+    {
+      "site": 3,
+      "frame": "entry",
+      "savedNonvolatiles": 8,
+      "frameBytes": 264,
+      "independentlyParsed": true
+    },
+    {
+      "site": 4,
+      "frame": "stub",
+      "savedNonvolatiles": 8,
+      "frameBytes": 264,
+      "independentlyParsed": true
+    },
+    {
+      "site": 4,
+      "frame": "entry",
+      "savedNonvolatiles": 8,
+      "frameBytes": 264,
+      "independentlyParsed": true
+    },
+    {
+      "site": 5,
+      "frame": "stub",
+      "savedNonvolatiles": 8,
+      "frameBytes": 264,
+      "independentlyParsed": true
+    },
+    {
+      "site": 5,
+      "frame": "entry",
+      "savedNonvolatiles": 8,
+      "frameBytes": 264,
+      "independentlyParsed": true
+    },
+    {
+      "site": 6,
+      "frame": "stub",
+      "savedNonvolatiles": 8,
+      "frameBytes": 264,
+      "independentlyParsed": true
+    },
+    {
+      "site": 6,
+      "frame": "entry",
+      "savedNonvolatiles": 8,
+      "frameBytes": 264,
+      "independentlyParsed": true
+    }
+  ],
+  "independentExecutableRuns": [
+    {
+      "path": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\build\\agent-storage\\native_scalar_harness.exe",
+      "sha256": "50a40d80fbcc9759fc99228c3a8102c489a4b843f5698f432b0438e20e3d444e",
+      "exitCode": 0,
+      "stdout": "PASS seven real x64 scalar adapters: 85680 operations;2040->4080->6120->8160->10200;stable borrowed/owned payloads\nPASS 670 instruction-boundary Windows unwinds;91 exact UD2 error-path unwinds;index reuse;independent domains;read/write lease blocks growth/close;teardown\nISOLATED HARNESS ONLY: explicit fixture traps, no production failure policy, live game, real Agent constructors or whole-engine barrier\n",
+      "stderr": ""
+    },
+    {
+      "path": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\build\\agent-storage\\native_scalar_harness_asan.exe",
+      "sha256": "71f87e3a6d8e1bc20dcae6266fb2d0e9a7a8c7aa63869a53622fb4c516072d0f",
+      "exitCode": 0,
+      "stdout": "PASS seven real x64 scalar adapters: 85680 operations;2040->4080->6120->8160->10200;stable borrowed/owned payloads\nPASS 670 instruction-boundary Windows unwinds;91 exact UD2 error-path unwinds;index reuse;independent domains;read/write lease blocks growth/close;teardown\nISOLATED HARNESS ONLY: explicit fixture traps, no production failure policy, live game, real Agent constructors or whole-engine barrier\n",
+      "stderr": ""
+    }
+  ],
+  "manualReview": [
+    "Seven exact IMUL+MOV pairs preserve product outputs and all unrelated GPRs. Product is distinct from Mission/index for every selected route, so computing it before saving inputs is safe here. Saved load destinations are replaced with zero-extended scalar results before restoration.",
+    "Fixed264-byte frames reserve32-byte helper shadow space,120-byte GPR slots,8-byte packed result and96-byte XMM0..5 storage without overlap. Standard-CALL entry alignment is maintained through entry and stub. XMM6..15 are untouched and rely on normal helper ABI preservation.",
+    "Helper holds a primary-domain read lease through get and scalar memory operation and returns only32-bit scalar/error status. Read leases protect storage lifetime; they do not serialize same-field writes.",
+    "Nonzero high32 status traps at exact generated UD2, even with nonzero low bits. Zero success returns normally. Narrow SEH filter requires illegal-instruction code, exact site trap PC and thread-local error; unrelated faults continue searching.",
+    "Helper catches C++ exceptions before noexcept exit; lease destruction precedes translated UD2. The native tests execute both generated frames during actual exception propagation.",
+    "Fourteen sorted runtime entries register stub and entry frames, verify table lookup, roll back failed constructor readback, and unregister before executable memory release. Both frames use ordinary allocation/save unwind codes and recognized ADD RSP/RET epilogues.",
+    "Borrowed first-block lifetime is retained by storage and freed exactly once at close; only owned suffixes receive synthetic destructor callbacks. Growth and close wait while the scalar helper lease remains held, and async failure cleanup releases the held helper before future destruction."
+  ],
+  "openFindings": [],
+  "limitations": [
+    "Only isolated standard-CALL fixtures are approved. Real native entry alignment, redirected/interior entries, C++ handler state and production error policy remain unproved.",
+    "Route catalog remains bounded consumer/owner evidence; it does not turn incomplete MAY-use or indirect-entry closure into global hook approval.",
+    "Original file bytes are executed in emulator for each comparison. Native storage uses synthetic records/callbacks; no actual Bannerlord constructors, engine barriers or game patches execute.",
+    "Independent wide-index emulator successes beyond32 bits prove capture/transport only, not practical native storage allocation at those indices.",
+    "Flags are deliberately not generally preserved. The exact continuation kills their prior requirements; undefined outputs do not promise a particular bit pattern.",
+    "Frozen native binaries were independently rerun, not rebuilt. ASAN covers compiled fixture/backend code, not generated instruction instrumentation.",
+    "No game or installed-file access, game process control, canonical report overwrite or engine patch approval."
+  ],
+  "gameLaunched": false,
+  "enginePatchApproved": false
+}

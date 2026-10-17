@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "status": "accepted-bounded-residual-search-review",
+  "sourceSha256": "2a5e0e0b15513ebb7052d747a621b82c50ee834553eba283b33bbbc33766e12a",
+  "candidateArtifactSha256": "8dd2103262a5aacea76bb1848d49a0fb1c319ef1636bd39ba7f22d37fc18dc70",
+  "siteCount": 399,
+  "valueFamilyCount": 58,
+  "families": {
+    "mov": 227,
+    "test": 54,
+    "cmp": 33,
+    "and": 54,
+    "or": 21,
+    "xor": 4,
+    "imul": 6
+  },
+  "allSiteAndContextBytesRechecked": true,
+  "selectedChangedOperandValueOverlap": [],
+  "wideRegisterMovImmediateCount": 0,
+  "specialSiteFindings": {
+    "0x1808e31b8": "FMOD WASAPI frame duration conversion: multiply by 10,000,000 before sample-rate division; not a Mission offset.",
+    "0x1807b500c": "Switch-table data overlaps the linear decoder; two DWORD code RVAs, not an executed IMUL.",
+    "0x1800e8aa7": "Packed texture/cubemap descriptor flags; 128x128, six faces, format31 passed to texture creation.",
+    "0x18031b39d": "Packed render-texture descriptor flags for ship_top_down_depth.",
+    "0x18039c829": "Packed filtered_cubemap descriptor flags; 128x128, six faces, format31.",
+    "0x180604af3": "AttackCollisionData local header after initializer619de0; packed scalar fields.",
+    "0x18068ec41": "AttackCollisionData local header after initializer619de0; packed scalar fields."
+  },
+  "retainedEvidence": [
+    {
+      "procedure": "0x1808e31b8",
+      "evidenceId": "ev_d710f5430e00991bd80afa4e6bd6c6aa963937ffaa2e29dbfcb8cdf513e6193e"
+    },
+    {
+      "procedure": "0x1800e8a10",
+      "evidenceId": "ev_ba63abe80e344fc24f5e32ec28ff98fd627f30a06a0306e75928e0f6d689cae5"
+    },
+    {
+      "procedure": "0x18031b330",
+      "evidenceId": "ev_2d02ef3843200150768578e6c52d3ffef6543814204f5b39f59d41d273c7b403"
+    },
+    {
+      "procedure": "0x18039c7c0",
+      "evidenceId": "ev_0b3ecbfaf9ae82176db00a5e065fd55479bcbdd84da90505714a4a694f8b2e6c"
+    }
+  ],
+  "switchTable": {
+    "rva": "0x7b4ff4",
+    "bytes": "864a7b00864a7b00864a7b00864a7b003b4c7b00524c7b00694c7b00804c7b00974c7b00ae4c7b00",
+    "targetRvas": [
+      "0x7b4a86",
+      "0x7b4a86",
+      "0x7b4a86",
+      "0x7b4a86",
+      "0x7b4c3b",
+      "0x7b4c52",
+      "0x7b4c69",
+      "0x7b4c80",
+      "0x7b4c97",
+      "0x7b4cae"
+    ],
+    "dispatchReferences": [
+      {
+        "address": "0x1807b4c2e",
+        "bytes": "418b8c80f44f7b00",
+        "decoded": "mov ecx, dword ptr [r8 + rax*4 + 0x7b4ff4]"
+      }
+    ]
+  },
+  "disposition": "Retain these exact numeric matches unchanged. No bulk scalar substitution. Selected edits require independent owner/CFG/ABI proofs.",
+  "scope": "Restricted shipping Single0 candidate. This reviews residual numeric-match selection, not every possible computation in the engine.",
+  "limitations": [
+    "32-bit materialization can participate in computed addresses; width alone is not semantic proof. No claim of complete arbitrary computed-pointer coverage.",
+    "3,099 undecodable executable bytes and indirect/split address constructions remain outside the exact decoded-operand search boundary.",
+    "No target execution, rendered soldier count, performance, teardown or runtime safety has been verified."
+  ],
+  "gameExecuted": false
+}

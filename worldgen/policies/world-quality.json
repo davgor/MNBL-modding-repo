@@ -1,9 +1,9 @@
 {
   "schema": "mnbl.world-quality",
   "version": 1,
-  "note": "Declared world-quality gate for generation attempts. Only these codes are retried with a derived seed; anything else (producer refusal, mechanical failure, source parser error, compiler or engine limitation) fails the generation immediately. Thresholds are the diagnostic campaign's minimum: two cities with ports.",
+  "note": "Declared world-quality gate for generation attempts. Only these codes are retried with a derived seed; anything else (producer refusal, mechanical failure, source parser error, compiler or engine limitation) fails the generation immediately. Thresholds are the diagnostic campaign's minimum: two cities with ports. The four travel codes come from the static travel gate (MMR-28, worldgen/policies/playability.json), which runs when a request binds playability and the campaign compiler policies.",
   "minCities": 2,
   "minHarbourHamlets": 2,
   "minCastles": 0,
-  "retryableQualityCodes": ["quality.too_few_cities", "quality.too_few_harbours", "quality.too_few_castles"]
+  "retryableQualityCodes": ["quality.too_few_cities", "quality.too_few_harbours", "quality.too_few_castles", "quality.unreachable_town", "quality.unplaceable_town", "quality.too_many_exclusions", "quality.repair_bound_exceeded"]
 }

@@ -1,0 +1,13 @@
+{
+  "author": {
+    "label": "Claude Code",
+    "role": "orchestrator"
+  },
+  "body": "MMR-64 handoff (save and load).\n- **Compatibility key.** A periodic save header now carries `coordinatePolicy` = `PeriodicWorldCoordinates.FrameIdentity`: the coordinate frame and rules, not the distance model. `WorldIdentity.RequireMatch` refuses:\n  - a periodic save made under another frame, or with none (the MMR-63-era saves);\n  - a header that disagrees with the package on periodicity.\n- **Non-periodic headers** carry `none`.\n- **Determinism observation (not MMR-64).** On the MMR-64 tree, one MMR-19 save/load pair (save 33364, load 3820, non-periodic fixtures w42/w43) failed the exact snapshot match on one value: `naval_patrol_party_1_party_3.nextTarget` x 9.53487396 → 9.53487587, 2 ulp of steering state recomputed after load. The rerun pair (19384 + 31924) matched 17/17. The snapshot compares `NextTargetPosition` exactly; decide whether steering state belongs in the oracle. Details: `evidence/runtime/periodic-coordinates-regressions.json`.",
+  "createdAt": "2026-10-16T08:31:01.152Z",
+  "epicId": "ep_01m4fpnf646t254mnh69jhz107",
+  "format": "darkmechanicus.comment",
+  "formatVersion": 1,
+  "id": "cm_01m51xc0h0h9gd6ng8xh1mh33y",
+  "ticketId": "tk_01m4fqfbgkz61vc2vqzb3vhggb"
+}

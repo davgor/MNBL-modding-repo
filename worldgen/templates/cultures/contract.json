@@ -1,0 +1,1336 @@
+﻿{
+    "schema":  "mnbl.culture-contract",
+    "version":  2,
+    "provenance":  {
+                       "catalogReceipt":  "evidence/runtime/in-game/campaign_catalog-10212.json",
+                       "spCulturesSha256":  "dd46f888a88ead9332dff93b86b514f480ce0611f590c4d740d651db6db89df6",
+                       "campaignSystemSha256":  "1f8e33e2ed73e6ec653d7629180afb70649ddc6e5bd1657a802a264efda1c3ae",
+                       "coreSha256":  "3e5cece8ca42faf3fdde27632519ed2a6f86d1ec6d1a742867729f00001689bf"
+                   },
+    "members":  {
+                    "militia_bonus":  {
+                                          "readBy":  "CultureObject.Deserialize",
+                                          "property":  "MilitiaBonus",
+                                          "propertyType":  "Int32",
+                                          "declaringType":  "CultureObject",
+                                          "setter":  "public",
+                                          "writers":  [
+                                                          "CultureObject.Deserialize"
+                                                      ],
+                                          "naval":  false
+                                      },
+                    "prosperity_bonus":  {
+                                             "readBy":  "CultureObject.Deserialize",
+                                             "property":  "ProsperityBonus",
+                                             "propertyType":  "Int32",
+                                             "declaringType":  "CultureObject",
+                                             "setter":  "public",
+                                             "writers":  [
+                                                             "CultureObject.Deserialize"
+                                                         ],
+                                             "naval":  false
+                                         },
+                    "naval_factor":  {
+                                         "readBy":  "CultureObject.Deserialize",
+                                         "property":  "NavalFactor",
+                                         "propertyType":  "Single",
+                                         "declaringType":  "CultureObject",
+                                         "setter":  "private",
+                                         "writers":  [
+                                                         "CultureObject.Deserialize"
+                                                     ],
+                                         "naval":  true
+                                     },
+                    "default_party_template":  {
+                                                   "readBy":  "CultureObject.Deserialize",
+                                                   "property":  "DefaultPartyTemplate",
+                                                   "propertyType":  "PartyTemplateObject",
+                                                   "declaringType":  "CultureObject",
+                                                   "setter":  "private",
+                                                   "writers":  [
+                                                                   "CultureObject.Deserialize"
+                                                               ],
+                                                   "naval":  false
+                                               },
+                    "villager_party_template":  {
+                                                    "readBy":  "CultureObject.Deserialize",
+                                                    "property":  "VillagerPartyTemplate",
+                                                    "propertyType":  "PartyTemplateObject",
+                                                    "declaringType":  "CultureObject",
+                                                    "setter":  "private",
+                                                    "writers":  [
+                                                                    "CultureObject.Deserialize"
+                                                                ],
+                                                    "naval":  false
+                                                },
+                    "fishing_party_template":  {
+                                                   "readBy":  "CultureObject.Deserialize",
+                                                   "property":  "FishingPartyTemplate",
+                                                   "propertyType":  "PartyTemplateObject",
+                                                   "declaringType":  "CultureObject",
+                                                   "setter":  "private",
+                                                   "writers":  [
+                                                                   "CultureObject.Deserialize"
+                                                               ],
+                                                   "naval":  true
+                                               },
+                    "militia_party_template":  {
+                                                   "readBy":  "CultureObject.Deserialize",
+                                                   "property":  "MilitiaPartyTemplate",
+                                                   "propertyType":  "PartyTemplateObject",
+                                                   "declaringType":  "CultureObject",
+                                                   "setter":  "private",
+                                                   "writers":  [
+                                                                   "CultureObject.Deserialize"
+                                                               ],
+                                                   "naval":  false
+                                               },
+                    "rebels_party_template":  {
+                                                  "readBy":  "CultureObject.Deserialize",
+                                                  "property":  "RebelsPartyTemplate",
+                                                  "propertyType":  "PartyTemplateObject",
+                                                  "declaringType":  "CultureObject",
+                                                  "setter":  "private",
+                                                  "writers":  [
+                                                                  "CultureObject.Deserialize"
+                                                              ],
+                                                  "naval":  false
+                                              },
+                    "bandit_boss_party_template":  {
+                                                       "readBy":  "CultureObject.Deserialize",
+                                                       "property":  "BanditBossPartyTemplate",
+                                                       "propertyType":  "PartyTemplateObject",
+                                                       "declaringType":  "CultureObject",
+                                                       "setter":  "private",
+                                                       "writers":  [
+                                                                       "CultureObject.Deserialize"
+                                                                   ],
+                                                       "naval":  false
+                                                   },
+                    "vassal_reward_party_template":  {
+                                                         "readBy":  "CultureObject.Deserialize",
+                                                         "property":  "VassalRewardTroopsPartyTemplate",
+                                                         "propertyType":  "PartyTemplateObject",
+                                                         "declaringType":  "CultureObject",
+                                                         "setter":  "private",
+                                                         "writers":  [
+                                                                         "CultureObject.Deserialize"
+                                                                     ],
+                                                         "naval":  false
+                                                     },
+                    "settlement_patrol_template_level_1":  {
+                                                               "readBy":  "CultureObject.Deserialize",
+                                                               "property":  "SettlementPatrolPartyTemplateWeak",
+                                                               "propertyType":  "PartyTemplateObject",
+                                                               "declaringType":  "CultureObject",
+                                                               "setter":  "private",
+                                                               "writers":  [
+                                                                               "CultureObject.Deserialize"
+                                                                           ],
+                                                               "naval":  false
+                                                           },
+                    "settlement_patrol_template_level_2":  {
+                                                               "readBy":  "CultureObject.Deserialize",
+                                                               "property":  "SettlementPatrolPartyTemplateModerate",
+                                                               "propertyType":  "PartyTemplateObject",
+                                                               "declaringType":  "CultureObject",
+                                                               "setter":  "private",
+                                                               "writers":  [
+                                                                               "CultureObject.Deserialize"
+                                                                           ],
+                                                               "naval":  false
+                                                           },
+                    "settlement_patrol_template_level_3":  {
+                                                               "readBy":  "CultureObject.Deserialize",
+                                                               "property":  "SettlementPatrolPartyTemplateStrong",
+                                                               "propertyType":  "PartyTemplateObject",
+                                                               "declaringType":  "CultureObject",
+                                                               "setter":  "private",
+                                                               "writers":  [
+                                                                               "CultureObject.Deserialize"
+                                                                           ],
+                                                               "naval":  false
+                                                           },
+                    "settlement_patrol_template_coastal":  {
+                                                               "readBy":  "CultureObject.Deserialize",
+                                                               "property":  "SettlementPatrolPartyTemplateNaval",
+                                                               "propertyType":  "PartyTemplateObject",
+                                                               "declaringType":  "CultureObject",
+                                                               "setter":  "private",
+                                                               "writers":  [
+                                                                               "CultureObject.Deserialize"
+                                                                           ],
+                                                               "naval":  true
+                                                           },
+                    "elite_basic_troop":  {
+                                              "readBy":  "CultureObject.Deserialize",
+                                              "property":  "EliteBasicTroop",
+                                              "propertyType":  "CharacterObject",
+                                              "declaringType":  "CultureObject",
+                                              "setter":  "private",
+                                              "writers":  [
+                                                              "CultureObject.Deserialize"
+                                                          ],
+                                              "naval":  false
+                                          },
+                    "melee_elite_militia_troop":  {
+                                                      "readBy":  "CultureObject.Deserialize",
+                                                      "property":  "MeleeEliteMilitiaTroop",
+                                                      "propertyType":  "CharacterObject",
+                                                      "declaringType":  "CultureObject",
+                                                      "setter":  "private",
+                                                      "writers":  [
+                                                                      "CultureObject.Deserialize"
+                                                                  ],
+                                                      "naval":  false
+                                                  },
+                    "ranged_elite_militia_troop":  {
+                                                       "readBy":  "CultureObject.Deserialize",
+                                                       "property":  "RangedEliteMilitiaTroop",
+                                                       "propertyType":  "CharacterObject",
+                                                       "declaringType":  "CultureObject",
+                                                       "setter":  "private",
+                                                       "writers":  [
+                                                                       "CultureObject.Deserialize"
+                                                                   ],
+                                                       "naval":  false
+                                                   },
+                    "melee_militia_troop":  {
+                                                "readBy":  "CultureObject.Deserialize",
+                                                "property":  "MeleeMilitiaTroop",
+                                                "propertyType":  "CharacterObject",
+                                                "declaringType":  "CultureObject",
+                                                "setter":  "private",
+                                                "writers":  [
+                                                                "CultureObject.Deserialize"
+                                                            ],
+                                                "naval":  false
+                                            },
+                    "ranged_militia_troop":  {
+                                                 "readBy":  "CultureObject.Deserialize",
+                                                 "property":  "RangedMilitiaTroop",
+                                                 "propertyType":  "CharacterObject",
+                                                 "declaringType":  "CultureObject",
+                                                 "setter":  "private",
+                                                 "writers":  [
+                                                                 "CultureObject.Deserialize"
+                                                             ],
+                                                 "naval":  false
+                                             },
+                    "basic_troop":  {
+                                        "readBy":  "CultureObject.Deserialize",
+                                        "property":  "BasicTroop",
+                                        "propertyType":  "CharacterObject",
+                                        "declaringType":  "CultureObject",
+                                        "setter":  "private",
+                                        "writers":  [
+                                                        "CultureObject.Deserialize"
+                                                    ],
+                                        "naval":  false
+                                    },
+                    "default_battle_equipment_roster":  {
+                                                            "readBy":  "CultureObject.Deserialize",
+                                                            "property":  "DefaultBattleEquipmentRoster",
+                                                            "propertyType":  "MBEquipmentRoster",
+                                                            "declaringType":  "CultureObject",
+                                                            "setter":  "private",
+                                                            "writers":  [
+                                                                            "CultureObject.Deserialize"
+                                                                        ],
+                                                            "naval":  false
+                                                        },
+                    "default_civilian_equipment_roster":  {
+                                                              "readBy":  "CultureObject.Deserialize",
+                                                              "property":  "DefaultCivilianEquipmentRoster",
+                                                              "propertyType":  "MBEquipmentRoster",
+                                                              "declaringType":  "CultureObject",
+                                                              "setter":  "private",
+                                                              "writers":  [
+                                                                              "CultureObject.Deserialize"
+                                                                          ],
+                                                              "naval":  false
+                                                          },
+                    "default_stealth_equipment_roster":  {
+                                                             "readBy":  "CultureObject.Deserialize",
+                                                             "property":  "DefaultStealthEquipmentRoster",
+                                                             "propertyType":  "MBEquipmentRoster",
+                                                             "declaringType":  "CultureObject",
+                                                             "setter":  "private",
+                                                             "writers":  [
+                                                                             "CultureObject.Deserialize"
+                                                                         ],
+                                                             "naval":  false
+                                                         },
+                    "duel_preset_equipment_roster":  {
+                                                         "readBy":  "CultureObject.Deserialize",
+                                                         "property":  "DuelPresetEquipmentRoster",
+                                                         "propertyType":  "MBEquipmentRoster",
+                                                         "declaringType":  "CultureObject",
+                                                         "setter":  "private",
+                                                         "writers":  [
+                                                                         "CultureObject.Deserialize"
+                                                                     ],
+                                                         "naval":  false
+                                                     },
+                    "marriage_bride_equipment_roster":  {
+                                                            "readBy":  "CultureObject.Deserialize",
+                                                            "property":  "MarriageBrideEquipmentRoster",
+                                                            "propertyType":  "MBEquipmentRoster",
+                                                            "declaringType":  "CultureObject",
+                                                            "setter":  "private",
+                                                            "writers":  [
+                                                                            "CultureObject.Deserialize"
+                                                                        ],
+                                                            "naval":  false
+                                                        },
+                    "tournament_master":  {
+                                              "readBy":  "CultureObject.Deserialize",
+                                              "property":  "TournamentMaster",
+                                              "propertyType":  "CharacterObject",
+                                              "declaringType":  "CultureObject",
+                                              "setter":  "private",
+                                              "writers":  [
+                                                              "CultureObject.Deserialize"
+                                                          ],
+                                              "naval":  false
+                                          },
+                    "villager":  {
+                                     "readBy":  "CultureObject.Deserialize",
+                                     "property":  "Villager",
+                                     "propertyType":  "CharacterObject",
+                                     "declaringType":  "CultureObject",
+                                     "setter":  "private",
+                                     "writers":  [
+                                                     "CultureObject.Deserialize"
+                                                 ],
+                                     "naval":  false
+                                 },
+                    "caravan_master":  {
+                                           "readBy":  "CultureObject.Deserialize",
+                                           "property":  "CaravanMaster",
+                                           "propertyType":  "CharacterObject",
+                                           "declaringType":  "CultureObject",
+                                           "setter":  "private",
+                                           "writers":  [
+                                                           "CultureObject.Deserialize"
+                                                       ],
+                                           "naval":  false
+                                       },
+                    "caravan_guard":  {
+                                          "readBy":  "CultureObject.Deserialize",
+                                          "property":  "CaravanGuard",
+                                          "propertyType":  "CharacterObject",
+                                          "declaringType":  "CultureObject",
+                                          "setter":  "private",
+                                          "writers":  [
+                                                          "CultureObject.Deserialize"
+                                                      ],
+                                          "naval":  false
+                                      },
+                    "prison_guard":  {
+                                         "readBy":  "CultureObject.Deserialize",
+                                         "property":  "PrisonGuard",
+                                         "propertyType":  "CharacterObject",
+                                         "declaringType":  "CultureObject",
+                                         "setter":  "private",
+                                         "writers":  [
+                                                         "CultureObject.Deserialize"
+                                                     ],
+                                         "naval":  false
+                                     },
+                    "guard":  {
+                                  "readBy":  "CultureObject.Deserialize",
+                                  "property":  "Guard",
+                                  "propertyType":  "CharacterObject",
+                                  "declaringType":  "CultureObject",
+                                  "setter":  "private",
+                                  "writers":  [
+                                                  "CultureObject.Deserialize"
+                                              ],
+                                  "naval":  false
+                              },
+                    "blacksmith":  {
+                                       "readBy":  "CultureObject.Deserialize",
+                                       "property":  "Blacksmith",
+                                       "propertyType":  "CharacterObject",
+                                       "declaringType":  "CultureObject",
+                                       "setter":  "private",
+                                       "writers":  [
+                                                       "CultureObject.Deserialize"
+                                                   ],
+                                       "naval":  false
+                                   },
+                    "weaponsmith":  {
+                                        "readBy":  "CultureObject.Deserialize",
+                                        "property":  "Weaponsmith",
+                                        "propertyType":  "CharacterObject",
+                                        "declaringType":  "CultureObject",
+                                        "setter":  "private",
+                                        "writers":  [
+                                                        "CultureObject.Deserialize"
+                                                    ],
+                                        "naval":  false
+                                    },
+                    "townswoman":  {
+                                       "readBy":  "CultureObject.Deserialize",
+                                       "property":  "Townswoman",
+                                       "propertyType":  "CharacterObject",
+                                       "declaringType":  "CultureObject",
+                                       "setter":  "private",
+                                       "writers":  [
+                                                       "CultureObject.Deserialize"
+                                                   ],
+                                       "naval":  false
+                                   },
+                    "townswoman_infant":  {
+                                              "readBy":  "CultureObject.Deserialize",
+                                              "property":  "TownswomanInfant",
+                                              "propertyType":  "CharacterObject",
+                                              "declaringType":  "CultureObject",
+                                              "setter":  "private",
+                                              "writers":  [
+                                                              "CultureObject.Deserialize"
+                                                          ],
+                                              "naval":  false
+                                          },
+                    "townswoman_child":  {
+                                             "readBy":  "CultureObject.Deserialize",
+                                             "property":  "TownswomanChild",
+                                             "propertyType":  "CharacterObject",
+                                             "declaringType":  "CultureObject",
+                                             "setter":  "private",
+                                             "writers":  [
+                                                             "CultureObject.Deserialize"
+                                                         ],
+                                             "naval":  false
+                                         },
+                    "townswoman_teenager":  {
+                                                "readBy":  "CultureObject.Deserialize",
+                                                "property":  "TownswomanTeenager",
+                                                "propertyType":  "CharacterObject",
+                                                "declaringType":  "CultureObject",
+                                                "setter":  "private",
+                                                "writers":  [
+                                                                "CultureObject.Deserialize"
+                                                            ],
+                                                "naval":  false
+                                            },
+                    "townsman":  {
+                                     "readBy":  "CultureObject.Deserialize",
+                                     "property":  "Townsman",
+                                     "propertyType":  "CharacterObject",
+                                     "declaringType":  "CultureObject",
+                                     "setter":  "private",
+                                     "writers":  [
+                                                     "CultureObject.Deserialize"
+                                                 ],
+                                     "naval":  false
+                                 },
+                    "townsman_infant":  {
+                                            "readBy":  "CultureObject.Deserialize",
+                                            "property":  "TownsmanInfant",
+                                            "propertyType":  "CharacterObject",
+                                            "declaringType":  "CultureObject",
+                                            "setter":  "private",
+                                            "writers":  [
+                                                            "CultureObject.Deserialize"
+                                                        ],
+                                            "naval":  false
+                                        },
+                    "townsman_child":  {
+                                           "readBy":  "CultureObject.Deserialize",
+                                           "property":  "TownsmanChild",
+                                           "propertyType":  "CharacterObject",
+                                           "declaringType":  "CultureObject",
+                                           "setter":  "private",
+                                           "writers":  [
+                                                           "CultureObject.Deserialize"
+                                                       ],
+                                           "naval":  false
+                                       },
+                    "townsman_teenager":  {
+                                              "readBy":  "CultureObject.Deserialize",
+                                              "property":  "TownsmanTeenager",
+                                              "propertyType":  "CharacterObject",
+                                              "declaringType":  "CultureObject",
+                                              "setter":  "private",
+                                              "writers":  [
+                                                              "CultureObject.Deserialize"
+                                                          ],
+                                              "naval":  false
+                                          },
+                    "village_woman":  {
+                                          "readBy":  "CultureObject.Deserialize",
+                                          "property":  "VillageWoman",
+                                          "propertyType":  "CharacterObject",
+                                          "declaringType":  "CultureObject",
+                                          "setter":  "private",
+                                          "writers":  [
+                                                          "CultureObject.Deserialize"
+                                                      ],
+                                          "naval":  false
+                                      },
+                    "villager_male_child":  {
+                                                "readBy":  "CultureObject.Deserialize",
+                                                "property":  "VillagerMaleChild",
+                                                "propertyType":  "CharacterObject",
+                                                "declaringType":  "CultureObject",
+                                                "setter":  "private",
+                                                "writers":  [
+                                                                "CultureObject.Deserialize"
+                                                            ],
+                                                "naval":  false
+                                            },
+                    "villager_male_teenager":  {
+                                                   "readBy":  "CultureObject.Deserialize",
+                                                   "property":  "VillagerMaleTeenager",
+                                                   "propertyType":  "CharacterObject",
+                                                   "declaringType":  "CultureObject",
+                                                   "setter":  "private",
+                                                   "writers":  [
+                                                                   "CultureObject.Deserialize"
+                                                               ],
+                                                   "naval":  false
+                                               },
+                    "villager_female_child":  {
+                                                  "readBy":  "CultureObject.Deserialize",
+                                                  "property":  "VillagerFemaleChild",
+                                                  "propertyType":  "CharacterObject",
+                                                  "declaringType":  "CultureObject",
+                                                  "setter":  "private",
+                                                  "writers":  [
+                                                                  "CultureObject.Deserialize"
+                                                              ],
+                                                  "naval":  false
+                                              },
+                    "villager_female_teenager":  {
+                                                     "readBy":  "CultureObject.Deserialize",
+                                                     "property":  "VillagerFemaleTeenager",
+                                                     "propertyType":  "CharacterObject",
+                                                     "declaringType":  "CultureObject",
+                                                     "setter":  "private",
+                                                     "writers":  [
+                                                                     "CultureObject.Deserialize"
+                                                                 ],
+                                                     "naval":  false
+                                                 },
+                    "ransom_broker":  {
+                                          "readBy":  "CultureObject.Deserialize",
+                                          "property":  "RansomBroker",
+                                          "propertyType":  "CharacterObject",
+                                          "declaringType":  "CultureObject",
+                                          "setter":  "private",
+                                          "writers":  [
+                                                          "CultureObject.Deserialize"
+                                                      ],
+                                          "naval":  false
+                                      },
+                    "gangleader_bodyguard":  {
+                                                 "readBy":  "CultureObject.Deserialize",
+                                                 "property":  "GangleaderBodyguard",
+                                                 "propertyType":  "CharacterObject",
+                                                 "declaringType":  "CultureObject",
+                                                 "setter":  "private",
+                                                 "writers":  [
+                                                                 "CultureObject.Deserialize"
+                                                             ],
+                                                 "naval":  false
+                                             },
+                    "merchant_notary":  {
+                                            "readBy":  "CultureObject.Deserialize",
+                                            "property":  "MerchantNotary",
+                                            "propertyType":  "CharacterObject",
+                                            "declaringType":  "CultureObject",
+                                            "setter":  "private",
+                                            "writers":  [
+                                                            "CultureObject.Deserialize"
+                                                        ],
+                                            "naval":  false
+                                        },
+                    "artisan_notary":  {
+                                           "readBy":  "CultureObject.Deserialize",
+                                           "property":  "ArtisanNotary",
+                                           "propertyType":  "CharacterObject",
+                                           "declaringType":  "CultureObject",
+                                           "setter":  "private",
+                                           "writers":  [
+                                                           "CultureObject.Deserialize"
+                                                       ],
+                                           "naval":  false
+                                       },
+                    "preacher_notary":  {
+                                            "readBy":  "CultureObject.Deserialize",
+                                            "property":  "PreacherNotary",
+                                            "propertyType":  "CharacterObject",
+                                            "declaringType":  "CultureObject",
+                                            "setter":  "private",
+                                            "writers":  [
+                                                            "CultureObject.Deserialize"
+                                                        ],
+                                            "naval":  false
+                                        },
+                    "rural_notable_notary":  {
+                                                 "readBy":  "CultureObject.Deserialize",
+                                                 "property":  "RuralNotableNotary",
+                                                 "propertyType":  "CharacterObject",
+                                                 "declaringType":  "CultureObject",
+                                                 "setter":  "private",
+                                                 "writers":  [
+                                                                 "CultureObject.Deserialize"
+                                                             ],
+                                                 "naval":  false
+                                             },
+                    "shop_worker":  {
+                                        "readBy":  "CultureObject.Deserialize",
+                                        "property":  "ShopWorker",
+                                        "propertyType":  "CharacterObject",
+                                        "declaringType":  "CultureObject",
+                                        "setter":  "private",
+                                        "writers":  [
+                                                        "CultureObject.Deserialize"
+                                                    ],
+                                        "naval":  false
+                                    },
+                    "tavernkeeper":  {
+                                         "readBy":  "CultureObject.Deserialize",
+                                         "property":  "Tavernkeeper",
+                                         "propertyType":  "CharacterObject",
+                                         "declaringType":  "CultureObject",
+                                         "setter":  "private",
+                                         "writers":  [
+                                                         "CultureObject.Deserialize"
+                                                     ],
+                                         "naval":  false
+                                     },
+                    "taverngamehost":  {
+                                           "readBy":  "CultureObject.Deserialize",
+                                           "property":  "TavernGamehost",
+                                           "propertyType":  "CharacterObject",
+                                           "declaringType":  "CultureObject",
+                                           "setter":  "private",
+                                           "writers":  [
+                                                           "CultureObject.Deserialize"
+                                                       ],
+                                           "naval":  false
+                                       },
+                    "musician":  {
+                                     "readBy":  "CultureObject.Deserialize",
+                                     "property":  "Musician",
+                                     "propertyType":  "CharacterObject",
+                                     "declaringType":  "CultureObject",
+                                     "setter":  "private",
+                                     "writers":  [
+                                                     "CultureObject.Deserialize"
+                                                 ],
+                                     "naval":  false
+                                 },
+                    "tavern_wench":  {
+                                         "readBy":  "CultureObject.Deserialize",
+                                         "property":  "TavernWench",
+                                         "propertyType":  "CharacterObject",
+                                         "declaringType":  "CultureObject",
+                                         "setter":  "private",
+                                         "writers":  [
+                                                         "CultureObject.Deserialize"
+                                                     ],
+                                         "naval":  false
+                                     },
+                    "armorer":  {
+                                    "readBy":  "CultureObject.Deserialize",
+                                    "property":  "Armorer",
+                                    "propertyType":  "CharacterObject",
+                                    "declaringType":  "CultureObject",
+                                    "setter":  "private",
+                                    "writers":  [
+                                                    "CultureObject.Deserialize"
+                                                ],
+                                    "naval":  false
+                                },
+                    "horseMerchant":  {
+                                          "readBy":  "CultureObject.Deserialize",
+                                          "property":  "HorseMerchant",
+                                          "propertyType":  "CharacterObject",
+                                          "declaringType":  "CultureObject",
+                                          "setter":  "private",
+                                          "writers":  [
+                                                          "CultureObject.Deserialize"
+                                                      ],
+                                          "naval":  false
+                                      },
+                    "barber":  {
+                                   "readBy":  "CultureObject.Deserialize",
+                                   "property":  "Barber",
+                                   "propertyType":  "CharacterObject",
+                                   "declaringType":  "CultureObject",
+                                   "setter":  "private",
+                                   "writers":  [
+                                                   "CultureObject.Deserialize"
+                                               ],
+                                   "naval":  false
+                               },
+                    "merchant":  {
+                                     "readBy":  "CultureObject.Deserialize",
+                                     "property":  "Merchant",
+                                     "propertyType":  "CharacterObject",
+                                     "declaringType":  "CultureObject",
+                                     "setter":  "private",
+                                     "writers":  [
+                                                     "CultureObject.Deserialize"
+                                                 ],
+                                     "naval":  false
+                                 },
+                    "beggar":  {
+                                   "readBy":  "CultureObject.Deserialize",
+                                   "property":  "Beggar",
+                                   "propertyType":  "CharacterObject",
+                                   "declaringType":  "CultureObject",
+                                   "setter":  "private",
+                                   "writers":  [
+                                                   "CultureObject.Deserialize"
+                                               ],
+                                   "naval":  false
+                               },
+                    "female_beggar":  {
+                                          "readBy":  "CultureObject.Deserialize",
+                                          "property":  "FemaleBeggar",
+                                          "propertyType":  "CharacterObject",
+                                          "declaringType":  "CultureObject",
+                                          "setter":  "private",
+                                          "writers":  [
+                                                          "CultureObject.Deserialize"
+                                                      ],
+                                          "naval":  false
+                                      },
+                    "female_dancer":  {
+                                          "readBy":  "CultureObject.Deserialize",
+                                          "property":  "FemaleDancer",
+                                          "propertyType":  "CharacterObject",
+                                          "declaringType":  "CultureObject",
+                                          "setter":  "private",
+                                          "writers":  [
+                                                          "CultureObject.Deserialize"
+                                                      ],
+                                          "naval":  false
+                                      },
+                    "shipwright":  {
+                                       "readBy":  "CultureObject.Deserialize",
+                                       "property":  "Shipwright",
+                                       "propertyType":  "CharacterObject",
+                                       "declaringType":  "CultureObject",
+                                       "setter":  "private",
+                                       "writers":  [
+                                                       "CultureObject.Deserialize"
+                                                   ],
+                                       "naval":  true
+                                   },
+                    "shipyard_worker":  {
+                                            "readBy":  "CultureObject.Deserialize",
+                                            "property":  "ShipyardWorker",
+                                            "propertyType":  "CharacterObject",
+                                            "declaringType":  "CultureObject",
+                                            "setter":  "private",
+                                            "writers":  [
+                                                            "CultureObject.Deserialize"
+                                                        ],
+                                            "naval":  true
+                                        },
+                    "militia_veteran_archer":  {
+                                                   "readBy":  "CultureObject.Deserialize",
+                                                   "property":  "MilitiaVeteranArcher",
+                                                   "propertyType":  "CharacterObject",
+                                                   "declaringType":  "CultureObject",
+                                                   "setter":  "private",
+                                                   "writers":  [
+                                                                   "CultureObject.Deserialize"
+                                                               ],
+                                                   "naval":  false
+                                               },
+                    "gear_dummy":  {
+                                       "readBy":  "CultureObject.Deserialize",
+                                       "property":  "GearDummy",
+                                       "propertyType":  "CharacterObject",
+                                       "declaringType":  "CultureObject",
+                                       "setter":  "private",
+                                       "writers":  [
+                                                       "CultureObject.Deserialize"
+                                                   ],
+                                       "naval":  false
+                                   },
+                    "bandit_bandit":  {
+                                          "readBy":  "CultureObject.Deserialize",
+                                          "property":  "BanditBandit",
+                                          "propertyType":  "CharacterObject",
+                                          "declaringType":  "CultureObject",
+                                          "setter":  "private",
+                                          "writers":  [
+                                                          "CultureObject.Deserialize"
+                                                      ],
+                                          "naval":  false
+                                      },
+                    "bandit_raider":  {
+                                          "readBy":  "CultureObject.Deserialize",
+                                          "property":  "BanditRaider",
+                                          "propertyType":  "CharacterObject",
+                                          "declaringType":  "CultureObject",
+                                          "setter":  "private",
+                                          "writers":  [
+                                                          "CultureObject.Deserialize"
+                                                      ],
+                                          "naval":  false
+                                      },
+                    "bandit_chief":  {
+                                         "readBy":  "CultureObject.Deserialize",
+                                         "property":  "BanditChief",
+                                         "propertyType":  "CharacterObject",
+                                         "declaringType":  "CultureObject",
+                                         "setter":  "private",
+                                         "writers":  [
+                                                         "CultureObject.Deserialize"
+                                                     ],
+                                         "naval":  false
+                                     },
+                    "bandit_boss":  {
+                                        "readBy":  "CultureObject.Deserialize",
+                                        "property":  "BanditBoss",
+                                        "propertyType":  "CharacterObject",
+                                        "declaringType":  "CultureObject",
+                                        "setter":  "private",
+                                        "writers":  [
+                                                        "CultureObject.Deserialize"
+                                                    ],
+                                        "naval":  false
+                                    },
+                    "default_character_creation_body_property":  {
+                                                                     "readBy":  "CultureObject.Deserialize",
+                                                                     "property":  "DefaultCharacterCreationBodyProperty",
+                                                                     "propertyType":  "MBBodyProperty",
+                                                                     "declaringType":  "CultureObject",
+                                                                     "setter":  "private",
+                                                                     "writers":  [
+                                                                                     "CultureObject.Deserialize"
+                                                                                 ],
+                                                                     "naval":  false
+                                                                 },
+                    "text":  {
+                                 "readBy":  "CultureObject.Deserialize",
+                                 "property":  "EncyclopediaText",
+                                 "propertyType":  "TextObject",
+                                 "declaringType":  "CultureObject",
+                                 "setter":  "private",
+                                 "writers":  [
+                                                 "CultureObject.Deserialize"
+                                             ],
+                                 "naval":  false
+                             },
+                    "start_point_position_x":  {
+                                                   "readBy":  "CultureObject.Deserialize",
+                                                   "property":  "StartingPoint",
+                                                   "propertyType":  "CampaignVec2",
+                                                   "declaringType":  "CultureObject",
+                                                   "setter":  "private",
+                                                   "writers":  [
+                                                                   "CultureObject.Deserialize"
+                                                               ],
+                                                   "naval":  false
+                                               },
+                    "start_point_position_y":  {
+                                                   "readBy":  "CultureObject.Deserialize",
+                                                   "property":  "StartingPoint",
+                                                   "propertyType":  "CampaignVec2",
+                                                   "declaringType":  "CultureObject",
+                                                   "setter":  "private",
+                                                   "writers":  [
+                                                                   "CultureObject.Deserialize"
+                                                               ],
+                                                   "naval":  false
+                                               },
+                    "board_game_type":  {
+                                            "readBy":  "CultureObject.Deserialize",
+                                            "property":  "BoardGame",
+                                            "propertyType":  "BoardGameType",
+                                            "declaringType":  "CultureObject",
+                                            "setter":  "private",
+                                            "writers":  [
+                                                            "CultureObject.Deserialize"
+                                                        ],
+                                            "naval":  false
+                                        },
+                    "default_policies":  {
+                                             "readBy":  "CultureObject.Deserialize",
+                                             "property":  "DefaultPolicyList",
+                                             "propertyType":  "MBReadOnlyList`1",
+                                             "declaringType":  "CultureObject",
+                                             "setter":  "none",
+                                             "writers":  [
+
+                                                         ],
+                                             "naval":  false
+                                         },
+                    "male_names":  {
+                                       "readBy":  "CultureObject.Deserialize",
+                                       "property":  "MaleNameList",
+                                       "propertyType":  "MBReadOnlyList`1",
+                                       "declaringType":  "CultureObject",
+                                       "setter":  "none",
+                                       "writers":  [
+
+                                                   ],
+                                       "naval":  false
+                                   },
+                    "female_names":  {
+                                         "readBy":  "CultureObject.Deserialize",
+                                         "property":  "FemaleNameList",
+                                         "propertyType":  "MBReadOnlyList`1",
+                                         "declaringType":  "CultureObject",
+                                         "setter":  "none",
+                                         "writers":  [
+
+                                                     ],
+                                         "naval":  false
+                                     },
+                    "clan_names":  {
+                                       "readBy":  "CultureObject.Deserialize",
+                                       "property":  "ClanNameList",
+                                       "propertyType":  "MBReadOnlyList`1",
+                                       "declaringType":  "CultureObject",
+                                       "setter":  "none",
+                                       "writers":  [
+
+                                                   ],
+                                       "naval":  false
+                                   },
+                    "cultural_feats":  {
+                                           "readBy":  "CultureObject.Deserialize",
+                                           "property":  "CultureFeats",
+                                           "propertyType":  "MBReadOnlyList`1",
+                                           "declaringType":  "CultureObject",
+                                           "setter":  "none",
+                                           "writers":  [
+
+                                                       ],
+                                           "naval":  false
+                                       },
+                    "possible_clan_banner_icon_ids":  {
+                                                          "readBy":  "CultureObject.Deserialize",
+                                                          "property":  "PossibleClanBannerIconsIDs",
+                                                          "propertyType":  "MBReadOnlyList`1",
+                                                          "declaringType":  "CultureObject",
+                                                          "setter":  "private",
+                                                          "writers":  [
+                                                                          "CultureObject.Deserialize"
+                                                                      ],
+                                                          "naval":  false
+                                                      },
+                    "notable_templates":  {
+                                              "readBy":  "CultureObject.Deserialize",
+                                              "property":  "NotableTemplates",
+                                              "propertyType":  "MBReadOnlyList`1",
+                                              "declaringType":  "CultureObject",
+                                              "setter":  "private",
+                                              "writers":  [
+                                                              "CultureObject.Deserialize"
+                                                          ],
+                                              "naval":  false
+                                          },
+                    "lord_templates":  {
+                                           "readBy":  "CultureObject.Deserialize",
+                                           "property":  "LordTemplates",
+                                           "propertyType":  "MBReadOnlyList`1",
+                                           "declaringType":  "CultureObject",
+                                           "setter":  "private",
+                                           "writers":  [
+                                                           "CultureObject.Deserialize"
+                                                       ],
+                                           "naval":  false
+                                       },
+                    "rebellion_hero_templates":  {
+                                                     "readBy":  "CultureObject.Deserialize",
+                                                     "property":  "RebelliousHeroTemplates",
+                                                     "propertyType":  "MBReadOnlyList`1",
+                                                     "declaringType":  "CultureObject",
+                                                     "setter":  "private",
+                                                     "writers":  [
+                                                                     "CultureObject.Deserialize"
+                                                                 ],
+                                                     "naval":  false
+                                                 },
+                    "tournament_team_templates_one_participant":  {
+                                                                      "readBy":  "CultureObject.Deserialize",
+                                                                      "property":  "TournamentTeamTemplatesForOneParticipant",
+                                                                      "propertyType":  "MBReadOnlyList`1",
+                                                                      "declaringType":  "CultureObject",
+                                                                      "setter":  "private",
+                                                                      "writers":  [
+                                                                                      "CultureObject.Deserialize"
+                                                                                  ],
+                                                                      "naval":  false
+                                                                  },
+                    "tournament_team_templates_two_participant":  {
+                                                                      "readBy":  "CultureObject.Deserialize",
+                                                                      "property":  "TournamentTeamTemplatesForTwoParticipant",
+                                                                      "propertyType":  "MBReadOnlyList`1",
+                                                                      "declaringType":  "CultureObject",
+                                                                      "setter":  "private",
+                                                                      "writers":  [
+                                                                                      "CultureObject.Deserialize"
+                                                                                  ],
+                                                                      "naval":  false
+                                                                  },
+                    "tournament_team_templates_four_participant":  {
+                                                                       "readBy":  "CultureObject.Deserialize",
+                                                                       "property":  "TournamentTeamTemplatesForFourParticipant",
+                                                                       "propertyType":  "MBReadOnlyList`1",
+                                                                       "declaringType":  "CultureObject",
+                                                                       "setter":  "private",
+                                                                       "writers":  [
+                                                                                       "CultureObject.Deserialize"
+                                                                                   ],
+                                                                       "naval":  false
+                                                                   },
+                    "vassal_reward_items":  {
+                                                "readBy":  "CultureObject.Deserialize",
+                                                "property":  "VassalRewardItems",
+                                                "propertyType":  "MBReadOnlyList`1",
+                                                "declaringType":  "CultureObject",
+                                                "setter":  "private",
+                                                "writers":  [
+                                                                "CultureObject.Deserialize"
+                                                            ],
+                                                "naval":  false
+                                            },
+                    "basic_mercenary_troops":  {
+                                                   "readBy":  "CultureObject.Deserialize",
+                                                   "property":  "BasicMercenaryTroops",
+                                                   "propertyType":  "MBReadOnlyList`1",
+                                                   "declaringType":  "CultureObject",
+                                                   "setter":  "private",
+                                                   "writers":  [
+                                                                   "CultureObject.Deserialize"
+                                                               ],
+                                                   "naval":  false
+                                               },
+                    "banner_bearer_replacement_weapons":  {
+                                                              "readBy":  "CultureObject.Deserialize",
+                                                              "property":  "BannerBearerReplacementWeapons",
+                                                              "propertyType":  "MBReadOnlyList`1",
+                                                              "declaringType":  "CultureObject",
+                                                              "setter":  "private",
+                                                              "writers":  [
+                                                                              "CultureObject.Deserialize"
+                                                                          ],
+                                                              "naval":  false
+                                                          },
+                    "caravan_party_templates":  {
+                                                    "readBy":  "CultureObject.Deserialize",
+                                                    "property":  "CaravanPartyTemplates",
+                                                    "propertyType":  "MBList`1",
+                                                    "declaringType":  "CultureObject",
+                                                    "setter":  "private",
+                                                    "writers":  [
+                                                                    "CultureObject.Deserialize"
+                                                                ],
+                                                    "naval":  false
+                                                },
+                    "elite_caravan_party_templates":  {
+                                                          "readBy":  "CultureObject.Deserialize",
+                                                          "property":  "EliteCaravanPartyTemplates",
+                                                          "propertyType":  "MBList`1",
+                                                          "declaringType":  "CultureObject",
+                                                          "setter":  "private",
+                                                          "writers":  [
+                                                                          "CultureObject.Deserialize"
+                                                                      ],
+                                                          "naval":  false
+                                                      },
+                    "available_ship_hulls":  {
+                                                 "readBy":  "CultureObject.Deserialize",
+                                                 "property":  "AvailableShipHulls",
+                                                 "propertyType":  "MBList`1",
+                                                 "declaringType":  "CultureObject",
+                                                 "setter":  "private",
+                                                 "writers":  [
+                                                                 "CultureObject.Deserialize"
+                                                             ],
+                                                 "naval":  true
+                                             },
+                    "color":  {
+                                  "readBy":  "BasicCultureObject.Deserialize",
+                                  "property":  "Color",
+                                  "propertyType":  "UInt32",
+                                  "declaringType":  "BasicCultureObject",
+                                  "setter":  "private",
+                                  "writers":  [
+                                                  "BasicCultureObject.Deserialize"
+                                              ],
+                                  "naval":  false
+                              },
+                    "color2":  {
+                                   "readBy":  "BasicCultureObject.Deserialize",
+                                   "property":  "Color2",
+                                   "propertyType":  "UInt32",
+                                   "declaringType":  "BasicCultureObject",
+                                   "setter":  "private",
+                                   "writers":  [
+                                                   "BasicCultureObject.Deserialize"
+                                               ],
+                                   "naval":  false
+                               },
+                    "cloth_alternative_color1":  {
+                                                     "readBy":  "BasicCultureObject.Deserialize",
+                                                     "property":  "ClothAlternativeColor",
+                                                     "propertyType":  "UInt32",
+                                                     "declaringType":  "BasicCultureObject",
+                                                     "setter":  "private",
+                                                     "writers":  [
+                                                                     "BasicCultureObject.Deserialize"
+                                                                 ],
+                                                     "naval":  false
+                                                 },
+                    "cloth_alternative_color2":  {
+                                                     "readBy":  "BasicCultureObject.Deserialize",
+                                                     "property":  "ClothAlternativeColor2",
+                                                     "propertyType":  "UInt32",
+                                                     "declaringType":  "BasicCultureObject",
+                                                     "setter":  "private",
+                                                     "writers":  [
+                                                                     "BasicCultureObject.Deserialize"
+                                                                 ],
+                                                     "naval":  false
+                                                 },
+                    "banner_background_color1":  {
+                                                     "readBy":  "BasicCultureObject.Deserialize",
+                                                     "property":  "BackgroundColor1",
+                                                     "propertyType":  "UInt32",
+                                                     "declaringType":  "BasicCultureObject",
+                                                     "setter":  "private",
+                                                     "writers":  [
+                                                                     "BasicCultureObject.Deserialize"
+                                                                 ],
+                                                     "naval":  false
+                                                 },
+                    "banner_foreground_color1":  {
+                                                     "readBy":  "BasicCultureObject.Deserialize",
+                                                     "property":  "ForegroundColor1",
+                                                     "propertyType":  "UInt32",
+                                                     "declaringType":  "BasicCultureObject",
+                                                     "setter":  "private",
+                                                     "writers":  [
+                                                                     "BasicCultureObject.Deserialize"
+                                                                 ],
+                                                     "naval":  false
+                                                 },
+                    "banner_background_color2":  {
+                                                     "readBy":  "BasicCultureObject.Deserialize",
+                                                     "property":  "BackgroundColor2",
+                                                     "propertyType":  "UInt32",
+                                                     "declaringType":  "BasicCultureObject",
+                                                     "setter":  "private",
+                                                     "writers":  [
+                                                                     "BasicCultureObject.Deserialize"
+                                                                 ],
+                                                     "naval":  false
+                                                 },
+                    "banner_foreground_color2":  {
+                                                     "readBy":  "BasicCultureObject.Deserialize",
+                                                     "property":  "ForegroundColor2",
+                                                     "propertyType":  "UInt32",
+                                                     "declaringType":  "BasicCultureObject",
+                                                     "setter":  "private",
+                                                     "writers":  [
+                                                                     "BasicCultureObject.Deserialize"
+                                                                 ],
+                                                     "naval":  false
+                                                 },
+                    "is_main_culture":  {
+                                            "readBy":  "BasicCultureObject.Deserialize",
+                                            "property":  "IsMainCulture",
+                                            "propertyType":  "Boolean",
+                                            "declaringType":  "BasicCultureObject",
+                                            "setter":  "private",
+                                            "writers":  [
+                                                            "BasicCultureObject.Deserialize"
+                                                        ],
+                                            "naval":  false
+                                        },
+                    "encounter_background_mesh":  {
+                                                      "readBy":  "BasicCultureObject.Deserialize",
+                                                      "property":  "EncounterBackgroundMesh",
+                                                      "propertyType":  "String",
+                                                      "declaringType":  "BasicCultureObject",
+                                                      "setter":  "public",
+                                                      "writers":  [
+                                                                      "BasicCultureObject.Deserialize"
+                                                                  ],
+                                                      "naval":  false
+                                                  },
+                    "faction_banner_key":  {
+                                               "readBy":  "BasicCultureObject.Deserialize",
+                                               "property":  "Banner",
+                                               "propertyType":  "Banner",
+                                               "declaringType":  "BasicCultureObject",
+                                               "setter":  "private",
+                                               "writers":  [
+                                                               "BasicCultureObject.Deserialize"
+                                                           ],
+                                               "naval":  false
+                                           },
+                    "is_bandit":  {
+                                      "readBy":  "BasicCultureObject.Deserialize",
+                                      "property":  "IsBandit",
+                                      "propertyType":  "Boolean",
+                                      "declaringType":  "BasicCultureObject",
+                                      "setter":  "private",
+                                      "writers":  [
+                                                      "BasicCultureObject.Deserialize"
+                                                  ],
+                                      "naval":  false
+                                  },
+                    "can_have_settlement":  {
+                                                "readBy":  "BasicCultureObject.Deserialize",
+                                                "property":  "CanHaveSettlement",
+                                                "propertyType":  "Boolean",
+                                                "declaringType":  "BasicCultureObject",
+                                                "setter":  "private",
+                                                "writers":  [
+                                                                "BasicCultureObject.Deserialize"
+                                                            ],
+                                                "naval":  false
+                                            }
+                },
+    "navalMembers":  [
+                         "shipwright",
+                         "shipyard_worker",
+                         "fishing_party_template",
+                         "available_ship_hulls",
+                         "settlement_patrol_template_coastal",
+                         "naval_factor"
+                     ],
+    "constructors":  [
+                         {
+                             "type":  "CultureObject",
+                             "access":  "public",
+                             "parameters":  [
+
+                                            ]
+                         },
+                         {
+                             "type":  "BasicCultureObject",
+                             "access":  "public",
+                             "parameters":  [
+
+                                            ]
+                         }
+                     ],
+    "summary":  {
+                    "members":  108,
+                    "privateSetter":  100,
+                    "noSetter":  5,
+                    "internalSetter":  0,
+                    "protectedSetter":  0,
+                    "publicSetter":  3,
+                    "writtenOnlyByDeserialize":  105,
+                    "otherWriters":  {
+
+                                     },
+                    "unmapped":  [
+
+                                 ]
+                },
+    "initialization":  "Setter accessibility is read on the property\u0027s declaring type. writers are the methods whose IL calls the setter (call/callvirt with its token; private setters are searched in the declaring type and its nested types, wider ones in the whole declaring assembly). A get-only property (setter none) is filled through its backing field by Deserialize. The constructors take no culture data, so a culture is complete only after Deserialize.",
+    "policy":  "A generated world presents every civilization through an installed main culture (culture-presentations.json). The culture contract is filled from XML, so it is reused as installed, never constructed or patched in code.",
+    "required":  [
+                     "naval_factor",
+                     "default_party_template",
+                     "villager_party_template",
+                     "fishing_party_template",
+                     "militia_party_template",
+                     "rebels_party_template",
+                     "vassal_reward_party_template",
+                     "settlement_patrol_template_level_1",
+                     "settlement_patrol_template_level_2",
+                     "settlement_patrol_template_level_3",
+                     "settlement_patrol_template_coastal",
+                     "elite_basic_troop",
+                     "melee_elite_militia_troop",
+                     "ranged_elite_militia_troop",
+                     "melee_militia_troop",
+                     "ranged_militia_troop",
+                     "basic_troop",
+                     "default_battle_equipment_roster",
+                     "default_civilian_equipment_roster",
+                     "default_stealth_equipment_roster",
+                     "duel_preset_equipment_roster",
+                     "marriage_bride_equipment_roster",
+                     "tournament_master",
+                     "villager",
+                     "caravan_master",
+                     "caravan_guard",
+                     "prison_guard",
+                     "guard",
+                     "blacksmith",
+                     "weaponsmith",
+                     "townswoman",
+                     "townswoman_infant",
+                     "townswoman_child",
+                     "townswoman_teenager",
+                     "townsman",
+                     "townsman_infant",
+                     "townsman_child",
+                     "townsman_teenager",
+                     "village_woman",
+                     "villager_male_child",
+                     "villager_male_teenager",
+                     "villager_female_child",
+                     "villager_female_teenager",
+                     "ransom_broker",
+                     "gangleader_bodyguard",
+                     "merchant_notary",
+                     "artisan_notary",
+                     "preacher_notary",
+                     "rural_notable_notary",
+                     "shop_worker",
+                     "tavernkeeper",
+                     "taverngamehost",
+                     "musician",
+                     "tavern_wench",
+                     "armorer",
+                     "horseMerchant",
+                     "barber",
+                     "merchant",
+                     "beggar",
+                     "female_beggar",
+                     "female_dancer",
+                     "shipwright",
+                     "shipyard_worker",
+                     "default_character_creation_body_property",
+                     "text",
+                     "start_point_position_x",
+                     "start_point_position_y",
+                     "board_game_type",
+                     "default_policies",
+                     "male_names",
+                     "female_names",
+                     "clan_names",
+                     "cultural_feats",
+                     "possible_clan_banner_icon_ids",
+                     "notable_templates",
+                     "lord_templates",
+                     "rebellion_hero_templates",
+                     "tournament_team_templates_one_participant",
+                     "tournament_team_templates_two_participant",
+                     "tournament_team_templates_four_participant",
+                     "vassal_reward_items",
+                     "basic_mercenary_troops",
+                     "banner_bearer_replacement_weapons",
+                     "caravan_party_templates",
+                     "elite_caravan_party_templates",
+                     "available_ship_hulls",
+                     "color",
+                     "color2",
+                     "is_main_culture",
+                     "encounter_background_mesh",
+                     "faction_banner_key",
+                     "can_have_settlement"
+                 ],
+    "requiredRule":  "A member is required when every installed main culture sets it; the installed game runs with the others empty (bandit-only members, optional bonuses and colours with defaults). For the installed main cultures requiredMissing is empty by construction; the check guards any template that is not an installed main culture."
+}

@@ -1,0 +1,13 @@
+{
+ "schema": "mnbl.one-shot-budget",
+ "version": 1,
+ "status": "provisional",
+ "rule": "The waiting times the New Campaign setup screen states (MMR-43). Provisional values are the reference measurements recorded so far; MMR-56 replaces them with its end-to-end F03 measurements and adds the campaign-start phase once that action exists (MMR-46). The screen states a phase's upper measurement rounded up to roundToSeconds, and never promises a time it has no measurement for; a run that takes longer adds its measurement.",
+ "roundToSeconds": 5,
+ "phases": {
+  "generateWorld": {
+   "seconds": [28.6, 27.2, 28.3, 29.4, 30.4],
+   "source": "MMR-44's generation job to review (request, source with quality attempts, bundle, verification, scene, runtime navigation), seed 42 at size 129, on this machine: from the job's start, 28.6 s, 27.2 s and 29.4 s (evidence/runtime/in-game/generation_job-30220.json, -27272.json, -29872.json, jobs[0].seconds); from the setup screen's Confirm to its result, 28.3 s and 30.4 s (world_setup-41228.json, world_setup-26012.json, keys.generationSeconds). Runs 27284 (32.0 s) and 28788 (33.6 s) used an interim build that gave the engine thread back after every navigation route and are not this pipeline. The R01 job's 11.2-15.4 s is no longer what the setup runs."
+  }
+ }
+}

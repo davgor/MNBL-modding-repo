@@ -33,7 +33,7 @@ Two processes ran module `174fcb0a…`, the final tree shared with MMR-59. Proce
 
 What the load uses:
 - the world package;
-- the installed scene slot. Its five files are hash-pinned by the package but live outside it, under a slot name derived from the seed. A same-seed regeneration or a slot redeploy would make the save refuse to load (fail closed). Package-owned scene storage belongs to MMR-62.
+- the installed scene slot. Its five files are hash-pinned by the package but live outside it, under a slot name derived from the seed. A same-seed regeneration or a slot redeploy would make the save refuse to load (fail closed). Package-owned scene storage was assigned to MMR-62; it is not done there: production worlds use content-addressed scene names (MMR-37) and the binding records the data bundle, and installing the scene at activation and reinstalling it at load belong to MMR-45 and MMR-49 (`docs/save-binding.md` limits).
 
 What the load rebuilds from those inputs, not compared with process 1:
 - the navigation caches (about 35 s and 70 s here);
@@ -93,7 +93,7 @@ What the load rebuilds from those inputs, not compared with process 1:
   - Whether a failed overwrite can leave a partial file is unverified.
 - **Missing, corrupt or incompatible packages:** the loader fails closed on any hash mismatch, but no refusal fixture was run (MMR-50).
 - **Re-save after load:** the identity behaviour is re-added on load with the header's entries, but no re-save was run. `SyncData` carries no mirror of the identity.
-- **Location:** the package lives in local app data for this diagnostic. The header stores its absolute path, which includes the Windows user name. Resolving by world id and manifest hash, and production location and ownership, belong to MMR-62.
+- **Location:** the package lives in local app data for this diagnostic. The header stores its absolute path, which includes the Windows user name. Resolving by world id and manifest hash, and production location and ownership, belong to MMR-62. Done by MMR-62: the header now holds the package directory's name, and every loader resolves `<store>/worlds/<id>-<manifest12>` (`GeneratedWorldPackage.Resolve`, `docs/save-binding.md`).
 - **Not part of the snapshot:** anchors and storms (MMR-49). The snapshot compares settlement names and cultures, party positions with their land flag and next steering point, and party, settlement and player faces.
 - **First-chance exceptions:** recorded during each load, informational and not asserted. 30 handled `NullReferenceException`s per load, source not captured; worth tracing in MMR-49's load path.
 - **Embarking was synthetic:** a ship and crew were granted, then `SetSailAtPosition` (as in MMR-17).
@@ -294,10 +294,11 @@ The native pathfinder cannot cross the seam: a continent cut by it is two native
 - **Labels, selection and tooltips:** these are not bound across the seam. Nameplates use canonical positions, so a settlement across the seam shows no label over its strip copy. The copies are not pickable. Mobile parties have no visual copy at all: the hostile party at 400.1 was logically visible from x = 1199.8 but drawn 800 units from the camera.
   - The seams are named: `PartyNameplateVM.RefreshPosition` and `SettlementNameplateVM` need the image nearest the camera. Display copies must register to the canonical `MapEntityVisual`. The entity click's native `Scene.DoesPathExistBetweenFaces` (`HandleLeftMouseButtonClick` IL_007c) bypasses `IMapScene`.
   - All of that is MMR-66's presentation work. The click test drives `MapState.ProcessTravel` directly; the native scene raycast is not simulated.
-- **Tracks** (`MapTracksVisualManager`), weather and storm wrap, and the camera x clamp at the terrain edge are not exercised. The strips keep the camera inside the terrain.
+  - Resolved by MMR-66 (run 33944, `docs/periodic-presentation.md`): nameplates and visuals at the image nearest the camera, settlement display copies registered to the canonical visual, and a native terrain pick in the strip.
+- **Tracks** (`MapTracksVisualManager`), weather and storm wrap, and the camera x clamp at the terrain edge are not exercised. The strips keep the camera inside the terrain. (MMR-65 and MMR-66 later exercised tracks across the seam; MMR-66's canonical camera never reaches the clamp.)
 - **Armies, sieges, raids and embark/disembark at the seam** were not run (army steering above; MMR-65).
 - **Locator image pass:** tested from the east side only. A party that is non-canonical for one frame skips the image pass, because a non-canonical centre marks the image pass. This gives a one-frame proximity or visibility miss before the rebase.
-- **Camera fields:** the camera shift moves every `Vec2`/`Vec3`/`MatrixFrame` field of `MapCameraView` within W/2 of the old party x. That is a heuristic. In this run only the three intended fields moved. It misses the `CampaignVec2` `_lastUsedIdealCameraTarget`. Production should name the fields (MMR-66).
+- **Camera fields:** the camera shift moves every `Vec2`/`Vec3`/`MatrixFrame` field of `MapCameraView` within W/2 of the old party x. That is a heuristic. In this run only the three intended fields moved. It misses the `CampaignVec2` `_lastUsedIdealCameraTarget`. Production should name the fields (MMR-66). MMR-66 replaced the shift with one canonical camera whose named fields are rebased by whole widths.
 - **Battle scene choice:** the battle-index map does not wrap (MMR-60), so scene variety may change across the seam. Scenes are chosen from canonical positions only, so the choice is deterministic.
 - **Remaining planar heuristics:** the survey counted 121 campaign methods with planar distance calls. That count includes the two `GetDistance` methods now transpiled; the rest (AI scoring, flee helpers, tracks) still measure planar. The research expects them to cause scoring or cosmetic errors near the seam rather than movement errors. That is not verified method by method; MMR-64 owns the distance contract.
 - **Cost:** the strip layout doubles the terrain and the navmesh. The All navigation cache took 419 s in the evidence run on this 1600² fixture (Default 19 s, Naval 128 s). Narrower strips with portal stitching are the production option.
@@ -425,6 +426,14 @@ The mission terrain is the stock template's, chosen by generated geography; heig
 - Location scenes need a generated-settlement mapping.
 - Periodic seams (MMR-63/64) block R07.
 - Nothing here needs a real campaign heightfield. The map patch is a managed index, not a terrain query.
+
+**Resolved by MMR-42** (`docs/mission-scenes.md`):
+- **Battle-index map:** installed for every generated world before any encounter, through `GeneratedEncounterResolver` over a versioned scene catalogue that the game checks against its loaded table.
+- **Naval-navigable terrain:** cells are classified by the full set, and each sea terrain gets its own naval scene through the engine's terrain tie-break. That gives 66 deterministic coastal indices instead of 8, and makes River and UnderBridge scenes selectable.
+- **Substitution rules:** agreed for Mountain, Forest and Snow, with biome and relief from the compiled masks.
+- **Settlement location scenes:** checked against the contracts the installed code reads, with `prototypeAndScenes` claimed and validated.
+- **The seam:** canonical patch sampling and the short-way direction, proven at a seam battle in game.
+- **Guard:** a mismatch guard records any battle scene choice that departs from the generated patch.
 
 ## Runtime native surface sequence (2026-10-13, MMR-16 accepted)
 

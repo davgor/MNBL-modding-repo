@@ -1,0 +1,13 @@
+{
+  "author": {
+    "label": "Claude Code",
+    "role": "orchestrator"
+  },
+  "body": "MMR-64 handoff (route execution and spatial consumers).\n- **Shared contract.** Use `PeriodicWorldCoordinates` (`DeltaX`, `Placements`, `CanonicalX`, `GeometricDistance` as a lower bound only) and `PeriodicDistanceModel.ShortestOverImages`. Never redefine a rule.\n- **Long-way paths.** `GeneratedMapScene.GetPathBetweenAIFaces` now returns a long-way path from a moved start, shifted back so it starts at the caller's start. Its points can lie beyond the terrain edge after the seam crossing; `PeriodicSeam` rebases at the seam before they are reached. Route execution must keep that invariant.\n- **Not representable.** A route whose path itself leaves the terrain cannot be represented.\n- **Still planar.** Of the MMR-63 survey (`build/research-wrap63/planar_campaign.tsv`, 182 sites), 129 spatial consumers remain planar: AI scoring, quests, NavalDLC behaviours and the like. 29 are patched (the model legs, the closest-settlement order, `DistanceHelper` and `SettlementHelper.FindNearestSettlementToPoint`); 4 are exact without a patch; 20 are views.\n- **Also MMR-65's:** armies, sieges, raids and embark at the seam; direct `LocatorGrid` callers; `FindPointAroundPosition`.",
+  "createdAt": "2026-10-16T08:31:01.193Z",
+  "epicId": "ep_01m4fpnf646t254mnh69jhz107",
+  "format": "darkmechanicus.comment",
+  "formatVersion": 1,
+  "id": "cm_01m51xc0j9ae7zp5y2c4gdsn5n",
+  "ticketId": "tk_01m4fr2f4jhzd3swbxzj3161xf"
+}

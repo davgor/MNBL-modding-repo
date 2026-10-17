@@ -1,0 +1,59 @@
+{
+  "fixtureDirectory": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\build\\battle-scale\\runner-failure-tests-96703efb5339490fa010f42b9f95165a",
+  "cases": [
+    {
+      "scenario": "preexisting-request",
+      "originalRestored": true,
+      "failure": "System.Management.Automation.RuntimeException: Another unclaimed probe request exists.",
+      "mockLaunches": 0,
+      "passed": true
+    },
+    {
+      "scenario": "partial-copy",
+      "originalRestored": true,
+      "failure": "System.Management.Automation.RuntimeException: Injected interrupted deployment copy.",
+      "mockLaunches": 0,
+      "passed": true
+    },
+    {
+      "scenario": "cleanup-throw",
+      "originalRestored": true,
+      "failure": "System.Management.Automation.MethodInvocationException: Exception calling \"Refresh\" with \"0\" argument(s): \"Injected cleanup Refresh failure.\" ---> System.Management.Automation.RuntimeException: Injected cleanup Refresh failure. ---> System.Management.Automation.RuntimeException: Injected cleanup Refresh failure.\r\n   --- End of inner exception stack trace ---\r\n   at System.Management.Automation.ExceptionHandlingOps.CheckActionPreference(FunctionContext funcContext, Exception exception)\r\n   at System.Management.Automation.Interpreter.ActionCallInstruction`2.Run(InterpretedFrame frame)\r\n   at System.Management.Automation.Interpreter.EnterTryCatchFinallyInstruction.Run(InterpretedFrame frame)\r\n   at System.Management.Automation.Interpreter.EnterTryCatchFinallyInstruction.Run(InterpretedFrame frame)\r\n   at System.Management.Automation.Interpreter.Interpreter.Run(InterpretedFrame frame)\r\n   at System.Management.Automation.Interpreter.LightLambda.RunVoid1[T0](T0 arg0)\r\n   at System.Management.Automation.ScriptBlock.InvokeWithPipeImpl(ScriptBlockClauseToInvoke clauseToInvoke, Boolean createLocalScope, Dictionary`2 functionsToDefine, List`1 variablesToDefine, ErrorHandlingBehavior errorHandlingBehavior, Object dollarUnder, Object input, Object scriptThis, Pipe outputPipe, InvocationInfo invocationInfo, Object[] args)\r\n   at System.Management.Automation.ScriptBlock.<>c__DisplayClass57_0.<InvokeWithPipe>b__0()\r\n   at System.Management.Automation.Runspaces.RunspaceBase.RunActionIfNoRunningPipelinesWithThreadCheck(Action action)\r\n   at System.Management.Automation.ScriptBlock.InvokeWithPipe(Boolean useLocalScope, ErrorHandlingBehavior errorHandlingBehavior, Object dollarUnder, Object input, Object scriptThis, Pipe outputPipe, InvocationInfo invocationInfo, Boolean propagateAllExceptionsToTop, List`1 variablesToDefine, Dictionary`2 functionsToDefine, Object[] args)\r\n   at System.Management.Automation.ScriptBlock.DoInvokeReturnAsIs(Boolean useLocalScope, ErrorHandlingBehavior errorHandlingBehavior, Object dollarUnder, Object input, Object scriptThis, Object[] args)\r\n   at System.Management.Automation.PSScriptMethod.InvokeScript(String methodName, ScriptBlock script, Object this, Object[] arguments)\r\n   --- End of inner exception stack trace ---\r\n   at System.Management.Automation.ExceptionHandlingOps.CheckActionPreference(FunctionContext funcContext, Exception exception)\r\n   at System.Management.Automation.Interpreter.ActionCallInstruction`2.Run(InterpretedFrame frame)\r\n   at System.Management.Automation.Interpreter.EnterTryCatchFinallyInstruction.Run(InterpretedFrame frame)\r\n   at System.Management.Automation.Interpreter.EnterTryCatchFinallyInstruction.Run(InterpretedFrame frame)",
+      "mockLaunches": 1,
+      "passed": true
+    },
+    {
+      "scenario": "stale-result",
+      "originalRestored": true,
+      "failure": "System.Management.Automation.RuntimeException: Probe result belongs to another run; refusing stale PID result.",
+      "mockLaunches": 1,
+      "passed": true
+    },
+    {
+      "scenario": "success-after-wait",
+      "originalRestored": true,
+      "failure": null,
+      "mockLaunches": 1,
+      "passed": true
+    },
+    {
+      "scenario": "partial-managed-copy",
+      "originalRestored": true,
+      "failure": "System.Management.Automation.RuntimeException: Injected interrupted managed deployment copy.",
+      "mockLaunches": 0,
+      "passed": true
+    },
+    {
+      "scenario": "success-admission",
+      "originalRestored": true,
+      "failure": null,
+      "mockLaunches": 1,
+      "passed": true
+    }
+  ],
+  "installedFilesTouched": false,
+  "testSha256": "2ef3ff7ec8a0c3c469ba46445b8407f10e62bc43180cc42a9d330caf1b9dd90b",
+  "gameExecuted": false,
+  "status": "passed",
+  "runnerSha256": "099353cda180234298d440155a4947b8e101533ff6a34f41ffc31c25f0b8e041"
+}

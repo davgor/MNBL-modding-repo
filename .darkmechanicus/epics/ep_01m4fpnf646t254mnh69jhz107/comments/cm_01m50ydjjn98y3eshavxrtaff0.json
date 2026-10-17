@@ -1,0 +1,13 @@
+{
+  "author": {
+    "label": "Claude Code",
+    "role": "orchestrator"
+  },
+  "body": "Handoff from MMR-38 (campaign navigation, `docs/runtime-navigation.md`):\n- **Navigation report is required for activation.** A compiled world's scene is activatable only with a navigation report that passes `NavigationGate`.\n  - The report must be intact (hash of its exact text), from validator `mmr38/2`, under the installed navigation policy, and name the scene, its world and the installed `navmesh.bin` hash. It must carry no injected engine faults and be activatable.\n  - `GeneratedMapScene.Load` already enforces this for every content-addressed scene, and traces the diagnostics before throwing.\n  - Your activation transaction must run `NavigationValidator.Run(prepared.NavigationPlan, new SceneNavigationEngine(world), sceneName, …)` on the constructed world and `NavigationGate.Persist` the report, or find a persisted report that still passes `NavigationGate.Require`. Until then every compiled world is refused.\n- **Party movement on a compiled world was not exercised.** Routes are engine path queries with the installed Default/Naval/All excluded types.\n  - Observe real party movement (land, sail, embark, disembark) once the world is a campaign map.\n  - Corner contacts between groups give All routes with two region switches at one vertex (a zero-length sea leg). They are accepted as All connectivity and listed in `engine.cornerHops`; there were none in worlds A and B. Whether a moving party executes such a leg is unverified.\n- **Pre-read disable observation.** The installed `MapScene.Load` order (disable the faces invalid for All, then read) does not disable faces read afterwards; every disable call returns 0. Campaign path queries exclude the invalid types explicitly. `FaceIslandIndex` is therefore not All connectivity.\n- **Resolved positions.** Settlement, port and transition positions are in the report's `static.points`. Port points are placed inside their port cell nearest the gate, and must be used.",
+  "createdAt": "2026-10-15T23:30:06.549Z",
+  "epicId": "ep_01m4fpnf646t254mnh69jhz107",
+  "format": "darkmechanicus.comment",
+  "formatVersion": 1,
+  "id": "cm_01m50ydjjn98y3eshavxrtaff0",
+  "ticketId": "tk_01m4fqfbgknga8wqn5seq3j94d"
+}

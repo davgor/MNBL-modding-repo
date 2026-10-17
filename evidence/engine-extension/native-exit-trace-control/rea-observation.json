@@ -1,0 +1,195 @@
+{
+  "evidence_id": "ev_d32fb14029ce6c109427760c4fe085c64839205770f4bb6edf3724b410625422",
+  "subject": null,
+  "provider": {
+    "id": "frida",
+    "name": "Frida",
+    "version": null
+  },
+  "analysis_profile": null,
+  "predicate_type": "rea.frida.instrumentation-observation",
+  "operation": "frida_session_status",
+  "parameters": {
+    "session_id": "7fb5c0ec-4e69-4f2b-af4f-c6d2c415e026"
+  },
+  "raw_result": null,
+  "normalized_result": {
+    "session_id": "7fb5c0ec-4e69-4f2b-af4f-c6d2c415e026",
+    "device_id": "local",
+    "state": "detached",
+    "target": "Bannerlord.exe (pid 45480)",
+    "pid": 45480,
+    "mode": "attach",
+    "scripts": [
+      {
+        "script_id": "f7b554c7-7f17-4183-8ed0-cee82de79fce",
+        "name": "rea-f7b554c7-7f17-4183-8ed0-cee82de79fce"
+      }
+    ],
+    "messages": [
+      {
+        "script_id": "f7b554c7-7f17-4183-8ed0-cee82de79fce",
+        "type": "send",
+        "payload": {
+          "event": "hook-installed",
+          "name": "ExitProcess",
+          "location": {
+            "address": "0x7ffa451717a0",
+            "module": "KERNEL32.dll",
+            "rva": "0x417a0"
+          }
+        }
+      },
+      {
+        "script_id": "f7b554c7-7f17-4183-8ed0-cee82de79fce",
+        "type": "send",
+        "payload": {
+          "event": "hook-installed",
+          "name": "TerminateProcess",
+          "location": {
+            "address": "0x7ffa43510230",
+            "module": "KERNELBASE.dll",
+            "rva": "0x100230"
+          }
+        }
+      },
+      {
+        "script_id": "f7b554c7-7f17-4183-8ed0-cee82de79fce",
+        "type": "send",
+        "payload": {
+          "event": "hook-installed",
+          "name": "RtlExitUserProcess",
+          "location": {
+            "address": "0x7ffa4629eef0",
+            "module": "ntdll.dll",
+            "rva": "0x7eef0"
+          }
+        }
+      },
+      {
+        "script_id": "f7b554c7-7f17-4183-8ed0-cee82de79fce",
+        "type": "send",
+        "payload": {
+          "event": "hook-installed",
+          "name": "NtTerminateProcess",
+          "location": {
+            "address": "0x7ffa463822c0",
+            "module": "ntdll.dll",
+            "rva": "0x1622c0"
+          }
+        }
+      },
+      {
+        "script_id": "f7b554c7-7f17-4183-8ed0-cee82de79fce",
+        "type": "send",
+        "payload": {
+          "event": "ready",
+          "pid": 45480,
+          "native": "0x7ff939960000"
+        }
+      },
+      {
+        "script_id": "f7b554c7-7f17-4183-8ed0-cee82de79fce",
+        "type": "send",
+        "payload": {
+          "event": "native-cleanup-enter",
+          "tid": 48708,
+          "stack": [
+            {
+              "address": "0x7ff9399a777b",
+              "module": "TaleWorlds.Native.dll",
+              "rva": "0x4777b"
+            },
+            {
+              "address": "0x7ff9c69a15ca",
+              "module": null,
+              "rva": null
+            },
+            {
+              "address": "0x80000000",
+              "module": null,
+              "rva": null
+            },
+            {
+              "address": "0x90f040001005f",
+              "module": null,
+              "rva": null
+            },
+            {
+              "address": "0x16342d70000",
+              "module": "Bannerlord.exe",
+              "rva": "0x0"
+            },
+            {
+              "address": "0x52eb3ff200",
+              "module": null,
+              "rva": null
+            },
+            {
+              "address": "0x70656c676e69732f",
+              "module": null,
+              "rva": null
+            },
+            {
+              "address": "0x4d5f20726579616c",
+              "module": null,
+              "rva": null
+            },
+            {
+              "address": "0x2a5f53454c55444f",
+              "module": null,
+              "rva": null
+            },
+            {
+              "address": "0x532a65766974614e",
+              "module": null,
+              "rva": null
+            },
+            {
+              "address": "0x6f43786f42646e61",
+              "module": null,
+              "rva": null
+            },
+            {
+              "address": "0x6f747375432a6572",
+              "module": null,
+              "rva": null
+            },
+            {
+              "address": "0x2a656c747461426d",
+              "module": null,
+              "rva": null
+            },
+            {
+              "address": "0x53454c55444f4d5f",
+              "module": null,
+              "rva": null
+            },
+            {
+              "address": "0x685478616d2f205f",
+              "module": null,
+              "rva": null
+            },
+            {
+              "address": "0x6e756f4364616572",
+              "module": null,
+              "rva": null
+            }
+          ],
+          "returnCode": 0
+        }
+      }
+    ],
+    "messages_truncated": false
+  },
+  "confidence": "observed",
+  "authority": "external-service",
+  "environment": null,
+  "limitations": [
+    "Artifact identity is unavailable for this observation.",
+    "The target operating system and architecture were not reported by this observation."
+  ],
+  "relationship_coverage": null,
+  "locations": [],
+  "evidence_links": []
+}

@@ -332,6 +332,35 @@ Compiled compile(const SourceLayers& L, const projection::Projection& p, const M
     return t;
 }
 
+std::string heightfield_bytes(const Compiled& t) {
+    std::string hf = "MNBLHF01";
+    append32(hf, static_cast<std::uint32_t>(t.side));
+    for (double v : t.z) append64(hf, v);
+    return hf;
+}
+
+std::string weights_bytes(const Compiled& t) {
+    std::string weights = "MNBLWT01";
+    append32(weights, static_cast<std::uint32_t>(t.side));
+    weights.append(reinterpret_cast<const char*>(t.rock.data()), t.rock.size());
+    return weights;
+}
+
+std::string q16_bytes(const Compiled& t) {
+    std::string q16 = "MNBLQ16B";
+    append32(q16, static_cast<std::uint32_t>(t.side));
+    append64(q16, t.height.hmin); append64(q16, t.height.hmax);
+    for (auto v : t.height.q) { q16.push_back(static_cast<char>(v >> 8)); q16.push_back(static_cast<char>(v & 0xff)); }
+    return q16;
+}
+
+std::string masks_bytes(const Compiled& t) {
+    std::string masks = "MNBLMK01";
+    append32(masks, static_cast<std::uint32_t>(t.side));
+    for (const auto* plane : {&t.biome, &t.intent, &t.landform, &t.padding}) masks.append(reinterpret_cast<const char*>(plane->data()), plane->size());
+    return masks;
+}
+
 int compile_terrain_main(int argc, char** argv) {
     const char* usage = "Usage: worldbridge --compile-terrain SPLIT --contract FILE --projection-policy FILE --materials FILE --import FILE --side N --out NEW_DIRECTORY";
     if (argc != 15) throw std::runtime_error(usage);
@@ -357,13 +386,7 @@ int compile_terrain_main(int argc, char** argv) {
     const auto t = compile(layers_of(world), proj, materials, import, side);
     const auto compiled = std::chrono::steady_clock::now();
 
-    std::string hf = "MNBLHF01", weights = "MNBLWT01", q16 = "MNBLQ16B", masks = "MNBLMK01";
-    for (auto* s : {&hf, &weights, &q16, &masks}) append32(*s, static_cast<std::uint32_t>(side));
-    for (double v : t.z) append64(hf, v);
-    weights.append(reinterpret_cast<const char*>(t.rock.data()), t.rock.size());
-    append64(q16, t.height.hmin); append64(q16, t.height.hmax);
-    for (auto v : t.height.q) { q16.push_back(static_cast<char>(v >> 8)); q16.push_back(static_cast<char>(v & 0xff)); }
-    for (const auto* plane : {&t.biome, &t.intent, &t.landform, &t.padding}) masks.append(reinterpret_cast<const char*>(plane->data()), plane->size());
+    const std::string hf = heightfield_bytes(t), masks = masks_bytes(t), weights = weights_bytes(t), q16 = q16_bytes(t);
 
     const fs::path& pending = partial;
     fs::create_directories(pending);

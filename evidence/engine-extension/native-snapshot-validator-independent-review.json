@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "status": "accepted-bounded-offline-snapshot-validator-not-engine-integration",
+  "reviewedSourceSha256": {
+    "src/MNBL.AgentStorage/NativePoolSnapshot.hpp": "cf2076735a90908babe1e9ddf6564aa19f188810b44e53f87b764a7529d73248",
+    "tests/AgentStorage/native_snapshot_tests.cpp": "cf5df9548a20a164638f370138f3a2288f026807e38c9e45e372fd109e5d5f92",
+    "tools/battle-scale/Test-NativePoolSnapshot.cmd": "c2d2255dc59daecd7ab2eefece9bac286791ba9f6c127591e40e098235726b9f",
+    "build/agent-storage/native_snapshot_independent_tests.cpp": "aea3df89d26eb149ace09c441ac2ecbb8e949f313b7100c6d80d51f55eddb802",
+    "build/agent-storage/native-snapshot-independent.cmd": "c6efd36fba6b8c2c2eb86afbf4e85564661f2fc19e89670b79a94cbc2cf1c181",
+    "evidence/engine-extension/native-pool-index-chain-replay.json": "79942f24b3183dacfc29505f516288152392ab97284bdd5a09d295776af615ae"
+  },
+  "findings": [],
+  "review": [
+    "Dimensions and positive capacity bounded by32766 prevent both buffer-size overflow and positive signed16 sentinel overflow. memcpy avoids misaligned typed loads.",
+    "Every nonnegative record header must equal its physical index; every negative header denotes inactive, matching native sign test. Each live set agrees exactly with supplied count and highwater.",
+    "Every occupied signed link must point to the next occupied index, withcapacity+1 sentinel on final entry; inactive links must be-1. This rejects skipped entries, cycles, backward or out-of-range links.",
+    "Companions2,3,4 must exactly match primary0; secondary1 remains independently occupied, including overlapping numeric indices.",
+    "Returns new occupancy vectors; neither reads process memory nor mutates record arrays. Validation exceptions cannot partially publish storage."
+  ],
+  "tests": [
+    {
+      "command": "tools/battle-scale/Test-NativePoolSnapshot.cmd",
+      "exitCode": 0,
+      "configuration": "MSVC /O2 /W4 /WX",
+      "output": "PASS empty/sparse primary and independent secondary snapshots at3/2040/4080;174 malformed header/link/counter/dimension/coupling mutations rejected"
+    },
+    {
+      "command": "build/agent-storage/native-snapshot-independent.cmd",
+      "exitCode": 0,
+      "configuration": "MSVC ASAN /Od /Zi /W4 /WX",
+      "output": "PASS independent4096 exhaustive primary/secondary occupancy pairs, overlap andfull/empty sets;32766 capacity/32767 sentinel;malformed successor/cycle rejection",
+      "exhaustivePairedOccupancyCases": 4096,
+      "capacityBoundary": 32766,
+      "sentinelBoundary": 32767,
+      "additionalCorruptionCases": 7
+    }
+  ],
+  "nativeEvidenceScope": "Retained replay proves stock2c8 link/remove sorted-successor semantics at2040; this review checks validator mechanics against that contract. It does not independently establish every native acquisition path or companion coupling transaction boundary.",
+  "limitations": [
+    "Caller must freeze native mutation from acquisition through adoption commit. Spans are caller-owned and validator cannot prove lifetime, accessible allocation extent or buffer provenance.",
+    "Native generations and free-list order are not imported. Returned vectors supply occupancy snapshots only.",
+    "No direct engine snapshot acquisition or integration withadopt_first_block is claimed. Full native metadata consumer migration remains unfinished."
+  ]
+}

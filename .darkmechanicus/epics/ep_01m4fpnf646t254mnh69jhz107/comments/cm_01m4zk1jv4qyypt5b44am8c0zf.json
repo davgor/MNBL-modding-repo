@@ -1,0 +1,13 @@
+{
+  "author": {
+    "label": "Claude Code",
+    "role": "orchestrator"
+  },
+  "body": "**From MMR-32: on the registration path, before the NPCCharacters document is registered**, call `HeroBodies.Draw(heroes.XmlHeroes, problems)` and then `HeroBodies.Apply(npcCharacters, bodies, problems)`. Both are in src/MNBL.ProceduralWorld/Campaign/HeroBodies.cs.\n\n- **Why:** `Hero.Deserialize` otherwise gives every hero of one template the template's body minimum, so they share a face. `HeroBodies` replaces each face key template with an explicit body that the engine's face generator draws from the hero's seed.\n- **Verified in run 17280:** 241 distinct bodies, the same again on a second draw.\n- **Also register** `GeneratedCharacterCreation` (via `GeneratedGameManager.CreationCultures`) with the world's presentation cultures. It includes a guarded Harmony prefix for the installed culture screen's sort, which crashes on a restricted list.",
+  "createdAt": "2026-10-15T10:52:04.836Z",
+  "epicId": "ep_01m4fpnf646t254mnh69jhz107",
+  "format": "darkmechanicus.comment",
+  "formatVersion": 1,
+  "id": "cm_01m4zk1jv4qyypt5b44am8c0zf",
+  "ticketId": "tk_01m4fqfbgknga8wqn5seq3j94d"
+}

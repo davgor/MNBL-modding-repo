@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "status": "partial-runtime-acceptance-combat-check-failed",
+  "runId": "9207e831-29fd-4920-b7d1-708d73d1f851",
+  "nativeHash": "941f2ca0aa41e594067e2b732edd043e0aee6173e358688663f5ee1ebac5be37",
+  "moduleHash": "47c746cea9594a3de93897b5db3aff7270423b8d5a814e06006809e5906beff3",
+  "fullPoolVerified": true,
+  "exhaustionVerified": true,
+  "fullPoolRefillVerified": true,
+  "maxLiveAgents": 4080,
+  "maxIndex": 4079,
+  "deleted": 64,
+  "reused": 64,
+  "combatCasualties": 0,
+  "teardownVerified": false,
+  "runtimeVerified": false,
+  "visibleSoldierCountVerified": false,
+  "restoredOriginalFiles": true,
+  "evidence": [
+    {
+      "path": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\evidence\\engine-extension\\native-pool-run-r8\\runtime-receipt.json",
+      "sha256": "81cdf300c1a620239f2032a6893744685428e5e09f1bacd31d4008865af1ddab"
+    },
+    {
+      "path": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\evidence\\engine-extension\\native-pool-run-r8\\probe-result.json",
+      "sha256": "28a287a5b9f8653f0cda3d0503047a0a6c79aacd094a51d6336f51f6074ac2f3"
+    },
+    {
+      "path": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\evidence\\engine-extension\\native-pool-run-r8\\4080-formations.png",
+      "sha256": "15c773bf7e744f1dd26a0a2873711c4df62aa9c76720aad47ba9eee1a4816cee"
+    }
+  ],
+  "observations": [
+    "4080 unique active slots0..4079 verified; allocator-only full path returned-1 with identical before/after metadata hashes.",
+    "64 native slots deleted then exactly64 reused; all4080 slots active again.",
+    "4080 valid visual objects, in-frustum and entity visibility checks recorded. Screenshot confirms rendered formations; no per-soldier pixel count.",
+    "Harness failed because no casualty callbacks occurred in30 seconds; no native crash or renderer spin diagnosed on this run.",
+    "Normal mission teardown was not reached; runner rejected abnormal exit-1 and restored originals."
+  ],
+  "hypothesis": "Unlike the earlier successful layered probe, the native probe never explicitly alarmed/targeted agents after keeping teams friendly through allocation. Cause requires corrected runtime test."
+}

@@ -1,0 +1,13 @@
+{
+  "author": {
+    "label": "Claude Code",
+    "role": "orchestrator"
+  },
+  "body": "MMR-64 handoff (camera, render copies, picking).\n- **Display copies.** Derive copies from `PeriodicWorldCoordinates.Images(x)` (k ∈ {0, +1, −1} inside [0, Extent]), `WrapIndex` and `DisplayOffset`.\n- **Identity.** Copies carry no gameplay identity. Map a picked display point to the canonical location with `CanonicalX` (as `MapState.ProcessTravel` does), and take identity from the canonical object, never from a display point's `LocationKey`: single-precision copies can land in the neighbouring quantum.\n- **Direction.** The tie rule (`DeltaX` east at exactly W/2) applies to camera and label direction choices too. `PeriodicPatches.PeriodicDelta` now uses `DeltaX(b, a)`.\n- **Battle map.** The battle-terrain map now wraps: strip cells hold their canonical cell's bytes.\n- **Still yours.** 20 view call sites in the MMR-63 survey remain planar.",
+  "createdAt": "2026-10-16T08:31:01.213Z",
+  "epicId": "ep_01m4fpnf646t254mnh69jhz107",
+  "format": "darkmechanicus.comment",
+  "formatVersion": 1,
+  "id": "cm_01m51xc0jxzxnmsac72vapbc7h",
+  "ticketId": "tk_01m4fr2f4ketqh6dd1jd7yt95j"
+}

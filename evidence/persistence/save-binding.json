@@ -1,0 +1,211 @@
+{
+  "schema": "mnbl.evidence.save-binding",
+  "version": 1,
+  "ticket": "MMR-48",
+  "accepted": {
+    "pid": "15972",
+    "result": "evidence/runtime/in-game/save_binding-15972.json",
+    "status": "ok",
+    "failures": [],
+    "checks": [
+      {
+        "check": "the startup pass ran the later-save recovery (nothing unresolved, no unreadable journal); the index binds every save kind",
+        "passed": true
+      },
+      {
+        "check": "the committed campaign is bound (instance, package, content id); its initial save published",
+        "passed": true
+      },
+      {
+        "check": "mutable changes: a town changed owner, the main party moved",
+        "passed": true
+      },
+      {
+        "check": "saveAs: journaled before the write, read back bound to the exact world and campaign, whole, compatibility keys, published",
+        "passed": true
+      },
+      {
+        "check": "quickSave: journaled before the write, read back bound to the exact world and campaign, whole, compatibility keys, published",
+        "passed": true
+      },
+      {
+        "check": "autoSave: journaled before the write, read back bound to the exact world and campaign, whole, compatibility keys, published",
+        "passed": true
+      },
+      {
+        "check": "ironman: journaled before the write, read back bound to the exact world and campaign, whole, compatibility keys, published",
+        "passed": true
+      },
+      {
+        "check": "the quick save replaced the Save As file (prior recorded)",
+        "passed": true
+      },
+      {
+        "check": "c2: package and bundle byte-identical after the changes and saves; bundle verifies with the same content id",
+        "passed": true
+      },
+      {
+        "check": "the index finds the initial save, the four saves and the active campaign",
+        "passed": true
+      },
+      {
+        "check": "recovery with the game save list: torn removed, untouched abandoned",
+        "passed": true
+      },
+      {
+        "check": "c3: exported, imported (copied), imported again (reused); 4 references, 1 campaign; the target index complete; 4 saves loadable; nothing regenerated",
+        "passed": true
+      },
+      {
+        "check": "at the main menu with no game: every save found bound from its header, with the build keys; the binding detached",
+        "passed": true
+      },
+      {
+        "check": "cleanup: the probe saves and the campaign initial save removed, the autosave slot restored",
+        "passed": true
+      }
+    ],
+    "passed": 14,
+    "total": 14,
+    "saves": {
+      "saveAs": {
+        "name": "mnbl_probe48_saveas_15972",
+        "seconds": 0.9545553000000382,
+        "readbackSeconds": 0.049646699999999995
+      },
+      "quickSave": {
+        "name": "mnbl_probe48_saveas_15972",
+        "seconds": 1.2810357999999837,
+        "readbackSeconds": 0.048637599999999996
+      },
+      "autoSave": {
+        "name": "saveauto1",
+        "seconds": 1.1945640999999796,
+        "readbackSeconds": 0.0473566
+      },
+      "ironman": {
+        "name": "IronmanLW9DEoGlPqLF",
+        "seconds": 1.1978837999999996,
+        "readbackSeconds": 0.0476394
+      }
+    },
+    "transfer": {
+      "exportSeconds": 5.2878985,
+      "importSeconds": 4.393582299999999,
+      "files": 903,
+      "bytes": 153201519
+    },
+    "binding": {
+      "worldId": "mnbl_1609fb72",
+      "package": "mnbl_1609fb72-38cfe59aabca",
+      "instance": "f97b15f524a647328ae25bf7c50c58cd",
+      "contentId": "f596b58cdcfc18798542fdef5a4d9c9f6d84abddca1425af8d0b87f521191d2d"
+    },
+    "startSeconds": 398.1007914
+  },
+  "earlier": [
+    {
+      "pid": "43868",
+      "result": "evidence/runtime/in-game/save_binding-43868.json",
+      "status": "error",
+      "failures": [
+        "c3: the Save As and Ironman saves exported with their world package and data bundle (verified), imported into an empty store (copied) and again under new names (the identical world reused: 4 references, 1 campaign); the inspector finds all four saves loadable; nothing regenerated"
+      ],
+      "checks": [
+        {
+          "check": "the startup pass ran the later-save recovery (nothing unresolved, no unreadable journal); the index binds every save kind",
+          "passed": true
+        },
+        {
+          "check": "the committed campaign is bound (instance, package, content id); its initial save published",
+          "passed": true
+        },
+        {
+          "check": "mutable changes: a town changed owner, the main party moved",
+          "passed": true
+        },
+        {
+          "check": "saveAs: journaled before the write, read back bound to the exact world and campaign, whole, compatibility keys, published",
+          "passed": true
+        },
+        {
+          "check": "quickSave: journaled before the write, read back bound to the exact world and campaign, whole, compatibility keys, published",
+          "passed": true
+        },
+        {
+          "check": "autoSave: journaled before the write, read back bound to the exact world and campaign, whole, compatibility keys, published",
+          "passed": true
+        },
+        {
+          "check": "ironman: journaled before the write, read back bound to the exact world and campaign, whole, compatibility keys, published",
+          "passed": true
+        },
+        {
+          "check": "the quick save replaced the Save As file (prior recorded)",
+          "passed": true
+        },
+        {
+          "check": "c2: package and bundle byte-identical after the changes and saves; bundle verifies with the same content id",
+          "passed": true
+        },
+        {
+          "check": "the index finds the initial save, the four saves and the active campaign",
+          "passed": true
+        },
+        {
+          "check": "recovery with the game save list: torn removed, untouched abandoned",
+          "passed": true
+        },
+        {
+          "check": "c3: exported, imported (copied), imported again (reused); 4 references, 1 campaign; the target index complete; 4 saves loadable; nothing regenerated",
+          "passed": true
+        },
+        {
+          "check": "at the main menu with no game: every save found bound from its header, with the build keys; the binding detached",
+          "passed": true
+        },
+        {
+          "check": "cleanup: the probe saves and the campaign initial save removed, the autosave slot restored",
+          "passed": false
+        }
+      ],
+      "passed": 13,
+      "total": 14,
+      "saves": {
+        "saveAs": {
+          "name": "mnbl_probe48_saveas_43868",
+          "seconds": 1.1644462999999519,
+          "readbackSeconds": 0.058863799999999994
+        },
+        "quickSave": {
+          "name": "mnbl_probe48_saveas_43868",
+          "seconds": 0.9794148000000291,
+          "readbackSeconds": 0.0565303
+        },
+        "autoSave": {
+          "name": "saveauto1",
+          "seconds": 1.1383816000000024,
+          "readbackSeconds": 0.057627899999999996
+        },
+        "ironman": {
+          "name": "IronmanUjbHnuPh6q8m",
+          "seconds": 0.9976871000000074,
+          "readbackSeconds": 0.0569669
+        }
+      },
+      "transfer": {
+        "exportSeconds": 4.4747552,
+        "importSeconds": 4.2446075,
+        "files": 903,
+        "bytes": 153161270
+      },
+      "binding": {
+        "worldId": "mnbl_1609fb72",
+        "package": "mnbl_1609fb72-70a6873a16c9",
+        "instance": "344d742323ec44d0ac73cbd02944ab4d",
+        "contentId": "f596b58cdcfc18798542fdef5a4d9c9f6d84abddca1425af8d0b87f521191d2d"
+      },
+      "startSeconds": 404.924942
+    }
+  ]
+}

@@ -38,6 +38,14 @@ $files = @(
     @{source='build/producer/apps/Release/fwg.exe'; relative='bin/Win64_Shipping_Client/fwg.exe'},
     @{source='build/worldbridge/Release/worldbridge.exe'; relative='bin/Win64_Shipping_Client/worldbridge.exe'}
 )
+# MMR-43: the Gauntlet prefabs (GUI/Prefabs/*.xml), after the four fixed outputs (the producer and bridge are manifest[2] and manifest[3]).
+$gui = Join-Path $repo 'Modules/MNBL.ProceduralWorld/GUI'
+if (Test-Path -LiteralPath $gui) {
+    $files += @(Get-ChildItem -LiteralPath $gui -Recurse -File | Sort-Object FullName | ForEach-Object {
+        $relative = $_.FullName.Substring((Join-Path $repo 'Modules/MNBL.ProceduralWorld').Length + 1).Replace('\','/')
+        @{source='Modules/MNBL.ProceduralWorld/' + $relative; relative=$relative}
+    })
+}
 $manifest = @($files | ForEach-Object {
     $source = Join-Path $repo $_.source
     $destination = [IO.Path]::GetFullPath((Join-Path $target $_.relative))
@@ -46,15 +54,22 @@ $manifest = @($files | ForEach-Object {
     @{source=$source; destination=$destination; relative=$_.relative; sha256=(Get-FileHash -LiteralPath $source).Hash.ToLowerInvariant()}
 })
 if ($manifest[2].sha256 -ne $lock.producer.sha256) { throw 'Producer differs from pinned binary.' }
+# Installed prefabs the repository no longer has are removed, so a renamed or deleted prefab cannot keep loading.
+$installedGui = Join-Path $target 'GUI'
+$stale = @()
+if (Test-Path -LiteralPath $installedGui) {
+    $stale = @(Get-ChildItem -LiteralPath $installedGui -Recurse -File | Where-Object { @($manifest | ForEach-Object { $_.destination }) -notcontains $_.FullName } | ForEach-Object { $_.FullName })
+}
 $pinPath = Join-Path $target 'bin/Win64_Shipping_Client/fwg.sha256'
 $bridgePinPath = Join-Path $target 'bin/Win64_Shipping_Client/worldbridge.sha256'
 $receiptPath = Join-Path $target 'deployment.json'
 Assert-PlainPath $pinPath
 Assert-PlainPath $bridgePinPath
 Assert-PlainPath $receiptPath
-$receipt = [ordered]@{schema='mnbl.deployment';version=1;utc=[DateTime]::UtcNow.ToString('O');dryRun=[bool]$DryRun;target=$target;files=$manifest;officialDescriptors=$officialBefore;buildInputsSha256=(Get-MnblHash "$repo/evidence/runtime/build-api-inputs.json")}
+$receipt = [ordered]@{schema='mnbl.deployment';version=1;utc=[DateTime]::UtcNow.ToString('O');dryRun=[bool]$DryRun;target=$target;files=$manifest;removedStale=$stale;officialDescriptors=$officialBefore;buildInputsSha256=(Get-MnblHash "$repo/evidence/runtime/build-api-inputs.json")}
 if ($DryRun) { $receipt | ConvertTo-Json -Depth 8; return }
 if (Get-Process -Name Bannerlord,Bannerlord.Native -ErrorAction SilentlyContinue) { throw 'Close Bannerlord before deploying its module.' }
+foreach ($path in $stale) { Assert-PlainPath $path; Remove-Item -LiteralPath $path -Force }
 foreach ($file in $manifest) {
     New-Item (Split-Path $file.destination) -ItemType Directory -Force | Out-Null
     Copy-Item -LiteralPath $file.source -Destination $file.destination

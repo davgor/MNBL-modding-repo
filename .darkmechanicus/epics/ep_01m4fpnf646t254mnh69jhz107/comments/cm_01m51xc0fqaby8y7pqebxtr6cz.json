@@ -1,0 +1,13 @@
+{
+  "author": {
+    "label": "Claude Code",
+    "role": "orchestrator"
+  },
+  "body": "MMR-64 handoff (periodic coordinates).\n- **Preflight.** Call `PeriodicPatches.Preflight()` before starting or loading a periodic campaign. It applies and removes the 16-entry patch set and throws when a target refuses. `DiagnosticSandboxBootstrap` already does this; the activation transaction must too.\n- **Single coordinate factory.** Registration, `WorldIdentity.Build` and `RequireMatch` all read the world's coordinates through `PeriodicWorld.FromPlacement` (a placement `periodic` block). When production registers from the bundle (`PeriodicWorldCoordinates.FromSurface`), change that one factory, so that the save header's `coordinatePolicy` (the `FrameIdentity`) and its check keep matching.\n- **Gate condition.** The navigation report records `coordinatePolicyVersion` and `coordinatePolicy`. `NavigationGate` refuses another policy version, so a persisted report from before MMR-64 must be regenerated.\n- **Activation receipt.** Name the coordinate `Identity` and `FrameIdentity` in the receipt. The generation job record already carries them.",
+  "createdAt": "2026-10-16T08:31:01.111Z",
+  "epicId": "ep_01m4fpnf646t254mnh69jhz107",
+  "format": "darkmechanicus.comment",
+  "formatVersion": 1,
+  "id": "cm_01m51xc0fqaby8y7pqebxtr6cz",
+  "ticketId": "tk_01m4fqfbgknga8wqn5seq3j94d"
+}

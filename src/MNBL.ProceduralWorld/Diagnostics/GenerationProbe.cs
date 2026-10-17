@@ -181,6 +181,23 @@ namespace MNBL.ProceduralWorld.Diagnostics
             finally { WriteJson(Path.Combine(jobRoot, "encoder-processes.json"), processes); }
         }
 
+        // MMR-44: the pinned worldbridge run as an owned child (the generation job's request, source and compile steps). On cancellation
+        // requestStop asks the bridge to stop (its cancel file) and the owned job is terminated after stopGraceMs if it has not exited;
+        // tick runs about every 500 ms while the bridge runs (progress polling). Logs are <role>-stdout.log and <role>-stderr.log in jobRoot.
+        // MMR-49: every process this module started in this process's lifetime, by role (the producer is the generator; the surface encoder
+        // rebuilds a scene from a bundle). The loader records the counts before and after a load.
+        internal static readonly System.Collections.Concurrent.ConcurrentDictionary<string, int> ProcessStarts = new System.Collections.Concurrent.ConcurrentDictionary<string, int>(StringComparer.Ordinal);
+
+        internal static Dictionary<string, object> RunBridge(string[] arguments, string jobRoot, string role, CancellationToken token, Action requestStop, int stopGraceMs,
+            Action tick, List<Dictionary<string, object>> processes)
+        {
+            string bin = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            string bridge = Path.Combine(bin, "worldbridge.exe");
+            string hash = VerifyPin(bridge, Path.Combine(bin, "worldbridge.sha256"));
+            return Execute(bridge, hash, arguments, jobRoot, role, token, false,
+                stage => File.AppendAllText(Path.Combine(jobRoot, "stages.log"), DateTime.UtcNow.ToString("O") + " " + stage + Environment.NewLine), processes, requestStop, stopGraceMs, tick);
+        }
+
         private static string VerifyPin(string binary, string pin)
         {
             string actual = Hash(binary), expected = File.ReadAllText(pin).Trim();
@@ -196,7 +213,8 @@ namespace MNBL.ProceduralWorld.Diagnostics
         }
 
         private static Dictionary<string, object> Execute(string executable, string expectedHash, string[] arguments, string jobRoot, string role,
-            CancellationToken token, bool controlledAbort, Action<string> stage, List<Dictionary<string, object>> processes)
+            CancellationToken token, bool controlledAbort, Action<string> stage, List<Dictionary<string, object>> processes,
+            Action requestStop = null, int stopGraceMs = 0, Action tick = null)
         {
             string actualHash = Hash(executable);
             if (actualHash != expectedHash) throw new InvalidDataException("Binary changed after preflight: " + executable);
@@ -229,18 +247,37 @@ namespace MNBL.ProceduralWorld.Diagnostics
                 {
                     token.ThrowIfCancellationRequested();
                     if (!process.Start()) throw new IOException("Process.Start returned false: " + executable);
+                    ProcessStarts.AddOrUpdate(role, 1, (k, n) => n + 1);   // MMR-49: what a load may prove it never started
                     started = true; receipt["started"] = true; receipt["pid"] = process.Id;
                     job.Assign(process); receipt["ownedJobAssigned"] = true;
                     string prefix = role == "producer" ? "" : role + "-";
                     stdout = Drain(process.StandardOutput, Path.Combine(jobRoot, prefix + "stdout.log"));
                     stderr = Drain(process.StandardError, Path.Combine(jobRoot, prefix + "stderr.log"));
-                    using (token.Register(() => job.Terminate()))
+                    // Without requestStop a cancellation terminates the owned tree at once; with it the child is asked first.
+                    using (token.Register(() => { if (requestStop == null) job.Terminate(); }))
                     {
                         stage(role + "_started");
                         sample();
+                        long stopAt = -1, tickAt = 0;
                         while (!process.WaitForExit(25))
                         {
                             sample();
+                            if (requestStop != null && token.IsCancellationRequested)
+                            {
+                                if (stopAt < 0)
+                                {
+                                    stopAt = watch.ElapsedMilliseconds; receipt["stopRequestedAtMs"] = stopAt;
+                                    try { requestStop(); } catch (Exception error) { receipt["stopRequestError"] = error.Message; }
+                                    stage(role + "_stop_requested");
+                                }
+                                else if (watch.ElapsedMilliseconds - stopAt > stopGraceMs && !receipt.ContainsKey("terminatedAfterGraceMs"))
+                                {
+                                    receipt["terminatedAfterGraceMs"] = watch.ElapsedMilliseconds - stopAt;
+                                    job.Terminate();
+                                    stage(role + "_terminated");
+                                }
+                            }
+                            if (tick != null && watch.ElapsedMilliseconds - tickAt >= 500) { tickAt = watch.ElapsedMilliseconds; tick(); }
                             if (controlledAbort && watch.ElapsedMilliseconds >= 150 && !token.IsCancellationRequested)
                             {
                                 // Only this newly assigned process tree is targeted; never locate a process by name.

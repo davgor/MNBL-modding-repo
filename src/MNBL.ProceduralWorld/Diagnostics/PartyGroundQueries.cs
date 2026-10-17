@@ -15,6 +15,7 @@ using TaleWorlds.Core;
 using TaleWorlds.Engine;
 using TaleWorlds.Library;
 using TaleWorlds.ModuleManager;
+using MNBL.ProceduralWorld.Surface;
 using Path = System.IO.Path;
 
 namespace MNBL.ProceduralWorld.Diagnostics
@@ -51,7 +52,7 @@ namespace MNBL.ProceduralWorld.Diagnostics
                 "partyGroundManifest and partyGroundHeightfield must be absolute paths.");
             var manifest = new JavaScriptSerializer().Deserialize<Dictionary<string, object>>(File.ReadAllText(manifestPath));
             Require(Text(manifest, "schema") == "mnbl.campaign-bootstrap-fixture" && Convert.ToInt32(manifest["version"]) == 1
-                && Text(manifest, "slot") == DiagnosticMapSceneCreator.Slot, "Wrong campaign fixture manifest.");
+                && Text(manifest, "slot") == GeneratedMapSceneCreator.Slot, "Wrong campaign fixture manifest.");
             var extent = new List<double>();
             foreach (object value in (System.Collections.IEnumerable)manifest["extent"]) extent.Add(Convert.ToDouble(value, CultureInfo.InvariantCulture));
             Require(extent.Count == 2 && extent[0] == Extent && extent[1] == Extent, "Fixture must be 1040 by 1040.");
@@ -59,14 +60,14 @@ namespace MNBL.ProceduralWorld.Diagnostics
             Require(Text(source, "kind") == "fwgc" && Convert.ToDouble(source["verticalScale"], CultureInfo.InvariantCulture) == .01, "Fixture source/scale mismatch.");
             string sourceHash = Hash(heightfieldPath);
             Require(String.Equals(sourceHash, Text(source, "sha256"), StringComparison.OrdinalIgnoreCase), "Heightfield does not match fixture manifest source hash.");
-            string folder = Path.Combine(ModuleHelper.GetModuleFullPath(DiagnosticMapSceneCreator.ModuleId), "SceneObj", DiagnosticMapSceneCreator.Slot);
+            string folder = Path.Combine(ModuleHelper.GetModuleFullPath(GeneratedMapSceneCreator.ModuleId), "SceneObj", GeneratedMapSceneCreator.Slot);
             var hashes = new Dictionary<string, string>(); var declared = (Dictionary<string, object>)manifest["files"];
             foreach (string file in Files) hashes[file] = Text(declared, file);
             var fixture = new Fixture { Folder = folder, Hashes = hashes, Interpolation = interpolation };
             VerifyFiles(fixture);
             var xml = new XmlDocument { XmlResolver = null };
             using (var reader = XmlReader.Create(Path.Combine(folder, "scene.xscene"), new XmlReaderSettings { DtdProcessing = DtdProcessing.Prohibit, XmlResolver = null })) xml.Load(reader);
-            Require(xml.DocumentElement.GetAttribute("name") == DiagnosticMapSceneCreator.Slot, "Fixture XML scene identity mismatch.");
+            Require(xml.DocumentElement.GetAttribute("name") == GeneratedMapSceneCreator.Slot, "Fixture XML scene identity mismatch.");
             var terrain = (XmlElement)xml.SelectSingleNode("/scene/terrain");
             Require(terrain != null && terrain.GetAttribute("node_dimension_x") == "4" && terrain.GetAttribute("node_dimension_y") == "4"
                 && Number(terrain.GetAttribute("node_size")) == 260, "Fixture terrain dimensions mismatch.");
@@ -84,7 +85,7 @@ namespace MNBL.ProceduralWorld.Diagnostics
                 double q = Math.Max(0, Math.Min(65535, Math.Round((field.At(x, y) * .01 - low) / (high - low) * 65535, MidpointRounding.ToEven)));
                 fixture.Heights[y * field.Side + x] = low + q * ((high - low) / 65535);
             }
-            report["fixture"] = new { folder, scene = DiagnosticMapSceneCreator.Slot, module = DiagnosticMapSceneCreator.ModuleId,
+            report["fixture"] = new { folder, scene = GeneratedMapSceneCreator.Slot, module = GeneratedMapSceneCreator.ModuleId,
                 extent = Extent, gridSide = field.Side, spacing = 8.125, minHeight = low, maxHeight = high,
                 sourcePath = Path.GetFullPath(heightfieldPath), sourceSha256 = sourceHash,
                 manifestPath = Path.GetFullPath(manifestPath), manifestSha256 = Hash(manifestPath), nativeFileHashes = hashes,
@@ -93,7 +94,7 @@ namespace MNBL.ProceduralWorld.Diagnostics
             return fixture;
         }
 
-        internal static void Measure(DiagnosticMapScene wrapper, Fixture fixture, Dictionary<string, object> report, Action<string> stage)
+        internal static void Measure(GeneratedMapScene wrapper, Fixture fixture, Dictionary<string, object> report, Action<string> stage)
         {
             var failures = new List<string>(); var gaps = new List<string>();
             report["failures"] = failures; report["gaps"] = gaps; report["status"] = "measuring";
@@ -103,7 +104,7 @@ namespace MNBL.ProceduralWorld.Diagnostics
                 var campaign = Campaign.Current; var party = MobileParty.MainParty;
                 Require(campaign != null && party != null && Object.ReferenceEquals(campaign.MapSceneWrapper, wrapper), "Campaign/main party/wrapper unavailable or changed.");
                 var scene = wrapper.Scene;
-                Require(scene.GetName() == DiagnosticMapSceneCreator.Slot && scene.IsLoadingFinished(), "Expected ready campaign fixture scene.");
+                Require(scene.GetName() == GeneratedMapSceneCreator.Slot && scene.IsLoadingFinished(), "Expected ready campaign fixture scene.");
                 report["sceneName"] = scene.GetName(); report["sceneModule"] = scene.GetModulePath();
                 bool eligible = Game.Current.GameStateManager.ActiveState is MapState && campaign.TimeControlMode == CampaignTimeControlMode.Stop
                     && party.Position.IsOnLand && !party.IsCurrentlyAtSea && party.CurrentSettlement == null
@@ -120,7 +121,7 @@ namespace MNBL.ProceduralWorld.Diagnostics
                 Require(nodes.X == 4 && nodes.Y == 4 && size == 260, "Native loaded terrain is not the manifest's 1040-unit fixture.");
                 stage("party_ground_explicit_height"); float ground = float.NaN;
                 bool hit = campaign.MapSceneWrapper.GetHeightAtPoint(position, ref ground);
-                report["groundQuery"] = new { success = hit, height = N(ground), source = "IMapScene.GetHeightAtPoint(in CampaignVec2,ref float) through DiagnosticMapScene; land collision exclude flags 144" };
+                report["groundQuery"] = new { success = hit, height = N(ground), source = "IMapScene.GetHeightAtPoint(in CampaignVec2,ref float) through GeneratedMapScene; land collision exclude flags 144" };
                 stage("party_ground_as_vec3"); var logical = position.AsVec3(); report["campaignAsVec3"] = V(logical);
                 stage("party_ground_terrain_height"); float terrainHeight = scene.GetTerrainHeight(xy, true);
                 report["sourceAtCampaignXY"] = Predictions(fixture, xy.x, xy.y);

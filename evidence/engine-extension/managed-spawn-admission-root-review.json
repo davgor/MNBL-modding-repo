@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "status": "accepted-for-restricted-runtime-test",
+  "reviewer": "root independent integration review",
+  "utc": "2026-10-17T10:09:41.197295+00:00",
+  "reviewedSources": {
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\src\\MNBL.BattleScale\\Core\\SpawnAdmission.cs": "228b2c5bfcc5d5e5ecf7dd6d93845dfd939b4f7cc142714fa8fc1665dda5bdab",
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\src\\MNBL.BattleScale\\NativeSpawnAdmission.cs": "ddc3771e615d4c3316ff4b893d863bbb231cbadc63c712cff6c84b1491777841",
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\tools\\battle-scale\\Patch-ManagedSpawnAdmission.ps1": "73d1cd2596672ad56b9b4fd6c7ca22afc8cf2e90b02c64f86b766c2fdbfbdd99",
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\tests\\BattleScale\\SpawnReservationTests.cs": "e9be82d645d3194a3f7640e5b8c0fb05ef8057df3a3defd356cb426d6272a21a",
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\tests\\BattleScale\\Test-SpawnReservations.ps1": "c93f32c6159acdf640663ed7bc9c354a789c55df5a53db4066ce04c4f1c92b77",
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\tests\\BattleScale\\Test-ManagedSpawnAdmissionIL.ps1": "b9964165d346c52db4715df58a8d0e4a177a9778f5427df7d07723c65d55a22b",
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\evidence\\engine-extension\\managed-spawn-admission-input.json": "4746663b54ab70533b59e9497d354f264ca132236c7f97970adf12fd45ad2170",
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\evidence\\engine-extension\\native-pool-exhaustion-contract.json": "f7d26319e9c79b35f86548f1284a4f3909773a8440a586db330b17f0835b7a80",
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\build\\battle-scale\\spawn-admission-reviewed-engine-v3.dll": "68ef0b2282682ea291f49859dc04712e8a8e3876a4fa9e9a3efc9bcce41ec032",
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\build\\battle-scale\\spawn-admission-reviewed-engine-v3.json": "b927f461be83d0943c06e48981ad09fcb7d0272d9d17015e5b2b6d8d980315c4",
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\build\\battle-scale\\spawn-admission-il-test-v3.json": "51316b937544df91fc497bb69b2ddf24a5b92f1bbbd4287c403d34bc48ac7b23",
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\build\\battle-scale\\module\\MNBL.BattleScale.dll": "88a8b2ddc809ed04daef314db662d1dd4a343245e866e491d382e8b51ea264cb"
+  },
+  "implementationReviewSha256": "d8bc5e002560f157b5130bb9e5c2880459fc40171aa7f45308177858627be7ac",
+  "findings": [],
+  "checks": [
+    "Independently inspected concrete reservation ledger, main-thread and current-mission guards, exact native count/header offsets, rider/mount index selection and exception cleanup.",
+    "Inspected offline rewrite routes, stack-preserving immediate arm, validated forced native index, Begin outside outer finally, long branch conversion and readback of all method shapes.",
+    "Independently replayed 33 ledger assertions and 1206-instruction IL flow/stack validation against v3 output; full core build247 assertions passed.",
+    "Managed original/module/rewriter/output identity and restoration are bound by profile3 and runner; no native edits added."
+  ],
+  "runtimeVerified": false,
+  "limitations": [
+    "Direct native entrypoints remain unsafe on overflow and outside the supported public managed API.",
+    "No rollback is promised for unrelated stock initialization errors after an Agent is successfully allocated; the fix prevents capacity exhaustion from stealing a reserved mount slot.",
+    "Thread confinement and valid coherent pool metadata remain required. Reflection or arbitrary third-party code modifying private internals is outside the isolated profile.",
+    "Random equipment reserves two slots conservatively, so an unmounted randomly chosen troop can be rejected with only one free slot.",
+    "A caller explicitly forcing the mount onto the slot that automatic rider allocation would take is rejected before allocation; it is not silently rewritten to a different rider slot."
+  ]
+}

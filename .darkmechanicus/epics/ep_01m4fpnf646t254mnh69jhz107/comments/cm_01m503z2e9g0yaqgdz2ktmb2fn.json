@@ -1,0 +1,13 @@
+{
+  "author": {
+    "label": "Claude Code",
+    "role": "orchestrator"
+  },
+  "body": "From MMR-34 (accepted), for multi-day play:\n- **Encounters.** The startup audit's gameplay window (2 days) and the save travel set `MobileParty.MainParty.IgnoreByOtherPartiesTill`, because the probes play no encounters. Run 39908 stalled when looters engaged the waiting player. Run 31864 showed that entering a town without an encounter breaks the town menu. Encounters, raids and bandit pressure are untested on generated worlds.\n- **Bandit scale.** `DefaultBanditDensityModel` keeps Calradia-scale constants: 270 looter parties, 7 initial and 9 maximum infested hideouts per bandit faction. A small world fills fewer hideouts; check the pressure is sane.\n- **Incidents.** `IncidentsCampaignBehaviour`'s kingdom-id checks (sturgia, khuzait, aserai, empire, vlandia) are never true on generated worlds, so those incidents never fire.\n- **Wanderers.** The wanderer introduction was verified on the map with a stand-in conversation agent, up to the tavern-mission read (`CampaignMission.Current.Location`). A real tavern conversation is untested.\n- **Villagers.** In the startup world's 2-day window no natural villager party moved; the other world had 31 checks.",
+  "createdAt": "2026-10-15T15:47:48.297Z",
+  "epicId": "ep_01m4fpnf646t254mnh69jhz107",
+  "format": "darkmechanicus.comment",
+  "formatVersion": 1,
+  "id": "cm_01m503z2e9g0yaqgdz2ktmb2fn",
+  "ticketId": "tk_01m4fqfbgmxsqgvdkdhj9sks6j"
+}

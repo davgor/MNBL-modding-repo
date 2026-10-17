@@ -1,0 +1,67 @@
+{
+  "schema": "mnbl.climate-flow-policy",
+  "version": "mmr39/1",
+  "owner": "MMR-39",
+  "code": [
+    "src/MNBL.ProceduralWorld/World/GeneratedClimateSystem.cs",
+    "src/MNBL.ProceduralWorld/World/GeneratedWaterSystem.cs",
+    "src/MNBL.ProceduralWorld/CampaignBootstrap/GeneratedClimate.cs",
+    "src/MNBL.ProceduralWorld/CampaignBootstrap/GeneratedMapSupport.cs",
+    "src/MNBL.ProceduralWorld/CampaignBootstrap/GeneratedColorGrade.cs"
+  ],
+  "why": "FWGC++ exports no engine flow or weather field. The host synthesizes them deterministically from what the source world carries; nothing is guessed from texture art.",
+  "source": {
+    "file": "world.json (a bundle's source/world.json, verified by the bundle manifest; a fixture names it by path and SHA-256)",
+    "wind": "climate.wind_arrows: fixed compass-bearing transport directions on an 8 x 6 lattice of the 129 source grid (columns 0..112 step 16, rows 21..126 step 21). Each arrow's 3D tangent is turned into local (east, north) at its position (y-up frame).",
+    "rain": "layers.rainfall (129 x 129, a relative proxy)",
+    "snow": "seasonal_environment.months[0..11].snow (129 x 129 each) and layers.ice_cap",
+    "note": "the seed-42 world's arrows all point due east, so its synthesized wind is a uniform east wind faded at the poles",
+    "colorGrade": "layers.biome (FWGC++ natural biome ids, generator/data/biomes.json; append-only) and layers.temperature (degrees C)",
+    "lakes": "layers.water_type (2 = lake) and layers.water_surface (the lake level in metres); docs/water-climate.md"
+  },
+  "wind": {
+    "dimension": 512,
+    "layout": "SandBox.MapScene._windFlowMapData: row-major (x, y) float32 pairs over the physical terrain [0, extent]^2; index row * 512 + col with col = floor(x / extent * 512) (the MMR-59 layout, read back through the engine and War Sails)",
+    "sample": "each sample's centre is mapped to its canonical logical location (PeriodicWorldCoordinates) and to the source grid (projection inverse.sourceGrid)",
+    "interpolation": "bilinear on the arrow lattice; columns periodic, rows clamped to the outer rings",
+    "poleTaperRows": 16,
+    "poleTaper": "smoothstep fade to zero over 16 source rows towards each pole line: a pole is one location, so it has one value (calm)",
+    "scale": 0.4,
+    "scaleReason": "NavalDLCMapWeatherModel clamps the wind's length to [0.0667, 0.46] before War Sails' boost (Map(angle, 0, 120, |w|, 0) x 1.5, clamped to [0, 1.5]) uses it; the official NavalDLC Main_map flowmap's background magnitude is 0.2 (its median, peaks to 12). 0.4 lies inside the clamp, so the synthesized strength reaches ships unchanged, and the pole taper stays visible down to the clamp's floor",
+    "mapVector": "(east, -north): physical y runs south",
+    "smoothness": "C1 across the pole taper; the largest neighbour step is recorded (0.037 for the seed-42 world at scale 0.4; the official flowmap's mean step is 0.39)"
+  },
+  "precipitation": {
+    "dimension": 32,
+    "layout": "SandBox.MapScene._snowAndRainData: row-major (snow, rain) byte pairs, 32 x 32 over the physical terrain (DefaultWeatherNodeDimension 32)",
+    "footprint": "each node averages 8 x 8 sub-samples of its square (each at its canonical location)",
+    "rain": "rainfall / the layer's maximum",
+    "snow": "max(largest monthly snow cover, ice cap)",
+    "byte": "round(255 x value), clamped to [0, 1] before scaling",
+    "season": "the engine's own (global, time-only); the field is where it snows or rains, not when"
+  },
+  "colorGrade": {
+    "dimension": 512,
+    "layout": "TaleWorlds.MountAndBlade.View.Scripts.MapColorGradeManager.colorGradeGrid: row-major grade bytes, 512 x 512 over the terrain; the manager picks the grade under the camera (col = floor(x / extent * 512)) every tick",
+    "grades": "the installed Modules/Native/ModuleData/worldmap_color_grades.xml values: 20 desert, 40 steppe, 60 centraleurope, 80 highlands, 100 normandy, 120 north, 140 mediterranean",
+    "sample": "the nearest source cell of each cell centre's canonical location",
+    "biomes": {
+      "1 tundra (tombstoned label)": 120,
+      "2 desert": 20,
+      "3 grassland": 40,
+      "4 forest": 60,
+      "5 exposed_rock": 80,
+      "6 snow (tombstoned label)": 120,
+      "7 rainforest": 140,
+      "13 marsh": 100,
+      "15 boreal_forest": 120,
+      "16 cold_tundra": 120,
+      "17 land_ice": 120
+    },
+    "water and other ids": "ocean (0), lake (8) and any unlisted id take a temperature band from the source temperature at the cell: below 2 C north (120), below 18 C normandy (100), else mediterranean (140)",
+    "binding": "a Harmony postfix on MapColorGradeManager.Init copies the grid over the one the manager reads from Calradia's worldmap_colorgrade_grid texture (patched before the map scene is read, removed when it is destroyed); managers already initialized are replaced in PrepareWeather. Production scenes carry the manager (the official Main_map script variables)"
+  },
+  "seam": "every sample is taken at its canonical location, so a strip sample is an exact copy of its canonical sample (a width holds 256 wind samples and 16 weather nodes)",
+  "poles": "rows beyond each pole line repeat the pole node's value (the accepted pole-alias rule, worldgen/policies/periodic-coordinates.json)",
+  "identity": "SHA-256 of the policy text (version, source SHA-256, coordinate policy identity, constants, the biome table) with the wind, snow/rain and colour-grade hashes; recorded in the placement's climate block (schema mnbl.generated-climate.v2) and checked on load"
+}

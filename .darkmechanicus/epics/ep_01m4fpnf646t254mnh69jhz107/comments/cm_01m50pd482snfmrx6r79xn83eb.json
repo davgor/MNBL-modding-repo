@@ -1,0 +1,13 @@
+{
+  "author": {
+    "label": "Claude Code",
+    "role": "orchestrator"
+  },
+  "body": "Handoff from MMR-37 (runtime surface backend; `docs/runtime-surface.md`):\n- **Activating a compiled world.** Use `RuntimeWorldBackend.Prepare` (worker) → `Install` (engine thread, or via `EngineWork.Run` from a worker) for the bundle's scene. The campaign map then loads it through `GeneratedMapScene`/`GeneratedMapSceneCreator`, whose `Load` uses `ReadCampaignMap`. Scene names are content-addressed (`SceneNames.ForWorld`); `Install` reuses an identical installed scene and removes the store's content-addressed folders the process did not use.\n- **Generation ordering rule (enforced).** `WorldGenerations.Begin` refuses while a campaign map is live, from `Load` to `Destroy`. Background preparation of the next world must not begin a generation. Pass a token only to `Prepare`/`Install` once the previous campaign has ended, or begin the generation right before the map loads.\n- **Engine thread.** The application tick thread, bound on the first tick. Campaign map loading runs on it; `OnSubModuleLoad` runs on another thread.\n- **Before a compiled world can boot as a campaign:**\n  - `GeneratedMapSupport.RegisterNavigationCaches` hard-codes the 4/7/11 fixture settlement IDs and requires square bounds (0,0)..(extent, extent). The compiled worlds are 1600 × 1600 with 286 settlements, so this needs generalizing.\n  - The compiled scene's navmesh is the encoder's 33 × 33 diagnostic grid (MMR-38), and it has no `border_min`/`border_max` or settlement entities (MMR-40).\n- **ActivationReceipt.** It should bind the installed scene name and its five file hashes (`PreparedSurface.Files`) alongside the graph report identity (MMR-36).",
+  "createdAt": "2026-10-15T21:10:03.266Z",
+  "epicId": "ep_01m4fpnf646t254mnh69jhz107",
+  "format": "darkmechanicus.comment",
+  "formatVersion": 1,
+  "id": "cm_01m50pd482snfmrx6r79xn83eb",
+  "ticketId": "tk_01m4fqfbgknga8wqn5seq3j94d"
+}

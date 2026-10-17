@@ -1,0 +1,13 @@
+{
+  "author": {
+    "label": "Claude Code",
+    "role": "orchestrator"
+  },
+  "body": "Handoff from MMR-36 (graph validation), for activation:\n- **Route the factories' output through the gate before activation.** `CampaignGraphValidator.Validate(policy, input)` (`src/MNBL.ProceduralWorld/Campaign/CampaignGraphValidator.cs`) is pure. `tests/Campaign/GraphFailureFixtures.cs` shows how to build the compiler world's input from the five factories:\n  - documents and declared keys;\n  - `Resolutions(...)` and `Dispositions(...)`;\n  - MMR-33's `Rebound`/`ReboundReason`;\n  - spawn anchors, starts and pirate zones as `SpawnPoints`;\n  - the startup plan;\n  - policy shas.\n  On failure, throw `GraphException` before anything registers. Today the in-game gate validates only the fixture worlds (`GeneratedCampaignRegistration.Register`, via `FixturePlacement.GraphInput`).\n- **Bind the identity.** Each report carries `PolicyIdentity`: a path→sha256 map plus a combined `sha256`. It covers the 15 resolving policies and templates, `worldgen/policies/graph-validation.json`, `runtime:catalogReceipt` and `runtime:liveDefaults`. The report's own `Sha256` binds the staged documents' hashes and the default inventory. ActivationReceipt should bind both with the WorldContentId.\n- **Loads are not re-validated.** There is no catalog on load. Resolving a load from the frozen versions is yours.\n- **Rollback.** `CampaignObjectRegistry` now rolls a failed new-world load or closure back through `RemoveWorldObjects` (`RollBack`, `RollbackRemaining`). `GeneratedGameManager` does the same on a post-registration closure failure (`IGeneratedWorld.RollBack`). This is covered by the fake engine tests (`tools/Test-CampaignRegistry.ps1`, 59/59), not exercised in game.\n- **Pending runtime checks.** Every report lists W05 (runtime positions on the generated scene and navmesh) and U03 (route reachability) as pending, not checked.",
+  "createdAt": "2026-10-15T19:18:06.017Z",
+  "epicId": "ep_01m4fpnf646t254mnh69jhz107",
+  "format": "darkmechanicus.comment",
+  "formatVersion": 1,
+  "id": "cm_01m50g04e1c9xz7efjtpp97gdb",
+  "ticketId": "tk_01m4fqfbgknga8wqn5seq3j94d"
+}

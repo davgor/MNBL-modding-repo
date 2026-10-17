@@ -1,0 +1,35 @@
+ok    bundle f596b58cdcfc: the source climate is read (129 grid, 12 snow months, 48 wind arrows, rainfall)
+ok    every source wind arrow is a unit tangent vector (its local east/north components)
+ok    the fields have SandBox.MapScene's layouts (512^2 (x, y) floats, 32^2 (snow, rain) bytes)
+ok    the synthesis is deterministic; its identity covers the source, the coordinate layout and the policy
+ok    every strip sample is an exact copy of its canonical sample (wind and snow/rain): the seam has no discontinuity
+ok    beyond the pole lines every column has one value (wind calm; the pole node's snow and rain): the pole is one location
+ok    the wind field is smooth (largest neighbour step 0.037451, the official War Sails flowmap's mean step is 0.39) and bounded by the policy scale
+ok    mid-latitude wind is the source's bearing at the policy scale: due east (+x) at 0.4
+ok    a weather node's snow and rain recompute from the source layers (8 x 8 footprint mean; rain over the layer maximum; snow the monthly maximum or the ice cap)
+ok    the world has snowy and rainy weather nodes (122 and 1024 of 1024)
+ok    the in-memory binding answers with the engine's index (row * dim + col, col = floor(x / extent * dim)) for wind, snow/rain and colour grade
+ok    the colour-grade grid has MapColorGradeManager's layout (512^2 bytes), only installed grade values, and is deterministic
+ok    the seed-42 world shows several climate grades (20, 40, 60, 80, 100, 120, 140)
+ok    colour-grade strip cells copy their canonical cells and the rows beyond each pole line carry one grade
+ok    colour-grade cells recompute from the source (nearest cell's biome; water and other ids by temperature band): 21 cells
+ok    arrows pointing north give the map vector (0, -0.4) at mid latitude (physical y runs south)
+ok    east and west arrows in alternate lattice columns interpolate through calm between them (mid-row range -0.387 to 0.387, mean 0)
+ok    a layout whose width is not a whole number of samples of every grid is refused (strip samples could not copy canonical ones)
+ok    a storm past a pole line is reflected back across it (one between the lines stays)
+ok    the storm spawn chance is scaled by the area of a weather node against Calradia's (1 at Calradia's spacing; 2.3669 here)
+ok    storms are born only at canonical positions between the pole lines (never in a strip or beyond a pole; anywhere on a world that is not periodic)
+ok    a position across the seam from a storm is measured at its copy beside the storm (5 units away, not width - 5)
+ok    a storm that leaves the canonical range is moved back by one width (none while canonical)
+ok    the MMR-63 fixture layout synthesizes its own fields from the same source (a different identity)
+ok    worldgen/policies/climate-flow.json names the code's version and constants
+ok    the bundle's water classes are read (ocean, lake, river, land)
+ok    the water body lies on the projection's datum (z = 0) and covers the whole terrain
+ok    the water body uses the installed War Sails water material, its water-body tag and the plane physics (as the MMR-59/63 fixtures)
+ok    a generated scene carries one water body and one colour-grade manager (a second manager is refused)
+ok    every lake body's level comes from the source's lake cells (8 bodies shown, 15 too shallow to clear their beds, 67 lake samples)
+ok    every lake plane lies inside the terrain (the scene's box is the campaign map's borders)
+ok    each lake's plane clears its bed, never rises above another sample within one sample of its box, and is its source level projected as the terrain (level x 0.01) unless that would
+ok    every strip lake is a copy of a canonical lake one width away, at the same level (4 strip copies)
+ok    a generated scene carries the sea plane and one plane per lake body, each a War Sails water body
+34/34 checks passed

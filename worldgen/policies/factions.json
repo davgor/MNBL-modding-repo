@@ -1,0 +1,1257 @@
+{
+ "schema": "mnbl.factions",
+ "version": 1,
+ "notes": "MMR-31 faction definitions (docs/factions.md). Owner: FactionFactory (src/MNBL.ProceduralWorld/Campaign/FactionFactory.cs). Kingdoms and clans are intents over the MMR-27 compiler records: identities, relationships and ownership come from the generated world; assets (cultures, banner meshes, palette, icons, policies, title strings) are the installed public ones listed here. C03 (MMR-32) fills hero bodies and rosters, C04 (MMR-33) binds fiefs, C07 (MMR-36) proves registered closure.",
+ "streams": {
+  "rule": "value(stream, version, world prefix, entity id, draw) = first 8 bytes of sha256(\"mnbl.faction-stream/1\\n\" + stream + \"\\n\" + version + \"\\n\" + prefix + \"\\n\" + entity + \"\\n\" + draw), big-endian. Each purpose has its own stream and version, so a new or re-versioned cosmetic stream never changes ownership or another stream. Ownership and membership use no randomness at all.",
+  "banner": 1,
+  "colors": 1,
+  "relations": 1
+ },
+ "sovereign": "MMR-27 resolves every realm's ruler: its sovereign, or the synthesized regent (regent:<realm uid>) when sovereign_uid is null. The ruler always leads the ruling clan. A kingdom intent without a ruler, ruling clan or capital is refused.",
+ "rulingClan": {
+  "source": "MMR-27 synthesizes one ruling clan per realm (clan:<realm uid>, \"House of {realm}\")",
+  "keeps": "the ruler, every regent, and every lord whose role is not a vassal-clan leader role",
+  "tierByFiefs": [
+   {
+    "minFiefs": 1,
+    "tier": 4
+   },
+   {
+    "minFiefs": 3,
+    "tier": 5
+   },
+   {
+    "minFiefs": 6,
+    "tier": 6
+   }
+  ],
+  "fiefs": "towns plus castles of the realm"
+ },
+ "vassalClans": {
+  "leaderRoles": [
+   "castellan",
+   "pretender",
+   "founder"
+  ],
+  "rule": "every living lord of a realm whose role is listed founds one vassal clan of that realm and leads it; its uid is clan:<lord uid> and its id the MMR-27 stable id of that uid (kind clan). Ordered by lord uid. Home: the realm capital (C04 may move it to a bound fief).",
+  "nameTemplate": "House of {leader}",
+  "tierByRole": {
+   "castellan": 3,
+   "pretender": 2,
+   "founder": 2
+  }
+ },
+ "resources": {
+  "tier": "Clan.Deserialize sets Tier and renown from it (CalculateInitialRenown); the tier above is the clan resource this ticket sets",
+  "goldAndInfluence": "not set here: hero gold and clan influence follow the installed new-game logic once C03 instantiates the heroes"
+ },
+ "diplomacy": {
+  "stance": "neutral",
+  "stanceRule": "every kingdom pair starts neutral: the source carries no realm relations, so no kingdom starts at war and wars are left to the campaign's own diplomacy. Kingdoms.xml carries no <relationships>: the installed Kingdom.Deserialize reads only the sign of a relationship value (below 0 calls FactionManager.DeclareWar, otherwise SetNeutral), stores no magnitude, and isAtWar can only add a war. Neutral is the engine default for a pair with no stance.",
+  "baseRelation": 0,
+  "spread": 20,
+  "rulerRelation": "each unordered kingdom pair once, lower id first: the relation between the two rulers is baseRelation + round(spread * (2 * u - 1)), u from the relations stream for \"<a>|<b>\". It is a hero relation intent for C03 (MMR-32), applied once the heroes exist; it is not written to Kingdoms.xml",
+  "clanRelations": "none set: clans start at the engine default"
+ },
+ "zeroTownRealm": {
+  "action": "dissolve",
+  "rule": "a realm with no town after the compiler and travel exclusions is not a kingdom: no kingdom or clan intent is emitted, its lords become unaffiliated and the dissolution is recorded with a reason. MMR-27 refuses a capital outside the realm's towns and MMR-28 never removes a town, so the pinned worlds have none; the rule closes the policy rather than keeping a kingdom with no valid initial state."
+ },
+ "texts": {
+  "kingdomEncyclopedia": "The {realm} of the {civilization}, ruled from {capital}.",
+  "clanEncyclopedia": "A noble house of the {realm}.",
+  "escaping": "names keep their source text; localized strings are {=<id>}text with braces turned into parentheses (TextObject reads braces as variables); XML attributes are escaped; control characters are dropped"
+ },
+ "banners": {
+  "layout": "two layers of 10 numbers: mesh.color1.color2.sizeX.sizeY.posX.posY.drawStroke.mirror.rotation; layer 1 the background, layer 2 the icon, as the installed noble clans and kingdoms use",
+  "backgroundMesh": 11,
+  "backgroundSize": 4922,
+  "iconSize": 454,
+  "center": 764,
+  "icons": "the presentation culture's possible_clan_banner_icon_ids (worldgen/templates/cultures)",
+  "colors": "two distinct palette colors per kingdom (background, icon), drawn in pairs from the colors stream; the ordered pair is unique among kingdoms (an equal or repeated pair draws the next pair). A kingdom's clans use the kingdom's colors",
+  "iconRule": "the kingdom's icon is one banner-stream draw; each clan of the kingdom (ruling clan first, then the vassal clans by id) draws from the banner stream until its icon differs from the kingdom's and every earlier clan's of that kingdom. A kingdom with more banners than icons is refused",
+  "unique": "every banner is unique in the world: colour pairs separate the kingdoms, icons separate a kingdom's own banners. The colors stream never changes an icon and the banner stream never changes a colour",
+  "palette": [
+   {
+    "id": 0,
+    "argb": "FFB57A1E"
+   },
+   {
+    "id": 1,
+    "argb": "FF4E1A13"
+   },
+   {
+    "id": 2,
+    "argb": "FF284E19"
+   },
+   {
+    "id": 3,
+    "argb": "FFB4F0F1"
+   },
+   {
+    "id": 4,
+    "argb": "FF793191"
+   },
+   {
+    "id": 5,
+    "argb": "FFFCDE90"
+   },
+   {
+    "id": 6,
+    "argb": "FF382188"
+   },
+   {
+    "id": 7,
+    "argb": "FFDEA940"
+   },
+   {
+    "id": 8,
+    "argb": "FF591645"
+   },
+   {
+    "id": 9,
+    "argb": "FFFFAD54"
+   },
+   {
+    "id": 10,
+    "argb": "FF429081"
+   },
+   {
+    "id": 11,
+    "argb": "FFEFC990"
+   },
+   {
+    "id": 12,
+    "argb": "FF224277"
+   },
+   {
+    "id": 13,
+    "argb": "FFCEDAE7"
+   },
+   {
+    "id": 14,
+    "argb": "FF8D291A"
+   },
+   {
+    "id": 15,
+    "argb": "FFF7BF46"
+   },
+   {
+    "id": 16,
+    "argb": "FF6BD5DC"
+   },
+   {
+    "id": 17,
+    "argb": "FFEED690"
+   },
+   {
+    "id": 18,
+    "argb": "FFAEC382"
+   },
+   {
+    "id": 19,
+    "argb": "FFC3C3C3"
+   },
+   {
+    "id": 20,
+    "argb": "FFD5D7D4"
+   },
+   {
+    "id": 21,
+    "argb": "FFE7ECD6"
+   },
+   {
+    "id": 22,
+    "argb": "FFEAEEEF"
+   },
+   {
+    "id": 23,
+    "argb": "FF7F6B60"
+   },
+   {
+    "id": 24,
+    "argb": "FF967E7E"
+   },
+   {
+    "id": 25,
+    "argb": "FFB6ABA7"
+   },
+   {
+    "id": 26,
+    "argb": "FFE7D3BA"
+   },
+   {
+    "id": 27,
+    "argb": "FFEAE1DA"
+   },
+   {
+    "id": 28,
+    "argb": "FFD9DBCE"
+   },
+   {
+    "id": 29,
+    "argb": "FFDFD6CD"
+   },
+   {
+    "id": 30,
+    "argb": "FFCAC1BA"
+   },
+   {
+    "id": 31,
+    "argb": "FFECE8DD"
+   },
+   {
+    "id": 32,
+    "argb": "FFE0DCD9"
+   },
+   {
+    "id": 33,
+    "argb": "FFEFECE5"
+   },
+   {
+    "id": 34,
+    "argb": "FFEAE9E5"
+   },
+   {
+    "id": 35,
+    "argb": "FFF5F5F5"
+   },
+   {
+    "id": 36,
+    "argb": "FFF5B365"
+   },
+   {
+    "id": 38,
+    "argb": "FFE68C36"
+   },
+   {
+    "id": 39,
+    "argb": "FFDCAC46"
+   },
+   {
+    "id": 41,
+    "argb": "FFEEE7D4"
+   },
+   {
+    "id": 42,
+    "argb": "FFE9E2C5"
+   },
+   {
+    "id": 43,
+    "argb": "FFEBDCBB"
+   },
+   {
+    "id": 44,
+    "argb": "FFF0E0A5"
+   },
+   {
+    "id": 45,
+    "argb": "FFE0C78E"
+   },
+   {
+    "id": 46,
+    "argb": "FFCDA87C"
+   },
+   {
+    "id": 47,
+    "argb": "FFF9D575"
+   },
+   {
+    "id": 48,
+    "argb": "FFE44434"
+   },
+   {
+    "id": 49,
+    "argb": "FFE69077"
+   },
+   {
+    "id": 50,
+    "argb": "FFE79C7D"
+   },
+   {
+    "id": 51,
+    "argb": "FFC94B4E"
+   },
+   {
+    "id": 52,
+    "argb": "FFE6B0A6"
+   },
+   {
+    "id": 53,
+    "argb": "FFE4C8C7"
+   },
+   {
+    "id": 54,
+    "argb": "FFF2B0A2"
+   },
+   {
+    "id": 55,
+    "argb": "FFDA6C6D"
+   },
+   {
+    "id": 56,
+    "argb": "FFE2BCAF"
+   },
+   {
+    "id": 57,
+    "argb": "FFBD7E75"
+   },
+   {
+    "id": 58,
+    "argb": "FFD1C7C5"
+   },
+   {
+    "id": 59,
+    "argb": "FF975B43"
+   },
+   {
+    "id": 60,
+    "argb": "FFE6A57F"
+   },
+   {
+    "id": 61,
+    "argb": "FF7B5E4E"
+   },
+   {
+    "id": 62,
+    "argb": "FFAC9188"
+   },
+   {
+    "id": 63,
+    "argb": "FFD7967A"
+   },
+   {
+    "id": 64,
+    "argb": "FFE6C9BB"
+   },
+   {
+    "id": 65,
+    "argb": "FF934165"
+   },
+   {
+    "id": 66,
+    "argb": "FFD39EB0"
+   },
+   {
+    "id": 67,
+    "argb": "FF644974"
+   },
+   {
+    "id": 68,
+    "argb": "FF7F658A"
+   },
+   {
+    "id": 69,
+    "argb": "FFA793AE"
+   },
+   {
+    "id": 70,
+    "argb": "FFC5057C"
+   },
+   {
+    "id": 71,
+    "argb": "FF710083"
+   },
+   {
+    "id": 72,
+    "argb": "FF00667F"
+   },
+   {
+    "id": 73,
+    "argb": "FF00A0BA"
+   },
+   {
+    "id": 74,
+    "argb": "FF53B7C6"
+   },
+   {
+    "id": 75,
+    "argb": "FFA1B1EF"
+   },
+   {
+    "id": 76,
+    "argb": "FF7F8CC0"
+   },
+   {
+    "id": 77,
+    "argb": "FF5960A8"
+   },
+   {
+    "id": 78,
+    "argb": "FFC1589A"
+   },
+   {
+    "id": 79,
+    "argb": "FFA34FAF"
+   },
+   {
+    "id": 80,
+    "argb": "FFD08E54"
+   },
+   {
+    "id": 81,
+    "argb": "FF939BD9"
+   },
+   {
+    "id": 82,
+    "argb": "FFEA4F00"
+   },
+   {
+    "id": 83,
+    "argb": "FFD22D33"
+   },
+   {
+    "id": 84,
+    "argb": "FFFDE217"
+   },
+   {
+    "id": 85,
+    "argb": "FFFFA4DD"
+   },
+   {
+    "id": 86,
+    "argb": "FFCB83D5"
+   },
+   {
+    "id": 87,
+    "argb": "FF895D5E"
+   },
+   {
+    "id": 88,
+    "argb": "FF02FF19"
+   },
+   {
+    "id": 89,
+    "argb": "FF019678"
+   },
+   {
+    "id": 90,
+    "argb": "FF9EC400"
+   },
+   {
+    "id": 91,
+    "argb": "FFA34402"
+   },
+   {
+    "id": 92,
+    "argb": "FF714214"
+   },
+   {
+    "id": 93,
+    "argb": "FFFFC3C3"
+   },
+   {
+    "id": 94,
+    "argb": "FF855FA8"
+   },
+   {
+    "id": 95,
+    "argb": "FF7E6E4A"
+   },
+   {
+    "id": 96,
+    "argb": "FF3A3321"
+   },
+   {
+    "id": 97,
+    "argb": "FF3D2F22"
+   },
+   {
+    "id": 98,
+    "argb": "FF422C2E"
+   },
+   {
+    "id": 99,
+    "argb": "FF453E38"
+   },
+   {
+    "id": 100,
+    "argb": "FF332C4D"
+   },
+   {
+    "id": 101,
+    "argb": "FF515267"
+   },
+   {
+    "id": 102,
+    "argb": "FF6C72A2"
+   },
+   {
+    "id": 103,
+    "argb": "FF8B93BA"
+   },
+   {
+    "id": 104,
+    "argb": "FFA6D5DB"
+   },
+   {
+    "id": 105,
+    "argb": "FFA4B1C2"
+   },
+   {
+    "id": 106,
+    "argb": "FFC5BCD1"
+   },
+   {
+    "id": 107,
+    "argb": "FFD8AEC5"
+   },
+   {
+    "id": 108,
+    "argb": "FFCEDADA"
+   },
+   {
+    "id": 109,
+    "argb": "FFD2D6D5"
+   },
+   {
+    "id": 110,
+    "argb": "FFCACCCB"
+   },
+   {
+    "id": 111,
+    "argb": "FFDFDEDC"
+   },
+   {
+    "id": 112,
+    "argb": "FF5D5B44"
+   },
+   {
+    "id": 113,
+    "argb": "FF726B3D"
+   },
+   {
+    "id": 114,
+    "argb": "FFCDCC7C"
+   },
+   {
+    "id": 115,
+    "argb": "FF8FD1DD"
+   },
+   {
+    "id": 116,
+    "argb": "FF0B0C11"
+   },
+   {
+    "id": 118,
+    "argb": "FFE36664"
+   },
+   {
+    "id": 119,
+    "argb": "FF456DFF"
+   },
+   {
+    "id": 120,
+    "argb": "FF5FBD72"
+   },
+   {
+    "id": 121,
+    "argb": "FFF4D32E"
+   },
+   {
+    "id": 122,
+    "argb": "FFA97435"
+   },
+   {
+    "id": 123,
+    "argb": "FF41281B"
+   },
+   {
+    "id": 126,
+    "argb": "FF34671E"
+   },
+   {
+    "id": 127,
+    "argb": "FFF3F3F3"
+   },
+   {
+    "id": 130,
+    "argb": "FF7739A7"
+   },
+   {
+    "id": 131,
+    "argb": "FFF1C232"
+   },
+   {
+    "id": 134,
+    "argb": "FF5AA4AD"
+   },
+   {
+    "id": 135,
+    "argb": "FFFFE9D4"
+   },
+   {
+    "id": 138,
+    "argb": "FF3A6298"
+   },
+   {
+    "id": 139,
+    "argb": "FFD9D9D9"
+   },
+   {
+    "id": 142,
+    "argb": "FF830808"
+   },
+   {
+    "id": 143,
+    "argb": "FFF4CA14"
+   },
+   {
+    "id": 146,
+    "argb": "FF2C4D86"
+   },
+   {
+    "id": 147,
+    "argb": "FF955066"
+   },
+   {
+    "id": 148,
+    "argb": "FF6C1512"
+   },
+   {
+    "id": 149,
+    "argb": "FF211F1F"
+   },
+   {
+    "id": 150,
+    "argb": "FFCCC4BF"
+   },
+   {
+    "id": 151,
+    "argb": "FFEF9B9B"
+   },
+   {
+    "id": 152,
+    "argb": "FFB5D0FD"
+   },
+   {
+    "id": 153,
+    "argb": "FFA8CEAB"
+   },
+   {
+    "id": 154,
+    "argb": "FF8D5C44"
+   },
+   {
+    "id": 155,
+    "argb": "FFE9A74D"
+   },
+   {
+    "id": 156,
+    "argb": "FFB3A491"
+   },
+   {
+    "id": 157,
+    "argb": "FF5F4F44"
+   },
+   {
+    "id": 158,
+    "argb": "FF234116"
+   },
+   {
+    "id": 159,
+    "argb": "FF26406D"
+   },
+   {
+    "id": 160,
+    "argb": "FF7A4253"
+   },
+   {
+    "id": 161,
+    "argb": "FF5A1310"
+   },
+   {
+    "id": 162,
+    "argb": "FF2F2A2B"
+   },
+   {
+    "id": 163,
+    "argb": "FF744C38"
+   },
+   {
+    "id": 164,
+    "argb": "FF594012"
+   },
+   {
+    "id": 165,
+    "argb": "FFBF5A25"
+   },
+   {
+    "id": 166,
+    "argb": "FFFFCF83"
+   },
+   {
+    "id": 167,
+    "argb": "FF85827F"
+   },
+   {
+    "id": 168,
+    "argb": "FFCE9697"
+   },
+   {
+    "id": 169,
+    "argb": "FF95A9CC"
+   },
+   {
+    "id": 170,
+    "argb": "FF89A78B"
+   },
+   {
+    "id": 171,
+    "argb": "FFFFB53E"
+   },
+   {
+    "id": 172,
+    "argb": "FFFFFFFF"
+   },
+   {
+    "id": 173,
+    "argb": "FFC7BEB7"
+   },
+   {
+    "id": 174,
+    "argb": "FFB38841"
+   },
+   {
+    "id": 175,
+    "argb": "FF848B65"
+   },
+   {
+    "id": 176,
+    "argb": "FF5A7A4F"
+   },
+   {
+    "id": 177,
+    "argb": "FF7CAFC7"
+   },
+   {
+    "id": 178,
+    "argb": "FF7C2B1A"
+   },
+   {
+    "id": 179,
+    "argb": "FFAC5F2E"
+   },
+   {
+    "id": 180,
+    "argb": "FF72583B"
+   },
+   {
+    "id": 181,
+    "argb": "FF61725E"
+   },
+   {
+    "id": 182,
+    "argb": "FFA6825C"
+   },
+   {
+    "id": 183,
+    "argb": "FFCCC3AB"
+   },
+   {
+    "id": 184,
+    "argb": "FF8B7C73"
+   },
+   {
+    "id": 185,
+    "argb": "FFD0884E"
+   },
+   {
+    "id": 186,
+    "argb": "FF7B5869"
+   },
+   {
+    "id": 187,
+    "argb": "FF66CCFF"
+   },
+   {
+    "id": 188,
+    "argb": "FFAA415D"
+   },
+   {
+    "id": 189,
+    "argb": "FF687F5E"
+   },
+   {
+    "id": 190,
+    "argb": "FF4E75BC"
+   },
+   {
+    "id": 191,
+    "argb": "FFF1C178"
+   },
+   {
+    "id": 192,
+    "argb": "FFD1C4A4"
+   },
+   {
+    "id": 193,
+    "argb": "FF5E5737"
+   },
+   {
+    "id": 194,
+    "argb": "FF802463"
+   },
+   {
+    "id": 196,
+    "argb": "FFDE9953"
+   },
+   {
+    "id": 197,
+    "argb": "FF4E3A55"
+   },
+   {
+    "id": 198,
+    "argb": "FFCC8324"
+   },
+   {
+    "id": 200,
+    "argb": "FF4F2212"
+   },
+   {
+    "id": 201,
+    "argb": "FF965228"
+   },
+   {
+    "id": 202,
+    "argb": "FF2A5599"
+   },
+   {
+    "id": 204,
+    "argb": "FF949CCC"
+   },
+   {
+    "id": 205,
+    "argb": "FF1C2A50"
+   },
+   {
+    "id": 208,
+    "argb": "FFA88220"
+   },
+   {
+    "id": 209,
+    "argb": "FF4A100C"
+   },
+   {
+    "id": 210,
+    "argb": "FF335F22"
+   },
+   {
+    "id": 212,
+    "argb": "FFDFC36B"
+   },
+   {
+    "id": 213,
+    "argb": "FF2D3F1D"
+   },
+   {
+    "id": 214,
+    "argb": "FF418174"
+   },
+   {
+    "id": 216,
+    "argb": "FFCCBB89"
+   },
+   {
+    "id": 217,
+    "argb": "FF58888B"
+   },
+   {
+    "id": 218,
+    "argb": "FF202931"
+   },
+   {
+    "id": 219,
+    "argb": "FFB7623C"
+   },
+   {
+    "id": 220,
+    "argb": "FF4E1362"
+   },
+   {
+    "id": 221,
+    "argb": "FF25152A"
+   },
+   {
+    "id": 222,
+    "argb": "FF420E54"
+   },
+   {
+    "id": 223,
+    "argb": "FFF1580D"
+   },
+   {
+    "id": 224,
+    "argb": "FFF48955"
+   },
+   {
+    "id": 225,
+    "argb": "FFE1890B"
+   },
+   {
+    "id": 226,
+    "argb": "FFD47547"
+   },
+   {
+    "id": 227,
+    "argb": "FF9F7407"
+   },
+   {
+    "id": 228,
+    "argb": "FFF2EAD6"
+   },
+   {
+    "id": 229,
+    "argb": "FFE1A50B"
+   },
+   {
+    "id": 230,
+    "argb": "FFDCBB65"
+   },
+   {
+    "id": 231,
+    "argb": "FF5F3F0E"
+   },
+   {
+    "id": 232,
+    "argb": "FFC13B29"
+   },
+   {
+    "id": 233,
+    "argb": "FF112038"
+   },
+   {
+    "id": 234,
+    "argb": "FF3995F8"
+   },
+   {
+    "id": 235,
+    "argb": "FFB7623C"
+   },
+   {
+    "id": 236,
+    "argb": "FF252A01"
+   },
+   {
+    "id": 237,
+    "argb": "FF315305"
+   },
+   {
+    "id": 238,
+    "argb": "FF72BFC0"
+   },
+   {
+    "id": 239,
+    "argb": "FFC2D3D3"
+   },
+   {
+    "id": 240,
+    "argb": "FF5C6868"
+   },
+   {
+    "id": 241,
+    "argb": "FF7A8383"
+   },
+   {
+    "id": 242,
+    "argb": "FFACB3B3"
+   },
+   {
+    "id": 243,
+    "argb": "FF234942"
+   },
+   {
+    "id": 244,
+    "argb": "FF213330"
+   },
+   {
+    "id": 245,
+    "argb": "FFEEA332"
+   },
+   {
+    "id": 246,
+    "argb": "FFF0E1CB"
+   },
+   {
+    "id": 247,
+    "argb": "FF192026"
+   },
+   {
+    "id": 248,
+    "argb": "FFEEBDA7"
+   },
+   {
+    "id": 249,
+    "argb": "FFE5A386"
+   },
+   {
+    "id": 250,
+    "argb": "FFFFFFFF"
+   }
+  ]
+ },
+ "names": {
+  "ordinal": "{name} {n}",
+  "rule": "kingdom names and clan names are each unique in the world: a repeated name takes the ordinal form counting from 2 (the first by uid keeps it), as the MMR-27 compiler does (worldgen/policies/campaign-content.json names.ordinal). The source name stays in the intent"
+ },
+ "cultures": {
+  "empire": {
+   "rulerTitle": "{=OoHhCa11}Senator",
+   "bannerIcons": [
+    100,
+    101,
+    102,
+    103,
+    104,
+    105,
+    106,
+    107,
+    108,
+    109,
+    110,
+    119,
+    147,
+    148,
+    152,
+    200,
+    201,
+    202,
+    203,
+    204,
+    205,
+    206,
+    207,
+    208,
+    209,
+    210,
+    211,
+    212,
+    213,
+    214,
+    215,
+    216,
+    217,
+    218,
+    219,
+    220,
+    221,
+    222,
+    223,
+    400
+   ],
+   "policies": [
+    "policy_coastal_guard_edict"
+   ],
+   "template": "worldgen/templates/cultures/empire.json"
+  },
+  "aserai": {
+   "rulerTitle": "{=5djtBrHj}Sultan",
+   "bannerIcons": [
+    110,
+    155,
+    156,
+    200,
+    201,
+    204,
+    212,
+    218,
+    219,
+    220,
+    221,
+    222,
+    223,
+    321,
+    400,
+    401,
+    403,
+    404,
+    405,
+    425,
+    426,
+    427,
+    428,
+    430,
+    309
+   ],
+   "policies": [
+    "policy_council_of_the_commons",
+    "policy_senate"
+   ],
+   "template": "worldgen/templates/cultures/aserai.json"
+  },
+  "sturgia": {
+   "rulerTitle": "{=FmbgPGBL}Grand Prince",
+   "bannerIcons": [
+    112,
+    113,
+    114,
+    115,
+    116,
+    117,
+    118,
+    132,
+    138,
+    139,
+    307,
+    331,
+    407,
+    408,
+    409,
+    410,
+    439,
+    440,
+    441,
+    442,
+    443,
+    444,
+    445
+   ],
+   "policies": [
+    "policy_lawspeakers",
+    "policy_precarial_land_tenure"
+   ],
+   "template": "worldgen/templates/cultures/sturgia.json"
+  },
+  "vlandia": {
+   "rulerTitle": "{=hwnp9abW}King",
+   "bannerIcons": [
+    140,
+    141,
+    142,
+    143,
+    144,
+    145,
+    146,
+    159,
+    205,
+    206,
+    207,
+    417,
+    418,
+    419,
+    300,
+    301,
+    302,
+    303,
+    315
+   ],
+   "policies": [
+    "policy_feudal_inheritance",
+    "policy_castle_charters"
+   ],
+   "template": "worldgen/templates/cultures/vlandia.json"
+  },
+  "battania": {
+   "rulerTitle": "{=afvM7XpQ}High King",
+   "bannerIcons": [
+    131,
+    132,
+    133,
+    134,
+    135,
+    136,
+    137,
+    145,
+    149,
+    151,
+    203,
+    406,
+    407,
+    408,
+    412,
+    413,
+    414,
+    415
+   ],
+   "policies": [
+    "policy_cantons",
+    "policy_lawspeakers"
+   ],
+   "template": "worldgen/templates/cultures/battania.json"
+  },
+  "khuzait": {
+   "rulerTitle": "{=hwnp9abW}King",
+   "bannerIcons": [
+    121,
+    122,
+    123,
+    124,
+    125,
+    126,
+    127,
+    128,
+    129,
+    130,
+    311,
+    312,
+    313,
+    314
+   ],
+   "policies": [
+    "policy_grazing_rights",
+    "policy_sacred_majesty"
+   ],
+   "template": "worldgen/templates/cultures/khuzait.json"
+  },
+  "nord": {
+   "rulerTitle": "{=hwnp9abW}King",
+   "bannerIcons": [
+    166,
+    167,
+    168,
+    169,
+    170,
+    171,
+    172,
+    173,
+    174,
+    165,
+    307,
+    331,
+    407,
+    408,
+    409,
+    410,
+    439,
+    440,
+    441,
+    442,
+    443,
+    444,
+    445
+   ],
+   "policies": [
+    "policy_lawspeakers",
+    "policy_precarial_land_tenure"
+   ],
+   "template": "worldgen/templates/cultures/nord.json"
+  }
+ },
+ "provenance": {
+  "bannerIconsSha256": "63bbb3a39549a4001199529e60f8676717349e8a1df738a4a334fe77037b0cee",
+  "installedBannerIcons": [
+   {
+    "path": "Modules/Native/ModuleData/banner_icons.xml",
+    "sha256": "63bbb3a39549a4001199529e60f8676717349e8a1df738a4a334fe77037b0cee"
+   },
+   {
+    "path": "Modules/NavalDLC/ModuleData/banner_icons.xml",
+    "sha256": "56ca25e35fb58cfdc46c66ae4fe63a7612b9cb7cf0be9bcd3a4e91184ad5e03a"
+   }
+  ],
+  "catalogKingdomsSha256": "946fa568a7216bbd007530c5e897159d2adeba1c43fbe13a5bee15dad4b11e3b",
+  "catalogFactionsSha256": "475abbc0bb59bbc3432ad9b570901e9693a7ba19d3d66bab2488cb0c63cf9a1d",
+  "culturePresentationsSha256": "efe9ba962fe7c1fe2ed7386ba04a2f39bb22222b52691ef21c3133728b781c3b",
+  "officialNobleBackgrounds": {
+   "11": 82
+  },
+  "officialNobleSizes": {
+   "4922": 37,
+   "4345": 31,
+   "8690": 2,
+   "1528": 12
+  }
+ }
+}

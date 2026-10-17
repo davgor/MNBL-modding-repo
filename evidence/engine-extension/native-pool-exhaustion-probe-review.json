@@ -1,0 +1,46 @@
+{
+  "status": "accepted-bounded-full-helper-test-source-review",
+  "gameExecuted": false,
+  "sourceSha256": "2a5e0e0b15513ebb7052d747a621b82c50ee834553eba283b33bbbc33766e12a",
+  "sources": {
+    "NativePoolProbeMission.cs": {
+      "path": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\src\\MNBL.BattleScale\\NativePoolProbeMission.cs",
+      "sha256": "d9cd4e0f4ac2796fa53fb1597c40a6de36fcec3961bb66e05f4fcff7c68fe9b2"
+    },
+    "native-pool-exhaustion-contract.json": {
+      "path": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\evidence\\engine-extension\\native-pool-exhaustion-contract.json",
+      "sha256": "f7d26319e9c79b35f86548f1284a4f3909773a8440a586db330b17f0835b7a80"
+    },
+    "native-pool-patch-4080.json": {
+      "path": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\evidence\\engine-extension\\native-pool-patch-4080.json",
+      "sha256": "a246b45a879ec77f8a735a43e5d108fbde8e77fdab0add879e6cb564077daa06"
+    },
+    "review_pool_exhaustion_probe.py": {
+      "path": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\tools\\battle-scale\\review_pool_exhaustion_probe.py",
+      "sha256": "b8301c37342198f819b104279ff5ece57ce17da0c2eed7426ca0071d69e26d02"
+    }
+  },
+  "exactNativePathBytes": "405356574883ec204533c9488bf9418bd94863f34869c6600c000044394c08107c17ffc381fbf00f00007ce5b8ffffffff4883c4205f5e5bc3",
+  "pathByteCount": 57,
+  "tableOffsets": [
+    "0xc56750",
+    "0x18ac140",
+    "0x1adbe30",
+    "0x1da3198",
+    "0x206a500"
+  ],
+  "snapshotBytes": 57160,
+  "findings": [
+    "Winapi int(IntPtr) maps to Windowsx64 RCX argument and signed EAX result, matching native helper.",
+    "Loaded57-byte path is checked immediately before invoking the hard-coded module-relative address; these bytes include all branches taken when every header is occupied.",
+    "The whole five next-index tables plus contiguous count/high-water fields and all4080 primary signed index headers are compared before/after.",
+    "All headers must be nonnegative; all four active pool counts must equal4080 and secondc60 count must be0; full managed population is checked before and after.",
+    "Invocation occurs only once in controlled precombat Single0 owner-thread scope. Report between snapshot and invocation performs managed state reporting/file output, no explicit yield or native allocation callback.",
+    "Public spawn is never called at capacity; the managed admission guard returnsfalse. This does not repair the native public overflow path."
+  ],
+  "limitations": [
+    "Concurrency exclusion is the controlled precombat/main-thread profile accepted by the parent, not a newly acquired native lock.",
+    "Source review and byte correspondence do not establish runtime success, final resource release, or exception rollback.",
+    "Snapshot covers allocation metadata and primary headers, not every payload byte or unrelated engine memory."
+  ]
+}

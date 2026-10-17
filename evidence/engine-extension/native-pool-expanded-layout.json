@@ -1,0 +1,173 @@
+{
+  "schemaVersion": 1,
+  "status": "layout-arithmetic-only-not-reference-coverage",
+  "binarySha256": "2a5e0e0b15513ebb7052d747a621b82c50ee834553eba283b33bbbc33766e12a",
+  "originalCapacity": 2040,
+  "capacity": 4080,
+  "sentinel": 4081,
+  "originalMissionAllocationBytes": 18369344,
+  "missionAllocationBytes": 35366000,
+  "additionalBytes": 16996656,
+  "insertions": [
+    {
+      "originalOffset": "0x62ca50",
+      "bytes": 6462720
+    },
+    {
+      "originalOffset": "0x62da40",
+      "bytes": 4080
+    },
+    {
+      "originalOffset": "0xc57750",
+      "bytes": 6462720
+    },
+    {
+      "originalOffset": "0xc58740",
+      "bytes": 4080
+    },
+    {
+      "originalOffset": "0xd6f5d0",
+      "bytes": 1142400
+    },
+    {
+      "originalOffset": "0xd705c0",
+      "bytes": 4080
+    },
+    {
+      "originalOffset": "0xed2f88",
+      "bytes": 1452480
+    },
+    {
+      "originalOffset": "0xed3f78",
+      "bytes": 4080
+    },
+    {
+      "originalOffset": "0x1036940",
+      "bytes": 1452480
+    },
+    {
+      "originalOffset": "0x1037930",
+      "bytes": 4080
+    },
+    {
+      "originalOffset": "0x1043da0",
+      "bytes": 1024
+    },
+    {
+      "originalOffset": "0x1043e1f",
+      "bytes": 128
+    },
+    {
+      "originalOffset": "0x1044220",
+      "bytes": 1024
+    },
+    {
+      "originalOffset": "0x104429f",
+      "bytes": 128
+    },
+    {
+      "originalOffset": "0x10446a0",
+      "bytes": 1024
+    },
+    {
+      "originalOffset": "0x104471f",
+      "bytes": 128
+    }
+  ],
+  "pools": [
+    {
+      "name": "agent_slots",
+      "missionOffset": "0x2d50",
+      "elementStride": "0xc60",
+      "capacity": 4080,
+      "indexTableOffset": "0xc56750",
+      "indexEntryBytes": 2,
+      "counterOffset": "0xc58730",
+      "highWaterOffset": "0xc58734",
+      "lastSlotOffset": "0xc55af0"
+    },
+    {
+      "name": "second_agent_slots_role_unresolved",
+      "missionOffset": "0xc58740",
+      "elementStride": "0xc60",
+      "capacity": 4080,
+      "indexTableOffset": "0x18ac140",
+      "indexEntryBytes": 2,
+      "counterOffset": "0x18ae120",
+      "highWaterOffset": "0x18ae124",
+      "lastSlotOffset": "0x18ab4e0"
+    },
+    {
+      "name": "companion_230",
+      "missionOffset": "0x18ae130",
+      "elementStride": "0x230",
+      "capacity": 4080,
+      "indexTableOffset": "0x1adbe30",
+      "indexEntryBytes": 2,
+      "counterOffset": "0x1adde10",
+      "highWaterOffset": "0x1adde14",
+      "lastSlotOffset": "0x1adbc00"
+    },
+    {
+      "name": "companion_2c8_A",
+      "missionOffset": "0x1adde18",
+      "elementStride": "0x2c8",
+      "capacity": 4080,
+      "indexTableOffset": "0x1da3198",
+      "indexEntryBytes": 2,
+      "counterOffset": "0x1da5178",
+      "highWaterOffset": "0x1da517c",
+      "lastSlotOffset": "0x1da2ed0"
+    },
+    {
+      "name": "companion_2c8_B",
+      "missionOffset": "0x1da5180",
+      "elementStride": "0x2c8",
+      "capacity": 4080,
+      "indexTableOffset": "0x206a500",
+      "indexEntryBytes": 2,
+      "counterOffset": "0x206c4e0",
+      "highWaterOffset": "0x206c4e4",
+      "lastSlotOffset": "0x206a238"
+    }
+  ],
+  "jobPageTables": [
+    {
+      "originalBase": "0x10439a0",
+      "originalPages": 127,
+      "pages": 255,
+      "recordsPerPage": 16,
+      "base": "0x2078550",
+      "pointerBase": "0x2078558",
+      "flagBase": "0x2078d50",
+      "endExclusive": "0x2078e50"
+    },
+    {
+      "originalBase": "0x1043e20",
+      "originalPages": 127,
+      "pages": 255,
+      "recordsPerPage": 16,
+      "base": "0x2078e50",
+      "pointerBase": "0x2078e58",
+      "flagBase": "0x2079650",
+      "endExclusive": "0x2079750"
+    },
+    {
+      "originalBase": "0x10442a0",
+      "originalPages": 127,
+      "pages": 255,
+      "recordsPerPage": 16,
+      "base": "0x2079750",
+      "pointerBase": "0x2079758",
+      "flagBase": "0x2079f50",
+      "endExclusive": "0x207a050"
+    }
+  ],
+  "requirements": [
+    "Construct expanded storage before any Agent pointer escapes; never relocate a live Mission.",
+    "Translate every Mission-relative field access after insertion boundaries, including non-pool tail fields.",
+    "Use pool-relative translation only with independently established pool-pointer provenance.",
+    "Review dependent containers, stack arrays, masks, capacity checks and exception cleanup separately.",
+    "Apply all instruction edits atomically before engine initialization; no game execution is performed by this tool."
+  ]
+}

@@ -1,0 +1,100 @@
+{
+  "schemaVersion": 1,
+  "status": "passed-exhaustion-and-teardown",
+  "verifiedUtc": "2026-10-17T08:23:42.521325+00:00",
+  "runId": "d05dd130-2567-4bb8-804f-1cc2ab2b2159",
+  "nativeHash": "941f2ca0aa41e594067e2b732edd043e0aee6173e358688663f5ee1ebac5be37",
+  "moduleHash": "4d127109535ebb4574fd2c44723b3646080491e6fc1b5ee176fd9716de456f43",
+  "runtimeVerified": true,
+  "exhaustionVerified": true,
+  "teardownVerified": true,
+  "peakAgents": 4080,
+  "maxIndex": 4079,
+  "deleted": 64,
+  "reused": 64,
+  "combatCasualties": 57,
+  "combatMovedAgents": 4024,
+  "combatDamagedAgents": 486,
+  "teardownAgentCount": 4080,
+  "clearedTeardownAgents": 4080,
+  "teardownStableTicks": 49,
+  "nativeReturnCode": 0,
+  "processExitCode": -1,
+  "shutdownVerification": {
+    "kind": "reviewed-watchdog-kp-command",
+    "ownedWatchdogIds": [
+      30780
+    ],
+    "limitation": "The stock watchdog terminates the process after main shutdown; remaining native releases after the command are not certified.",
+    "logs": [
+      {
+        "sha256": "0f98c786cba9ed4da7f9c5c6cdc1779313a7e611f8aaad6d67d2cea02f17ceb6",
+        "path": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\build\\battle-scale\\native-run-20261017-081811-632d6efb\\watchdog_log_40556.txt"
+      },
+      {
+        "sha256": "7bde738e65fce5e85ce0958585b7fa05247d8d10201dd1dfac649e38b6badccd",
+        "path": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\build\\battle-scale\\native-run-20261017-081811-632d6efb\\rgl_log_40556.txt"
+      }
+    ],
+    "gamePid": 40556,
+    "contractSha256": "a53f635c34844fa460be087c4bd123f36fa57291e14cdb734338cb695aba0f0d",
+    "allNativeDestructorsVerified": false,
+    "exitCode": -1,
+    "verified": true
+  },
+  "fullCapacityVisualDiagnostics": {
+    "validVisuals": 4080,
+    "inCameraFrustum": 4080,
+    "visibilityChecksPassed": 4080,
+    "source": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\evidence\\engine-extension\\native-pool-run-r10\\probe-snapshot-near-formation-capture.json"
+  },
+  "visibleSoldierCountVerified": false,
+  "restoredOriginalFiles": true,
+  "evidence": [
+    {
+      "path": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\evidence\\engine-extension\\native-pool-run-r10\\combat-formations.png",
+      "sha256": "2963bd0eb57386f96decec917d7f5bc2ce25cde0494c3ff9b885102000c301c0"
+    },
+    {
+      "path": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\evidence\\engine-extension\\native-pool-run-r10\\full-capacity-formations.png",
+      "sha256": "c521e3d23610b2725400025c8b2df1cc478fbb72b051e9e25e633f0b67a252b6"
+    },
+    {
+      "path": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\evidence\\engine-extension\\native-pool-run-r10\\probe-result.json",
+      "sha256": "c009763c58c724d1e1d950f834abf920c212cab13efc31575d7009bfe4662739"
+    },
+    {
+      "path": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\evidence\\engine-extension\\native-pool-run-r10\\probe-snapshot-near-formation-capture.json",
+      "sha256": "c5aac4877e164fcc45baa4da1df0c8d32b6e4d5dbcf75406cd70f874de17aa29"
+    },
+    {
+      "path": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\evidence\\engine-extension\\native-pool-run-r10\\restore-files.json",
+      "sha256": "194441e16b1107940437f47e0ee951f9ff0517fab46d7d695446b6101e28dd07"
+    },
+    {
+      "path": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\evidence\\engine-extension\\native-pool-run-r10\\rgl_log_40556.txt",
+      "sha256": "7bde738e65fce5e85ce0958585b7fa05247d8d10201dd1dfac649e38b6badccd"
+    },
+    {
+      "path": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\evidence\\engine-extension\\native-pool-run-r10\\rgl_log_errors_40556.txt",
+      "sha256": "b5a980071125456f60265c99e0ef4367987428978e33a3ae74121f78f353d8c9"
+    },
+    {
+      "path": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\evidence\\engine-extension\\native-pool-run-r10\\runtime-receipt.json",
+      "sha256": "e3517a6817cff768c490a4b934bab31f0ef378272393d6e5e2becabc835ec212"
+    },
+    {
+      "path": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\evidence\\engine-extension\\native-pool-run-r10\\watchdog_log_40556.txt",
+      "sha256": "0f98c786cba9ed4da7f9c5c6cdc1779313a7e611f8aaad6d67d2cea02f17ceb6"
+    }
+  ],
+  "limitations": [
+    "Isolated infantry probe only; broader engine-extension framework and production safety remain unfinished.",
+    "All 4080 agents passed visual/frustum/entity checks at full capacity; exact on-screen pixel counts and frame times are unverified.",
+    "Secondary native pool remained empty; its allocation/exhaustion path was not exercised.",
+    "Public SpawnAgent overflow remains unsafe and is guarded by the harness; only the private allocator full path was tested.",
+    "Failed-construction injection, cavalry, ranged, siege, long soak and third-party mod compatibility remain unverified.",
+    "Stock watchdog shutdown is build-specifically verified; native releases after its kill request are not certified.",
+    "Supplemental switch proofs reduce 401 canonical open decode bytes by 89 to 312 outside patched groups; arbitrary computed entries remain unproved."
+  ]
+}

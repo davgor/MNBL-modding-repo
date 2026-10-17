@@ -1,0 +1,566 @@
+{
+ "schema": "mnbl.travel-graph-evidence",
+ "version": 1,
+ "ticket": "MMR-28",
+ "generatedUtc": "2026-10-15T05:17:12.993687+00:00",
+ "policy": {
+  "file": "worldgen/policies/playability.json",
+  "sha256": "67343ec09ad3fee82022f007462b7e295fc72d04b67759c8b5114d713a66efc1"
+ },
+ "calibration": {
+  "file": "worldgen/calibration/naval-transitions/naval-transitions.json",
+  "checks": {
+   "policyPinsCalibration": true,
+   "evidenceHashes": true,
+   "installedEnvelopeHash": true,
+   "portBoundCoversEnvelope": true
+  }
+ },
+ "tools": {
+  "worldbridge": "9586fc64b5a367859ff3661c94b582a5e1e2d470c3b1b639f2273b3b532f95b1"
+ },
+ "unitLog": {
+  "file": "evidence/fwg/travel-tests.txt",
+  "sha256": "af37b579f814d092fe4a41e9c4515cfd4cfe2d5d13cc690fffcdab1572f5fb2b"
+ },
+ "ctestLog": {
+  "file": "evidence/fwg/travel-ctest.log",
+  "sha256": "466a70c863edfb931aa75e059b70d98ddfe888fefb462a2737bf9578dfdb944a"
+ },
+ "gate": {
+  "file": "evidence/fwg/travel-gate.json",
+  "sha256": "1fa93f312c3647a88aedba26d584e63f983cd7af00f8de633a8e348b077dffc8",
+  "passed": true,
+  "checks": {
+   "acceptedWithRealPolicies": true,
+   "strictFirstAttemptRejected": true,
+   "strictRetriedOnDerivedSeed": true,
+   "strictReasonsNameUids": true,
+   "attemptKeepsTravelOutputs": true,
+   "compilerRefusalFailsAtOnce": true
+  }
+ },
+ "verified": [
+  {
+   "name": "size33",
+   "source": "build/research-identity24/run-3428e1108c114ff9a3eab72124eb3c9d/a33-threads0-work/41bd083d9d825893/attempt-0-run-1/world",
+   "terrain": "build/research-terrain26/s33",
+   "campaign": "build/research-campaign27/s33",
+   "travel": "build/research-travel28/s33",
+   "status": "rejected",
+   "reasons": [
+    {
+     "code": "quality.unplaceable_town",
+     "uids": 1,
+     "message": "Town surface-city-0-507-human_rainforest has no land, mountain or reachable land cell within 2 cells"
+    },
+    {
+     "code": "quality.unreachable_town",
+     "uids": 1,
+     "message": "Town surface-city-0-804-frosthold_dwarf in land group 14 is not player-safe (cannot return to the main group; 0 port basins, 1 open coast basins; no valid port)"
+    },
+    {
+     "code": "quality.unplaceable_town",
+     "uids": 1,
+     "message": "Town surface-city-1-519-human_desert has no land, mountain or reachable land cell within 2 cells"
+    },
+    {
+     "code": "quality.unplaceable_town",
+     "uids": 1,
+     "message": "Town surface-city-2-349-dwarf has no land, mountain or reachable land cell within 2 cells"
+    },
+    {
+     "code": "quality.unreachable_town",
+     "uids": 1,
+     "message": "Town surface-city-2-435-elf in land group 2 is not player-safe (cannot return to the main group; 0 port basins, 1 open coast basins; no valid port)"
+    },
+    {
+     "code": "quality.unreachable_town",
+     "uids": 1,
+     "message": "Town surface-city-2-735-human_heartland in land group 12 is not player-safe (cannot return to the main group; 0 port basins, 1 open coast basins; no valid port)"
+    }
+   ],
+   "checks": {
+    "inputsAreTheMmr26And27Artifacts": true,
+    "cellsBinHashRecorded": true,
+    "schemasValidate": true,
+    "compiledClassesRecomputed": true,
+    "finalClassesRecomputed": true,
+    "placementsAndPointsRecomputed": true,
+    "repairRecordsComplete": true,
+    "openSeaRecomputed": true,
+    "landComponentsRecomputed": true,
+    "basinsRecomputed": true,
+    "roadsCrossingsAndProducerOutcomesRecomputed": true,
+    "groupsRecomputed": true,
+    "portsRecomputed": true,
+    "reachabilityRecomputed": true,
+    "exclusionsRecomputed": true,
+    "reasonsAndBoundsRecomputed": true,
+    "gatesOnLand": true,
+    "portsServeTheirGates": true,
+    "transitionsAdjacent": true,
+    "idsClosed": true,
+    "everythingPendingEngineValidation": true,
+    "campaignRecordsUpdated": true
+   },
+   "counts": {
+    "landComponents": 19,
+    "groups": 19,
+    "basins": 1,
+    "openBasins": 1,
+    "openSeaCells": 3920,
+    "harbourTowns": 15,
+    "validPorts": 7,
+    "exclusions": 5,
+    "requiredBridges": 0,
+    "playerSafeGroups": 4,
+    "mainGroupTowns": 10,
+    "positionCollisions": 0
+   },
+   "invalidPortReasons": {
+    "port_too_far_from_gate": 11,
+    "harbour_village_excluded": 2,
+    "town_unplaceable": 1
+   },
+   "repairs": {
+    "footprint": 1,
+    "pass": 3,
+    "snap": 6
+   },
+   "placements": {
+    "town/direct": 21,
+    "town/unplaceable": 3,
+    "village/direct": 70,
+    "village/unplaceable": 5,
+    "village/snap": 6,
+    "castle/direct": 21,
+    "castle/footprint": 1
+   },
+   "compiledClasses": {
+    "land": 1603,
+    "mountain": 223,
+    "river": 217,
+    "sea": 6149
+   },
+   "classes": {
+    "land": 1607,
+    "mountain": 219,
+    "river": 217,
+    "sea": 6149
+   },
+   "wallSeconds": 0.97
+  },
+  {
+   "name": "size129",
+   "source": "build/research-source23/split-129",
+   "terrain": "build/research-terrain26/s129",
+   "campaign": "build/research-campaign27/s129",
+   "travel": "build/research-travel28/s129",
+   "status": "ok",
+   "reasons": [],
+   "checks": {
+    "inputsAreTheMmr26And27Artifacts": true,
+    "cellsBinHashRecorded": true,
+    "schemasValidate": true,
+    "compiledClassesRecomputed": true,
+    "finalClassesRecomputed": true,
+    "placementsAndPointsRecomputed": true,
+    "repairRecordsComplete": true,
+    "openSeaRecomputed": true,
+    "landComponentsRecomputed": true,
+    "basinsRecomputed": true,
+    "roadsCrossingsAndProducerOutcomesRecomputed": true,
+    "groupsRecomputed": true,
+    "portsRecomputed": true,
+    "reachabilityRecomputed": true,
+    "exclusionsRecomputed": true,
+    "reasonsAndBoundsRecomputed": true,
+    "gatesOnLand": true,
+    "portsServeTheirGates": true,
+    "transitionsAdjacent": true,
+    "idsClosed": true,
+    "everythingPendingEngineValidation": true,
+    "campaignRecordsUpdated": true
+   },
+   "counts": {
+    "landComponents": 28,
+    "groups": 27,
+    "basins": 35,
+    "openBasins": 1,
+    "openSeaCells": 2963,
+    "harbourTowns": 44,
+    "validPorts": 30,
+    "exclusions": 6,
+    "requiredBridges": 1,
+    "playerSafeGroups": 11,
+    "mainGroupTowns": 17,
+    "positionCollisions": 1
+   },
+   "invalidPortReasons": {
+    "port_too_far_from_gate": 26,
+    "harbour_village_excluded": 4
+   },
+   "repairs": {
+    "footprint": 6,
+    "pass": 14,
+    "access": 4,
+    "snap": 4,
+    "harbour_shift": 1
+   },
+   "placements": {
+    "town/footprint": 1,
+    "town/direct": 44,
+    "village/direct": 212,
+    "village/footprint": 5,
+    "village/snap": 4,
+    "castle/direct": 26
+   },
+   "compiledClasses": {
+    "lake": 59,
+    "land": 1874,
+    "mountain": 515,
+    "river": 37,
+    "sea": 5707
+   },
+   "classes": {
+    "lake": 59,
+    "land": 1898,
+    "mountain": 491,
+    "river": 37,
+    "sea": 5707
+   },
+   "wallSeconds": 2.558
+  },
+  {
+   "name": "size257",
+   "source": "build/research-source23/split-257",
+   "terrain": "build/research-terrain26/s257",
+   "campaign": "build/research-campaign27/s257",
+   "travel": "build/research-travel28/s257",
+   "status": "rejected",
+   "reasons": [
+    {
+     "code": "quality.unreachable_town",
+     "uids": 1,
+     "message": "Town surface-city-0-30173-hill_dwarf in land group 12 is not player-safe (unreachable from the main group; cannot return to the main group; 0 port basins, 0 open coast basins; no valid port)"
+    },
+    {
+     "code": "quality.unplaceable_town",
+     "uids": 1,
+     "message": "Town surface-city-1-31581-human_heartland has no land, mountain or reachable land cell within 2 cells"
+    },
+    {
+     "code": "quality.repair_bound_exceeded",
+     "uids": 40,
+     "message": "40 settlement snaps exceed maxSnapFraction"
+    }
+   ],
+   "checks": {
+    "inputsAreTheMmr26And27Artifacts": true,
+    "cellsBinHashRecorded": true,
+    "schemasValidate": true,
+    "compiledClassesRecomputed": true,
+    "finalClassesRecomputed": true,
+    "placementsAndPointsRecomputed": true,
+    "repairRecordsComplete": true,
+    "openSeaRecomputed": true,
+    "landComponentsRecomputed": true,
+    "basinsRecomputed": true,
+    "roadsCrossingsAndProducerOutcomesRecomputed": true,
+    "groupsRecomputed": true,
+    "portsRecomputed": true,
+    "reachabilityRecomputed": true,
+    "exclusionsRecomputed": true,
+    "reasonsAndBoundsRecomputed": true,
+    "gatesOnLand": true,
+    "portsServeTheirGates": true,
+    "transitionsAdjacent": true,
+    "idsClosed": true,
+    "everythingPendingEngineValidation": true,
+    "campaignRecordsUpdated": true
+   },
+   "counts": {
+    "landComponents": 37,
+    "groups": 35,
+    "basins": 56,
+    "openBasins": 1,
+    "openSeaCells": 2949,
+    "harbourTowns": 47,
+    "validPorts": 28,
+    "exclusions": 5,
+    "requiredBridges": 2,
+    "playerSafeGroups": 11,
+    "mainGroupTowns": 20,
+    "positionCollisions": 24
+   },
+   "invalidPortReasons": {
+    "port_too_far_from_gate": 34,
+    "basin_not_reachable_from_gate": 2,
+    "harbour_village_excluded": 2
+   },
+   "repairs": {
+    "footprint": 9,
+    "pass": 5,
+    "access": 3,
+    "snap": 40,
+    "harbour_shift": 7
+   },
+   "placements": {
+    "town/direct": 37,
+    "town/footprint": 1,
+    "town/snap": 10,
+    "town/unplaceable": 1,
+    "village/direct": 200,
+    "village/snap": 28,
+    "village/footprint": 7,
+    "castle/direct": 25,
+    "castle/snap": 2,
+    "castle/footprint": 1
+   },
+   "compiledClasses": {
+    "lake": 112,
+    "land": 1847,
+    "mountain": 521,
+    "river": 23,
+    "sea": 5689
+   },
+   "classes": {
+    "lake": 112,
+    "land": 1864,
+    "mountain": 504,
+    "river": 23,
+    "sea": 5689
+   },
+   "wallSeconds": 4.361
+  },
+  {
+   "name": "size513",
+   "source": "build/research-source23/split-513",
+   "terrain": "build/research-terrain26/s513",
+   "campaign": "build/research-campaign27/s513",
+   "travel": "build/research-travel28/s513",
+   "status": "rejected",
+   "reasons": [
+    {
+     "code": "quality.unplaceable_town",
+     "uids": 1,
+     "message": "Town surface-city-2-127160-human_rainforest has no land, mountain or reachable land cell within 2 cells"
+    },
+    {
+     "code": "quality.repair_bound_exceeded",
+     "uids": 73,
+     "message": "73 settlement snaps exceed maxSnapFraction"
+    },
+    {
+     "code": "quality.repair_bound_exceeded",
+     "uids": 36,
+     "message": "36 harbour shifts exceed maxHarbourShiftFraction of 99 harbours"
+    }
+   ],
+   "checks": {
+    "inputsAreTheMmr26And27Artifacts": true,
+    "cellsBinHashRecorded": true,
+    "schemasValidate": true,
+    "compiledClassesRecomputed": true,
+    "finalClassesRecomputed": true,
+    "placementsAndPointsRecomputed": true,
+    "repairRecordsComplete": true,
+    "openSeaRecomputed": true,
+    "landComponentsRecomputed": true,
+    "basinsRecomputed": true,
+    "roadsCrossingsAndProducerOutcomesRecomputed": true,
+    "groupsRecomputed": true,
+    "portsRecomputed": true,
+    "reachabilityRecomputed": true,
+    "exclusionsRecomputed": true,
+    "reasonsAndBoundsRecomputed": true,
+    "gatesOnLand": true,
+    "portsServeTheirGates": true,
+    "transitionsAdjacent": true,
+    "idsClosed": true,
+    "everythingPendingEngineValidation": true,
+    "campaignRecordsUpdated": true
+   },
+   "counts": {
+    "landComponents": 40,
+    "groups": 34,
+    "basins": 67,
+    "openBasins": 1,
+    "openSeaCells": 2943,
+    "harbourTowns": 51,
+    "validPorts": 33,
+    "exclusions": 11,
+    "requiredBridges": 6,
+    "playerSafeGroups": 13,
+    "mainGroupTowns": 20,
+    "positionCollisions": 38
+   },
+   "invalidPortReasons": {
+    "port_too_far_from_gate": 32,
+    "harbour_village_excluded": 3
+   },
+   "repairs": {
+    "footprint": 13,
+    "pass": 23,
+    "access": 2,
+    "snap": 73,
+    "harbour_shift": 36
+   },
+   "placements": {
+    "town/snap": 13,
+    "town/direct": 39,
+    "town/unplaceable": 1,
+    "town/footprint": 3,
+    "village/direct": 200,
+    "village/snap": 58,
+    "village/unplaceable": 6,
+    "village/footprint": 9,
+    "castle/direct": 34,
+    "castle/footprint": 1,
+    "castle/snap": 2
+   },
+   "compiledClasses": {
+    "lake": 171,
+    "land": 1799,
+    "mountain": 527,
+    "river": 10,
+    "sea": 5685
+   },
+   "classes": {
+    "lake": 171,
+    "land": 1837,
+    "mountain": 489,
+    "river": 10,
+    "sea": 5685
+   },
+   "wallSeconds": 10.305
+  },
+  {
+   "name": "size1025",
+   "source": "build/research-source23/split-1025",
+   "terrain": "build/research-terrain26/s1025",
+   "campaign": "build/research-campaign27/s1025",
+   "travel": "build/research-travel28/s1025",
+   "status": "rejected",
+   "reasons": [
+    {
+     "code": "quality.unreachable_town",
+     "uids": 1,
+     "message": "Town surface-city-2-226825-frosthold_dwarf in land group 3 is not player-safe (unreachable from the main group; cannot return to the main group; 0 port basins, 0 open coast basins; its port is invalid)"
+    },
+    {
+     "code": "quality.unplaceable_town",
+     "uids": 1,
+     "message": "Town surface-city-2-510323-human_maritime has no land, mountain or reachable land cell within 2 cells"
+    },
+    {
+     "code": "quality.unreachable_town",
+     "uids": 1,
+     "message": "Town surface-city-2-560283-human_heartland in land group 14 is not player-safe (unreachable from the main group; cannot return to the main group; 0 port basins, 0 open coast basins; its port is invalid)"
+    },
+    {
+     "code": "quality.repair_bound_exceeded",
+     "uids": 113,
+     "message": "113 settlement snaps exceed maxSnapFraction"
+    },
+    {
+     "code": "quality.repair_bound_exceeded",
+     "uids": 31,
+     "message": "31 harbour shifts exceed maxHarbourShiftFraction of 101 harbours"
+    }
+   ],
+   "checks": {
+    "inputsAreTheMmr26And27Artifacts": true,
+    "cellsBinHashRecorded": true,
+    "schemasValidate": true,
+    "compiledClassesRecomputed": true,
+    "finalClassesRecomputed": true,
+    "placementsAndPointsRecomputed": true,
+    "repairRecordsComplete": true,
+    "openSeaRecomputed": true,
+    "landComponentsRecomputed": true,
+    "basinsRecomputed": true,
+    "roadsCrossingsAndProducerOutcomesRecomputed": true,
+    "groupsRecomputed": true,
+    "portsRecomputed": true,
+    "reachabilityRecomputed": true,
+    "exclusionsRecomputed": true,
+    "reasonsAndBoundsRecomputed": true,
+    "gatesOnLand": true,
+    "portsServeTheirGates": true,
+    "transitionsAdjacent": true,
+    "idsClosed": true,
+    "everythingPendingEngineValidation": true,
+    "campaignRecordsUpdated": true
+   },
+   "counts": {
+    "landComponents": 38,
+    "groups": 33,
+    "basins": 77,
+    "openBasins": 1,
+    "openSeaCells": 2937,
+    "harbourTowns": 51,
+    "validPorts": 34,
+    "exclusions": 24,
+    "requiredBridges": 5,
+    "playerSafeGroups": 13,
+    "mainGroupTowns": 21,
+    "positionCollisions": 29
+   },
+   "invalidPortReasons": {
+    "harbour_village_excluded": 12,
+    "port_too_far_from_gate": 24
+   },
+   "repairs": {
+    "footprint": 13,
+    "pass": 30,
+    "access": 5,
+    "snap": 113,
+    "harbour_shift": 31
+   },
+   "placements": {
+    "town/direct": 35,
+    "town/snap": 18,
+    "town/footprint": 4,
+    "town/unplaceable": 1,
+    "village/direct": 181,
+    "village/footprint": 9,
+    "village/snap": 93,
+    "village/unplaceable": 5,
+    "castle/direct": 39,
+    "castle/snap": 2
+   },
+   "compiledClasses": {
+    "lake": 221,
+    "land": 1751,
+    "mountain": 532,
+    "river": 4,
+    "sea": 5684
+   },
+   "classes": {
+    "lake": 221,
+    "land": 1799,
+    "mountain": 484,
+    "river": 4,
+    "sea": 5684
+   },
+   "wallSeconds": 33.43
+  }
+ ],
+ "repeats": [
+  {
+   "first": "build/research-travel28/s129",
+   "second": "build/research-travel28/s129-repeat",
+   "identical": true
+  }
+ ],
+ "passed": true,
+ "reproduce": [
+  "./tools/Build.ps1",
+  "ctest -C Release (build/worldbridge)",
+  "bash build/research-travel28/run.sh (worldbridge --compile-travel per world)",
+  "powershell -File tools/Test-TravelGate.ps1",
+  "python tools/summarize_travel.py --verify NAME=SPLIT=TERRAIN=CAMPAIGN=TRAVEL [...] --repeat A=B --gate evidence/fwg/travel-gate.json --out evidence/fwg/travel-graph.json"
+ ]
+}

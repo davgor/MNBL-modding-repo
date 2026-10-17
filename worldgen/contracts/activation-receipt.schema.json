@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "mnbl.activation-receipt/1",
+  "title": "MNBL world activation receipt",
+  "description": "Written only by U03, after the runtime validations W02-W05 and C07 pass for one campaign instance. It lives outside the immutable world data bundle (a bundle that contains a receipt fails validation) and binds that bundle's worldContentId and manifest to one campaignInstanceId, so identical world content can back separate saves without changing worldContentId. The compiler never writes it (MMR-29 defines the contract only). Resolved game-policy slots and engine caches are named by runtimeDerivedBundleSha256 and never rewrite the data bundle.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "version", "worldContentId", "manifestSha256", "campaignInstanceId", "runtimeDerivedBundleSha256", "validations", "activatedBy"],
+  "$defs": { "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+             "validation": { "type": "object", "additionalProperties": false, "required": ["status", "evidenceSha256"],
+                             "properties": { "status": { "const": "passed" }, "evidenceSha256": { "$ref": "#/$defs/sha256" } } } },
+  "properties": {
+    "schema": { "const": "mnbl.activation-receipt" },
+    "version": { "const": 1 },
+    "worldContentId": { "$ref": "#/$defs/sha256" },
+    "manifestSha256": { "$ref": "#/$defs/sha256" },
+    "campaignInstanceId": { "type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$" },
+    "runtimeDerivedBundleSha256": { "$ref": "#/$defs/sha256" },
+    "validations": {
+      "type": "object", "additionalProperties": false, "required": ["W02", "W03", "W04", "W05", "C07"],
+      "description": "every runtime validation the activation needs, each passed with the hash of its evidence",
+      "properties": { "W02": { "$ref": "#/$defs/validation" }, "W03": { "$ref": "#/$defs/validation" }, "W04": { "$ref": "#/$defs/validation" },
+                      "W05": { "$ref": "#/$defs/validation" }, "C07": { "$ref": "#/$defs/validation" } }
+    },
+    "activatedBy": { "const": "U03" }
+  }
+}

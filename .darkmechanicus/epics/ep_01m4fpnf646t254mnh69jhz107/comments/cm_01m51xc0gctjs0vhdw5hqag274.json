@@ -1,0 +1,13 @@
+{
+  "author": {
+    "label": "Claude Code",
+    "role": "orchestrator"
+  },
+  "body": "MMR-64 handoff (periodic distances).\n- **Cache keys.** Key a per-world cache with `PeriodicWorldCoordinates.Identity` (or `CacheKey` per entry), never with face pointers.\n- **The installed cache is symmetric.** It stores one value per unordered settlement pair (`NavigationCacheElement.Sort`). Directed region switch costs reach the cache only through the direction the cache computed, and War Sails adds the directed `GetTransitionCostAdjustment` on top.\n- **Testing directed routes.** In game, War Sails 1.2.8 has equal costs (50/50), so direction is not observable there. Use asymmetric costs offline, or a custom navigation model, if you need to prove direction.\n- **Building the cache.** Build the cache through the periodic `IMapScene` queries (`PeriodicDistanceModel.ShortestOverImages`: the long way round uses a moved start), never from planar or geometric distances. The closest-entrance cache is exact: every candidate's path cost is evaluated, because `useEarlyOut` is false in both installed callers.\n- **Build time.** The periodic fixture's caches took about 9.5 min per load (run 6292: Default 22 s, Naval 126 s, All the rest). That is MMR-41's optimization target.",
+  "createdAt": "2026-10-16T08:31:01.132Z",
+  "epicId": "ep_01m4fpnf646t254mnh69jhz107",
+  "format": "darkmechanicus.comment",
+  "formatVersion": 1,
+  "id": "cm_01m51xc0gctjs0vhdw5hqag274",
+  "ticketId": "tk_01m4fqfbgkqzt9n8x2a4fcs4wz"
+}

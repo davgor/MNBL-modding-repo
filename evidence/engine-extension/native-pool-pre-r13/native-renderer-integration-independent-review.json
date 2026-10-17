@@ -1,0 +1,93 @@
+{
+  "schemaVersion": 1,
+  "status": "accepted-for-restricted-test-integration",
+  "gameExecuted": false,
+  "installedFilesModified": false,
+  "reviewedSourceSha256": {
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\tools\\battle-scale\\build_pool_patch_manifest.py": "28b965555e7f02831929c222b1650988f84951a5f9b566b40b0c62f43e5203df",
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\tools\\battle-scale\\prepare_native_pool_test.py": "70ca5b27dcabf8d00866be0a62c6396be9f06e0d9278c8731204a044e80911d6",
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\tools\\battle-scale\\patch_native_copy.py": "e61450ea2094b82e153e6c47d3b981fe8faa65f184542efe1b9e19357e842793",
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\tests\\BattleScale\\test_native_test_package.py": "7a85380b131200e791c1bdb3515e4e5ba686142f9db12bcb83ab9c5af66b769d",
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\tests\\BattleScale\\test_pool_patch_manifest.py": "b5bbf71c56c0721de41171af97fb9d7acd22e46866478cfec192ba561d5aaa03",
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\evidence\\engine-extension\\native-bone-mapping-patch.json": "e88dfdeebb3222fa1dbbc586cbafce93487396f3dffb8efd6b3ea2de5ebd5104",
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\evidence\\engine-extension\\native-bone-mapping-independent-review.json": "12c924409187f067a1d6f4ceee4c6d5c4678dfb27ff447fe76c63ee5a7fbde9a",
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\evidence\\engine-extension\\native-renderer-buffer-lifecycle-review.json": "9a2b8aa99e05e89751a7afdb5966e82c43134e9b426710a739dae074858f9667",
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\src\\MNBL.BattleScale\\SubModule.cs": "541f816ad5db22f3723ecbe980a779204f24f79e25d0749e8e5e9ee172e17743",
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\src\\MNBL.BattleScale\\NativePoolProbeMission.cs": "cbc908148a83dafcc4c65a564a9514edd73f5fa91121a814fdcdad5a05913b4f",
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\src\\MNBL.BattleScale\\Core\\NativeProbeWorkload.cs": "41ffcc1abcd7b39ec5cb12ffa326dda77561b6a7c14312d27029dae18240f010",
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\tests\\BattleScale\\NativeWorkloadTests.cs": "6c72f9d27289318c6a7819b23ec7dcb9a53c269c83af714ceabd380896a0c664",
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\evidence\\engine-extension\\native-workload-independent-review.json": "db639b5b41f71da1adf85ff9f418130ed2846ed06e74bb23cf9b7b250f37adf7"
+  },
+  "findings": [],
+  "resolvedFindings": [
+    {
+      "id": "renderer-partial-geometry",
+      "resolution": "Packaging requires all13 exact renderer edits by address/RVA/original/replacement; missing/weakened/moved tests cover11 geometry sites and2 guard sites."
+    },
+    {
+      "id": "manifest-approval-replay",
+      "resolution": "Packaging requires the exact independent approval file/hash, explicit boolean approval, native source hash, actual canonical patch set, complete source evidence hashes and current generator hash."
+    },
+    {
+      "id": "display-address-relocation",
+      "resolution": "Every patch display address must equal imageBase+RVA; existing PE verification binds RVA to actual fileOffset. Regression rejects moving an approved nonrequired edit while preserving display address and bytes."
+    },
+    {
+      "resolution": "Generated TEST-HELD text now names selected workload, real duration, recycle count, rider/horse physical slots, public SpawnAgent check and managed engine restore requirement.",
+      "id": "schema3-generated-test-instructions"
+    }
+  ],
+  "tests": [
+    {
+      "exitCode": 0,
+      "scope": "Inert synthetic packages; exact renderer guards and geometry plus schema3 managed copy/workload binding, invalid options and partial managed copy cleanup.",
+      "testsPassed": 28,
+      "test": "test_native_test_package.py"
+    },
+    {
+      "exitCode": 0,
+      "testsPassed": 13,
+      "test": "test_pool_patch_manifest.py"
+    }
+  ],
+  "observedManifest": {
+    "patchCount": 1676,
+    "rendererEditsExactlyMatched": 13,
+    "canonicalPatchSetSha256": "36336b8845a52c900286dd800bb5e7555fa45bbe9cf454c3d9cb898b8e1dd7e2"
+  },
+  "acceptanceScope": [
+    "Renderer inputs are transitively bound to the reviewed patch and lifecycle evidence; original and replacement spans must decode exactly and preserve source file offsets.",
+    "Current package code fails closed on incomplete geometry, stale approval/evidence/build, changed generator and moved patch locations before creating output.",
+    "Required Single0/contact guards, isolated provider checks and fresh output-directory protections remain active.",
+    "Packaging now additionally binds the exact native source, patched candidate and stock Watchdog implementation to the reviewed shutdown contract. This does not change any of the 13 renderer patch bytes.",
+    "Schema3 admission packaging pins exact managed original, rewritten copy, probe module and rewrite receipt hashes; the trusted managed provider hash changes only after the source match. New outputs are removed on patcher failure.",
+    "ValidateProfile requires schema3/admission, hashes the loaded managed engine and module, configures workload before mission construction, then validates isolated providers and native worker/capacity state before enabling admission.",
+    "SubModule preserves the original managed-engine hash gate for non-native demos; native probes use the exact profile validation before game creation and mission creation."
+  ],
+  "limitations": [
+    "This review approves integration logic for a restricted runtime test; it does not mark the regenerated full manifest or the game test passed.",
+    "Root must regenerate/finalize static approval and isolated profile hashes after source/evidence changes; normal packaging checks must pass before deployment.",
+    "Existing renderer asynchronous scheduling remains unchanged; this review does not independently prove backend synchronization or arbitrary third-party provider behavior.",
+    "This integration review excludes correctness of the managed admission IL rewriter itself; the separate guard-patcher review and actual runtime overflow checks are still required.",
+    "Legacy schema2 package mode remains in tooling for historical fixtures; the current module requires schema3 admission. Current cavalry/ranged launches must use --admission and explicit workload/duration/cycles."
+  ],
+  "reviewedAtUtc": "2026-10-17T10:11:12.7929602Z",
+  "historicalReview": {
+    "path": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\evidence\\engine-extension\\native-renderer-integration-r8-independent-review.json",
+    "sha256": "b0cd2577ec6d72f6628756f4cea5a9739c076deb77f5c1528809ccdf4cda30e8"
+  },
+  "reviewer": "/root/workload_review",
+  "preManagedAdmissionReview": {
+    "path": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\evidence\\engine-extension\\native-pool-run-r10\\reviews\\native-renderer-integration-independent-review.json",
+    "sha256": "aee2d8f4f5c65985297bba16068068346f3541b0264f595032eb2e9421e36dd8"
+  },
+  "modernPowerShellCompatibilityReview": {
+    "change": "Managed patch subprocess uses pwsh instead of Windows PowerShell5; explanatory comment only.",
+    "previousSourceSha256": "a7f452957a7ddcb7e0893b1c9d8aced3fd65b9764ed74a1f96135a983c730836",
+    "currentSourceSha256": "70ca5b27dcabf8d00866be0a62c6396be9f06e0d9278c8731204a044e80911d6",
+    "boundedDiffVerified": "Reversing only the executable token and added comment reconstructs exactly the previous reviewed source SHA256.",
+    "runtimePath": "C:\\Users\\davgo\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe",
+    "runtimeVersion": "7.6.5.0",
+    "tests": "28 inert package tests independently rerun and passed; this bounded re-review does not execute the managed rewriter or game."
+  }
+}

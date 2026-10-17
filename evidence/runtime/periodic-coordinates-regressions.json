@@ -1,0 +1,98 @@
+{
+ "schema": "mnbl.periodic-coordinates-regressions",
+ "version": 1,
+ "ticket": "MMR-64",
+ "scope": "in-game regressions of accepted tickets on the MMR-64 final tree; each recomputed by its own summarizer into a scratch file (the accepted evidence files of those tickets are unchanged)",
+ "runs": [
+  {
+   "ticket": "MMR-38",
+   "probe": "world_navigation",
+   "run": {
+    "file": "evidence/runtime/in-game/world_navigation-6436.json",
+    "sha256": "ede7f5cfe8d9da7a320894d01d1ea12e4c83c8d49b8a860f33c33da2904810e7",
+    "status": "ok",
+    "pid": 6436,
+    "moduleSha256": "3f3266ac0ae4837a032a3960152be74c05c71d489be5d95a86792c21b032d270",
+    "error": null
+   },
+   "summarizer": "tools/summarize_world_navigation.py",
+   "passed": [
+    33,
+    33
+   ]
+  },
+  {
+   "ticket": "MMR-44",
+   "probe": "generation_job",
+   "run": {
+    "file": "evidence/runtime/in-game/generation_job-34480.json",
+    "sha256": "7ebd7cdbfeb0be47508f67063d6cfcf8622db1d15514aa02d6d7da8b83cc551c",
+    "status": "ok",
+    "pid": 34480,
+    "moduleSha256": "3f3266ac0ae4837a032a3960152be74c05c71d489be5d95a86792c21b032d270",
+    "error": null
+   },
+   "summarizer": "tools/summarize_generation_job.py",
+   "passed": [
+    17,
+    17
+   ],
+   "coordinatePolicy": "4a111663dd8a5bdfc4836095b87a8db45534b70403c22f24d164e87d432f0c48"
+  },
+  {
+   "ticket": "MMR-19",
+   "probe": "generated_campaign saveProbe + generated_save_load (first pair)",
+   "save": {
+    "file": "evidence/runtime/in-game/generated_campaign-33364.json",
+    "sha256": "3e5fe7a52291ae3cb87375f750b1fc6dd92ac451b82fb6ca0beda7c409dcaf84",
+    "status": "ok",
+    "pid": 33364,
+    "moduleSha256": "3f3266ac0ae4837a032a3960152be74c05c71d489be5d95a86792c21b032d270",
+    "error": null
+   },
+   "load": {
+    "file": "evidence/runtime/in-game/generated_save_load-3820.json",
+    "sha256": "c321efcb96358040adf854719f684f2883af99c7a2a60c93d0b6d49aa407efe0",
+    "status": "error",
+    "pid": 3820,
+    "moduleSha256": "3f3266ac0ae4837a032a3960152be74c05c71d489be5d95a86792c21b032d270",
+    "error": "System.InvalidOperationException: Generated save load failed: mnbl_00059042: 1 values differ from the saved snapshot (first: .parties.naval_patrol_party_1_party_3.nextTarget[0]: 9.5348739624023438 -> 9.5348758697509766).\r\n   at MNBL.ProceduralWorld.Diagnostics.WorldSaveProbe.<Load>d__4.MoveNext()\r\n   at MNBL.ProceduralWorld.Automation.AutorunHost.Step()"
+   },
+   "summarizer": "tools/summarize_world_save_probe.py",
+   "passed": [
+    15,
+    17
+   ],
+   "failing": [
+    "snapshotsMatchAfterColdLoad",
+    "noFailures"
+   ],
+   "note": "one value differed after the cold load: naval_patrol_party_1_party_3.nextTarget x 9.5348739624 -> 9.5348758698 (2 ulp of steering state NextTargetPosition, recomputed after load) on a non-periodic world, where no MMR-64 code runs (periodic patches, preflight and seam behaviour are periodic-only; the scene path shift is 0; the battle map is unchanged); the rerun pair below matched exactly"
+  },
+  {
+   "ticket": "MMR-19",
+   "probe": "generated_campaign saveProbe + generated_save_load (rerun pair)",
+   "save": {
+    "file": "evidence/runtime/in-game/generated_campaign-19384.json",
+    "sha256": "9f40b99aaf1e9cf06a3a391e4fda4d2586e1b94fd6dcf4482a060d24c40ca157",
+    "status": "ok",
+    "pid": 19384,
+    "moduleSha256": "3f3266ac0ae4837a032a3960152be74c05c71d489be5d95a86792c21b032d270",
+    "error": null
+   },
+   "load": {
+    "file": "evidence/runtime/in-game/generated_save_load-31924.json",
+    "sha256": "72a267ec37dcc1138b75f3d9199cf2a2784e3cd6469dfa531e71a4ac10cef49f",
+    "status": "ok",
+    "pid": 31924,
+    "moduleSha256": "3f3266ac0ae4837a032a3960152be74c05c71d489be5d95a86792c21b032d270",
+    "error": null
+   },
+   "summarizer": "tools/summarize_world_save_probe.py",
+   "passed": [
+    17,
+    17
+   ]
+  }
+ ]
+}

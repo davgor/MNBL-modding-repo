@@ -1,0 +1,102 @@
+{
+  "schema": "mnbl.naval-transitions",
+  "version": 1,
+  "source": {
+    "evidence": "evidence/runtime/navigation-probe.json",
+    "evidenceSha256": "da1556aff6492b34a04180369024b37cdb16f5548bc8161b65d2432d3a2bff5b",
+    "run": "evidence/runtime/in-game/generated_campaign-2248.json",
+    "runSha256": "18dbf3ceb7d6ddd4276cd82188bca093e545907875187feb35175ab38498deca",
+    "faceGroupTable": "docs/formats/navmesh-bin.md",
+    "faceGroupTableSha256": "b5eee6c44128fc177b3e614e5899cdde4887419f67b610be11d2adfe00128e26",
+    "note": "MMR-17 accepted run 2248 (worlds mnbl_0000002a and mnbl_0000002b): NavalDLC.GameComponents.NavalPartyNavigationModel with NavalDLCMapDistanceModel. The invalid-terrain sets, region switch costs and embark threshold are identical in both worlds; the face-group ids are TaleWorlds.Core.TerrainType values (IL-verified table in navmesh-bin.md section 5)."
+  },
+  "invalidTerrain": {
+    "Default": [
+      7,
+      8,
+      10,
+      11,
+      13,
+      14,
+      18,
+      19,
+      21,
+      22,
+      23,
+      24,
+      25
+    ],
+    "Naval": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      13,
+      14,
+      15,
+      16,
+      17,
+      20,
+      21,
+      22
+    ],
+    "All": [
+      7,
+      13,
+      14,
+      21,
+      22
+    ]
+  },
+  "faceGroups": {
+    "Plain": 1,
+    "Mountain": 7,
+    "Lake": 8,
+    "River": 11,
+    "Bridge": 17,
+    "CoastalSea": 18,
+    "OpenSea": 19,
+    "UnderBridge": 25
+  },
+  "regionSwitchCost": {
+    "landToSea": 50,
+    "seaToLand": 50
+  },
+  "embarkDisembarkThreshold": 0.5,
+  "observed": {
+    "gateFaceGroup": 1,
+    "portFaceGroup": 18,
+    "gateAndPortShareIsland": true,
+    "waterSeparatedLandShareIsland": true,
+    "portOffsetFromGate": {
+      "mnbl_0000002a": 6.25,
+      "mnbl_0000002b": 5.0,
+      "note": "gate and port cells of town_1 in the two fixture worlds"
+    },
+    "playerEmbark": "only at a town port: SetSailAtPosition, the call the town's leave-by-sea menu makes (6.7 and 4.6 units from where the player stood at the gate); the player does not embark by walking onto water",
+    "aiEmbark": "anywhere on the coast: the generated ruler embarked from its own landmass with no port and disembarked on a water-separated landmass without one",
+    "disembark": "any coast of the destination landmass, for the player and the AI (world 42: the player disembarked on the off-shore landmass, which has no port)",
+    "transitionHours": "0-3 h with a valid anchor (NavalDLCPartyTransitionModel); 48 h without one per IL, not observed",
+    "connectivity": "faces connect through shared edges; a grid navmesh with two triangles per cell (split along the (x, y)-(x+1, y+1) diagonal, MMR-16) connects cells that share an edge, never cells that touch only at a corner",
+    "islands": "engine islands span land and sea faces (town gate, town port and the water-separated landmass are all island 2), so an island is a connected set of All-valid faces"
+  },
+  "open": [
+    "Coastline clearance (how far from land a port point must lie for ships to dock) was not measured: the MMR-17 ports sat one cell offshore on CoastalSea. Compiled port cells share an edge with their land entrance and lie within the installed port-gate envelope; every one is a mandatory host check for MMR-38.",
+    "No bridge (17) or under-bridge (25) faces were authored or observed, and neither shipped campaign map authors Bridge 17 (navmesh-bin.md section 5), so bridge candidates are unproven engine features until MMR-38 realizes and checks them.",
+    "MMR-17 authored no OpenSea (19) or River (11) faces (its open-sea fixture point was CoastalSea 18); OpenSea faces were later exercised by the MMR-59 climate fixtures, River faces never.",
+    "Face-ability toggles renumber islands and strand cached parties (MMR-17 known gap); the compiler emits no runtime toggle."
+  ],
+  "installedPortGateEnvelope": {
+    "source": "D:/SteamLibrary/steamapps/common/Mount & Blade II Bannerlord/Modules/NavalDLC/ModuleData/settlements.xml",
+    "sourceSha256": "4f2924a0b236062d1720e0ad48131d23fa4863e5c0aa7fe475f36b0056b9e436",
+    "towns": 29,
+    "min": 4.86,
+    "median": 7.98,
+    "p90": 10.21,
+    "max": 10.97,
+    "note": "Distance from gate_pos to port_pos (map units) over every War Sails town with a port on the installed campaign map; the largest is town_V8. The playability policy bounds a compiled port to whole cells covering this maximum."
+  }
+}

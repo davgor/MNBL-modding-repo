@@ -7,12 +7,14 @@ using MNBL.ProceduralWorld.Automation;
 using MNBL.ProceduralWorld.CampaignBootstrap;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
+using TaleWorlds.CampaignSystem.ComponentInterfaces;
 using TaleWorlds.CampaignSystem.Encounters;
 using TaleWorlds.CampaignSystem.GameMenus;
 using TaleWorlds.CampaignSystem.Naval;
 using TaleWorlds.CampaignSystem.Party;
 using TaleWorlds.CampaignSystem.Settlements;
 using TaleWorlds.Library;
+using MNBL.ProceduralWorld.Surface;
 
 namespace MNBL.ProceduralWorld.Diagnostics
 {
@@ -28,7 +30,7 @@ namespace MNBL.ProceduralWorld.Diagnostics
             var world = PeriodicWorld.Current;
             if (world == null) { failures.Add("No periodic world is active (placement lacks 'periodic')."); yield break; }
             var campaign = Campaign.Current;
-            var map = (DiagnosticMapScene)campaign.MapSceneWrapper;
+            var map = (GeneratedMapScene)campaign.MapSceneWrapper;
             var nav = campaign.Models.PartyNavigationModel;
             var distanceModel = campaign.Models.MapDistanceModel;
             var town1 = Settlement.Find(worldId + "_town_1"); var town2 = Settlement.Find(worldId + "_town_2");
@@ -39,16 +41,24 @@ namespace MNBL.ProceduralWorld.Diagnostics
                     ["logicalX"] = world.LogicalX(s.Position.X), ["canonical"] = world.IsCanonical(s.Position.X) }).ToList(),
                 ["seamBehaviorRegistered"] = campaign.CampaignBehaviorManager.GetBehavior<PeriodicSeamBehavior>() != null };
             if (!world.IsCanonical(town1.Position.X) || !world.IsCanonical(town2.Position.X)) failures.Add("Settlements are not canonical.");
-            // Display copies: the fixture places visual-only settlement copies in the strips. They are scene entities with no
-            // campaign identity, so every settlement stays one logical object.
+            // Display copies: visual-only settlement copies in the strips, scene entities with no campaign identity, so every settlement
+            // stays one logical object. MMR-66 makes them at run time (PeriodicMapPresentation, replacing the fixture's static ones); a
+            // fixture copy still in the scene is listed too.
             var copies = new List<object>();
+            foreach (var c in MNBL.ProceduralWorld.World.PeriodicMapPresentation.Copies)
+            {
+                var s = Settlement.Find(c.Settlement);
+                var at = c.Copy.GlobalPosition;
+                copies.Add(new Dictionary<string, object> { ["entity"] = c.Entity, ["of"] = c.Settlement, ["position"] = new[] { at.x, at.y }, ["offset"] = s == null ? (object)null : at.x - s.Position.X,
+                    ["runtime"] = true, ["replacedFixtureEntity"] = c.ReplacedFixtureEntity });
+            }
             foreach (var s in Settlement.All.Where(s => s.StringId.StartsWith(worldId + "_", StringComparison.Ordinal)))
                 foreach (var side in new[] { "west", "east" })
                 {
                     var entity = map.Scene.FindEntityWithName(worldId + "_display_" + s.StringId.Substring(worldId.Length + 1) + "_" + side);
                     if (entity == null) continue;
                     var at = entity.GlobalPosition;
-                    copies.Add(new Dictionary<string, object> { ["entity"] = entity.Name, ["of"] = s.StringId, ["position"] = new[] { at.x, at.y }, ["offset"] = at.x - s.Position.X });
+                    copies.Add(new Dictionary<string, object> { ["entity"] = entity.Name, ["of"] = s.StringId, ["position"] = new[] { at.x, at.y }, ["offset"] = at.x - s.Position.X, ["runtime"] = false });
                 }
             int namedDisplay = Settlement.All.Count(s => s.StringId.Contains("_display_")) + MobileParty.All.Count(p => p.StringId.Contains("_display_"));
             bool uniqueIds = Settlement.All.Select(s => s.StringId).Distinct().Count() == Settlement.All.Count;
@@ -91,6 +101,14 @@ namespace MNBL.ProceduralWorld.Diagnostics
 
             // Deterministic tie: a target exactly Width/2 east of the start has two equal images (as given, and -Width).
             report["tie"] = Tie(map, world, nav, distanceModel, failures);
+            context.Checkpoint();
+
+            // ---- MMR-64: the coordinate contract and the whole installed distance surface ----
+            report["coordinates"] = world.Coordinates.Record(); report["coordinatePolicyText"] = world.Coordinates.PolicyText;
+            var coverage = new Dictionary<string, object>(); report["distanceCoverage"] = coverage;
+            try { DistanceCoverage(map, world, nav, distanceModel, town1, town2, worldId, coverage); }
+            catch (Exception e) { coverage["error"] = e.ToString(); failures.Add("distance coverage: " + e.Message); }
+            if (coverage.ContainsKey("failures")) failures.AddRange(((List<string>)coverage["failures"]).Select(f => "distance coverage: " + f));
             context.Checkpoint();
 
             // ---- player and AI travel across the seam, both directions, land and sea ----
@@ -207,10 +225,11 @@ namespace MNBL.ProceduralWorld.Diagnostics
             report["patchError"] = PeriodicPatches.LastError;
             report["locatorImagePasses"] = PeriodicPatches.ImagePasses;
             if (PeriodicPatches.LastError != null) failures.Add("Periodic patches failed to apply: " + PeriodicPatches.LastError.Split('\n')[0]);
-            report["periodicQueries"] = DiagnosticMapScene.PeriodicQueries;
-            report["periodicImageWins"] = DiagnosticMapScene.PeriodicImageWins;
-            report["periodicNativeQueries"] = DiagnosticMapScene.PeriodicNativeQueries;
-            report["periodicPruned"] = DiagnosticMapScene.PeriodicPruned;
+            report["periodicQueries"] = GeneratedMapScene.PeriodicQueries;
+            report["periodicImageWins"] = GeneratedMapScene.PeriodicImageWins;
+            report["periodicNativeQueries"] = GeneratedMapScene.PeriodicNativeQueries;
+            report["periodicPruned"] = GeneratedMapScene.PeriodicPruned;
+            report["periodicStartMoves"] = GeneratedMapScene.PeriodicStartMoves;
             report["rebases"] = PeriodicSeam.Rebases;
             report["targetsCanonicalized"] = PeriodicSeam.TargetsCanonicalized;
             report["nonCanonicalPartiesAtEnd"] = MobileParty.All.Where(p => p.IsActive && !world.IsCanonical(p.Position.X)).Select(p => p.StringId).ToList();
@@ -378,20 +397,46 @@ namespace MNBL.ProceduralWorld.Diagnostics
             var dir = record != null && record.ContainsKey("PatchEncounterDir") ? record["PatchEncounterDir"] as float[] : null;
             row["encounterDirection"] = new Dictionary<string, object> { ["patchEncounterDir"] = dir, ["expectedPeriodic"] = new[] { expected.X, expected.Y }, ["planar"] = new[] { planar.X, planar.Y } };
             if (dir == null || dir[0] * expected.X + dir[1] * expected.Y < 0.9f) failures.Add("The battle's encounter direction does not point through the seam.");
+            // MMR-42: canonical patch sampling at the seam: the patch at the main party and at its other strip image are the same cell, and the scene
+            // the model opened is the generated patch's (the mismatch guard's record of this choice agrees).
+            var wrapper = Campaign.Current.MapSceneWrapper;
+            var image = new CampaignVec2(new Vec2(before.X + (before.X > world.OriginX + world.Width / 2 ? -world.Width : world.Width), before.Y), before.IsOnLand);
+            var patchHere = wrapper.GetMapPatchAtPosition(in before); var patchImage = wrapper.GetMapPatchAtPosition(in image);
+            var guardRow = observed.ContainsKey("scene") ? MNBL.ProceduralWorld.Missions.MissionScenePatches.LastOpening(observed["scene"] as string) : null;
+            row["missionScene"] = new Dictionary<string, object> { ["scene"] = observed.ContainsKey("scene") ? observed["scene"] : null,
+                ["patch"] = new Dictionary<string, object> { ["position"] = Xy(before), ["index"] = patchHere.sceneIndex, ["coordinates"] = new[] { patchHere.normalizedCoordinates.X, patchHere.normalizedCoordinates.Y } },
+                ["imagePatch"] = new Dictionary<string, object> { ["position"] = Xy(image), ["index"] = patchImage.sceneIndex, ["coordinates"] = new[] { patchImage.normalizedCoordinates.X, patchImage.normalizedCoordinates.Y } },
+                ["guard"] = guardRow };
+            if (patchHere.sceneIndex != patchImage.sceneIndex || patchHere.normalizedCoordinates.X != patchImage.normalizedCoordinates.X || patchHere.normalizedCoordinates.Y != patchImage.normalizedCoordinates.Y)
+                failures.Add("The battle-map patch at the seam point differs from the patch at its other image.");
+            if (guardRow == null) failures.Add("The battle scene guard did not observe the seam battle's scene choice.");
+            else if (!Equals(guardRow["agrees"], true)) failures.Add("The seam battle's scene is not the generated patch's: " + guardRow["problem"]);
             if (PlayerEncounter.Current != null) PlayerEncounter.Finish(true);
             start = context.Seconds;
             while ((PlayerEncounter.Current != null || main.MapEvent != null || !(TaleWorlds.Core.Game.Current.GameStateManager.ActiveState is TaleWorlds.CampaignSystem.GameState.MapState)) && context.Seconds - start < 30)
                 yield return null;
             RuntimeMissionProbe.Pause();
+            // MMR-66: the map camera after the return (the map screen re-activates; a second for its camera to settle on the party).
+            for (int i = 0; i < 60; i++) yield return null;
+            Dictionary<string, object> camera = null;
+            if (MNBL.ProceduralWorld.UI.PeriodicMapCameraView.Current != null)
+            {
+                var t = MNBL.ProceduralWorld.UI.PeriodicMapCameraView.Target();
+                var drawn = MNBL.ProceduralWorld.World.PeriodicMapPresentation.DrawnPosition(main);   // the party's drawn entity
+                camera = new Dictionary<string, object> { ["target"] = new[] { t.x, t.y }, ["targetCanonical"] = world.IsCanonical(t.x),
+                    ["partyEntity"] = drawn == null ? null : new[] { drawn.Value.x, drawn.Value.y },
+                    ["distanceToPartyDrawn"] = drawn == null ? float.MaxValue : new Vec2(t.x - drawn.Value.x, t.y - drawn.Value.y).Length,
+                    ["followMode"] = MNBL.ProceduralWorld.UI.PeriodicMapCameraView.FollowMode() };
+            }
             row["afterReturn"] = new Dictionary<string, object> { ["player"] = Xy(main.Position), ["canonical"] = world.IsCanonical(main.Position.X),
-                ["displacement"] = world.Distance(before.ToVec2(), main.Position.ToVec2()) };
+                ["displacement"] = world.Distance(before.ToVec2(), main.Position.ToVec2()), ["camera"] = camera };
             if (!world.IsCanonical(main.Position.X)) failures.Add("Player not canonical after the seam battle.");
             if (world.Distance(before.ToVec2(), main.Position.ToVec2()) > 0.635) failures.Add("Player returned away from the seam encounter point.");
             EndWar(enemy, enemyFaction);
         }
 
         // The nearest row to y0 (0.5 steps, within 40) where every x is on land.
-        private static float LandRow(float y0, params float[] xs)
+        internal static float LandRow(float y0, params float[] xs)
         {
             for (float dy = 0; dy < 40; dy += 0.5f)
                 foreach (float y in new[] { y0 + dy, y0 - dy })
@@ -406,7 +451,7 @@ namespace MNBL.ProceduralWorld.Diagnostics
         }
 
         // Undo the synthetic war so no hostile party interrupts the later phases.
-        private static void EndWar(MobileParty enemy, IFaction enemyFaction)
+        internal static void EndWar(MobileParty enemy, IFaction enemyFaction)
         {
             if (enemyFaction.IsAtWarWith(Clan.PlayerClan.MapFaction)) MakePeaceAction.Apply(Clan.PlayerClan.MapFaction, enemyFaction);
             if (enemy.IsActive) enemy.Ai.SetDoNotMakeNewDecisions(false);
@@ -494,7 +539,26 @@ namespace MNBL.ProceduralWorld.Diagnostics
             foreach (var party in MobileParty.All) live[party.StringId] = ReadSaved(party);
             if (!observer.Success || !TaleWorlds.Core.MBSaveLoad.IsSaveGameFileExists(saveName)) { failures.Add("The save did not complete."); yield break; }
 
-            var data = TaleWorlds.Core.MBSaveLoad.LoadSaveGameData(saveName);
+            // MMR-64: the header carries the coordinate policy; the package check accepts it and refuses another policy or none.
+            var info = TaleWorlds.Core.MBSaveLoad.GetSaveFileWithName(saveName);
+            var header = new Dictionary<string, string>(StringComparer.Ordinal);
+            foreach (var key in WorldIdentity.Keys) { string value; if (info != null && info.MetaData.TryGetValue(WorldIdentityBehavior.Prefix + key, out value)) header[key] = value; }
+            string savedPolicy; header.TryGetValue("coordinatePolicy", out savedPolicy);
+            var policy = new Dictionary<string, object> { ["saved"] = savedPolicy, ["expected"] = world.Coordinates.FrameIdentity }; row["savePolicy"] = policy;
+            if (savedPolicy != world.Coordinates.FrameIdentity) failures.Add("The save header's coordinate frame is " + (savedPolicy ?? "missing") + ", not the world's.");
+            if (header.ContainsKey("package") && header.ContainsKey("manifestSha256"))
+            {
+                var package = GeneratedWorldPackage.Resolve(header);
+                Func<Dictionary<string, string>, string> verdict = h => { try { WorldIdentity.RequireMatch(h, package); return "accepted"; } catch (System.IO.InvalidDataException e) { return "refused: " + e.Message; } };
+                var otherPolicy = new Dictionary<string, string>(header) { ["coordinatePolicy"] = new string('0', 64) };
+                var noPolicy = new Dictionary<string, string>(header); noPolicy.Remove("coordinatePolicy");
+                policy["asSaved"] = verdict(header); policy["anotherPolicy"] = verdict(otherPolicy); policy["noPolicy"] = verdict(noPolicy);
+                if ((string)policy["asSaved"] != "accepted" || ((string)policy["anotherPolicy"]).StartsWith("accepted", StringComparison.Ordinal) || ((string)policy["noPolicy"]).StartsWith("accepted", StringComparison.Ordinal))
+                    failures.Add("The package check does not accept exactly the saved coordinate policy.");
+            }
+            else failures.Add("The save header names no world package.");
+
+            var data = MNBL.ProceduralWorld.Persistence.LoadRouting.Deserialize(() => TaleWorlds.Core.MBSaveLoad.LoadSaveGameData(saveName));   // MMR-49: the guard's allowance
             row["deserialized"] = data != null && data.Successful;
             if (data == null || !data.Successful) { failures.Add("The save could not be deserialized."); yield break; }
             var loadedCampaign = ((TaleWorlds.Core.Game)data.Root).GameType as Campaign;
@@ -542,7 +606,7 @@ namespace MNBL.ProceduralWorld.Diagnostics
             public void OnSaveOver(bool success, string name) { Success = success && name == expected; Completed = true; }
         }
 
-        private static Dictionary<string, object> Tie(DiagnosticMapScene map, PeriodicWorld world, TaleWorlds.CampaignSystem.ComponentInterfaces.PartyNavigationModel nav,
+        private static Dictionary<string, object> Tie(GeneratedMapScene map, PeriodicWorld world, TaleWorlds.CampaignSystem.ComponentInterfaces.PartyNavigationModel nav,
             TaleWorlds.CampaignSystem.ComponentInterfaces.MapDistanceModel distanceModel, List<string> failures)
         {
             var invalid = nav.GetInvalidTerrainTypesForNavigationType(MobileParty.NavigationType.Naval);
@@ -555,39 +619,292 @@ namespace MNBL.ProceduralWorld.Diagnostics
                     if (!a.Face.IsValid() || !b.Face.IsValid()) continue;
                     if (!nav.IsTerrainTypeValidForNavigationType((TaleWorlds.Core.TerrainType)a.Face.FaceGroupIndex, MobileParty.NavigationType.Naval)
                         || !nav.IsTerrainTypeValidForNavigationType((TaleWorlds.Core.TerrainType)b.Face.FaceGroupIndex, MobileParty.NavigationType.Naval)) continue;
-                    PathFaceRecord face; Vec2 image; float d;
+                    PathFaceRecord fromFace, face; Vec2 from, image; float d;
                     if (!map.NearestTargetImage(a.Face, b.Face, a.ToVec2(), b.ToVec2(), 0.3f, Campaign.PathFindingMaxCostLimit, invalid,
-                            distanceModel.RegionSwitchCostFromLandToSea, distanceModel.RegionSwitchCostFromSeaToLand, out face, out image, out d)) continue;
+                            distanceModel.RegionSwitchCostFromLandToSea, distanceModel.RegionSwitchCostFromSeaToLand, out fromFace, out from, out face, out image, out d)) continue;
                     float direct, west = float.NaN;
                     bool okDirect = map.PlanarPathDistance(a.Face, b.Face, a.ToVec2(), b.ToVec2(), 0.3f, Campaign.PathFindingMaxCostLimit, out direct, invalid,
                         distanceModel.RegionSwitchCostFromLandToSea, distanceModel.RegionSwitchCostFromSeaToLand);
                     var westImage = new CampaignVec2(new Vec2(b.X - world.Width, y), false);
                     bool okWest = westImage.Face.IsValid() && map.PlanarPathDistance(a.Face, westImage.Face, a.ToVec2(), westImage.ToVec2(), 0.3f,
                         Campaign.PathFindingMaxCostLimit, out west, invalid, distanceModel.RegionSwitchCostFromLandToSea, distanceModel.RegionSwitchCostFromSeaToLand);
+                    // MMR-64: the same target passed as its west copy must give the same image (the rule does not depend on the copy).
+                    PathFaceRecord fromViaWestFace, faceViaWest; Vec2 fromViaWest, imageViaWest = new Vec2(float.NaN, float.NaN); float dViaWest = float.NaN;
+                    bool okViaWest = westImage.Face.IsValid() && map.NearestTargetImage(a.Face, westImage.Face, a.ToVec2(), westImage.ToVec2(), 0.3f, Campaign.PathFindingMaxCostLimit, invalid,
+                        distanceModel.RegionSwitchCostFromLandToSea, distanceModel.RegionSwitchCostFromSeaToLand, out fromViaWestFace, out fromViaWest, out faceViaWest, out imageViaWest, out dViaWest);
                     var row = new Dictionary<string, object> { ["from"] = Xy(a), ["to"] = Xy(b), ["directDistance"] = okDirect ? (object)direct : null,
                         ["westImageDistance"] = okWest ? (object)west : null, ["chosen"] = new[] { image.X, image.Y }, ["chosenDistance"] = d,
-                        ["rule"] = "within 1e-3 keep the earlier image: as given, then +Width (east), then -Width (west)" };
+                        ["chosenWhenWestCopyPassed"] = okViaWest ? new[] { imageViaWest.X, imageViaWest.Y } : null,
+                        ["rule"] = "MMR-64 (PeriodicDistanceModel.ShortestOverImages): within 1e-3 the nearer |dx| wins, an exact half-width tie resolves east, whichever copy is passed" };
                     bool equal = okDirect && okWest && Math.Abs(direct - west) <= 1e-3f;
                     row["routesEqual"] = equal;
-                    if (equal && Math.Abs(image.X - b.X) > 1e-3f) failures.Add("Tie did not keep the as-given image.");
+                    if (equal && Math.Abs(image.X - b.X) > 1e-3f) failures.Add("Tie did not resolve east.");
+                    if (equal && (!okViaWest || Math.Abs(imageViaWest.X - b.X) > 1e-3f)) failures.Add("Tie depended on the copy passed (the west copy did not resolve east).");
                     if (!equal) continue;  // keep searching for an exactly equal pair
                     return row;
                 }
-            return new Dictionary<string, object> { ["found"] = false, ["note"] = "no exactly equal east/west route pair found on open sea rows; rule unit-checked in PeriodicWorld" };
+            return new Dictionary<string, object> { ["found"] = false, ["note"] = "no exactly equal east/west route pair found on open sea rows; rule unit-checked in tests/World/PeriodicCoordinateTests.cs" };
         }
 
-        private static void Judge(Dictionary<string, object> record, List<string> failures, PeriodicWorld world, Vec2 from, Vec2 to)
+        // MMR-64: every member of the installed MapDistanceModel against PeriodicDistanceModel.Manifest, the patch counts, cross-seam values
+        // for each overload category, directed transition costs, PathExistBetweenPoints capabilities, the closest entrance near the seam against
+        // a brute-force periodic search, and the periodic battle-terrain map. Fixture: town1 by the east seam, town2 by the west.
+        private static void DistanceCoverage(GeneratedMapScene map, PeriodicWorld world, PartyNavigationModel nav, MapDistanceModel distanceModel,
+            Settlement town1, Settlement town2, string worldId, Dictionary<string, object> row)
+        {
+            var failures = new List<string>(); row["failures"] = failures;
+            var land = MobileParty.NavigationType.Default; var sea = MobileParty.NavigationType.Naval; var all = MobileParty.NavigationType.All;
+            bool navalModel = distanceModel.GetType().FullName == "NavalDLC.GameComponents.NavalDLCMapDistanceModel";
+
+            // 1. Reflection: the manifest names every member of the installed base type, and both models declare every method.
+            List<string> uncovered, stale;
+            var members = PeriodicDistanceModel.Members(typeof(MapDistanceModel));
+            PeriodicDistanceModel.Compare(members, out uncovered, out stale);
+            var notOverridden = new[] { typeof(TaleWorlds.CampaignSystem.GameComponents.DefaultMapDistanceModel), distanceModel.GetType() }.Distinct()
+                .ToDictionary(t => t.FullName, t => PeriodicDistanceModel.NotOverridden(t));
+            row["reflection"] = new Dictionary<string, object> { ["installedMembers"] = members, ["uncovered"] = uncovered, ["stale"] = stale,
+                ["notOverridden"] = notOverridden.ToDictionary(kv => kv.Key, kv => (object)kv.Value), ["activeModel"] = distanceModel.GetType().FullName, ["manifest"] = PeriodicDistanceModel.Record() };
+            if (uncovered.Count > 0 || stale.Count > 0) failures.Add("The manifest and the installed MapDistanceModel differ: uncovered [" + String.Join(", ", uncovered) + "], stale [" + String.Join(", ", stale) + "]");
+            foreach (var kv in notOverridden) if (kv.Value.Count > 0) failures.Add(kv.Key + " does not declare " + String.Join(", ", kv.Value));
+
+            // 2. Patch counts, the MMR-64 closest settlement order and distance helpers included.
+            Func<string, int> replacedIn = part => PeriodicPatches.Applied.Where(a => ((string)a["target"]).Contains(part)).Sum(a => a.ContainsKey("replacedCalls") ? Convert.ToInt32(a["replacedCalls"]) : 0);
+            int ordering = replacedIn("<GetClosestSettlementsToPositionInCache>");
+            var helperPatches = PeriodicDistanceModel.HelperCoverage.ToDictionary(h => h.Type + "::" + h.Member.Substring(0, h.Member.IndexOf('(')), h => replacedIn(h.Type + "::" + h.Member.Substring(0, h.Member.IndexOf('('))));
+            row["patches"] = new Dictionary<string, object> { ["applied"] = PeriodicPatches.Applied.Count, ["orderingLambdas"] = ordering,
+                ["helpers"] = helperPatches.ToDictionary(kv => kv.Key, kv => (object)kv.Value),
+                ["partyLegs"] = PeriodicPatches.Applied.Where(a => ((string)a["target"]).EndsWith("::GetDistance", StringComparison.Ordinal)).ToDictionary(a => (string)a["target"], a => a["replacedCalls"]) };
+            if (ordering != 2) failures.Add("The closest settlement order patch replaced " + ordering + " ordering calls (expected 2).");
+            foreach (var h in PeriodicDistanceModel.HelperCoverage)
+            {
+                string key = h.Type + "::" + h.Member.Substring(0, h.Member.IndexOf('('));
+                if (helperPatches[key] != h.Sites) failures.Add("The " + key + " patch replaced " + helperPatches[key] + " planar calls (expected " + h.Sites + ").");
+            }
+
+            // 2b. The distance helpers: every planar distance call in their original IL (Harmony's reading) has a HelperCoverage entry.
+            var helperScan = new List<object>(); var helperUncovered = new List<string>(); var seen = new HashSet<string>(StringComparer.Ordinal);
+            const System.Reflection.BindingFlags every = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public |
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.DeclaredOnly;
+            foreach (var helper in new[] { typeof(Helpers.DistanceHelper), typeof(Helpers.SettlementHelper) })
+                foreach (var type in new[] { helper }.Concat(helper.GetNestedTypes(every)))
+                    foreach (var method in type.GetMethods(every))
+                    {
+                        if (method.IsAbstract || method.ContainsGenericParameters || method.GetMethodBody() == null) continue;
+                        List<HarmonyLib.CodeInstruction> code;
+                        try { code = HarmonyLib.PatchProcessor.GetOriginalInstructions(method); }
+                        catch (Exception e) { helperUncovered.Add(type.FullName + "::" + method.Name + " could not be read: " + e.Message); continue; }
+                        int sites = code.Count(i => (i.opcode == System.Reflection.Emit.OpCodes.Call || i.opcode == System.Reflection.Emit.OpCodes.Callvirt) && i.operand is System.Reflection.MethodBase
+                            && PeriodicDistanceModel.PlanarDistanceMethods.Contains(PeriodicDistanceModel.PlanarName((System.Reflection.MethodBase)i.operand)));
+                        if (sites == 0) continue;
+                        string member = PeriodicDistanceModel.Signature(method);
+                        var listed = PeriodicDistanceModel.HelperCoverage.FirstOrDefault(h => h.Type == type.FullName && h.Member == member);
+                        seen.Add(type.FullName + "::" + member);
+                        helperScan.Add(new Dictionary<string, object> { ["type"] = type.FullName, ["member"] = member, ["planarSites"] = sites, ["listed"] = listed != null });
+                        if (listed == null || listed.Sites != sites) helperUncovered.Add(type.FullName + "::" + member + " has " + sites + " planar distance calls" + (listed == null ? " and no coverage entry" : ", the entry lists " + listed.Sites));
+                    }
+            foreach (var h in PeriodicDistanceModel.HelperCoverage) if (!seen.Contains(h.Type + "::" + h.Member)) helperUncovered.Add(h.Type + "::" + h.Member + " is listed but has no planar call");
+            row["helpers"] = new Dictionary<string, object> { ["scan"] = helperScan, ["uncovered"] = helperUncovered, ["coverage"] = PeriodicDistanceModel.HelperRecord() };
+            if (helperUncovered.Count > 0) failures.Add("Distance helper coverage: " + String.Join("; ", helperUncovered));
+
+            // 3. Cross-seam values of every overload category: never below the wrapped lower bound, and short (planar is about a width).
+            var main = MobileParty.MainParty;
+            if (main.CurrentSettlement != null) LeaveSettlementAction.ApplyForParty(main);
+            main.Position = town1.GatePosition; main.SetMoveModeHold();
+            // Any active party on land (War Sails lords carry ships; on land they are land parties for the Default overloads), lords first.
+            var other = MobileParty.All.Where(p => p != main && p.IsActive && p.MapEvent == null && !p.IsCurrentlyAtSea && (p.IsLordParty || p.IsCaravan || p.IsBandit))
+                .OrderBy(p => p.IsLordParty ? 0 : 1).ThenBy(p => p.StringId, StringComparer.Ordinal).FirstOrDefault();
+            if (other != null)
+            {
+                if (other.CurrentSettlement != null) LeaveSettlementAction.ApplyForParty(other);
+                other.Ai.SetDoNotMakeNewDecisions(true);
+                other.Position = town2.GatePosition; other.SetMoveModeHold();
+            }
+            float planar = town1.GatePosition.ToVec2().Distance(town2.GatePosition.ToVec2());
+            var values = new Dictionary<string, object>(); row["values"] = values;
+            Action<string, float, Vec2, Vec2> expectShort = (name, value, a, b) => {
+                float lower = world.Distance(a, b);
+                values[name] = new Dictionary<string, object> { ["value"] = value, ["lowerBound"] = lower, ["planarStraight"] = a.Distance(b) };
+                if (float.IsNaN(value) || value < lower - 1e-2f || value > 3 * lower + 30 || value > planar / 2)
+                    failures.Add(name + " = " + value + " is not the short cross-seam value (wrapped lower bound " + lower + ", planar " + a.Distance(b) + ")");
+            };
+            Vec2 g1 = town1.GatePosition.ToVec2(), g2 = town2.GatePosition.ToVec2(), p1 = town1.PortPosition.ToVec2(), p2 = town2.PortPosition.ToVec2();
+            float ratio;
+            expectShort("settlement->settlement gates 1->2", distanceModel.GetDistance(town1, town2, false, false, land), g1, g2);
+            expectShort("settlement->settlement gates 2->1", distanceModel.GetDistance(town2, town1, false, false, land), g2, g1);
+            expectShort("settlement->settlement ports 1->2 (land ratio)", distanceModel.GetDistance(town1, town2, true, true, sea, out ratio), p1, p2); values["ports 1->2 land ratio"] = ratio;
+            expectShort("settlement->settlement ports 2->1", distanceModel.GetDistance(town2, town1, true, true, sea), p2, p1);
+            expectShort("party->settlement gate", distanceModel.GetDistance(main, town2, false, land, out ratio), main.Position.ToVec2(), g2);
+            var point = town2.GatePosition;
+            expectShort("party->point", distanceModel.GetDistance(main, in point, land, out ratio), main.Position.ToVec2(), point.ToVec2());
+            expectShort("settlement->point", distanceModel.GetDistance(town1, in point, false, land), g1, point.ToVec2());
+            values["party->party other"] = other == null ? null : other.StringId;
+            if (other == null) failures.Add("No AI party on land for the party-to-party overloads.");
+            else
+            {
+                expectShort("party->party", distanceModel.GetDistance(main, other, land, out ratio), main.Position.ToVec2(), other.Position.ToVec2());
+                float bounded, boundedRatio;
+                bool within = distanceModel.GetDistance(main, other, land, 100f, out bounded, out boundedRatio);
+                values["party->party bounded(100) within"] = within;
+                if (!within) failures.Add("The bounded party-to-party distance across the seam is not within 100.");
+                else expectShort("party->party bounded(100)", bounded, main.Position.ToVec2(), other.Position.ToVec2());
+            }
+            // The installed settlement cache keeps one value per unordered pair.
+            values["cacheSymmetric"] = distanceModel.GetDistance(town1, town2, false, false, land) == distanceModel.GetDistance(town2, town1, false, false, land)
+                && distanceModel.GetDistance(town1, town2, true, true, sea) == distanceModel.GetDistance(town2, town1, true, true, sea);
+
+            // 3b. Seam-crossing legs: the party and the point sit by the east seam, where the closest entrance is town2 across the seam, so the
+            //     straight legs of every party, point and helper formula cross it. Each value is short, never below the wrapped lower bound,
+            //     and differs from the same call with the periodic world switched off (the patched legs fall back to planar; the cache and the
+            //     map scene stay periodic), so the periodic legs are what the answer depends on.
+            var seamValues = new Dictionary<string, object>(); row["seamLegs"] = seamValues;
+            float seamY = LandRow(town2.GatePosition.Y, world.MaxX - 2f, world.OriginX + 3f);
+            if (float.IsNaN(seamY)) failures.Add("No land row by the seam for the seam-crossing legs.");
+            else
+            {
+                var east = new CampaignVec2(new Vec2(world.MaxX - 2f, seamY), true);
+                var westOfSeam = new CampaignVec2(new Vec2(world.OriginX + 3f, seamY), true);
+                var entrance = distanceModel.GetClosestEntranceToFace(east.Face, land).Item1;
+                seamValues["eastPoint"] = Xy(east); seamValues["eastPointEntrance"] = entrance == null ? null : entrance.StringId;
+                if (entrance != town2) failures.Add("The east seam point's closest entrance is " + (entrance == null ? "none" : entrance.StringId) + ", not town2 across the seam.");
+                Func<Func<float>, float> planarOf = call => { var current = PeriodicWorld.Current; PeriodicWorld.Current = null; try { return call(); } finally { PeriodicWorld.Current = current; } };
+                Action<string, Func<float>, Vec2, Vec2> seam = (name, call, a, b) => {
+                    float value = call(), plain = planarOf(call), lower = world.Distance(a, b);
+                    seamValues[name] = new Dictionary<string, object> { ["value"] = value, ["withoutPeriodicWorld"] = plain, ["lowerBound"] = lower };
+                    if (float.IsNaN(value) || value < lower - 1e-2f || value > 3 * lower + 30 || Math.Abs(value - plain) <= 1)
+                        failures.Add("seam leg " + name + " = " + value + " (without the periodic world " + plain + ", wrapped lower bound " + lower + ")");
+                };
+                main.Position = east; main.SetMoveModeHold();
+                seam("party->settlement", () => { float r; return distanceModel.GetDistance(main, town1, false, land, out r); }, east.ToVec2(), g1);
+                var gate = town1.GatePosition;
+                seam("party->point", () => { float r; return distanceModel.GetDistance(main, in gate, land, out r); }, east.ToVec2(), g1);
+                var eastPoint = east;
+                seam("settlement->point", () => distanceModel.GetDistance(town1, in eastPoint, false, land), g1, east.ToVec2());
+                if (other != null)
+                {
+                    other.Position = westOfSeam; other.SetMoveModeHold();
+                    seam("party->party (model)", () => { float r; return distanceModel.GetDistance(main, other, land, out r); }, east.ToVec2(), westOfSeam.ToVec2());
+                    seam("DistanceHelper.FindClosestDistanceFromMobilePartyToMobileParty", () => Helpers.DistanceHelper.FindClosestDistanceFromMobilePartyToMobileParty(main, other, land),
+                        east.ToVec2(), westOfSeam.ToVec2());
+                    other.Position = town1.GatePosition; other.SetMoveModeHold();
+                    seam("DistanceHelper.GetDistanceBetweenMobilePartyToMobileParty", () => { float r; return Helpers.DistanceHelper.GetDistanceBetweenMobilePartyToMobileParty(main, other, land, out r); },
+                        east.ToVec2(), g1);
+                }
+                var nearest = Helpers.SettlementHelper.FindNearestSettlementToPoint(in eastPoint, s => s.IsTown);
+                var active = PeriodicWorld.Current; PeriodicWorld.Current = null;
+                Settlement nearestPlain;
+                try { nearestPlain = Helpers.SettlementHelper.FindNearestSettlementToPoint(in eastPoint, s => s.IsTown); } finally { PeriodicWorld.Current = active; }
+                seamValues["SettlementHelper.FindNearestSettlementToPoint (towns)"] = new Dictionary<string, object> { ["value"] = nearest == null ? null : nearest.StringId,
+                    ["withoutPeriodicWorld"] = nearestPlain == null ? null : nearestPlain.StringId };
+                if (nearest != town2 || nearestPlain == town2) failures.Add("SettlementHelper.FindNearestSettlementToPoint by the east seam gave " + (nearest == null ? "none" : nearest.StringId) + " (expected town2 across the seam).");
+                main.Position = town1.GatePosition; main.SetMoveModeHold();
+            }
+            values["landRatio ports 1->2"] = distanceModel.GetLandRatioOfPathBetweenSettlements(town1, town2, true, true);
+            values["portToGate town1"] = distanceModel.GetPortToGateDistanceForSettlement(town1);
+            values["maximumConnected"] = new[] { land, sea, all }.ToDictionary(t => t.ToString(), t => (object)distanceModel.GetMaximumDistanceBetweenTwoConnectedSettlements(t));
+            var neighbours = distanceModel.GetNeighborsOfFortification(town1.Town, land).Select(s => s.StringId).ToList();
+            values["neighbours of town1 (land)"] = neighbours;
+            if (!neighbours.Contains(town2.StringId)) failures.Add("town2, across the seam, is not a land neighbour of town1.");
+
+            // 4. Directed transition costs (War Sails): from a port to a gate pays sea to land, the reverse land to sea; port to port across the
+            //    seam keeps the sign flip, which needs the cross-seam cache distance to be finite.
+            int toSea = distanceModel.RegionSwitchCostFromLandToSea, toLand = distanceModel.RegionSwitchCostFromSeaToLand;
+            float portToGate = distanceModel.GetTransitionCostAdjustment(town1, true, town2, false, false, false);
+            float gateToPort = distanceModel.GetTransitionCostAdjustment(town2, false, town1, true, false, false);
+            float portToPort = distanceModel.GetTransitionCostAdjustment(town1, true, town2, true, false, false);
+            // The installed costs may be equal (War Sails 1.2.8: 50 and 50); then direction is not observable here (the offline grid uses 5 and 1).
+            row["transitions"] = new Dictionary<string, object> { ["landToSea"] = toSea, ["seaToLand"] = toLand, ["directionObservable"] = toSea != toLand, ["town1 port -> town2 gate"] = portToGate,
+                ["town2 gate -> town1 port"] = gateToPort, ["town1 port -> town2 port"] = portToPort };
+            if (navalModel ? portToGate != -toLand || gateToPort != -toSea || portToPort != toSea + toLand : portToGate != 0 || gateToPort != 0 || portToPort != 0)
+                failures.Add("Transition cost adjustments across the seam are not the directed installed values.");
+
+            // 5. PathExistBetweenPoints: a matching capability across the seam exists.
+            var gate1 = town1.GatePosition; var gate2 = town2.GatePosition; var port1 = town1.PortPosition; var port2 = town2.PortPosition;
+            var exists = new Dictionary<string, object> { ["gate1 -> gate2 Default"] = distanceModel.PathExistBetweenPoints(in gate1, in gate2, land),
+                ["port1 -> port2 Naval"] = distanceModel.PathExistBetweenPoints(in port1, in port2, sea), ["gate1 -> port2 Default"] = distanceModel.PathExistBetweenPoints(in gate1, in port2, land) };
+            row["pathExists"] = exists;
+            if (!(bool)exists["gate1 -> gate2 Default"] || !(bool)exists["port1 -> port2 Naval"]) failures.Add("PathExistBetweenPoints denies a cross-seam path of a matching capability.");
+
+            // 6. The closest entrance per face (the cache the prefilter builds) near the seam, against a brute force over every candidate
+            //    settlement with the periodic path query. Seam-sensitive samples are those whose planar-nearest entrance is not the true one.
+            var samples = new List<object>(); row["closestEntrance"] = samples;
+            float radius = nav.GetEmbarkDisembarkThresholdDistance();
+            int sensitive = 0, wrong = 0;
+            var c = world.Coordinates;
+            foreach (var type in new[] { land, sea })
+            {
+                bool naval = type == sea;
+                var candidates = Settlement.All.Where(s => (s.IsFortification || s.IsVillage) && (!naval || s.HasPort)).ToList();
+                var invalid = nav.GetInvalidTerrainTypesForNavigationType(type);
+                var points = new List<CampaignVec2>();
+                for (float y = (float)c.OriginY + 4; y < c.OriginY + c.Height - 4; y += 6)
+                    foreach (float x in new[] { world.OriginX + 1.5f, world.OriginX + 15f, world.MaxX - 15f, world.MaxX - 1.5f, world.OriginX - 1.5f, world.MaxX + 1.5f })
+                    {
+                        var at = new CampaignVec2(new Vec2(x, y), !naval);
+                        if (at.Face.IsValid() && nav.IsTerrainTypeValidForNavigationType((TaleWorlds.Core.TerrainType)at.Face.FaceGroupIndex, type)) points.Add(at);
+                    }
+                foreach (var at in points.Take(40))
+                {
+                    var here = at;
+                    Func<Settlement, bool, float> cost = (s, port) => {
+                        var e = port ? s.PortPosition : s.GatePosition; float d;
+                        return ((TaleWorlds.CampaignSystem.Map.IMapScene)map).GetPathDistanceBetweenAIFaces(here.Face, e.Face, here.ToVec2(), e.ToVec2(), radius, Campaign.PathFindingMaxCostLimit, out d,
+                            invalid, toSea, toLand) ? d : float.MaxValue; };
+                    var cached = distanceModel.GetClosestEntranceToFace(at.Face, type);
+                    Settlement best = null; float bestCost = float.MaxValue;
+                    foreach (var s in candidates) { float d = cost(s, naval); if (d < bestCost) { bestCost = d; best = s; } }
+                    var planarNearest = candidates.OrderBy(s => (naval ? s.PortPosition : s.GatePosition).ToVec2().DistanceSquared(at.ToVec2())).FirstOrDefault();
+                    float cachedCost = cached.Item1 == null ? float.MaxValue : cost(cached.Item1, cached.Item2);
+                    bool isSensitive = best != null && planarNearest != best, ok = best == null || (cached.Item1 != null && cachedCost <= bestCost + Math.Max(0.5f, 0.02f * bestCost));
+                    if (isSensitive) sensitive++;
+                    if (!ok) wrong++;
+                    samples.Add(new Dictionary<string, object> { ["type"] = type.ToString(), ["point"] = Xy(at), ["canonical"] = world.IsCanonical(at.X),
+                        ["cached"] = cached.Item1 == null ? null : cached.Item1.StringId + (cached.Item2 ? ":port" : ":gate"), ["cachedCost"] = cachedCost,
+                        ["best"] = best == null ? null : best.StringId, ["bestCost"] = bestCost, ["planarNearest"] = planarNearest == null ? null : planarNearest.StringId,
+                        ["seamSensitive"] = isSensitive, ["ok"] = ok });
+                }
+            }
+            row["closestEntranceSummary"] = new Dictionary<string, object> { ["samples"] = samples.Count, ["seamSensitive"] = sensitive, ["wrong"] = wrong };
+            if (samples.Count == 0) failures.Add("No closest-entrance samples near the seam.");
+            if (wrong > 0) failures.Add(wrong + " closest-entrance samples near the seam are not the periodic nearest.");
+
+            // 7. The battle-terrain map: every strip cell holds its canonical cell's bytes, and a block starts at the seam.
+            var bytes = (byte[])HarmonyLib.AccessTools.Field(typeof(SandBox.MapScene), "_battleTerrainIndexMap").GetValue(map);
+            int width = (int)HarmonyLib.AccessTools.Field(typeof(SandBox.MapScene), "_battleTerrainIndexMapWidth").GetValue(map);
+            int height = (int)HarmonyLib.AccessTools.Field(typeof(SandBox.MapScene), "_battleTerrainIndexMapHeight").GetValue(map);
+            float cell = world.Extent / width;
+            int originCell = (int)Math.Round(world.OriginX / cell), periodCells = (int)Math.Round(world.Width / cell), stripCells = 0, mismatched = 0, seamOffset = -1;
+            if (bytes != null && bytes.Length == width * height * 2)
+            {
+                for (int y = 0; y < height; y++)
+                    for (int x = 0; x < width; x++)
+                    {
+                        if (x >= originCell && x < originCell + periodCells) continue;
+                        stripCells++;
+                        int image = originCell + ((x - originCell) % periodCells + periodCells) % periodCells;
+                        int at = 2 * (y * width + x), canonical = 2 * (y * width + image);
+                        if (bytes[at] != bytes[canonical] || bytes[at + 1] != bytes[canonical + 1]) mismatched++;
+                    }
+                seamOffset = bytes[2 * originCell + 1] & 15;
+            }
+            row["battleTerrainMap"] = new Dictionary<string, object> { ["width"] = width, ["height"] = height, ["originCell"] = originCell, ["periodCells"] = periodCells,
+                ["stripCells"] = stripCells, ["mismatchedStripCells"] = mismatched, ["blockOffsetAtSeam"] = seamOffset };
+            if (bytes == null || stripCells == 0 || mismatched > 0 || seamOffset != 0) failures.Add("The battle-terrain map does not wrap (" + mismatched + " strip cells differ from their canonical cells, block offset at the seam " + seamOffset + ").");
+            if (other != null) other.Ai.SetDoNotMakeNewDecisions(false);
+        }
+
+        internal static void Judge(Dictionary<string, object> record, List<string> failures, PeriodicWorld world, Vec2 from, Vec2 to)
         {
             string leg = (string)record["leg"];
             if (!(bool)record["arrived"]) failures.Add(leg + ": did not arrive.");
             if ((int)record["rebases"] < 1) failures.Add(leg + ": never crossed the seam (no rebase).");
             if ((double)record["maxStepPeriodic"] > 5) failures.Add(leg + ": a sample moved " + record["maxStepPeriodic"] + " units (map-width motion).");
+            if (record.ContainsKey("maxPlanarResidual") && (float)record["maxPlanarResidual"] > 5) failures.Add(leg + ": a sample jumped " + record["maxPlanarResidual"] + " units planarly beyond its rebases.");
             double planar = from.Distance(to), periodic = world.Distance(from, to);
             if ((float)record["traveledPeriodic"] > planar * 0.9 && periodic < planar * 0.5) failures.Add(leg + ": travelled the long planar way.");
             if (!(bool)record["canonicalThroughout"]) failures.Add(leg + ": party was left non-canonical for more than one sample.");
         }
 
-        private static IEnumerator Travel(ProbeContext context, DiagnosticSandboxBootstrap boot, PeriodicWorld world, MobileParty party, Func<bool> done,
+        internal static IEnumerator Travel(ProbeContext context, DiagnosticSandboxBootstrap boot, PeriodicWorld world, MobileParty party, Func<bool> done,
             double timeoutSeconds, Dictionary<string, object> record)
         {
             var campaign = Campaign.Current;
@@ -597,6 +914,9 @@ namespace MNBL.ProceduralWorld.Diagnostics
             var track = new List<float[]>(); int nonCanonicalSamples = 0, nonCanonicalRun = 0, maxNonCanonicalRun = 0;
             var logicalSequence = new List<float>();
             double cameraMax = 0;
+            // MMR-65: the periodic step cannot see a jump of about k·W; the raw planar step less this party's rebase shifts since the last
+            // frame can (a rebase moves it by exactly its shift).
+            var lastPlanar = party.Position.ToVec2(); int eventsSeen = PeriodicSeam.Events.Count; float maxResidual = 0;
             boot.HoldPaused = false;
             DiagnosticSandboxBootstrap.Run(campaign, CampaignTimeControlMode.UnstoppableFastForward);
             bool arrived = false;
@@ -606,6 +926,11 @@ namespace MNBL.ProceduralWorld.Diagnostics
                 if (boot.Failed) throw new InvalidOperationException(boot.Error);
                 if (campaign.TimeControlMode == CampaignTimeControlMode.Stop) DiagnosticSandboxBootstrap.Run(campaign, CampaignTimeControlMode.UnstoppableFastForward);
                 var position = party.Position.ToVec2();
+                float shift = 0;
+                for (int e = eventsSeen; e < PeriodicSeam.Events.Count; e++) if (PeriodicSeam.Events[e].Party == party.StringId) shift += PeriodicSeam.Events[e].Shift;
+                eventsSeen = PeriodicSeam.Events.Count;
+                maxResidual = Math.Max(maxResidual, new Vec2(position.X - shift - lastPlanar.X, position.Y - lastPlanar.Y).Length);
+                lastPlanar = position;
                 float step = world.Distance(last, position);  // a rebase is not motion
                 if (step > 0.01f) { traveled += step; maxStep = Math.Max(maxStep, step); last = position; lastProgress = context.Seconds; }
                 if (context.Seconds - lastSample >= 0.1)
@@ -629,10 +954,10 @@ namespace MNBL.ProceduralWorld.Diagnostics
             var events = PeriodicSeam.Events.Skip(rebasesBefore).Where(e => e.Party == party.StringId).ToList();
             record["arrived"] = arrived; record["realSeconds"] = context.Seconds - begin; record["campaignDays"] = CampaignTime.Now.ToDays - startDays;
             record["start"] = new[] { start.X, start.Y }; record["end"] = new[] { party.Position.X, party.Position.Y };
-            record["traveledPeriodic"] = traveled; record["maxStepPeriodic"] = (double)maxStep;
+            record["traveledPeriodic"] = traveled; record["maxStepPeriodic"] = (double)maxStep; record["maxPlanarResidual"] = maxResidual;
             record["rebases"] = events.Count;
             record["rebaseEvents"] = events.Select(e => new Dictionary<string, object> { ["fromX"] = e.FromX, ["toX"] = e.ToX, ["y"] = e.Y, ["shift"] = e.Shift,
-                ["pathPoints"] = e.PathPointsShifted, ["cameraFields"] = e.CameraFields }).ToList();
+                ["pathPoints"] = e.PathPointsShifted }).ToList();
             record["nonCanonicalSamples"] = nonCanonicalSamples; record["maxNonCanonicalRun"] = maxNonCanonicalRun;
             record["canonicalThroughout"] = maxNonCanonicalRun <= 1;
             if (party == MobileParty.MainParty) record["cameraFrameMaxDistance"] = cameraMax;
@@ -640,7 +965,8 @@ namespace MNBL.ProceduralWorld.Diagnostics
             context.Checkpoint();
         }
 
-        // Horizontal distance between the map camera frame and the main party (SandBox.View reached by reflection).
+        // Horizontal distance between the map camera frame and the main party (SandBox.View reached by reflection). MMR-66: periodic, i.e. to
+        // the party as drawn (every visual is drawn at its image nearest the camera, so the camera may look at the party's twin image).
         private static double CameraFrameDistance()
         {
             object screen = TaleWorlds.ScreenSystem.ScreenManager.TopScreen;
@@ -654,11 +980,13 @@ namespace MNBL.ProceduralWorld.Diagnostics
                         if (p == null) return Double.NaN;
                         var frame = (MatrixFrame)p.GetValue(view);
                         var party = MobileParty.MainParty.Position;
-                        return Math.Sqrt((frame.origin.x - party.X) * (frame.origin.x - party.X) + (frame.origin.y - party.Y) * (frame.origin.y - party.Y));
+                        var world = PeriodicWorld.Current;
+                        return world != null ? world.Distance(frame.origin.AsVec2, party.ToVec2())
+                            : Math.Sqrt((frame.origin.x - party.X) * (frame.origin.x - party.X) + (frame.origin.y - party.Y) * (frame.origin.y - party.Y));
                     }
             return Double.NaN;
         }
 
-        private static float[] Xy(CampaignVec2 p) { return new[] { p.X, p.Y }; }
+        internal static float[] Xy(CampaignVec2 p) { return new[] { p.X, p.Y }; }
     }
 }

@@ -1,0 +1,13 @@
+{
+  "author": {
+    "label": "Claude Code",
+    "role": "orchestrator"
+  },
+  "body": "Handoff from MMR-38 (`docs/runtime-navigation.md`):\n- **Strip navmesh.** The production navmesh covers both periodic strips; every logical cell has two physical images.\n- **Seam routes in the validator.** Routes try every image of the target and keep the shortest found path, as `GeneratedMapScene`'s periodic queries do. Land and sea routes cross the seam both ways in the fixture without detour (x = 1200 eastbound, x = 400 westbound).\n- **Not done.** The `seamTransition` host checks (world B, two ports) route the port transition across the seam column. The embark action at the seam and party movement across it are yours.",
+  "createdAt": "2026-10-15T23:30:06.639Z",
+  "epicId": "ep_01m4fpnf646t254mnh69jhz107",
+  "format": "darkmechanicus.comment",
+  "formatVersion": 1,
+  "id": "cm_01m50ydjnf0p1rx8755y6x0qwj",
+  "ticketId": "tk_01m4fr2f4jhzd3swbxzj3161xf"
+}

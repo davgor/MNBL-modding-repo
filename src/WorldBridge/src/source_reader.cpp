@@ -547,7 +547,7 @@ private:
         }, contract.max_records);
     }
 
-    // roads.routes[]: node paths; only the fields the projection needs are retained.
+    // roads.routes[]: node paths and producer-reported river crossings; the other fields are skipped.
     void routes() {
         cursor.array([&](std::size_t) {
             Route route;
@@ -557,6 +557,13 @@ private:
                 else if (k == "to") route.to = cursor.integer();
                 else if (k == "length_m") route.length_m = cursor.finite();
                 else if (k == "nodes") cursor.array([&](std::size_t) { budget.add(sizeof(std::int64_t)); route.nodes.push_back(cursor.integer()); }, contract.max_records);
+                else if (k == "river_crossings") cursor.array([&](std::size_t) {
+                    std::pair<std::int64_t, std::int64_t> step;
+                    const auto count = cursor.array([&](std::size_t i) { const auto node = cursor.integer(); if (i == 0) step.first = node; else step.second = node; }, 2);
+                    if (count != 2) cursor.fail("invalid_record", "roads.routes[].river_crossings[] must be [node, node]");
+                    budget.add(sizeof(step));
+                    route.river_crossings.push_back(step);
+                }, contract.max_records);
                 else return false;
                 return true;
             });

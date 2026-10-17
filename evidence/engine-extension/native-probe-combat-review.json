@@ -1,0 +1,318 @@
+{
+  "schemaVersion": 1,
+  "status": "accepted-bounded-combat-harness-correction-for-restricted-runtime-test",
+  "reviewedAtUtc": "2026-10-17T07:43:09.0181270Z",
+  "reviewedSources": [
+    {
+      "path": "src/MNBL.BattleScale/NativePoolProbeMission.cs",
+      "sha256": "8e704d3168198374628307d5b156cd547890e2af468b5a1792a0cca897116f65"
+    },
+    {
+      "path": "src/MNBL.BattleScale/SubModule.cs",
+      "sha256": "4062accce859e2361888a7104875b745c83758467417888b9dfe510bfe8c95a1"
+    },
+    {
+      "path": "src/MNBL.BattleScale/LayeredBattleMission.cs",
+      "sha256": "630704415023ba2a3bdbd277491875a9db7cfac3fae7b3a47bf9327808ce95c7"
+    },
+    {
+      "path": "evidence/engine-extension/native-pool-runtime-r8.json",
+      "sha256": "36baf5f31f29193c4ab401c384e5f6aeec80b6cc710ed1b8552d47ccb85514ba"
+    },
+    {
+      "path": "D:\\SteamLibrary\\steamapps\\common\\Mount & Blade II Bannerlord\\bin\\Win64_Shipping_Client\\TaleWorlds.MountAndBlade.dll",
+      "sha256": "19387f31557ff840d14f378f6bbdf1d58fcff406ab9ff2294dfbb3e49a50b87e"
+    },
+    {
+      "path": "D:\\SteamLibrary\\steamapps\\common\\Mount & Blade II Bannerlord\\bin\\Win64_Shipping_Client\\TaleWorlds.Core.dll",
+      "sha256": "3e5cece8ca42faf3fdde27632519ed2a6f86d1ec6d1a742867729f00001689bf"
+    },
+    {
+      "path": "D:\\SteamLibrary\\steamapps\\common\\Mount & Blade II Bannerlord\\bin\\Win64_Shipping_Client\\TaleWorlds.Engine.dll",
+      "sha256": "bfd5db82d92f75ef15a5eb9a9f0c9391412566933193122db1684019ed704d68"
+    },
+    {
+      "path": "D:\\SteamLibrary\\steamapps\\common\\Mount & Blade II Bannerlord\\bin\\Win64_Shipping_Client\\TaleWorlds.Library.dll",
+      "sha256": "ab4ff23e94a6f4b6f293d0cb4333cae731a0499063fe4a8b6c6a3770de32c4e5"
+    }
+  ],
+  "method": "Read-only source comparison and execution-free Mono.Cecil IL inspection; no native installed file access, game execution, attachment, or source modification.",
+  "findings": [],
+  "observedFailure": "r8 reported zero combat casualties despite successful full population, allocator exhaustion, and 64-slot reuse. This review does not claim the missing alarm/target calls were the experimentally established cause.",
+  "acceptedChange": [
+    "Combat starts only after full-population, exhaustion and exact 64-slot reuse acceptance.",
+    "IssueCombatOrders reapplies Charge and sets Alarmed plus live opposing-side targets using stable spawn-position ordering. All target agents are selected from IsActive snapshots. Player position zero is excluded from AI command mutation.",
+    "Modulo assignment is guarded by enemies.Length > 0. Sorting each side avoids the previous all-pairs nearest-target scan.",
+    "No health reduction, direct damage, forced casualty, acceptance weakening, or native API exposure was introduced.",
+    "Movement and damage counts are diagnostic snapshots of currently active agents; they are not cumulative activity counts or substitute acceptance.",
+    "Five-second recycling reports preserve the original callback wait and timeout.",
+    "Combat casualty and full staged teardown requirements remain mandatory."
+  ],
+  "managedFindings": [
+    "Mission constructor initializes AllowAiTicking to true.",
+    "AgentHumanAILogic.OnAgentCreated adds HumanAIComponent to AI-controlled human agents.",
+    "Official Mission.SpawnTroop explicitly alarms AI agents when requested after calling SpawnAgent; raw SpawnAgent has no direct SetWatchState/SetAlarmState call.",
+    "WatchState.Alarmed=2 maps through CurrentWatchState setter to SetAlarmState flag3.",
+    "SetTargetAgent forwards the native agent pointer and target agent index through IMBAgent; null would be -1 but this correction only passes selected active targets."
+  ],
+  "limitations": [
+    "Correct combat behavior remains to be verified by r9 runtime; r8 did not capture watch-state, target, movement or damage telemetry.",
+    "This review does not prove navmesh quality, target reachability, all agents fighting, or a minimum battlefield frame rate.",
+    "Official SpawnTroop can also wield initial weapons; prior layered probe and corrected probe use alarm/target APIs without that explicit helper. No additional setup is asserted necessary without runtime evidence.",
+    "Managed AI commands can retain native targets until the next periodic refresh; this is standard Agent API use, not a new native pointer lifetime guarantee."
+  ],
+  "managedContracts": [
+    {
+      "method": "System.Void TaleWorlds.MountAndBlade.Agent::set_CurrentWatchState(TaleWorlds.MountAndBlade.Agent/WatchState)",
+      "metadataToken": "[Method:0x09c7]",
+      "il": [
+        "IL_0000: ldarg.1",
+        "IL_0001: switch IL_0014,IL_001d,IL_0026",
+        "IL_0012: br.s IL_002f",
+        "IL_0014: ldarg.0",
+        "IL_0015: ldc.i4.0",
+        "IL_0016: call System.Boolean TaleWorlds.MountAndBlade.Agent::SetAlarmState(TaleWorlds.MountAndBlade.Agent/AIStateFlag)",
+        "IL_001b: pop",
+        "IL_001c: ret",
+        "IL_001d: ldarg.0",
+        "IL_001e: ldc.i4.1",
+        "IL_001f: call System.Boolean TaleWorlds.MountAndBlade.Agent::SetAlarmState(TaleWorlds.MountAndBlade.Agent/AIStateFlag)",
+        "IL_0024: pop",
+        "IL_0025: ret",
+        "IL_0026: ldarg.0",
+        "IL_0027: ldc.i4.3",
+        "IL_0028: call System.Boolean TaleWorlds.MountAndBlade.Agent::SetAlarmState(TaleWorlds.MountAndBlade.Agent/AIStateFlag)",
+        "IL_002d: pop",
+        "IL_002e: ret",
+        "IL_002f: ldstr \"false\"",
+        "IL_0034: ldstr \"C:\\BuildAgent\\work\\mb3\\Source\\Bannerlord\\TaleWorlds.MountAndBlade\\Agent.cs\"",
+        "IL_0039: ldstr \"CurrentWatchState\"",
+        "IL_003e: ldc.i4 933",
+        "IL_0043: call System.Void TaleWorlds.Library.Debug::FailedAssert(System.String,System.String,System.String,System.Int32)",
+        "IL_0048: ret"
+      ]
+    },
+    {
+      "method": "System.Void TaleWorlds.MountAndBlade.Agent::SetWatchState(TaleWorlds.MountAndBlade.Agent/WatchState)",
+      "metadataToken": "[Method:0x0a27]",
+      "il": [
+        "IL_0000: ldarg.0",
+        "IL_0001: ldarg.1",
+        "IL_0002: call System.Void TaleWorlds.MountAndBlade.Agent::set_CurrentWatchState(TaleWorlds.MountAndBlade.Agent/WatchState)",
+        "IL_0007: ret"
+      ]
+    },
+    {
+      "method": "System.Boolean TaleWorlds.MountAndBlade.Agent::SetAlarmState(TaleWorlds.MountAndBlade.Agent/AIStateFlag)",
+      "metadataToken": "[Method:0x0a2c]",
+      "il": [
+        "IL_0000: ldarg.0",
+        "IL_0001: call TaleWorlds.MountAndBlade.Agent/AIStateFlag TaleWorlds.MountAndBlade.Agent::get_AIStateFlags()",
+        "IL_0006: ldc.i4.3",
+        "IL_0007: and",
+        "IL_0008: ldarg.1",
+        "IL_0009: beq.s IL_001e",
+        "IL_000b: ldsfld TaleWorlds.MountAndBlade.IMBAgent TaleWorlds.MountAndBlade.MBAPI::IMBAgent",
+        "IL_0010: ldarg.0",
+        "IL_0011: call System.UIntPtr TaleWorlds.MountAndBlade.Agent::GetPtr()",
+        "IL_0016: ldarg.1",
+        "IL_0017: callvirt System.Void TaleWorlds.MountAndBlade.IMBAgent::SetAIAlarmState(System.UIntPtr,TaleWorlds.MountAndBlade.Agent/AIStateFlag)",
+        "IL_001c: ldc.i4.1",
+        "IL_001d: ret",
+        "IL_001e: ldc.i4.0",
+        "IL_001f: ret"
+      ]
+    },
+    {
+      "method": "System.Void TaleWorlds.MountAndBlade.Agent::SetTargetAgent(TaleWorlds.MountAndBlade.Agent)",
+      "metadataToken": "[Method:0x0aac]",
+      "il": [
+        "IL_0000: ldsfld TaleWorlds.MountAndBlade.IMBAgent TaleWorlds.MountAndBlade.MBAPI::IMBAgent",
+        "IL_0005: ldarg.0",
+        "IL_0006: call System.UIntPtr TaleWorlds.MountAndBlade.Agent::GetPtr()",
+        "IL_000b: ldarg.1",
+        "IL_000c: brtrue.s IL_0011",
+        "IL_000e: ldc.i4.m1",
+        "IL_000f: br.s IL_0017",
+        "IL_0011: ldarg.1",
+        "IL_0012: call System.Int32 TaleWorlds.MountAndBlade.Agent::get_Index()",
+        "IL_0017: callvirt System.Void TaleWorlds.MountAndBlade.IMBAgent::SetTargetAgent(System.UIntPtr,System.Int32)",
+        "IL_001c: ret"
+      ]
+    },
+    {
+      "method": "System.Void TaleWorlds.MountAndBlade.Mission::.ctor(TaleWorlds.Core.MissionInitializerRecord,TaleWorlds.MountAndBlade.MissionState,System.Boolean)",
+      "scope": "Default AI ticking",
+      "il": [
+        "IL_0062: ldarg.0",
+        "IL_0063: ldc.i4.1",
+        "IL_0064: stfld System.Boolean TaleWorlds.MountAndBlade.Mission::AllowAiTicking"
+      ]
+    },
+    {
+      "method": "TaleWorlds.MountAndBlade.Agent TaleWorlds.MountAndBlade.Mission::SpawnAgent(TaleWorlds.MountAndBlade.AgentBuildData,System.Boolean)",
+      "instructionCount": 1026,
+      "directAlarmCalls": []
+    },
+    {
+      "method": "TaleWorlds.MountAndBlade.Agent TaleWorlds.MountAndBlade.Mission::SpawnTroop(TaleWorlds.Core.IAgentOriginBase,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Int32,System.Int32,System.Boolean,System.Boolean,System.Nullable`1<TaleWorlds.Library.Vec3>,System.Nullable`1<TaleWorlds.Library.Vec2>,System.String,TaleWorlds.Core.ItemObject,TaleWorlds.Core.FormationClass,System.Boolean)",
+      "scope": "Exact post-SpawnAgent AI alarm and initial weapon setup",
+      "il": [
+        "IL_01b4: ldarg.0",
+        "IL_01b5: ldloc.2",
+        "IL_01b6: ldc.i4.0",
+        "IL_01b7: call TaleWorlds.MountAndBlade.Agent TaleWorlds.MountAndBlade.Mission::SpawnAgent(TaleWorlds.MountAndBlade.AgentBuildData,System.Boolean)",
+        "IL_01bc: stloc.3",
+        "IL_01bd: ldloc.3",
+        "IL_01be: callvirt TaleWorlds.Core.BasicCharacterObject TaleWorlds.MountAndBlade.Agent::get_Character()",
+        "IL_01c3: callvirt System.Boolean TaleWorlds.Core.BasicCharacterObject::get_IsHero()",
+        "IL_01c8: brfalse.s IL_01dc",
+        "IL_01ca: ldloc.3",
+        "IL_01cb: ldloc.3",
+        "IL_01cc: callvirt TaleWorlds.Core.AgentFlag TaleWorlds.MountAndBlade.Agent::GetAgentFlags()",
+        "IL_01d1: ldc.i4 8388608",
+        "IL_01d6: or",
+        "IL_01d7: callvirt System.Void TaleWorlds.MountAndBlade.Agent::SetAgentFlags(TaleWorlds.Core.AgentFlag)",
+        "IL_01dc: ldloc.3",
+        "IL_01dd: callvirt System.Boolean TaleWorlds.MountAndBlade.Agent::get_IsAIControlled()",
+        "IL_01e2: ldarg.s isAlarmed",
+        "IL_01e4: and",
+        "IL_01e5: brfalse.s IL_01ee",
+        "IL_01e7: ldloc.3",
+        "IL_01e8: ldc.i4.2",
+        "IL_01e9: callvirt System.Void TaleWorlds.MountAndBlade.Agent::SetWatchState(TaleWorlds.MountAndBlade.Agent/WatchState)",
+        "IL_01ee: ldarg.s wieldInitialWeapons",
+        "IL_01f0: brfalse.s IL_01fa",
+        "IL_01f2: ldloc.3",
+        "IL_01f3: ldc.i4.2",
+        "IL_01f4: ldc.i4.0",
+        "IL_01f5: callvirt System.Void TaleWorlds.MountAndBlade.Agent::WieldInitialWeapons(TaleWorlds.MountAndBlade.Agent/WeaponWieldActionType,TaleWorlds.Core.Equipment/InitialWeaponEquipPreference)",
+        "IL_01fa: ldarg.s specialActionSetSuffix"
+      ]
+    },
+    {
+      "method": "System.Void TaleWorlds.MountAndBlade.Formation::SetMovementOrder(TaleWorlds.MountAndBlade.MovementOrder)",
+      "metadataToken": "[Method:0x1ffa]",
+      "il": [
+        "IL_0000: ldarg.0",
+        "IL_0001: ldfld System.Action`2<TaleWorlds.MountAndBlade.Formation,TaleWorlds.MountAndBlade.MovementOrder/MovementOrderEnum> TaleWorlds.MountAndBlade.Formation::OnBeforeMovementOrderApplied",
+        "IL_0006: dup",
+        "IL_0007: brtrue.s IL_000c",
+        "IL_0009: pop",
+        "IL_000a: br.s IL_0018",
+        "IL_000c: ldarg.0",
+        "IL_000d: ldarg.1",
+        "IL_000e: ldfld TaleWorlds.MountAndBlade.MovementOrder/MovementOrderEnum TaleWorlds.MountAndBlade.MovementOrder::OrderEnum",
+        "IL_0013: callvirt System.Void System.Action`2<TaleWorlds.MountAndBlade.Formation,TaleWorlds.MountAndBlade.MovementOrder/MovementOrderEnum>::Invoke(!0,!1)",
+        "IL_0018: ldarg.1",
+        "IL_0019: ldfld TaleWorlds.MountAndBlade.MovementOrder/MovementOrderEnum TaleWorlds.MountAndBlade.MovementOrder::OrderEnum",
+        "IL_001e: brtrue.s IL_0027",
+        "IL_0020: ldsfld TaleWorlds.MountAndBlade.MovementOrder TaleWorlds.MountAndBlade.MovementOrder::MovementOrderStop",
+        "IL_0025: starg.s input",
+        "IL_0027: ldarg.0",
+        "IL_0028: ldflda TaleWorlds.MountAndBlade.MovementOrder TaleWorlds.MountAndBlade.Formation::_movementOrder",
+        "IL_002d: ldarg.0",
+        "IL_002e: ldfld TaleWorlds.MountAndBlade.MovementOrder TaleWorlds.MountAndBlade.Formation::_movementOrder",
+        "IL_0033: ldarg.1",
+        "IL_0034: ldarg.0",
+        "IL_0035: call System.Boolean TaleWorlds.MountAndBlade.Formation::get_IsAIControlled()",
+        "IL_003a: call System.Boolean TaleWorlds.MountAndBlade.MovementOrder::AreOrdersPracticallySame(TaleWorlds.MountAndBlade.MovementOrder,TaleWorlds.MountAndBlade.MovementOrder,System.Boolean)",
+        "IL_003f: ldc.i4.0",
+        "IL_0040: ceq",
+        "IL_0042: dup",
+        "IL_0043: brfalse.s IL_0051",
+        "IL_0045: ldarg.0",
+        "IL_0046: ldflda TaleWorlds.MountAndBlade.MovementOrder TaleWorlds.MountAndBlade.Formation::_movementOrder",
+        "IL_004b: ldarg.0",
+        "IL_004c: call System.Void TaleWorlds.MountAndBlade.MovementOrder::OnCancel(TaleWorlds.MountAndBlade.Formation)",
+        "IL_0051: brfalse.s IL_00bc",
+        "IL_0053: ldarg.0",
+        "IL_0054: ldflda TaleWorlds.MountAndBlade.MovementOrder TaleWorlds.MountAndBlade.Formation::_movementOrder",
+        "IL_0059: ldfld TaleWorlds.MountAndBlade.MovementOrder/MovementOrderEnum TaleWorlds.MountAndBlade.MovementOrder::OrderEnum",
+        "IL_005e: ldarg.1",
+        "IL_005f: ldfld TaleWorlds.MountAndBlade.MovementOrder/MovementOrderEnum TaleWorlds.MountAndBlade.MovementOrder::OrderEnum",
+        "IL_0064: call System.Int32 TaleWorlds.MountAndBlade.MovementOrder::GetMovementOrderDefensivenessChange(TaleWorlds.MountAndBlade.MovementOrder/MovementOrderEnum,TaleWorlds.MountAndBlade.MovementOrder/MovementOrderEnum)",
+        "IL_0069: brfalse.s IL_00a9",
+        "IL_006b: ldarg.1",
+        "IL_006c: ldfld TaleWorlds.MountAndBlade.MovementOrder/MovementOrderEnum TaleWorlds.MountAndBlade.MovementOrder::OrderEnum",
+        "IL_0071: call System.Int32 TaleWorlds.MountAndBlade.MovementOrder::GetMovementOrderDefensiveness(TaleWorlds.MountAndBlade.MovementOrder/MovementOrderEnum)",
+        "IL_0076: brtrue.s IL_0081",
+        "IL_0078: ldarg.0",
+        "IL_0079: ldc.i4.0",
+        "IL_007a: stfld System.Int32 TaleWorlds.MountAndBlade.Formation::_formationOrderDefensivenessFactor",
+        "IL_007f: br.s IL_00a3",
+        "IL_0081: ldarg.0",
+        "IL_0082: ldarg.1",
+        "IL_0083: ldfld TaleWorlds.MountAndBlade.MovementOrder/MovementOrderEnum TaleWorlds.MountAndBlade.MovementOrder::OrderEnum",
+        "IL_0088: call System.Int32 TaleWorlds.MountAndBlade.MovementOrder::GetMovementOrderDefensiveness(TaleWorlds.MountAndBlade.MovementOrder/MovementOrderEnum)",
+        "IL_008d: ldarg.0",
+        "IL_008e: call TaleWorlds.MountAndBlade.ArrangementOrder TaleWorlds.MountAndBlade.Formation::get_ArrangementOrder()",
+        "IL_0093: ldfld TaleWorlds.MountAndBlade.ArrangementOrder/ArrangementOrderEnum TaleWorlds.MountAndBlade.ArrangementOrder::OrderEnum",
+        "IL_0098: call System.Int32 TaleWorlds.MountAndBlade.ArrangementOrder::GetArrangementOrderDefensiveness(TaleWorlds.MountAndBlade.ArrangementOrder/ArrangementOrderEnum)",
+        "IL_009d: add",
+        "IL_009e: stfld System.Int32 TaleWorlds.MountAndBlade.Formation::_formationOrderDefensivenessFactor",
+        "IL_00a3: ldarg.0",
+        "IL_00a4: call System.Void TaleWorlds.MountAndBlade.Formation::UpdateAgentDrivenPropertiesBasedOnOrderDefensiveness()",
+        "IL_00a9: ldarg.0",
+        "IL_00aa: ldarg.1",
+        "IL_00ab: stfld TaleWorlds.MountAndBlade.MovementOrder TaleWorlds.MountAndBlade.Formation::_movementOrder",
+        "IL_00b0: ldarg.0",
+        "IL_00b1: ldflda TaleWorlds.MountAndBlade.MovementOrder TaleWorlds.MountAndBlade.Formation::_movementOrder",
+        "IL_00b6: ldarg.0",
+        "IL_00b7: call System.Void TaleWorlds.MountAndBlade.MovementOrder::OnApply(TaleWorlds.MountAndBlade.Formation)",
+        "IL_00bc: ldarg.0",
+        "IL_00bd: ldnull",
+        "IL_00be: call System.Void TaleWorlds.MountAndBlade.Formation::SetTargetFormation(TaleWorlds.MountAndBlade.Formation)",
+        "IL_00c3: ret"
+      ]
+    },
+    {
+      "method": "System.Void TaleWorlds.MountAndBlade.AgentHumanAILogic::OnAgentCreated(TaleWorlds.MountAndBlade.Agent)",
+      "metadataToken": "[Method:0x22e2]",
+      "il": [
+        "IL_0000: ldarg.0",
+        "IL_0001: ldarg.1",
+        "IL_0002: call System.Void TaleWorlds.MountAndBlade.MissionBehavior::OnAgentCreated(TaleWorlds.MountAndBlade.Agent)",
+        "IL_0007: ldarg.1",
+        "IL_0008: callvirt System.Boolean TaleWorlds.MountAndBlade.Agent::get_IsAIControlled()",
+        "IL_000d: brfalse.s IL_0023",
+        "IL_000f: ldarg.1",
+        "IL_0010: callvirt System.Boolean TaleWorlds.MountAndBlade.Agent::get_IsHuman()",
+        "IL_0015: brfalse.s IL_0023",
+        "IL_0017: ldarg.1",
+        "IL_0018: ldarg.1",
+        "IL_0019: newobj System.Void TaleWorlds.MountAndBlade.HumanAIComponent::.ctor(TaleWorlds.MountAndBlade.Agent)",
+        "IL_001e: callvirt System.Void TaleWorlds.MountAndBlade.Agent::AddComponent(TaleWorlds.MountAndBlade.AgentComponent)",
+        "IL_0023: ret"
+      ]
+    },
+    {
+      "method": "System.Void TaleWorlds.MountAndBlade.Team::SetIsEnemyOf(TaleWorlds.MountAndBlade.Team,System.Boolean)",
+      "metadataToken": "[Method:0x344c]",
+      "il": [
+        "IL_0000: ldarg.0",
+        "IL_0001: ldfld TaleWorlds.MountAndBlade.MBTeam TaleWorlds.MountAndBlade.Team::MBTeam",
+        "IL_0006: stloc.0",
+        "IL_0007: ldloca.s V_0",
+        "IL_0009: ldarg.1",
+        "IL_000a: ldfld TaleWorlds.MountAndBlade.MBTeam TaleWorlds.MountAndBlade.Team::MBTeam",
+        "IL_000f: ldarg.2",
+        "IL_0010: call System.Void TaleWorlds.MountAndBlade.MBTeam::SetIsEnemyOf(TaleWorlds.MountAndBlade.MBTeam,System.Boolean)",
+        "IL_0015: call System.Boolean TaleWorlds.MountAndBlade.GameNetwork::get_IsServerOrRecorder()",
+        "IL_001a: brfalse.s IL_0040",
+        "IL_001c: call System.Void TaleWorlds.MountAndBlade.GameNetwork::BeginBroadcastModuleEvent()",
+        "IL_0021: ldarg.0",
+        "IL_0022: call System.Int32 TaleWorlds.MountAndBlade.Team::get_TeamIndex()",
+        "IL_0027: ldarg.1",
+        "IL_0028: callvirt System.Int32 TaleWorlds.MountAndBlade.Team::get_TeamIndex()",
+        "IL_002d: ldarg.2",
+        "IL_002e: newobj System.Void NetworkMessages.FromServer.TeamSetIsEnemyOf::.ctor(System.Int32,System.Int32,System.Boolean)",
+        "IL_0033: call System.Void TaleWorlds.MountAndBlade.GameNetwork::WriteMessage(TaleWorlds.MountAndBlade.Network.Messages.GameNetworkMessage)",
+        "IL_0038: ldc.i4.s 16",
+        "IL_003a: ldnull",
+        "IL_003b: call System.Void TaleWorlds.MountAndBlade.GameNetwork::EndBroadcastModuleEvent(TaleWorlds.MountAndBlade.GameNetwork/EventBroadcastFlags,TaleWorlds.MountAndBlade.NetworkCommunicator)",
+        "IL_0040: ret"
+      ]
+    }
+  ]
+}

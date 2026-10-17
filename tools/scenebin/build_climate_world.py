@@ -132,7 +132,7 @@ def climate(plan, pattern, out, zones=1):
                            rain='%d west of x=extent/2, else 0' % LEVEL if pattern == 'along' else '0 everywhere',
                            snow='%d where y>=extent/2, else 0' % LEVEL if pattern == 'across' else '0 everywhere'),
         binding='SandBox.MapScene private fields _windFlowMapData, _snowAndRainData, _snowAndRainDataTextureWidth/Height, '
-                'written in DiagnosticMapScene.Load before MapWeatherModel.InitializeCaches; no texture import',
+                'written in GeneratedMapScene.Load (MMR-37; formerly DiagnosticMapScene) before MapWeatherModel.InitializeCaches; no texture import',
         scope='MMR-59 diagnostic pattern with known samples; not climate generation')
 
 
