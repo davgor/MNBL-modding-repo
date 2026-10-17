@@ -680,11 +680,22 @@ namespace MNBL.ProceduralWorld.Automation
             }
             after["fleetHoursRun"] = CampaignTime.Now.ToHours - fleetHours;
             samples.Add(TimeState(context.Seconds - start));
+            // The transit ends at its arrival time; War Sails sets the anchor's position to its target on the next hourly tick (run 16324 read
+            // it in between): time runs on until the position is set, at most 3 campaign hours.
+            double settled = CampaignTime.Now.ToHours, settleStart = context.Seconds;
+            while (!moving.Anchor.IsMovingToPoint && float.IsNaN(moving.Anchor.Position.X) && CampaignTime.Now.ToHours - settled < 3 && context.Seconds - settleStart < 60)
+            {
+                ClearEncounter(after);
+                if (Campaign.Current.TimeControlMode == CampaignTimeControlMode.Stop) Campaign.Current.TimeControlMode = CampaignTimeControlMode.UnstoppablePlay;
+                yield return null;
+            }
+            after["settleHours"] = CampaignTime.Now.ToHours - settled;
             Campaign.Current.TimeControlMode = CampaignTimeControlMode.Stop;
             yield return Frames(5);
-            after["arrived"] = !moving.Anchor.IsMovingToPoint; after["positionAfter"] = moving.Anchor.Position.IsValid() ? moving.Anchor.Position.ToVec2().ToString() : "invalid";
+            var at = moving.Anchor.Position;
+            after["arrived"] = !moving.Anchor.IsMovingToPoint; after["positionAfter"] = float.IsNaN(at.X) ? "unset" : at.ToVec2().ToString();
             after["fleetSeconds"] = context.Seconds - start;
-            bool atTarget = target.IsValid() && moving.Anchor.Position.IsValid() && moving.Anchor.Position.ToVec2().Distance(target.ToVec2()) < 0.01f;
+            bool atTarget = target.IsValid() && !float.IsNaN(at.X) && at.ToVec2().Distance(target.ToVec2()) < 0.01f;
             st.Expect((bool)after["movingAtLoad"] && !moving.Anchor.IsMovingToPoint && atTarget,
                 "world A after load: the fleet called across the seam kept its target and transit, and arrived at the port it was sent to (not snapped to the player)");
         }
