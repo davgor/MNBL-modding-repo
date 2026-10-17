@@ -573,9 +573,26 @@ namespace MNBL.ProceduralWorld.Automation
             return new Dictionary<string, object> { ["t"] = Math.Round(seconds, 1), ["hours"] = CampaignTime.Now.ToHours, ["mode"] = campaign.TimeControlMode.ToString(), ["locked"] = campaign.TimeControlModeLock,
                 ["state"] = Game.Current.GameStateManager.ActiveState == null ? null : Game.Current.GameStateManager.ActiveState.GetType().Name,
                 ["menu"] = map == null || map.MenuContext == null || map.MenuContext.GameMenu == null ? null : map.MenuContext.GameMenu.StringId, ["encounter"] = PlayerEncounter.Current != null,
-                ["mainMapEvent"] = main.MapEvent != null, ["inquiry"] = InformationManager.IsAnyInquiryActive(), ["periodicPatches"] = PeriodicPatches.IsApplied, ["periodicWorld"] = PeriodicWorld.Current != null,
+                ["mainMapEvent"] = main.MapEvent != null, ["inquiry"] = InformationManager.IsAnyInquiryActive(),
+                ["conversation"] = campaign.ConversationManager != null && campaign.ConversationManager.IsConversationInProgress, ["mapConversation"] = map != null && map.MapConversationActive, ["periodicPatches"] = PeriodicPatches.IsApplied, ["periodicWorld"] = PeriodicWorld.Current != null,
                 ["cameraAnimating"] = animating, ["main"] = main.Position.ToVec2().ToString(), ["mainMoving"] = main.DefaultBehavior.ToString(),
                 ["hostileNear"] = MobileParty.All.Count(p => p.IsActive && p != main && p.MapFaction != null && p.MapFaction.IsAtWarWith(main.MapFaction) && p.Position.ToVec2().Distance(main.Position.ToVec2()) < 3f) };
+        }
+
+        // Ends what an encounter left open, as the player would leave it: a conversation (and the map's conversation view), the encounter, its
+        // menu. What was ended is counted in the row.
+        private static void ClearEncounter(Dictionary<string, object> row)
+        {
+            Action<string> count = key => row[key] = (row.ContainsKey(key) ? (int)row[key] : 0) + 1;
+            var conversations = Campaign.Current.ConversationManager;
+            try { if (conversations != null && conversations.IsConversationInProgress) { conversations.EndConversation(); count("conversationsEnded"); } }
+            catch (Exception error) { row["conversationEndError"] = error.GetType().Name + ": " + error.Message; }
+            var map = Game.Current.GameStateManager.ActiveState as MapState;
+            try { if (map != null && map.MapConversationActive) { map.OnMapConversationOver(); count("mapConversationsClosed"); } }
+            catch (Exception error) { row["mapConversationError"] = error.GetType().Name + ": " + error.Message; }
+            try { if (PlayerEncounter.Current != null) { PlayerEncounter.Finish(true); count("encountersFinished"); } }
+            catch (Exception error) { row["finishError"] = error.GetType().Name + ": " + error.Message; }
+            ExitMenu(row);
         }
 
         // Leaves a game menu (an encounter's) for the map, where campaign time runs; the menus left are recorded.
@@ -640,13 +657,13 @@ namespace MNBL.ProceduralWorld.Automation
             after["pursuitSeconds"] = context.Seconds - start;
             st.Expect(pursuer != null && (int)after["pursuerCount"] == 1 && (bool)after["encounter"] && (int)after["mapEventsWithPlayer"] <= 1 && (int)after["playerRecrossings"] == 0,
                 "world A after load: the pursuit from across the seam ends in one encounter with the one pursuer, and the player's party does not cross the seam again");
-            // Clear the encounter, remove the pursuer, and let the fleet run on.
-            try { if (PlayerEncounter.Current != null) PlayerEncounter.Finish(true); } catch (Exception error) { after["finishError"] = error.Message; }
+            // Clear the encounter (its meeting menu opened a conversation with the pursuer's leader, which keeps the map frozen until it ends:
+            // run 46320's game log), remove the pursuer, and let the fleet run on.
+            ClearEncounter(after);
             var bandit = pursuer == null ? null : MobileParty.All.FirstOrDefault(p => p.StringId == pursuer);
             try { if (bandit != null && bandit.IsActive && bandit.MapEvent == null) DestroyPartyAction.Apply(null, bandit); } catch (Exception error) { after["destroyError"] = error.Message; }
             main.IgnoreByOtherPartiesTill(CampaignTime.HoursFromNow(24 * 30));
-            // The encounter's menu keeps campaign time stopped (run 44940): back to the map.
-            ExitMenu(after);
+            ClearEncounter(after);
             yield return Frames(10);
             if (moving == null || moving.Anchor == null) { st.Expect(false, "world A after load: the moving fleet exists"); yield break; }
             Campaign.Current.TimeControlMode = CampaignTimeControlMode.UnstoppablePlay;
@@ -656,8 +673,7 @@ namespace MNBL.ProceduralWorld.Automation
             var samples = new List<object>(); after["fleetSamples"] = samples;
             while (moving.Anchor.IsMovingToPoint && context.Seconds - start < 90)
             {
-                try { if (PlayerEncounter.Current != null) PlayerEncounter.Finish(true); } catch (Exception error) { after["finishErrorInFleet"] = error.Message; }
-                ExitMenu(after);
+                ClearEncounter(after);
                 if (context.Seconds - sampled >= 10) { sampled = context.Seconds; samples.Add(TimeState(context.Seconds - start)); }
                 if (Campaign.Current.TimeControlMode == CampaignTimeControlMode.Stop) Campaign.Current.TimeControlMode = CampaignTimeControlMode.UnstoppablePlay;
                 yield return null;

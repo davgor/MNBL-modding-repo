@@ -12,6 +12,48 @@
 # writes them locally; the committed summaries in evidence/runtime/ are the receipts.
 /evidence/runtime/in-game/
 
+# Bulky evidence kept on disk only (untracked 2026-10-17). Receipts that pin these
+# files by SHA-256 stay tracked; a fresh clone does not contain the pinned files.
+# Screenshots and full game/editor logs (~0.5 MB each; small logs stay tracked):
+/evidence/**/*.png
+/evidence/**/rgl_log_[0-9]*.txt
+/evidence/baseline/editor-startup-*.log
+# Machine-generated dumps over 1 MB (Ghidra/REA exports, instruction inventories,
+# call traces). New dumps of this kind belong in build/, or get added here.
+/evidence/character-overhaul/rea-2026-10-16.json
+/evidence/engine-extension/managed-core-callback-bodies.json
+/evidence/engine-extension/native-callback-contracts.json
+/evidence/engine-extension/native-closure-ghidra-evidence.json
+/evidence/engine-extension/native-decode-gap-r13-review.json
+/evidence/engine-extension/native-decode-gap-r8-review.json
+/evidence/engine-extension/native-decode-gap-review.json
+/evidence/engine-extension/native-expansion-ghidra-evidence.json
+/evidence/engine-extension/native-live-agent-access-review.json
+/evidence/engine-extension/native-live-agent-owner-extension.json
+/evidence/engine-extension/native-pool-module-boundaries.json
+/evidence/engine-extension/native-pool-patch-4080.json
+/evidence/engine-extension/native-pool-pre-r13/native-pool-patch-4080.json
+/evidence/engine-extension/native-pool-pre-r13/watchdog-static-input.json
+/evidence/engine-extension/native-pool-reference-classification.json
+/evidence/engine-extension/native-pool-reference-inventory.json
+/evidence/engine-extension/native-pool-run-r10/reviews/native-pool-patch-4080.json
+/evidence/engine-extension/native-ranged-page-consumer-inventory.json
+/evidence/engine-extension/native-segmented-agent-consumers.json
+/evidence/engine-extension/native-segmented-audio-exclusions.json
+/evidence/engine-extension/native-segmented-companion-accesses.json
+/evidence/engine-extension/native-segmented-companion-extension.json
+/evidence/engine-extension/native-simple-agent-operation-routes.json
+/evidence/engine-extension/pool-managed-expansion-audit.json
+/evidence/engine-extension/pool-patch-generator-review.json
+/evidence/engine-extension/pool-semantic-review-high.json
+/evidence/engine-extension/pool-semantic-review-mid.json
+/evidence/rea-red-team/gamer-evidence.json
+/evidence/runtime/api-inventory.json
+/evidence/runtime/call-traces.json
+/evidence/runtime/loading-call-traces.json
+/evidence/runtime/physics-call-traces.json
+/evidence/world/settlement-position-report.json
+
 # Python bytecode
 __pycache__/
 *.py[cod]

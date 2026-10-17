@@ -1,2 +1,5 @@
-# Auto detect text files and perform LF normalization
-* text=auto
+# Store and check out every file byte-exact: no line-ending conversion.
+# Hundreds of tracked receipts pin other tracked files by SHA-256 of their on-disk
+# bytes, and those files mix LF and CRLF. Normalization (text=auto with
+# core.autocrlf) would change the bytes on checkout and break every such pin.
+* -text

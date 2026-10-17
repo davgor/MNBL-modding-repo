@@ -106,6 +106,15 @@ It found:
   - The probe planted images off the map's edge.
   - The encounter's game menu kept campaign time stopped, so the fleet could not arrive. The fleet itself kept its target and transit through the load.
 
+**Runs 35184 (create) and 46320 (cold, a diagnostic run on 35184's saves)** passed every check but the fleet's arrival. Run 46320 exercised the cold path:
+- the swept scene was re-encoded by the surface encoder only;
+- navigation and playability were restored from the kept evidence, and the settlement layout re-derived;
+- A was equal to its save;
+- B loaded from inside A;
+- the baseline held.
+
+Its time samples showed campaign time not advancing after the pursuit, with mode, lock, menu, encounter and inquiry all clear. The game's log for the run explained it: the encounter's meeting menu had started a conversation with the bandit leader. `PlayerEncounter.Finish` does not end that conversation, and the map stays frozen while it is open. A player ends it by talking. The probe now ends it as the game does (`ConversationManager.EndConversation`, `MapState.OnMapConversationOver`) before finishing the encounter. A probe defect, not a loader one: the fleet kept its target and transit through the load in every run.
+
 ## Results
 
 (Filled from the accepted runs.)
