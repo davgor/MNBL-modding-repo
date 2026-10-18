@@ -1,0 +1,2195 @@
+{
+ "schema": "mnbl.autorun-result",
+ "version": 1,
+ "requestId": "d54ec2d1265a45b19af42420128890dc",
+ "probe": "naval_missions",
+ "args": {
+  "scenarios": "<repo>\\tests\\Runtime\\NavalScenarios.json"
+ },
+ "processId": 46036,
+ "status": "ok",
+ "final": true,
+ "error": null,
+ "checkpointWriteFailures": 0,
+ "quitPlanned": "TaleWorlds.Engine.Utilities.DoDelayedexit(0) (fallback TaleWorlds.Engine.Utilities.QuitGame after 30 s)",
+ "outputs": {
+  "scope": "MMR-53: naval gameplay on generated world A.",
+  "scenarioFile": {
+   "schema": "mnbl.naval-scenarios.v1",
+   "sha256": "ae3cb48b76b403605a919765bbe755db01d258ccbe891b03ecc69a11b1e1d552"
+  },
+  "rules": {
+   "crew": 40,
+   "defeatTroops": 8,
+   "grain": 200,
+   "goldMargin": 2000,
+   "repairDamageFraction": 0.4,
+   "voyageHours": 240,
+   "voyageSeconds": 300,
+   "raftSeconds": 300,
+   "raidSeconds": 240,
+   "landingSeconds": 180,
+   "coastSeconds": 120,
+   "straitEndDistance": 3.0,
+   "returnBoundLand": 0.635,
+   "returnBoundNaval": 1.885,
+   "missionReadySeconds": 180,
+   "teardownSeconds": 90,
+   "sampleSeconds": 3,
+   "stockMissingPatterns": [
+    "^Missing shader from sack: ",
+    "^Voice object for text id is not found: "
+   ]
+  },
+  "failures": [],
+  "cases": {
+   "shipyard.buy": {
+    "caseName": "shipyard.buy",
+    "failures": [],
+    "setup": {
+     "crewAdded": 39,
+     "grainAdded": 200,
+     "goldAdded": 13000,
+     "anchorValidBefore": false,
+     "canBuy": {
+      "relevant": true,
+      "enabled": true,
+      "goldCost": 12000,
+      "tooltip": ""
+     },
+     "canConfirm": true,
+     "confirmHint": null
+    },
+    "relocations": [
+     {
+      "to": "mnbl_1609fb72_t_30a1119e46",
+      "from": [
+       1042.97913,
+       699.3487
+      ],
+      "distance": 573.6843
+     }
+    ],
+    "before": {
+     "position": [
+      475.6647,
+      784.6012
+     ],
+     "isOnLand": true,
+     "atSea": false,
+     "face": {
+      "index": 7538,
+      "group": 1,
+      "terrain": "Plain",
+      "island": 2
+     },
+     "expectedBattleScene": {
+      "sceneIndex": 221,
+      "naval": false,
+      "candidates": [
+       "nord_battle_terrain_j"
+      ],
+      "scene": "nord_battle_terrain_j",
+      "deterministic": true,
+      "rule": "a single scene lists the index"
+     }
+    },
+    "entered": true,
+    "ship": {
+     "name": "Gatopard",
+     "hull": "western_light_ship",
+     "price": 12000,
+     "hitPoints": 10800,
+     "maxHitPoints": 10800
+    },
+    "bought": {
+     "owner": true,
+     "inParty": true,
+     "goldPaid": 12000,
+     "townGoldGained": 0,
+     "anchorDocked": true,
+     "naval": true
+    },
+    "after": {
+     "position": [
+      475.6647,
+      784.6012
+     ],
+     "isOnLand": true,
+     "atSea": false,
+     "face": {
+      "index": 7538,
+      "group": 1,
+      "terrain": "Plain",
+      "island": 2
+     },
+     "expectedBattleScene": {
+      "sceneIndex": 221,
+      "naval": false,
+      "candidates": [
+       "nord_battle_terrain_j"
+      ],
+      "scene": "nord_battle_terrain_j",
+      "deterministic": true,
+      "rule": "a single scene lists the index"
+     }
+    },
+    "afterNavigation": null,
+    "returnExpected": {
+     "position": [
+      475.6647,
+      784.6012
+     ],
+     "reason": "the town's gate, where the leave path puts the party"
+    },
+    "returnDisplacement": 0,
+    "returnBound": 0.635,
+    "seconds": 5.514298099999962,
+    "asserts": [],
+    "assertCount": 0,
+    "assertCanarySeen": true,
+    "log": {
+     "path": "rgl_log_<pid>.txt",
+     "read": true,
+     "missingLines": 0,
+     "kinds": {},
+     "worldMissing": [],
+     "worldMissingCount": 0,
+     "otherMissing": [],
+     "otherMissingCount": 0
+    }
+   },
+   "route.port": {
+    "caseName": "route.port",
+    "failures": [],
+    "from": "mnbl_1609fb72_t_30a1119e46",
+    "to": "mnbl_1609fb72_t_e7ed06396a",
+    "kind": "port",
+    "relocations": [
+     {
+      "to": "mnbl_1609fb72_t_30a1119e46",
+      "from": [
+       475.6647,
+       784.6012
+      ],
+      "distance": 0
+     }
+    ],
+    "before": {
+     "position": [
+      475.6647,
+      784.6012
+     ],
+     "isOnLand": true,
+     "atSea": false,
+     "face": {
+      "index": 7538,
+      "group": 1,
+      "terrain": "Plain",
+      "island": 2
+     },
+     "expectedBattleScene": {
+      "sceneIndex": 221,
+      "naval": false,
+      "candidates": [
+       "nord_battle_terrain_j"
+      ],
+      "scene": "nord_battle_terrain_j",
+      "deterministic": true,
+      "rule": "a single scene lists the index"
+     }
+    },
+    "entered": true,
+    "sailed": {
+     "atSea": true,
+     "settlement": null,
+     "fromPort": 0,
+     "anchorValid": false,
+     "navigation": null,
+     "menu": "the map"
+    },
+    "order": {
+     "canNavigate": true,
+     "navigation": "Naval",
+     "targetingPort": true
+    },
+    "voyage": {
+     "hours": 22.266161555424333,
+     "distance": 41.68438911437988,
+     "offNavigationSamples": 0,
+     "landSeaChanges": 0,
+     "arrived": true,
+     "minWidth": 8.5,
+     "narrowest": [
+      469.5238,
+      780.7812
+     ]
+    },
+    "arrival": {
+     "settlement": "mnbl_1609fb72_t_e7ed06396a",
+     "atSea": false,
+     "anchorDocked": true,
+     "menus": [
+      "town",
+      "port_menu",
+      "port_menu"
+     ]
+    },
+    "after": {
+     "position": [
+      450.1105,
+      813.6383
+     ],
+     "isOnLand": true,
+     "atSea": false,
+     "face": {
+      "index": 8814,
+      "group": 1,
+      "terrain": "Plain",
+      "island": 2
+     },
+     "expectedBattleScene": {
+      "sceneIndex": 225,
+      "naval": false,
+      "candidates": [
+       "nord_battle_terrain_k"
+      ],
+      "scene": "nord_battle_terrain_k",
+      "deterministic": true,
+      "rule": "a single scene lists the index"
+     }
+    },
+    "afterNavigation": null,
+    "returnExpected": {
+     "position": [
+      450.1105,
+      813.6383
+     ],
+     "reason": "the town's gate, where the leave path puts the party"
+    },
+    "returnDisplacement": 0,
+    "returnBound": 0.635,
+    "seconds": 19.296070499999985,
+    "asserts": [],
+    "assertCount": 0,
+    "assertCanarySeen": true,
+    "log": {
+     "path": "rgl_log_<pid>.txt",
+     "read": true,
+     "missingLines": 0,
+     "kinds": {},
+     "worldMissing": [],
+     "worldMissingCount": 0,
+     "otherMissing": [],
+     "otherMissingCount": 0
+    }
+   },
+   "shipyard.repair": {
+    "caseName": "shipyard.repair",
+    "failures": [],
+    "setup": {
+     "damage": 4320,
+     "dealt": 0,
+     "hitPointsDamaged": 6480,
+     "maxHitPoints": 10800,
+     "repairCost": 800
+    },
+    "relocations": [
+     {
+      "to": "mnbl_1609fb72_t_e7ed06396a",
+      "from": [
+       450.1105,
+       813.6383
+      ],
+      "distance": 0
+     }
+    ],
+    "before": {
+     "position": [
+      450.1105,
+      813.6383
+     ],
+     "isOnLand": true,
+     "atSea": false,
+     "face": {
+      "index": 8814,
+      "group": 1,
+      "terrain": "Plain",
+      "island": 2
+     },
+     "expectedBattleScene": {
+      "sceneIndex": 225,
+      "naval": false,
+      "candidates": [
+       "nord_battle_terrain_k"
+      ],
+      "scene": "nord_battle_terrain_k",
+      "deterministic": true,
+      "rule": "a single scene lists the index"
+     }
+    },
+    "entered": true,
+    "repaired": {
+     "hitPoints": 10800,
+     "goldPaid": 800,
+     "menu": "port_menu"
+    },
+    "after": {
+     "position": [
+      450.1105,
+      813.6383
+     ],
+     "isOnLand": true,
+     "atSea": false,
+     "face": {
+      "index": 8814,
+      "group": 1,
+      "terrain": "Plain",
+      "island": 2
+     },
+     "expectedBattleScene": {
+      "sceneIndex": 225,
+      "naval": false,
+      "candidates": [
+       "nord_battle_terrain_k"
+      ],
+      "scene": "nord_battle_terrain_k",
+      "deterministic": true,
+      "rule": "a single scene lists the index"
+     }
+    },
+    "afterNavigation": null,
+    "returnExpected": {
+     "position": [
+      450.1105,
+      813.6383
+     ],
+     "reason": "the town's gate, where the leave path puts the party"
+    },
+    "returnDisplacement": 0,
+    "returnBound": 0.635,
+    "seconds": 1.1379056000000105,
+    "asserts": [],
+    "assertCount": 0,
+    "assertCanarySeen": true,
+    "log": {
+     "path": "rgl_log_<pid>.txt",
+     "read": true,
+     "missingLines": 0,
+     "kinds": {},
+     "worldMissing": [],
+     "worldMissingCount": 0,
+     "otherMissing": [],
+     "otherMissingCount": 0
+    }
+   },
+   "route.island": {
+    "caseName": "route.island",
+    "failures": [],
+    "from": "mnbl_1609fb72_t_e7ed06396a",
+    "to": "mnbl_1609fb72_t_7efe6a0c96",
+    "kind": "island",
+    "relocations": [
+     {
+      "to": "mnbl_1609fb72_t_e7ed06396a",
+      "from": [
+       450.1105,
+       813.6383
+      ],
+      "distance": 0
+     }
+    ],
+    "before": {
+     "position": [
+      450.1105,
+      813.6383
+     ],
+     "isOnLand": true,
+     "atSea": false,
+     "face": {
+      "index": 8814,
+      "group": 1,
+      "terrain": "Plain",
+      "island": 2
+     },
+     "expectedBattleScene": {
+      "sceneIndex": 225,
+      "naval": false,
+      "candidates": [
+       "nord_battle_terrain_k"
+      ],
+      "scene": "nord_battle_terrain_k",
+      "deterministic": true,
+      "rule": "a single scene lists the index"
+     }
+    },
+    "entered": true,
+    "sailed": {
+     "atSea": true,
+     "settlement": null,
+     "fromPort": 0,
+     "anchorValid": false,
+     "navigation": null,
+     "menu": "the map"
+    },
+    "order": {
+     "canNavigate": true,
+     "navigation": "Naval",
+     "targetingPort": true
+    },
+    "voyage": {
+     "hours": 32.19946863874793,
+     "distance": 77.85362541675568,
+     "offNavigationSamples": 0,
+     "landSeaChanges": 0,
+     "arrived": true,
+     "minWidth": 8.5,
+     "narrowest": [
+      443.936859,
+      812.0074
+     ]
+    },
+    "arrival": {
+     "settlement": "mnbl_1609fb72_t_7efe6a0c96",
+     "atSea": false,
+     "anchorDocked": true,
+     "menus": [
+      "town",
+      "port_menu",
+      "port_menu"
+     ]
+    },
+    "after": {
+     "position": [
+      482.8125,
+      879.1598
+     ],
+     "isOnLand": true,
+     "atSea": false,
+     "face": {
+      "index": 11379,
+      "group": 1,
+      "terrain": "Plain",
+      "island": 2
+     },
+     "expectedBattleScene": {
+      "sceneIndex": 219,
+      "naval": false,
+      "candidates": [
+       "nord_battle_terrain_i"
+      ],
+      "scene": "nord_battle_terrain_i",
+      "deterministic": true,
+      "rule": "a single scene lists the index"
+     }
+    },
+    "afterNavigation": null,
+    "returnExpected": {
+     "position": [
+      482.8125,
+      879.1598
+     ],
+     "reason": "the town's gate, where the leave path puts the party"
+    },
+    "returnDisplacement": 0,
+    "returnBound": 0.635,
+    "seconds": 27.817788899999982,
+    "asserts": [],
+    "assertCount": 0,
+    "assertCanarySeen": true,
+    "log": {
+     "path": "rgl_log_<pid>.txt",
+     "read": true,
+     "missingLines": 0,
+     "kinds": {},
+     "worldMissing": [],
+     "worldMissingCount": 0,
+     "otherMissing": [],
+     "otherMissingCount": 0
+    }
+   },
+   "blockade": {
+    "caseName": "blockade",
+    "failures": [],
+    "setup": {
+     "warDeclared": "mnbl_1609fb72_k_3f9b573679",
+     "relocatedFrom": {
+      "position": [
+       482.8125,
+       879.1598
+      ],
+      "distance": 40.210495
+     },
+     "outsideMenu": "town_outside",
+     "peaceMade": true,
+     "movedBack": {
+      "distance": 0,
+      "navigation": null
+     }
+    },
+    "settlement": "mnbl_1609fb72_t_db2d888bf1",
+    "before": {
+     "position": [
+      476.454834,
+      839.4551
+     ],
+     "isOnLand": true,
+     "atSea": false,
+     "face": {
+      "index": 9842,
+      "group": 1,
+      "terrain": "Plain",
+      "island": 2
+     },
+     "expectedBattleScene": {
+      "sceneIndex": 219,
+      "naval": false,
+      "candidates": [
+       "nord_battle_terrain_i"
+      ],
+      "scene": "nord_battle_terrain_i",
+      "deterministic": true,
+      "rule": "a single scene lists the index"
+     }
+    },
+    "blockade": {
+     "siege": true,
+     "active": true,
+     "activatedEvents": 1,
+     "anchorDisabled": true,
+     "blockadingParties": [
+      "player_party"
+     ],
+     "ships": 1,
+     "arcs": {
+      "script": true,
+      "points": 1,
+      "offNaval": 0,
+      "offSamples": [],
+      "center": [
+       475.9768,
+       839.771
+      ],
+      "fullPoints": 10,
+      "fullOffNaval": 0,
+      "fromPort": 1.54649091
+     }
+    },
+    "lifted": {
+     "siege": false,
+     "deactivatedEvents": 1,
+     "anchorDisabled": false
+    },
+    "after": {
+     "position": [
+      474.278931,
+      837.228149
+     ],
+     "isOnLand": true,
+     "atSea": false,
+     "face": {
+      "index": 9585,
+      "group": 1,
+      "terrain": "Plain",
+      "island": 2
+     },
+     "expectedBattleScene": {
+      "sceneIndex": 219,
+      "naval": false,
+      "candidates": [
+       "nord_battle_terrain_i"
+      ],
+      "scene": "nord_battle_terrain_i",
+      "deterministic": true,
+      "rule": "a single scene lists the index"
+     }
+    },
+    "afterNavigation": null,
+    "seconds": 2.2939274000000296,
+    "asserts": [],
+    "assertCount": 0,
+    "assertCanarySeen": true,
+    "log": {
+     "path": "rgl_log_<pid>.txt",
+     "read": true,
+     "missingLines": 0,
+     "kinds": {},
+     "worldMissing": [],
+     "worldMissingCount": 0,
+     "otherMissing": [],
+     "otherMissingCount": 0
+    }
+   },
+   "dropoff": {
+    "caseName": "dropoff",
+    "failures": [],
+    "from": "mnbl_1609fb72_t_7efe6a0c96",
+    "to": "mnbl_1609fb72_v_f924958cd5",
+    "relocations": [
+     {
+      "to": "mnbl_1609fb72_t_7efe6a0c96",
+      "from": [
+       482.8125,
+       879.1598
+      ],
+      "distance": 0
+     }
+    ],
+    "before": {
+     "position": [
+      482.8125,
+      879.1598
+     ],
+     "isOnLand": true,
+     "atSea": false,
+     "face": {
+      "index": 11379,
+      "group": 1,
+      "terrain": "Plain",
+      "island": 2
+     },
+     "expectedBattleScene": {
+      "sceneIndex": 219,
+      "naval": false,
+      "candidates": [
+       "nord_battle_terrain_i"
+      ],
+      "scene": "nord_battle_terrain_i",
+      "deterministic": true,
+      "rule": "a single scene lists the index"
+     }
+    },
+    "entered": true,
+    "sailed": {
+     "atSea": true,
+     "settlement": null,
+     "fromPort": 0,
+     "anchorValid": false,
+     "navigation": null,
+     "menu": "the map"
+    },
+    "order": {
+     "canNavigate": true,
+     "navigation": "Naval",
+     "targetingPort": true
+    },
+    "voyage": {
+     "hours": 8.379864944610745,
+     "distance": 12.908162355422974,
+     "offNavigationSamples": 0,
+     "landSeaChanges": 0,
+     "arrived": true,
+     "minWidth": 8.5,
+     "narrowest": [
+      486.176727,
+      874.5529
+     ]
+    },
+    "arrival": {
+     "settlement": "mnbl_1609fb72_v_f924958cd5",
+     "atSea": true
+    },
+    "disembarked": {
+     "atSea": false,
+     "fromGate": 0,
+     "anchorAtVillage": true,
+     "anchorFromPort": 0,
+     "navigation": null
+    },
+    "returnExpected": {
+     "position": [
+      485.9375,
+      878.125
+     ],
+     "reason": "the village's gate, where the disembark puts the party"
+    },
+    "returnDisplacement": 0,
+    "returnBound": 0.635,
+    "reembarked": {
+     "atSea": true,
+     "fromAnchor": 0,
+     "anchorValid": false,
+     "navigation": null
+    },
+    "coastalLanding": {
+     "point": [
+      486.476135,
+      875.453
+     ],
+     "canNavigate": true,
+     "navigation": "All",
+     "fromSea": 8.338563,
+     "landed": {
+      "atSea": false,
+      "sawTransition": true,
+      "transitionHours": 2.0199210275895894,
+      "landedAfterHours": 2.120137750171125,
+      "hours": 6.400010666809976,
+      "ashore": [
+       493.25,
+       877.913757
+      ],
+      "fromPoint": 0.0433566719,
+      "navigation": null,
+      "anchorValid": true,
+      "anchorAtVillage": false,
+      "anchorFromAshore": 1,
+      "anchorNavigation": null,
+      "lastDisembarkFromAshore": 0
+     },
+     "reboarded": {
+      "atSea": true,
+      "fromAnchor": 0,
+      "anchorValid": false,
+      "navigation": null
+     }
+    },
+    "after": {
+     "position": [
+      494.25,
+      877.913757
+     ],
+     "isOnLand": false,
+     "atSea": true,
+     "face": {
+      "index": 11381,
+      "group": 18,
+      "terrain": "CoastalSea",
+      "island": 2
+     },
+     "expectedBattleScene": {
+      "sceneIndex": 110,
+      "naval": true,
+      "candidates": [
+       "battle_terrain_coastal_021"
+      ],
+      "scene": "battle_terrain_coastal_021",
+      "deterministic": true,
+      "rule": "a single scene lists the index"
+     }
+    },
+    "seconds": 17.696588099999985,
+    "asserts": [],
+    "assertCount": 0,
+    "assertCanarySeen": true,
+    "log": {
+     "path": "rgl_log_<pid>.txt",
+     "read": true,
+     "missingLines": 0,
+     "kinds": {},
+     "worldMissing": [],
+     "worldMissingCount": 0,
+     "otherMissing": [],
+     "otherMissingCount": 0
+    }
+   },
+   "pirate.battle": {
+    "caseName": "pirate.battle",
+    "failures": [],
+    "setup": {
+     "crewAdded": 0,
+     "excluded": null,
+     "pirate": "southern_pirates_742",
+     "clan": "southern_pirates",
+     "pirateShips": 4,
+     "pirateTroops": 66,
+     "pirateFrom": [
+      523.8814,
+      873.4118
+     ],
+     "pirateMoved": 28.328146,
+     "pirateRestored": "patrol"
+    },
+    "before": {
+     "position": [
+      494.25,
+      877.913757
+     ],
+     "isOnLand": false,
+     "atSea": true,
+     "face": {
+      "index": 11381,
+      "group": 18,
+      "terrain": "CoastalSea",
+      "island": 2
+     },
+     "expectedBattleScene": {
+      "sceneIndex": 110,
+      "naval": true,
+      "candidates": [
+       "battle_terrain_coastal_021"
+      ],
+      "scene": "battle_terrain_coastal_021",
+      "deterministic": true,
+      "rule": "a single scene lists the index"
+     }
+    },
+    "fleetBefore": {
+     "ships": [
+      {
+       "hull": "western_light_ship",
+       "hitPoints": 10800,
+       "maxHitPoints": 10800
+      }
+     ],
+     "troops": 40,
+     "healthy": 40,
+     "anchorValid": false
+    },
+    "mapEvent": {
+     "naval": true,
+     "involved": [
+      "southern_pirates_742",
+      "player_party"
+     ]
+    },
+    "fight": {},
+    "mission": {
+     "scene": "battle_terrain_coastal_021",
+     "sceneNameProperty": "battle_terrain_coastal_021",
+     "module": "$BASE/Modules/NavalDLC/",
+     "terrainType": "CoastalSea",
+     "hasEnemyTeam": true,
+     "screen": "NavalDLC.View.NavalMissionScreen",
+     "initializerRecordSource": "TaleWorlds.MountAndBlade.Mission.<InitializerRecord>k__BackingField",
+     "mainAgentPosition": [
+      4611.48535,
+      4709.089,
+      22.40768
+     ],
+     "combat": true,
+     "loadSeconds": 2.931072400000005,
+     "spawns": {
+      "agents": 98,
+      "onNavmesh": 98,
+      "heightAdjusted": 0,
+      "offNavmesh": 0,
+      "offNavmeshUsingObject": 0,
+      "usedObjects": {},
+      "boundaries": 1,
+      "outsideBoundaries": 0,
+      "mainOnNavmesh": true,
+      "samples": []
+     },
+     "missionTimeAdvanced": 3.0508999824523926,
+     "screenshot": true,
+     "endedItself": false,
+     "missionResult": null,
+     "teardownSeconds": 0.581059200000027
+    },
+    "gear": {
+     "agents": 98,
+     "playerPartyAgents": 32,
+     "incomplete": 0,
+     "byCulture": {
+      "empire": 32,
+      "southern_pirates": 66
+     },
+     "problems": []
+    },
+    "menusAfterBattle": [
+     "encounter",
+     "the map"
+    ],
+    "after": {
+     "position": [
+      495.1686,
+      879.4093
+     ],
+     "isOnLand": false,
+     "atSea": true,
+     "face": {
+      "index": 11381,
+      "group": 18,
+      "terrain": "CoastalSea",
+      "island": 2
+     },
+     "expectedBattleScene": {
+      "sceneIndex": 110,
+      "naval": true,
+      "candidates": [
+       "battle_terrain_coastal_021"
+      ],
+      "scene": "battle_terrain_coastal_021",
+      "deterministic": true,
+      "rule": "a single scene lists the index"
+     }
+    },
+    "fleetAfter": {
+     "ships": [
+      {
+       "hull": "western_light_ship",
+       "hitPoints": 10800,
+       "maxHitPoints": 10800
+      }
+     ],
+     "troops": 40,
+     "healthy": 40,
+     "anchorValid": false
+    },
+    "returnDisplacement": 1.7551344073958843,
+    "returnBound": 1.885,
+    "sceneMatchesPatch": true,
+    "mismatchGuard": {
+     "index": 110,
+     "naval": true,
+     "terrainAtParty": "CoastalSea",
+     "opened": "battle_terrain_coastal_021",
+     "expected": "battle_terrain_coastal_021",
+     "candidates": [
+      "battle_terrain_coastal_021"
+     ],
+     "rule": "a single scene lists the index",
+     "deterministic": true,
+     "agrees": true,
+     "problem": null,
+     "position": [
+      494.25,
+      877.913757
+     ],
+     "patchCoordinates": [
+      0.466666669,
+      0.733333349
+     ],
+     "campaignHours": 2185930.264423833
+    },
+    "afterNavigation": null,
+    "seconds": 9.548792399999968,
+    "asserts": [],
+    "assertCount": 0,
+    "assertCanarySeen": true,
+    "log": {
+     "path": "rgl_log_<pid>.txt",
+     "read": true,
+     "missingLines": 6,
+     "kinds": {
+      "Missing shader from sack: pbr_terrain": 2,
+      "Missing shader from sack: pbr_terrain_gbuffer": 2,
+      "Missing shader from sack: pbr_terrain_pointlight": 1,
+      "Missing shader from sack: pbr_terrain_shadowmap": 1
+     },
+     "worldMissing": [],
+     "worldMissingCount": 0,
+     "otherMissing": [],
+     "otherMissingCount": 0
+    }
+   },
+   "raid": {
+    "caseName": "raid",
+    "failures": [],
+    "setup": {
+     "warDeclared": "mnbl_1609fb72_k_de9f25ee81",
+     "crewAdded": 0,
+     "shallowShips": 1,
+     "navalTroopSelection": {
+      "offered": 40,
+      "selected": 32,
+      "minTroops": 15,
+      "eligibleShips": 1,
+      "ships": [
+       "western_light_ship"
+      ],
+      "minShips": 1,
+      "maxShips": 3
+     },
+     "peaceMade": true
+    },
+    "village": "mnbl_1609fb72_v_1b54c2686d",
+    "expectedScene": "aserai_village_j_raid",
+    "mapEventsEnded": [
+     {
+      "type": "Raid",
+      "isRaid": true,
+      "playerMapEvent": true,
+      "naval": false,
+      "attackerLeader": "player_party",
+      "attackerLeaderIsMain": true,
+      "defenderLeaderIsVillage": true,
+      "villageRaided": false,
+      "villageState": "BeingRaided",
+      "diplomaticallyFinished": false,
+      "endedByRetreat": false,
+      "winner": "Attacker"
+     },
+     {
+      "type": "Raid",
+      "isRaid": true,
+      "playerMapEvent": true,
+      "naval": false,
+      "attackerLeader": "player_party",
+      "attackerLeaderIsMain": true,
+      "defenderLeaderIsVillage": true,
+      "villageRaided": false,
+      "villageState": "BeingRaided",
+      "diplomaticallyFinished": false,
+      "endedByRetreat": false,
+      "winner": "Attacker"
+     }
+    ],
+    "order": {
+     "canNavigate": true,
+     "navigation": "Naval",
+     "targetingPort": true
+    },
+    "voyage": {
+     "hours": 17.49986808327958,
+     "distance": 41.317341804504395,
+     "offNavigationSamples": 0,
+     "landSeaChanges": 0,
+     "arrived": true,
+     "minWidth": 11.25,
+     "narrowest": [
+      496.614227,
+      874.3108
+     ]
+    },
+    "arrival": {
+     "atSea": true,
+     "settlement": "mnbl_1609fb72_v_1b54c2686d"
+    },
+    "fight": {
+     "landing": {
+      "controller": true,
+      "paths": 4,
+      "pathFrames": [
+       8,
+       8,
+       8,
+       8
+      ],
+      "jumpingFrames": 4,
+      "startedAfter": 51.20478270000007,
+      "started": true,
+      "completed": true,
+      "seconds": 80.48163140000003,
+      "playerAgentsAshore": 27,
+      "playerAgentsAboard": 0,
+      "playerAgentsUntracked": 0
+     },
+     "sceneTags": {
+      "landing": 10,
+      "jumping": 3,
+      "playerSpawnFrame": 1
+     },
+     "sceneLevels": "naval_raid",
+     "killed": 53,
+     "seconds": 0.6895848000000342,
+     "victory": true
+    },
+    "mission": {
+     "scene": "aserai_village_j_raid",
+     "sceneNameProperty": "aserai_village_j_raid",
+     "module": "$BASE/Modules/SandBox/",
+     "terrainType": "River",
+     "hasEnemyTeam": true,
+     "screen": "NavalDLC.View.NavalMissionScreen",
+     "initializerRecordSource": "TaleWorlds.MountAndBlade.Mission.<InitializerRecord>k__BackingField",
+     "mainAgentPosition": [
+      247.052979,
+      642.445435,
+      21.6966534
+     ],
+     "combat": true,
+     "loadSeconds": 2.2517239999999674,
+     "spawns": {
+      "agents": 85,
+      "onNavmesh": 85,
+      "heightAdjusted": 0,
+      "offNavmesh": 0,
+      "offNavmeshUsingObject": 0,
+      "usedObjects": {},
+      "boundaries": 1,
+      "outsideBoundaries": 0,
+      "mainOnNavmesh": true,
+      "samples": []
+     },
+     "screenshot": true,
+     "endedItself": true,
+     "missionResult": {
+      "victory": true,
+      "defeated": false,
+      "enemyRetreated": false
+     },
+     "teardownSeconds": 0.6002083000000766
+    },
+    "gear": {
+     "agents": 80,
+     "playerPartyAgents": 27,
+     "incomplete": 0,
+     "byCulture": {
+      "aserai": 53,
+      "empire": 27
+     },
+     "problems": []
+    },
+    "menusAfterRaid": [
+     "PartyState",
+     "InventoryState",
+     "raiding_village",
+     "village_raid_ended_leaded_by_someone_else",
+     "the map"
+    ],
+    "screensClosed": [
+     "PartyState",
+     "InventoryState"
+    ],
+    "raidEndMenu": "village_raid_ended_leaded_by_someone_else",
+    "villageState": "Looted",
+    "after": {
+     "position": [
+      506.875,
+      838.125
+     ],
+     "isOnLand": false,
+     "atSea": true,
+     "face": {
+      "index": 9847,
+      "group": 18,
+      "terrain": "CoastalSea",
+      "island": 2
+     },
+     "expectedBattleScene": {
+      "sceneIndex": 116,
+      "naval": true,
+      "candidates": [
+       "battle_terrain_coastal_caspian_sea_02"
+      ],
+      "scene": "battle_terrain_coastal_caspian_sea_02",
+      "deterministic": true,
+      "rule": "a single scene lists the index"
+     }
+    },
+    "afterNavigation": null,
+    "atSeaAfter": true,
+    "returnExpected": {
+     "position": [
+      506.875,
+      838.125
+     ],
+     "reason": "the village's port, the raid's sea side"
+    },
+    "returnDisplacement": 0,
+    "returnBound": 1.885,
+    "seconds": 169.05802960000005,
+    "asserts": [],
+    "assertCount": 0,
+    "assertCanarySeen": true,
+    "log": {
+     "path": "rgl_log_<pid>.txt",
+     "read": true,
+     "missingLines": 6,
+     "kinds": {
+      "Missing shader from sack: pbr_terrain": 2,
+      "Missing shader from sack: pbr_terrain_gbuffer": 2,
+      "Missing shader from sack: pbr_terrain_pointlight": 1,
+      "Missing shader from sack: pbr_terrain_shadowmap": 1
+     },
+     "worldMissing": [],
+     "worldMissingCount": 0,
+     "otherMissing": [],
+     "otherMissingCount": 0
+    }
+   },
+   "naval.defeat": {
+    "caseName": "naval.defeat",
+    "failures": [],
+    "setup": {
+     "crewAdded": 5,
+     "playerTroops": 9,
+     "excluded": "southern_pirates_742",
+     "pirate": "northern_pirates_1090",
+     "clan": "northern_pirates",
+     "pirateShips": 4,
+     "pirateTroops": 62,
+     "pirateFrom": [
+      592.309448,
+      863.5958
+     ],
+     "pirateMoved": 90.31931,
+     "pirateRestored": "patrol"
+    },
+    "before": {
+     "position": [
+      506.875,
+      838.125
+     ],
+     "isOnLand": false,
+     "atSea": true,
+     "face": {
+      "index": 9847,
+      "group": 18,
+      "terrain": "CoastalSea",
+      "island": 2
+     },
+     "expectedBattleScene": {
+      "sceneIndex": 116,
+      "naval": true,
+      "candidates": [
+       "battle_terrain_coastal_caspian_sea_02"
+      ],
+      "scene": "battle_terrain_coastal_caspian_sea_02",
+      "deterministic": true,
+      "rule": "a single scene lists the index"
+     }
+    },
+    "fleetBefore": {
+     "ships": [
+      {
+       "hull": "western_light_ship",
+       "hitPoints": 10800,
+       "maxHitPoints": 10800
+      }
+     ],
+     "troops": 9,
+     "healthy": 8,
+     "anchorValid": false
+    },
+    "mapEvent": {
+     "naval": true,
+     "involved": [
+      "northern_pirates_1090",
+      "player_party"
+     ]
+    },
+    "fight": {
+     "fallen": 8,
+     "seconds": 9.853845699999965,
+     "defeated": true
+    },
+    "mission": {
+     "scene": "battle_terrain_coastal_caspian_sea_02",
+     "sceneNameProperty": "battle_terrain_coastal_caspian_sea_02",
+     "module": "$BASE/Modules/NavalDLC/",
+     "terrainType": "CoastalSea",
+     "hasEnemyTeam": true,
+     "screen": "NavalDLC.View.NavalMissionScreen",
+     "initializerRecordSource": "TaleWorlds.MountAndBlade.Mission.<InitializerRecord>k__BackingField",
+     "mainAgentPosition": [
+      4987.782,
+      2984.477,
+      43.31438
+     ],
+     "combat": true,
+     "loadSeconds": 2.4213722000000644,
+     "spawns": {
+      "agents": 70,
+      "onNavmesh": 70,
+      "heightAdjusted": 0,
+      "offNavmesh": 0,
+      "offNavmeshUsingObject": 0,
+      "usedObjects": {},
+      "boundaries": 1,
+      "outsideBoundaries": 0,
+      "mainOnNavmesh": true,
+      "samples": []
+     },
+     "screenshot": true,
+     "endedItself": true,
+     "missionResult": {
+      "victory": false,
+      "defeated": true,
+      "enemyRetreated": false
+     },
+     "teardownSeconds": 0.4768656999999621
+    },
+    "gear": {
+     "agents": 70,
+     "playerPartyAgents": 8,
+     "incomplete": 0,
+     "byCulture": {
+      "empire": 8,
+      "sea_raiders": 62
+     },
+     "problems": []
+    },
+    "expectedScene": "battle_terrain_coastal_caspian_sea_02",
+    "sceneDeterministic": true,
+    "sceneMatchesPatch": true,
+    "menusAfterDefeat": [],
+    "captured": true,
+    "fleetAfterDefeat": {
+     "ships": [],
+     "troops": 0,
+     "healthy": 0,
+     "anchorValid": false
+    },
+    "captor": "northern_pirates_1090",
+    "captorAtSea": true,
+    "shipsAfterDefeat": 0,
+    "releasedAt": [
+     502.7305,
+     838.2016
+    ],
+    "afterEscape": {
+     "prisoner": false,
+     "atSea": true,
+     "raft": false,
+     "ships": 0,
+     "menu": "player_raft_state_after_prisoner"
+    },
+    "raftMenus": [
+     "player_raft_state_after_prisoner",
+     "player_raft_state_wait",
+     "player_raft_state_end",
+     "the map"
+    ],
+    "raft": {
+     "sawRaft": true,
+     "raftAtEnd": false,
+     "atSea": false,
+     "ships": 0,
+     "shipsBefore": 0,
+     "anchorValid": false,
+     "ashoreFrom": 1.20377576
+    },
+    "escaped": true,
+    "after": {
+     "position": [
+      502.802856,
+      837
+     ],
+     "isOnLand": true,
+     "atSea": false,
+     "face": {
+      "index": 9590,
+      "group": 1,
+      "terrain": "Plain",
+      "island": 2
+     },
+     "expectedBattleScene": {
+      "sceneIndex": 116,
+      "naval": false,
+      "candidates": [
+       "battle_terrain_biome_094"
+      ],
+      "scene": "battle_terrain_biome_094",
+      "deterministic": true,
+      "rule": "a single scene lists the index"
+     }
+    },
+    "afterNavigation": null,
+    "seconds": 14.491503200000011,
+    "asserts": [],
+    "assertCount": 0,
+    "assertCanarySeen": true,
+    "log": {
+     "path": "rgl_log_<pid>.txt",
+     "read": true,
+     "missingLines": 6,
+     "kinds": {
+      "Missing shader from sack: pbr_terrain": 2,
+      "Missing shader from sack: pbr_terrain_gbuffer": 2,
+      "Missing shader from sack: pbr_terrain_pointlight": 1,
+      "Missing shader from sack: pbr_terrain_shadowmap": 1
+     },
+     "worldMissing": [],
+     "worldMissingCount": 0,
+     "otherMissing": [],
+     "otherMissingCount": 0
+    }
+   }
+  },
+  "menus": {
+   "town": [
+    {
+     "id": "talk_to_garrison_commander_town",
+     "holds": false,
+     "enabled": false,
+     "text": "Talk to the garrison commander",
+     "tooltip": null
+    },
+    {
+     "id": "port",
+     "holds": true,
+     "enabled": true,
+     "text": "Go to the port",
+     "tooltip": null
+    },
+    {
+     "id": "manage_alley",
+     "holds": false,
+     "enabled": false,
+     "text": "Go to alley",
+     "tooltip": null
+    },
+    {
+     "id": "town_keep",
+     "holds": true,
+     "enabled": true,
+     "text": "Go to the keep",
+     "tooltip": null
+    },
+    {
+     "id": "town_arena",
+     "holds": true,
+     "enabled": true,
+     "text": "Go to the arena",
+     "tooltip": null
+    },
+    {
+     "id": "town_backstreet",
+     "holds": true,
+     "enabled": true,
+     "text": "Go to the tavern district",
+     "tooltip": null
+    },
+    {
+     "id": "manage_production",
+     "holds": false,
+     "enabled": false,
+     "text": "Manage town",
+     "tooltip": null
+    },
+    {
+     "id": "manage_warehouse",
+     "holds": false,
+     "enabled": false,
+     "text": "Enter the warehouse",
+     "tooltip": null
+    },
+    {
+     "id": "manage_production_cheat",
+     "holds": false,
+     "enabled": false,
+     "text": "Manage town (Cheat)",
+     "tooltip": null
+    },
+    {
+     "id": "talk_to_steward_for_revenue_town",
+     "holds": false,
+     "enabled": false,
+     "text": "Hand over the revenue",
+     "tooltip": null
+    },
+    {
+     "id": "recruit_volunteers",
+     "holds": true,
+     "enabled": true,
+     "text": "Recruit troops",
+     "tooltip": null
+    },
+    {
+     "id": "trade",
+     "holds": true,
+     "enabled": true,
+     "text": "Trade",
+     "tooltip": null
+    },
+    {
+     "id": "town_smithy",
+     "holds": true,
+     "enabled": true,
+     "text": "Enter smithy",
+     "tooltip": null
+    },
+    {
+     "id": "town_streets",
+     "holds": true,
+     "enabled": true,
+     "text": "Take a walk around the town center",
+     "tooltip": null
+    },
+    {
+     "id": "town_wait",
+     "holds": true,
+     "enabled": true,
+     "text": "Wait here for some time",
+     "tooltip": null
+    },
+    {
+     "id": "town_return_to_army",
+     "holds": false,
+     "enabled": false,
+     "text": "Return to Army",
+     "tooltip": null
+    },
+    {
+     "id": "town_leave",
+     "holds": true,
+     "enabled": true,
+     "text": "Leave",
+     "tooltip": null
+    }
+   ],
+   "port_menu": [
+    {
+     "id": "leave_option",
+     "holds": true,
+     "enabled": true,
+     "text": "Go to the town center",
+     "tooltip": null
+    },
+    {
+     "id": "leave_option_isleave",
+     "holds": false,
+     "enabled": false,
+     "text": "Go to the town center",
+     "tooltip": null
+    },
+    {
+     "id": "call_fleet",
+     "holds": false,
+     "enabled": false,
+     "text": "Call fleet",
+     "tooltip": null
+    },
+    {
+     "id": "inspect_fleet",
+     "holds": false,
+     "enabled": false,
+     "text": "Browse shipyard",
+     "tooltip": null
+    },
+    {
+     "id": "manage_fleet",
+     "holds": true,
+     "enabled": true,
+     "text": "Manage fleet",
+     "tooltip": null
+    },
+    {
+     "id": "repair_ships",
+     "holds": true,
+     "enabled": false,
+     "text": "Repair ships (0<img src=\"General\\Icons\\Coin@2x\" extend=\"6\">)",
+     "tooltip": "None of your ships are damaged."
+    },
+    {
+     "id": "trade",
+     "holds": true,
+     "enabled": true,
+     "text": "Trade",
+     "tooltip": null
+    },
+    {
+     "id": "enter_port",
+     "holds": true,
+     "enabled": true,
+     "text": "Take a walk around the port",
+     "tooltip": null
+    },
+    {
+     "id": "port_wait",
+     "holds": true,
+     "enabled": true,
+     "text": "Wait here for some time",
+     "tooltip": null
+    },
+    {
+     "id": "sail_option",
+     "holds": true,
+     "enabled": true,
+     "text": "Set sail",
+     "tooltip": null
+    }
+   ],
+   "town_outside": [
+    {
+     "id": "approach_gates",
+     "holds": true,
+     "enabled": true,
+     "text": "Approach the gates and hail the guard.",
+     "tooltip": null
+    },
+    {
+     "id": "town_disguise_yourself",
+     "holds": true,
+     "enabled": true,
+     "text": "Disguise yourself and sneak through the gate.",
+     "tooltip": null
+    },
+    {
+     "id": "town_besiege",
+     "holds": true,
+     "enabled": true,
+     "text": "Besiege the town.",
+     "tooltip": null
+    },
+    {
+     "id": "town_enter_cheat",
+     "holds": false,
+     "enabled": false,
+     "text": "Enter town (Cheat).",
+     "tooltip": null
+    },
+    {
+     "id": "town_outside_leave",
+     "holds": true,
+     "enabled": true,
+     "text": "Leave...",
+     "tooltip": null
+    }
+   ],
+   "menu_siege_strategies": [
+    {
+     "id": "menu_siege_strategies_lead_assault",
+     "holds": true,
+     "enabled": false,
+     "text": "Lead an assault",
+     "tooltip": "You need to wait for the siege equipment to be prepared."
+    },
+    {
+     "id": "menu_siege_strategies_order_troops",
+     "holds": true,
+     "enabled": false,
+     "text": "Send troops",
+     "tooltip": "You need to wait for the siege equipment to be prepared."
+    },
+    {
+     "id": "menu_siege_strategies_request_parley",
+     "holds": false,
+     "enabled": false,
+     "text": "Request a parley",
+     "tooltip": null
+    },
+    {
+     "id": "menu_siege_strategies_leave",
+     "holds": true,
+     "enabled": true,
+     "text": "Leave",
+     "tooltip": null
+    },
+    {
+     "id": "menu_siege_strategies_leave_army",
+     "holds": false,
+     "enabled": false,
+     "text": "Leave Army",
+     "tooltip": null
+    },
+    {
+     "id": "menu_siege_strategies_break_out_from_gate",
+     "holds": false,
+     "enabled": false,
+     "text": "Break out from gate",
+     "tooltip": null
+    },
+    {
+     "id": "menu_siege_strategies_break_out_from_port",
+     "holds": false,
+     "enabled": false,
+     "text": "Break out from port",
+     "tooltip": null
+    },
+    {
+     "id": "menu_siege_strategies_sally_out_from_gate",
+     "holds": false,
+     "enabled": false,
+     "text": "",
+     "tooltip": null
+    },
+    {
+     "id": "menu_siege_strategies_sally_out_from_port",
+     "holds": false,
+     "enabled": false,
+     "text": "",
+     "tooltip": null
+    },
+    {
+     "id": "menu_siege_strategies_ambush",
+     "holds": false,
+     "enabled": false,
+     "text": "Ambush",
+     "tooltip": null
+    }
+   ],
+   "menu_siege_strategies_break_siege": [
+    {
+     "id": "menu_siege_strategies_break_siege_return",
+     "holds": true,
+     "enabled": true,
+     "text": "Return to siege",
+     "tooltip": null
+    },
+    {
+     "id": "menu_siege_strategies_break_siege_go_on",
+     "holds": true,
+     "enabled": true,
+     "text": "Go on.",
+     "tooltip": null
+    }
+   ],
+   "village": [
+    {
+     "id": "revenue_farming_quest_collect_tax_menu_button",
+     "holds": false,
+     "enabled": false,
+     "text": "Collect revenue",
+     "tooltip": null
+    },
+    {
+     "id": "hostile_action",
+     "holds": true,
+     "enabled": true,
+     "text": "Take a hostile action",
+     "tooltip": null
+    },
+    {
+     "id": "recruit_volunteers",
+     "holds": true,
+     "enabled": true,
+     "text": "Recruit troops",
+     "tooltip": null
+    },
+    {
+     "id": "trade",
+     "holds": true,
+     "enabled": true,
+     "text": "Buy products",
+     "tooltip": null
+    },
+    {
+     "id": "village_center",
+     "holds": true,
+     "enabled": true,
+     "text": "Take a walk through the lands",
+     "tooltip": null
+    },
+    {
+     "id": "village_wait",
+     "holds": true,
+     "enabled": false,
+     "text": "Wait here for some time",
+     "tooltip": "You cannot wait in the village while you are at sea."
+    },
+    {
+     "id": "village_return_to_army",
+     "holds": false,
+     "enabled": false,
+     "text": "Return to Army",
+     "tooltip": null
+    },
+    {
+     "id": "disembark",
+     "holds": true,
+     "enabled": true,
+     "text": "Disembark",
+     "tooltip": null
+    },
+    {
+     "id": "leave_set_sail",
+     "holds": false,
+     "enabled": false,
+     "text": "Set Sail",
+     "tooltip": null
+    },
+    {
+     "id": "leave_at_sea",
+     "holds": true,
+     "enabled": true,
+     "text": "Leave",
+     "tooltip": null
+    },
+    {
+     "id": "leave",
+     "holds": false,
+     "enabled": false,
+     "text": "Leave",
+     "tooltip": null
+    }
+   ],
+   "encounter": [
+    {
+     "id": "continue_preparations",
+     "holds": false,
+     "enabled": false,
+     "text": "Continue siege preparations.",
+     "tooltip": null
+    },
+    {
+     "id": "village_raid_action",
+     "holds": false,
+     "enabled": false,
+     "text": "Plunder the village, then raze it.",
+     "tooltip": null
+    },
+    {
+     "id": "village_force_volunteer_action",
+     "holds": false,
+     "enabled": false,
+     "text": "Force notables to give you recruits.",
+     "tooltip": null
+    },
+    {
+     "id": "village_force_supplies_action",
+     "holds": false,
+     "enabled": false,
+     "text": "Force people to give you supplies.",
+     "tooltip": null
+    },
+    {
+     "id": "attack",
+     "holds": true,
+     "enabled": true,
+     "text": "Attack!",
+     "tooltip": null
+    },
+    {
+     "id": "capture_the_enemy",
+     "holds": false,
+     "enabled": false,
+     "text": "Capture the enemy.",
+     "tooltip": null
+    },
+    {
+     "id": "str_order_attack",
+     "holds": true,
+     "enabled": true,
+     "text": "Send ships.",
+     "tooltip": "Sea Battle\n\n• Light ships gain major bonus.\n• Heavy ships suffer major penalty.\n"
+    },
+    {
+     "id": "leave_soldiers_behind",
+     "holds": false,
+     "enabled": false,
+     "text": "Try to get away.",
+     "tooltip": null
+    },
+    {
+     "id": "surrender",
+     "holds": false,
+     "enabled": false,
+     "text": "Surrender.",
+     "tooltip": null
+    },
+    {
+     "id": "leave",
+     "holds": true,
+     "enabled": true,
+     "text": "Leave...",
+     "tooltip": null
+    },
+    {
+     "id": "abandon_army",
+     "holds": false,
+     "enabled": false,
+     "text": "Abandon army.",
+     "tooltip": null
+    },
+    {
+     "id": "go_back_to_settlement",
+     "holds": false,
+     "enabled": false,
+     "text": "Return to .",
+     "tooltip": null
+    }
+   ],
+   "village_hostile_action": [
+    {
+     "id": "raid_village",
+     "holds": true,
+     "enabled": true,
+     "text": "Raid the village",
+     "tooltip": null
+    },
+    {
+     "id": "force_peasants_to_give_volunteers",
+     "holds": true,
+     "enabled": true,
+     "text": "Force notables to give you recruits",
+     "tooltip": null
+    },
+    {
+     "id": "force_peasants_to_give_supplies",
+     "holds": true,
+     "enabled": true,
+     "text": "Force peasants to give you goods",
+     "tooltip": null
+    },
+    {
+     "id": "forget_it",
+     "holds": true,
+     "enabled": true,
+     "text": "Forget it",
+     "tooltip": null
+    }
+   ],
+   "raiding_village": [
+    {
+     "id": "raiding_village_end",
+     "holds": true,
+     "enabled": true,
+     "text": "End Raiding",
+     "tooltip": null
+    },
+    {
+     "id": "leave_army",
+     "holds": false,
+     "enabled": false,
+     "text": "Leave Army",
+     "tooltip": null
+    },
+    {
+     "id": "abandon_army",
+     "holds": false,
+     "enabled": false,
+     "text": "Abandon Army",
+     "tooltip": null
+    }
+   ],
+   "village_raid_ended_leaded_by_someone_else": [
+    {
+     "id": "continue",
+     "holds": true,
+     "enabled": true,
+     "text": "Continue",
+     "tooltip": null
+    }
+   ],
+   "player_raft_state_after_prisoner": [
+    {
+     "id": "continue",
+     "holds": true,
+     "enabled": true,
+     "text": "Continue",
+     "tooltip": null
+    }
+   ],
+   "player_raft_state_wait": [],
+   "player_raft_state_end": [
+    {
+     "id": "continue",
+     "holds": true,
+     "enabled": true,
+     "text": "Continue",
+     "tooltip": null
+    }
+   ]
+  },
+  "baselines": [
+   {
+    "at": "start",
+    "game": false,
+    "held": {},
+    "tracked": 20
+   },
+   {
+    "at": "end",
+    "game": false,
+    "held": {},
+    "tracked": 20
+   }
+  ],
+  "load": {
+   "save": "mnbl_probe52_A_designated",
+   "seconds": 404.0143263,
+   "vanillaStarted": false,
+   "worldId": "mnbl_1609fb72",
+   "instance": "54289731c1834480b40f56f007eea02b",
+   "loaded": true
+  },
+  "setup": {
+   "saveManagerReplaced": "SandBox.SandBoxSaveManager",
+   "playerIgnoredUntilDays": 91137.37496207407,
+   "playerCulture": "empire"
+  },
+  "traffic": {
+   "embarked": {
+    "bandit": 17,
+    "caravan": 8,
+    "lord": 117,
+    "villager": 53
+   },
+   "disembarked": {
+    "lord": 86
+   },
+   "problems": [],
+   "arrivalsByKind": {
+    "lord": 54
+   },
+   "atSeaAtStart": 149,
+   "checked": 228,
+   "problemCount": 0,
+   "portArrivals": 54,
+   "islandArrivals": 36,
+   "islandPortTowns": 21,
+   "islandsReached": [
+    "mnbl_1609fb72_t_02135fe588",
+    "mnbl_1609fb72_t_18dce31a8b",
+    "mnbl_1609fb72_t_33e9f6405e",
+    "mnbl_1609fb72_t_38c906c775",
+    "mnbl_1609fb72_t_3dd40e786f",
+    "mnbl_1609fb72_t_4a4ee84369",
+    "mnbl_1609fb72_t_652a339695",
+    "mnbl_1609fb72_t_7efe6a0c96",
+    "mnbl_1609fb72_t_96d91dc9a3",
+    "mnbl_1609fb72_t_a9bb2f10b0",
+    "mnbl_1609fb72_t_bb5436b93b",
+    "mnbl_1609fb72_t_c1093bcad9",
+    "mnbl_1609fb72_t_d92f348adf",
+    "mnbl_1609fb72_t_de424cc7cd",
+    "mnbl_1609fb72_t_e60ca08fa1"
+   ],
+   "portEntriesOverLand": 1069,
+   "atSeaAtEnd": 229
+  },
+  "voyage": {
+   "start": {
+    "id": "mnbl_1609fb72_t_30a1119e46",
+    "name": "Graflin (Age 2)",
+    "port": [
+     473.4375,
+     780.9375
+    ],
+    "gate": [
+     475.6647,
+     784.6012
+    ]
+   },
+   "mainland": {
+    "id": "mnbl_1609fb72_t_e7ed06396a",
+    "name": "Korpor (Age 2)",
+    "port": [
+     448.4375,
+     812.1875
+    ],
+    "gate": [
+     450.1105,
+     813.6383
+    ]
+   },
+   "island": {
+    "id": "mnbl_1609fb72_t_7efe6a0c96",
+    "name": "Frosrin",
+    "port": [
+     482.8125,
+     874.6875
+    ],
+    "gate": [
+     482.8125,
+     879.1598
+    ]
+   },
+   "village": {
+    "id": "mnbl_1609fb72_v_f924958cd5",
+    "name": "Frosrin Harbour",
+    "port": [
+     494.375,
+     878.125
+    ],
+    "gate": [
+     485.9375,
+     878.125
+    ]
+   },
+   "basin": 0,
+   "mainGroup": 0,
+   "pinned": true,
+   "islandPortTowns": [
+    "mnbl_1609fb72_t_02135fe588",
+    "mnbl_1609fb72_t_18dce31a8b",
+    "mnbl_1609fb72_t_33e9f6405e",
+    "mnbl_1609fb72_t_3591ac6a33",
+    "mnbl_1609fb72_t_38c906c775",
+    "mnbl_1609fb72_t_3dd40e786f",
+    "mnbl_1609fb72_t_4a4ee84369",
+    "mnbl_1609fb72_t_5372f23728",
+    "mnbl_1609fb72_t_652a339695",
+    "mnbl_1609fb72_t_7efe6a0c96",
+    "mnbl_1609fb72_t_96d91dc9a3",
+    "mnbl_1609fb72_t_a9bb2f10b0",
+    "mnbl_1609fb72_t_bb5436b93b",
+    "mnbl_1609fb72_t_bbe5821524",
+    "mnbl_1609fb72_t_c1093bcad9",
+    "mnbl_1609fb72_t_d92f348adf",
+    "mnbl_1609fb72_t_da31273eb4",
+    "mnbl_1609fb72_t_de424cc7cd",
+    "mnbl_1609fb72_t_e60ca08fa1",
+    "mnbl_1609fb72_t_ecf4b31651",
+    "mnbl_1609fb72_t_eebd8fd293"
+   ]
+  },
+  "pirates": {
+   "wrapper": true,
+   "planPoints": 53,
+   "frameError": null,
+   "clans": [
+    {
+     "clan": "northern_pirates",
+     "planned": 33,
+     "served": 33,
+     "servedOffNaval": 0,
+     "fromScene": 0,
+     "zones": 33,
+     "zonesFromServed": 33,
+     "parties": 27,
+     "withShips": 27,
+     "notAtSea": 0,
+     "offNavigation": 0,
+     "unassigned": 0,
+     "beyondZoneRadius": 0,
+     "inServedZone": 27
+    },
+    {
+     "clan": "southern_pirates",
+     "planned": 20,
+     "served": 20,
+     "servedOffNaval": 0,
+     "fromScene": 0,
+     "zones": 20,
+     "zonesFromServed": 20,
+     "parties": 17,
+     "withShips": 17,
+     "notAtSea": 0,
+     "offNavigation": 0,
+     "unassigned": 0,
+     "beyondZoneRadius": 1,
+     "inServedZone": 17
+    }
+   ],
+   "plannedForPirateClans": 53,
+   "served": 53,
+   "servedOffNaval": 0,
+   "zones": 53,
+   "zonesFromServed": 53,
+   "fromScene": 0,
+   "parties": 44,
+   "unassigned": 0,
+   "beyondZoneRadius": 1,
+   "offNavigation": 0,
+   "notAtSea": 0,
+   "pirateClans": 2,
+   "inServedZone": 44
+  },
+  "pirateBattleMissionScreenshot": "<home>\\AppData\\Local\\MNBL.ProceduralWorld\\autorun\\naval-46036-pirateBattleMission.bmp",
+  "raidMissionScreenshot": "<home>\\AppData\\Local\\MNBL.ProceduralWorld\\autorun\\naval-46036-raidMission.bmp",
+  "navalDefeatMissionScreenshot": "<home>\\AppData\\Local\\MNBL.ProceduralWorld\\autorun\\naval-46036-navalDefeatMission.bmp",
+  "menusSeen": [
+   "town",
+   "town",
+   "port_menu",
+   "port_menu",
+   "town",
+   "town",
+   "town",
+   "port_menu",
+   "town",
+   "town",
+   "port_menu",
+   "port_menu",
+   "town",
+   "town_outside",
+   "menu_siege_strategies",
+   "menu_siege_strategies_break_siege",
+   "town",
+   "port_menu",
+   "village",
+   "encounter",
+   "encounter",
+   "village",
+   "village_hostile_action",
+   "encounter",
+   "raiding_village",
+   "village_raid_ended_leaded_by_someone_else",
+   "encounter",
+   "player_raft_state_after_prisoner",
+   "player_raft_state_wait",
+   "player_raft_state_end"
+  ],
+  "reloads": 0,
+  "completed": true,
+  "ownedWorkCleanupComplete": true
+ },
+ "moduleAssembly": "D:\\SteamLibrary\\steamapps\\common\\Mount & Blade II Bannerlord\\Modules\\MNBL.ProceduralWorld\\bin\\Win64_Shipping_Client\\MNBL.ProceduralWorld.dll",
+ "moduleSha256": "3003e2930ccfff90a2d025e11d27f3a06b0a09bb31870a8ecd861b11699f1e4f",
+ "utc": "2026-10-18T12:51:19.2020124Z"
+}

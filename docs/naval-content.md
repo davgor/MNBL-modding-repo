@@ -163,9 +163,9 @@ Earlier runs:
 
 ## What this does not prove
 
-- **Scene entities:** MMR-40 bakes port markers, blockade arcs (every ship on water) and village drop-offs into a world's scene (`docs/settlement-entities.md`). Pirate spawn points are still intents (handed to MMR-53), so no pirate spawns (no patrol zone).
+- **Scene entities:** MMR-40 bakes port markers, blockade arcs (every ship on water) and village drop-offs into a world's scene (`docs/settlement-entities.md`). Pirate spawn points were intents at this run, so no pirate spawned (no patrol zone); MMR-39's naval scene wrapper now serves them, and MMR-53 found the patrol zones exactly the served points in play (`docs/naval-missions.md`).
 - **Crew, captain and reinforcement spawn points, and deck geometry in a mission:** the chain is verified down to each hull's nested prefab and deck navmesh file. The spawn points (`sp_troop_captain`, `sp_troop_crew_spawn` and the deck spawns) live in the prefab's nested links and are resolved only when a mission builds the ship. MMR-42 (mission scenes) and MMR-51 (naval play) own that. Crew troops come from the party roster, not from the hull.
 - **Ships a landlocked clan gains other than by trade** (loot after a battle) are sold by the installed trade logic over time, not refused.
 - **Engine snapping:** a world's ports are MMR-38's navigation port points, and MMR-40's port entities stand on them.
 - **Naval gameplay:** blockades, raids, naval battles and pirate encounters over many days are MMR-51's.
-- **The full world in game:** MMR-45 registers the full world (facilities and landings in its records) and gives its fleet rule and pirate spawn points to the naval scene wrapper. The facilities, landings and spawn points are verified offline. In play they are MMR-53's.
+- **The full world in game:** MMR-45 registers the full world (facilities and landings in its records) and gives its fleet rule and pirate spawn points to the naval scene wrapper. MMR-53 played them on world A (`docs/naval-missions.md`): the shipyard, voyages, the drop-off and a coastal landing, a blockade, pirate battles and a seaborne raid; the pirates patrol the served spawn points.

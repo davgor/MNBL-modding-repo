@@ -92,8 +92,13 @@ def main():
 
     gen = stated_seconds(budget, "generateWorld")
     keys = o["keys"]
-    check(("about %d seconds" % gen) in o["waitText"] and "campaign" not in o["waitText"] and set(budget["phases"]) == {"generateWorld"},
-          "the waiting time is the budget's largest generation measurement rounded up (%d s); no campaign-start time while starting is not offered" % gen, o["waitText"])
+    # MMR-56 added the first campaign start (startCampaign, stated in whole minutes rounded up); a run on a build whose budget had none shows
+    # no start sentence.
+    start = budget["phases"].get("startCampaign")
+    minutes = None if start is None else max(1, int(math.ceil(max(start["seconds"]) / 60.0)))
+    check(("about %d seconds" % gen) in o["waitText"] and set(budget["phases"]) <= {"generateWorld", "startCampaign"}
+          and (("about %d minutes" % minutes) in o["waitText"] if minutes else "campaign" not in o["waitText"]),
+          "the waiting time is the budget's largest generation measurement rounded up (%d s)%s" % (gen, "" if minutes is None else ", and its first campaign start's in whole minutes (%d)" % minutes), o["waitText"])
     check(keys["generationSeconds"] <= gen, "the generation finished within the stated waiting time", "%.1f s of %d s" % (keys["generationSeconds"], gen))
     check(keys["maxFrameGapSeconds"] < 0.5, "the engine thread kept ticking while generating (largest frame gap under 0.5 s)", "largest frame gap %.3f s" % keys["maxFrameGapSeconds"])
 

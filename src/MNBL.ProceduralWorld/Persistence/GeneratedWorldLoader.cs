@@ -250,10 +250,13 @@ namespace MNBL.ProceduralWorld.Persistence
             catch (InvalidDataException error) { throw Refuse(LoadPolicy.DamagedSave, "its world binding is malformed: " + error.Message); }
             if (binding == null) throw Refuse(LoadPolicy.NotGenerated, "the header names no generated world");
             Binding = binding;
-            if (header.BodyWhole != true) throw Refuse(LoadPolicy.DamagedSave, "its game data is not whole: " + (header.BodyProblem ?? "unchecked"));
+            // MMR-50: game data another program holds is not damage (WorldCompatibilityPolicy reports it the same).
+            if (header.BodyWhole == null) throw Refuse(LoadPolicy.Unavailable, "its game data cannot be read now" + (header.BodyProblem == null ? "" : " (" + header.BodyProblem + ")"));
+            if (header.BodyWhole != true) throw Refuse(LoadPolicy.DamagedSave, "its game data is not whole: " + (header.BodyProblem ?? "torn"));
             Report["binding"] = new Dictionary<string, object> { ["worldId"] = binding.WorldId, ["package"] = binding.PackageName, ["instance"] = binding.Instance, ["contentId"] = binding.ContentId };
             var running = Engine("the running build", () => WorldSaveBinding.Compatibility());
-            var refusal = LoadPolicy.Compatibility(SaveBindingContract.CompatibilityFrom(header.Metadata), running, Notes);
+            var savedBuild = SaveBindingContract.CompatibilityFrom(header.Metadata);
+            var refusal = savedBuild.Count == 0 ? LoadPolicy.LegacyCompatibility(LoadPolicy.LegacyBuild(header.Metadata), running, Notes) : LoadPolicy.Compatibility(savedBuild, running, Notes);
             if (refusal != null) throw new Refused(refusal);
             var plan = new LoadPlan { Compiled = binding.ContentId != WorldBinding.NoContent, Instance = binding.Instance, PackageDirectory = Path.Combine(GeneratedWorldPackage.Root, binding.PackageName) };
             if (plan.Compiled && !ActivationRequest.ValidInstance(binding.Instance)) throw Refuse(LoadPolicy.DamagedSave, "its campaign instance '" + binding.Instance + "' is not a campaign instance id");

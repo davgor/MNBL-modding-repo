@@ -44,14 +44,5 @@ if (!$ProducerPath) {
 }
 $producerHash = (Get-FileHash -LiteralPath $ProducerPath -Algorithm SHA256).Hash.ToLowerInvariant()
 if ($producerHash -ne $lock.producer.sha256) { throw "fwg.exe SHA256 $producerHash differs from tools.lock.json $($lock.producer.sha256)." }
-$bin = (New-Item -ItemType Directory -Path "$stage/bin/Win64_Shipping_Client" -Force).FullName
-Copy-Item -LiteralPath "$repo/Modules/MNBL.ProceduralWorld/SubModule.xml" -Destination "$stage/SubModule.xml"
-if (Test-Path -LiteralPath "$repo/Modules/MNBL.ProceduralWorld/GUI") { Copy-Item -LiteralPath "$repo/Modules/MNBL.ProceduralWorld/GUI" -Destination "$stage/GUI" -Recurse }
-Copy-Item -LiteralPath "$work/module/MNBL.ProceduralWorld.dll" -Destination $bin
-Copy-Item -LiteralPath $ProducerPath -Destination "$bin/fwg.exe"
-Copy-Item -LiteralPath "$work/worldbridge/Release/worldbridge.exe" -Destination $bin
-# The module refuses a producer or bridge that differs from these pins (GenerationProbe.VerifyPin); same format as Deploy-Dev.ps1.
-$utf8 = New-Object Text.UTF8Encoding $false
-[IO.File]::WriteAllText("$bin/fwg.sha256", $lock.producer.sha256 + "`n", $utf8)
-[IO.File]::WriteAllText("$bin/worldbridge.sha256", (Get-FileHash -LiteralPath "$bin/worldbridge.exe" -Algorithm SHA256).Hash.ToLowerInvariant() + "`n", $utf8)
+Copy-MnblProceduralWorldStage $repo $stage "$work/module/MNBL.ProceduralWorld.dll" $ProducerPath "$work/worldbridge/Release/worldbridge.exe" $lock.producer.sha256
 Write-Output "Staged MNBL.ProceduralWorld at $stage"

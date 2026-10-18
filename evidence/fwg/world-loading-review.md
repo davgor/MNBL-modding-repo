@@ -115,11 +115,49 @@ It found:
 
 Its time samples showed campaign time not advancing after the pursuit, with mode, lock, menu, encounter and inquiry all clear. The game's log for the run explained it: the encounter's meeting menu had started a conversation with the bandit leader. `PlayerEncounter.Finish` does not end that conversation, and the map stays frozen while it is open. A player ends it by talking. The probe now ends it as the game does (`ConversationManager.EndConversation`, `MapState.OnMapConversationOver`) before finishing the encounter. A probe defect, not a loader one: the fleet kept its target and transit through the load in every run.
 
+**Runs 16324, 5088 and 2804 (create)** narrowed the last probe issues:
+- **Run 16324.** With the conversation ended, time ran and the fleet completed its transit. The probe read the anchor's position in the gap before War Sails' next hourly tick sets it to the target, so it now runs time on until the position is set.
+- **Run 5088.** Cut off mid-load at the user's pause: the process exited during the navigation cache build, with no exception and no dump. Not counted.
+- **Run 2804.** Passed every check, the fleet included, except world B's prisoner. The lord was held at the save and at the load (B's comparison passed), then escaped within the next 2.4 campaign hours through the installed hourly escape. The check now requires the prisoner held at the load, and afterwards still held or escaped and free; held by another party, dead or gone still fail.
+
 ## Results
 
-(Filled from the accepted runs.)
+The accepted runs are on one build, worldbridge `776C160626D029E6`. `tools/summarize_two_world_matrix.py 48048 39860 28224` writes `evidence/persistence/two-world-matrix.json`. Every check is recomputed from the archived outputs, not taken from the probe's pass lines.
+
+**Create, run 48048: 37/37, status ok.**
+- **World A (seed 42) setup:**
+  - an AI lord embarked at sea;
+  - an AI lord fleet after a naval battle with pirates;
+  - ownership, a spawned party, a prisoner, a relation;
+  - a siege;
+  - a fleet called across the seam and moving at the save, another anchored by the seam;
+  - the player saved just after crossing the seam, with a bandit pursuing from across it;
+  - four planted non-canonical values (BehaviorTarget, last disembark, track, map event), each written at its canonical image.
+- **World B (fixture `mnbl_00059042`):** ownership, prisoner and relation.
+- **A through Continue.** One load for 285 per-frame calls. A equals its save: 0 AI retargets of 1007 parties, flagships and ship owners included. Then:
+  - the embarked party is still at sea;
+  - the pursuit ends in one encounter with no second crossing;
+  - the fleet arrives at its port.
+- **B through the load screen from inside A** (the loader checks, then ends A). B equals its save; after the load its time runs and its changes hold.
+- **Refusals from inside the running B** (torn → `damaged-save`, missing bundle → `missing-world`, other game version → `incompatible-build`). Each left B running on its map and ran the caller's cancel. World A's package and bundle were unchanged.
+- **A refused Continue** returned to the main menu.
+- **Baselines.** Every baseline held: 20 tracked statics at zero after each game.
+
+**Cold, run 39860 (a new process): 20/20, status ok.**
+- A's scene and reports were swept, then A was loaded. The scene was re-encoded from the bundle by the surface encoder only (14 s). Navigation and playability were restored from the activation evidence, and the settlement layout was re-derived and checked against the kept one. The load took 6.4 s, because this build's navigation caches were already built.
+- A equals its save, and the pursuit and the fleet behave as in the create run.
+- B was loaded from inside A and equals its save.
+- The probe's saves and the campaigns' initial saves were deleted, and the baseline held.
+
+**Load check, run 28224 (before the fixes): 3/3.** The first production load of a compiled world.
+
+**Criteria.**
+- **c1:** met for the ticket's sequence. The same-process and cold A/B loads restore both worlds' land and naval state, embarked and post-naval-battle fleets included, with owner, membership, flagship and crew compared value for value.
+- **c2:** met. No generator process ran in any load (only the surface encoder, once, to re-encode a swept scene). No object, frame or terrain context of one world was present after loading the other (the registry's full census).
+- **c3:** met. Missing and corrupt inputs refused before anything changed, from the menu and from a running campaign, and every baseline held after disposal.
 
 ## Limits
 
-- World B is a fixture world (`mnbl_00059042`, MMR-19), loaded through the same routing and loader but without a bundle or re-encoding.
-  A second compiled world needs a generator or policy change (production seed yield), outside this ticket.
+- World B is a fixture world (`mnbl_00059042`, MMR-19). It is loaded through the same routing and loader but has no bundle and no re-encoding. A second compiled world needs a generator or policy change (production seed yield), outside this ticket.
+- A failure after the start (`ReturnToMenu`) is implemented but not exercised in game. Every refusal before the start is. The stopped-engine detector is tested offline only.
+- The deferred re-encode (a swept scene loaded from inside another running compiled campaign) is implemented, but no run swept the scene of the world loaded from inside another; the cold run's re-encode loaded from the main menu.

@@ -82,7 +82,7 @@ namespace MNBL.ProceduralWorld.UI
             GenerateText = Text(WorldSetupText.Generate);
             SettingsTitleText = Text(WorldSetupText.Settings);
             HasWaitText = WaitTime.Available(model.Contract);
-            WaitText = HasWaitText ? Text(WorldSetupText.Wait, WaitTime.Variables(model.Contract)) : "";
+            WaitText = HasWaitText ? WaitTime.Text(model.Contract, Text) : "";
             DiagnosticsButtonText = Text(WorldSetupText.Diagnostics);
             StartCampaignText = Text(WorldSetupText.StartCampaign);
             ResumeText = Text(WorldSetupText.Resume); DiscardText = Text(WorldSetupText.Discard);

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Text;
 using System.Web.Script.Serialization;
@@ -280,17 +281,21 @@ internal static class RecoveryTests
 
         // Saves: bindings from the headers; the store's relationships.
         string saves = Path.Combine(temp, "Game Saves"); Directory.CreateDirectory(saves);
-        string package = "mnbl_1609fb72-0123456789ab";
+        // MMR-50: a package that verifies (world.json hashes to the binding's manifest hash), as a save is loadable only with its world whole.
+        var packageManifest = Encoding.UTF8.GetBytes(Json.Serialize(new Dictionary<string, object> { ["schema"] = WorldSaveTransfer.PackageSchema, ["worldId"] = "mnbl_1609fb72", ["seed"] = 42,
+            ["files"] = new Dictionary<string, object>(), ["sceneName"] = "mnbl_world_x", ["sceneFiles"] = new Dictionary<string, object>(), ["documents"] = new List<object>() }));
+        string packageSha = WorldSaveTransfer.Sha256Bytes(packageManifest);
+        string package = "mnbl_1609fb72-" + packageSha.Substring(0, 12);
         // A committed activation of bundle A, its initial save the bound one.
         journalStore.Abandon(journalStore.Journal(activeInstance), "test: one activation at a time");
         string committedInstance = Guid.NewGuid().ToString("N");
         var committedJournal = journalStore.Begin(new ActivationRequest { Instance = committedInstance, WorldContentId = contentA, ManifestSha256 = "0123456789ab" + new string('0', 52) });
         journalStore.Commit(committedJournal, "test");
-        Directory.CreateDirectory(Path.Combine(worlds, package)); File.WriteAllText(Path.Combine(worlds, package, "world.json"), "{}");
-        Save(Path.Combine(saves, "bound.sav"), new Dictionary<string, string> { ["mnbl.world.id"] = "mnbl_1609fb72", ["mnbl.world.manifestSha256"] = "0123456789ab" + new string('0', 52),
-            ["mnbl.world.instance"] = committedInstance, ["mnbl.world.contentId"] = contentA, ["mnbl.world.scene"] = "mnbl_world_x", ["UniqueGameId"] = "a" });
+        Directory.CreateDirectory(Path.Combine(worlds, package)); File.WriteAllBytes(Path.Combine(worlds, package, "world.json"), packageManifest);
+        Save(Path.Combine(saves, "bound.sav"), new Dictionary<string, string> { ["mnbl.world.id"] = "mnbl_1609fb72", ["mnbl.world.manifestSha256"] = packageSha,
+            ["mnbl.world.instance"] = committedInstance, ["mnbl.world.contentId"] = contentA, ["mnbl.world.scene"] = "mnbl_world_x", ["mnbl.world.seed"] = "42", ["UniqueGameId"] = "a", ["ApplicationVersion"] = "v1.4.8.119303" });
         Save(Path.Combine(saves, "orphan.sav"), new Dictionary<string, string> { ["mnbl.world.id"] = "mnbl_deadbeef", ["mnbl.world.manifestSha256"] = new string('9', 64),
-            ["mnbl.world.instance"] = Guid.NewGuid().ToString("N"), ["mnbl.world.contentId"] = new string('d', 64), ["mnbl.world.scene"] = "mnbl_world_y", ["UniqueGameId"] = "b" });
+            ["mnbl.world.instance"] = Guid.NewGuid().ToString("N"), ["mnbl.world.contentId"] = new string('d', 64), ["mnbl.world.scene"] = "mnbl_world_y", ["UniqueGameId"] = "b", ["ApplicationVersion"] = "v1.4.8.119303" });
         Save(Path.Combine(saves, "vanilla.sav"), new Dictionary<string, string> { ["UniqueGameId"] = "c" });
         File.WriteAllBytes(Path.Combine(saves, "torn.sav"), new byte[] { 1, 2 });
         var report = WorldInspector.Store(store, saves, host, lockNow, null);
@@ -317,10 +322,25 @@ internal static class RecoveryTests
     // The binding store's save header type (compiled in with the activation journal; the inspector reads headers itself).
     internal static SaveHeader Header(string name) { return new SaveHeader { Name = name, Metadata = null, BodyWhole = null, BodyProblem = null }; }
 
+    // A save in the installed format: Int32 header length, JSON {"List": metadata}, then deflated game data whole for SaveFileCheck (MMR-50:
+    // the inspector's verdict is the compatibility policy's, which reads the game data too).
     private static void Save(string path, Dictionary<string, string> metadata)
     {
         var json = Encoding.UTF8.GetBytes(Json.Serialize(new Dictionary<string, object> { ["List"] = metadata }));
-        using (var w = new BinaryWriter(File.Create(path))) { w.Write(json.Length); w.Write(json); w.Write(new byte[] { 0, 0, 0, 0 }); }
+        var random = new Random(json.Length);
+        Func<int, byte[]> bytes = n => { var b = new byte[n]; random.NextBytes(b); return b; };
+        using (var file = File.Create(path))
+        {
+            file.Write(BitConverter.GetBytes(json.Length), 0, 4); file.Write(json, 0, json.Length);
+            using (var deflate = new DeflateStream(file, CompressionLevel.Fastest, true))
+            using (var writer = new BinaryWriter(deflate))
+            {
+                var h = bytes(200); writer.Write(h.Length); writer.Write(h);
+                writer.Write(2); for (int i = 0; i < 2; i++) { var o = bytes(300); writer.Write(o.Length); writer.Write(o); }
+                writer.Write(1); { var c = bytes(100); writer.Write(c.Length); writer.Write(c); }
+                var s = bytes(500); writer.Write(s.Length); writer.Write(s);
+            }
+        }
     }
 
     private static void CopyTree(string from, string to)

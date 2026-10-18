@@ -114,6 +114,7 @@ Refusing means the player sees a message and the caller's cancel runs.
 | `incompatible-build` | another binding contract, save id base, identity schema, game or War Sails version; a bundle built for other versions | use the version the campaign was made with |
 | `not-rebuildable` | a rebuilt document, coordinate frame or climate differs; the scene re-encodes differently, or not within its limit; a report is missing and not kept, damaged, or fails its gate; the layout is not the activated one; the replay plan, the map scene or a periodic patch target refuses | use the version the campaign was made with |
 | `busy` | another load, a generation job, an activation, a campaign off its map | wait, or return to the campaign map |
+| `not-generated` | the save does not belong to a generated world (`LoadPolicy.NotGenerated`) | load it as a normal campaign |
 | `load-failed` | an unexpected error before the start (nothing was changed), or a failure after it | — |
 
 **Compatibility.**
@@ -183,3 +184,29 @@ MMR-63 left a hole. The per-tick seam pass runs before the hourly AI, so a targe
 - `CheckPositionsForMapChangeAndUpdateIfNeeded` moves a position only when it is not on naval navigation.
 
 With canonical positions, a fleet called across the seam keeps its target and its arrival time through a load, and is never snapped to the player.
+
+## Evidence
+
+**Offline.**
+- `tools/Test-WorldLoader.ps1`: 42/42, written to `evidence/persistence/loader-tests.json` and `.txt`. It covers compatibility, rebuilt documents, scene state, rebuilt values, routing, busy, stall, every refusal's text, and the lifetime scope.
+- `tools/Test-SaveBinding.ps1`: 77/77, including the v2 export's activation evidence (exported, verified, restored, reused, a conflict refused, a crash's temporary file cleaned).
+
+**In game.** The runs are summarized in `evidence/persistence/two-world-matrix.json` by `tools/summarize_two_world_matrix.py 48048 39860 28224`, which recomputes every check from the archived outputs.
+
+**Create, run 48048: 37/37.**
+- **World A (seed 42) setup:** an AI lord embarked at sea; an AI fleet after a naval battle with pirates; ownership, a spawned party, a prisoner, a relation; a siege; a fleet called across the seam and moving at the save, another anchored by the seam; the player saved just after crossing the seam with a bandit pursuing from across it; non-canonical values planted and saved canonical.
+- **World B (MMR-19's fixture world):** with its changes.
+- **A through Continue:** one load for 285 per-frame calls. A equals its save, flagships and ship owners included. The embarked party is still at sea, the pursuit ends in one encounter with no second crossing, and the fleet arrives at its port.
+- **B through the load screen from inside A.** B equals its save.
+- **Three refusals from inside the running B, and a refused Continue:** each before anything changed.
+- **Every baseline held.**
+
+**Cold, run 39860 (a new process): 20/20.**
+- A's swept scene was re-encoded by the surface encoder only (14 s). Navigation and playability were restored from the activation evidence, and the settlement layout was re-derived.
+- A and B equal their saves.
+- The probe's saves were deleted, and the baseline held.
+
+**Limits.**
+- World B is a fixture world: the production generator yields one activatable world today.
+- A failure after the start and a re-encode deferred behind a running campaign are implemented but not exercised in game.
+- The review and the runs that were not accepted are in `evidence/fwg/world-loading-review.md`.

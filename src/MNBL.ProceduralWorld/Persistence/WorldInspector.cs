@@ -65,7 +65,11 @@ namespace MNBL.ProceduralWorld.Persistence
         public static IDictionary<string, string> SaveMetadata(string path) { return SaveFolder.ReadMetadata(path); }
 
         // The whole store. savesFolder: the game's "Game Saves" folder (null: saves are not read); currentLock: this module's producer lock.
-        public static Dictionary<string, object> Store(string store, string savesFolder, WorldDataBundle.HostProfile host, string currentLock, string rootProblem)
+        // MMR-50: runningBuild (the mnbl.save.* keys of the running build, without the prefix; null: not compared) and sceneStore (the module's
+        // SceneObj folder; null: the scene and its reports are not checked) feed each save's compatibility decision (WorldCompatibilityPolicy):
+        // the read-only validation report before a load.
+        public static Dictionary<string, object> Store(string store, string savesFolder, WorldDataBundle.HostProfile host, string currentLock, string rootProblem,
+            IDictionary<string, string> runningBuild = null, string sceneStore = null)
         {
             store = Path.GetFullPath(store);
             var report = new Dictionary<string, object> { ["schema"] = "mnbl.world-inspection.v1", ["root"] = rootProblem == null ? "verified" : rootProblem,
@@ -138,7 +142,10 @@ namespace MNBL.ProceduralWorld.Persistence
                         Dictionary<string, object> b;
                         if (bundleStatus == null) bundleStatus = byContent.TryGetValue(binding.ContentId, out b) ? (string)b["status"] : Missing;
                         row["bundle"] = bundleStatus;
-                        row["loadable"] = (bool)row["packagePresent"] && (bundleStatus == Valid || binding.ContentId == WorldBinding.NoContent);
+                        var decision = WorldCompatibilityPolicy.Evaluate(WorldCompatibilityPolicy.Gather(file, store, sceneStore, host, runningBuild));
+                        row["compatibility"] = decision.Report((string)row["name"]);
+                        row["class"] = decision.Class;
+                        row["loadable"] = decision.Class != WorldCompatibilityPolicy.Unsupported;
                         if (binding.ContentId != WorldBinding.NoContent) { List<string> l; if (!referenced.TryGetValue(binding.ContentId, out l)) referenced[binding.ContentId] = l = new List<string>(); l.Add((string)row["name"]); }
                     }
                     catch (Exception error) { row["error"] = error.GetType().Name + ": " + error.Message; }
@@ -156,6 +163,7 @@ namespace MNBL.ProceduralWorld.Persistence
             report["summary"] = new Dictionary<string, object> {
                 ["bundles"] = bundles.GroupBy(b => (string)b["status"]).ToDictionary(g => g.Key, g => g.Count()),
                 ["savesBound"] = saves.Count(s => s.ContainsKey("instance")), ["savesLoadable"] = saves.Count(s => Equals(s.ContainsKey("loadable") ? s["loadable"] : null, true)),
+                ["savesByClass"] = saves.Where(s => s.ContainsKey("class")).GroupBy(s => (string)s["class"]).ToDictionary(g => g.Key, g => g.Count()),
                 ["unfinishedJobs"] = ((List<Dictionary<string, object>>)report["jobs"]).Count(j => !(bool)j["finished"]) };
             return report;
         }

@@ -1,0 +1,2907 @@
+{
+  "schema": "mnbl.evidence.campaign-soak",
+  "version": 1,
+  "ticket": "MMR-51",
+  "pid": "41920",
+  "result": "evidence/runtime/in-game/campaign_soak-41920.json",
+  "status": "ok",
+  "error": null,
+  "scenarioFile": {
+    "run": {
+      "schema": "mnbl.campaign-soak-scenarios.v1",
+      "sha256": "e93187290a922ecb878e047907fb1e15abc3e035c4e94a29badc3f08bf995dce"
+    },
+    "current": "2864f25c638e274b323c5b323216cad2bb81a69c636f8723877921c0d9df8716",
+    "note": "checked with the rules, hours and motion fractions the run recorded; regressions appended after the run change only the file's hash"
+  },
+  "failures": [],
+  "passed": 55,
+  "total": 55,
+  "scenarios": [
+    {
+      "id": "A.init",
+      "world": "A",
+      "source": "natural",
+      "what": "World A's new campaign initializes a coherent state: no invalid reference (owners, bound towns, leaders, rulers, governors, party leaders and clans, armies, home settlements), no settlement, clan or kingdom outside the world or its aliases, every town and castle with a garrison, food and an owner, every town with notables offering volunteers and a market of trade goods (a market sold out later is a recorded state of the economy), every kingdom with a living ruler, every party on valid navigation; lords, lord parties, caravans and bandits present; every semantic route (MMR-41: villages to their bound settlements, starts, capitals, ports) holds in the live campaign (CampaignPlayability: engine paths and the registered navigation caches). Villages without a trade town and towns without gold are recorded.",
+      "passed": true,
+      "checks": [
+        {
+          "check": "no invalid reference (0)",
+          "passed": true
+        },
+        {
+          "check": "no party off navigation (0)",
+          "passed": true
+        },
+        {
+          "check": "no settlement, clan or kingdom outside the world or its aliases (0)",
+          "passed": true
+        },
+        {
+          "check": "every town and castle garrisoned (71 of 71)",
+          "passed": true
+        },
+        {
+          "check": "every town fed (0 without food), offering volunteers (0 without) and stocking trade goods (0 without)",
+          "passed": true
+        },
+        {
+          "check": "lords 372, lord parties 151, caravans 118, bandit parties 364, kingdoms 40",
+          "passed": true
+        },
+        {
+          "check": "its semantic routes hold in the live campaign: 672 of 672 routes passed, 0 failures, activatable True",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "A.visit",
+      "world": "A",
+      "source": "player",
+      "what": "The player's party travels from its start town to the nearest other town by land (MapDistanceModel, default navigation) that offers it a volunteer and an affordable trade good, and the engine opens that town's settlement encounter (the town menu) on arrival, as when the player clicks the town; the player later leaves through the menu's leave path (PlayerEncounter.LeaveSettlement, Finish). Other parties ignore the player for the whole test (IgnoreByOtherPartiesTill, recorded as setup).",
+      "passed": true,
+      "checks": [
+        {
+          "check": "the player's party travelled 8.67 h by land from mnbl_1609fb72_t_38c906c775 to mnbl_1609fb72_t_266d733fa8 (no encounter before the move) and the engine opened its settlement encounter (menu town)",
+          "passed": true
+        },
+        {
+          "check": "the player left through the menu's leave path, back on the map",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "A.trade",
+      "world": "A",
+      "source": "player",
+      "what": "In that town the player buys one trade good and sells it back through the trade screen's logic: an InventoryLogic for the town built as InventoryScreenHelper.OpenScreenAsTrade builds it (the town menu's trade option; a no-op AfterTransfer handler stands in for the screen's refresh), one transfer each way, committed by DoneLogic. The stock moves one item each way, and the player's and the town's gold move by exactly the quoted prices.",
+      "passed": true,
+      "checks": [
+        {
+          "check": "bought one clay for 25 through the trade screen's logic (committed True): town stock -1, party stock +1, player gold -price, town gold +price",
+          "passed": true
+        },
+        {
+          "check": "sold it back for 21 (committed True): town stock +1, party stock -1, player gold +price, town gold -price",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "A.recruit",
+      "world": "A",
+      "source": "player",
+      "what": "In that town the player recruits one volunteer from a notable (the installed recruitment screen's domain sequence, RecruitmentVM.OnDone): the roster gains the troop, the gold drops by the model's cost, the notable's slot empties. The game decides the volunteer on offer, its availability and its cost.",
+      "passed": true,
+      "checks": [
+        {
+          "check": "recruited one vlandian_recruit from CharacterObject_1563 at mnbl_1609fb72_t_266d733fa8 for 20: roster +1, gold -cost, slot emptied",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "A.day",
+      "world": "A",
+      "source": "natural",
+      "what": "One campaign day of natural simulation with the player sheltered and holding: time advances without stalls, with no exception thrown from campaign code and no engine assert (both hooks proven by canaries); at least half of the lords, caravans, villagers and bandits move; no party leaves valid navigation, none has its path to a settlement not found (MobileParty._aiPathNotFound, read every frame) or stays stuck (travelling by its short-term behaviour yet not moving) for the stuck window, and no villager holds still for it without an installed reason (home village raided, target town besieged or at war; War Sails' fishing parties, a kind of their own, hold while fishing at their fishing point or roaming); caravans trade in towns, villagers sell their village's goods on entering their towns (SellGoodsForTradeAction.ApplyByVillagerTrade), lords recruit, no town runs out of food, no town is without gold for the whole day.",
+      "passed": true,
+      "checks": [
+        {
+          "check": "campaign time advanced 24.02 of 24 hours (0 stalls, 20 s)",
+          "passed": true
+        },
+        {
+          "check": "no exception thrown from campaign code (0 of 0 in all), no engine assert (0), no listener error; both canaries seen (exception True, assert True)",
+          "passed": true
+        },
+        {
+          "check": "no party position off navigation (0), no party whose path to a settlement was not found (0 of 0 unfound paths), none stuck for 6 h (0)",
+          "passed": true
+        },
+        {
+          "check": "no villager or fishing party holding for 6 h without an installed reason (0; 39 parties holding in all: {'bandit': 1, 'fishing': 34, 'lord': 3, 'patrol': 1})",
+          "passed": true
+        },
+        {
+          "check": "bandit moved: 294 of 369 (at least 50%)",
+          "passed": true
+        },
+        {
+          "check": "caravan moved: 118 of 118 (at least 50%)",
+          "passed": true
+        },
+        {
+          "check": "lord moved: 142 of 151 (at least 50%)",
+          "passed": true
+        },
+        {
+          "check": "villager moved: 43 of 65 (at least 50%)",
+          "passed": true
+        },
+        {
+          "check": "caravans traded in towns 137 times (5804 items); villagers entered towns 29 times and sold their village's goods 27 times (1602 items; 0 entries sold nothing to a town without gold)",
+          "passed": true
+        },
+        {
+          "check": "lords recruited 1014 times (1026 troops)",
+          "passed": true
+        },
+        {
+          "check": "no town without food at the end of the day (0: )",
+          "passed": true
+        },
+        {
+          "check": "no town without gold through the whole day (1 at the start: mnbl_1609fb72_t_30a1119e46; still none at the end: none)",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "A.replenish",
+      "world": "A",
+      "source": "natural",
+      "what": "After the day: volunteer slots empty at the start refill through the installed daily update across the world (operability, not a rate); the player's emptied slot and the traded good's town stock are recorded with the model's daily refill chance.",
+      "passed": true,
+      "checks": [
+        {
+          "check": "volunteer slots empty at the start refilled through the daily update: 887 of 2731 (operability, not a rate)",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "A.war",
+      "world": "A",
+      "source": "diagnostic",
+      "what": "A war declared between two kingdoms at peace, the target holding two or more fiefs (DeclareWarAction.ApplyByDefault): both stances at war and the event raised; the following hours' AI reaction is recorded as natural behaviour.",
+      "passed": true,
+      "checks": [
+        {
+          "check": "mnbl_1609fb72_k_02c999f4ad declared war on mnbl_1609fb72_k_1088c05c8d (3 fiefs): both stances at war, the event raised",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "A.ownership",
+      "world": "A",
+      "source": "diagnostic",
+      "what": "A town of the war's target passed to a lord of the declarer (ChangeOwnerOfSettlementAction.ApplyByDefault): owner clan, faction, bound villages, both clans' fiefs and the garrison follow, its notables stay, any governor is of the new clan, the event names both owners, and the target, keeping a fief, survives and stays at war (a kingdom left without fiefs is dissolved by the installed FactionDiscontinuationCampaignBehavior, as run 21164 showed).",
+      "passed": true,
+      "checks": [
+        {
+          "check": "mnbl_1609fb72_t_caf0eeb8c4 passed from mnbl_1609fb72_l_0fd00a637c to mnbl_1609fb72_l_9d9e9268b9: owner clan, faction of the declarer, 2 villages, fiefs, garrison, notables, governor and the event follow",
+          "passed": true
+        },
+        {
+          "check": "the target kingdom keeps a fief (3 before) and stays at war with the declarer",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "A.succession.clan",
+      "world": "A",
+      "source": "diagnostic",
+      "what": "A clan leader with adult kin dies of old age (KillCharacterAction.ApplyByOldAge), a clan with fiefs preferred: an heir of the clan leads it, the clan keeps its fiefs, the leader-changed event is raised, and nothing refers to the dead hero as a leader, governor or party member.",
+      "passed": true,
+      "checks": [
+        {
+          "check": "mnbl_1609fb72_h_388053cf7f of mnbl_1609fb72_l_0d02cd80cc died of old age: mnbl_1609fb72_h_2ebdb97aff leads the clan, its 3 fiefs kept, the event raised, no reference to the dead hero",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "A.succession.ruler",
+      "world": "A",
+      "source": "diagnostic",
+      "what": "A kingdom's ruler dies of old age, a kingdom with two or more candidate clans preferred: the outcome is the installed rule's (KillCharacterAction.ApplyInternal) for its candidates (clans not eliminated, not mercenaries, not led by the dead ruler): two or more, a king selection is added and, for a kingdom other than the player's, held at once by Kingdom.AddDecision (KingdomElection.StartElection), applying the elected ruling clan, one of the candidates (a ruling clan without an heir then gives the rule to another eligible clan); one, that clan rules; none, the kingdom is destroyed. The kingdom keeps a living leader of its ruling clan, and nothing refers to the dead ruler.",
+      "passed": true,
+      "checks": [
+        {
+          "check": "mnbl_1609fb72_h_c0de99aea1, ruler of mnbl_1609fb72_k_06eebb41b5, died of old age; 2 candidate clans (king selection): king selection added True, pending False, ruling clans applied ['mnbl_1609fb72_l_d78a71fdcb'], ruling clan mnbl_1609fb72_l_d78a71fdcb -> mnbl_1609fb72_l_d78a71fdcb (heir in it: True), led by mnbl_1609fb72_h_27b772cefc; no reference to the dead ruler",
+          "passed": true
+        },
+        {
+          "check": "the election branch was exercised (two or more candidate clans)",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "A.after",
+      "world": "A",
+      "source": "natural",
+      "what": "Six campaign hours after the diagnostic actions: time advances without stalls, campaign exceptions or engine asserts, the state stays coherent (no invalid reference, no party off navigation), and the war (elimination told apart from peace), the new owner and the heirs are recorded as the simulation left them.",
+      "passed": true,
+      "checks": [
+        {
+          "check": "campaign time advanced 6.01 of 6 hours (0 stalls, 5 s)",
+          "passed": true
+        },
+        {
+          "check": "no exception thrown from campaign code (0 of 0 in all), no engine assert (0), no listener error; both canaries seen (exception True, assert True)",
+          "passed": true
+        },
+        {
+          "check": "no party position off navigation (0), no party whose path to a settlement was not found (0 of 0 unfound paths), none stuck for 6 h (0)",
+          "passed": true
+        },
+        {
+          "check": "no villager or fishing party holding for 6 h without an installed reason (0; 4 parties holding in all: {'fishing': 3, 'lord': 1})",
+          "passed": true
+        },
+        {
+          "check": "no invalid reference (0)",
+          "passed": true
+        },
+        {
+          "check": "no party off navigation (0)",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "B.init",
+      "world": "B",
+      "source": "natural",
+      "what": "World B (MMR-19's fixture world, started after A ended in the same process) initializes its own state: nothing of A is registered or referenced, its campaign time starts fresh, its parties, notables, markets and food are its own and coherent, and its semantic routes hold in the live campaign (its fixture replaces no creation culture's start, so its refused player-start route is recorded as not applicable).",
+      "passed": true,
+      "checks": [
+        {
+          "check": "no invalid reference (0)",
+          "passed": true
+        },
+        {
+          "check": "no party off navigation (0)",
+          "passed": true
+        },
+        {
+          "check": "no settlement, clan or kingdom outside world B or its aliases (0)",
+          "passed": true
+        },
+        {
+          "check": "nothing of world A registered (0 objects) or referenced (0 ids of A's world); B's own objects 22",
+          "passed": true
+        },
+        {
+          "check": "B's campaign time starts fresh (day 91077.37; A started at day 91077.37 and ended at day 91078.99)",
+          "passed": true
+        },
+        {
+          "check": "B's towns fed (2 of 2), its markets stocked (2299 items), its notables offering volunteers (29 slots), every town and castle garrisoned (2 of 2), lord parties 2",
+          "passed": true
+        },
+        {
+          "check": "its semantic routes hold in the live campaign: 10 of 11 routes passed, 0 failures, the player-start route not applicable (1 refused: the fixture replaces no creation culture's start)",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "B.hours",
+      "world": "B",
+      "source": "natural",
+      "what": "Twelve campaign hours of B: time advances without stalls, campaign exceptions or engine asserts, at least half of its lords and caravans move on valid navigation, the state stays coherent.",
+      "passed": true,
+      "checks": [
+        {
+          "check": "campaign time advanced 12.00 of 12 hours (0 stalls, 10 s)",
+          "passed": true
+        },
+        {
+          "check": "no exception thrown from campaign code (0 of 0 in all), no engine assert (0), no listener error; both canaries seen (exception True, assert True)",
+          "passed": true
+        },
+        {
+          "check": "no party position off navigation (0), no party whose path to a settlement was not found (0 of 0 unfound paths), none stuck for 6 h (0)",
+          "passed": true
+        },
+        {
+          "check": "no villager or fishing party holding for 6 h without an installed reason (0; 0 parties holding in all: {})",
+          "passed": true
+        },
+        {
+          "check": "no invalid reference (0)",
+          "passed": true
+        },
+        {
+          "check": "no party off navigation (0)",
+          "passed": true
+        },
+        {
+          "check": "caravan moved: 3 of 4 (at least 50%)",
+          "passed": true
+        },
+        {
+          "check": "lord moved: 2 of 2 (at least 50%)",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "baselines",
+      "world": null,
+      "source": "harness",
+      "what": "No game and every tracked static at its baseline at the start and after each world ends.",
+      "passed": true,
+      "checks": [
+        {
+          "check": "start: no game, every tracked static at its baseline",
+          "passed": true
+        },
+        {
+          "check": "after world A ended: no game, every tracked static at its baseline",
+          "passed": true
+        },
+        {
+          "check": "after world B ended: no game, every tracked static at its baseline",
+          "passed": true
+        }
+      ]
+    }
+  ],
+  "worlds": {
+    "A": {
+      "seed": 42,
+      "worldId": "mnbl_1609fb72",
+      "startSeconds": 412.3942419,
+      "init": {
+        "census": {
+          "clan:bandit": 9,
+          "clan:minor": 1,
+          "clan:noble": 92,
+          "garrison": 71,
+          "hero:lord": 372,
+          "hero:notable": 909,
+          "hero:wanderer": 28,
+          "hideout:infested": 34,
+          "kingdom": 40,
+          "kingdom:fiefs:1": 22,
+          "kingdom:fiefs:2": 10,
+          "kingdom:fiefs:3": 5,
+          "kingdom:fiefs:4+": 3,
+          "party:bandit": 364,
+          "party:caravan": 118,
+          "party:fishing": 22,
+          "party:garrison": 71,
+          "party:lord": 151,
+          "party:militia": 286,
+          "party:patrol": 49,
+          "party:player": 1,
+          "settlement:castle": 26,
+          "settlement:hideout": 72,
+          "settlement:other": 1,
+          "settlement:town": 45,
+          "settlement:village": 215,
+          "town:noGold": 1
+        },
+        "wars": 0,
+        "invalid": [],
+        "unexpected": [],
+        "villagesWithoutTradeTown": [],
+        "townsWithoutGold": [
+          "mnbl_1609fb72_t_30a1119e46"
+        ],
+        "townsWithoutTradeGoods": [],
+        "economy": {
+          "townCount": 45,
+          "food": 18000,
+          "gold": 1107432,
+          "tradeGoodStacks": 603,
+          "marketItems": 31138,
+          "villageItems": 14292,
+          "volunteerSlotsFilled": 758,
+          "volunteerSlotsEmpty": 760
+        }
+      },
+      "playability": {
+        "activatable": true,
+        "routes": {
+          "total": 672,
+          "passed": 672,
+          "failed": 0,
+          "byCategory": {
+            "village-market": {
+              "routes": 430,
+              "passed": 430,
+              "types": {
+                "Default": 430
+              }
+            },
+            "capital-fief": {
+              "routes": 62,
+              "passed": 62,
+              "types": {
+                "Default": 62
+              }
+            },
+            "player-start": {
+              "routes": 42,
+              "passed": 42,
+              "types": {
+                "All": 16,
+                "Naval": 14,
+                "Default": 12
+              }
+            },
+            "port-to-port": {
+              "routes": 58,
+              "passed": 58,
+              "types": {
+                "Naval": 58
+              }
+            },
+            "faction-access": {
+              "routes": 80,
+              "passed": 80,
+              "types": {
+                "Default": 64,
+                "All": 16
+              }
+            }
+          }
+        },
+        "failures": [],
+        "failureCount": 0,
+        "notApplicable": [],
+        "startsChecked": true,
+        "flags": {
+          "total": 0,
+          "resolved": 0,
+          "failed": 0,
+          "byKind": {},
+          "failedFlags": []
+        },
+        "world": {
+          "sites": 286,
+          "portTowns": 30,
+          "kingdoms": [
+            {
+              "id": "mnbl_1609fb72_k_02c999f4ad",
+              "capital": "mnbl_1609fb72_t_30a1119e46",
+              "rulingClan": "mnbl_1609fb72_l_9d9e9268b9",
+              "naval": true,
+              "reason": "clan mnbl_1609fb72_l_9d9e9268b9 may hold ships (the fleet rule)"
+            },
+            {
+              "id": "mnbl_1609fb72_k_06eebb41b5",
+              "capital": "mnbl_1609fb72_t_18dce31a8b",
+              "rulingClan": "mnbl_1609fb72_l_d78a71fdcb",
+              "naval": true,
+              "reason": "clan mnbl_1609fb72_l_d78a71fdcb may hold ships (the fleet rule)"
+            },
+            {
+              "id": "mnbl_1609fb72_k_0828499ae3",
+              "capital": "mnbl_1609fb72_t_02135fe588",
+              "rulingClan": "mnbl_1609fb72_l_1cf250e5a9",
+              "naval": true,
+              "reason": "clan mnbl_1609fb72_l_1cf250e5a9 may hold ships (the fleet rule)"
+            },
+            {
+              "id": "mnbl_1609fb72_k_0a33a1e8bd",
+              "capital": "mnbl_1609fb72_t_bb5436b93b",
+              "rulingClan": "mnbl_1609fb72_l_c0df16c0d6",
+              "naval": true,
+              "reason": "clan mnbl_1609fb72_l_c0df16c0d6 may hold ships (the fleet rule)"
+            },
+            {
+              "id": "mnbl_1609fb72_k_0ec6776f68",
+              "capital": "mnbl_1609fb72_t_bbe5821524",
+              "rulingClan": "mnbl_1609fb72_l_0a68ec5a48",
+              "naval": true,
+              "reason": "clan mnbl_1609fb72_l_0a68ec5a48 may hold ships (the fleet rule)"
+            },
+            {
+              "id": "mnbl_1609fb72_k_1088c05c8d",
+              "capital": "mnbl_1609fb72_t_caf0eeb8c4",
+              "rulingClan": "mnbl_1609fb72_l_0fd00a637c",
+              "naval": true,
+              "reason": "clan mnbl_1609fb72_l_0fd00a637c may hold ships (the fleet rule)"
+            },
+            {
+              "id": "mnbl_1609fb72_k_12050ce578",
+              "capital": "mnbl_1609fb72_t_266d733fa8",
+              "rulingClan": "mnbl_1609fb72_l_227da99e96",
+              "naval": true,
+              "reason": "clan mnbl_1609fb72_l_227da99e96 may hold ships (the fleet rule)"
+            },
+            {
+              "id": "mnbl_1609fb72_k_182d59cd0c",
+              "capital": "mnbl_1609fb72_t_c1093bcad9",
+              "rulingClan": "mnbl_1609fb72_l_4589bbbe70",
+              "naval": true,
+              "reason": "clan mnbl_1609fb72_l_4589bbbe70 may hold ships (the fleet rule)"
+            },
+            {
+              "id": "mnbl_1609fb72_k_20495b7806",
+              "capital": "mnbl_1609fb72_t_7efe6a0c96",
+              "rulingClan": "mnbl_1609fb72_l_6e21250a6e",
+              "naval": true,
+              "reason": "clan mnbl_1609fb72_l_6e21250a6e may hold ships (the fleet rule)"
+            },
+            {
+              "id": "mnbl_1609fb72_k_233bf0b802",
+              "capital": "mnbl_1609fb72_t_da31273eb4",
+              "rulingClan": "mnbl_1609fb72_l_ddef31d573",
+              "naval": true,
+              "reason": "clan mnbl_1609fb72_l_ddef31d573 may hold ships (the fleet rule)"
+            },
+            {
+              "id": "mnbl_1609fb72_k_2f8a7b2695",
+              "capital": "mnbl_1609fb72_t_db07bde4dd",
+              "rulingClan": "mnbl_1609fb72_l_998c1993cf",
+              "naval": true,
+              "reason": "clan mnbl_1609fb72_l_998c1993cf may hold ships (the fleet rule)"
+            },
+            {
+              "id": "mnbl_1609fb72_k_35ccda72b0",
+              "capital": "mnbl_1609fb72_t_8e1456f833",
+              "rulingClan": "mnbl_1609fb72_l_5d04c7737a",
+              "naval": true,
+              "reason": "clan mnbl_1609fb72_l_5d04c7737a may hold ships (the fleet rule)"
+            },
+            {
+              "id": "mnbl_1609fb72_k_3f9b573679",
+              "capital": "mnbl_1609fb72_t_e7ed06396a",
+              "rulingClan": "mnbl_1609fb72_l_7a7349e94d",
+              "naval": true,
+              "reason": "clan mnbl_1609fb72_l_7a7349e94d may hold ships (the fleet rule)"
+            },
+            {
+              "id": "mnbl_1609fb72_k_4e1c3bc9eb",
+              "capital": "mnbl_1609fb72_t_de424cc7cd",
+              "rulingClan": "mnbl_1609fb72_l_dd54c573e2",
+              "naval": true,
+              "reason": "clan mnbl_1609fb72_l_dd54c573e2 may hold ships (the fleet rule)"
+            },
+            {
+              "id": "mnbl_1609fb72_k_582ebdd82f",
+              "capital": "mnbl_1609fb72_t_803bc3052d",
+              "rulingClan": "mnbl_1609fb72_l_7df35e15df",
+              "naval": true,
+              "reason": "clan mnbl_1609fb72_l_7df35e15df may hold ships (the fleet rule)"
+            },
+            {
+              "id": "mnbl_1609fb72_k_5e4d260b4b",
+              "capital": "mnbl_1609fb72_t_eebd8fd293",
+              "rulingClan": "mnbl_1609fb72_l_e375a51600",
+              "naval": true,
+              "reason": "clan mnbl_1609fb72_l_e375a51600 may hold ships (the fleet rule)"
+            },
+            {
+              "id": "mnbl_1609fb72_k_61b41cbb8e",
+              "capital": "mnbl_1609fb72_t_3591ac6a33",
+              "rulingClan": "mnbl_1609fb72_l_31aee57f34",
+              "naval": true,
+              "reason": "clan mnbl_1609fb72_l_31aee57f34 may hold ships (the fleet rule)"
+            },
+            {
+              "id": "mnbl_1609fb72_k_630b741d7c",
+              "capital": "mnbl_1609fb72_t_64245c0202",
+              "rulingClan": "mnbl_1609fb72_l_af22cabed9",
+              "naval": true,
+              "reason": "clan mnbl_1609fb72_l_af22cabed9 may hold ships (the fleet rule)"
+            },
+            {
+              "id": "mnbl_1609fb72_k_656790d73e",
+              "capital": "mnbl_1609fb72_t_35e7ca3644",
+              "rulingClan": "mnbl_1609fb72_l_b75d37c5f1",
+              "naval": true,
+              "reason": "clan mnbl_1609fb72_l_b75d37c5f1 may hold ships (the fleet rule)"
+            },
+            {
+              "id": "mnbl_1609fb72_k_69aee02e63",
+              "capital": "mnbl_1609fb72_t_33e9f6405e",
+              "rulingClan": "mnbl_1609fb72_l_02eaa73635",
+              "naval": true,
+              "reason": "clan mnbl_1609fb72_l_02eaa73635 may hold ships (the fleet rule)"
+            },
+            {
+              "id": "mnbl_1609fb72_k_7217a84b0e",
+              "capital": "mnbl_1609fb72_t_91e41e3505",
+              "rulingClan": "mnbl_1609fb72_l_86229a7e64",
+              "naval": true,
+              "reason": "clan mnbl_1609fb72_l_86229a7e64 may hold ships (the fleet rule)"
+            },
+            {
+              "id": "mnbl_1609fb72_k_721934292d",
+              "capital": "mnbl_1609fb72_t_652a339695",
+              "rulingClan": "mnbl_1609fb72_l_97bfc7cb60",
+              "naval": true,
+              "reason": "clan mnbl_1609fb72_l_97bfc7cb60 may hold ships (the fleet rule)"
+            },
+            {
+              "id": "mnbl_1609fb72_k_778d3bcb44",
+              "capital": "mnbl_1609fb72_t_d92f348adf",
+              "rulingClan": "mnbl_1609fb72_l_39f80f03bb",
+              "naval": true,
+              "reason": "clan mnbl_1609fb72_l_39f80f03bb may hold ships (the fleet rule)"
+            },
+            {
+              "id": "mnbl_1609fb72_k_7a91edb685",
+              "capital": "mnbl_1609fb72_t_96d91dc9a3",
+              "rulingClan": "mnbl_1609fb72_l_fe76b374cb",
+              "naval": true,
+              "reason": "clan mnbl_1609fb72_l_fe76b374cb may hold ships (the fleet rule)"
+            },
+            {
+              "id": "mnbl_1609fb72_k_8850480cb9",
+              "capital": "mnbl_1609fb72_t_26da4d0d23",
+              "rulingClan": "mnbl_1609fb72_l_ff3a0d335a",
+              "naval": true,
+              "reason": "clan mnbl_1609fb72_l_ff3a0d335a may hold ships (the fleet rule)"
+            },
+            {
+              "id": "mnbl_1609fb72_k_8b7bcd56ec",
+              "capital": "mnbl_1609fb72_t_a06de08e5b",
+              "rulingClan": "mnbl_1609fb72_l_2fde3b543e",
+              "naval": true,
+              "reason": "clan mnbl_1609fb72_l_2fde3b543e may hold ships (the fleet rule)"
+            },
+            {
+              "id": "mnbl_1609fb72_k_8d7719f9e6",
+              "capital": "mnbl_1609fb72_t_0c85a587ff",
+              "rulingClan": "mnbl_1609fb72_l_df410f9b83",
+              "naval": true,
+              "reason": "clan mnbl_1609fb72_l_df410f9b83 may hold ships (the fleet rule)"
+            },
+            {
+              "id": "mnbl_1609fb72_k_9ee7a5f56b",
+              "capital": "mnbl_1609fb72_t_4a4ee84369",
+              "rulingClan": "mnbl_1609fb72_l_49d3ef7273",
+              "naval": true,
+              "reason": "clan mnbl_1609fb72_l_49d3ef7273 may hold ships (the fleet rule)"
+            },
+            {
+              "id": "mnbl_1609fb72_k_a3436a4bb1",
+              "capital": "mnbl_1609fb72_t_3dd40e786f",
+              "rulingClan": "mnbl_1609fb72_l_17ad0f887d",
+              "naval": true,
+              "reason": "clan mnbl_1609fb72_l_17ad0f887d may hold ships (the fleet rule)"
+            },
+            {
+              "id": "mnbl_1609fb72_k_a4b4b957ac",
+              "capital": "mnbl_1609fb72_t_5c564ff552",
+              "rulingClan": "mnbl_1609fb72_l_79447272af",
+              "naval": true,
+              "reason": "clan mnbl_1609fb72_l_79447272af may hold ships (the fleet rule)"
+            },
+            {
+              "id": "mnbl_1609fb72_k_b187081dc4",
+              "capital": "mnbl_1609fb72_t_9447ebbe75",
+              "rulingClan": "mnbl_1609fb72_l_e0adf04fd2",
+              "naval": true,
+              "reason": "clan mnbl_1609fb72_l_e0adf04fd2 may hold ships (the fleet rule)"
+            },
+            {
+              "id": "mnbl_1609fb72_k_bee79b1465",
+              "capital": "mnbl_1609fb72_t_c5ddd8ea7e",
+              "rulingClan": "mnbl_1609fb72_l_ad3e82a4fc",
+              "naval": true,
+              "reason": "clan mnbl_1609fb72_l_ad3e82a4fc may hold ships (the fleet rule)"
+            },
+            {
+              "id": "mnbl_1609fb72_k_c31c68bd44",
+              "capital": "mnbl_1609fb72_t_b58aa76d2e",
+              "rulingClan": "mnbl_1609fb72_l_67771498b8",
+              "naval": true,
+              "reason": "clan mnbl_1609fb72_l_67771498b8 may hold ships (the fleet rule)"
+            },
+            {
+              "id": "mnbl_1609fb72_k_cb45569f1f",
+              "capital": "mnbl_1609fb72_t_8c18b565ee",
+              "rulingClan": "mnbl_1609fb72_l_89410c91f0",
+              "naval": true,
+              "reason": "clan mnbl_1609fb72_l_89410c91f0 may hold ships (the fleet rule)"
+            },
+            {
+              "id": "mnbl_1609fb72_k_cd29590fba",
+              "capital": "mnbl_1609fb72_t_a9bb2f10b0",
+              "rulingClan": "mnbl_1609fb72_l_c4498cca5b",
+              "naval": true,
+              "reason": "clan mnbl_1609fb72_l_c4498cca5b may hold ships (the fleet rule)"
+            },
+            {
+              "id": "mnbl_1609fb72_k_d2af303495",
+              "capital": "mnbl_1609fb72_t_e60ca08fa1",
+              "rulingClan": "mnbl_1609fb72_l_45e21fb560",
+              "naval": true,
+              "reason": "clan mnbl_1609fb72_l_45e21fb560 may hold ships (the fleet rule)"
+            },
+            {
+              "id": "mnbl_1609fb72_k_d4e5b2e1d4",
+              "capital": "mnbl_1609fb72_t_38c906c775",
+              "rulingClan": "mnbl_1609fb72_l_cc4edb27c6",
+              "naval": true,
+              "reason": "clan mnbl_1609fb72_l_cc4edb27c6 may hold ships (the fleet rule)"
+            },
+            {
+              "id": "mnbl_1609fb72_k_de9f25ee81",
+              "capital": "mnbl_1609fb72_t_eb208cfa45",
+              "rulingClan": "mnbl_1609fb72_l_1a568e7f5c",
+              "naval": true,
+              "reason": "clan mnbl_1609fb72_l_1a568e7f5c may hold ships (the fleet rule)"
+            },
+            {
+              "id": "mnbl_1609fb72_k_e01be0bf17",
+              "capital": "mnbl_1609fb72_t_2b31fce358",
+              "rulingClan": "mnbl_1609fb72_l_b3879ef01b",
+              "naval": true,
+              "reason": "clan mnbl_1609fb72_l_b3879ef01b may hold ships (the fleet rule)"
+            },
+            {
+              "id": "mnbl_1609fb72_k_f552348a1c",
+              "capital": "mnbl_1609fb72_t_5372f23728",
+              "rulingClan": "mnbl_1609fb72_l_cca5832749",
+              "naval": true,
+              "reason": "clan mnbl_1609fb72_l_cca5832749 may hold ships (the fleet rule)"
+            }
+          ],
+          "starts": [
+            {
+              "culture": "aserai",
+              "town": "mnbl_1609fb72_t_4a4ee84369",
+              "point": [
+                917.1875,
+                805.7222900390625
+              ]
+            },
+            {
+              "culture": "battania",
+              "town": "mnbl_1609fb72_t_a9bb2f10b0",
+              "point": [
+                1046.870849609375,
+                817.7028198242188
+              ]
+            },
+            {
+              "culture": "empire",
+              "town": "mnbl_1609fb72_t_38c906c775",
+              "point": [
+                1042.9791259765625,
+                699.3486938476562
+              ]
+            },
+            {
+              "culture": "khuzait",
+              "town": "mnbl_1609fb72_t_7efe6a0c96",
+              "point": [
+                482.8125,
+                879.1597900390625
+              ]
+            },
+            {
+              "culture": "nord",
+              "town": "mnbl_1609fb72_t_8c18b565ee",
+              "point": [
+                737.2064819335938,
+                671.1713256835938
+              ]
+            },
+            {
+              "culture": "sturgia",
+              "town": "mnbl_1609fb72_t_db07bde4dd",
+              "point": [
+                553.1632080078125,
+                694.23291015625
+              ]
+            },
+            {
+              "culture": "vlandia",
+              "town": "mnbl_1609fb72_t_02135fe588",
+              "point": [
+                917.1875,
+                838.0277099609375
+              ]
+            }
+          ],
+          "startCultures": null,
+          "excludedStarts": [],
+          "landGroups": 11,
+          "basins": 1,
+          "cachePairs": {
+            "Default": 64261,
+            "Naval": 5994,
+            "All": 109745
+          }
+        }
+      },
+      "visit": {
+        "setup": {
+          "playerIgnoredByOtherPartiesUntilDays": 91107.37496207407
+        },
+        "startTown": "mnbl_1609fb72_t_38c906c775",
+        "startDistance": 0,
+        "reachableTowns": 16,
+        "skippedNearer": [],
+        "town": "mnbl_1609fb72_t_266d733fa8",
+        "landDistance": 40.36994,
+        "volunteersOffered": 13,
+        "startHours": 2185856.999089778,
+        "encounterBefore": false,
+        "settlementBefore": null,
+        "travelHours": 8.674880305305123,
+        "travelSeconds": 8.851634700000034,
+        "inSettlement": "mnbl_1609fb72_t_266d733fa8",
+        "encounterSettlement": "mnbl_1609fb72_t_266d733fa8",
+        "menu": "town",
+        "trade": {
+          "tradeGoodsStocked": 3,
+          "item": "clay",
+          "buy": {
+            "direction": "buy",
+            "price": 25,
+            "totalAmount": 25,
+            "done": true
+          },
+          "sell": {
+            "direction": "sell",
+            "price": 21,
+            "totalAmount": -21,
+            "done": true
+          },
+          "before": {
+            "townStock": 7,
+            "partyStock": 0,
+            "gold": 1000,
+            "townGold": 38471
+          },
+          "afterBuy": {
+            "townStock": 6,
+            "partyStock": 1,
+            "gold": 975,
+            "townGold": 38496
+          },
+          "afterSell": {
+            "townStock": 7,
+            "partyStock": 0,
+            "gold": 996,
+            "townGold": 38475
+          }
+        },
+        "recruitment": {
+          "notables": 5,
+          "settlement": "mnbl_1609fb72_t_266d733fa8",
+          "notable": "CharacterObject_1563",
+          "slot": 2,
+          "troop": "vlandian_recruit",
+          "cost": 20,
+          "goldBefore": 996,
+          "countBefore": 0,
+          "dailyRefillChance": 0.5383527,
+          "goldAfter": 976,
+          "countAfter": 1,
+          "slotCleared": true
+        },
+        "leave": {
+          "inSettlement": null,
+          "encounter": false,
+          "menu": null
+        }
+      },
+      "day": {
+        "hours": 24,
+        "hoursAdvanced": 24.01963330572471,
+        "realSeconds": 20.090007100000037,
+        "setup": {
+          "playerIgnoredByOtherPartiesUntilDays": 91107.73641542014,
+          "playerHolding": true
+        },
+        "motion": {
+          "bandit": {
+            "tracked": 369,
+            "moved": 294,
+            "travelled": 14440.08,
+            "maxTravelled": 90.77
+          },
+          "caravan": {
+            "tracked": 118,
+            "moved": 118,
+            "travelled": 8499.94,
+            "maxTravelled": 116.31
+          },
+          "fishing": {
+            "tracked": 42,
+            "moved": 42,
+            "travelled": 1026.77,
+            "maxTravelled": 50.69
+          },
+          "garrison": {
+            "tracked": 71,
+            "moved": 0,
+            "travelled": 0,
+            "maxTravelled": 0
+          },
+          "lord": {
+            "tracked": 151,
+            "moved": 142,
+            "travelled": 6313.26,
+            "maxTravelled": 72.38
+          },
+          "militia": {
+            "tracked": 286,
+            "moved": 0,
+            "travelled": 0,
+            "maxTravelled": 0
+          },
+          "patrol": {
+            "tracked": 49,
+            "moved": 49,
+            "travelled": 2394.69,
+            "maxTravelled": 66.82
+          },
+          "villager": {
+            "tracked": 65,
+            "moved": 43,
+            "travelled": 583.35,
+            "maxTravelled": 48.33
+          }
+        },
+        "counters": {
+          "battle:FieldBattle": 71,
+          "battle:FieldBattle:naval": 1,
+          "battleEnded:FieldBattle": 74,
+          "created:bandit": 56,
+          "created:fishing": 15,
+          "created:villager": 48,
+          "destroyed:bandit": 80,
+          "entered:bandit>hideout": 1,
+          "entered:caravan>town": 70,
+          "entered:lord>castle": 33,
+          "entered:lord>town": 82,
+          "entered:lord>village": 33,
+          "entered:patrol>town": 4,
+          "entered:villager>castle": 3,
+          "entered:villager>town": 29,
+          "entered:villager>village": 78,
+          "recruited:lord": 1014,
+          "recruited:none": 33,
+          "recruitedTroops:lord": 1026,
+          "recruitedTroops:none": 33,
+          "trade:caravan": 137,
+          "tradeItems:caravan": 5804,
+          "villagerItemsSold": 1602,
+          "villagerSold": 27,
+          "villagerSoldNothing:onlyPackAnimals": 2
+        },
+        "samples": {
+          "recruited:lord": [
+            "mnbl_1609fb72_h_8dcd29057d @ mnbl_1609fb72_v_b270e818a6: 1 aserai_youth",
+            "mnbl_1609fb72_h_8dcd29057d @ mnbl_1609fb72_v_b270e818a6: 1 aserai_youth",
+            "mnbl_1609fb72_h_8dcd29057d @ mnbl_1609fb72_v_b270e818a6: 1 aserai_youth",
+            "mnbl_1609fb72_h_8dcd29057d @ mnbl_1609fb72_v_b270e818a6: 1 aserai_youth",
+            "mnbl_1609fb72_h_8dcd29057d @ mnbl_1609fb72_v_b270e818a6: 1 aserai_youth",
+            "mnbl_1609fb72_h_8dcd29057d @ mnbl_1609fb72_v_b270e818a6: 1 aserai_youth",
+            "mnbl_1609fb72_h_8dcd29057d @ mnbl_1609fb72_v_b270e818a6: 1 aserai_youth",
+            "mnbl_1609fb72_h_8dcd29057d @ mnbl_1609fb72_v_b270e818a6: 1 aserai_youth",
+            "mnbl_1609fb72_h_8dcd29057d @ mnbl_1609fb72_v_b270e818a6: 1 aserai_recruit",
+            "mnbl_1609fb72_h_8dcd29057d @ mnbl_1609fb72_v_b270e818a6: 1 aserai_youth",
+            "mnbl_1609fb72_h_8dcd29057d @ mnbl_1609fb72_v_b270e818a6: 1 aserai_recruit",
+            "mnbl_1609fb72_h_4bb3293dfd @ mnbl_1609fb72_t_30a1119e46: 2 western_mercenary"
+          ],
+          "trade:caravan": [
+            "caravan_template_vlandia_464 @ mnbl_1609fb72_t_d92f348adf: grape×14, salt×8, hardwood×15, whale_oil×2",
+            "caravan_template_vlandia_433 @ mnbl_1609fb72_t_35e7ca3644: meat×5, olives×8, walrus_tusk×1, fur×3",
+            "caravan_template_empire_427 @ mnbl_1609fb72_t_803bc3052d: whale_oil×-2, sheep×-3, fish×-11, clay×-5",
+            "caravan_template_vlandia_433 @ mnbl_1609fb72_t_35e7ca3644: oil×-5, planks×-6, wine×-14, fur×-3",
+            "caravan_template_aserai_473 @ mnbl_1609fb72_t_9447ebbe75: fish×-17, cotton×-1, clay×-5, hides×-1",
+            "caravan_template_sturgia_491 @ mnbl_1609fb72_t_db07bde4dd: planks×-3",
+            "caravan_template_vlandia_499 @ mnbl_1609fb72_t_35e7ca3644: clay×2, meat×3, hardwood×4, hog×2",
+            "caravan_template_aserai_460 @ mnbl_1609fb72_t_30a1119e46: butter×2, whale_oil×2, oil×1, cotton×3",
+            "caravan_template_aserai_460 @ mnbl_1609fb72_t_30a1119e46: oil×-1, olives×-1",
+            "caravan_template_vlandia_409 @ mnbl_1609fb72_t_803bc3052d: beer×16, tools×4, pottery×12, oil×18",
+            "caravan_template_aserai_467 @ mnbl_1609fb72_t_30a1119e46: whale_oil×1, clay×3, pottery×5, oil×4",
+            "caravan_template_vlandia_514 @ mnbl_1609fb72_t_803bc3052d: olives×4, silver×3"
+          ],
+          "battle:FieldBattle": [
+            "patrol_party_1_party_359 > looters_326",
+            "patrol_party_1_party_361 > looters_221",
+            "mnbl_1609fb72_h_d4aaca6fc7_party_1 > looters_270",
+            "patrol_party_1_party_375 > looters_202",
+            "patrol_party_1_party_382 > looters_211",
+            "mnbl_1609fb72_h_663bfc4bff_party_1 > looters_293",
+            "mnbl_1609fb72_h_75255d3010_party_1 > looters_253",
+            "mnbl_1609fb72_h_c38b757470_party_1 > looters_251",
+            "mnbl_1609fb72_h_e1fa5e48ae_party_1 > looters_239",
+            "patrol_party_1_party_351 > desert_bandits_89",
+            "patrol_party_1_party_373 > looters_204",
+            "patrol_party_1_party_350 > looters_186"
+          ],
+          "villagerSold": [
+            "villager_nord_template_526 @ mnbl_1609fb72_t_33e9f6405e: 24 items, trade gold 0 -> 2013",
+            "villager_sturgia_template_1 @ mnbl_1609fb72_t_d92f348adf: 35 items, trade gold 0 -> 1086",
+            "villager_nord_template_1 @ mnbl_1609fb72_t_8c18b565ee: 14 items, trade gold 0 -> 1066",
+            "villager_vlandia_template_524 @ mnbl_1609fb72_t_ecf4b31651: 46 items, trade gold 0 -> 453",
+            "villager_battania_template_525 @ mnbl_1609fb72_t_3dd40e786f: 71 items, trade gold 0 -> 2782",
+            "villager_battania_template_534 @ mnbl_1609fb72_t_a06de08e5b: 163 items, trade gold 0 -> 2588",
+            "villager_battania_template_535 @ mnbl_1609fb72_t_96d91dc9a3: 165 items, trade gold 0 -> 2087",
+            "villager_vlandia_template_522 @ mnbl_1609fb72_t_2b31fce358: 26 items, trade gold 0 -> 294",
+            "villager_vlandia_template_537 @ mnbl_1609fb72_t_eebd8fd293: 63 items, trade gold 0 -> 807",
+            "villager_vlandia_template_529 @ mnbl_1609fb72_t_ecf4b31651: 54 items, trade gold 0 -> 695",
+            "villager_vlandia_template_521 @ mnbl_1609fb72_t_3591ac6a33: 15 items, trade gold 0 -> 996",
+            "villager_empire_template_1 @ mnbl_1609fb72_t_da31273eb4: 61 items, trade gold 0 -> 3600"
+          ],
+          "recruited:none": [
+            "? @ mnbl_1609fb72_t_d92f348adf: 1 western_crossbow_t4",
+            "? @ mnbl_1609fb72_t_803bc3052d: 1 western_mercenary",
+            "? @ mnbl_1609fb72_t_da31273eb4: 1 western_mercenary_t4",
+            "? @ mnbl_1609fb72_t_803bc3052d: 1 western_mercenary",
+            "? @ mnbl_1609fb72_t_d92f348adf: 1 western_crossbow_t4",
+            "? @ mnbl_1609fb72_t_803bc3052d: 1 western_mercenary",
+            "? @ mnbl_1609fb72_t_da31273eb4: 1 western_mercenary_t4",
+            "? @ mnbl_1609fb72_t_38c906c775: 1 eastern_mercenary",
+            "? @ mnbl_1609fb72_t_caf0eeb8c4: 1 sword_sisters_sister_t5",
+            "? @ mnbl_1609fb72_t_38c906c775: 1 eastern_mercenary",
+            "? @ mnbl_1609fb72_t_8c18b565ee: 1 sword_sisters_sister_t3",
+            "? @ mnbl_1609fb72_t_8c18b565ee: 1 caravan_guard_nord"
+          ]
+        },
+        "stalls": [],
+        "stuck": [],
+        "holding": [
+          {
+            "party": "looters_325",
+            "kind": "bandit",
+            "position": [
+              1050.88,
+              809.89
+            ],
+            "shortTerm": "Hold",
+            "default": "PatrolAroundPoint",
+            "target": "mnbl_1609fb72_v_9bc516298d [Hold]",
+            "atSea": false,
+            "landCapable": true,
+            "disbanding": false,
+            "goods": 1,
+            "navigation": null,
+            "home": "mnbl_1609fb72_v_9bc516298d",
+            "sinceHours": 2185882.55,
+            "reason": "own AI decision"
+          },
+          {
+            "party": "mnbl_1609fb72_l_02eaa73635_1",
+            "kind": "fishing",
+            "position": [
+              816.32,
+              879.72
+            ],
+            "shortTerm": "Hold",
+            "default": "Hold",
+            "target": "(816.32, 879.72) [Hold, at sea]",
+            "atSea": true,
+            "landCapable": false,
+            "disbanding": false,
+            "goods": 5,
+            "navigation": null,
+            "home": "mnbl_1609fb72_v_b23bd58e31",
+            "sinceHours": 2185871.51,
+            "fishing": true,
+            "roaming": true,
+            "reason": "fishing at its fishing point"
+          },
+          {
+            "party": "mnbl_1609fb72_l_02eaa73635_533",
+            "kind": "fishing",
+            "position": [
+              844.73,
+              897.73
+            ],
+            "shortTerm": "Hold",
+            "default": "Hold",
+            "target": "(844.73, 897.73) [Hold, at sea]",
+            "atSea": true,
+            "landCapable": false,
+            "disbanding": false,
+            "goods": 3,
+            "navigation": null,
+            "home": "mnbl_1609fb72_v_b23bd58e31",
+            "sinceHours": 2185874.51,
+            "fishing": true,
+            "roaming": true,
+            "reason": "fishing at its fishing point"
+          },
+          {
+            "party": "mnbl_1609fb72_l_0d02cd80cc_1",
+            "kind": "fishing",
+            "position": [
+              934.69,
+              784.37
+            ],
+            "shortTerm": "Hold",
+            "default": "Hold",
+            "target": "(934.69, 784.37) [Hold, at sea]",
+            "atSea": true,
+            "landCapable": false,
+            "disbanding": false,
+            "goods": 4,
+            "navigation": null,
+            "home": "mnbl_1609fb72_v_99c26e68bf",
+            "sinceHours": 2185871.51,
+            "fishing": true,
+            "roaming": true,
+            "reason": "fishing at its fishing point"
+          },
+          {
+            "party": "mnbl_1609fb72_l_1a568e7f5c_1",
+            "kind": "fishing",
+            "position": [
+              509.95,
+              861.14
+            ],
+            "shortTerm": "Hold",
+            "default": "Hold",
+            "target": "(509.95, 861.14) [Hold, at sea]",
+            "atSea": true,
+            "landCapable": false,
+            "disbanding": false,
+            "goods": 3,
+            "navigation": null,
+            "home": "mnbl_1609fb72_v_1b54c2686d",
+            "sinceHours": 2185871.51,
+            "fishing": true,
+            "roaming": true,
+            "reason": "fishing at its fishing point"
+          },
+          {
+            "party": "mnbl_1609fb72_l_413e07561c_1",
+            "kind": "fishing",
+            "position": [
+              461.14,
+              754.77
+            ],
+            "shortTerm": "Hold",
+            "default": "Hold",
+            "target": "(461.14, 754.77) [Hold, at sea]",
+            "atSea": true,
+            "landCapable": false,
+            "disbanding": false,
+            "goods": 2,
+            "navigation": null,
+            "home": "mnbl_1609fb72_v_5ed243ea57",
+            "sinceHours": 2185871.51,
+            "fishing": true,
+            "roaming": true,
+            "reason": "fishing at its fishing point"
+          },
+          {
+            "party": "mnbl_1609fb72_l_413e07561c_588",
+            "kind": "fishing",
+            "position": [
+              479.24,
+              745.57
+            ],
+            "shortTerm": "Hold",
+            "default": "Hold",
+            "target": "(479.24, 745.57) [Hold, at sea]",
+            "atSea": true,
+            "landCapable": false,
+            "disbanding": false,
+            "goods": 0,
+            "navigation": null,
+            "home": "mnbl_1609fb72_v_5ed243ea57",
+            "sinceHours": 2185885.55,
+            "fishing": true,
+            "roaming": true,
+            "reason": "fishing at its fishing point"
+          },
+          {
+            "party": "mnbl_1609fb72_l_4589bbbe70_1",
+            "kind": "fishing",
+            "position": [
+              1023.11,
+              779.37
+            ],
+            "shortTerm": "Hold",
+            "default": "Hold",
+            "target": "(1023.11, 779.37) [Hold, at sea]",
+            "atSea": true,
+            "landCapable": false,
+            "disbanding": false,
+            "goods": 1,
+            "navigation": null,
+            "home": "mnbl_1609fb72_v_ca565dacb8",
+            "sinceHours": 2185873.55,
+            "fishing": true,
+            "roaming": true,
+            "reason": "fishing at its fishing point"
+          },
+          {
+            "party": "mnbl_1609fb72_l_45e21fb560_1",
+            "kind": "fishing",
+            "position": [
+              645.32,
+              729.25
+            ],
+            "shortTerm": "Hold",
+            "default": "Hold",
+            "target": "(645.32, 729.25) [Hold, at sea]",
+            "atSea": true,
+            "landCapable": false,
+            "disbanding": false,
+            "goods": 3,
+            "navigation": null,
+            "home": "mnbl_1609fb72_v_639d3dddd4",
+            "sinceHours": 2185871.51,
+            "fishing": true,
+            "roaming": true,
+            "reason": "fishing at its fishing point"
+          },
+          {
+            "party": "mnbl_1609fb72_l_45e21fb560_587",
+            "kind": "fishing",
+            "position": [
+              670.98,
+              746.67
+            ],
+            "shortTerm": "Hold",
+            "default": "Hold",
+            "target": "(670.98, 746.67) [Hold, at sea]",
+            "atSea": true,
+            "landCapable": false,
+            "disbanding": false,
+            "goods": 3,
+            "navigation": null,
+            "home": "mnbl_1609fb72_v_639d3dddd4",
+            "sinceHours": 2185884.53,
+            "fishing": true,
+            "roaming": true,
+            "reason": "fishing at its fishing point"
+          },
+          {
+            "party": "mnbl_1609fb72_l_6e21250a6e_1",
+            "kind": "fishing",
+            "position": [
+              499.99,
+              864.1
+            ],
+            "shortTerm": "Hold",
+            "default": "Hold",
+            "target": "(499.99, 864.1) [Hold, at sea]",
+            "atSea": true,
+            "landCapable": false,
+            "disbanding": false,
+            "goods": 1,
+            "navigation": null,
+            "home": "mnbl_1609fb72_v_f924958cd5",
+            "sinceHours": 2185871.51,
+            "fishing": true,
+            "roaming": true,
+            "reason": "fishing at its fishing point"
+          },
+          {
+            "party": "mnbl_1609fb72_l_7df35e15df_1",
+            "kind": "fishing",
+            "position": [
+              470.46,
+              721.01
+            ],
+            "shortTerm": "Hold",
+            "default": "Hold",
+            "target": "(470.46, 721.01) [Hold, at sea]",
+            "atSea": true,
+            "landCapable": false,
+            "disbanding": false,
+            "goods": 2,
+            "navigation": null,
+            "home": "mnbl_1609fb72_v_634c7d9978",
+            "sinceHours": 2185888.55,
+            "fishing": true,
+            "roaming": true,
+            "reason": "fishing at its fishing point"
+          },
+          {
+            "party": "mnbl_1609fb72_l_86229a7e64_1",
+            "kind": "fishing",
+            "position": [
+              533.47,
+              682.9
+            ],
+            "shortTerm": "Hold",
+            "default": "Hold",
+            "target": "(533.47, 682.9) [Hold, at sea]",
+            "atSea": true,
+            "landCapable": false,
+            "disbanding": false,
+            "goods": 4,
+            "navigation": null,
+            "home": "mnbl_1609fb72_v_78cdb8a2de",
+            "sinceHours": 2185872.53,
+            "fishing": true,
+            "roaming": true,
+            "reason": "fishing at its fishing point"
+          },
+          {
+            "party": "mnbl_1609fb72_l_86229a7e64_542",
+            "kind": "fishing",
+            "position": [
+              531.68,
+              690.1
+            ],
+            "shortTerm": "Hold",
+            "default": "Hold",
+            "target": "(531.68, 690.1) [Hold, at sea]",
+            "atSea": true,
+            "landCapable": false,
+            "disbanding": false,
+            "goods": 3,
+            "navigation": null,
+            "home": "mnbl_1609fb72_v_78cdb8a2de",
+            "sinceHours": 2185882.55,
+            "fishing": true,
+            "roaming": true,
+            "reason": "fishing at its fishing point"
+          },
+          {
+            "party": "mnbl_1609fb72_l_89410c91f0_1",
+            "kind": "fishing",
+            "position": [
+              997.88,
+              662.68
+            ],
+            "shortTerm": "Hold",
+            "default": "Hold",
+            "target": "(997.88, 662.68) [Hold, at sea]",
+            "atSea": true,
+            "landCapable": false,
+            "disbanding": false,
+            "goods": 4,
+            "navigation": null,
+            "home": "mnbl_1609fb72_v_1072e7b63c",
+            "sinceHours": 2185871.51,
+            "fishing": true,
+            "roaming": true,
+            "reason": "fishing at its fishing point"
+          },
+          {
+            "party": "mnbl_1609fb72_l_89410c91f0_3",
+            "kind": "fishing",
+            "position": [
+              834.08,
+              732.8
+            ],
+            "shortTerm": "Hold",
+            "default": "Hold",
+            "target": "(834.08, 732.8) [Hold, at sea]",
+            "atSea": true,
+            "landCapable": false,
+            "disbanding": false,
+            "goods": 8,
+            "navigation": null,
+            "home": "mnbl_1609fb72_v_409df0ca19",
+            "sinceHours": 2185882.55,
+            "fishing": true,
+            "roaming": true,
+            "reason": "fishing at its fishing point"
+          },
+          {
+            "party": "mnbl_1609fb72_l_89410c91f0_4",
+            "kind": "fishing",
+            "position": [
+              704.7,
+              676.18
+            ],
+            "shortTerm": "Hold",
+            "default": "Hold",
+            "target": "(704.7, 676.18) [Hold, at sea]",
+            "atSea": true,
+            "landCapable": false,
+            "disbanding": false,
+            "goods": 6,
+            "navigation": null,
+            "home": "mnbl_1609fb72_v_7bc6d793dc",
+            "sinceHours": 2185871.51,
+            "fishing": true,
+            "roaming": true,
+            "reason": "fishing at its fishing point"
+          },
+          {
+            "party": "mnbl_1609fb72_l_89410c91f0_5",
+            "kind": "fishing",
+            "position": [
+              843.25,
+              733.79
+            ],
+            "shortTerm": "Hold",
+            "default": "Hold",
+            "target": "(843.25, 733.79) [Hold, at sea]",
+            "atSea": true,
+            "landCapable": false,
+            "disbanding": false,
+            "goods": 4,
+            "navigation": null,
+            "home": "mnbl_1609fb72_v_da5c94780c",
+            "sinceHours": 2185871.51,
+            "fishing": true,
+            "roaming": true,
+            "reason": "fishing at its fishing point"
+          },
+          {
+            "party": "mnbl_1609fb72_l_a80727fc08_1",
+            "kind": "fishing",
+            "position": [
+              549.95,
+              687.97
+            ],
+            "shortTerm": "Hold",
+            "default": "Hold",
+            "target": "(549.95, 687.97) [Hold, at sea]",
+            "atSea": true,
+            "landCapable": false,
+            "disbanding": false,
+            "goods": 10,
+            "navigation": null,
+            "home": "mnbl_1609fb72_v_2a544157c4",
+            "sinceHours": 2185881.53,
+            "fishing": true,
+            "roaming": true,
+            "reason": "fishing at its fishing point"
+          },
+          {
+            "party": "mnbl_1609fb72_l_af22cabed9_1",
+            "kind": "fishing",
+            "position": [
+              1029.35,
+              826.1
+            ],
+            "shortTerm": "Hold",
+            "default": "Hold",
+            "target": "(1029.35, 826.1) [Hold, at sea]",
+            "atSea": true,
+            "landCapable": false,
+            "disbanding": false,
+            "goods": 4,
+            "navigation": null,
+            "home": "mnbl_1609fb72_v_1289119b8c",
+            "sinceHours": 2185871.51,
+            "fishing": true,
+            "roaming": true,
+            "reason": "fishing at its fishing point"
+          },
+          {
+            "party": "mnbl_1609fb72_l_af22cabed9_528",
+            "kind": "fishing",
+            "position": [
+              1048.75,
+              845.58
+            ],
+            "shortTerm": "Hold",
+            "default": "Hold",
+            "target": "(1048.75, 845.58) [Hold, at sea]",
+            "atSea": true,
+            "landCapable": false,
+            "disbanding": false,
+            "goods": 1,
+            "navigation": null,
+            "home": "mnbl_1609fb72_v_b80b409813",
+            "sinceHours": 2185875.53,
+            "fishing": true,
+            "roaming": true,
+            "reason": "fishing at its fishing point"
+          },
+          {
+            "party": "mnbl_1609fb72_l_b75d37c5f1_1",
+            "kind": "fishing",
+            "position": [
+              971.79,
+              849.27
+            ],
+            "shortTerm": "Hold",
+            "default": "Hold",
+            "target": "(971.79, 849.27) [Hold, at sea]",
+            "atSea": true,
+            "landCapable": false,
+            "disbanding": false,
+            "goods": 4,
+            "navigation": null,
+            "home": "mnbl_1609fb72_v_edd9e5c871",
+            "sinceHours": 2185871.51,
+            "fishing": true,
+            "roaming": true,
+            "reason": "fishing at its fishing point"
+          },
+          {
+            "party": "mnbl_1609fb72_l_c2571ad737_1",
+            "kind": "fishing",
+            "position": [
+              617.27,
+              727.31
+            ],
+            "shortTerm": "Hold",
+            "default": "Hold",
+            "target": "(617.27, 727.31) [Hold, at sea]",
+            "atSea": true,
+            "landCapable": false,
+            "disbanding": false,
+            "goods": 4,
+            "navigation": null,
+            "home": "mnbl_1609fb72_v_b3af9cdfe9",
+            "sinceHours": 2185871.51,
+            "fishing": true,
+            "roaming": true,
+            "reason": "fishing at its fishing point"
+          },
+          {
+            "party": "mnbl_1609fb72_l_cc4edb27c6_1",
+            "kind": "fishing",
+            "position": [
+              1041.16,
+              675.25
+            ],
+            "shortTerm": "Hold",
+            "default": "Hold",
+            "target": "(1041.16, 675.25) [Hold, at sea]",
+            "atSea": true,
+            "landCapable": false,
+            "disbanding": false,
+            "goods": 9,
+            "navigation": null,
+            "home": "mnbl_1609fb72_v_672b9d802a",
+            "sinceHours": 2185881.53,
+            "fishing": true,
+            "roaming": true,
+            "reason": "fishing at its fishing point"
+          },
+          {
+            "party": "mnbl_1609fb72_l_cc4edb27c6_571",
+            "kind": "fishing",
+            "position": [
+              1025.65,
+              687.2
+            ],
+            "shortTerm": "Hold",
+            "default": "Hold",
+            "target": "(1025.65, 687.2) [Hold, at sea]",
+            "atSea": true,
+            "landCapable": false,
+            "disbanding": false,
+            "goods": 6,
+            "navigation": null,
+            "home": "mnbl_1609fb72_v_67d3a8dea8",
+            "sinceHours": 2185885.55,
+            "fishing": true,
+            "roaming": true,
+            "reason": "fishing at its fishing point"
+          },
+          {
+            "party": "mnbl_1609fb72_l_cca5832749_1",
+            "kind": "fishing",
+            "position": [
+              618.69,
+              877.02
+            ],
+            "shortTerm": "Hold",
+            "default": "Hold",
+            "target": "(618.69, 877.02) [Hold, at sea]",
+            "atSea": true,
+            "landCapable": false,
+            "disbanding": false,
+            "goods": 2,
+            "navigation": null,
+            "home": "mnbl_1609fb72_v_0b5854cbae",
+            "sinceHours": 2185871.51,
+            "fishing": true,
+            "roaming": true,
+            "reason": "fishing at its fishing point"
+          },
+          {
+            "party": "mnbl_1609fb72_l_d78a71fdcb_1",
+            "kind": "fishing",
+            "position": [
+              409.79,
+              724.25
+            ],
+            "shortTerm": "Hold",
+            "default": "Hold",
+            "target": "(409.79, 724.25) [Hold, at sea]",
+            "atSea": true,
+            "landCapable": false,
+            "disbanding": false,
+            "goods": 3,
+            "navigation": null,
+            "home": "mnbl_1609fb72_v_ac0e94ac23",
+            "sinceHours": 2185877.51,
+            "fishing": true,
+            "roaming": true,
+            "reason": "fishing at its fishing point"
+          },
+          {
+            "party": "mnbl_1609fb72_l_dd54c573e2_1",
+            "kind": "fishing",
+            "position": [
+              444.8,
+              906.25
+            ],
+            "shortTerm": "Hold",
+            "default": "Hold",
+            "target": "(444.8, 906.25) [Hold, at sea]",
+            "atSea": true,
+            "landCapable": false,
+            "disbanding": false,
+            "goods": 3,
+            "navigation": null,
+            "home": "mnbl_1609fb72_v_345b480686",
+            "sinceHours": 2185871.51,
+            "fishing": true,
+            "roaming": true,
+            "reason": "fishing at its fishing point"
+          },
+          {
+            "party": "mnbl_1609fb72_l_dd54c573e2_2",
+            "kind": "fishing",
+            "position": [
+              423.95,
+              905.3
+            ],
+            "shortTerm": "Hold",
+            "default": "Hold",
+            "target": "(423.95, 905.3) [Hold, at sea]",
+            "atSea": true,
+            "landCapable": false,
+            "disbanding": false,
+            "goods": 3,
+            "navigation": null,
+            "home": "mnbl_1609fb72_v_369f400c73",
+            "sinceHours": 2185871.51,
+            "fishing": true,
+            "roaming": true,
+            "reason": "fishing at its fishing point"
+          },
+          {
+            "party": "mnbl_1609fb72_l_ddef31d573_1",
+            "kind": "fishing",
+            "position": [
+              840.37,
+              824.56
+            ],
+            "shortTerm": "Hold",
+            "default": "Hold",
+            "target": "(840.37, 824.56) [Hold, at sea]",
+            "atSea": true,
+            "landCapable": false,
+            "disbanding": false,
+            "goods": 1,
+            "navigation": null,
+            "home": "mnbl_1609fb72_v_7fa61dfa9d",
+            "sinceHours": 2185871.51,
+            "fishing": true,
+            "roaming": true,
+            "reason": "fishing at its fishing point"
+          },
+          {
+            "party": "mnbl_1609fb72_l_ddef31d573_520",
+            "kind": "fishing",
+            "position": [
+              858.47,
+              804.63
+            ],
+            "shortTerm": "Hold",
+            "default": "Hold",
+            "target": "(858.47, 804.63) [Hold, at sea]",
+            "atSea": true,
+            "landCapable": false,
+            "disbanding": false,
+            "goods": 2,
+            "navigation": null,
+            "home": "mnbl_1609fb72_v_f4813dc745",
+            "sinceHours": 2185873.55,
+            "fishing": true,
+            "roaming": true,
+            "reason": "fishing at its fishing point"
+          },
+          {
+            "party": "mnbl_1609fb72_l_ddef31d573_538",
+            "kind": "fishing",
+            "position": [
+              845.62,
+              831.92
+            ],
+            "shortTerm": "Hold",
+            "default": "Hold",
+            "target": "(845.62, 831.92) [Hold, at sea]",
+            "atSea": true,
+            "landCapable": false,
+            "disbanding": false,
+            "goods": 4,
+            "navigation": null,
+            "home": "mnbl_1609fb72_v_7fa61dfa9d",
+            "sinceHours": 2185882.55,
+            "fishing": true,
+            "roaming": true,
+            "reason": "fishing at its fishing point"
+          },
+          {
+            "party": "mnbl_1609fb72_l_df410f9b83_1",
+            "kind": "fishing",
+            "position": [
+              470.66,
+              771.21
+            ],
+            "shortTerm": "Hold",
+            "default": "Hold",
+            "target": "(470.66, 771.21) [Hold, at sea]",
+            "atSea": true,
+            "landCapable": false,
+            "disbanding": false,
+            "goods": 4,
+            "navigation": null,
+            "home": "mnbl_1609fb72_v_653a0b6d02",
+            "sinceHours": 2185871.51,
+            "fishing": true,
+            "roaming": true,
+            "reason": "fishing at its fishing point"
+          },
+          {
+            "party": "mnbl_1609fb72_l_e0adf04fd2_1",
+            "kind": "fishing",
+            "position": [
+              556.58,
+              832.24
+            ],
+            "shortTerm": "Hold",
+            "default": "Hold",
+            "target": "(556.58, 832.24) [Hold, at sea]",
+            "atSea": true,
+            "landCapable": false,
+            "disbanding": false,
+            "goods": 5,
+            "navigation": null,
+            "home": "mnbl_1609fb72_v_016001a1be",
+            "sinceHours": 2185871.51,
+            "fishing": true,
+            "roaming": true,
+            "reason": "fishing at its fishing point"
+          },
+          {
+            "party": "mnbl_1609fb72_l_ec83f7c40f_1",
+            "kind": "fishing",
+            "position": [
+              1016.69,
+              947.66
+            ],
+            "shortTerm": "Hold",
+            "default": "Hold",
+            "target": "(1016.69, 947.66) [Hold, at sea]",
+            "atSea": true,
+            "landCapable": false,
+            "disbanding": false,
+            "goods": 4,
+            "navigation": null,
+            "home": "mnbl_1609fb72_v_89ec3c58d0",
+            "sinceHours": 2185880.51,
+            "fishing": true,
+            "roaming": true,
+            "reason": "fishing at its fishing point"
+          },
+          {
+            "party": "mnbl_1609fb72_h_649e106e20_party_1",
+            "kind": "lord",
+            "position": [
+              860.19,
+              741.16
+            ],
+            "shortTerm": "Hold",
+            "default": "Hold",
+            "target": "(860.19, 741.16) [Hold]",
+            "atSea": false,
+            "landCapable": true,
+            "disbanding": false,
+            "goods": 146,
+            "navigation": null,
+            "home": "mnbl_1609fb72_t_b58aa76d2e",
+            "sinceHours": 2185881.53,
+            "reason": "own AI decision"
+          },
+          {
+            "party": "mnbl_1609fb72_h_c49ac22a55_party_1",
+            "kind": "lord",
+            "position": [
+              1025.56,
+              765.04
+            ],
+            "shortTerm": "Hold",
+            "default": "Hold",
+            "target": "(1025.56, 765.04) [Hold]",
+            "atSea": false,
+            "landCapable": true,
+            "disbanding": false,
+            "goods": 259,
+            "navigation": null,
+            "home": "mnbl_1609fb72_t_c1093bcad9",
+            "sinceHours": 2185881.53,
+            "reason": "own AI decision"
+          },
+          {
+            "party": "mnbl_1609fb72_h_e1fa5e48ae_party_1",
+            "kind": "lord",
+            "position": [
+              552.33,
+              692.29
+            ],
+            "shortTerm": "Hold",
+            "default": "Hold",
+            "target": "(552.33, 692.29) [Hold]",
+            "atSea": false,
+            "landCapable": true,
+            "disbanding": false,
+            "goods": 261,
+            "navigation": null,
+            "home": "mnbl_1609fb72_t_db07bde4dd",
+            "sinceHours": 2185885.55,
+            "reason": "own AI decision"
+          },
+          {
+            "party": "patrol_party_1_party_368",
+            "kind": "patrol",
+            "position": [
+              987.32,
+              918.1
+            ],
+            "shortTerm": "Hold",
+            "default": "Hold",
+            "target": "(987.32, 918.1) [Hold]",
+            "atSea": false,
+            "landCapable": true,
+            "disbanding": false,
+            "goods": 25,
+            "navigation": null,
+            "home": "mnbl_1609fb72_t_d92f348adf",
+            "sinceHours": 2185875.53,
+            "reason": "own AI decision"
+          }
+        ],
+        "holdingByKind": {
+          "bandit": 1,
+          "fishing": 34,
+          "lord": 3,
+          "patrol": 1
+        },
+        "holdingVillagersWithoutReason": 0,
+        "unfoundPaths": [],
+        "unfoundPathCount": 0,
+        "unfoundToSettlementCount": 0,
+        "offNavigation": [],
+        "thrownCount": 0,
+        "campaignThrown": 0,
+        "thrown": [],
+        "assertCount": 0,
+        "asserts": [],
+        "exceptionCanarySeen": true,
+        "assertCanarySeen": true,
+        "economyBefore": {
+          "townCount": 45,
+          "food": 17875.6,
+          "gold": 1303906,
+          "tradeGoodStacks": 358,
+          "marketItems": 16939,
+          "villageItems": 15554,
+          "volunteerSlotsFilled": 416,
+          "volunteerSlotsEmpty": 1102
+        },
+        "economyAfter": {
+          "townCount": 45,
+          "food": 17583,
+          "gold": 1146290,
+          "tradeGoodStacks": 387,
+          "marketItems": 14556,
+          "villageItems": 17844,
+          "volunteerSlotsFilled": 410,
+          "volunteerSlotsEmpty": 1108
+        }
+      },
+      "replenishment": {
+        "slots": 5388,
+        "emptyAtStart": 2731,
+        "refilled": 887,
+        "emptiedDuringDay": 342,
+        "emptyAtEnd": 2186,
+        "playerSlot": {
+          "slot": "CharacterObject_1563/2",
+          "now": "vlandian_recruit",
+          "refilled": true,
+          "dailyRefillChance": 0.5383527
+        },
+        "tradedGood": {
+          "item": "clay",
+          "stockAfterTrade": 7,
+          "stockAfterDay": 0
+        }
+      },
+      "afterDay": {
+        "census": {
+          "clan:bandit": 9,
+          "clan:minor": 1,
+          "clan:noble": 92,
+          "garrison": 71,
+          "hero:lord": 372,
+          "hero:notable": 909,
+          "hero:wanderer": 28,
+          "hideout:infested": 33,
+          "kingdom": 40,
+          "kingdom:fiefs:1": 22,
+          "kingdom:fiefs:2": 10,
+          "kingdom:fiefs:3": 5,
+          "kingdom:fiefs:4+": 3,
+          "party:bandit": 289,
+          "party:caravan": 118,
+          "party:fishing": 42,
+          "party:garrison": 71,
+          "party:lord": 151,
+          "party:militia": 286,
+          "party:patrol": 49,
+          "party:player": 1,
+          "party:villager": 66,
+          "settlement:castle": 26,
+          "settlement:hideout": 72,
+          "settlement:other": 1,
+          "settlement:town": 45,
+          "settlement:village": 215,
+          "town:noTradeGoods": 1,
+          "town:noVolunteers": 1
+        },
+        "wars": 0,
+        "invalid": [],
+        "unexpected": [],
+        "villagesWithoutTradeTown": [],
+        "townsWithoutGold": [],
+        "townsWithoutTradeGoods": [
+          "mnbl_1609fb72_t_266d733fa8"
+        ],
+        "economy": {
+          "townCount": 45,
+          "food": 17583,
+          "gold": 1146290,
+          "tradeGoodStacks": 387,
+          "marketItems": 14556,
+          "villageItems": 17844,
+          "volunteerSlotsFilled": 410,
+          "volunteerSlotsEmpty": 1108
+        }
+      },
+      "diagnostics": {
+        "events": [
+          "warDeclared mnbl_1609fb72_k_02c999f4ad mnbl_1609fb72_k_1088c05c8d Default",
+          "ownerChanged mnbl_1609fb72_t_caf0eeb8c4 mnbl_1609fb72_h_289a533ef4 mnbl_1609fb72_h_4bb3293dfd Default",
+          "clanLeaderChanged mnbl_1609fb72_h_388053cf7f mnbl_1609fb72_h_2ebdb97aff",
+          "heroKilled mnbl_1609fb72_h_388053cf7f DiedOfOldAge",
+          "clanLeaderChanged mnbl_1609fb72_h_c0de99aea1 mnbl_1609fb72_h_27b772cefc",
+          "decisionAdded KingSelectionKingdomDecision mnbl_1609fb72_k_06eebb41b5",
+          "rulingClanChanged mnbl_1609fb72_k_06eebb41b5 mnbl_1609fb72_l_d78a71fdcb",
+          "decisionConcluded KingSelectionKingdomDecision mnbl_1609fb72_k_06eebb41b5",
+          "heroKilled mnbl_1609fb72_h_c0de99aea1 DiedOfOldAge"
+        ],
+        "listenerErrors": [],
+        "war": {
+          "declarer": "mnbl_1609fb72_k_02c999f4ad",
+          "target": "mnbl_1609fb72_k_1088c05c8d",
+          "targetFiefs": 3,
+          "atWar": true,
+          "warsBefore": 0,
+          "warsAfter": 1,
+          "event": true
+        },
+        "ownershipTown": "mnbl_1609fb72_t_caf0eeb8c4",
+        "ownershipClan": "mnbl_1609fb72_l_9d9e9268b9",
+        "ownership": {
+          "town": "mnbl_1609fb72_t_caf0eeb8c4",
+          "from": "mnbl_1609fb72_l_0fd00a637c",
+          "to": "mnbl_1609fb72_l_9d9e9268b9",
+          "newOwnerHero": "mnbl_1609fb72_h_4bb3293dfd",
+          "ownerClan": "mnbl_1609fb72_l_9d9e9268b9",
+          "faction": "mnbl_1609fb72_k_02c999f4ad",
+          "villages": [
+            "mnbl_1609fb72_v_2780f545e7:mnbl_1609fb72_l_9d9e9268b9:mnbl_1609fb72_k_02c999f4ad",
+            "mnbl_1609fb72_v_aa9755779b:mnbl_1609fb72_l_9d9e9268b9:mnbl_1609fb72_k_02c999f4ad"
+          ],
+          "inNewFiefs": true,
+          "inOldFiefs": false,
+          "garrisonFaction": "mnbl_1609fb72_k_02c999f4ad",
+          "notablesKept": true,
+          "targetKingdomSurvives": true,
+          "stillAtWar": true,
+          "governor": null,
+          "event": true
+        },
+        "heirClan": "mnbl_1609fb72_l_0d02cd80cc",
+        "heir": "mnbl_1609fb72_h_2ebdb97aff",
+        "succession.clan": {
+          "clan": "mnbl_1609fb72_l_0d02cd80cc",
+          "victim": "mnbl_1609fb72_h_388053cf7f",
+          "victimParty": "mnbl_1609fb72_h_388053cf7f_party_1",
+          "dead": true,
+          "newLeader": "mnbl_1609fb72_h_2ebdb97aff",
+          "newLeaderAlive": true,
+          "eliminated": false,
+          "fiefsKept": true,
+          "fiefs": 3,
+          "governedByVictim": [],
+          "event": true,
+          "deadReferences": []
+        },
+        "rulerKingdom": "mnbl_1609fb72_k_06eebb41b5",
+        "succession.ruler": {
+          "kingdom": "mnbl_1609fb72_k_06eebb41b5",
+          "victim": "mnbl_1609fb72_h_c0de99aea1",
+          "dead": true,
+          "rulingClanBefore": "mnbl_1609fb72_l_d78a71fdcb",
+          "candidates": [
+            "mnbl_1609fb72_l_119460bd0b",
+            "mnbl_1609fb72_l_d78a71fdcb"
+          ],
+          "rulingClanHadHeir": true,
+          "branch": "king selection",
+          "rulingClan": "mnbl_1609fb72_l_d78a71fdcb",
+          "leader": "mnbl_1609fb72_h_27b772cefc",
+          "leaderAlive": true,
+          "eliminated": false,
+          "kingSelectionPending": false,
+          "rulingClanChanged": false,
+          "kingSelectionAdded": true,
+          "kingSelectionConcluded": true,
+          "rulingClansApplied": [
+            "mnbl_1609fb72_l_d78a71fdcb"
+          ],
+          "playerKingdom": false,
+          "deadReferences": []
+        },
+        "warDeclarer": "mnbl_1609fb72_k_02c999f4ad",
+        "warTarget": "mnbl_1609fb72_k_1088c05c8d"
+      },
+      "after": {
+        "hours": 6,
+        "hoursAdvanced": 6.014736277516931,
+        "realSeconds": 5.4137344999999755,
+        "setup": {
+          "playerIgnoredByOtherPartiesUntilDays": 91108.73723347453,
+          "playerHolding": true
+        },
+        "motion": {
+          "bandit": {
+            "tracked": 305,
+            "moved": 212,
+            "travelled": 3021.85,
+            "maxTravelled": 25.7
+          },
+          "caravan": {
+            "tracked": 118,
+            "moved": 117,
+            "travelled": 2078.42,
+            "maxTravelled": 30.91
+          },
+          "fishing": {
+            "tracked": 44,
+            "moved": 40,
+            "travelled": 408.42,
+            "maxTravelled": 22.64
+          },
+          "garrison": {
+            "tracked": 71,
+            "moved": 0,
+            "travelled": 0,
+            "maxTravelled": 0
+          },
+          "lord": {
+            "tracked": 151,
+            "moved": 126,
+            "travelled": 1588.66,
+            "maxTravelled": 17.91
+          },
+          "militia": {
+            "tracked": 286,
+            "moved": 0,
+            "travelled": 0,
+            "maxTravelled": 0
+          },
+          "patrol": {
+            "tracked": 48,
+            "moved": 47,
+            "travelled": 594.71,
+            "maxTravelled": 25.41
+          },
+          "villager": {
+            "tracked": 73,
+            "moved": 43,
+            "travelled": 332.07,
+            "maxTravelled": 17.13
+          }
+        },
+        "counters": {
+          "battle:FieldBattle": 11,
+          "battle:FieldBattle:naval": 1,
+          "battle:Raid": 1,
+          "battleEnded:FieldBattle": 9,
+          "created:bandit": 16,
+          "created:fishing": 2,
+          "created:villager": 7,
+          "destroyed:bandit": 8,
+          "destroyed:patrol": 1,
+          "entered:caravan>town": 21,
+          "entered:lord>castle": 7,
+          "entered:lord>town": 12,
+          "entered:lord>village": 3,
+          "entered:patrol>town": 2,
+          "entered:villager>castle": 1,
+          "entered:villager>town": 21,
+          "entered:villager>village": 21,
+          "heroKilled:Lost": 1,
+          "recruited:lord": 138,
+          "recruited:none": 2,
+          "recruitedTroops:lord": 143,
+          "recruitedTroops:none": 2,
+          "trade:caravan": 37,
+          "tradeItems:caravan": 2029,
+          "villagerItemsSold": 1163,
+          "villagerSold": 16,
+          "villagerSoldNothing:onlyPackAnimals": 3
+        },
+        "samples": {
+          "recruited:lord": [
+            "mnbl_1609fb72_h_be0a0d4f55 @ mnbl_1609fb72_t_5372f23728: 1 sword_sisters_sister_t3",
+            "mnbl_1609fb72_h_be0a0d4f55 @ mnbl_1609fb72_t_5372f23728: 1 nord_youngling",
+            "mnbl_1609fb72_h_990ae3e56b @ mnbl_1609fb72_t_de424cc7cd: 2 eastern_mercenary",
+            "mnbl_1609fb72_h_990ae3e56b @ mnbl_1609fb72_t_de424cc7cd: 1 eastern_mercenary",
+            "mnbl_1609fb72_h_990ae3e56b @ mnbl_1609fb72_t_de424cc7cd: 1 eastern_mercenary",
+            "mnbl_1609fb72_h_adc9848867 @ mnbl_1609fb72_v_9bc7861793: 1 khuzait_nomad",
+            "mnbl_1609fb72_h_adc9848867 @ mnbl_1609fb72_v_9bc7861793: 1 khuzait_nomad",
+            "mnbl_1609fb72_h_bdfd85d742 @ mnbl_1609fb72_v_eec54e8c3a: 1 sturgian_warrior_son",
+            "mnbl_1609fb72_h_3d680620bd @ mnbl_1609fb72_t_9447ebbe75: 1 aserai_recruit",
+            "mnbl_1609fb72_h_3d680620bd @ mnbl_1609fb72_t_9447ebbe75: 1 aserai_recruit",
+            "mnbl_1609fb72_h_3d680620bd @ mnbl_1609fb72_t_9447ebbe75: 1 aserai_recruit",
+            "mnbl_1609fb72_h_3d680620bd @ mnbl_1609fb72_t_9447ebbe75: 1 aserai_recruit"
+          ],
+          "trade:caravan": [
+            "caravan_template_aserai_437 @ mnbl_1609fb72_t_e7ed06396a: oil×-6, pottery×-7, beer×-8, date_fruit×-10",
+            "caravan_template_empire_500 @ mnbl_1609fb72_t_33e9f6405e: grain×12, grape×3, date_fruit×1, leather×15",
+            "caravan_template_empire_500 @ mnbl_1609fb72_t_33e9f6405e: linen×-14, leather×-15, salt×-22, whale_oil×-6",
+            "caravan_template_battania_502 @ mnbl_1609fb72_t_de424cc7cd: hardwood×-32, beer×-2, fish×-42, clay×-7",
+            "caravan_template_aserai_466 @ mnbl_1609fb72_t_26da4d0d23: leather×4, jewelry×2",
+            "caravan_template_nord_453 @ mnbl_1609fb72_t_b58aa76d2e: meat×1, hides×2, date_fruit×1, silver×1",
+            "caravan_template_khuzait_481 @ mnbl_1609fb72_t_96d91dc9a3: cotton×2, silver×3, wool×14, iron×13",
+            "caravan_template_empire_432 @ mnbl_1609fb72_t_652a339695: grain×-27, sumpter_horse×-1",
+            "caravan_template_aserai_495 @ mnbl_1609fb72_t_e7ed06396a: whale_oil×1, fish×8, date_fruit×8",
+            "caravan_template_nord_453 @ mnbl_1609fb72_t_b58aa76d2e: tools×-4, pottery×-3, linen×-2, wool×-46",
+            "caravan_template_nord_413 @ mnbl_1609fb72_t_35e7ca3644: beer×7, leather×5, velvet×1, felt×4",
+            "caravan_template_empire_1 @ mnbl_1609fb72_t_26da4d0d23: grain×9, fish×12, mule×4, sumpter_horse×2"
+          ],
+          "villagerSold": [
+            "villager_battania_template_557 @ mnbl_1609fb72_t_db2d888bf1: 49 items, trade gold 0 -> 1513",
+            "villager_aserai_template_573 @ mnbl_1609fb72_t_4a4ee84369: 39 items, trade gold 0 -> 2269",
+            "villager_empire_template_589 @ mnbl_1609fb72_t_38c906c775: 123 items, trade gold 0 -> 1287",
+            "villager_aserai_template_602 @ mnbl_1609fb72_t_eb208cfa45: 54 items, trade gold 0 -> 1350",
+            "villager_nord_template_527 @ mnbl_1609fb72_t_a81734c1d7: 51 items, trade gold 0 -> 346",
+            "villager_empire_template_614 @ mnbl_1609fb72_t_803bc3052d: 145 items, trade gold 0 -> 1594",
+            "villager_battania_template_632 @ mnbl_1609fb72_t_3dd40e786f: 131 items, trade gold 0 -> 2136",
+            "villager_khuzait_template_644 @ mnbl_1609fb72_t_18dce31a8b: 23 items, trade gold 0 -> 3665",
+            "villager_vlandia_template_647 @ mnbl_1609fb72_t_26da4d0d23: 29 items, trade gold 0 -> 455",
+            "villager_aserai_template_574 @ mnbl_1609fb72_t_64245c0202: 45 items, trade gold 0 -> 495",
+            "villager_aserai_template_605 @ mnbl_1609fb72_t_0c85a587ff: 102 items, trade gold 0 -> 729",
+            "villager_nord_template_642 @ mnbl_1609fb72_t_5372f23728: 84 items, trade gold 0 -> 2734"
+          ],
+          "heroKilled": [
+            "CharacterObject_1439 (Lost)"
+          ],
+          "recruited:none": [
+            "? @ mnbl_1609fb72_t_e7ed06396a: 1 western_crossbow_t4",
+            "? @ mnbl_1609fb72_t_0c85a587ff: 1 caravan_guard_aserai"
+          ],
+          "battle:FieldBattle": [
+            "patrol_party_1_party_377 > looters_283",
+            "mnbl_1609fb72_h_f819b685f5_party_1 > looters_312",
+            "patrol_party_1_party_363 > looters_269",
+            "patrol_party_1_party_353 > looters_306",
+            "northern_pirates_339 > caravan_template_vlandia_513",
+            "mnbl_1609fb72_h_24d488a184_party_1 > looters_295",
+            "patrol_party_1_party_1 > looters_314",
+            "patrol_party_1_party_349 > looters_246",
+            "patrol_party_1_party_381 > mountain_bandits_553",
+            "patrol_party_1_party_372 > looters_265",
+            "mnbl_1609fb72_h_badb5f0349_party_1 > looters_664",
+            "mnbl_1609fb72_h_141cb4791f_party_1 > looters_662"
+          ],
+          "battle:Raid": [
+            "mnbl_1609fb72_h_c946a2a3d4_party_1 > mnbl_1609fb72_v_aa9755779b"
+          ]
+        },
+        "stalls": [],
+        "stuck": [],
+        "holding": [
+          {
+            "party": "mnbl_1609fb72_l_af22cabed9_528",
+            "kind": "fishing",
+            "position": [
+              1041.94,
+              822.97
+            ],
+            "shortTerm": "Hold",
+            "default": "Hold",
+            "target": "(1041.94, 822.97) [Hold, at sea]",
+            "atSea": true,
+            "landCapable": false,
+            "disbanding": false,
+            "goods": 4,
+            "navigation": null,
+            "home": "mnbl_1609fb72_v_b80b409813",
+            "sinceHours": 2185895.51,
+            "fishing": true,
+            "roaming": true,
+            "reason": "fishing at its fishing point"
+          },
+          {
+            "party": "mnbl_1609fb72_l_c0df16c0d6_1",
+            "kind": "fishing",
+            "position": [
+              1131.99,
+              854.33
+            ],
+            "shortTerm": "Hold",
+            "default": "Hold",
+            "target": "(1131.99, 854.33) [Hold, at sea]",
+            "atSea": true,
+            "landCapable": false,
+            "disbanding": false,
+            "goods": 1,
+            "navigation": null,
+            "home": "mnbl_1609fb72_v_055ff8d216",
+            "sinceHours": 2185895.51,
+            "fishing": true,
+            "roaming": true,
+            "reason": "fishing at its fishing point"
+          },
+          {
+            "party": "mnbl_1609fb72_l_cc4edb27c6_1",
+            "kind": "fishing",
+            "position": [
+              1038.04,
+              687.21
+            ],
+            "shortTerm": "Hold",
+            "default": "Hold",
+            "target": "(1038.04, 687.21) [Hold, at sea]",
+            "atSea": true,
+            "landCapable": false,
+            "disbanding": false,
+            "goods": 13,
+            "navigation": null,
+            "home": "mnbl_1609fb72_v_672b9d802a",
+            "sinceHours": 2185895.51,
+            "fishing": true,
+            "roaming": true,
+            "reason": "fishing at its fishing point"
+          },
+          {
+            "party": "mnbl_1609fb72_h_e1fa5e48ae_party_1",
+            "kind": "lord",
+            "position": [
+              552.33,
+              692.29
+            ],
+            "shortTerm": "Hold",
+            "default": "Hold",
+            "target": "(552.33, 692.29) [Hold]",
+            "atSea": false,
+            "landCapable": true,
+            "disbanding": false,
+            "goods": 261,
+            "navigation": null,
+            "home": "mnbl_1609fb72_t_db07bde4dd",
+            "sinceHours": 2185895.51,
+            "reason": "own AI decision"
+          }
+        ],
+        "holdingByKind": {
+          "fishing": 3,
+          "lord": 1
+        },
+        "holdingVillagersWithoutReason": 0,
+        "unfoundPaths": [],
+        "unfoundPathCount": 0,
+        "unfoundToSettlementCount": 0,
+        "offNavigation": [],
+        "thrownCount": 0,
+        "campaignThrown": 0,
+        "thrown": [],
+        "assertCount": 0,
+        "asserts": [],
+        "exceptionCanarySeen": true,
+        "assertCanarySeen": true,
+        "economyBefore": {
+          "townCount": 45,
+          "food": 17583,
+          "gold": 1146290,
+          "tradeGoodStacks": 387,
+          "marketItems": 14556,
+          "villageItems": 17844,
+          "volunteerSlotsFilled": 410,
+          "volunteerSlotsEmpty": 1108
+        },
+        "economyAfter": {
+          "townCount": 45,
+          "food": 17472.3,
+          "gold": 1115236,
+          "tradeGoodStacks": 406,
+          "marketItems": 15155,
+          "villageItems": 17770,
+          "volunteerSlotsFilled": 472,
+          "volunteerSlotsEmpty": 1046
+        }
+      },
+      "followUp": {
+        "declarerEliminated": false,
+        "targetEliminated": false,
+        "stillAtWar": true,
+        "partiesTargetingEnemy": 6,
+        "armies": 0,
+        "townOwner": "mnbl_1609fb72_l_9d9e9268b9",
+        "townBesieged": false,
+        "heirLeads": "mnbl_1609fb72_h_2ebdb97aff",
+        "ruler": "mnbl_1609fb72_h_27b772cefc",
+        "kingSelectionPending": false
+      },
+      "final": {
+        "census": {
+          "clan:bandit": 9,
+          "clan:minor": 1,
+          "clan:noble": 92,
+          "garrison": 71,
+          "hero:lord": 370,
+          "hero:notable": 908,
+          "hero:wanderer": 28,
+          "hideout:infested": 33,
+          "kingdom": 40,
+          "kingdom:fiefs:1": 21,
+          "kingdom:fiefs:2": 12,
+          "kingdom:fiefs:3": 4,
+          "kingdom:fiefs:4+": 3,
+          "party:bandit": 297,
+          "party:caravan": 118,
+          "party:fishing": 44,
+          "party:garrison": 71,
+          "party:lord": 151,
+          "party:militia": 286,
+          "party:patrol": 47,
+          "party:player": 1,
+          "party:villager": 74,
+          "settlement:castle": 26,
+          "settlement:hideout": 72,
+          "settlement:other": 1,
+          "settlement:town": 45,
+          "settlement:village": 215,
+          "town:noTradeGoods": 1
+        },
+        "wars": 1,
+        "invalid": [],
+        "unexpected": [],
+        "villagesWithoutTradeTown": [],
+        "townsWithoutGold": [],
+        "townsWithoutTradeGoods": [
+          "mnbl_1609fb72_t_266d733fa8"
+        ],
+        "economy": {
+          "townCount": 45,
+          "food": 17472.3,
+          "gold": 1115236,
+          "tradeGoodStacks": 406,
+          "marketItems": 15155,
+          "villageItems": 17770,
+          "volunteerSlotsFilled": 472,
+          "volunteerSlotsEmpty": 1046
+        }
+      }
+    },
+    "B": {
+      "seed": 364610,
+      "worldId": "mnbl_00059042",
+      "startSeconds": 38.04786939999997,
+      "fixture": true,
+      "init": {
+        "census": {
+          "clan:noble": 3,
+          "garrison": 2,
+          "hero:lord": 5,
+          "hero:notable": 16,
+          "kingdom": 2,
+          "kingdom:fiefs:1": 2,
+          "party:caravan": 4,
+          "party:garrison": 2,
+          "party:lord": 2,
+          "party:militia": 4,
+          "party:patrol": 4,
+          "party:player": 1,
+          "settlement:town": 2,
+          "settlement:village": 2
+        },
+        "wars": 0,
+        "invalid": [],
+        "unexpected": [],
+        "villagesWithoutTradeTown": [],
+        "townsWithoutGold": [],
+        "townsWithoutTradeGoods": [],
+        "economy": {
+          "townCount": 2,
+          "food": 600,
+          "gold": 80266,
+          "tradeGoodStacks": 7,
+          "marketItems": 2299,
+          "villageItems": 32,
+          "volunteerSlotsFilled": 29,
+          "volunteerSlotsEmpty": 31
+        }
+      },
+      "playability": {
+        "activatable": false,
+        "routes": {
+          "total": 11,
+          "passed": 10,
+          "failed": 1,
+          "byCategory": {
+            "village-market": {
+              "routes": 4,
+              "passed": 4,
+              "types": {
+                "Default": 4
+              }
+            },
+            "capital-fief": {
+              "routes": 0,
+              "passed": 0,
+              "types": {}
+            },
+            "player-start": {
+              "routes": 1,
+              "passed": 0,
+              "types": {
+                "Default": 1
+              }
+            },
+            "port-to-port": {
+              "routes": 2,
+              "passed": 2,
+              "types": {
+                "Naval": 2
+              }
+            },
+            "faction-access": {
+              "routes": 4,
+              "passed": 4,
+              "types": {
+                "Default": 4
+              }
+            }
+          }
+        },
+        "failures": [],
+        "failureCount": 0,
+        "notApplicable": [
+          {
+            "id": "player-start (no start) -> (no start)",
+            "category": "player-start",
+            "problems": [
+              "refused: no town can be a player start (MMR-34 refuses such a world)"
+            ]
+          }
+        ],
+        "startsChecked": false,
+        "flags": {
+          "total": 0,
+          "resolved": 0,
+          "failed": 0,
+          "byKind": {},
+          "failedFlags": []
+        },
+        "world": {
+          "sites": 4,
+          "portTowns": 2,
+          "kingdoms": [
+            {
+              "id": "mnbl_00059042_kingdom_1",
+              "capital": "mnbl_00059042_town_1",
+              "rulingClan": "mnbl_00059042_clan_1",
+              "naval": true,
+              "reason": "2 port towns in clan mnbl_00059042_clan_1's home mnbl_00059042_town_1's land group (no fleet rule registered)"
+            },
+            {
+              "id": "mnbl_00059042_kingdom_2",
+              "capital": "mnbl_00059042_town_2",
+              "rulingClan": "mnbl_00059042_clan_2",
+              "naval": true,
+              "reason": "2 port towns in clan mnbl_00059042_clan_2's home mnbl_00059042_town_2's land group (no fleet rule registered)"
+            }
+          ],
+          "starts": [],
+          "startCultures": [],
+          "excludedStarts": [
+            {
+              "culture": "aserai",
+              "town": "mnbl_00059042_town_1",
+              "point": [
+                367,
+                251
+              ]
+            },
+            {
+              "culture": "battania",
+              "town": "mnbl_00059042_town_2",
+              "point": [
+                397,
+                476
+              ]
+            },
+            {
+              "culture": "empire",
+              "town": "mnbl_00059042_town_1",
+              "point": [
+                609.375,
+                165.625
+              ]
+            },
+            {
+              "culture": "khuzait",
+              "town": "mnbl_00059042_town_1",
+              "point": [
+                841,
+                541
+              ]
+            },
+            {
+              "culture": "nord",
+              "town": "mnbl_00059042_town_1",
+              "point": [
+                725,
+                811
+              ]
+            },
+            {
+              "culture": "sturgia",
+              "town": "mnbl_00059042_town_1",
+              "point": [
+                523,
+                603
+              ]
+            },
+            {
+              "culture": "vlandia",
+              "town": "mnbl_00059042_town_2",
+              "point": [
+                305,
+                414
+              ]
+            }
+          ],
+          "landGroups": 1,
+          "basins": 1,
+          "cachePairs": {
+            "Default": 6,
+            "Naval": 1,
+            "All": 15
+          }
+        }
+      },
+      "independence": {
+        "aObjects": 0,
+        "bObjects": 22,
+        "foreign": [],
+        "foreignCount": 0,
+        "campaignDays": 91077.37496207407,
+        "aStartDays": 91077.37496207407,
+        "unprefixedIdsAlsoInA": [
+          "CharacterObject_1",
+          "caravan_template_empire_1",
+          "naval_patrol_party_1_party_1",
+          "patrol_party_1_party_1"
+        ],
+        "unprefixedIdsAlsoInACount": 4,
+        "townsFed": 2,
+        "towns": 2,
+        "marketItems": 2299,
+        "volunteerSlotsFilled": 29
+      },
+      "hours": {
+        "hours": 12,
+        "hoursAdvanced": 12.000662916339934,
+        "realSeconds": 10.428178799999955,
+        "setup": {
+          "playerIgnoredByOtherPartiesUntilDays": 91107.37496207407,
+          "playerHolding": true
+        },
+        "motion": {
+          "caravan": {
+            "tracked": 4,
+            "moved": 3,
+            "travelled": 76.85,
+            "maxTravelled": 26.51
+          },
+          "garrison": {
+            "tracked": 2,
+            "moved": 0,
+            "travelled": 0,
+            "maxTravelled": 0
+          },
+          "lord": {
+            "tracked": 2,
+            "moved": 2,
+            "travelled": 66.26,
+            "maxTravelled": 33.76
+          },
+          "militia": {
+            "tracked": 4,
+            "moved": 0,
+            "travelled": 0,
+            "maxTravelled": 0
+          },
+          "patrol": {
+            "tracked": 4,
+            "moved": 4,
+            "travelled": 134.78,
+            "maxTravelled": 38.52
+          }
+        },
+        "counters": {},
+        "samples": {},
+        "stalls": [],
+        "stuck": [],
+        "holding": [],
+        "holdingByKind": {},
+        "holdingVillagersWithoutReason": 0,
+        "unfoundPaths": [],
+        "unfoundPathCount": 0,
+        "unfoundToSettlementCount": 0,
+        "offNavigation": [],
+        "thrownCount": 0,
+        "campaignThrown": 0,
+        "thrown": [],
+        "assertCount": 0,
+        "asserts": [],
+        "exceptionCanarySeen": true,
+        "assertCanarySeen": true,
+        "economyBefore": {
+          "townCount": 2,
+          "food": 600,
+          "gold": 80266,
+          "tradeGoodStacks": 7,
+          "marketItems": 2299,
+          "villageItems": 32,
+          "volunteerSlotsFilled": 29,
+          "volunteerSlotsEmpty": 31
+        },
+        "economyAfter": {
+          "townCount": 2,
+          "food": 539.4,
+          "gold": 88352,
+          "tradeGoodStacks": 5,
+          "marketItems": 2275,
+          "villageItems": 48,
+          "volunteerSlotsFilled": 39,
+          "volunteerSlotsEmpty": 21
+        }
+      },
+      "final": {
+        "census": {
+          "clan:noble": 3,
+          "garrison": 2,
+          "hero:lord": 5,
+          "hero:notable": 16,
+          "kingdom": 2,
+          "kingdom:fiefs:1": 2,
+          "party:caravan": 4,
+          "party:garrison": 2,
+          "party:lord": 2,
+          "party:militia": 4,
+          "party:patrol": 4,
+          "party:player": 1,
+          "settlement:town": 2,
+          "settlement:village": 2
+        },
+        "wars": 0,
+        "invalid": [],
+        "unexpected": [],
+        "villagesWithoutTradeTown": [],
+        "townsWithoutGold": [],
+        "townsWithoutTradeGoods": [],
+        "economy": {
+          "townCount": 2,
+          "food": 539.4,
+          "gold": 88352,
+          "tradeGoodStacks": 5,
+          "marketItems": 2275,
+          "villageItems": 48,
+          "volunteerSlotsFilled": 39,
+          "volunteerSlotsEmpty": 21
+        }
+      }
+    }
+  },
+  "regressions": [
+    {
+      "id": "screen-trade-after-transfer",
+      "foundBy": "run 4652",
+      "scenario": "A.trade",
+      "failure": "The trade through InventoryLogic moved the goods but settled no gold: a NullReferenceException after the transfer (run 4652), then one in the TransactionDebt setter (run 34968), before DoneLogic.",
+      "cause": "InventoryLogic invokes four callbacks unchecked that the inventory screen's view model hooks: the AfterTransfer and AfterReset events and the TotalAmountChange and DonationXpChange actions; the headless logic had none.",
+      "fix": "No-op handlers stand in for all four (the screen's refresh); the exception's full text is recorded if a trade fails.",
+      "guard": {
+        "kind": "mutation",
+        "mutation": "trade-not-committed",
+        "fails": "A.trade"
+      }
+    },
+    {
+      "id": "visit-without-volunteer",
+      "foundBy": "run 4652",
+      "scenario": "A.recruit",
+      "failure": "The nearest other town offered the player no volunteer (its notables' slots within the player's relation limit were empty), so no recruitment happened.",
+      "cause": "VolunteerModel.MaximumIndexHeroCanRecruitFromHero limits a stranger to a notable's lowest slots; the probe picked the town by distance alone.",
+      "fix": "The visit goes to the nearest town by land that offers the player a volunteer and an affordable trade good; nearer towns skipped are recorded.",
+      "guard": {
+        "kind": "mutation",
+        "mutation": "no-recruit",
+        "fails": "A.recruit"
+      }
+    },
+    {
+      "id": "fishing-parties-hold-at-sea",
+      "foundBy": "run 4652",
+      "scenario": "A.day",
+      "failure": "34 villager parties held still at sea for six hours, counted as holding without an installed reason.",
+      "cause": "They are War Sails' fishing parties (NavalDLC.FishingPartyComponent extends VillagerPartyComponent, naval only): FishingPartyCampaignBehavior holds them at their fishing point while IsFishing.",
+      "fix": "Fishing parties are a kind of their own; a fishing party's hold is explained while it is fishing or roaming, otherwise it fails like a villager's.",
+      "guard": {
+        "kind": "mutation",
+        "mutation": "fishing-party-holds-idle",
+        "fails": "A.day"
+      }
+    },
+    {
+      "id": "fixture-world-player-start",
+      "foundBy": "run 4652",
+      "scenario": "B.init",
+      "failure": "World B's route check failed one route: 'no town can be a player start'.",
+      "cause": "MMR-19's fixture world replaces no creation culture's start point, so MMR-41's player-start route has nothing to hold there.",
+      "fix": "With no starts checked the refused player-start route is recorded as not applicable; every other route must hold.",
+      "guard": {
+        "kind": "mutation",
+        "mutation": "route-fails-in-b",
+        "fails": "B.init"
+      }
+    },
+    {
+      "id": "player-trade-path",
+      "foundBy": "run 47176; review finding 7",
+      "scenario": "A.trade",
+      "failure": "The player's trade went through SellItemsAction, which only AI parties use: run 47176's check that the town received the price failed by 2 gold (the town keeps the price less a tax and books a security-adjusted commission).",
+      "cause": "The probe used the AI trade action; the trade screen commits through InventoryLogic.DoneLogic (the town's MerchantInventoryListener and GiveGoldAction).",
+      "fix": "The trade goes through an InventoryLogic built as InventoryScreenHelper.OpenScreenAsTrade builds it, committed by DoneLogic.",
+      "guard": {
+        "kind": "mutation",
+        "mutation": "town-short-paid",
+        "fails": "A.trade"
+      }
+    },
+    {
+      "id": "visit-without-travel",
+      "foundBy": "review finding 6 (runs 47176, 21164)",
+      "scenario": "A.visit",
+      "failure": "The visit targeted the town the player starts at: 0 distance, 0 travel hours; no pathing was exercised.",
+      "cause": "The nearest town to the start position is the start town.",
+      "fix": "The visit goes to the nearest other town by land and requires travel time and no encounter before the move.",
+      "guard": {
+        "kind": "mutation",
+        "mutation": "no-travel",
+        "fails": "A.visit"
+      }
+    },
+    {
+      "id": "hold-is-not-stuck",
+      "foundBy": "run 47176",
+      "scenario": "A.day",
+      "failure": "Two looter parties holding by choice (short-term Hold) were counted stuck.",
+      "cause": "MobileParty.IsMoving is only Position != MoveTargetPoint for an AI party.",
+      "fix": "Stuck requires a travelling short-term behaviour (neither Hold nor None); holding parties are recorded with their state, and a villager holding without an installed reason fails.",
+      "guard": {
+        "kind": "mutation",
+        "mutation": "villager-holds-without-reason",
+        "fails": "A.day"
+      }
+    },
+    {
+      "id": "villager-sale-order",
+      "foundBy": "run 21164",
+      "scenario": "A.day",
+      "failure": "33 villager town entries, 0 sales measured.",
+      "cause": "MbEvent.AddNonSerializedListener puts a listener at the head of the list and InvokeList walks from the head, so the probe's SettlementEntered listener ran before VillagerCampaignBehavior's sale.",
+      "fix": "The goods, trade gold and town gold are taken on entry (before the sale) and compared at the next hour.",
+      "guard": {
+        "kind": "mutation",
+        "mutation": "no-villager-sales",
+        "fails": "A.day"
+      }
+    },
+    {
+      "id": "king-selection-held-at-once",
+      "foundBy": "runs 47176, 21164",
+      "scenario": "A.succession.ruler",
+      "failure": "The expectation awaited a pending king selection; none was pending.",
+      "cause": "Kingdom.AddDecision holds the election of a kingdom other than the player's at once (KingdomElection.StartElection); with one candidate clan (run 47176) no election is held at all.",
+      "fix": "The expectation follows KillCharacterAction.ApplyInternal and Kingdom.AddDecision branch by branch, and a kingdom with two or more candidates is preferred.",
+      "guard": {
+        "kind": "mutation",
+        "mutation": "king-selection-left-pending",
+        "fails": "A.succession.ruler"
+      }
+    },
+    {
+      "id": "ownership-dissolved-target",
+      "foundBy": "run 21164; review finding 3",
+      "scenario": "A.ownership",
+      "failure": "Taking the war target's only town dissolved the kingdom (FactionDiscontinuationCampaignBehavior), voiding the war it was meant to follow; the follow-up read the elimination as peace.",
+      "cause": "Seed 42 has 40 kingdoms for 45 towns (MMR-31: one kingdom per realm with a town), most holding a single fief.",
+      "fix": "The war target holds two or more fiefs; the ownership row requires it to survive at war, and the follow-up tells elimination from peace.",
+      "guard": {
+        "kind": "mutation",
+        "mutation": "target-dissolved",
+        "fails": "A.ownership"
+      }
+    },
+    {
+      "id": "town-without-gold",
+      "foundBy": "runs 47176, 21164; review finding 12",
+      "scenario": "A.day",
+      "failure": "Town mnbl_1609fb72_t_30a1119e46 starts world A with 0 gold, so it buys nothing from villagers or caravans until it earns some.",
+      "cause": "Towns start at 0 gold and earn their first through the new-game consumption passes (ItemConsumptionBehavior.MakeConsumptionAllTowns), which pay only for market items in categories with a demand budget; this town's opening market earned nothing. It earns 2277 gold over the first day (run 21164).",
+      "fix": "Recorded (the installed economy, not a defect): the audit lists towns without gold, villagers' sales record the town's gold on entry, and a town without gold for the whole day fails.",
+      "guard": {
+        "kind": "mutation",
+        "mutation": "town-poor-all-day",
+        "fails": "A.day"
+      }
+    },
+    {
+      "id": "market-sold-out-not-invalid",
+      "foundBy": "run 34968",
+      "scenario": "A.after",
+      "failure": "Town mnbl_1609fb72_t_7c3c7cce5c sold its last trade-good stack 30 hours in, and the audit counted it as an invalid reference, failing A.after.",
+      "cause": "The audit treated a market without trade goods as an incoherent state. World-wide the markets halve in the first hours after the new game and then fall about 7% a day while trade-good stacks restock; one town selling out is a local state of the economy.",
+      "fix": "Towns without trade goods are recorded in the census (town:noTradeGoods); every town must stock trade goods at initialization (A.init, B.init).",
+      "guard": {
+        "kind": "mutation",
+        "mutation": "town-without-trade-goods-at-start",
+        "fails": "A.init"
+      }
+    },
+    {
+      "id": "fixture-inputs-checked-first",
+      "foundBy": "run 47176",
+      "scenario": "B.init",
+      "failure": "World B failed to start after world A's nine minutes: its fixture placement and catalog receipt paths were empty.",
+      "cause": "The probe read B's inputs only when it reached B.",
+      "fix": "The scenario file names B's inputs; the probe checks every input and file before any game starts, and the offline check validates the fields.",
+      "guard": {
+        "kind": "input",
+        "check": "CampaignSoakProbe.Body validates every scenario input before world A; check_campaign_soak_scenarios.py validates each world's fields"
+      }
+    }
+  ]
+}

@@ -50,8 +50,9 @@ def loaded(world, key, how, other_world=None, cold=False):
         rows.append(('A %s: the fleet called across the seam kept its target and transit and arrived where it was sent' % how,
                      a.get('movingAtLoad') is True and a.get('arrived') is True and a.get('positionAfter') == a.get('target')))
     else:
-        rows.append(('B %s: campaign time runs and parties move; the town the player took and the lord the player holds stay so; party positions and targets canonical' % how,
-                     (a.get('hoursRun') or 0) > 0 and (a.get('partiesMoved') or 0) > 0 and a.get('ownedByPlayer') is True and a.get('prisonerHeld') is True and a.get('nonCanonicalPartiesAfterRun') == []))
+        rows.append(('B %s: campaign time runs and parties move; the town the player took stays so; the lord the player took is held at the load (then %s); party positions and targets canonical' % (how, a.get('prisonerAfterRun')),
+                     (a.get('hoursRun') or 0) > 0 and (a.get('partiesMoved') or 0) > 0 and a.get('ownedByPlayer') is True and a.get('prisonerHeldAtLoad') is True
+                     and a.get('prisonerAfterRun') in ('held', 'escaped') and a.get('nonCanonicalPartiesAfterRun') == []))
         rows.append(('B %s: loaded from inside the running world A (the loader ended A first)' % how, l.get('fromRunningGame') is True and r.get('endedRunningGame') is True))
     if cold and key == 'A':
         # The encoder re-derives the settlement layout beside the scene (checked against the kept layout); navigation and playability come

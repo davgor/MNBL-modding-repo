@@ -1,0 +1,13 @@
+{
+  "author": {
+    "label": "Claude Code",
+    "role": "orchestrator"
+  },
+  "body": "**Owner decisions from MMR-57 (packaging).** None blocks the local package; all must be settled before any public or Workshop release.\n\n1. **Copied official culture text.** The module assembly embeds `worldgen/templates/cultures/*.json`: about 1,051 name and lore strings, with their localisation ids, copied from the game's culture definitions (7 are lore paragraphs). No game file is redistributed, but the text is the game's. Resolving it from the player's installation at run time would change every world's content id, because the templates feed world compilation. Recorded in the manifest's `contentNotes` and in `docs/packaging.md`.\n2. **Visual C++ 2015-2022 x64 runtime.** `worldbridge.exe` and `fwg.exe` import `VCRUNTIME140_1`, which the game does not ship. Today it is declared in `runtimeRequirements`. A static-runtime build would remove the dependency but change both pinned binaries.\n3. **Read-only installations are unsupported.** Generated scenes must be installed in the module's own `SceneObj`, the only place the engine reads scenes from. The failure is clean, but the player sees the generic \"The generated world could not be read\" (`BadSource`, offered as retryable) with the denied path. A dedicated message is possible.\n4. **Windows user names outside the ANSI code page cannot generate a world** (`unrepresentable_path`; `fwg.exe` takes narrow arguments).",
+  "createdAt": "2026-10-18T16:52:09.871Z",
+  "epicId": "ep_01m4fpnf646t254mnh69jhz107",
+  "format": "darkmechanicus.comment",
+  "formatVersion": 1,
+  "id": "cm_01m57yv2gfsx5qnydkyaaq5ys2",
+  "ticketId": null
+}

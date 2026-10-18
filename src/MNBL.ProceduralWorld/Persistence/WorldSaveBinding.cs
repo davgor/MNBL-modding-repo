@@ -87,7 +87,7 @@ namespace MNBL.ProceduralWorld.Persistence
                 module == null ? "unknown" : module.Version.ToString(),
                 File.Exists(assembly) ? WorldSaveTransfer.Sha256File(assembly) : "unknown",
                 TaleWorlds.Engine.Utilities.GetApplicationVersionWithBuildNumber().ToString(),
-                naval == null ? "absent" : naval.Version.ToString(),
+                naval == null || !TaleWorlds.ModuleManager.ModuleHelper.IsModuleActive("NavalDLC") ? "absent" : naval.Version.ToString(),   // MMR-50: active, not merely installed
                 "mnbl.runtime-world-backend/R07; producerLock " + (producerLock.Length > 12 ? producerLock.Substring(0, 12) : producerLock),
                 MNBL.ProceduralWorld.Surface.NavigationCacheKey.Schema + "/" + MNBL.ProceduralWorld.Surface.NavigationCacheKey.Version.ToString(CultureInfo.InvariantCulture) + "; adapter " + MNBL.ProceduralWorld.Surface.WorldNavigationCache.Adapter,
                 SaveIds.Base.ToString(CultureInfo.InvariantCulture) + "/v" + SaveIds.Version.ToString(CultureInfo.InvariantCulture),

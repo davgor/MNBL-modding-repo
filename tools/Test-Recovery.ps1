@@ -11,7 +11,9 @@ New-Item -ItemType Directory -Path $out | Out-Null
 $csc='C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/MSBuild/Current/Bin/Roslyn/csc.exe'
 $sources=@('src/MNBL.ProceduralWorld/Generation/GenerationDiagnostics.cs','src/MNBL.ProceduralWorld/Generation/GenerationErrors.cs','src/MNBL.ProceduralWorld/Generation/WorldRecoveryService.cs',
     'src/MNBL.ProceduralWorld/Generation/JobStateMachine.cs','src/MNBL.ProceduralWorld/Generation/ProgressEvents.cs','src/MNBL.ProceduralWorld/Generation/WorldActivationTransaction.cs',
-    'src/MNBL.ProceduralWorld/Persistence/WorldInspector.cs','src/MNBL.ProceduralWorld/Persistence/StagingCleanup.cs','src/MNBL.ProceduralWorld/Persistence/DurableFile.cs',
+    'src/MNBL.ProceduralWorld/Persistence/WorldCompatibilityPolicy.cs','src/MNBL.ProceduralWorld/Persistence/LoadPolicy.cs','src/MNBL.ProceduralWorld/Persistence/SaveBindingContract.cs',
+    'src/MNBL.ProceduralWorld/Persistence/WorldSaveTransfer.cs','src/MNBL.ProceduralWorld/Persistence/FolderSaveCatalog.cs','src/MNBL.ProceduralWorld/Persistence/SaveFileCheck.cs',
+    'src/MNBL.ProceduralWorld/Persistence/WorldReferenceIndex.cs','src/MNBL.ProceduralWorld/Persistence/StoreLock.cs','src/MNBL.ProceduralWorld/Persistence/WorldInspector.cs','src/MNBL.ProceduralWorld/Persistence/StagingCleanup.cs','src/MNBL.ProceduralWorld/Persistence/DurableFile.cs',
     'src/MNBL.ProceduralWorld/Persistence/WorldBinding.cs','src/MNBL.ProceduralWorld/Persistence/EarlyWorldBindingStore.cs','src/MNBL.ProceduralWorld/Persistence/SaveJournal.cs','src/MNBL.ProceduralWorld/Persistence/SaveFolder.cs','src/MNBL.ProceduralWorld/CampaignBootstrap/WorldDataBundle.cs',
     'tests/Generation/RecoveryTests.cs')
 $data=@('tools/Test-Recovery.ps1')

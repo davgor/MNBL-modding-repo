@@ -210,7 +210,7 @@ archived results (`evidence/runtime/in-game/new_campaign_flow-<pid>.json`/`.log`
   40 %, and every string is a `{=mnbl_...}` TextObject.
 - **Names come from the generator.** Town and kingdom names such as "Korpor (Age 2)" are the generator's and the compiler's; the preview
   shows what the campaign registers.
-- **The start time is not stated.** MMR-56 measures the start phase on F03 worlds.
+- **The start time** is stated by the setup screen since MMR-56 (`docs/first-test-profile.md`): about 7 minutes for a world's first start, while its navigation caches are generated on the engine thread and the game stops responding.
 - **A recoverable failure after the initial save** (MMR-45: any failure once PublishSave completed) leaves the campaign running, with its
   saves allowed again. The pending model reopens the setup with `activation.unresolved` when the player next reaches the main menu.
 - **Hover is driven through the view model in game.** The probe calls the marker view model's hover commands as the widget does. The

@@ -32,6 +32,24 @@ function ConvertTo-MnblMsbuildPath([string]$Path) {
     [IO.Path]::GetFullPath($Path).Replace('\','/').TrimEnd('/') + '/'
 }
 
+# The Procedural World module folder as a release ships it (MMR-57): SubModule.xml, GUI, the module assembly, the pinned producer
+# and the bridge with their hash pins. The release build (Build-ProceduralWorld.ps1) and the local package (tools/Package.ps1)
+# both stage through this, so the two cannot drift.
+function Copy-MnblProceduralWorldStage([string]$Repo, [string]$Stage, [string]$ModuleDll, [string]$Producer, [string]$Bridge, [string]$ProducerSha256) {
+    $bin = (New-Item -ItemType Directory -Path "$Stage/bin/Win64_Shipping_Client" -Force).FullName
+    Copy-Item -LiteralPath "$Repo/Modules/MNBL.ProceduralWorld/SubModule.xml" -Destination "$Stage/SubModule.xml"
+    if (Test-Path -LiteralPath "$Repo/Modules/MNBL.ProceduralWorld/GUI") { Copy-Item -LiteralPath "$Repo/Modules/MNBL.ProceduralWorld/GUI" -Destination "$Stage/GUI" -Recurse }
+    # The surface template's own files and its recipe; its official-derived files are made on the player's machine (SurfaceTemplateSource).
+    Copy-Item -LiteralPath "$Repo/Modules/MNBL.ProceduralWorld/SurfaceTemplate" -Destination "$Stage/SurfaceTemplate" -Recurse
+    Copy-Item -LiteralPath $ModuleDll -Destination $bin
+    Copy-Item -LiteralPath $Producer -Destination "$bin/fwg.exe"
+    Copy-Item -LiteralPath $Bridge -Destination "$bin/worldbridge.exe"
+    # The module refuses a producer or bridge that differs from these pins (GenerationProbe.VerifyPin); same format as Deploy-Dev.ps1.
+    $utf8 = New-Object Text.UTF8Encoding $false
+    [IO.File]::WriteAllText("$bin/fwg.sha256", $ProducerSha256 + "`n", $utf8)
+    [IO.File]::WriteAllText("$bin/worldbridge.sha256", (Get-FileHash -LiteralPath "$bin/worldbridge.exe" -Algorithm SHA256).Hash.ToLowerInvariant() + "`n", $utf8)
+}
+
 function Get-MnblReferenceArgs([string]$References, [string]$Work) {
     $refs = ConvertTo-MnblMsbuildPath $References
     $out = ConvertTo-MnblMsbuildPath $Work

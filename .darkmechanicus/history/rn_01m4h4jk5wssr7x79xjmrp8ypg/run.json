@@ -7641,12 +7641,1186 @@
     },
     {
       "createdAt": "2026-10-17T13:13:39.508Z",
+      "decidedAt": "2026-10-18T02:26:31.112Z",
+      "decision": {
+        "decidedBy": "Claude Code",
+        "notes": "Accepted on the recomputed summary, not the probe's pass lines. Carried-forward limits: B is a fixture world, not a second compiled world (production seed yield). A failure after the start and the deferred re-encode behind a running campaign are implemented but not exercised in game. MMR-50/53 may cite this ticket's seam, anchor and fleet save/load checks.",
+        "outcome": "accepted",
+        "reasons": []
+      },
+      "evidence": {
+        "checks": [
+          {
+            "detail": "37/37 recomputed checks, status ok. Covers:\n- A: embarked AI party, post-naval-battle AI fleet, siege, ownership, spawned party, prisoner, relation, moving and anchored fleets across the seam, save just after a seam crossing with a pursuit, and planted non-canonical values saved canonical.\n- B: fixture world.\n- A through Continue: one load for 285 per-frame calls; equal to its save, 0 AI retargets of 1007 parties; embarked party still at sea; one encounter, no re-crossing; fleet arrived at its port.\n- B from inside A: equal to its save.\n- Three in-game refusals and a refused Continue, each before anything changed.\n- Five baselines.",
+            "name": "two_world_matrix create (run 48048)",
+            "status": "passed"
+          },
+          {
+            "detail": "20/20 recomputed checks, status ok. A's swept scene was re-encoded by the surface encoder only (14 s); navigation and playability were restored from the activation evidence and the layout re-derived. A and B equal their saves, and the A after-load checks pass. Saves deleted; baseline held.",
+            "name": "two_world_matrix cold (run 39860, new process)",
+            "status": "passed"
+          },
+          {
+            "detail": "3/3: the first production load of a compiled world (before the fix batch).",
+            "name": "load check (run 28224)",
+            "status": "passed"
+          },
+          {
+            "detail": "42/42 (evidence/persistence/loader-tests.json).",
+            "name": "Test-WorldLoader",
+            "status": "passed"
+          },
+          {
+            "detail": "GenerationJob 19, WorldSetup 29, WorldPreview 16, Recovery 10, Activation 240, CompiledWorld 8, GraphValidation 72, CampaignRegistry 59, Settlements 22, NavalContent 15, SpawnPolicy 18, EarlyBinding 58, SaveBinding 77, PeriodicCoordinates 85, Playability 24, SettlementPlacement 52, EncounterResolver 35, GeneratedCampaignDataset (60 checks plus descriptors) all pass, plus WorldLoader 42.",
+            "name": "Offline harness batch (19)",
+            "status": "passed"
+          },
+          {
+            "detail": "",
+            "name": "Compile: module and transfer tool, C# 7.3, warnings as errors",
+            "status": "passed"
+          },
+          {
+            "detail": "1 blocker, 4 major, 12 minor; all fixed in one batch (evidence/fwg/world-loading-review.md).",
+            "name": "Independent review",
+            "status": "passed"
+          },
+          {
+            "detail": "ReturnToMenu (ending the loader's own game on its map) is implemented and reviewed but not triggered in game. The stopped-engine detector is tested offline only.",
+            "name": "Failure after the start, exercised in game",
+            "status": "skipped"
+          }
+        ],
+        "criteria": [
+          {
+            "criterionId": "c1",
+            "met": true,
+            "note": "evidence/persistence/two-world-matrix.json, recomputed from the raw outputs: create 48048 37/37 and cold 39860 20/20, both status ok. A and B are restored equal to their saves in the same process and after a cold restart. The embarked party, post-naval-battle fleet, siege, prisoner, relation, ownership, spawned party and moving/anchored fleets are included, and owner, flagship and ships are compared. Limit carried forward: B is the MMR-19 fixture world."
+          },
+          {
+            "criterionId": "c2",
+            "met": true,
+            "note": "Every load reports generatorStarted false; processesStarted is only surface_encoder:1, in the cold re-encode. otherWorldObjects totals 0 across the registry's census after each load, and the frame and terrain contexts are the loaded world's only."
+          },
+          {
+            "criterionId": "c3",
+            "met": true,
+            "note": "The three refusal fixtures give the expected codes before anything changed: the running B was kept, the caller's cancel ran, and world A's package and bundle hashes were unchanged. The refused Continue returned to the menu. All five create baselines and both cold baselines show no game and 0 held statics."
+          }
+        ],
+        "notes": "Raw run outputs are in evidence/runtime/in-game/two_world_matrix-<pid>.json, git-ignored like other raw probe dumps. The summary recomputes every check from them. Runs not accepted (11568, 44940, 35184, 46320, 16324, 5088, 2804) and what each found are recorded in the review record."
+      },
+      "failure": null,
+      "fencingToken": 1,
+      "id": "at_01m54zy8dmgs8xkmanykbpdy8x",
+      "kind": "work",
+      "number": 1,
+      "outputs": {
+        "artifacts": [
+          {
+            "hash": null,
+            "label": "Two-world matrix (create 48048, cold 39860, load check 28224), recomputed",
+            "location": "evidence/persistence/two-world-matrix.json",
+            "remoteOnly": false
+          },
+          {
+            "hash": null,
+            "label": "Loader offline tests 42/42",
+            "location": "evidence/persistence/loader-tests.json",
+            "remoteOnly": false
+          },
+          {
+            "hash": null,
+            "label": "Save binding and transfer tests 77/77",
+            "location": "evidence/persistence/save-binding-tests.json",
+            "remoteOnly": false
+          },
+          {
+            "hash": null,
+            "label": "Review record, confirming runs and results",
+            "location": "evidence/fwg/world-loading-review.md",
+            "remoteOnly": false
+          },
+          {
+            "hash": null,
+            "label": "Design and evidence",
+            "location": "docs/world-loading.md",
+            "remoteOnly": false
+          }
+        ],
+        "branch": "codex/fwgc-procedural-campaign",
+        "changedFiles": [
+          "src/MNBL.ProceduralWorld/Persistence/GeneratedWorldLoader.cs",
+          "src/MNBL.ProceduralWorld/Persistence/LoadPolicy.cs",
+          "src/MNBL.ProceduralWorld/Persistence/LoadRouting.cs",
+          "src/MNBL.ProceduralWorld/Persistence/WorldSaveTransfer.cs",
+          "src/MNBL.ProceduralWorld/Persistence/WorldInspector.cs",
+          "src/MNBL.ProceduralWorld/Generation/WorldReconstruction.cs",
+          "src/MNBL.ProceduralWorld/Generation/ActivationCommitStage.cs",
+          "src/MNBL.ProceduralWorld/Generation/GenerationStages.cs",
+          "src/MNBL.ProceduralWorld/CampaignBootstrap/CompiledWorldRegistration.cs",
+          "src/MNBL.ProceduralWorld/CampaignBootstrap/GeneratedLoadManager.cs",
+          "src/MNBL.ProceduralWorld/CampaignBootstrap/PeriodicSeam.cs",
+          "src/MNBL.ProceduralWorld/Campaign/GeneratedGameManager.cs",
+          "src/MNBL.ProceduralWorld/Campaign/GeneratedPatches.cs",
+          "src/MNBL.ProceduralWorld/Campaign/WorldLifetimeTrackers.cs",
+          "src/MNBL.ProceduralWorld/World/WorldLifetimeScope.cs",
+          "src/MNBL.ProceduralWorld/World/RuntimeWorldBackend.cs",
+          "src/MNBL.ProceduralWorld/World/NavigationValidator.cs",
+          "src/MNBL.ProceduralWorld/World/RuntimePlayabilityValidator.cs",
+          "src/MNBL.ProceduralWorld/Diagnostics/WorldSaveProbe.cs",
+          "src/MNBL.ProceduralWorld/Diagnostics/WorldWrapProbe.cs",
+          "src/MNBL.ProceduralWorld/SubModule.cs",
+          "src/MNBL.ProceduralWorld/Automation/TwoWorldMatrixProbe.cs",
+          "src/MNBL.ProceduralWorld/Automation/WorldSnapshot.cs",
+          "src/MNBL.ProceduralWorld/Automation/AutorunProbes.cs",
+          "tests/Persistence/LoaderTests.cs",
+          "tests/Persistence/SaveBindingTests.cs",
+          "tools/Test-WorldLoader.ps1",
+          "tools/summarize_two_world_matrix.py",
+          "worldgen/contracts/save-binding.schema.json",
+          "docs/world-loading.md",
+          "docs/save-binding.md",
+          "evidence/persistence/two-world-matrix.json",
+          "evidence/persistence/loader-tests.json",
+          "evidence/persistence/save-binding-tests.json",
+          "evidence/fwg/world-loading-review.md"
+        ],
+        "commits": [],
+        "summary": "MMR-49: the production load of a generated campaign, from the normal Load and Continue entries.\n\nLoad order (`GeneratedWorldLoader`). Everything is checked before anything changes:\n1. Discover the binding and the immutable package and bundle.\n2. Check the derived resources: the installed scene, paired and resolved; or a swept scene re-encoded into staging by the surface encoder only. The navigation, playability and layout reports, installed or kept with the campaign, pass their gates. Then the campaign rebuilt from the bundle (`WorldReconstruction`, shared with the activation), the replay plan, the map scene and the periodic patches.\n3. End the running campaign, on its map only.\n4. Install.\n5. Deserialize, behind a guard only the loader passes.\n6. Start (`GeneratedLoadManager`).\n\nA refusal before step 3 writes nothing and leaves a running campaign running.\n\nRouting (`LoadRouting`):\n- a prefix on `SandBoxSaveHelper.LoadGameAction`, so vanilla's prompts are kept;\n- a `TryLoadSave` prefix that ignores the preload screen's per-frame repeats;\n- a version-agnostic guard on `MBSaveLoad.LoadSaveGameData`.\n\nPolicy (`LoadPolicy`, pure): compatibility, rebuilt documents, scene state, rebuilt values, routing, busy, and the stalled-engine monitor.\n\nLifetime: `WorldLifetimeScope` plus 20 trackers, and the teardown releases everything back to the baseline.\n\nSave pass: canonicalizes party, AI, anchor, map event and track positions. It no longer requires a navmesh face, which was a gap found in game.\n\nTransfer: export format `mnbl.save-export.v2`, which carries each campaign's activation evidence.\n\nOne independent review (1 blocker, 4 major, 12 minor) was fixed in one batch. The confirming runs found two more loader defects, both fixed: a missing bundle was classified as damaged, and the save-pass predicate gap.\n\nAccepted runs, on one build: create 48048, 37/37 recomputed checks; cold 39860, 20/20. Offline: 19 harnesses green; `Test-WorldLoader` 42/42, `Test-SaveBinding` 77/77.\n\nLimits:\n- World B is MMR-19's fixture world: production yields one activatable world today.\n- A failure after the start, and a re-encode deferred behind a running campaign, are implemented but not exercised in game."
+      },
+      "reconciledAt": null,
+      "revisionId": "rv_01m4xazdg471p8ggry5yynj8ye",
+      "state": "accepted",
+      "submittedAt": "2026-10-18T02:26:20.387Z",
+      "supersededAt": null,
+      "ticketContentHash": "sha256:284219f9f924518e5217f773ae8a8b073d358ebf75554ed4d9c45c6f437b473f",
+      "ticketId": "tk_01m4fqfbgkz61vc2vqzb3vhggb",
+      "updatedAt": "2026-10-18T02:26:31.112Z",
+      "worker": {
+        "catalogRevision": null,
+        "effort": "medium",
+        "hostId": null,
+        "label": "Claude Code",
+        "modelId": "claude-opus-5-5",
+        "rationale": "Next ready ticket after MMR-48. It builds directly on the save binding just accepted: the header binding (mnbl.world.* + mnbl.save.* compatibility keys), the reference index and the inspector are what a load reads before deserialization. Same session, same context on the activation (MMR-45), the store and the save hooks.",
+        "sessionId": null
+      }
+    },
+    {
+      "createdAt": "2026-10-18T02:27:44.548Z",
+      "decidedAt": "2026-10-18T04:11:44.680Z",
+      "decision": {
+        "decidedBy": "Claude Code",
+        "notes": "Verified against the tracked evidence files and the harness runs from this session. The raw in-game outputs are git-ignored; the summary recomputes its checks from them.",
+        "outcome": "accepted",
+        "reasons": []
+      },
+      "evidence": {
+        "checks": [
+          {
+            "detail": "13/13 recomputed checks, status ok. Covers:\n- source save supported; after the sweep, rebuildable (scene conditional; nav and playability restored; layout re-derived);\n- the load agreed: Loaded, surface encoder only, the restored and re-derived reports exactly those reported, bundle and package unchanged;\n- a current-format save supported;\n- four fixtures (incompatible contract, incompatible save ids, War Sails version not installed, corrupted package hash) each reported unsupported and refused by the loader with the same code before any game started, with every byte preserved;\n- three baselines.",
+            "name": "compat_matrix in game (run 24328)",
+            "status": "passed"
+          },
+          {
+            "detail": "56/56 (evidence/persistence/compatibility-tests.json).",
+            "name": "Test-Compatibility",
+            "status": "passed"
+          },
+          {
+            "detail": "41/41 managed; C++ 38/38, including: the same content republished under new provenance is reused unchanged; redescribed content is refused and left untouched; a damaged bundle is refused and left untouched.",
+            "name": "Test-WorldDataBundle (managed + C++ bundle_transaction_tests)",
+            "status": "passed"
+          },
+          {
+            "detail": "GenerationJob 19, WorldSetup 29, WorldPreview 16, Recovery 10, Activation 240, CompiledWorld 8, GraphValidation 72, CampaignRegistry 59, Settlements 22, NavalContent 15, SpawnPolicy 18, EarlyBinding 58, SaveBinding 77, PeriodicCoordinates 85, Playability 24, SettlementPlacement 52, EncounterResolver 35, GeneratedCampaignDataset pass; WorldLoader 42.",
+            "name": "Offline batch",
+            "status": "passed"
+          },
+          {
+            "detail": "46 bound saves, all supported, read-only.",
+            "name": "Inspect-World on the real store",
+            "status": "passed"
+          },
+          {
+            "detail": "1 blocker, 4 major, 11 minor; all fixed in one batch (evidence/fwg/save-compatibility-review.md). The first attempt failed with an API refusal (oauth_org_not_allowed); the retry ran.",
+            "name": "Independent review",
+            "status": "passed"
+          }
+        ],
+        "criteria": [
+          {
+            "criterionId": "c1",
+            "met": true,
+            "note": "Checked against compat-matrix.json (run 24328, 13/13 recomputed by tools/summarize_compat_matrix.py from the raw run output), compatibility-tests.json (56/56) and Inspect-World on the real store (46 saves, all supported). The in-game report's rebuild rows matched what the load restored and re-derived."
+          },
+          {
+            "criterionId": "c2",
+            "met": true,
+            "note": "compat-matrix.json: the four fixtures (contract, save ids, War Sails version, package hash) were each reported unsupported, refused by the loader with the same code before any game started, and their hashes were preserved. War Sails absence is covered offline in compatibility-tests.json."
+          },
+          {
+            "criterionId": "c3",
+            "met": true,
+            "note": "bundle_transaction_tests 38/38 (Test-WorldDataBundle): reuse unchanged, conflicts refused and left untouched. save-type-ledger.json has converters [] and a refusing converterRule (schema requires both). Message-literal scan in CompatibilityTests: no migration offer."
+          }
+        ],
+        "notes": "Raw run outputs are in evidence/runtime/in-game/compat_matrix-<pid>.json (git-ignored). Runs not accepted: 31360 (a probe defect: the nested enumerator runner was missing) and 43648 (passed, but on the code before the review fixes)."
+      },
+      "failure": null,
+      "fencingToken": 1,
+      "id": "at_01m56dc8s3q57jr7smxwrnmyn5",
+      "kind": "work",
+      "number": 1,
+      "outputs": {
+        "artifacts": [
+          {
+            "hash": null,
+            "label": "In-game compatibility matrix (run 24328), recomputed",
+            "location": "evidence/persistence/compat-matrix.json",
+            "remoteOnly": false
+          },
+          {
+            "hash": null,
+            "label": "Compatibility offline tests 56/56",
+            "location": "evidence/persistence/compatibility-tests.json",
+            "remoteOnly": false
+          },
+          {
+            "hash": null,
+            "label": "Installed save definer rescan",
+            "location": "evidence/persistence/save-definer-scan-mmr50.json",
+            "remoteOnly": false
+          },
+          {
+            "hash": null,
+            "label": "Review record",
+            "location": "evidence/fwg/save-compatibility-review.md",
+            "remoteOnly": false
+          },
+          {
+            "hash": null,
+            "label": "Design and evidence",
+            "location": "docs/save-compatibility.md",
+            "remoteOnly": false
+          }
+        ],
+        "branch": "codex/fwgc-procedural-campaign",
+        "changedFiles": [
+          "src/MNBL.ProceduralWorld/Persistence/WorldCompatibilityPolicy.cs",
+          "src/MNBL.ProceduralWorld/Persistence/WorldCompatibilityReport.cs",
+          "src/MNBL.ProceduralWorld/Persistence/LoadPolicy.cs",
+          "src/MNBL.ProceduralWorld/Persistence/GeneratedWorldLoader.cs",
+          "src/MNBL.ProceduralWorld/Persistence/WorldInspector.cs",
+          "src/MNBL.ProceduralWorld/Persistence/WorldBinding.cs",
+          "src/MNBL.ProceduralWorld/Persistence/WorldSaveBinding.cs",
+          "src/MNBL.ProceduralWorld/Persistence/WorldSaveTransfer.cs",
+          "src/MNBL.ProceduralWorld/CampaignBootstrap/WorldIdentity.cs",
+          "src/MNBL.ProceduralWorld/CampaignBootstrap/WorldDataBundle.cs",
+          "src/MNBL.ProceduralWorld/Automation/CompatibilityProbe.cs",
+          "src/MNBL.ProceduralWorld/Automation/TwoWorldMatrixProbe.cs",
+          "src/MNBL.ProceduralWorld/Automation/AutorunProbes.cs",
+          "tests/Persistence/CompatibilityTests.cs",
+          "tests/Persistence/fixtures/previous-saves/pre-mmr48-initial.header.json",
+          "tests/Persistence/fixtures/previous-saves/mmr50-current.header.json",
+          "tests/Generation/RecoveryTests.cs",
+          "tests/WorldDataBundleTests.cs",
+          "tools/Test-Compatibility.ps1",
+          "tools/summarize_compat_matrix.py",
+          "tools/Inspect-World.ps1",
+          "tools/InspectWorld/Program.cs",
+          "tools/Test-Recovery.ps1",
+          "worldgen/contracts/save-type-ledger.json",
+          "worldgen/contracts/save-binding.schema.json",
+          "docs/save-compatibility.md",
+          "docs/world-bundle.md",
+          "evidence/persistence/compat-matrix.json",
+          "evidence/persistence/compatibility-tests.json",
+          "evidence/persistence/compatibility-tests.txt",
+          "evidence/persistence/save-definer-scan-mmr50.json",
+          "evidence/generation/recovery/recovery-tests.json",
+          "evidence/fwg/save-compatibility-review.md"
+        ],
+        "commits": [],
+        "summary": "MMR-50: an explicit compatibility policy and migration boundary for generated campaign saves.\n\n`WorldCompatibilityPolicy` (pure: Gather facts from files, then Evaluate) gives each save one of three classes, each with per-component rows and the loader's refusal codes:\n- **supported:** usable as is; module and backend differences are verified at load; a new producer reads old frozen bundles as they are.\n- **rebuildable-derived-cache:**\n  - a swept scene is re-encoded by the surface encoder and verified byte for byte (marked conditional when the build that encoded it differs or is unknown);\n  - reports are restored from the activation's copies, and the layout re-derived;\n  - a new navigation cache key means the caches are rebuilt from the frozen navmesh.\n- **unsupported-world:**\n  - damaged, held or unknown saves;\n  - another contract, save id version, identity schema, game or War Sails (missing War Sails included; pre-MMR-48 saves compared from their header);\n  - a missing or damaged package or bundle (a missing bundle is never a cache miss and is never regenerated);\n  - a different installed scene, a missing report, a layout of another world.\n\nThe decision follows the loader's order and codes. The loader gained the matching rules: legacy header fingerprints, held game data as save-unavailable, War Sails active rather than merely installed.\n\nRead-only validation report:\n- without the game: `tools/Inspect-World.ps1` (the inspector's per-save verdict is now the policy's);\n- in game: `WorldCompatibilityReport.ForSave`.\n\nMigration boundary:\n- no converter is implemented;\n- the save type ledger gains `converterRule` and an empty `converters` list (schema updated);\n- a bundle refusal no longer offers a nonexistent migration tool;\n- tests scan every module message literal for such an offer.\n\nSave type ids:\n- the installed SaveableTypeDefiner discovery and numbering rules are documented from the IL (Dictionary.Add, so collisions throw);\n- a rescan found 153 definers, the nearest base 2,830,000 from the reserved 7910000;\n- the module defines no saveable type.\n\nPrevious-save fixtures: a real pre-MMR-48 header, and the real current-format header captured in game.\n\nOne independent review (1 blocker, 4 major, 11 minor) was fixed in one batch; the first review attempt failed on an API refusal and was retried.\n\nEvidence:\n- compat_matrix 24328: 13/13 recomputed checks, status ok;\n- Test-Compatibility 56/56;\n- full offline batch green."
+      },
+      "reconciledAt": null,
+      "revisionId": "rv_01m4xazdg471p8ggry5yynj8ye",
+      "state": "accepted",
+      "submittedAt": "2026-10-18T04:09:23.265Z",
+      "supersededAt": null,
+      "ticketContentHash": "sha256:89ac4a9a39a92998212399cd55855d1e5b2f20530c0e69a448480b2247803e85",
+      "ticketId": "tk_01m4fqfbgk2n18h9rrf7a94fm5",
+      "updatedAt": "2026-10-18T04:11:44.680Z",
+      "worker": {
+        "catalogRevision": null,
+        "effort": "medium",
+        "hostId": null,
+        "label": "Claude Code",
+        "modelId": "claude-opus-5-5",
+        "rationale": "Next ready ticket after MMR-49, and it extends that ticket's work directly. MMR-49's LoadPolicy already compares the mnbl.save.* build keys (strict versus rebuilt-and-verified), and MMR-48 holds the save-type ledger and the transfer verifier. This ticket turns them into an explicit compatibility policy (supported, rebuildable derived cache, unsupported world), a read-only validation report, and the incompatible-schema, missing-DLC and corrupt-hash fixtures. Same session context on the loader, refusals and save definitions.",
+        "sessionId": null
+      }
+    },
+    {
+      "createdAt": "2026-10-18T04:12:06.482Z",
+      "decidedAt": "2026-10-18T06:17:47.543Z",
+      "decision": {
+        "decidedBy": "Claude Code",
+        "notes": "Verified by re-running the summarizer and the offline replay on the committed fixture in this session. The raw in-game outputs are git-ignored; the trimmed fixture is committed.",
+        "outcome": "accepted",
+        "reasons": []
+      },
+      "evidence": {
+        "checks": [
+          {
+            "detail": "55/55 checks recomputed by tools/summarize_campaign_soak.py, 14/14 scenarios, status ok.\n\nA.init:\n- coherent: 0 invalid references, 0 outside objects, 0 off navigation;\n- 672/672 semantic routes hold live.\n\nPlayer:\n- 8.67 h by land, town menu opened by the engine;\n- trade via DoneLogic exact (bought 25, sold 21);\n- recruit for 20; left via the leave path.\n\nA.day (24.02 h):\n- 0 stalls, exceptions, asserts (both canaries seen);\n- 0 off navigation, unfound paths, stuck parties;\n- moved: lords 142/151, caravans 118/118, villagers 43/65, bandits 294/369;\n- 137 caravan trades; villagers sold goods 27 of 29 town entries (the other 2 carried only pack animals);\n- 1014 lord recruitments; no town without food, none without gold all day;\n- 34 fishing parties holding, all fishing.\n\nReplenishment: 887 slots refilled.\n\nDiagnostics: war, ownership (target survives at war), clan and ruler succession (election held at once, concluded), with no dead references. Six clean hours after.\n\nB: independent of A, coherent, 10/10 applicable routes, 12 clean hours.\n\nThree baselines held.",
+            "name": "campaign_soak in game (run 41920)",
+            "status": "passed"
+          },
+          {
+            "detail": "Scenario check: 14 scenarios, 13 regressions, 0 problems. Regression replay 13/13: the committed fixture passes every scenario, and each of the 12 mutation-guarded failures, re-injected, fails its scenario (evidence/gameplay/campaign-soak-tests.txt).",
+            "name": "Offline: tools/Test-CampaignSoak.ps1",
+            "status": "passed"
+          },
+          {
+            "detail": "Module builds with warnings as errors; Build.ps1 verified hashes; worldbridge unchanged (776C160626D029E6).",
+            "name": "Compile",
+            "status": "passed"
+          },
+          {
+            "detail": "2 blocker, 3 major, 8 minor findings, all fixed in one batch; 5 further confirming-run findings fixed (evidence/fwg/campaign-soak-review.md).",
+            "name": "Independent review",
+            "status": "passed"
+          }
+        ],
+        "criteria": [
+          {
+            "criterionId": "c1",
+            "met": true,
+            "note": "evidence/gameplay/campaign-soak.json (run 41920, recomputed from the raw output):\n- A.init and B.init pass: 0 invalid references and 0 outside objects; 0 A objects or ids in B; fresh time; routes 672/672 and 10/10 applicable.\n- A.day passes: 0 exceptions or asserts with both canaries seen; 0 off navigation, 0 unfound paths, 0 stuck, 0 unexplained holds."
+          },
+          {
+            "criterionId": "c2",
+            "met": true,
+            "note": "Passing scenarios: A.visit, A.trade (exact through DoneLogic), A.recruit, A.replenish, A.day (motion fractions, trades, villager sales, recruitment), A.war, A.ownership, A.succession.clan and A.succession.ruler (election branch), A.after. Each scenario carries its source (natural, player, diagnostic, harness) in the scenario file and in the evidence."
+          },
+          {
+            "criterionId": "c3",
+            "met": true,
+            "note": "Ran tools/Test-CampaignSoak.ps1: scenario check 0 problems; replay 13/13. The committed fixture passes, and each of the 12 mutation guards fails its scenario. The 13 regressions each name their run or finding, cause, fix and guard."
+          }
+        ],
+        "notes": "Raw run outputs are in evidence/runtime/in-game/campaign_soak-<pid>.json (git-ignored).\n\nRuns not accepted: 47176, 21164, 4652, 34968 (each one's findings are in the review record).\n\nLimits:\n- World B is the fixture world (only seed 42 activates).\n- A short run establishes operability, not long-term balance.\n- MMR-49's two-world matrix was not re-run after the helper extraction; the review found it faithful and all five soak runs exercised the helpers.\n- Each run's new campaign writes its initial save, kept as in earlier tickets."
+      },
+      "failure": null,
+      "fencingToken": 1,
+      "id": "at_01m56kbbyj8nas5c8kker5d62w",
+      "kind": "work",
+      "number": 1,
+      "outputs": {
+        "artifacts": [
+          {
+            "hash": null,
+            "label": "Campaign soak recomputed evidence (run 41920)",
+            "location": "evidence/gameplay/campaign-soak.json",
+            "remoteOnly": false
+          },
+          {
+            "hash": null,
+            "label": "Scenarios and regression fixture",
+            "location": "tests/Runtime/CampaignSoakScenarios.json",
+            "remoteOnly": false
+          },
+          {
+            "hash": null,
+            "label": "Committed regression fixture (run 41920, trimmed)",
+            "location": "tests/Runtime/fixtures/campaign-soak-41920.json",
+            "remoteOnly": false
+          },
+          {
+            "hash": null,
+            "label": "Offline checks (scenario check, regression replay 13/13)",
+            "location": "evidence/gameplay/campaign-soak-tests.txt",
+            "remoteOnly": false
+          },
+          {
+            "hash": null,
+            "label": "Design, results and small-world behaviour",
+            "location": "docs/campaign-behavior-compatibility.md",
+            "remoteOnly": false
+          },
+          {
+            "hash": null,
+            "label": "Review record",
+            "location": "evidence/fwg/campaign-soak-review.md",
+            "remoteOnly": false
+          }
+        ],
+        "branch": "codex/fwgc-procedural-campaign",
+        "changedFiles": [
+          "src/MNBL.ProceduralWorld/Automation/CampaignSoakProbe.cs",
+          "src/MNBL.ProceduralWorld/Automation/TwoWorldMatrixProbe.cs",
+          "src/MNBL.ProceduralWorld/Automation/AutorunProbes.cs",
+          "tests/Runtime/CampaignSoakScenarios.json",
+          "tests/Runtime/check_campaign_soak_scenarios.py",
+          "tests/Runtime/test_campaign_soak_regressions.py",
+          "tests/Runtime/fixtures/campaign-soak-41920.json",
+          "tools/summarize_campaign_soak.py",
+          "tools/Test-CampaignSoak.ps1",
+          "evidence/gameplay/campaign-soak.json",
+          "evidence/gameplay/campaign-soak-tests.txt",
+          "evidence/fwg/campaign-soak-review.md",
+          "docs/campaign-behavior-compatibility.md"
+        ],
+        "commits": [],
+        "summary": "MMR-51: generated campaign gameplay in the bounded first test, with the `campaign_soak` probe (Automation/CampaignSoakProbe.cs).\n\nWorlds:\n- A: the full generated world, seed 42, started from the world setup screen.\n- B: MMR-19's fixture world, started after A ends in the same process (the production generator activates only seed 42).\n\nScenarios live in tests/Runtime/CampaignSoakScenarios.json, and tools/summarize_campaign_soak.py recomputes every check from the run's outputs (its rules, hours and motion fractions). The summary is the verdict.\n\nWorld A:\n- Initial audit: references, objects outside the world, navigation, census, economy. MMR-41's semantic routes are checked against the live campaign.\n- Player (setup, recorded): sheltered, travels by land to a town; the engine opens the town menu. Trades through the trade screen's InventoryLogic (DoneLogic), recruits through RecruitmentVM.OnDone's sequence, leaves through the menu's leave path.\n- One natural campaign day:\n  - motion by party kind, and unfound paths every frame;\n  - stuck parties, and holding parties with their installed reason;\n  - exceptions and engine asserts, each proven by a canary;\n  - trades, villager sales, recruitment;\n  - food, gold and markets.\n- Replenishment after the day.\n- Diagnostic actions through installed actions: declared war, ownership change, clan-leader death, ruler death (election branch). Then six more hours and a final audit.\n\nWorld B: fresh-state audit, independence from A, routes, twelve hours.\n\nOne independent review (2 blocker, 3 major, 8 minor) was fixed in one batch:\n- engine semantics corrected against the IL: immediate elections, listener dispatch order, kingdom discontinuation, IsMoving;\n- the trade moved to the screen logic;\n- travel, per-frame unfound paths, holding detail, motion fractions;\n- assert and exception canaries, input validation, summary tied to the run;\n- regression replay; CRLF restored on the refactored TwoWorldMatrixProbe.\n\nThe confirming runs found five more probe problems, all fixed:\n- the trade screen's four callbacks;\n- the volunteer relation limit;\n- the fixture world's player-start route;\n- market sell-outs;\n- War Sails fishing parties.\n\nNo game crash or invalid reference was found.\n\nSmall-world behaviour recorded under the installed rules:\n- 40 kingdoms for 45 towns; 22 single-fief kingdoms are dissolved when they lose their fief;\n- one town starts without gold;\n- first-hour market fall;\n- fishing parties hold at sea.\n\nc3: 13 regressions, each with its guard. A committed trimmed fixture (run 41920); 12 guards are mutations replayed offline that must fail their scenario (13/13), 1 is the probe's input check.\n\nAccepted run 41920: 55/55 recomputed checks, 14/14 scenarios, status ok."
+      },
+      "reconciledAt": null,
+      "revisionId": "rv_01m4xazdg471p8ggry5yynj8ye",
+      "state": "accepted",
+      "submittedAt": "2026-10-18T06:17:34.402Z",
+      "supersededAt": null,
+      "ticketContentHash": "sha256:9e775e124eaf01986b7961d3c8809390ab488952577469008472ce17a9f67216",
+      "ticketId": "tk_01m4fqfbgmxsqgvdkdhj9sks6j",
+      "updatedAt": "2026-10-18T06:17:47.543Z",
+      "worker": {
+        "catalogRevision": null,
+        "effort": "medium",
+        "hostId": null,
+        "label": "Claude Code",
+        "modelId": "claude-opus-5-5",
+        "rationale": "Next ready ticket in row 28 after MMR-50. It exercises the integrated A/B campaigns that MMR-49 loads and restores: one campaign day on A with live parties, economy and recruitment, then trade, recruit, war/ownership and succession actions, and an independent B start. It reuses the campaign probe harness (TwoWorldMatrixProbe, the world A/B fixtures, the probe food and encounter rules) from MMR-49 and MMR-50.",
+        "sessionId": null
+      }
+    },
+    {
+      "createdAt": "2026-10-18T06:18:27.409Z",
+      "decidedAt": "2026-10-18T10:08:48.780Z",
+      "decision": {
+        "decidedBy": "Claude Code",
+        "notes": "Accepted after re-running the summary on run 33816 (163/163, 14/14, status ok) and tools/Test-LandMissions.ps1 (2/2; replay 20/20). Review record evidence/fwg/land-missions-review.md lists the 16 review findings and their fixes; limits in docs/land-missions.md.",
+        "outcome": "accepted",
+        "reasons": []
+      },
+      "evidence": {
+        "checks": [
+          {
+            "detail": "163/163 recomputed checks, 14/14 cases, status ok; absent: field.wetland (absent from A and B at full resolution).",
+            "name": "in-game land_missions run 33816 recomputed",
+            "status": "passed"
+          },
+          {
+            "detail": "scenario check 0 problems (14 cases, 19 regressions); replay 20/20: fixture 163/163 and every regression's mutation fails its case.",
+            "name": "offline checks (tools/Test-LandMissions.ps1)",
+            "status": "passed"
+          },
+          {
+            "detail": "tools/Build.ps1 hash-verified, 0 warnings; deployed; engine DLL hash 19387F31557F unchanged; peer lock free before each launch.",
+            "name": "module build and deploy",
+            "status": "passed"
+          },
+          {
+            "detail": "1 blocker, 7 major, 8 minor, all fixed in one batch; recorded in evidence/fwg/land-missions-review.md.",
+            "name": "independent review",
+            "status": "passed"
+          },
+          {
+            "detail": "none in evidence/gameplay/land-missions.json, the fixture, the docs or the review record.",
+            "name": "user paths in committed evidence",
+            "status": "passed"
+          }
+        ],
+        "criteria": [
+          {
+            "criterionId": "c1",
+            "met": true,
+            "note": "Verified by recomputing run 33816 with tools/summarize_land_missions.py (163/163): every present case ran to its end with its return row (installed return point, bound, land, navigation) passing; steppe from world B; wetland absent from both worlds with full-resolution counts recorded."
+          },
+          {
+            "criterionId": "c2",
+            "met": true,
+            "note": "Verified in the recomputed assets rows: every mission's spawn row passes (off-mesh agents only at recorded stock usable points), every case's log has 0 world-missing and 0 unknown-kind missing lines and 0 asserts with canaries seen; the retreat outcome and capture return rows pass."
+          },
+          {
+            "criterionId": "c3",
+            "met": true,
+            "note": "Verified: each settlement case's mapped-scene rows pass (town center and tavern, castle, village, siege, hideout), the location audit passes for 358 settlements, and the gear rows pass for all 7 cultures present with troops and a hero excluding the player's party. Regression replay 20/20."
+          }
+        ],
+        "notes": "Diagnostic setup is recorded per case: the castle given to the player and returned; lords leaving settlements; wars declared and peace made; crews added; the hideout troop selection answered with its offered selection; the siege camp advanced to 0.99 after 1.5 h of its own preparation (natural ~94 h; sally-outs are stock and excluded). Not proven (docs/land-missions.md): wetland battles, village raids, lord's hall fights, port visits (naval is MMR-53), the camp's natural completion, the captivity's hourly escape and menus, a field battle won in mission, the night stealth hideout mission, world B from a clean checkout (git-ignored inputs, as for MMR-51)."
+      },
+      "failure": null,
+      "fencingToken": 1,
+      "id": "at_01m56tjq6h5v2ethqad7sezh8f",
+      "kind": "work",
+      "number": 1,
+      "outputs": {
+        "artifacts": [
+          {
+            "hash": null,
+            "label": "Land missions verdict (run 33816)",
+            "location": "evidence/gameplay/land-missions.json",
+            "remoteOnly": false
+          },
+          {
+            "hash": null,
+            "label": "Offline checks log",
+            "location": "evidence/gameplay/land-missions-tests.txt",
+            "remoteOnly": false
+          },
+          {
+            "hash": null,
+            "label": "Review record",
+            "location": "evidence/fwg/land-missions-review.md",
+            "remoteOnly": false
+          },
+          {
+            "hash": null,
+            "label": "Scenario file",
+            "location": "tests/Runtime/LandMissionScenarios.json",
+            "remoteOnly": false
+          },
+          {
+            "hash": null,
+            "label": "Doc",
+            "location": "docs/land-missions.md",
+            "remoteOnly": false
+          }
+        ],
+        "branch": "codex/fwgc-procedural-campaign",
+        "changedFiles": [
+          "src/MNBL.ProceduralWorld/Automation/LandMissionsProbe.cs",
+          "src/MNBL.ProceduralWorld/Automation/AssertCapture.cs",
+          "src/MNBL.ProceduralWorld/Missions/LocationSceneAudit.cs",
+          "src/MNBL.ProceduralWorld/Automation/GeneratedCampaignBootProbe.cs",
+          "src/MNBL.ProceduralWorld/Automation/AutorunProbes.cs",
+          "src/MNBL.ProceduralWorld/CampaignBootstrap/GeneratedBattleTerrain.cs",
+          "src/MNBL.ProceduralWorld/Diagnostics/RuntimeMissionProbe.cs",
+          "tests/Runtime/LandMissionScenarios.json",
+          "tests/Runtime/fixtures/land-missions-33816.json",
+          "tests/Runtime/check_land_mission_scenarios.py",
+          "tests/Runtime/test_land_missions_regressions.py",
+          "tools/summarize_land_missions.py",
+          "tools/Test-LandMissions.ps1",
+          "evidence/gameplay/land-missions.json",
+          "evidence/gameplay/land-missions-tests.txt",
+          "evidence/fwg/land-missions-review.md",
+          "docs/land-missions.md",
+          "docs/mission-scenes.md",
+          "docs/campaign-behavior-compatibility.md",
+          "docs/runtime-capabilities.md"
+        ],
+        "commits": [],
+        "summary": "MMR-52: land missions and settlement interactions verified in game on world A's designated test save (mnbl_probe52_A_designated), with world B (MMR-19 fixture) for what A lacks. New probe land_missions (Automation/LandMissionsProbe.cs) with shared AssertCapture, LocationSceneAudit (MMR-42's audit moved out of GeneratedCampaignBootProbe) and GeneratedBattleTerrain.SampleCell/Cells/Context. Scenario file tests/Runtime/LandMissionScenarios.json (14 cases, rules, 19 regressions each guarded by a fixture mutation); verdict tools/summarize_land_missions.py recomputes every case with the scenario file's rules into evidence/gameplay/land-missions.json; offline checks tools/Test-LandMissions.ps1 (scenario check + regression replay 20/20). Accepted run 33816: 163/163 recomputed checks, 14/14 cases, status ok. Battles on open, woodland, rock, cold (3 substituted classes), desert, a Bridge crossing and a retreat in A, steppe in B; wetland absent from both at full resolution (A 5,548 land cells, B 11,652). Each battle: exactly the player's and a lord party of the next culture (ship-owning lords fight on land), the patch's scene with MMR-42's guard observing this battle's choice, deployment, every agent on the navmesh inside boundaries, complete gear, return within 0.635 on land. Town center with a notable's conversation and the tavern (tavern keeper), castle (given and returned), village; siege assault with deployment on the mapped siege scene (camp's own preparation observed 1.5 h at 0.0106/h, then advanced to 0.99 as recorded diagnostic setup and completed by the engine); capture (defeat in mission, prisoner, installed escape within the installed double-teleport bound); hideout cleared (assault, troop selection answered, phase-aware sweep, boss dialogue's battle option, mapped hideout_center scene). Every culture present seen with troops and a hero (player's party excluded); 358 settlements' location scenes meet the contracts; 659 names resolved; no missing world asset, no unknown missing line, no assert. One independent read-only review (1 blocker, 7 major, 8 minor) fixed in one batch; confirming runs found three more (a campaign-map navmesh query hung a tavern; stock seated/terrain spawns; the escape's double teleport), all fixed and guarded. Docs: docs/land-missions.md (new), docs/mission-scenes.md, docs/campaign-behavior-compatibility.md, docs/runtime-capabilities.md; review record evidence/fwg/land-missions-review.md."
+      },
+      "reconciledAt": null,
+      "revisionId": "rv_01m4xazdg471p8ggry5yynj8ye",
+      "state": "accepted",
+      "submittedAt": "2026-10-18T10:08:38.047Z",
+      "supersededAt": null,
+      "ticketContentHash": "sha256:791694e14aab85ccb5e1bd2433bbc3de5b4c24940d366db164edc779cd42819f",
+      "ticketId": "tk_01m4fqfbgmkdbp3b70wcgxsrrh",
+      "updatedAt": "2026-10-18T10:08:48.780Z",
+      "worker": {
+        "catalogRevision": null,
+        "effort": "medium",
+        "hostId": null,
+        "label": "Claude Code",
+        "modelId": "claude-opus-5-5",
+        "rationale": "Next ready ticket in row 28 after MMR-51. It verifies land missions and settlement interactions on the generated worlds, building on MMR-60's mission entry/return automation (BaselineMissionSteps, BaselineCombatSteps), MMR-42's battle-scene resolution, and MMR-51's campaign_soak harness for starting world A and B and driving the player's party through encounters.",
+        "sessionId": null
+      }
+    },
+    {
+      "createdAt": "2026-10-18T10:09:29.394Z",
+      "decidedAt": "2026-10-18T12:59:52.626Z",
+      "decision": {
+        "decidedBy": "Claude Code",
+        "notes": "Accepted after re-running the summarizer (104/104), both offline suites (2/2 each) and the land confirming run (163/163). Disclosed gaps remain in docs/naval-missions.md 'What this does not prove'.",
+        "outcome": "accepted",
+        "reasons": []
+      },
+      "evidence": {
+        "checks": [
+          {
+            "detail": "104/104 checks, 13/13 cases, status ok, 0 reloads, 0 asserts, 0 unknown missing lines",
+            "name": "naval_missions run 46036 recomputed",
+            "status": "passed"
+          },
+          {
+            "detail": "163/163, 14/14, wetland absent as before",
+            "name": "land_missions run 38972 (shared harness changed)",
+            "status": "passed"
+          },
+          {
+            "detail": "scenario check 0 problems; fixture 104/104; 8/8 regressions fail their named check",
+            "name": "tools/Test-NavalMissions.ps1",
+            "status": "passed"
+          },
+          {
+            "detail": "2/2",
+            "name": "tools/Test-LandMissions.ps1",
+            "status": "passed"
+          },
+          {
+            "detail": "no errors or CS warnings",
+            "name": "MSBuild compile check",
+            "status": "passed"
+          },
+          {
+            "detail": "2 blockers, 6 major, 13 minor; all fixed in one batch",
+            "name": "Independent read-only review",
+            "status": "passed"
+          },
+          {
+            "detail": "No voyage crossed water narrower than 8.5 (coastal legs); disclosed in the doc's limits",
+            "name": "Narrow strait coverage",
+            "status": "failed"
+          }
+        ],
+        "criteria": [
+          {
+            "criterionId": "c1",
+            "met": true,
+            "note": "Verified in evidence/gameplay/naval-scenarios.json (run 46036): route.port, route.island, dropoff (with the coastal landing) and ai rows all pass; AI island arrivals 36 at 15 of 21 towns. Narrow straits not crossed: disclosed, outside c1's wording."
+          },
+          {
+            "criterionId": "c2",
+            "met": true,
+            "note": "pirate.battle and naval.defeat rows pass: patch scenes matched, naval return 1.755 within 1.885, capture at sea, raft wait and end, ashore on land navigation."
+          },
+          {
+            "criterionId": "c3",
+            "met": true,
+            "note": "raid and blockade are separate cases with their own rows, both passing; landing counted by SteppedShip (27 ashore); blockade arcs 10/10 on water."
+          }
+        ],
+        "notes": "Disclosed limits: boarding, crew reinforcement, battle damage, outcomes decided by fighting, return to ship in a mission, defender navigation/per-hull clearance, blockade battles, visual water judgement, world B. The scenario file changed after run 46036 only in its fixture key, guard checks and one description; the rules are the run's."
+      },
+      "failure": null,
+      "fencingToken": 1,
+      "id": "at_01m577sr9jc59bdk3h8f9att9h",
+      "kind": "work",
+      "number": 1,
+      "outputs": {
+        "artifacts": [
+          {
+            "hash": null,
+            "label": "Naval scenario evidence (run 46036, 104/104)",
+            "location": "evidence/gameplay/naval-scenarios.json",
+            "remoteOnly": false
+          },
+          {
+            "hash": null,
+            "label": "Naval run result",
+            "location": "evidence/runtime/in-game/naval_missions-46036.json",
+            "remoteOnly": false
+          },
+          {
+            "hash": null,
+            "label": "Land confirming run result (163/163)",
+            "location": "evidence/runtime/in-game/land_missions-38972.json",
+            "remoteOnly": false
+          },
+          {
+            "hash": null,
+            "label": "Review record",
+            "location": "evidence/fwg/naval-missions-review.md",
+            "remoteOnly": false
+          }
+        ],
+        "branch": "codex/fwgc-procedural-campaign",
+        "changedFiles": [
+          "src/MNBL.ProceduralWorld/Automation/NavalMissionsProbe.cs",
+          "src/MNBL.ProceduralWorld/Automation/LandMissionsProbe.cs",
+          "src/MNBL.ProceduralWorld/Automation/AutorunProbes.cs",
+          "src/MNBL.ProceduralWorld/Campaign/GeneratedNavalMapSceneWrapper.cs",
+          "src/MNBL.ProceduralWorld/Diagnostics/RuntimeMissionProbe.cs",
+          "tests/Runtime/NavalScenarios.json",
+          "tests/Runtime/fixtures/naval-missions-46036.json",
+          "tests/Runtime/check_naval_scenarios.py",
+          "tests/Runtime/test_naval_regressions.py",
+          "tools/summarize_naval_missions.py",
+          "tools/Test-NavalMissions.ps1",
+          "docs/naval-missions.md",
+          "docs/land-missions.md",
+          "docs/runtime-capabilities.md",
+          "docs/mission-scenes.md",
+          "docs/campaign-behavior-compatibility.md",
+          "docs/naval-content.md",
+          "evidence/fwg/naval-missions-review.md",
+          "evidence/gameplay/naval-scenarios.json",
+          "evidence/gameplay/naval-scenarios-tests.txt"
+        ],
+        "commits": [],
+        "summary": "Naval gameplay on generated world A (docs/naval-missions.md). New probe naval_missions (Automation/NavalMissionsProbe.cs) on MMR-52's land_missions harness loads the designated save and takes War Sails' installed paths in order:\n- shipyard purchase (PortScreenTradeModeHandler, buy button state read) and port-menu repair;\n- port-to-port and island voyages as map clicks, a harbour-village drop-off, and a coastal landing by a click on land (MapState.ProcessTravel: the 2 h sea-to-land transition, the anchor left at the coast), each with re-boarding at the anchor;\n- a land siege of a port town that activates the blockade (arcs on water), lifted;\n- a pirate battle at sea (a retreat), a seaborne raid through War Sails' landing controller (agents counted ashore by AgentNavalComponent.SteppedShip), and a naval defeat with capture, forced escape and the raft;\n- AI transitions and same-tick sea arrivals (island port towns counted), and a per-clan pirate audit (zones == served == plan).\nScenario file tests/Runtime/NavalScenarios.json (world, pinned targets used by the probe, rules, 13 cases, 8 regressions each guarded by a fixture mutation that must fail a named check); summarizer tools/summarize_naval_missions.py; offline tools/Test-NavalMissions.ps1.\n\nConfirming run 46036: 104/104 recomputed checks, 13/13 cases, status ok, no reload. Land run 38972 after the shared harness changes: 163/163, 14/14. One independent read-only review (2 blockers, 6 major, 13 minor), all fixed in one batch: evidence/fwg/naval-missions-review.md.\n\nFinding: the raid always ends at village_raid_ended_leaded_by_someone_else because MapEvent.FinalizeEventAux dispatches OnMapEventEnded before RaidEventComponent.OnBeforeFinalize loots the village (installed engine order, recorded and documented).\n\nNot covered and disclosed in the doc's limits:\n- no voyage crosses water narrower than 8.5 (the pinned targets are coastal, not a narrow strait);\n- boarding, crew reinforcement, battle damage, and outcomes decided by fighting (the probe kills the raid's defenders; the pirate battle is a retreat);\n- return to a ship inside a mission;\n- defender navigation and per-hull clearance;\n- blockade battles or AI blockades;\n- visual water judgement;\n- world B.\nNo adapter seam bypass was found. No commits made."
+      },
+      "reconciledAt": null,
+      "revisionId": "rv_01m4xazdg471p8ggry5yynj8ye",
+      "state": "accepted",
+      "submittedAt": "2026-10-18T12:59:42.642Z",
+      "supersededAt": null,
+      "ticketContentHash": "sha256:9f8783030fe3ea583a7e20196182a7da21a8c2030030d70a3b6bdd617dc12ca1",
+      "ticketId": "tk_01m4fqfbgm6fz7za27erzb4tzv",
+      "updatedAt": "2026-10-18T12:59:52.626Z",
+      "worker": {
+        "catalogRevision": null,
+        "effort": "medium",
+        "hostId": null,
+        "label": "Claude Code",
+        "modelId": "claude-opus-5-5",
+        "rationale": "Last ready ticket of row 28 after MMR-52. It verifies the naval missions on the generated worlds, reusing MMR-52's land_missions harness (designated save, Case fail-soft with asserts/log window, spawn and return checks, world B fallback, fixture mutation guards) and MMR-38/MMR-40's ports and MMR-42's naval scene resolution.",
+        "sessionId": null
+      }
+    },
+    {
+      "createdAt": "2026-10-18T13:00:28.002Z",
+      "decidedAt": "2026-10-18T14:15:04.749Z",
+      "decision": {
+        "decidedBy": "Claude Code",
+        "notes": "Accepted after recomputing the summary (20/20), running Test-WorldSetup (29/29) and checking the live wait text in run 35468. Unresolved: the first-start freeze (stated); the bench/end-to-end C++ artifacts were not written (explained).",
+        "outcome": "accepted",
+        "reasons": []
+      },
+      "evidence": {
+        "checks": [
+          {
+            "detail": "20/20 checks, status ok; findings: 383 s engine-thread freeze during the first start; caches 382 s of 400 s",
+            "name": "first_test_profile run 35468 recomputed",
+            "status": "passed"
+          },
+          {
+            "detail": "29/29 with the merged budget (60 s, 7 min)",
+            "name": "tools/Test-WorldSetup.ps1",
+            "status": "passed"
+          },
+          {
+            "detail": "no errors",
+            "name": "MSBuild compile check",
+            "status": "passed"
+          },
+          {
+            "detail": "1 blocker, 8 major, 10 minor; all fixed in one batch",
+            "name": "Independent read-only review",
+            "status": "passed"
+          },
+          {
+            "detail": "not written; a compiler-only bench is not end to end; the bridge's own timings and the game path cover it",
+            "name": "C++ bench and end-to-end bundle test",
+            "status": "skipped"
+          },
+          {
+            "detail": "the game does not respond for 383 s while navigation caches build on the engine thread; stated in findings, doc and wait text, not resolved",
+            "name": "First-start responsiveness",
+            "status": "failed"
+          }
+        ],
+        "criteria": [
+          {
+            "criterionId": "c1",
+            "met": true,
+            "note": "Verified in worldgen/validation/first-test-measurements.json (run 35468, 20/20): end-to-end phases, splits, memory, disk, frames, save/load, machine, settings and build fingerprints."
+          },
+          {
+            "criterionId": "c2",
+            "met": true,
+            "note": "one-shot-budget.json carries testedSettings and provisionalLimits with the no-guarantee rule; limits recomputed from merged measurements."
+          },
+          {
+            "criterionId": "c3",
+            "met": true,
+            "note": "Geography and engine-route differences recomputed; acceptance-seeds.json lists chosen and rejected seeds with reasons and caveats."
+          },
+          {
+            "criterionId": "c4",
+            "met": true,
+            "note": "The setup text reads the measured budget (60 s, 7 min, freeze warning), shown live; the 383 s freeze is explicit in findings."
+          }
+        ],
+        "notes": "Expected artifacts compile_world_bench.cpp and end_to_end_bundle_tests.cpp were not created (explained in the doc). The freeze on first start is an unresolved responsiveness issue, stated, not fixed."
+      },
+      "failure": null,
+      "fencingToken": 1,
+      "id": "at_01m57hjtf2w502g0xjxftbemyr",
+      "kind": "work",
+      "number": 1,
+      "outputs": {
+        "artifacts": [
+          {
+            "hash": null,
+            "label": "First-test measurements (run 35468, 20/20)",
+            "location": "worldgen/validation/first-test-measurements.json",
+            "remoteOnly": false
+          },
+          {
+            "hash": null,
+            "label": "Budget with startCampaign and provisional limits",
+            "location": "worldgen/policies/one-shot-budget.json",
+            "remoteOnly": false
+          },
+          {
+            "hash": null,
+            "label": "Acceptance seeds",
+            "location": "worldgen/fixtures/acceptance-seeds.json",
+            "remoteOnly": false
+          },
+          {
+            "hash": null,
+            "label": "Confirming run",
+            "location": "evidence/runtime/in-game/first_test_profile-35468.json",
+            "remoteOnly": false
+          },
+          {
+            "hash": null,
+            "label": "Review record",
+            "location": "evidence/fwg/first-test-profile-review.md",
+            "remoteOnly": false
+          }
+        ],
+        "branch": "codex/fwgc-procedural-campaign",
+        "changedFiles": [
+          "src/MNBL.ProceduralWorld/Automation/FirstTestProfileProbe.cs",
+          "src/MNBL.ProceduralWorld/Automation/AutorunProbes.cs",
+          "src/MNBL.ProceduralWorld/UI/WorldSetupModel.cs",
+          "src/MNBL.ProceduralWorld/UI/WorldSetupViewModel.cs",
+          "tests/UI/WorldSetupTests.cs",
+          "tools/summarize_first_test.py",
+          "tools/summarize_world_setup.py",
+          "worldgen/policies/one-shot-budget.json",
+          "worldgen/fixtures/acceptance-seeds.json",
+          "worldgen/validation/first-test-measurements.json",
+          "docs/first-test-profile.md",
+          "docs/world-setup.md",
+          "docs/world-preview.md",
+          "docs/generation-job.md",
+          "docs/runtime-backend-decision.md",
+          "docs/runtime-capabilities.md",
+          "evidence/fwg/first-test-profile-review.md",
+          "evidence/runtime/world-setup-tests.json",
+          "evidence/runtime/world-setup-tests.txt"
+        ],
+        "commits": [],
+        "summary": "The F03 first-test profile (recipe 3, size 129, phase 16, 3 quality attempts) measured end to end through the player's own path (docs/first-test-profile.md).\n\nNew probe first_test_profile (Automation/FirstTestProfileProbe.cs) runs four parts:\n- **A (seed 42), cold:** the setup screen's Confirm, the job record (each phase, worldbridge receipts, the producer's run-record), Start Campaign with player-style character creation, frame-by-frame responsiveness, the activation steps with navigation caches, map frames paused / play / fast forward with simulation rate, a timed manual save and load;\n- **seed 43:** tried, and refused after 3 quality attempts;\n- **B (seed 73):** generated to review;\n- **throughout:** memory sampled 4x/s per phase, store and job-directory disk, the machine, settings and build fingerprints (managed + native engine, embedded setup docs).\n\nSummarizer tools/summarize_first_test.py writes worldgen/validation/first-test-measurements.json with recomputed checks and explicit findings. Its --budget option merges runs by pid into worldgen/policies/one-shot-budget.json (generateWorld, new startCampaign phase, tested settings, provisional limits recomputed at about 1.5x). Seeds are recorded in worldgen/fixtures/acceptance-seeds.json. The setup's wait text (WorldSetupModel WaitTime) now states the first campaign start in minutes, with a freeze warning; the offline setup tests (29/29) derive their expectations from the budget.\n\n**Confirming run 35468: 20/20, status ok.**\n- **Generation:** A cold 32.7 s (producer 5.66 s, peak 247 MB; bridge bundle 5.93 s, peak 255 MB; scene encode 13.7 s).\n- **First start:** 398.9 s of activation work; navigation caches 382.3 s, the engine thread blocked 383.1 s (game not responding).\n- **Map:** 60 fps (a 60 fps cap); play 0.30 h/s, fast forward 1.20 h/s.\n- **Save and load:** save 1.1 s (3.7 MB); load 14.5 s.\n- **Memory:** game peak 5.1 GB working set, 7.5 GB private.\n- **Seeds:** B 55.7 s; seed 43 refused.\n- **A vs B:** different geography (land cells 2389 vs 4192, 36.8% same class) and engine routes (826 vs 1118, different matrices and meshes).\n- **Wait text:** the live screen showed 'about 60 seconds' and 'about 7 minutes more ... may stop responding'.\n\nTest run 17872 (15/17) found that StoppablePlay holds time. One independent read-only review (1 blocker, 8 major, 10 minor), all fixed in one batch: evidence/fwg/first-test-profile-review.md.\n\n**Unresolved, stated explicitly:**\n- the about 6.4-minute engine-thread freeze on every new world's first start, and on the first start or load after any module build;\n- one machine only;\n- seed 73 not playable (village binding);\n- seeds 44-72 not re-tried on this build.\n\n**Not written:** the expected src/WorldBridge/bench/compile_world_bench.cpp and src/WorldBridge/tests/end_to_end_bundle_tests.cpp. The doc explains why: a compiler-only bench is not end to end, and the bridge already times itself.\n\nA's bundle was moved aside for the cold run and the original restored (the regenerated copy differs only in runtime-lock hash, kept in build/mmr56-cold-bundle). No commits."
+      },
+      "reconciledAt": null,
+      "revisionId": "rv_01m4xazdg471p8ggry5yynj8ye",
+      "state": "accepted",
+      "submittedAt": "2026-10-18T14:14:53.496Z",
+      "supersededAt": null,
+      "ticketContentHash": "sha256:7d24402554c30c8301b76eb83a35bb46c44d79f5611d2ea95ad0dd594d294f77",
+      "ticketId": "tk_01m4fqfbgmw4wvsvp7fy58y1xk",
+      "updatedAt": "2026-10-18T14:15:04.749Z",
+      "worker": {
+        "catalogRevision": null,
+        "effort": "medium",
+        "hostId": null,
+        "label": "Claude Code",
+        "modelId": "claude-opus-5-5",
+        "rationale": "Only ready ticket (row 29) after MMR-53. It measures the first-test profile end to end through the in-game request-to-play path (generation, conversion, construction, nav-cache build, activation, save/load) on the pinned build, records provisional limits in worldgen/policies/one-shot-budget.json, feeds the MMR-43 wait text, and reports A/B seed differentiation (geography hashes, route matrices) citing MMR-24 for determinism.",
+        "sessionId": null
+      }
+    },
+    {
+      "createdAt": "2026-10-18T14:17:11.542Z",
+      "decidedAt": "2026-10-18T16:52:20.146Z",
+      "decision": {
+        "decidedBy": "Claude Code",
+        "notes": "Accepted with the read-only and code-page limits and the owner decisions disclosed (epic comment cm_01m57yv2gfsx5qnydkyaaq5ys2).",
+        "outcome": "accepted",
+        "reasons": []
+      },
+      "evidence": {
+        "checks": [
+          {
+            "detail": "27/27 checks: c1 13, c2 7, c3 7. Install probe 9276, disabled boot 40572, removed boot 31356, reload probe 40996, read-only probe 47592, baseline 43464.",
+            "name": "clean-install verdict (tools/summarize_clean_install.py --baseline-pid 43464)",
+            "status": "passed"
+          },
+          {
+            "detail": "8/8",
+            "name": "CI tooling unit tests (python -m unittest discover -s tests/ci)",
+            "status": "passed"
+          },
+          {
+            "detail": "3 registered mods; versions checked against HEAD",
+            "name": "mods.py registry check",
+            "status": "passed"
+          },
+          {
+            "detail": "0 of 30,170 installed game files identical to a packaged file; 36 embedded resources equal to the repository, none extra; the template ships only this module's files, matching the recipe; native imports recorded.",
+            "name": "package audits (tools/Package.ps1)",
+            "status": "passed"
+          },
+          {
+            "detail": "scene.xscene derived from the installed official scene reproduces the template byte for byte (0380c71fad31).",
+            "name": "surface template derivation proof (make_surface_template.py)",
+            "status": "passed"
+          },
+          {
+            "detail": "ANSI case (spaces, &, accents) published f596b58c…; CJK case refused with unrepresentable_path, as designed.",
+            "name": "paths (tools/Test-PackagePaths.ps1)",
+            "status": "passed"
+          },
+          {
+            "detail": "Valid denial (reads work, creation refused). The module cannot generate or load a world: the scene install into Modules/MNBL.ProceduralWorld/SceneObj is denied. The failure is clean (no hang, no vanilla start, no partial scene). Unsupported by design, because the engine reads scenes only from a module's SceneObj. The player sees the generic BadSource message with the denied path. Disclosed in docs/packaging.md.",
+            "name": "read-only installation",
+            "status": "failed"
+          },
+          {
+            "detail": "One read-only reviewer: 1 blocker, 9 major and about 20 minor findings; all fixed in one batch or disclosed (evidence/fwg/packaging-review.md). Post-review confirming-sequence fixes (read-only denial without SYNCHRONIZE, summary baseline and descriptor-scan filter) are recorded there.",
+            "name": "independent review",
+            "status": "passed"
+          }
+        ],
+        "criteria": [
+          {
+            "criterionId": "c1",
+            "met": true,
+            "note": "Verified against evidence/release/clean-install.json (27/27) and probe 9276: package-only install (no receipt, clean store), War Sails and Harmony active, seed 42 generated as the development scene, campaign entered with 358 settlements, no new missing-line kinds against dev baseline 43464."
+          },
+          {
+            "criterionId": "c2",
+            "met": true,
+            "note": "Manifest complete (11 files: hashes, provenance, dependencies, runtime, build, licenses); 0 of 30,170 game files identical; official-derived template files are derived at run time, not shipped. The copied culture text is an owner decision recorded on the epic; it gates public release, which this ticket excludes."
+          },
+          {
+            "criterionId": "c3",
+            "met": true,
+            "note": "Disabled and removed boots reach the main menu; world data, saves and official files are unchanged byte for byte; the reinstalled module loads the save with no scene left. Vanilla save and campaign without the module are not covered (disclosed)."
+          }
+        ],
+        "notes": "The full land, naval and save scenario on this package is MMR-1's, per the ticket. The release build from CI (reference assemblies, from a commit) is a separate action. This package was built locally from an uncommitted working tree (ownedFilesUncommitted in the manifest). No Workshop or public publishing was done."
+      },
+      "failure": null,
+      "fencingToken": 1,
+      "id": "at_01m57nza3pdrsszz3eyh6r4wer",
+      "kind": "work",
+      "number": 1,
+      "outputs": {
+        "artifacts": [
+          {
+            "hash": "sha256:f70b44c0879d4389fced8c16e61ea5fb331995ae862acdd8bfe1ddf8d86b314f",
+            "label": "Local package (git-ignored)",
+            "location": "artifacts/release/MNBL.ProceduralWorld-v0.0.1.zip",
+            "remoteOnly": false
+          },
+          {
+            "hash": null,
+            "label": "Package manifest",
+            "location": "evidence/release/package-manifest.json",
+            "remoteOnly": false
+          },
+          {
+            "hash": null,
+            "label": "Clean-install verdict (27/27)",
+            "location": "evidence/release/clean-install.json",
+            "remoteOnly": false
+          },
+          {
+            "hash": null,
+            "label": "Packaging doc with results and limits",
+            "location": "docs/packaging.md",
+            "remoteOnly": false
+          },
+          {
+            "hash": null,
+            "label": "Review record",
+            "location": "evidence/fwg/packaging-review.md",
+            "remoteOnly": false
+          }
+        ],
+        "branch": "codex/fwgc-procedural-campaign",
+        "changedFiles": [
+          "config/mods.json",
+          ".github/workflows/mod-releases.yml",
+          "tools/ci/mods.py",
+          "tests/ci/test_mods.py",
+          "tools/ci/CiBuild.ps1",
+          "tools/ci/Build-ProceduralWorld.ps1",
+          "tools/Package.ps1",
+          "tools/Deploy-Dev.ps1",
+          "src/MNBL.ProceduralWorld/World/SurfaceTemplateSource.cs",
+          "src/MNBL.ProceduralWorld/World/RuntimeWorldBackend.cs",
+          "src/MNBL.ProceduralWorld/Automation/CleanInstallProbe.cs",
+          "src/MNBL.ProceduralWorld/Automation/AutorunProbes.cs",
+          "tools/scenebin/make_surface_template.py",
+          "Modules/MNBL.ProceduralWorld/SurfaceTemplate/terrain.bin",
+          "Modules/MNBL.ProceduralWorld/SurfaceTemplate/navmesh.bin",
+          "Modules/MNBL.ProceduralWorld/SurfaceTemplate/template-recipe.json",
+          "tools/Test-CleanInstall.ps1",
+          "tools/Test-PackagePaths.ps1",
+          "tools/summarize_clean_install.py",
+          "docs/packaging.md",
+          "docs/releases.md",
+          "evidence/fwg/packaging-review.md",
+          "evidence/release/clean-install.json",
+          "evidence/release/package-manifest.json"
+        ],
+        "commits": [],
+        "summary": "Procedural World is packaged through the per-mod release pipeline and was tested installed on its own: clean-install verdict 27/27.\n\nPackage:\n- `mods.py package` checks the new `package` block in config/mods.json (the only files a package may hold, with provenance, dependencies, runtime requirements, licenses, content notes and what is not redistributed). It refuses a missing listed file, an unlisted file, a file without provenance, or any file named like an official game, DLC or dependency file, before it writes anything. It also writes `<id>-<version>.manifest.json` with every file's size and SHA-256; the release workflow uploads it.\n- `tools/Package.ps1` builds the local package from this PC's verified build. It adds two audits CI cannot run: no packaged file is identical to any of 30,170 installed game files, and the assembly embeds exactly the repository's 36 worldgen files. Archive MNBL.ProceduralWorld-v0.0.1.zip: 11 files, sha f70b44c0879d….\n\nGap found and fixed: the development install had masked a missing content dependency. The surface template's scene.xscene and atmosphere.xml are official-derived, so they cannot ship. `World/SurfaceTemplateSource.cs` now derives them on the player's machine from the installed SandBoxCore battle_terrain_001 into the per-user store, with recipe hashes. The module writes flora.bin, which is byte-identical to official empty flora files. The package ships only this module's terrain.bin, navmesh.bin and the recipe. `tools/scenebin/make_surface_template.py` proves the derivation byte for byte.\n\nClean install: the `tools/Test-CleanInstall.ps1` orchestrator and the `clean_install` probe. The sequence holds the battle-scale lock, moves the development module and store aside, and puts both back.\n- The package installed alone loads with War Sails and Harmony. It generates seed 42 as the same scene the development install makes, enters the campaign (358 settlements), and has no missing asset of its own. Every missing-line kind also appears in the development baseline run 43464.\n- With the module present but disabled, and with it removed, the game boots to the main menu. The world data (906 files), the 103 saves and the official files are unchanged.\n- Reinstalled with no scene left, the save loads to the map.\n\nPaths with spaces, & and code-page accents work; letters outside the code page are refused cleanly.\n\nRead-only module folder (a valid denial: reads work, creation refused): generation fails and the load is refused cleanly, with no hang. It is unsupported by design, because the engine reads scenes only from the module's SceneObj.\n\nOpen owner decisions:\n- the assembly embeds about 1,051 strings of copied official culture text;\n- the native executables need the VC++ 2015-2022 x64 runtime."
+      },
+      "reconciledAt": null,
+      "revisionId": "rv_01m4xazdg471p8ggry5yynj8ye",
+      "state": "accepted",
+      "submittedAt": "2026-10-18T16:51:55.234Z",
+      "supersededAt": null,
+      "ticketContentHash": "sha256:d73740eaeb31a38327d4a35ead543acd6908cab0db819b00ca39367047aee637",
+      "ticketId": "tk_01m4fqfbgmgdqahamt65ejaxz7",
+      "updatedAt": "2026-10-18T16:52:20.146Z",
+      "worker": {
+        "catalogRevision": null,
+        "effort": "medium",
+        "hostId": null,
+        "label": "Claude Code",
+        "modelId": "claude-opus-5-5",
+        "rationale": "Only ready ticket (row 30) after MMR-56. Package the Procedural World module through the existing per-mod release pipeline (config/mods.json, tools/ci) with a hashed manifest, dependencies, provenance and licenses and an exclusion audit; then install the staged package alone into the game and verify load with War Sails, New Campaign generate and enter, assets resolving, plus install/disable/remove behaviour, spaces/non-ASCII paths and a read-only module folder.",
+        "sessionId": null
+      }
+    },
+    {
+      "createdAt": "2026-10-18T16:52:35.038Z",
+      "decidedAt": "2026-10-18T17:48:22.878Z",
+      "decision": {
+        "decidedBy": "Claude Code",
+        "notes": "Accepted after one independent review (1 blocker, 7 major and 11 minor findings, all fixed or disclosed). Owner decision on a release at merge: epic comment cm_01m5821pfrqadmnf6rjems844z.",
+        "outcome": "accepted",
+        "reasons": []
+      },
+      "evidence": {
+        "checks": [
+          {
+            "detail": "Test-ApiPins: PASS (31 files); check_producer_lock.py: 22/22 with and without --source, and a clean 20/22 FAIL with a missing checkout; Doctor -Output <scratch>: inventory passed; Deploy-Dev -DryRun: receipt valid against the current build (assembly a61d6dc7, fwg 564c2629, worldbridge 776c1606); unittest tests/ci OK.",
+            "name": "setup commands run as documented (no build, no game)",
+            "status": "passed"
+          },
+          {
+            "detail": "Every tools/*.ps1, tests and docs path named in the runbooks exists; the probe list matches AutorunProbes.cs; Collect-OwnedProbe usage corrected (it takes -Record, not -ProcessId).",
+            "name": "cited commands, scripts, probes and paths exist",
+            "status": "passed"
+          },
+          {
+            "detail": "tools/build_acceptance_index.py: 82 files hashed, statuses consistent with aspects, no passing aspect with a recorded failure except 3 designed cases listed in the index.",
+            "name": "acceptance index build",
+            "status": "passed"
+          },
+          {
+            "detail": "Every relative link in README, both runbooks and releases.md resolves.",
+            "name": "links",
+            "status": "passed"
+          },
+          {
+            "detail": "One read-only reviewer: 1 blocker (Doctor requires the Modding Kit, now documented, with Doctor optional and kit-free setup commands), 7 major and 11 minor findings, all fixed in one batch or disclosed: load-refusal behaviour, vanilla/module-absent loads, transfer scope, the re-save claim, the release-on-merge risk, scoped pass aspects (s5 became not-run), the error-code gaps and wording.",
+            "name": "independent review",
+            "status": "passed"
+          },
+          {
+            "detail": "Build.ps1 and Build-Fwg.ps1 were not re-run in this ticket: the current build is MMR-57's, validated by Deploy-Dev -DryRun. Whether a fresh FWGC++ build reproduces the pinned bytes is unshown; the runbook says so and gives the published-binary fallback.",
+            "name": "build reproduction by a fresh developer",
+            "status": "skipped"
+          }
+        ],
+        "criteria": [
+          {
+            "criterionId": "c1",
+            "met": true,
+            "note": "Setup and deploy commands were run as documented (Test-ApiPins, check_producer_lock with --source, Doctor -Output, Deploy-Dev -DryRun, the CI tests); every cited script, probe and path exists. The player flow matches WorldSetupModel/WorldSetupScreen. A full fresh build was not re-run (disclosed)."
+          },
+          {
+            "criterionId": "c2",
+            "met": true,
+            "note": "After the review's corrections the guidance matches the code and evidence: refusals leave a running campaign as it was, the guard needs the module enabled, transfer is offline-tested only, rollback to an older version is untested."
+          },
+          {
+            "criterionId": "c3",
+            "met": true,
+            "note": "The index maps s1-s7 to 82 hashed evidence files with consistent pass/fail/blocked/not-run statuses. The builder refuses inconsistencies and passing aspects whose evidence records failures. Deferred certification is listed once, outside the statuses."
+          }
+        ],
+        "notes": "11 cited evidence files (MMR-51..57 summaries, acceptance seeds, first-test measurements) are untracked in git; the index records that. Nothing was committed, by instruction. The owner decision about a release on merge is recorded on the epic."
+      },
+      "failure": null,
+      "fencingToken": 1,
+      "id": "at_01m57yvv2y4wb1ezh8hf2fv86v",
+      "kind": "work",
+      "number": 1,
+      "outputs": {
+        "artifacts": [
+          {
+            "hash": null,
+            "label": "One-shot acceptance index",
+            "location": "evidence/one-shot/acceptance-index.json",
+            "remoteOnly": false
+          },
+          {
+            "hash": null,
+            "label": "Index builder",
+            "location": "tools/build_acceptance_index.py",
+            "remoteOnly": false
+          },
+          {
+            "hash": null,
+            "label": "Developer runbook",
+            "location": "docs/runbooks/development.md",
+            "remoteOnly": false
+          },
+          {
+            "hash": null,
+            "label": "Player runbook",
+            "location": "docs/runbooks/player-worlds.md",
+            "remoteOnly": false
+          },
+          {
+            "hash": null,
+            "label": "README",
+            "location": "README.md",
+            "remoteOnly": false
+          }
+        ],
+        "branch": "codex/fwgc-procedural-campaign",
+        "changedFiles": [
+          "README.md",
+          "docs/runbooks/development.md",
+          "docs/runbooks/player-worlds.md",
+          "tools/build_acceptance_index.py",
+          "evidence/one-shot/acceptance-index.json",
+          "docs/runtime-backend-decision.md",
+          "docs/world-loading.md",
+          "docs/world-activation.md",
+          "docs/runtime-capabilities.md",
+          "docs/releases.md",
+          "tests/check_producer_lock.py"
+        ],
+        "commits": [],
+        "summary": "Documentation of the tested local package, plus the one-shot acceptance index.\n\nREADME.md, rewritten:\n- states the real status (a local test package, not a release; only seed 42 gives a playable world; first start about 7 minutes; open decisions);\n- gives the s1-s7 status table from the index;\n- warns that a merge into main would publish v0.0.1 as an ordinary release;\n- links the runbooks, the docs map and the mods.\n\ndocs/runbooks/development.md (new):\n- prerequisites with pins and who checks them, and this PC's hard-coded paths;\n- setup and build commands (all checked);\n- which commands rewrite tracked evidence;\n- the producer pin and the fallback download;\n- offline tests and how to make the test bundles; deploy (refusals, copies, receipt, -DryRun);\n- rolling back a deployed build;\n- the in-game probe flow and the shared-installation rules;\n- packaging and the clean-install test; locations; known tooling gaps.\n\ndocs/runbooks/player-worlds.md (new):\n- requirements, install, the New Procedural Campaign flow with its real texts and keys;\n- seed behaviour (only seed 42 plays; seed 73 previews then is refused);\n- times and the first-start freeze;\n- content mapping (culture table, kingdoms and clans, names, no 24-town cap, world A counts, asset reuse, no Calradia objects);\n- topology and seam behaviour and limits; world and save locations; backup and transfer (with the gaps stated);\n- compatibility, module update and rollback;\n- the load-refusal table;\n- a troubleshooting matrix keyed to the real generation error codes; known limits.\n\nevidence/one-shot/acceptance-index.json, generated by the new tools/build_acceptance_index.py:\n- maps s1-s7 to 82 evidence files (SHA-256, git tracking, the verdict fields each file records);\n- each criterion's aspects use pass/fail/blocked/not-run;\n- s1 pass, s2 fail, s3 fail, s4 fail, s5 not-run, s6 blocked, s7 not-run;\n- the script refuses a missing file, a criterion status that disagrees with its aspects, or a passing aspect whose evidence records a failure (3 designed cases are listed with reasons);\n- deferred certification is listed once and is outside every status;\n- identities and build currency; a finalScenario slot for MMR-1.\n\nStale records fixed:\n- runtime-backend-decision.md: load, alternate-load, autosave, periodic-resume and canonical-state rows from MMR-48/49; the re-save row scoped to MMR-50;\n- world-loading.md: not-generated refusal row;\n- world-activation.md: cleanup never removes packages;\n- runtime-capabilities.md: the grazing ray superseded; the load NullReferenceExceptions marked open, not informational;\n- releases.md: the release warning.\n\ntests/check_producer_lock.py gained --source and a clean failure without a checkout."
+      },
+      "reconciledAt": null,
+      "revisionId": "rv_01m4xazdg471p8ggry5yynj8ye",
+      "state": "accepted",
+      "submittedAt": "2026-10-18T17:48:12.714Z",
+      "supersededAt": null,
+      "ticketContentHash": "sha256:367a0a23913416ec77fc19cb749c502cdae9e7e3eb0842de1be7df96af4cba76",
+      "ticketId": "tk_01m4fqfbgmbwtnjnqcfsmpm90r",
+      "updatedAt": "2026-10-18T17:48:22.878Z",
+      "worker": {
+        "catalogRevision": null,
+        "effort": "medium",
+        "hostId": null,
+        "label": "Claude Code",
+        "modelId": "claude-opus-5-5",
+        "rationale": "Only ready ticket (row 31) after MMR-57. Write the README and the developer and player runbooks from the implemented commands and paths, a troubleshooting matrix tied to real error codes, and evidence/one-shot/acceptance-index.json mapping epic s1-s7 to current evidence with pass/fail/blocked/not-run and the deferred certification listed as not run.",
+        "sessionId": null
+      }
+    },
+    {
+      "createdAt": "2026-10-18T17:49:15.318Z",
       "decidedAt": null,
       "decision": null,
       "evidence": null,
       "failure": null,
       "fencingToken": 1,
-      "id": "at_01m54zy8dmgs8xkmanykbpdy8x",
+      "id": "at_01m5823knpjd7ffgm736317b14",
       "kind": "work",
       "number": 1,
       "outputs": null,
@@ -7655,16 +8829,16 @@
       "state": "running",
       "submittedAt": null,
       "supersededAt": null,
-      "ticketContentHash": "sha256:284219f9f924518e5217f773ae8a8b073d358ebf75554ed4d9c45c6f437b473f",
-      "ticketId": "tk_01m4fqfbgkz61vc2vqzb3vhggb",
-      "updatedAt": "2026-10-17T14:27:42.133Z",
+      "ticketContentHash": "sha256:2c5c238dace1f7ccee0feb822c0297e71b59abb933e5e78e7aa52331904e3afe",
+      "ticketId": "tk_01m4fpnf64s6r96g13ymz26760",
+      "updatedAt": "2026-10-18T19:14:06.227Z",
       "worker": {
         "catalogRevision": null,
         "effort": "medium",
         "hostId": null,
         "label": "Claude Code",
         "modelId": "claude-opus-5-5",
-        "rationale": "Next ready ticket after MMR-48. It builds directly on the save binding just accepted: the header binding (mnbl.world.* + mnbl.save.* compatibility keys), the reference index and the inspector are what a load reads before deserialization. Same session, same context on the activation (MMR-45), the store and the save hooks.",
+        "rationale": "The sprint's acceptance node, ready after MMR-58. Run the established offline suites on the integrated sources, then the seven-step one-shot scenario on the clean MMR-57 package with the development module and store aside, recording every step pass/fail/blocked/not-run in evidence/one-shot/acceptance-index.json. The increment commit is the owner's to approve (no commits without permission); B-dependent steps are expected blocked (only seed 42 activates).",
         "sessionId": null
       }
     }

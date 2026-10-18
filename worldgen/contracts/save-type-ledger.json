@@ -5,6 +5,8 @@
   "rule": "Module-fixed save definitions only: SaveableTypeDefiner base and type/container ids, SyncData keys and save header keys. They are constants of the module, versioned here and never derived from a world, seed or campaign. Per-world generated object ids (mnbl_<8 hex>_..., CampaignIdentity) are StringIds inside a campaign's game data and never appear in this ledger. Entries are append-only: an id or key, once listed, keeps its meaning; a change of a saved shape gets a new id or key, a new entry and a migration (MMR-50). tests/Persistence/fixtures/save-type-ledger.v1.json is entry 1 frozen; SaveBindingTests checks the ledger still begins with it and its last entry matches the code.",
   "saveIdBase": 7910000,
   "reservedRange": { "first": 7910000, "last": 7919999 },
+  "converterRule": "MMR-50: a save made under another saveIdsVersion, binding contract or identity schema loads only through a converter listed here, each with a tested fixture of the version it reads. None is implemented, so such a save is refused (incompatible-build), never converted, and no migration is offered to the player. A converter would copy the save (the original is never written), convert the copy and verify it before it is offered.",
+  "converters": [],
   "entries": [
     {
       "entry": 1,

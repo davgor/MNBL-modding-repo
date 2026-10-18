@@ -1,7 +1,9 @@
 """Checks worldgen/producer.lock.json against the accepted F02/R01 provenance and the live inputs.
 
 Offline; launches nothing. Exit 0 only when every pin agrees.
+Usage: python tests/check_producer_lock.py [--source <FWGC++ checkout>]  (default: the lock's localSource, this PC's checkout)
 """
+import argparse
 import hashlib
 import json
 import subprocess
@@ -15,7 +17,10 @@ def sha(path):
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 
 
-def main():
+def main(argv=None):
+    ap = argparse.ArgumentParser(description='Check the producer lock against its evidence and the live inputs.')
+    ap.add_argument('--source', help="the FWGC++ checkout (default: the lock's localSource)")
+    args = ap.parse_args(argv)
     lock = json.loads((REPO / 'worldgen/producer.lock.json').read_text(encoding='utf-8'))
     tools = json.loads((REPO / 'tools.lock.json').read_text(encoding='utf-8'))
     producer, toolchain, runtime = lock['producer'], lock['toolchain'], lock['runtime']
@@ -48,11 +53,16 @@ def main():
     version = '.'.join(line.split('=', 1)[1] for line in cache.splitlines()
                        if line.split(':', 1)[0] in ('CMAKE_CACHE_MAJOR_VERSION', 'CMAKE_CACHE_MINOR_VERSION', 'CMAKE_CACHE_PATCH_VERSION'))
     check(toolchain['cmake'].startswith(version), 'producer CMake cache version ' + version)
-    source = Path(producer['localSource'])
-    head = subprocess.run(['git', '-C', str(source), 'rev-parse', 'HEAD'], capture_output=True, text=True).stdout.strip()
-    dirty = subprocess.run(['git', '-C', str(source), 'status', '--porcelain'], capture_output=True, text=True).stdout.strip()
-    check(head == producer['sourceCommit'] and dirty == '', 'local FWGC++ checkout is the pinned clean commit')
-    check(sha(source / 'dependencies.json') == lock['contentProvenance']['dependencyManifestSha256'], 'dependency manifest hash')
+    source = Path(args.source or producer['localSource'])
+    if not (source / '.git').exists():
+        check(False, 'local FWGC++ checkout at %s (pass --source)' % source)
+        check(False, 'dependency manifest hash (no checkout)')
+    else:
+        head = subprocess.run(['git', '-C', str(source), 'rev-parse', 'HEAD'], capture_output=True, text=True).stdout.strip()
+        dirty = subprocess.run(['git', '-C', str(source), 'status', '--porcelain'], capture_output=True, text=True).stdout.strip()
+        check(head == producer['sourceCommit'] and dirty == '', 'local FWGC++ checkout is the pinned clean commit')
+        manifest = source / 'dependencies.json'
+        check(manifest.is_file() and sha(manifest) == lock['contentProvenance']['dependencyManifestSha256'], 'dependency manifest hash')
     for failure in failures:
         print('FAIL:', failure)
     print(('PASS' if not failures else 'FAIL') + ': %d/%d producer lock checks' % (checks - len(failures), checks))

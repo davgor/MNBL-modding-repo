@@ -52,9 +52,12 @@ namespace MNBL.ProceduralWorld.Automation
     // tools/summarize_two_world_matrix.py from the outputs.
     internal static class TwoWorldMatrixProbe
     {
-        internal static IEnumerator Run(ProbeContext context)
+        internal static IEnumerator Run(ProbeContext context) { return Nested(Body(context)); }
+
+        // Runs a probe body whose steps yield nested enumerators (EndGame, Frames, a load): each runs to its end before the body goes on.
+        internal static IEnumerator Nested(IEnumerator body)
         {
-            var stack = new Stack<IEnumerator>(); stack.Push(Body(context));
+            var stack = new Stack<IEnumerator>(); stack.Push(body);
             try
             {
                 while (stack.Count > 0)
@@ -167,8 +170,23 @@ namespace MNBL.ProceduralWorld.Automation
         {
             var world = new Dictionary<string, object>();
             st.Worlds[key] = world;
-            var refused = new List<object>(); world["seedsRefused"] = refused;
             var steps = new Dictionary<string, object>(); world["steps"] = steps;
+            yield return StartGenerated(context, world, key, seeds, context.Str("culture", "empire"), "two_world_matrix");
+            var binding = WorldSaveBinding.BindingOf(Campaign.Current.GetCampaignBehavior<WorldIdentityBehavior>());
+            string prefix = (string)world["prefix"];
+            var initial = SaveBindingRuntime.Store.Journal(binding.Instance);
+            world["initialSave"] = initial == null ? null : initial.SaveName;
+            var watched = new List<string>(); world["watchedHeroes"] = watched;
+            // Mutable state, then the save.
+            yield return ScenarioA(context, st, world, steps, watched, prefix);
+            yield return SaveAndEnd(context, st, key, world, prefix, watched);
+        }
+
+        // A new campaign of a generated world from the world setup screen (generation, activation, character creation), as the player starts
+        // one: the first candidate seed that generates is used. Ends on the campaign map with time stopped; the world's identity in the row.
+        internal static IEnumerator StartGenerated(ProbeContext context, Dictionary<string, object> world, string key, uint[] seeds, string culture, string tag)
+        {
+            var refused = new List<object>(); world["seedsRefused"] = refused;
             Module.CurrentModule.ExecuteInitialStateOptionWithId(WorldSetupScreen.MenuId);
             double start = context.Seconds;
             while ((WorldSetupScreen.Current == null || !WorldSetupScreen.Current.MovieLoaded) && context.Seconds - start < 20) yield return null;
@@ -178,7 +196,7 @@ namespace MNBL.ProceduralWorld.Automation
             {
                 vm.SeedText = seed.ToString(CultureInfo.InvariantCulture); yield return null;
                 screen.HandleInput(k => k == SetupInput.Confirm, false);
-                context.Stage("two_world_matrix:" + key + ":generate:" + seed);
+                context.Stage(tag + ":" + key + ":generate:" + seed);
                 start = context.Seconds;
                 yield return null;
                 while (model.State == SetupState.Generating && context.Seconds - start < 1200) yield return null;
@@ -187,7 +205,7 @@ namespace MNBL.ProceduralWorld.Automation
             }
             if (model.State != SetupState.Generated) throw new InvalidOperationException("World " + key + " was not generated from any candidate seed: " + model.State + " " + model.Error);
             vm.ExecuteStartCampaign();
-            var creation = new NewCampaignFlowProbe.CreationDriver(context.Str("culture", "empire"), "MNBL " + key);
+            var creation = new NewCampaignFlowProbe.CreationDriver(culture, "MNBL " + key);
             start = context.Seconds;
             while (model.State == SetupState.Starting && context.Seconds - start < 3300)
             {
@@ -204,31 +222,36 @@ namespace MNBL.ProceduralWorld.Automation
             Campaign.Current.TimeControlMode = CampaignTimeControlMode.Stop;
             yield return Frames(30);
             var binding = WorldSaveBinding.BindingOf(Campaign.Current.GetCampaignBehavior<WorldIdentityBehavior>());
-            string prefix = binding.WorldId + "_";
-            world["worldId"] = binding.WorldId; world["prefix"] = prefix; world["instance"] = binding.Instance; world["package"] = binding.PackageName; world["contentId"] = binding.ContentId;
+            world["worldId"] = binding.WorldId; world["prefix"] = binding.WorldId + "_"; world["instance"] = binding.Instance; world["package"] = binding.PackageName; world["contentId"] = binding.ContentId;
             world["frame"] = PeriodicWorld.Current == null ? null : PeriodicWorld.Current.Coordinates.FrameIdentity;
-            var initial = SaveBindingRuntime.Store.Journal(binding.Instance);
-            world["initialSave"] = initial == null ? null : initial.SaveName;
-            var watched = new List<string>(); world["watchedHeroes"] = watched;
-            // Mutable state, then the save.
-            yield return ScenarioA(context, st, world, steps, watched, prefix);
-            yield return SaveAndEnd(context, st, key, world, prefix, watched);
         }
 
         // MMR-19's fixture world through the diagnostic bootstrap (as generated_campaign starts it): its package and identity are written once
         // the map is up, so every save names it.
         private static IEnumerator CreateFixtureWorld(ProbeContext context, State st, string key)
         {
-            var world = new Dictionary<string, object> { ["fixture"] = true };
+            var world = new Dictionary<string, object>();
             st.Worlds[key] = world;
             var steps = new Dictionary<string, object>(); world["steps"] = steps;
+            yield return StartFixture(context, world, key, "two_world_matrix");
+            world["initialSave"] = null;
+            var watched = new List<string>(); world["watchedHeroes"] = watched;
+            Instant(st, world, steps, watched, (string)world["prefix"], key);
+            yield return SaveAndEnd(context, st, key, world, (string)world["prefix"], watched);
+        }
+
+        // A new campaign of MMR-19's fixture world (fixtureSeed=, default 364610). Ends on the campaign map with time stopped and the
+        // diagnostic bootstrap no longer holding it paused; the world's identity in the row.
+        internal static IEnumerator StartFixture(ProbeContext context, Dictionary<string, object> world, string key, string tag)
+        {
+            world["fixture"] = true;
             uint seed = (uint)context.Int("fixtureSeed", 364610);
             world["seed"] = seed;
             var registration = GeneratedCampaignRegistration.Prepare(seed, context.Str("fixturePlacement", ""), context.Str("catalogReceipt", ""), context.Str("culture", "empire"),
                 context.Str("heroTemplate", "spc_legion_of_the_betrayed_leader_0"), context.Str("townPrototype", "town_EN2"), context.Str("villagePrototype", "village_EN1_3"));
             var support = new Dictionary<string, object>();
             var boot = DiagnosticSandboxBootstrap.StartGenerated(registration, registration.SceneName, registration.CultureId, census => { }, support,
-                stage => context.Stage("two_world_matrix:" + key + ":" + stage), registration.Periodic, registration.Climate);
+                stage => context.Stage(tag + ":" + key + ":" + stage), registration.Periodic, registration.Climate);
             double start = context.Seconds;
             while (!boot.Completed)
             {
@@ -248,12 +271,8 @@ namespace MNBL.ProceduralWorld.Automation
             string prefix = binding.WorldId + "_";
             world["worldId"] = binding.WorldId; world["prefix"] = prefix; world["instance"] = binding.Instance; world["package"] = binding.PackageName; world["contentId"] = binding.ContentId;
             world["frame"] = PeriodicWorld.Current == null ? null : PeriodicWorld.Current.Coordinates.FrameIdentity;
-            world["initialSave"] = null;
             boot.HoldPaused = false;
             Campaign.Current.TimeControlMode = CampaignTimeControlMode.Stop;
-            var watched = new List<string>(); world["watchedHeroes"] = watched;
-            Instant(st, world, steps, watched, prefix, key);
-            yield return SaveAndEnd(context, st, key, world, prefix, watched);
         }
 
         private static IEnumerator SaveAndEnd(ProbeContext context, State st, string key, Dictionary<string, object> world, string prefix, List<string> watched)
@@ -563,7 +582,7 @@ namespace MNBL.ProceduralWorld.Automation
 
         // What decides whether campaign time runs now: the mode and its lock, the game state, an encounter, a menu, an inquiry, the periodic
         // patches, the camera's animation, the hostile parties beside the player.
-        private static Dictionary<string, object> TimeState(double seconds)
+        internal static Dictionary<string, object> TimeState(double seconds)
         {
             var campaign = Campaign.Current; var main = MobileParty.MainParty;
             var map = Game.Current.GameStateManager.ActiveState as MapState;
@@ -581,7 +600,7 @@ namespace MNBL.ProceduralWorld.Automation
 
         // Ends what an encounter left open, as the player would leave it: a conversation (and the map's conversation view), the encounter, its
         // menu. What was ended is counted in the row.
-        private static void ClearEncounter(Dictionary<string, object> row)
+        internal static void ClearEncounter(Dictionary<string, object> row)
         {
             Action<string> count = key => row[key] = (row.ContainsKey(key) ? (int)row[key] : 0) + 1;
             var conversations = Campaign.Current.ConversationManager;
@@ -596,7 +615,7 @@ namespace MNBL.ProceduralWorld.Automation
         }
 
         // Leaves a game menu (an encounter's) for the map, where campaign time runs; the menus left are recorded.
-        private static void ExitMenu(Dictionary<string, object> row)
+        internal static void ExitMenu(Dictionary<string, object> row)
         {
             var map = Game.Current == null ? null : Game.Current.GameStateManager.ActiveState as MapState;
             if (map == null || map.MenuContext == null || map.MenuContext.GameMenu == null) return;
@@ -707,6 +726,8 @@ namespace MNBL.ProceduralWorld.Automation
             var after = new Dictionary<string, object>(); load["after"] = after;
             var positions = MobileParty.All.Where(p => p.IsActive && p != MobileParty.MainParty && p.CurrentSettlement == null && p.MapEvent == null)
                 .OrderBy(p => p.StringId, StringComparer.Ordinal).Take(80).ToDictionary(p => p.StringId, p => p.Position.ToVec2());
+            var prisoner = created.ContainsKey("prisoner") ? Hero.FindFirst(h => h.StringId == (string)created["prisoner"]) : null;
+            after["prisonerHeldAtLoad"] = prisoner != null && prisoner.IsPrisoner && prisoner.PartyBelongedToAsPrisoner == MobileParty.MainParty.Party;
             double hours = CampaignTime.Now.ToHours;
             Campaign.Current.TimeControlMode = CampaignTimeControlMode.UnstoppablePlay;
             double start = context.Seconds;
@@ -721,14 +742,16 @@ namespace MNBL.ProceduralWorld.Automation
             after["partiesMoved"] = positions.Count(kv => { var p = MobileParty.All.FirstOrDefault(x => x.StringId == kv.Key); return p != null && p.IsActive && p.Position.ToVec2().Distance(kv.Value) > 0.01f; });
             var owned = created.ContainsKey("ownedTown") ? Settlement.Find((string)created["ownedTown"]) : null;
             after["ownedByPlayer"] = owned != null && owned.OwnerClan == Clan.PlayerClan;
-            var prisoner = created.ContainsKey("prisoner") ? Hero.FindFirst(h => h.StringId == (string)created["prisoner"]) : null;
-            after["prisonerHeld"] = prisoner != null && prisoner.IsPrisoner && prisoner.PartyBelongedToAsPrisoner == MobileParty.MainParty.Party;
+            // While time runs a hero prisoner may escape (the installed hourly escape, run 2804): still held, or escaped and free, are play;
+            // held by another party, dead or gone are not.
+            after["prisonerAfterRun"] = prisoner == null ? "missing" : !prisoner.IsAlive ? "dead" : !prisoner.IsPrisoner ? "escaped" : prisoner.PartyBelongedToAsPrisoner == MobileParty.MainParty.Party ? "held" : "held elsewhere";
             // While time runs, the per-tick pass keeps party positions and order targets canonical; the other saved fields (BehaviorTarget,
             // anchors, tracks, map events) are made canonical at the save (CanonicalizeForSave) and may sit in a strip between saves.
             after["nonCanonicalPartiesAfterRun"] = PeriodicSeam.NonCanonicalSaved().Where(f => !f.EndsWith(".BehaviorTarget", StringComparison.Ordinal) && !f.Contains(".Anchor.")
                 && !f.StartsWith("Track[", StringComparison.Ordinal) && !f.StartsWith("MapEvent[", StringComparison.Ordinal)).Take(10).ToList();
-            st.Expect((double)after["hoursRun"] > 0 && (int)after["partiesMoved"] > 0 && (bool)after["ownedByPlayer"] && (bool)after["prisonerHeld"] && ((List<string>)after["nonCanonicalPartiesAfterRun"]).Count == 0,
-                "world B after load: campaign time runs and parties move; the town the player took is still the player's and the lord the player took is still held; party positions and targets canonical");
+            bool prisonerOk = (bool)after["prisonerHeldAtLoad"] && ((string)after["prisonerAfterRun"] == "held" || (string)after["prisonerAfterRun"] == "escaped");
+            st.Expect((double)after["hoursRun"] > 0 && (int)after["partiesMoved"] > 0 && (bool)after["ownedByPlayer"] && prisonerOk && ((List<string>)after["nonCanonicalPartiesAfterRun"]).Count == 0,
+                "world B after load: campaign time runs and parties move; the town the player took is still the player's; the lord the player took is held at the load (then " + after["prisonerAfterRun"] + "); party positions and targets canonical");
         }
 
         // ---------------------------------------------------------------- refusals
@@ -789,7 +812,7 @@ namespace MNBL.ProceduralWorld.Automation
         }
 
         // Replaces a text in a save's header JSON, keeping the game data; the header length follows.
-        private static byte[] RewriteHeader(byte[] save, string from, string to)
+        internal static byte[] RewriteHeader(byte[] save, string from, string to)
         {
             int length = BitConverter.ToInt32(save, 0);
             string json = new UTF8Encoding(false).GetString(save, 4, length);
@@ -924,7 +947,7 @@ namespace MNBL.ProceduralWorld.Automation
         // ---------------------------------------------------------------- helpers
 
         // Ends a game that reached its map (ending one mid-load stops the engine); a game still loading is waited for first, up to an hour.
-        private static IEnumerator EndGame(ProbeContext context)
+        internal static IEnumerator EndGame(ProbeContext context)
         {
             if (Game.Current == null) yield break;
             double wait = context.Seconds;
@@ -973,7 +996,7 @@ namespace MNBL.ProceduralWorld.Automation
             return point.IsValid() ? point : new CampaignVec2(near.ToVec2(), false);
         }
 
-        private static string TreeHash(string root)
+        internal static string TreeHash(string root)
         {
             if (!Directory.Exists(root)) return "absent";
             var text = new StringBuilder();
@@ -981,6 +1004,6 @@ namespace MNBL.ProceduralWorld.Automation
             using (var sha = System.Security.Cryptography.SHA256.Create()) return String.Concat(sha.ComputeHash(new UTF8Encoding(false).GetBytes(text.ToString())).Select(b => b.ToString("x2", CultureInfo.InvariantCulture)));
         }
 
-        private static IEnumerator Frames(int count) { for (int i = 0; i < count; i++) yield return null; }
+        internal static IEnumerator Frames(int count) { for (int i = 0; i < count; i++) yield return null; }
     }
 }

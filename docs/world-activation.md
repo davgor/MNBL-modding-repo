@@ -306,7 +306,7 @@ SettlementPlacement 52, Playability 24.
 - **A game that fails while loading** is ended once it has loaded: `MBGameManager.EndGame` waits for `IsLoaded`, and the host waits up to
   300 s. An exception inside the engine's new-game callbacks can end the process. The journal then stays active, and the next start abandons
   it.
-- **Abandoned packages stay unbound in the store.** No save names them. MMR-47's staging cleanup and world inspection remove them.
+- **Abandoned packages stay unbound in the store.** No save names them. MMR-47's staging cleanup does not remove them: it never removes bundles, packages, activations or saves (`docs/recovery.md`, `Persistence/StagingCleanup.cs`). The world inspection lists them.
 - **The probe records a stopped run's instance only in the journal.** The next start's single recovery row names it.
 
 ## Handoffs

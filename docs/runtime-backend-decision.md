@@ -38,7 +38,7 @@ Absent evidence is never marked passed. "IL" means the behaviour was read from i
 
 | R | Contract | Status | Evidence | Limits, unresolved items and owners |
 |---|---|---|---|---|
-| R01 | In-game generation from a chosen seed with progress, cancel and errors, no external editor or restart | passed with limits | MMR-15: `evidence/runtime/generator-probe.json` (PID 19240: seeds 42 and 43, invalid request, producer abort, cancel, recovery). Producer `fwg.exe` and `worldbridge.exe` are pinned (MMR-22). Generation is reproducible (MMR-24, `evidence/fwg/generation-identity.json`) | Developer-menu callbacks only: the New Campaign screen is MMR-43 and the transactional job is MMR-44. The run used worldbridge `0d8bf53a…`; the deployed pin is now `2a8b3d63…` (see "Evidence currency") |
+| R01 | In-game generation from a chosen seed with progress, cancel and errors, no external editor or restart | passed with limits | MMR-15: `evidence/runtime/generator-probe.json` (PID 19240: seeds 42 and 43, invalid request, producer abort, cancel, recovery). Producer `fwg.exe` and `worldbridge.exe` are pinned (MMR-22). Generation is reproducible (MMR-24, `evidence/fwg/generation-identity.json`) | Developer-menu callbacks only: the New Campaign screen is MMR-43 and the transactional job is MMR-44. (The developer menu and its `generation_menu` probe were removed on 2026-10-18.) The run used worldbridge `0d8bf53a…`; the deployed pin is now `2a8b3d63…` (see "Evidence currency") |
 | R02 | Runtime terrain rendering, heights, ground, rays and picking on freshly generated terrain registered after launch | passed with limits | MMR-16: `evidence/runtime/surface-probe.json`, `runtime_surface-32896*`, review `surface-coverage-review.json` (`trueCurrentBlockers: []`). In one process, seeds 42 (800 m) and 43 (640 m) were generated, encoded, installed under fresh names and registered at runtime (`Utilities.PairSceneNameToModuleName`). Party grounding passed in `sandbox_boot-25008` | **Exact native bin-boundary rounding is unresolved** (MMR-37). **The combined terrain-node exports crash natively** (PID 27392); they are withheld and have no gameplay consumer. **Constraint:** a loaded scene's `terrain.bin` cannot be replaced (file lock), so names are immutable. **Superseded:** the 0.2002 m grazing-ray error recorded for PIDs 34660/12748 was a historical reference model (`legacySourceReferenceError`, "historical_untruncated_anti_diagonal_observation_only"). The same ray (`calibration_200_128:camera`) has `referenceError` 3.8e-05 m in the accepted run 32896 |
 | R03 | Generated land and War Sails routes on runtime geometry; player and AI movement; obstruction | passed with limits | MMR-17: `evidence/runtime/navigation-probe.json` (run 2248, two worlds). Land travel and naval sailing re-ran on `174fcb0a` (runs 24212 and 31624) | **Navmesh loading from a scene registered after launch is unobserved.** Every route ran on scene slots installed before launch with `tools/Deploy-SceneSlots.ps1` (MMR-45). The obstruction test toggled faces with `Scene.SetAbilityOfFacesWithId`, which renumbers islands; the probe's `RefreshFaceCaches` refreshes only `MobileParty` positions, not gate and port positions (probe-only; MMR-38). The player's return voyage was not run. No bridges, no stitching, and AI ship choice was scripted |
 | R04 | Generated campaign objects register before initialization; no official world objects survive; two worlds in one process | passed with limits | MMR-18: `evidence/runtime/bootstrap-probe.json` (runs 31308, 23192, 24736). Registration re-ran on `174fcb0a` (24212, 31624; census 4 settlements, 3 clans, 2 kingdoms in every world) | `BackstoryCampaignBehavior` and `RetirementCampaignBehavior` are removed in generated mode. 33 engine-literal NPC templates are retained. `fighter_sturgia` is excluded (its stock record references a missing EquipmentRoster). Excluded literals still have live consumers beyond the 2-day window: NavalDLC `dead_lord_7_1`/`naval_storyline_*` and `GetBodyguardOfCulture` (MMR-34). Town meshes were not visible in captures (nameplates only; MMR-40). Town food falls about 70/day (MMR-33). No bandit clans (MMR-34) |
@@ -302,11 +302,12 @@ The installed members the backend calls, by group. Signatures are recorded in se
 | Operation | State | Reproducer or source | Dependent scope |
 |---|---|---|---|
 | Load navmesh and settlement entities from a scene registered after launch, then boot a campaign in one pass | passed (MMR-45): world A's scene, installed and registered by the generation job in the running game, boots a campaign with its navmesh (navigation caches built over it) and every baked settlement entity (none made at run time): world_activation runs 22472, 9404, 43676. Historical fresh-name navigation imports had returned 0 faces | PIDs 29364 and 14300; `backend-callsite-matrix.json` `explicitUnknowns` | MMR-45, with MMR-29/40 for in-process composition. **Bounded fallback:** a pool of slot names indexed at startup, each written once before its first load (PID 25128 imported rewritten bytes from such a name) |
-| Load a generated save from the normal menu | unsafe today: the vanilla manager would re-read official XML | IL (`SandBoxSaveHelper.TryLoadSave` → vanilla `SandBoxGameManager(LoadResult)`) | MMR-49 (routing or refusal; MMR-62's binding and index are what it reads) |
-| Re-save after load; alternating loads in one process | not run | MMR-19 limits | MMR-49 |
-| Autosave and failed save with the identity | IL only | `GetSaveMetaData` (all save modes); `FileDriver.Save` IL_008c | MMR-49 |
-| Resume a periodic save; cold-load a periodic world | not run (the seam save was only deserialized) | `world-wrap-probe.json` `seamSave.reloaded.scope` | MMR-49 |
-| Canonical state at the save instant; `BehaviorTarget` | not implemented | MMR-63 limits | MMR-49 |
+| Load a generated save from the normal menu | passed (MMR-49): a generated save is routed to the module's world loader, which checks it before anything is deserialized; any other path that would read it is refused (`LoadRouting`) | `docs/world-loading.md`; `evidence/persistence/two-world-matrix.json` (runs 48048, 39860, 28224) | none |
+| Alternating loads in one process and after a cold restart | passed (MMR-49): world A and the MMR-19 fixture world, alternately loaded in one process and after a cold restart | `evidence/persistence/two-world-matrix.json` | none. The second world is a fixture: only seed 42 activates (`evidence/one-shot/acceptance-index.json` s6) |
+| Re-save after load | published and header-verified (MMR-50 run 24328); loading that re-save again was not run | `evidence/persistence/compat-matrix.json` | none |
+| Autosave and failed save with the identity | passed (MMR-48): every save kind, autosaves included, carries the binding and is journaled | `docs/save-binding.md`; `evidence/persistence/save-binding.json` | none |
+| Resume a periodic save; cold-load a periodic world | passed on world A (MMR-49): a seam crossing, a pursuit across the seam and a fleet called across it survive save and a cold load | `evidence/persistence/two-world-matrix.json` (run 48048, cold run 39860) | none |
+| Canonical state at the save instant; `BehaviorTarget` | implemented (MMR-49): `PeriodicSeam.CanonicalizeForSave` runs before every save | `docs/world-loading.md` (Canonical positions at the save) | none |
 | Storm and weather wrap across the seam | implemented (MMR-39); the planar storm checks near the seam are transpiled and strip-centred searches get their image pass (MMR-65; the strip-centre query is tested, storm damage was not rerun) | `evidence/world/water-climate.json` (run 27432); `evidence/world/periodic-consumers.tsv` | none |
 | Sieges, raids and embarking or disembarking at a coast at the seam | not run in game; their spatial calls are audited and transpiled (siege camp positions, raid and patrol searches, transition points) | `docs/periodic-movement.md` limits | MMR-42 (sieges with settlements), MMR-53 (naval) |
 | Naval encounter at the seam | not run | MMR-63 limits | MMR-53 |
@@ -326,7 +327,7 @@ The installed members the backend calls, by group. Signatures are recorded in se
 These figures come only from telemetry the accepted probes already recorded. No benchmark was run for this ticket.
 - **The full extraction** is `task-notes/mmr21-telemetry.md`. It gives every field path and log line, and marks each value as recorded (R) or derived from two log timestamps (D).
 - **Single samples.** Each value is one sample on one machine. The closest repeats share a world id but not always the same scene files.
-- **These are provisional.** MMR-56 measures the real first-test profile, and MMR-57 owns packaging.
+- **These are provisional.** MMR-56 has since measured the real first-test profile end to end (`docs/first-test-profile.md`, `worldgen/validation/first-test-measurements.json`); MMR-57 owns packaging.
 
 **Machine and settings.**
 - No accepted probe records hardware or settings. The values below come from the MMR-13 baseline on the same machine (`evidence/baseline/performance.json`, `environment.json`). Nothing proves the settings were unchanged since then.
@@ -375,7 +376,7 @@ All campaign runs used catalog receipt `27bca57ee00ae08a…`.
 
 **Memory.**
 - Child processes (Windows job peak working set): `fwg.exe` 253–294 MiB in game (62–236 MiB offline), worldbridge reader 26 MiB, surface encoder 48 MiB.
-- **Game-process peak RAM is not recorded** by any accepted probe (no working set, private bytes or GC heap). It is unknown, and MMR-56 must record it.
+- **Game-process peak RAM** was not recorded by the probes this section cites. MMR-56 measured it on the F03 profile: a 5,139-5,209 MB working set and 7,475-7,543 MB of private bytes at their peaks (`docs/first-test-profile.md`).
 
 **Scene resources and sizes.** Sizes are on disk; in-memory sizes are not recorded. Entity counts are authored counts from the build receipts and the xscene, not engine readback; MMR-16 saw engine-created entities beyond the authored ones.
 
@@ -393,7 +394,7 @@ All campaign runs used catalog receipt `27bca57ee00ae08a…`.
 - World packages: 3,599,637 B (manifest `8828c934b3b50901`) and 3,599,671 B (`c25c9d9d4d269573`), 13 files each. `NPCCharacters.xml` (1.43 MB) and the wind field (2.10 MB) make up most of it.
 - The MMR-63 save size is not recorded: that file was deleted.
 
-**Provisional limits derived from these figures** (to be replaced by MMR-56's measurements):
+**Provisional limits derived from these figures.** MMR-56's measurements supersede them: `worldgen/policies/one-shot-budget.json` (`provisionalLimits`) and `docs/first-test-profile.md`.
 
 1. **The navigation cache build is the binding cost.**
    - In the one pair available, 4× the faces took 16× the time. That pair also differs in geography, so the scaling law is not established.
@@ -401,10 +402,10 @@ All campaign runs used catalog receipt `27bca57ee00ae08a…`.
    - A periodic new game at 131,072 faces took 9.6 minutes.
    - MMR-41 publishes each world's caches under a key of every input, and later loads of an unchanged world read them back: 95 ms on the periodic fixture instead of 566 s (runs 6152 and 35828). The first campaign start of a world still pays the build.
    - Provisional limit: worlds of 32,768 faces, at most 75 s for the first load, and a periodic fixture-sized world about 9.5 minutes for its first load only.
-   - The first-load cost at real settlement counts is unmeasured (MMR-45, MMR-56). This is a performance limit, not a failed capability.
+   - At real settlement counts MMR-56 measured world A's first start at 382-391 s of cache generation, with the engine thread blocked for 383 s (the game does not respond). This is a performance limit, not a failed capability.
 2. **Generation:** about 13 s and 300 MiB of producer memory at size 129, with about 170 MB of staging output per world.
 3. **Per-world disk:** about 3.6 MB of package plus about 6–10 MB of scene files, outside the save. Each save is about 120 KB.
-4. **Game-process memory, frame time and in-memory geometry are unknown.** No limit is stated for them; MMR-56 measures them.
+4. **Game-process memory and frame time:** MMR-56 measured them (the map at a 60 fps cap; the game's peaks above). In-memory geometry is still unmeasured.
 
 ## Probe components to promote
 

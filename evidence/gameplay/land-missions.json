@@ -1,0 +1,4290 @@
+{
+  "schema": "mnbl.evidence.land-missions",
+  "version": 1,
+  "ticket": "MMR-52",
+  "pid": "33816",
+  "result": "evidence/runtime/in-game/land_missions-33816.json",
+  "status": "ok",
+  "error": null,
+  "scenarioFile": {
+    "run": {
+      "schema": "mnbl.land-mission-scenarios.v1",
+      "sha256": "6c60f1c5245e7b93c11be57bf46d32efd733b83a21bdd686daf31043f30eaebf"
+    },
+    "current": "41f3990ccd7ba086d31d92ef29150595df3bc21df396b87c567266352510242d"
+  },
+  "failures": [],
+  "passed": 163,
+  "total": 163,
+  "absent": [
+    "field.wetland"
+  ],
+  "scenarios": [
+    {
+      "id": "field",
+      "source": "player",
+      "what": "One field battle on each battle class present in world A (the resolver's classes of the compiled biomes and face terrain: open, woodland, steppe, rock, cold, desert, wetland; every cell with a land sample counts, as the battle map classes it), one of them a substituted class (woodland and rock fight on Plain scenes, cold on Steppe scenes: no installed battle scene is Forest, Mountain or Snow); a class A lacks is fought in world B, and a class both lack is absent. Each battle: the player's party at a sample point of a cell of that class, a lord party of the next culture present beside it (its kingdom at war for the battle, peace made after, the party put back where it was), the official encounter and its attack option; only those two parties fight, in a land map event; the scene the engine opens is the one the generated battle-index map names for the patch, and MMR-42's guard made its own observation of this battle's choice and agreed; deployment finished; every agent spawned on the scene's navigation mesh inside its boundaries; the mission ended through Mission.OnEndMissionResult (whose installed implementation leaves the battle by retreating); the party returns within the vanilla encounter radius bound, on land, on valid navigation.",
+      "passed": true,
+      "checks": [
+        {
+          "check": "open: the case ran to its end without error ()",
+          "passed": true
+        },
+        {
+          "check": "open: the patch's scene opened: nord_battle_terrain_f (expected nord_battle_terrain_f, deterministic True)",
+          "passed": true
+        },
+        {
+          "check": "open: the MMR-42 guard observed this battle's choice and agreed (1 new observations)",
+          "passed": true
+        },
+        {
+          "check": "open: only the player's and the enemy's parties fought (mnbl_1609fb72_h_6db9cb9c56_party_1, player_party)",
+          "passed": true
+        },
+        {
+          "check": "open: deployment finished and the mission ran (3.03 s of mission time)",
+          "passed": true
+        },
+        {
+          "check": "open: every agent's gear complete: 0 of 96 incomplete",
+          "passed": true
+        },
+        {
+          "check": "open: the party returned on valid navigation (None)",
+          "passed": true
+        },
+        {
+          "check": "open: back at the entry position within the vanilla return bound: 0.574 of 0.635",
+          "passed": true
+        },
+        {
+          "check": "open: on land, as before",
+          "passed": true
+        },
+        {
+          "check": "woodland: the case ran to its end without error ()",
+          "passed": true
+        },
+        {
+          "check": "woodland: the patch's scene opened: battle_terrain_biome_058 (expected battle_terrain_biome_058, deterministic True)",
+          "passed": true
+        },
+        {
+          "check": "woodland: the MMR-42 guard observed this battle's choice and agreed (1 new observations)",
+          "passed": true
+        },
+        {
+          "check": "woodland: only the player's and the enemy's parties fought (mnbl_1609fb72_h_e8e3760b7b_party_1, player_party)",
+          "passed": true
+        },
+        {
+          "check": "woodland: deployment finished and the mission ran (3.02 s of mission time)",
+          "passed": true
+        },
+        {
+          "check": "woodland: every agent's gear complete: 0 of 88 incomplete",
+          "passed": true
+        },
+        {
+          "check": "woodland: the party returned on valid navigation (None)",
+          "passed": true
+        },
+        {
+          "check": "woodland: back at the entry position within the vanilla return bound: 0.517 of 0.635",
+          "passed": true
+        },
+        {
+          "check": "woodland: on land, as before",
+          "passed": true
+        },
+        {
+          "check": "B steppe: the case ran to its end without error ()",
+          "passed": true
+        },
+        {
+          "check": "B steppe: the patch's scene opened: battle_terrain_biome_047 (expected battle_terrain_biome_047, deterministic True)",
+          "passed": true
+        },
+        {
+          "check": "B steppe: the MMR-42 guard observed this battle's choice and agreed (1 new observations)",
+          "passed": true
+        },
+        {
+          "check": "B steppe: only the player's and the enemy's parties fought (mnbl_00059042_ruler_1_party_1, player_party)",
+          "passed": true
+        },
+        {
+          "check": "B steppe: deployment finished and the mission ran (3.01 s of mission time)",
+          "passed": true
+        },
+        {
+          "check": "B steppe: every agent's gear complete: 0 of 156 incomplete",
+          "passed": true
+        },
+        {
+          "check": "B steppe: the party returned on valid navigation (None)",
+          "passed": true
+        },
+        {
+          "check": "B steppe: back at the entry position within the vanilla return bound: 0.565 of 0.635",
+          "passed": true
+        },
+        {
+          "check": "B steppe: on land, as before",
+          "passed": true
+        },
+        {
+          "check": "rock: the case ran to its end without error ()",
+          "passed": true
+        },
+        {
+          "check": "rock: the patch's scene opened: battle_terrain_020 (expected battle_terrain_020, deterministic True)",
+          "passed": true
+        },
+        {
+          "check": "rock: the MMR-42 guard observed this battle's choice and agreed (1 new observations)",
+          "passed": true
+        },
+        {
+          "check": "rock: only the player's and the enemy's parties fought (mnbl_1609fb72_h_589f6e75fd_party_1, player_party)",
+          "passed": true
+        },
+        {
+          "check": "rock: deployment finished and the mission ran (3.02 s of mission time)",
+          "passed": true
+        },
+        {
+          "check": "rock: every agent's gear complete: 0 of 92 incomplete",
+          "passed": true
+        },
+        {
+          "check": "rock: the party returned on valid navigation (None)",
+          "passed": true
+        },
+        {
+          "check": "rock: back at the entry position within the vanilla return bound: 0.520 of 0.635",
+          "passed": true
+        },
+        {
+          "check": "rock: on land, as before",
+          "passed": true
+        },
+        {
+          "check": "cold: the case ran to its end without error ()",
+          "passed": true
+        },
+        {
+          "check": "cold: the patch's scene opened: battle_terrain_biome_130 (expected battle_terrain_biome_130, deterministic True)",
+          "passed": true
+        },
+        {
+          "check": "cold: the MMR-42 guard observed this battle's choice and agreed (1 new observations)",
+          "passed": true
+        },
+        {
+          "check": "cold: only the player's and the enemy's parties fought (mnbl_1609fb72_h_141cb4791f_party_1, player_party)",
+          "passed": true
+        },
+        {
+          "check": "cold: deployment finished and the mission ran (3.01 s of mission time)",
+          "passed": true
+        },
+        {
+          "check": "cold: every agent's gear complete: 0 of 94 incomplete",
+          "passed": true
+        },
+        {
+          "check": "cold: the party returned on valid navigation (None)",
+          "passed": true
+        },
+        {
+          "check": "cold: back at the entry position within the vanilla return bound: 0.521 of 0.635",
+          "passed": true
+        },
+        {
+          "check": "cold: on land, as before",
+          "passed": true
+        },
+        {
+          "check": "desert: the case ran to its end without error ()",
+          "passed": true
+        },
+        {
+          "check": "desert: the patch's scene opened: battle_terrain_biome_006 (expected battle_terrain_biome_006, deterministic True)",
+          "passed": true
+        },
+        {
+          "check": "desert: the MMR-42 guard observed this battle's choice and agreed (1 new observations)",
+          "passed": true
+        },
+        {
+          "check": "desert: only the player's and the enemy's parties fought (mnbl_1609fb72_h_dac9a2ed6f_party_1, player_party)",
+          "passed": true
+        },
+        {
+          "check": "desert: deployment finished and the mission ran (3.00 s of mission time)",
+          "passed": true
+        },
+        {
+          "check": "desert: every agent's gear complete: 0 of 109 incomplete",
+          "passed": true
+        },
+        {
+          "check": "desert: the party returned on valid navigation (None)",
+          "passed": true
+        },
+        {
+          "check": "desert: back at the entry position within the vanilla return bound: 0.558 of 0.635",
+          "passed": true
+        },
+        {
+          "check": "desert: on land, as before",
+          "passed": true
+        },
+        {
+          "check": "field.wetland absent from A and B at full resolution (recorded)",
+          "passed": true
+        },
+        {
+          "check": "a substituted class fought (['woodland', 'rock', 'cold'] fought, ['woodland', 'rock', 'cold'] passed)",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "crossing",
+      "source": "player",
+      "what": "One field battle at a crossing: the player's party on a Bridge or Fording sample point of a crossing cell; checked as a field battle.",
+      "passed": true,
+      "checks": [
+        {
+          "check": "on a Bridge face: the case ran to its end without error ()",
+          "passed": true
+        },
+        {
+          "check": "on a Bridge face: the patch's scene opened: battle_terrain_031 (expected battle_terrain_031, deterministic True)",
+          "passed": true
+        },
+        {
+          "check": "on a Bridge face: the MMR-42 guard observed this battle's choice and agreed (1 new observations)",
+          "passed": true
+        },
+        {
+          "check": "on a Bridge face: only the player's and the enemy's parties fought (mnbl_1609fb72_h_0d707bb52a_party_1, player_party)",
+          "passed": true
+        },
+        {
+          "check": "on a Bridge face: deployment finished and the mission ran (3.01 s of mission time)",
+          "passed": true
+        },
+        {
+          "check": "on a Bridge face: every agent's gear complete: 0 of 85 incomplete",
+          "passed": true
+        },
+        {
+          "check": "on a Bridge face: the party returned on valid navigation (None)",
+          "passed": true
+        },
+        {
+          "check": "on a Bridge face: back at the entry position within the vanilla return bound: 0.541 of 0.635",
+          "passed": true
+        },
+        {
+          "check": "on a Bridge face: on land, as before",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "retreat",
+      "source": "player",
+      "what": "One field battle the player leaves by retreating (Mission.RetreatMission, as the retreat order does), checked as a field battle; the battle is left to the enemy: the player's side did not win and the enemy party remains, with healthy troops.",
+      "passed": true,
+      "checks": [
+        {
+          "check": "the case ran to its end without error ()",
+          "passed": true
+        },
+        {
+          "check": "the patch's scene opened: nord_battle_terrain_f (expected nord_battle_terrain_f, deterministic True)",
+          "passed": true
+        },
+        {
+          "check": "the MMR-42 guard observed this battle's choice and agreed (1 new observations)",
+          "passed": true
+        },
+        {
+          "check": "only the player's and the enemy's parties fought (mnbl_1609fb72_h_858ec89c85_party_1, player_party)",
+          "passed": true
+        },
+        {
+          "check": "deployment finished and the mission ran (3.02 s of mission time)",
+          "passed": true
+        },
+        {
+          "check": "every agent's gear complete: 0 of 90 incomplete",
+          "passed": true
+        },
+        {
+          "check": "the party returned on valid navigation (None)",
+          "passed": true
+        },
+        {
+          "check": "back at the entry position within the vanilla return bound: 0.550 of 0.635",
+          "passed": true
+        },
+        {
+          "check": "on land, as before",
+          "passed": true
+        },
+        {
+          "check": "left by Mission.RetreatMission",
+          "passed": true
+        },
+        {
+          "check": "the battle left to the enemy (player won False, enemy active True with 60 healthy, None)",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "town",
+      "source": "player",
+      "what": "A town entered through the official encounter (the town menu): its center (town_streets) opens the settlement's mapped center scene; a notable or merchant there is spoken to (MissionConversationLogic.StartConversation: the conversation's agent and its first line); its tavern interior opens through the location encounter (TownEncounter.CreateAndOpenMissionController, as the center's tavern door does) with the mapped tavern scene; the player leaves through the menu's leave path at its gate (where it entered), on land, on valid navigation.",
+      "passed": true,
+      "checks": [
+        {
+          "check": "the case ran to its end without error ()",
+          "passed": true
+        },
+        {
+          "check": "the center opened its mapped scene vlandia_town_c (vlandia_town_c)",
+          "passed": true
+        },
+        {
+          "check": "the tavern opened its mapped scene vlandia_tavern_interior_a (vlandia_tavern_interior_a)",
+          "passed": true
+        },
+        {
+          "check": "a notable spoken to in the center (CharacterObject_1179, Artisan): first line \"Yours is not a face I know. What is your name, stranger?\"",
+          "passed": true
+        },
+        {
+          "check": "the party returned on valid navigation (None)",
+          "passed": true
+        },
+        {
+          "check": "back at the settlement's gate, where the party entered within the vanilla return bound: 0.000 of 0.635",
+          "passed": true
+        },
+        {
+          "check": "on land, as before",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "castle",
+      "source": "player",
+      "what": "A castle entered (the castle menu; the castle is first given to the player's clan, recorded as diagnostic setup, so its gates open without a guard dialogue): its courtyard (take_a_walk_around_the_castle) opens the mapped center scene; the player leaves through the menu at its gate (where it entered), on land, on valid navigation.",
+      "passed": true,
+      "checks": [
+        {
+          "check": "the case ran to its end without error ()",
+          "passed": true
+        },
+        {
+          "check": "the center opened its mapped scene sturgia_castle_siege_001 (sturgia_castle_siege_001)",
+          "passed": true
+        },
+        {
+          "check": "the castle given for the visit and given back",
+          "passed": true
+        },
+        {
+          "check": "the party returned on valid navigation (None)",
+          "passed": true
+        },
+        {
+          "check": "back at the settlement's gate, where the party entered within the vanilla return bound: 0.000 of 0.635",
+          "passed": true
+        },
+        {
+          "check": "on land, as before",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "village",
+      "source": "player",
+      "what": "A village entered (the village menu): its center (village_center) opens the mapped village scene; the player leaves through the menu at its gate (where it entered), on land, on valid navigation.",
+      "passed": true,
+      "checks": [
+        {
+          "check": "the case ran to its end without error ()",
+          "passed": true
+        },
+        {
+          "check": "the center opened its mapped scene nord_village_a (nord_village_a)",
+          "passed": true
+        },
+        {
+          "check": "the party returned on valid navigation (None)",
+          "passed": true
+        },
+        {
+          "check": "back at the settlement's gate, where the party entered within the vanilla return bound: 0.000 of 0.635",
+          "passed": true
+        },
+        {
+          "check": "on land, as before",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "hideout",
+      "source": "player",
+      "what": "One infested hideout cleared: outside the hideout model's night hours (campaign time runs past them if needed: sneaking in by night opens the stealth ambush mission instead), the player's party at the hideout's gate and its assault option, the troop selection it opens answered with the selection it offers (as Done without changes); the hideout mission opens the hideout's mapped hideout_center scene; bandits fall only in the controller's fight phases and the boss only in the boss fight; the boss's dialogue answered through its own battle option; the mission won; the hideout is no longer infested and the party returns to the gate on valid navigation.",
+      "passed": true,
+      "checks": [
+        {
+          "check": "the case ran to its end without error ()",
+          "passed": true
+        },
+        {
+          "check": "entered through its assault at hour 8.998889 (attack hours [23, 2]), the troop selection answered (15 of 30 offered, 8 to 15)",
+          "passed": true
+        },
+        {
+          "check": "the hideout mission won (25 bandits fell, 1 boss conversations)",
+          "passed": true
+        },
+        {
+          "check": "the hideout no longer infested",
+          "passed": true
+        },
+        {
+          "check": "the mission opened its mapped scene desert_hideout_004_sv (desert_hideout_004_sv)",
+          "passed": true
+        },
+        {
+          "check": "the party returned on valid navigation (None)",
+          "passed": true
+        },
+        {
+          "check": "back at the hideout's gate, where the party entered within the vanilla return bound: 0.000 of 0.635",
+          "passed": true
+        },
+        {
+          "check": "on land, as before",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "siege",
+      "source": "player",
+      "what": "One siege assault with deployment: the player besieges a hostile castle (the outside menu's besiege option; the castle farthest from its own kingdom's lord parties, since a relief's encounter stops the camp's preparation), the camp's own preparation observed as campaign time runs for siegeObserveHours (its rate per hour and a time series of the menu, the siege, the camp's progress and the player's map event recorded), then brought to siegeCompletionFrom as diagnostic setup (recorded: at the installed rate the camp needs about four days, in which the garrison sallies out, a stock mechanic not retested here) and completed by the engine's own tick; the assault (menu_siege_strategies_lead_assault) opens the settlement's mapped center scene in its siege level with deployment finished; the assault is broken off (Mission.OnEndMissionResult) and the siege lifted through the menu; the party returns on valid navigation.",
+      "passed": true,
+      "checks": [
+        {
+          "check": "the case ran to its end without error ()",
+          "passed": true
+        },
+        {
+          "check": "the camp built by itself: 0.0143497176 after 1.515881555620581 campaign hours at 0.0106314663 per hour (94.06040269984976 hours needed naturally)",
+          "passed": true
+        },
+        {
+          "check": "then advanced to 0.99 (diagnostic setup, recorded) and completed by the engine's tick in 2.6 hours in all, without interruption (None)",
+          "passed": true
+        },
+        {
+          "check": "the assault opened the mapped scene nord_castle_b (nord_castle_b) with deployment finished",
+          "passed": true
+        },
+        {
+          "check": "the party returned on valid navigation (None)",
+          "passed": true
+        },
+        {
+          "check": "back at the siege camp, where the assault began within the vanilla return bound: 0.000 of 0.635",
+          "passed": true
+        },
+        {
+          "check": "on land, as before",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "capture",
+      "source": "player",
+      "what": "One party defeat leading to capture and escape: the player's party attacks a stronger hostile party and loses in the mission (every agent of the player's team falls, the main agent knocked out; the mission, ended by its own logic, is left as the leave button leaves it); the campaign takes the player prisoner; the escape (EndCaptivityAction.ApplyByEscape, as the captivity's escape applies it) frees the party near its captor (the installed release teleports it out of the encounter radius twice: within 2 x 1.25 x the encounter model's land radius of the captor's position), on land, on valid navigation.",
+      "passed": true,
+      "checks": [
+        {
+          "check": "the case ran to its end without error ()",
+          "passed": true
+        },
+        {
+          "check": "the player defeated in the mission (1 fell)",
+          "passed": true
+        },
+        {
+          "check": "taken prisoner by mnbl_1609fb72_h_f1d8309dd9_party_1",
+          "passed": true
+        },
+        {
+          "check": "escaped",
+          "passed": true
+        },
+        {
+          "check": "the party returned on valid navigation (None)",
+          "passed": true
+        },
+        {
+          "check": "back at the captor's position, where the escape releases the party within the vanilla return bound: 0.727 of 1.26",
+          "passed": true
+        },
+        {
+          "check": "on land, as before",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "gear",
+      "source": "natural",
+      "what": "Every culture present in world A shows complete troop and hero gear in mission: each human agent of the battles carries body armour and a weapon, every equipped item's meshes exist (MetaMesh.GetCopy: a crafted weapon's piece meshes, else the item's MultiMeshName), and each culture present is seen with both troops and a hero (a lord party of each culture fights; one in a settlement leaves it first, recorded as setup).",
+      "passed": true,
+      "checks": [
+        {
+          "check": "aserai: 162 troops and 2 heroes seen in mission, 0 incomplete",
+          "passed": true
+        },
+        {
+          "check": "battania: 57 troops and 1 heroes seen in mission, 0 incomplete",
+          "passed": true
+        },
+        {
+          "check": "empire: 61 troops and 1 heroes seen in mission, 0 incomplete",
+          "passed": true
+        },
+        {
+          "check": "khuzait: 63 troops and 1 heroes seen in mission, 0 incomplete",
+          "passed": true
+        },
+        {
+          "check": "nord: 338 troops and 1 heroes seen in mission, 0 incomplete",
+          "passed": true
+        },
+        {
+          "check": "sturgia: 54 troops and 1 heroes seen in mission, 0 incomplete",
+          "passed": true
+        },
+        {
+          "check": "vlandia: 59 troops and 1 heroes seen in mission, 0 incomplete",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "locations",
+      "source": "natural",
+      "what": "Every generated settlement's location scenes meet the mission scene contracts and the engine finds each scene file (MMR-42's audit, live); every settlement entered opened its mapped scene.",
+      "passed": true,
+      "checks": [
+        {
+          "check": "358 settlements' location scenes meet the contracts (0 problems) and exist (0 missing of 3009 references)",
+          "passed": true
+        },
+        {
+          "check": "the center opened its mapped scene vlandia_town_c (vlandia_town_c)",
+          "passed": true
+        },
+        {
+          "check": "the center opened its mapped scene sturgia_castle_siege_001 (sturgia_castle_siege_001)",
+          "passed": true
+        },
+        {
+          "check": "the center opened its mapped scene nord_village_a (nord_village_a)",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "names",
+      "source": "natural",
+      "what": "Encyclopedia names: every generated settlement, clan, kingdom and lord has a resolved name and encyclopedia link (no unresolved {=...} or {VARIABLE}), with an encyclopedia page that accepts it; every location menu the cases opened had its options.",
+      "passed": true,
+      "checks": [
+        {
+          "check": "659 names and encyclopedia links resolved (0 problems)",
+          "passed": true
+        },
+        {
+          "check": "every location menu opened had its options (8 menus; without: [])",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "assets",
+      "source": "natural",
+      "what": "No missing asset and valid spawns in the cases' missions: no engine log line during a case names a generated object or a scene the case opened as missing, and every other missing line is of a stock kind the scenario file names (stockMissingPatterns); no engine assert fired (Debug.DebugManager wrapper with a canary); in every mission opened, every active human agent stands on a face of the scene's navigation mesh and inside the mission's boundaries.",
+      "passed": true,
+      "checks": [
+        {
+          "check": "B.field.steppe: no missing asset in the log (0 of the world, 0 of an unknown kind: []), no engine assert (0, canary True)",
+          "passed": true
+        },
+        {
+          "check": "B.field.steppe mission: every agent spawned on the navigation mesh inside the boundaries (156 agents; 0 off it on a scene object {}; 0 off it with nothing under it, 0 outside; [])",
+          "passed": true
+        },
+        {
+          "check": "capture: no missing asset in the log (0 of the world, 0 of an unknown kind: []), no engine assert (0, canary True)",
+          "passed": true
+        },
+        {
+          "check": "capture mission: every agent spawned on the navigation mesh inside the boundaries (99 agents; 0 off it on a scene object {}; 0 off it with nothing under it, 0 outside; [])",
+          "passed": true
+        },
+        {
+          "check": "castle: no missing asset in the log (0 of the world, 0 of an unknown kind: []), no engine assert (0, canary True)",
+          "passed": true
+        },
+        {
+          "check": "castle center: every agent spawned on the navigation mesh inside the boundaries (15 agents; 0 off it on a scene object {}; 0 off it with nothing under it, 0 outside; [])",
+          "passed": true
+        },
+        {
+          "check": "crossing: no missing asset in the log (0 of the world, 0 of an unknown kind: []), no engine assert (0, canary True)",
+          "passed": true
+        },
+        {
+          "check": "crossing mission: every agent spawned on the navigation mesh inside the boundaries (85 agents; 0 off it on a scene object {}; 0 off it with nothing under it, 0 outside; [])",
+          "passed": true
+        },
+        {
+          "check": "field.cold: no missing asset in the log (0 of the world, 0 of an unknown kind: []), no engine assert (0, canary True)",
+          "passed": true
+        },
+        {
+          "check": "field.cold mission: every agent spawned on the navigation mesh inside the boundaries (94 agents; 0 off it on a scene object {}; 0 off it with nothing under it, 0 outside; [])",
+          "passed": true
+        },
+        {
+          "check": "field.desert: no missing asset in the log (0 of the world, 0 of an unknown kind: []), no engine assert (0, canary True)",
+          "passed": true
+        },
+        {
+          "check": "field.desert mission: every agent spawned on the navigation mesh inside the boundaries (109 agents; 0 off it on a scene object {}; 0 off it with nothing under it, 0 outside; [])",
+          "passed": true
+        },
+        {
+          "check": "field.open: no missing asset in the log (0 of the world, 0 of an unknown kind: []), no engine assert (0, canary True)",
+          "passed": true
+        },
+        {
+          "check": "field.open mission: every agent spawned on the navigation mesh inside the boundaries (96 agents; 0 off it on a scene object {}; 0 off it with nothing under it, 0 outside; [])",
+          "passed": true
+        },
+        {
+          "check": "field.rock: no missing asset in the log (0 of the world, 0 of an unknown kind: []), no engine assert (0, canary True)",
+          "passed": true
+        },
+        {
+          "check": "field.rock mission: every agent spawned on the navigation mesh inside the boundaries (92 agents; 0 off it on a scene object {}; 0 off it with nothing under it, 0 outside; [])",
+          "passed": true
+        },
+        {
+          "check": "field.woodland: no missing asset in the log (0 of the world, 0 of an unknown kind: []), no engine assert (0, canary True)",
+          "passed": true
+        },
+        {
+          "check": "field.woodland mission: every agent spawned on the navigation mesh inside the boundaries (88 agents; 0 off it on a scene object {}; 0 off it with nothing under it, 0 outside; [])",
+          "passed": true
+        },
+        {
+          "check": "hideout: no missing asset in the log (0 of the world, 0 of an unknown kind: []), no engine assert (0, canary True)",
+          "passed": true
+        },
+        {
+          "check": "hideout mission: every agent spawned on the navigation mesh inside the boundaries (35 agents; 5 off it on a scene object {'ChairUsePoint': 5}; 0 off it with nothing under it, 0 outside; [])",
+          "passed": true
+        },
+        {
+          "check": "retreat: no missing asset in the log (0 of the world, 0 of an unknown kind: []), no engine assert (0, canary True)",
+          "passed": true
+        },
+        {
+          "check": "retreat mission: every agent spawned on the navigation mesh inside the boundaries (90 agents; 0 off it on a scene object {}; 0 off it with nothing under it, 0 outside; [])",
+          "passed": true
+        },
+        {
+          "check": "siege: no missing asset in the log (0 of the world, 0 of an unknown kind: []), no engine assert (0, canary True)",
+          "passed": true
+        },
+        {
+          "check": "siege mission: every agent spawned on the navigation mesh inside the boundaries (375 agents; 0 off it on a scene object {}; 0 off it with nothing under it, 0 outside; [])",
+          "passed": true
+        },
+        {
+          "check": "town: no missing asset in the log (0 of the world, 0 of an unknown kind: []), no engine assert (0, canary True)",
+          "passed": true
+        },
+        {
+          "check": "town center: every agent spawned on the navigation mesh inside the boundaries (86 agents; 2 off it on a scene object {'ChairUsePoint': 2}; 0 off it with nothing under it, 0 outside; [])",
+          "passed": true
+        },
+        {
+          "check": "town tavern: every agent spawned on the navigation mesh inside the boundaries (24 agents; 12 off it on a scene object {'ChairUsePoint': 11, 'PlayMusicPoint': 1}; 0 off it with nothing under it, 0 outside; [])",
+          "passed": true
+        },
+        {
+          "check": "village: no missing asset in the log (0 of the world, 0 of an unknown kind: []), no engine assert (0, canary True)",
+          "passed": true
+        },
+        {
+          "check": "village center: every agent spawned on the navigation mesh inside the boundaries (23 agents; 0 off it on a scene object {}; 0 off it with nothing under it, 0 outside; [])",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "baselines",
+      "source": "harness",
+      "what": "No game and every tracked static at its baseline at the start and at the end.",
+      "passed": true,
+      "checks": [
+        {
+          "check": "the run's rules are the scenario file's",
+          "passed": true
+        },
+        {
+          "check": "start: no game, every tracked static at its baseline",
+          "passed": true
+        },
+        {
+          "check": "end: no game, every tracked static at its baseline",
+          "passed": true
+        },
+        {
+          "check": "the start baseline recorded",
+          "passed": true
+        },
+        {
+          "check": "the end baseline recorded",
+          "passed": true
+        }
+      ]
+    }
+  ],
+  "load": {
+    "save": "mnbl_probe52_A_designated",
+    "loaded": true,
+    "seconds": 399.18935309999995,
+    "worldId": "mnbl_1609fb72"
+  },
+  "terrain": {
+    "cells": [
+      400,
+      400
+    ],
+    "cellSize": [
+      4,
+      4
+    ],
+    "stride": 1,
+    "landCellsSampled": 5548,
+    "landCentreCells": 4695,
+    "classesPresent": {
+      "cold": 2807,
+      "desert": 1308,
+      "open": 663,
+      "rock": 30,
+      "woodland": 740
+    },
+    "chosen": {
+      "open": {
+        "class": "open",
+        "cell": [
+          195,
+          151
+        ],
+        "position": [
+          782,
+          607.8
+        ],
+        "face": "Plain",
+        "biome": "ocean",
+        "landform": "Submerged"
+      },
+      "cold": {
+        "class": "cold",
+        "cell": [
+          195,
+          152
+        ],
+        "position": [
+          782,
+          610
+        ],
+        "face": "Plain",
+        "biome": "land_ice",
+        "landform": "Valley"
+      },
+      "woodland": {
+        "class": "woodland",
+        "cell": [
+          251,
+          170
+        ],
+        "position": [
+          1004.2,
+          680.2
+        ],
+        "face": "Plain",
+        "biome": "boreal_forest",
+        "landform": "Plain / hillside"
+      },
+      "desert": {
+        "class": "desert",
+        "cell": [
+          152,
+          176
+        ],
+        "position": [
+          610,
+          706
+        ],
+        "face": "Plain",
+        "biome": "desert",
+        "landform": "Mountain / ridge"
+      },
+      "rock": {
+        "class": "rock",
+        "cell": [
+          148,
+          180
+        ],
+        "position": [
+          592.2,
+          720.2
+        ],
+        "face": "Plain",
+        "biome": "exposed_rock",
+        "landform": "Mountain / ridge"
+      }
+    },
+    "crossingCells": 10,
+    "crossing": {
+      "class": "woodland",
+      "cell": [
+        258,
+        184
+      ],
+      "position": [
+        1034,
+        738
+      ],
+      "face": "Bridge",
+      "biome": "forest",
+      "landform": "Mountain / ridge"
+    }
+  },
+  "culturesPresent": [
+    "aserai",
+    "battania",
+    "empire",
+    "khuzait",
+    "nord",
+    "sturgia",
+    "vlandia"
+  ],
+  "cultures": {
+    "aserai": {
+      "troops": 162,
+      "heroes": 2,
+      "incomplete": 0,
+      "samples": []
+    },
+    "battania": {
+      "troops": 57,
+      "heroes": 1,
+      "incomplete": 0,
+      "samples": []
+    },
+    "empire": {
+      "troops": 61,
+      "heroes": 1,
+      "incomplete": 0,
+      "samples": []
+    },
+    "khuzait": {
+      "troops": 63,
+      "heroes": 1,
+      "incomplete": 0,
+      "samples": []
+    },
+    "nord": {
+      "troops": 338,
+      "heroes": 1,
+      "incomplete": 0,
+      "samples": []
+    },
+    "sturgia": {
+      "troops": 54,
+      "heroes": 1,
+      "incomplete": 0,
+      "samples": []
+    },
+    "vlandia": {
+      "troops": 59,
+      "heroes": 1,
+      "incomplete": 0,
+      "samples": []
+    },
+    "desert_bandits": {
+      "troops": 20,
+      "heroes": 0,
+      "incomplete": 0,
+      "samples": []
+    }
+  },
+  "locationAudit": {
+    "catalogueSha256": "b5c29519521efa68c6579e6a5417aadbb639ab2e0a98e378fd66d62977ce916e",
+    "settlements": 358,
+    "sceneReferences": 3009,
+    "problems": [],
+    "problemCount": 0,
+    "engineMissing": []
+  },
+  "names": {
+    "checked": 659,
+    "problems": [],
+    "problemCount": 0
+  },
+  "menus": {
+    "encounter": [
+      {
+        "id": "continue_preparations",
+        "holds": false,
+        "enabled": false,
+        "text": "Continue siege preparations.",
+        "tooltip": null
+      },
+      {
+        "id": "village_raid_action",
+        "holds": false,
+        "enabled": false,
+        "text": "Plunder the village, then raze it.",
+        "tooltip": null
+      },
+      {
+        "id": "village_force_volunteer_action",
+        "holds": false,
+        "enabled": false,
+        "text": "Force notables to give you recruits.",
+        "tooltip": null
+      },
+      {
+        "id": "village_force_supplies_action",
+        "holds": false,
+        "enabled": false,
+        "text": "Force people to give you supplies.",
+        "tooltip": null
+      },
+      {
+        "id": "attack",
+        "holds": true,
+        "enabled": true,
+        "text": "Attack!",
+        "tooltip": null
+      },
+      {
+        "id": "capture_the_enemy",
+        "holds": false,
+        "enabled": false,
+        "text": "Capture the enemy.",
+        "tooltip": null
+      },
+      {
+        "id": "str_order_attack",
+        "holds": true,
+        "enabled": true,
+        "text": "Send troops.",
+        "tooltip": "Plains Battle\n\n• Cavalry gain large bonus.\n• Horse archers gain large bonus."
+      },
+      {
+        "id": "leave_soldiers_behind",
+        "holds": false,
+        "enabled": false,
+        "text": "Try to get away.",
+        "tooltip": null
+      },
+      {
+        "id": "surrender",
+        "holds": false,
+        "enabled": false,
+        "text": "Surrender.",
+        "tooltip": null
+      },
+      {
+        "id": "leave",
+        "holds": true,
+        "enabled": true,
+        "text": "Leave...",
+        "tooltip": null
+      },
+      {
+        "id": "abandon_army",
+        "holds": false,
+        "enabled": false,
+        "text": "Abandon army.",
+        "tooltip": null
+      },
+      {
+        "id": "go_back_to_settlement",
+        "holds": false,
+        "enabled": false,
+        "text": "Return to .",
+        "tooltip": null
+      }
+    ],
+    "town": [
+      {
+        "id": "talk_to_garrison_commander_town",
+        "holds": false,
+        "enabled": false,
+        "text": "Talk to the garrison commander",
+        "tooltip": null
+      },
+      {
+        "id": "port",
+        "holds": true,
+        "enabled": true,
+        "text": "Go to the port",
+        "tooltip": null
+      },
+      {
+        "id": "manage_alley",
+        "holds": false,
+        "enabled": false,
+        "text": "Go to alley",
+        "tooltip": null
+      },
+      {
+        "id": "town_keep",
+        "holds": true,
+        "enabled": true,
+        "text": "Go to the keep",
+        "tooltip": null
+      },
+      {
+        "id": "town_arena",
+        "holds": true,
+        "enabled": true,
+        "text": "Go to the arena",
+        "tooltip": null
+      },
+      {
+        "id": "town_backstreet",
+        "holds": true,
+        "enabled": true,
+        "text": "Go to the tavern district",
+        "tooltip": null
+      },
+      {
+        "id": "manage_production",
+        "holds": false,
+        "enabled": false,
+        "text": "Manage town",
+        "tooltip": null
+      },
+      {
+        "id": "manage_warehouse",
+        "holds": false,
+        "enabled": false,
+        "text": "Enter the warehouse",
+        "tooltip": null
+      },
+      {
+        "id": "manage_production_cheat",
+        "holds": false,
+        "enabled": false,
+        "text": "Manage town (Cheat)",
+        "tooltip": null
+      },
+      {
+        "id": "talk_to_steward_for_revenue_town",
+        "holds": false,
+        "enabled": false,
+        "text": "Hand over the revenue",
+        "tooltip": null
+      },
+      {
+        "id": "recruit_volunteers",
+        "holds": true,
+        "enabled": true,
+        "text": "Recruit troops",
+        "tooltip": null
+      },
+      {
+        "id": "trade",
+        "holds": true,
+        "enabled": true,
+        "text": "Trade",
+        "tooltip": null
+      },
+      {
+        "id": "town_smithy",
+        "holds": true,
+        "enabled": true,
+        "text": "Enter smithy",
+        "tooltip": null
+      },
+      {
+        "id": "town_streets",
+        "holds": true,
+        "enabled": true,
+        "text": "Take a walk around the town center",
+        "tooltip": null
+      },
+      {
+        "id": "town_wait",
+        "holds": true,
+        "enabled": true,
+        "text": "Wait here for some time",
+        "tooltip": null
+      },
+      {
+        "id": "town_return_to_army",
+        "holds": false,
+        "enabled": false,
+        "text": "Return to Army",
+        "tooltip": null
+      },
+      {
+        "id": "town_leave",
+        "holds": true,
+        "enabled": true,
+        "text": "Leave",
+        "tooltip": null
+      }
+    ],
+    "castle": [
+      {
+        "id": "castle_prison",
+        "holds": true,
+        "enabled": true,
+        "text": "Go to the dungeon",
+        "tooltip": null
+      },
+      {
+        "id": "castle_prison_cheat",
+        "holds": false,
+        "enabled": false,
+        "text": "Go to the dungeon (Cheat)",
+        "tooltip": null
+      },
+      {
+        "id": "manage_garrison",
+        "holds": true,
+        "enabled": true,
+        "text": "Manage garrison",
+        "tooltip": null
+      },
+      {
+        "id": "manage_production",
+        "holds": true,
+        "enabled": true,
+        "text": "Manage castle",
+        "tooltip": null
+      },
+      {
+        "id": "open_stash",
+        "holds": true,
+        "enabled": true,
+        "text": "Open stash",
+        "tooltip": null
+      },
+      {
+        "id": "leave_troops_to_garrison",
+        "holds": false,
+        "enabled": false,
+        "text": "Donate troops to garrison",
+        "tooltip": null
+      },
+      {
+        "id": "take_a_walk_around_the_castle",
+        "holds": true,
+        "enabled": true,
+        "text": "Take a walk around the castle",
+        "tooltip": null
+      },
+      {
+        "id": "castle_lords_hall",
+        "holds": true,
+        "enabled": true,
+        "text": "Go to the lord's hall",
+        "tooltip": null
+      },
+      {
+        "id": "castle_lords_hall_cheat",
+        "holds": false,
+        "enabled": false,
+        "text": "Go to the lord's hall (Cheat)",
+        "tooltip": null
+      },
+      {
+        "id": "town_wait",
+        "holds": true,
+        "enabled": true,
+        "text": "Wait here for some time",
+        "tooltip": null
+      },
+      {
+        "id": "castle_return_to_army",
+        "holds": false,
+        "enabled": false,
+        "text": "Return to Army",
+        "tooltip": null
+      },
+      {
+        "id": "leave",
+        "holds": true,
+        "enabled": true,
+        "text": "Leave",
+        "tooltip": null
+      }
+    ],
+    "village": [
+      {
+        "id": "revenue_farming_quest_collect_tax_menu_button",
+        "holds": false,
+        "enabled": false,
+        "text": "Collect revenue",
+        "tooltip": null
+      },
+      {
+        "id": "hostile_action",
+        "holds": true,
+        "enabled": true,
+        "text": "Take a hostile action",
+        "tooltip": null
+      },
+      {
+        "id": "recruit_volunteers",
+        "holds": true,
+        "enabled": true,
+        "text": "Recruit troops",
+        "tooltip": null
+      },
+      {
+        "id": "trade",
+        "holds": true,
+        "enabled": true,
+        "text": "Buy products",
+        "tooltip": null
+      },
+      {
+        "id": "village_center",
+        "holds": true,
+        "enabled": true,
+        "text": "Take a walk through the lands",
+        "tooltip": null
+      },
+      {
+        "id": "village_wait",
+        "holds": true,
+        "enabled": true,
+        "text": "Wait here for some time",
+        "tooltip": null
+      },
+      {
+        "id": "village_return_to_army",
+        "holds": false,
+        "enabled": false,
+        "text": "Return to Army",
+        "tooltip": null
+      },
+      {
+        "id": "disembark",
+        "holds": false,
+        "enabled": false,
+        "text": "Disembark",
+        "tooltip": null
+      },
+      {
+        "id": "leave_set_sail",
+        "holds": false,
+        "enabled": false,
+        "text": "Set Sail",
+        "tooltip": null
+      },
+      {
+        "id": "leave_at_sea",
+        "holds": false,
+        "enabled": false,
+        "text": "Leave",
+        "tooltip": null
+      },
+      {
+        "id": "leave",
+        "holds": true,
+        "enabled": true,
+        "text": "Leave",
+        "tooltip": null
+      }
+    ],
+    "castle_outside": [
+      {
+        "id": "approach_gates",
+        "holds": true,
+        "enabled": true,
+        "text": "Approach the gates and hail the guard.",
+        "tooltip": null
+      },
+      {
+        "id": "town_besiege",
+        "holds": true,
+        "enabled": true,
+        "text": "Besiege the castle.",
+        "tooltip": null
+      },
+      {
+        "id": "town_outside_leave",
+        "holds": true,
+        "enabled": true,
+        "text": "Leave...",
+        "tooltip": null
+      }
+    ],
+    "menu_siege_strategies": [
+      {
+        "id": "menu_siege_strategies_lead_assault",
+        "holds": true,
+        "enabled": false,
+        "text": "Lead an assault",
+        "tooltip": "You need to wait for the siege equipment to be prepared."
+      },
+      {
+        "id": "menu_siege_strategies_order_troops",
+        "holds": true,
+        "enabled": false,
+        "text": "Send troops",
+        "tooltip": "You need to wait for the siege equipment to be prepared."
+      },
+      {
+        "id": "menu_siege_strategies_request_parley",
+        "holds": false,
+        "enabled": false,
+        "text": "Request a parley",
+        "tooltip": null
+      },
+      {
+        "id": "menu_siege_strategies_leave",
+        "holds": true,
+        "enabled": true,
+        "text": "Leave",
+        "tooltip": null
+      },
+      {
+        "id": "menu_siege_strategies_leave_army",
+        "holds": false,
+        "enabled": false,
+        "text": "Leave Army",
+        "tooltip": null
+      },
+      {
+        "id": "menu_siege_strategies_break_out_from_gate",
+        "holds": false,
+        "enabled": false,
+        "text": "Break out from gate",
+        "tooltip": null
+      },
+      {
+        "id": "menu_siege_strategies_break_out_from_port",
+        "holds": false,
+        "enabled": false,
+        "text": "Break out from port",
+        "tooltip": null
+      },
+      {
+        "id": "menu_siege_strategies_sally_out_from_gate",
+        "holds": false,
+        "enabled": false,
+        "text": "",
+        "tooltip": null
+      },
+      {
+        "id": "menu_siege_strategies_sally_out_from_port",
+        "holds": false,
+        "enabled": false,
+        "text": "",
+        "tooltip": null
+      },
+      {
+        "id": "menu_siege_strategies_ambush",
+        "holds": false,
+        "enabled": false,
+        "text": "Ambush",
+        "tooltip": null
+      }
+    ],
+    "menu_siege_strategies_break_siege": [
+      {
+        "id": "menu_siege_strategies_break_siege_return",
+        "holds": true,
+        "enabled": true,
+        "text": "Return to siege",
+        "tooltip": null
+      },
+      {
+        "id": "menu_siege_strategies_break_siege_go_on",
+        "holds": true,
+        "enabled": true,
+        "text": "Go on.",
+        "tooltip": null
+      }
+    ],
+    "hideout_place": [
+      {
+        "id": "attack",
+        "holds": true,
+        "enabled": false,
+        "text": "Sneak in now",
+        "tooltip": "Bandits are awake and too aware to be ambushed."
+      },
+      {
+        "id": "assault",
+        "holds": true,
+        "enabled": true,
+        "text": "Assault hideout",
+        "tooltip": null
+      },
+      {
+        "id": "wait",
+        "holds": true,
+        "enabled": true,
+        "text": "Wait until nightfall to sneak in",
+        "tooltip": null
+      },
+      {
+        "id": "send_troops",
+        "holds": true,
+        "enabled": true,
+        "text": "Send troops to clear (36%)",
+        "tooltip": "You will gain no loot or experience."
+      },
+      {
+        "id": "leave",
+        "holds": true,
+        "enabled": true,
+        "text": "Leave",
+        "tooltip": null
+      }
+    ]
+  },
+  "cases": {
+    "field.open": {
+      "caseName": "field.open",
+      "failures": [],
+      "candidate": {
+        "class": "open",
+        "cell": [
+          195,
+          151
+        ],
+        "position": [
+          782,
+          607.8
+        ],
+        "face": "Plain",
+        "biome": "ocean",
+        "landform": "Submerged"
+      },
+      "retreat": false,
+      "setup": {
+        "crewAdded": 29,
+        "enemyLeftSettlement": null,
+        "enemy": "mnbl_1609fb72_h_6db9cb9c56_party_1",
+        "enemyKind": "lord",
+        "enemyCulture": "aserai",
+        "enemyTroops": 66,
+        "warDeclared": "mnbl_1609fb72_k_de9f25ee81",
+        "enemyShips": 1,
+        "peaceMade": true,
+        "enemyRestored": [
+          510.517365,
+          789.2039
+        ]
+      },
+      "mapEvent": {
+        "naval": false,
+        "involved": [
+          "mnbl_1609fb72_h_6db9cb9c56_party_1",
+          "player_party"
+        ]
+      },
+      "mission": {
+        "scene": "nord_battle_terrain_f",
+        "sceneNameProperty": "nord_battle_terrain_f",
+        "module": "$BASE/Modules/NavalDLC/",
+        "terrainType": "Plain",
+        "hasEnemyTeam": true,
+        "screen": "TaleWorlds.MountAndBlade.View.Screens.MissionScreen",
+        "initializerRecordSource": "TaleWorlds.MountAndBlade.Mission.<InitializerRecord>k__BackingField",
+        "initializerRecord": {
+          "TerrainType": 1,
+          "DamageToFriendsMultiplier": 0.5,
+          "DamageFromPlayerToFriendsMultiplier": 0.5,
+          "NeedsRandomTerrain": false,
+          "RandomTerrainSeed": 1438,
+          "SceneName": "nord_battle_terrain_f",
+          "SceneLevels": "",
+          "PlayingInCampaignMode": true,
+          "EnableSceneRecording": false,
+          "SceneUpgradeLevel": 0,
+          "SceneHasMapPatch": true,
+          "PatchCoordinates": [
+            1,
+            0.466666669
+          ],
+          "PatchEncounterDir": [
+            0.3148238,
+            -0.949150145
+          ],
+          "DoNotUseLoadingScreen": false,
+          "DisableDynamicPointlightShadows": false,
+          "DisableCorpseFadeOut": false,
+          "DecalAtlasGroup": 2,
+          "AtmosphereOnCampaign": "AtmosphereInfo"
+        },
+        "terrainSamples": [
+          {
+            "at": [
+              969.719666,
+              926.190552
+            ],
+            "terrainHeight": 472.927063
+          },
+          {
+            "at": [
+              989.719666,
+              926.190552
+            ],
+            "terrainHeight": 472.9438
+          },
+          {
+            "at": [
+              949.719666,
+              926.190552
+            ],
+            "terrainHeight": 472.872864
+          },
+          {
+            "at": [
+              969.719666,
+              946.190552
+            ],
+            "terrainHeight": 471.116272
+          },
+          {
+            "at": [
+              969.719666,
+              906.190552
+            ],
+            "terrainHeight": 476.1919
+          }
+        ],
+        "mainAgentPosition": [
+          969.719666,
+          926.190552,
+          472.927
+        ],
+        "combat": true,
+        "loadSeconds": 3.1558405999999763,
+        "deployed": true,
+        "spawns": {
+          "agents": 96,
+          "onNavmesh": 96,
+          "heightAdjusted": 0,
+          "offNavmesh": 0,
+          "offNavmeshUsingObject": 0,
+          "usedObjects": {},
+          "boundaries": 1,
+          "outsideBoundaries": 0,
+          "mainOnNavmesh": true,
+          "samples": []
+        },
+        "missionTimeAdvanced": 3.031819999217987,
+        "screenshot": true,
+        "endedItself": false,
+        "missionResult": null,
+        "teardownSeconds": 0.5674680000000194
+      },
+      "gear": {
+        "agents": 96,
+        "playerPartyAgents": 30,
+        "incomplete": 0,
+        "byCulture": {
+          "aserai": 66,
+          "empire": 30
+        },
+        "problems": []
+      },
+      "outcome": {
+        "menu": "encounter",
+        "battleState": "None",
+        "playerWon": false,
+        "enemyActive": true,
+        "enemyHealthy": 66,
+        "encounterState": "Wait"
+      },
+      "returnDisplacement": 0.5737293259629576,
+      "returnBound": 0.635,
+      "sceneMatchesPatch": true,
+      "mismatchGuard": {
+        "index": 206,
+        "naval": false,
+        "terrainAtParty": "Plain",
+        "opened": "nord_battle_terrain_f",
+        "expected": "nord_battle_terrain_f",
+        "candidates": [
+          "nord_battle_terrain_f"
+        ],
+        "rule": "a single scene lists the index",
+        "deterministic": true,
+        "agrees": true,
+        "problem": null,
+        "position": [
+          782,
+          607.8
+        ],
+        "patchCoordinates": [
+          1,
+          0.466666669
+        ],
+        "campaignHours": 2185856.999089778
+      },
+      "guardObservations": 1,
+      "afterNavigation": null,
+      "seconds": 14.641033400000026,
+      "asserts": [],
+      "assertCount": 0,
+      "assertCanarySeen": true,
+      "log": {
+        "path": "rgl_log_<pid>.txt",
+        "read": true,
+        "missingLines": 6,
+        "kinds": {
+          "Missing shader from sack: pbr_terrain": 2,
+          "Missing shader from sack: pbr_terrain_gbuffer": 2,
+          "Missing shader from sack: pbr_terrain_pointlight": 1,
+          "Missing shader from sack: pbr_terrain_shadowmap": 1
+        },
+        "worldMissing": [],
+        "worldMissingCount": 0,
+        "otherMissing": [],
+        "otherMissingCount": 0
+      }
+    },
+    "field.woodland": {
+      "caseName": "field.woodland",
+      "failures": [],
+      "candidate": {
+        "class": "woodland",
+        "cell": [
+          251,
+          170
+        ],
+        "position": [
+          1004.2,
+          680.2
+        ],
+        "face": "Plain",
+        "biome": "boreal_forest",
+        "landform": "Plain / hillside"
+      },
+      "retreat": false,
+      "setup": {
+        "crewAdded": 0,
+        "enemyLeftSettlement": null,
+        "enemy": "mnbl_1609fb72_h_e8e3760b7b_party_1",
+        "enemyKind": "lord",
+        "enemyCulture": "battania",
+        "enemyTroops": 58,
+        "warDeclared": "mnbl_1609fb72_k_7a91edb685",
+        "enemyShips": 2,
+        "peaceMade": true,
+        "enemyRestored": [
+          1172.40222,
+          857.194031
+        ]
+      },
+      "mapEvent": {
+        "naval": false,
+        "involved": [
+          "mnbl_1609fb72_h_e8e3760b7b_party_1",
+          "player_party"
+        ]
+      },
+      "mission": {
+        "scene": "battle_terrain_biome_058",
+        "sceneNameProperty": "battle_terrain_biome_058",
+        "module": "$BASE/Modules/SandBoxCore/",
+        "terrainType": "Plain",
+        "hasEnemyTeam": true,
+        "screen": "TaleWorlds.MountAndBlade.View.Screens.MissionScreen",
+        "initializerRecordSource": "TaleWorlds.MountAndBlade.Mission.<InitializerRecord>k__BackingField",
+        "initializerRecord": {
+          "TerrainType": 1,
+          "DamageToFriendsMultiplier": 0.5,
+          "DamageFromPlayerToFriendsMultiplier": 0.5,
+          "NeedsRandomTerrain": false,
+          "RandomTerrainSeed": 9586,
+          "SceneName": "battle_terrain_biome_058",
+          "SceneLevels": "",
+          "PlayingInCampaignMode": true,
+          "EnableSceneRecording": false,
+          "SceneUpgradeLevel": 0,
+          "SceneHasMapPatch": true,
+          "PatchCoordinates": [
+            0.466666669,
+            0.6666667
+          ],
+          "PatchEncounterDir": [
+            0.7386469,
+            0.674092531
+          ],
+          "DoNotUseLoadingScreen": false,
+          "DisableDynamicPointlightShadows": false,
+          "DisableCorpseFadeOut": false,
+          "DecalAtlasGroup": 2,
+          "AtmosphereOnCampaign": "AtmosphereInfo"
+        },
+        "terrainSamples": [
+          {
+            "at": [
+              753.443848,
+              822.416138
+            ],
+            "terrainHeight": 70.01883
+          },
+          {
+            "at": [
+              773.443848,
+              822.416138
+            ],
+            "terrainHeight": 69.3978043
+          },
+          {
+            "at": [
+              733.443848,
+              822.416138
+            ],
+            "terrainHeight": 69.59424
+          },
+          {
+            "at": [
+              753.443848,
+              842.416138
+            ],
+            "terrainHeight": 68.70897
+          },
+          {
+            "at": [
+              753.443848,
+              802.416138
+            ],
+            "terrainHeight": 70.2989044
+          }
+        ],
+        "mainAgentPosition": [
+          753.443848,
+          822.416138,
+          70.01883
+        ],
+        "combat": true,
+        "loadSeconds": 1.665741799999978,
+        "deployed": true,
+        "spawns": {
+          "agents": 88,
+          "onNavmesh": 88,
+          "heightAdjusted": 0,
+          "offNavmesh": 0,
+          "offNavmeshUsingObject": 0,
+          "usedObjects": {},
+          "boundaries": 1,
+          "outsideBoundaries": 0,
+          "mainOnNavmesh": true,
+          "samples": []
+        },
+        "missionTimeAdvanced": 3.0156300216913223,
+        "screenshot": true,
+        "endedItself": false,
+        "missionResult": null,
+        "teardownSeconds": 0.41366030000000364
+      },
+      "gear": {
+        "agents": 88,
+        "playerPartyAgents": 30,
+        "incomplete": 0,
+        "byCulture": {
+          "battania": 58,
+          "empire": 30
+        },
+        "problems": []
+      },
+      "outcome": {
+        "menu": "encounter",
+        "battleState": "None",
+        "playerWon": false,
+        "enemyActive": true,
+        "enemyHealthy": 58,
+        "encounterState": "Wait"
+      },
+      "returnDisplacement": 0.5167359896524437,
+      "returnBound": 0.635,
+      "sceneMatchesPatch": true,
+      "mismatchGuard": {
+        "index": 58,
+        "naval": false,
+        "terrainAtParty": "Plain",
+        "opened": "battle_terrain_biome_058",
+        "expected": "battle_terrain_biome_058",
+        "candidates": [
+          "battle_terrain_biome_058"
+        ],
+        "rule": "a single scene lists the index",
+        "deterministic": true,
+        "agrees": true,
+        "problem": null,
+        "position": [
+          1004.2,
+          680.2
+        ],
+        "patchCoordinates": [
+          0.466666669,
+          0.6666667
+        ],
+        "campaignHours": 2185856.999089778
+      },
+      "guardObservations": 1,
+      "afterNavigation": null,
+      "seconds": 11.872538100000043,
+      "asserts": [],
+      "assertCount": 0,
+      "assertCanarySeen": true,
+      "log": {
+        "path": "rgl_log_<pid>.txt",
+        "read": true,
+        "missingLines": 6,
+        "kinds": {
+          "Missing shader from sack: pbr_terrain": 2,
+          "Missing shader from sack: pbr_terrain_gbuffer": 2,
+          "Missing shader from sack: pbr_terrain_pointlight": 1,
+          "Missing shader from sack: pbr_terrain_shadowmap": 1
+        },
+        "worldMissing": [],
+        "worldMissingCount": 0,
+        "otherMissing": [],
+        "otherMissingCount": 0
+      }
+    },
+    "field.steppe": {
+      "class": "steppe",
+      "absent": true
+    },
+    "field.rock": {
+      "caseName": "field.rock",
+      "failures": [],
+      "candidate": {
+        "class": "rock",
+        "cell": [
+          148,
+          180
+        ],
+        "position": [
+          592.2,
+          720.2
+        ],
+        "face": "Plain",
+        "biome": "exposed_rock",
+        "landform": "Mountain / ridge"
+      },
+      "retreat": false,
+      "setup": {
+        "crewAdded": 0,
+        "enemyLeftSettlement": null,
+        "enemy": "mnbl_1609fb72_h_589f6e75fd_party_1",
+        "enemyKind": "lord",
+        "enemyCulture": "empire",
+        "enemyTroops": 62,
+        "warDeclared": "mnbl_1609fb72_k_7217a84b0e",
+        "enemyShips": 2,
+        "peaceMade": true,
+        "enemyRestored": [
+          589.7984,
+          704.504761
+        ]
+      },
+      "mapEvent": {
+        "naval": false,
+        "involved": [
+          "mnbl_1609fb72_h_589f6e75fd_party_1",
+          "player_party"
+        ]
+      },
+      "mission": {
+        "scene": "battle_terrain_020",
+        "sceneNameProperty": "battle_terrain_020",
+        "module": "$BASE/Modules/SandBoxCore/",
+        "terrainType": "Plain",
+        "hasEnemyTeam": true,
+        "screen": "TaleWorlds.MountAndBlade.View.Screens.MissionScreen",
+        "initializerRecordSource": "TaleWorlds.MountAndBlade.Mission.<InitializerRecord>k__BackingField",
+        "initializerRecord": {
+          "TerrainType": 1,
+          "DamageToFriendsMultiplier": 0.5,
+          "DamageFromPlayerToFriendsMultiplier": 0.5,
+          "NeedsRandomTerrain": false,
+          "RandomTerrainSeed": 2080,
+          "SceneName": "battle_terrain_020",
+          "SceneLevels": "",
+          "PlayingInCampaignMode": true,
+          "EnableSceneRecording": false,
+          "SceneUpgradeLevel": 0,
+          "SceneHasMapPatch": true,
+          "PatchCoordinates": [
+            0,
+            0.266666681
+          ],
+          "PatchEncounterDir": [
+            -0.110702105,
+            -0.9938537
+          ],
+          "DoNotUseLoadingScreen": false,
+          "DisableDynamicPointlightShadows": false,
+          "DisableCorpseFadeOut": false,
+          "DecalAtlasGroup": 2,
+          "AtmosphereOnCampaign": "AtmosphereInfo"
+        },
+        "terrainSamples": [
+          {
+            "at": [
+              474.0865,
+              541.9603
+            ],
+            "terrainHeight": 33.1598244
+          },
+          {
+            "at": [
+              494.0865,
+              541.9603
+            ],
+            "terrainHeight": 35.5966454
+          },
+          {
+            "at": [
+              454.0865,
+              541.9603
+            ],
+            "terrainHeight": 34.5245934
+          },
+          {
+            "at": [
+              474.0865,
+              561.9603
+            ],
+            "terrainHeight": 35.07162
+          },
+          {
+            "at": [
+              474.0865,
+              521.9603
+            ],
+            "terrainHeight": 33.016468
+          }
+        ],
+        "mainAgentPosition": [
+          474.0865,
+          541.9603,
+          33.15982
+        ],
+        "combat": true,
+        "loadSeconds": 1.7180011000000377,
+        "deployed": true,
+        "spawns": {
+          "agents": 92,
+          "onNavmesh": 92,
+          "heightAdjusted": 0,
+          "offNavmesh": 0,
+          "offNavmeshUsingObject": 0,
+          "usedObjects": {},
+          "boundaries": 1,
+          "outsideBoundaries": 0,
+          "mainOnNavmesh": true,
+          "samples": []
+        },
+        "missionTimeAdvanced": 3.015740007162094,
+        "screenshot": true,
+        "endedItself": false,
+        "missionResult": null,
+        "teardownSeconds": 0.3903973000000178
+      },
+      "gear": {
+        "agents": 92,
+        "playerPartyAgents": 30,
+        "incomplete": 0,
+        "byCulture": {
+          "empire": 92
+        },
+        "problems": []
+      },
+      "outcome": {
+        "menu": "encounter",
+        "battleState": "None",
+        "playerWon": false,
+        "enemyActive": true,
+        "enemyHealthy": 62,
+        "encounterState": "Wait"
+      },
+      "returnDisplacement": 0.5199609571251569,
+      "returnBound": 0.635,
+      "sceneMatchesPatch": true,
+      "mismatchGuard": {
+        "index": 86,
+        "naval": false,
+        "terrainAtParty": "Plain",
+        "opened": "battle_terrain_020",
+        "expected": "battle_terrain_020",
+        "candidates": [
+          "battle_terrain_020"
+        ],
+        "rule": "a single scene lists the index",
+        "deterministic": true,
+        "agrees": true,
+        "problem": null,
+        "position": [
+          592.2,
+          720.2
+        ],
+        "patchCoordinates": [
+          0,
+          0.266666681
+        ],
+        "campaignHours": 2185856.999089778
+      },
+      "guardObservations": 1,
+      "afterNavigation": null,
+      "seconds": 14.609227499999974,
+      "asserts": [],
+      "assertCount": 0,
+      "assertCanarySeen": true,
+      "log": {
+        "path": "rgl_log_<pid>.txt",
+        "read": true,
+        "missingLines": 6,
+        "kinds": {
+          "Missing shader from sack: pbr_terrain": 2,
+          "Missing shader from sack: pbr_terrain_gbuffer": 2,
+          "Missing shader from sack: pbr_terrain_pointlight": 1,
+          "Missing shader from sack: pbr_terrain_shadowmap": 1
+        },
+        "worldMissing": [],
+        "worldMissingCount": 0,
+        "otherMissing": [],
+        "otherMissingCount": 0
+      }
+    },
+    "field.cold": {
+      "caseName": "field.cold",
+      "failures": [],
+      "candidate": {
+        "class": "cold",
+        "cell": [
+          195,
+          152
+        ],
+        "position": [
+          782,
+          610
+        ],
+        "face": "Plain",
+        "biome": "land_ice",
+        "landform": "Valley"
+      },
+      "retreat": false,
+      "setup": {
+        "crewAdded": 0,
+        "enemyLeftSettlement": null,
+        "enemy": "mnbl_1609fb72_h_141cb4791f_party_1",
+        "enemyKind": "lord",
+        "enemyCulture": "khuzait",
+        "enemyTroops": 64,
+        "warDeclared": "mnbl_1609fb72_k_20495b7806",
+        "enemyShips": 2,
+        "peaceMade": true,
+        "enemyRestored": [
+          488.304321,
+          877.4459
+        ]
+      },
+      "mapEvent": {
+        "naval": false,
+        "involved": [
+          "mnbl_1609fb72_h_141cb4791f_party_1",
+          "player_party"
+        ]
+      },
+      "mission": {
+        "scene": "battle_terrain_biome_130",
+        "sceneNameProperty": "battle_terrain_biome_130",
+        "module": "$BASE/Modules/SandBoxCore/",
+        "terrainType": "Plain",
+        "hasEnemyTeam": true,
+        "screen": "TaleWorlds.MountAndBlade.View.Screens.MissionScreen",
+        "initializerRecordSource": "TaleWorlds.MountAndBlade.Mission.<InitializerRecord>k__BackingField",
+        "initializerRecord": {
+          "TerrainType": 1,
+          "DamageToFriendsMultiplier": 0.5,
+          "DamageFromPlayerToFriendsMultiplier": 0.5,
+          "NeedsRandomTerrain": false,
+          "RandomTerrainSeed": 6304,
+          "SceneName": "battle_terrain_biome_130",
+          "SceneLevels": "",
+          "PlayingInCampaignMode": true,
+          "EnableSceneRecording": false,
+          "SceneUpgradeLevel": 0,
+          "SceneHasMapPatch": true,
+          "PatchCoordinates": [
+            1,
+            0.533333361
+          ],
+          "PatchEncounterDir": [
+            -0.7958813,
+            -0.6054528
+          ],
+          "DoNotUseLoadingScreen": false,
+          "DisableDynamicPointlightShadows": false,
+          "DisableCorpseFadeOut": false,
+          "DecalAtlasGroup": 2,
+          "AtmosphereOnCampaign": "AtmosphereInfo"
+        },
+        "terrainSamples": [
+          {
+            "at": [
+              1114.911,
+              867.9672
+            ],
+            "terrainHeight": 23.085146
+          },
+          {
+            "at": [
+              1134.911,
+              867.9672
+            ],
+            "terrainHeight": 23.9961948
+          },
+          {
+            "at": [
+              1094.911,
+              867.9672
+            ],
+            "terrainHeight": 22.9428539
+          },
+          {
+            "at": [
+              1114.911,
+              887.9672
+            ],
+            "terrainHeight": 21.5204067
+          },
+          {
+            "at": [
+              1114.911,
+              847.9672
+            ],
+            "terrainHeight": 25.0904655
+          }
+        ],
+        "mainAgentPosition": [
+          1114.911,
+          867.9672,
+          23.085144
+        ],
+        "combat": true,
+        "loadSeconds": 2.0848241999999573,
+        "deployed": true,
+        "spawns": {
+          "agents": 94,
+          "onNavmesh": 94,
+          "heightAdjusted": 0,
+          "offNavmesh": 0,
+          "offNavmeshUsingObject": 0,
+          "usedObjects": {},
+          "boundaries": 1,
+          "outsideBoundaries": 0,
+          "mainOnNavmesh": true,
+          "samples": []
+        },
+        "missionTimeAdvanced": 3.0107598304748535,
+        "screenshot": true,
+        "endedItself": false,
+        "missionResult": null,
+        "teardownSeconds": 0.4049742999999921
+      },
+      "gear": {
+        "agents": 94,
+        "playerPartyAgents": 30,
+        "incomplete": 0,
+        "byCulture": {
+          "empire": 30,
+          "khuzait": 64
+        },
+        "problems": []
+      },
+      "outcome": {
+        "menu": "encounter",
+        "battleState": "None",
+        "playerWon": false,
+        "enemyActive": true,
+        "enemyHealthy": 64,
+        "encounterState": "Wait"
+      },
+      "returnDisplacement": 0.5211574944393632,
+      "returnBound": 0.635,
+      "sceneMatchesPatch": true,
+      "mismatchGuard": {
+        "index": 130,
+        "naval": false,
+        "terrainAtParty": "Plain",
+        "opened": "battle_terrain_biome_130",
+        "expected": "battle_terrain_biome_130",
+        "candidates": [
+          "battle_terrain_biome_130"
+        ],
+        "rule": "a single scene lists the index",
+        "deterministic": true,
+        "agrees": true,
+        "problem": null,
+        "position": [
+          782,
+          610
+        ],
+        "patchCoordinates": [
+          1,
+          0.533333361
+        ],
+        "campaignHours": 2185856.999089778
+      },
+      "guardObservations": 1,
+      "afterNavigation": null,
+      "seconds": 11.925469300000032,
+      "asserts": [],
+      "assertCount": 0,
+      "assertCanarySeen": true,
+      "log": {
+        "path": "rgl_log_<pid>.txt",
+        "read": true,
+        "missingLines": 6,
+        "kinds": {
+          "Missing shader from sack: pbr_terrain": 2,
+          "Missing shader from sack: pbr_terrain_gbuffer": 2,
+          "Missing shader from sack: pbr_terrain_pointlight": 1,
+          "Missing shader from sack: pbr_terrain_shadowmap": 1
+        },
+        "worldMissing": [],
+        "worldMissingCount": 0,
+        "otherMissing": [],
+        "otherMissingCount": 0
+      }
+    },
+    "field.desert": {
+      "caseName": "field.desert",
+      "failures": [],
+      "candidate": {
+        "class": "desert",
+        "cell": [
+          152,
+          176
+        ],
+        "position": [
+          610,
+          706
+        ],
+        "face": "Plain",
+        "biome": "desert",
+        "landform": "Mountain / ridge"
+      },
+      "retreat": false,
+      "setup": {
+        "crewAdded": 0,
+        "enemyLeftSettlement": null,
+        "enemy": "mnbl_1609fb72_h_dac9a2ed6f_party_1",
+        "enemyKind": "lord",
+        "enemyCulture": "nord",
+        "enemyTroops": 79,
+        "warDeclared": "mnbl_1609fb72_k_35ccda72b0",
+        "enemyShips": 2,
+        "peaceMade": true,
+        "enemyRestored": [
+          1018.42657,
+          916.8354
+        ]
+      },
+      "mapEvent": {
+        "naval": false,
+        "involved": [
+          "mnbl_1609fb72_h_dac9a2ed6f_party_1",
+          "player_party"
+        ]
+      },
+      "mission": {
+        "scene": "battle_terrain_biome_006",
+        "sceneNameProperty": "battle_terrain_biome_006",
+        "module": "$BASE/Modules/SandBoxCore/",
+        "terrainType": "Plain",
+        "hasEnemyTeam": true,
+        "screen": "TaleWorlds.MountAndBlade.View.Screens.MissionScreen",
+        "initializerRecordSource": "TaleWorlds.MountAndBlade.Mission.<InitializerRecord>k__BackingField",
+        "initializerRecord": {
+          "TerrainType": 1,
+          "DamageToFriendsMultiplier": 0.5,
+          "DamageFromPlayerToFriendsMultiplier": 0.5,
+          "NeedsRandomTerrain": false,
+          "RandomTerrainSeed": 9967,
+          "SceneName": "battle_terrain_biome_006",
+          "SceneLevels": "",
+          "PlayingInCampaignMode": true,
+          "EnableSceneRecording": false,
+          "SceneUpgradeLevel": 0,
+          "SceneHasMapPatch": true,
+          "PatchCoordinates": [
+            0.266666681,
+            0
+          ],
+          "PatchEncounterDir": [
+            0.9944008,
+            0.105673775
+          ],
+          "DoNotUseLoadingScreen": false,
+          "DisableDynamicPointlightShadows": false,
+          "DisableCorpseFadeOut": false,
+          "DecalAtlasGroup": 2,
+          "AtmosphereOnCampaign": "AtmosphereInfo"
+        },
+        "terrainSamples": [
+          {
+            "at": [
+              1447.71216,
+              1027.05945
+            ],
+            "terrainHeight": 116.221069
+          },
+          {
+            "at": [
+              1467.71216,
+              1027.05945
+            ],
+            "terrainHeight": 119.7197
+          },
+          {
+            "at": [
+              1427.71216,
+              1027.05945
+            ],
+            "terrainHeight": 116.502647
+          },
+          {
+            "at": [
+              1447.71216,
+              1047.05945
+            ],
+            "terrainHeight": 117.7388
+          },
+          {
+            "at": [
+              1447.71216,
+              1007.05945
+            ],
+            "terrainHeight": 112.834877
+          }
+        ],
+        "mainAgentPosition": [
+          1447.71216,
+          1027.05945,
+          116.221016
+        ],
+        "combat": true,
+        "loadSeconds": 1.7504350000000386,
+        "deployed": true,
+        "spawns": {
+          "agents": 109,
+          "onNavmesh": 109,
+          "heightAdjusted": 0,
+          "offNavmesh": 0,
+          "offNavmeshUsingObject": 0,
+          "usedObjects": {},
+          "boundaries": 1,
+          "outsideBoundaries": 0,
+          "mainOnNavmesh": true,
+          "samples": []
+        },
+        "missionTimeAdvanced": 3.0014598220586777,
+        "screenshot": true,
+        "endedItself": false,
+        "missionResult": null,
+        "teardownSeconds": 0.4096918000000187
+      },
+      "gear": {
+        "agents": 109,
+        "playerPartyAgents": 30,
+        "incomplete": 0,
+        "byCulture": {
+          "empire": 30,
+          "nord": 79
+        },
+        "problems": []
+      },
+      "outcome": {
+        "menu": "encounter",
+        "battleState": "None",
+        "playerWon": false,
+        "enemyActive": true,
+        "enemyHealthy": 79,
+        "encounterState": "Wait"
+      },
+      "returnDisplacement": 0.5576932891918015,
+      "returnBound": 0.635,
+      "sceneMatchesPatch": true,
+      "mismatchGuard": {
+        "index": 6,
+        "naval": false,
+        "terrainAtParty": "Plain",
+        "opened": "battle_terrain_biome_006",
+        "expected": "battle_terrain_biome_006",
+        "candidates": [
+          "battle_terrain_biome_006"
+        ],
+        "rule": "a single scene lists the index",
+        "deterministic": true,
+        "agrees": true,
+        "problem": null,
+        "position": [
+          610,
+          706
+        ],
+        "patchCoordinates": [
+          0.266666681,
+          0
+        ],
+        "campaignHours": 2185856.999089778
+      },
+      "guardObservations": 1,
+      "afterNavigation": null,
+      "seconds": 11.191949799999975,
+      "asserts": [],
+      "assertCount": 0,
+      "assertCanarySeen": true,
+      "log": {
+        "path": "rgl_log_<pid>.txt",
+        "read": true,
+        "missingLines": 6,
+        "kinds": {
+          "Missing shader from sack: pbr_terrain": 2,
+          "Missing shader from sack: pbr_terrain_gbuffer": 2,
+          "Missing shader from sack: pbr_terrain_pointlight": 1,
+          "Missing shader from sack: pbr_terrain_shadowmap": 1
+        },
+        "worldMissing": [],
+        "worldMissingCount": 0,
+        "otherMissing": [],
+        "otherMissingCount": 0
+      }
+    },
+    "field.wetland": {
+      "class": "wetland",
+      "absent": true
+    },
+    "crossing": {
+      "caseName": "crossing",
+      "failures": [],
+      "candidate": {
+        "class": "woodland",
+        "cell": [
+          258,
+          184
+        ],
+        "position": [
+          1034,
+          738
+        ],
+        "face": "Bridge",
+        "biome": "forest",
+        "landform": "Mountain / ridge"
+      },
+      "retreat": false,
+      "setup": {
+        "crewAdded": 0,
+        "enemyLeftSettlement": null,
+        "enemy": "mnbl_1609fb72_h_0d707bb52a_party_1",
+        "enemyKind": "lord",
+        "enemyCulture": "sturgia",
+        "enemyTroops": 55,
+        "warDeclared": "mnbl_1609fb72_k_2f8a7b2695",
+        "enemyShips": 2,
+        "peaceMade": true,
+        "enemyRestored": [
+          614.8174,
+          653.2619
+        ]
+      },
+      "mapEvent": {
+        "naval": false,
+        "involved": [
+          "mnbl_1609fb72_h_0d707bb52a_party_1",
+          "player_party"
+        ]
+      },
+      "mission": {
+        "scene": "battle_terrain_031",
+        "sceneNameProperty": "battle_terrain_031",
+        "module": "$BASE/Modules/SandBoxCore/",
+        "terrainType": "Bridge",
+        "hasEnemyTeam": true,
+        "screen": "TaleWorlds.MountAndBlade.View.Screens.MissionScreen",
+        "initializerRecordSource": "TaleWorlds.MountAndBlade.Mission.<InitializerRecord>k__BackingField",
+        "initializerRecord": {
+          "TerrainType": 17,
+          "DamageToFriendsMultiplier": 0.5,
+          "DamageFromPlayerToFriendsMultiplier": 0.5,
+          "NeedsRandomTerrain": false,
+          "RandomTerrainSeed": 7716,
+          "SceneName": "battle_terrain_031",
+          "SceneLevels": "",
+          "PlayingInCampaignMode": true,
+          "EnableSceneRecording": false,
+          "SceneUpgradeLevel": 0,
+          "SceneHasMapPatch": true,
+          "PatchCoordinates": [
+            0.933333337,
+            0.533333361
+          ],
+          "PatchEncounterDir": [
+            -0.85981077,
+            0.5106127
+          ],
+          "DoNotUseLoadingScreen": false,
+          "DisableDynamicPointlightShadows": false,
+          "DisableCorpseFadeOut": false,
+          "DecalAtlasGroup": 2,
+          "AtmosphereOnCampaign": "AtmosphereInfo"
+        },
+        "terrainSamples": [
+          {
+            "at": [
+              451.627441,
+              824.5727
+            ],
+            "terrainHeight": 6.907233
+          },
+          {
+            "at": [
+              471.627441,
+              824.5727
+            ],
+            "terrainHeight": 13.325285
+          },
+          {
+            "at": [
+              431.627441,
+              824.5727
+            ],
+            "terrainHeight": 5.46634436
+          },
+          {
+            "at": [
+              451.627441,
+              844.5727
+            ],
+            "terrainHeight": 9.610731
+          },
+          {
+            "at": [
+              451.627441,
+              804.5727
+            ],
+            "terrainHeight": 5.071915
+          }
+        ],
+        "mainAgentPosition": [
+          451.627441,
+          824.5727,
+          6.90724564
+        ],
+        "combat": true,
+        "loadSeconds": 1.1573275999999737,
+        "deployed": true,
+        "spawns": {
+          "agents": 85,
+          "onNavmesh": 85,
+          "heightAdjusted": 0,
+          "offNavmesh": 0,
+          "offNavmeshUsingObject": 0,
+          "usedObjects": {},
+          "boundaries": 1,
+          "outsideBoundaries": 0,
+          "mainOnNavmesh": true,
+          "samples": []
+        },
+        "missionTimeAdvanced": 3.0065699070692062,
+        "screenshot": true,
+        "endedItself": false,
+        "missionResult": null,
+        "teardownSeconds": 0.3904681999999866
+      },
+      "gear": {
+        "agents": 85,
+        "playerPartyAgents": 30,
+        "incomplete": 0,
+        "byCulture": {
+          "empire": 30,
+          "sturgia": 55
+        },
+        "problems": []
+      },
+      "outcome": {
+        "menu": "encounter",
+        "battleState": "None",
+        "playerWon": false,
+        "enemyActive": true,
+        "enemyHealthy": 55,
+        "encounterState": "Wait"
+      },
+      "returnDisplacement": 0.5408190153085037,
+      "returnBound": 0.635,
+      "sceneMatchesPatch": true,
+      "mismatchGuard": {
+        "index": 126,
+        "naval": false,
+        "terrainAtParty": "Bridge",
+        "opened": "battle_terrain_031",
+        "expected": "battle_terrain_031",
+        "candidates": [
+          "battle_terrain_031"
+        ],
+        "rule": "a single scene lists the index",
+        "deterministic": true,
+        "agrees": true,
+        "problem": null,
+        "position": [
+          1034,
+          738
+        ],
+        "patchCoordinates": [
+          0.933333337,
+          0.533333361
+        ],
+        "campaignHours": 2185856.999089778
+      },
+      "guardObservations": 1,
+      "afterNavigation": null,
+      "seconds": 13.87529040000004,
+      "asserts": [],
+      "assertCount": 0,
+      "assertCanarySeen": true,
+      "log": {
+        "path": "rgl_log_<pid>.txt",
+        "read": true,
+        "missingLines": 6,
+        "kinds": {
+          "Missing shader from sack: pbr_terrain": 2,
+          "Missing shader from sack: pbr_terrain_gbuffer": 2,
+          "Missing shader from sack: pbr_terrain_pointlight": 1,
+          "Missing shader from sack: pbr_terrain_shadowmap": 1
+        },
+        "worldMissing": [],
+        "worldMissingCount": 0,
+        "otherMissing": [],
+        "otherMissingCount": 0
+      }
+    },
+    "retreat": {
+      "caseName": "retreat",
+      "failures": [],
+      "candidate": {
+        "class": "open",
+        "cell": [
+          195,
+          151
+        ],
+        "position": [
+          782,
+          607.8
+        ],
+        "face": "Plain",
+        "biome": "ocean",
+        "landform": "Submerged"
+      },
+      "retreat": true,
+      "setup": {
+        "crewAdded": 0,
+        "enemyLeftSettlement": null,
+        "enemy": "mnbl_1609fb72_h_858ec89c85_party_1",
+        "enemyKind": "lord",
+        "enemyCulture": "vlandia",
+        "enemyTroops": 60,
+        "warDeclared": "mnbl_1609fb72_k_a4b4b957ac",
+        "enemyShips": 2,
+        "peaceMade": true,
+        "enemyRestored": [
+          982.0027,
+          877.512939
+        ]
+      },
+      "mapEvent": {
+        "naval": false,
+        "involved": [
+          "mnbl_1609fb72_h_858ec89c85_party_1",
+          "player_party"
+        ]
+      },
+      "mission": {
+        "scene": "nord_battle_terrain_f",
+        "sceneNameProperty": "nord_battle_terrain_f",
+        "module": "$BASE/Modules/NavalDLC/",
+        "terrainType": "Plain",
+        "hasEnemyTeam": true,
+        "screen": "TaleWorlds.MountAndBlade.View.Screens.MissionScreen",
+        "initializerRecordSource": "TaleWorlds.MountAndBlade.Mission.<InitializerRecord>k__BackingField",
+        "initializerRecord": {
+          "TerrainType": 1,
+          "DamageToFriendsMultiplier": 0.5,
+          "DamageFromPlayerToFriendsMultiplier": 0.5,
+          "NeedsRandomTerrain": false,
+          "RandomTerrainSeed": 8573,
+          "SceneName": "nord_battle_terrain_f",
+          "SceneLevels": "",
+          "PlayingInCampaignMode": true,
+          "EnableSceneRecording": false,
+          "SceneUpgradeLevel": 0,
+          "SceneHasMapPatch": true,
+          "PatchCoordinates": [
+            1,
+            0.466666669
+          ],
+          "PatchEncounterDir": [
+            0.2326711,
+            -0.9725555
+          ],
+          "DoNotUseLoadingScreen": false,
+          "DisableDynamicPointlightShadows": false,
+          "DisableCorpseFadeOut": false,
+          "DecalAtlasGroup": 2,
+          "AtmosphereOnCampaign": "AtmosphereInfo"
+        },
+        "terrainSamples": [
+          {
+            "at": [
+              971.7986,
+              926.1793
+            ],
+            "terrainHeight": 472.8894
+          },
+          {
+            "at": [
+              991.7986,
+              926.1793
+            ],
+            "terrainHeight": 473.024475
+          },
+          {
+            "at": [
+              951.7986,
+              926.1793
+            ],
+            "terrainHeight": 472.904144
+          },
+          {
+            "at": [
+              971.7986,
+              946.1793
+            ],
+            "terrainHeight": 471.1167
+          },
+          {
+            "at": [
+              971.7986,
+              906.1793
+            ],
+            "terrainHeight": 476.1138
+          }
+        ],
+        "mainAgentPosition": [
+          971.7986,
+          926.1793,
+          472.8894
+        ],
+        "combat": true,
+        "loadSeconds": 1.9183933999999567,
+        "deployed": true,
+        "spawns": {
+          "agents": 90,
+          "onNavmesh": 90,
+          "heightAdjusted": 0,
+          "offNavmesh": 0,
+          "offNavmeshUsingObject": 0,
+          "usedObjects": {},
+          "boundaries": 1,
+          "outsideBoundaries": 0,
+          "mainOnNavmesh": true,
+          "samples": []
+        },
+        "missionTimeAdvanced": 3.0156300216913223,
+        "screenshot": true,
+        "endedItself": false,
+        "missionResult": null,
+        "teardownSeconds": 0.41239460000002737
+      },
+      "gear": {
+        "agents": 90,
+        "playerPartyAgents": 30,
+        "incomplete": 0,
+        "byCulture": {
+          "empire": 30,
+          "vlandia": 60
+        },
+        "problems": []
+      },
+      "outcome": {
+        "menu": "encounter",
+        "battleState": "None",
+        "playerWon": false,
+        "enemyActive": true,
+        "enemyHealthy": 60,
+        "encounterState": "Wait"
+      },
+      "returnDisplacement": 0.5499707474298651,
+      "returnBound": 0.635,
+      "sceneMatchesPatch": true,
+      "mismatchGuard": {
+        "index": 206,
+        "naval": false,
+        "terrainAtParty": "Plain",
+        "opened": "nord_battle_terrain_f",
+        "expected": "nord_battle_terrain_f",
+        "candidates": [
+          "nord_battle_terrain_f"
+        ],
+        "rule": "a single scene lists the index",
+        "deterministic": true,
+        "agrees": true,
+        "problem": null,
+        "position": [
+          782,
+          607.8
+        ],
+        "patchCoordinates": [
+          1,
+          0.466666669
+        ],
+        "campaignHours": 2185856.999089778
+      },
+      "guardObservations": 1,
+      "afterNavigation": null,
+      "seconds": 12.942376299999978,
+      "asserts": [],
+      "assertCount": 0,
+      "assertCanarySeen": true,
+      "log": {
+        "path": "rgl_log_<pid>.txt",
+        "read": true,
+        "missingLines": 6,
+        "kinds": {
+          "Missing shader from sack: pbr_terrain": 2,
+          "Missing shader from sack: pbr_terrain_gbuffer": 2,
+          "Missing shader from sack: pbr_terrain_pointlight": 1,
+          "Missing shader from sack: pbr_terrain_shadowmap": 1
+        },
+        "worldMissing": [],
+        "worldMissingCount": 0,
+        "otherMissing": [],
+        "otherMissingCount": 0
+      }
+    },
+    "town": {
+      "caseName": "town",
+      "failures": [],
+      "settlement": "mnbl_1609fb72_t_02135fe588",
+      "name": "Mekrak (Age 2)",
+      "expectedScenes": {
+        "center": "vlandia_town_c",
+        "tavern": "vlandia_tavern_interior_a"
+      },
+      "wallLevel": 1,
+      "entered": true,
+      "center": {
+        "scene": "vlandia_town_c",
+        "sceneNameProperty": "vlandia_town_c",
+        "module": "$BASE/Modules/SandBoxCore/",
+        "terrainType": "Plain",
+        "hasEnemyTeam": true,
+        "screen": "TaleWorlds.MountAndBlade.View.Screens.MissionScreen",
+        "initializerRecordSource": "TaleWorlds.MountAndBlade.Mission.<InitializerRecord>k__BackingField",
+        "initializerRecord": {
+          "TerrainType": 1,
+          "DamageToFriendsMultiplier": 0.5,
+          "DamageFromPlayerToFriendsMultiplier": 0.5,
+          "NeedsRandomTerrain": false,
+          "RandomTerrainSeed": 0,
+          "SceneName": "vlandia_town_c",
+          "SceneLevels": "civilian level_1",
+          "PlayingInCampaignMode": true,
+          "EnableSceneRecording": false,
+          "SceneUpgradeLevel": 0,
+          "SceneHasMapPatch": false,
+          "PatchCoordinates": [
+            0,
+            0
+          ],
+          "PatchEncounterDir": [
+            0,
+            0
+          ],
+          "DoNotUseLoadingScreen": false,
+          "DisableDynamicPointlightShadows": false,
+          "DisableCorpseFadeOut": false,
+          "DecalAtlasGroup": 3,
+          "AtmosphereOnCampaign": "AtmosphereInfo"
+        },
+        "terrainSamples": [
+          {
+            "at": [
+              779.185,
+              655.323
+            ],
+            "terrainHeight": 19.5229511
+          },
+          {
+            "at": [
+              799.185,
+              655.323
+            ],
+            "terrainHeight": 20.8677979
+          },
+          {
+            "at": [
+              759.185,
+              655.323
+            ],
+            "terrainHeight": 20.6648445
+          },
+          {
+            "at": [
+              779.185,
+              675.323
+            ],
+            "terrainHeight": 21.34966
+          },
+          {
+            "at": [
+              779.185,
+              635.323
+            ],
+            "terrainHeight": 20.0067139
+          }
+        ],
+        "mainAgentPosition": [
+          779.185,
+          655.323,
+          19.52295
+        ],
+        "combat": false,
+        "loadSeconds": 2.5250919000000067,
+        "spawns": {
+          "agents": 86,
+          "onNavmesh": 84,
+          "heightAdjusted": 0,
+          "offNavmesh": 0,
+          "offNavmeshUsingObject": 2,
+          "usedObjects": {
+            "ChairUsePoint": 2
+          },
+          "boundaries": 1,
+          "outsideBoundaries": 0,
+          "mainOnNavmesh": true,
+          "samples": []
+        },
+        "screenshot": true,
+        "endedItself": false,
+        "missionResult": null,
+        "teardownSeconds": 0.4254688999999985
+      },
+      "centerConversation": {
+        "started": true,
+        "agents": 86,
+        "agent": "Cherald of Mekrak (Age 2)",
+        "character": "CharacterObject_1179",
+        "hero": "CharacterObject_1179",
+        "notable": true,
+        "occupation": "Artisan",
+        "withAgent": true,
+        "conversationHero": "CharacterObject_1179",
+        "firstLine": "Yours is not a face I know. What is your name, stranger?",
+        "ended": true
+      },
+      "tavern": {
+        "scene": "vlandia_tavern_interior_a",
+        "sceneNameProperty": "vlandia_tavern_interior_a",
+        "module": "$BASE/Modules/SandBox/",
+        "terrainType": "Plain",
+        "hasEnemyTeam": true,
+        "screen": "TaleWorlds.MountAndBlade.View.Screens.MissionScreen",
+        "initializerRecordSource": "TaleWorlds.MountAndBlade.Mission.<InitializerRecord>k__BackingField",
+        "initializerRecord": {
+          "TerrainType": 1,
+          "DamageToFriendsMultiplier": 0.5,
+          "DamageFromPlayerToFriendsMultiplier": 0.5,
+          "NeedsRandomTerrain": false,
+          "RandomTerrainSeed": 0,
+          "SceneName": "vlandia_tavern_interior_a",
+          "SceneLevels": "civilian level_1",
+          "PlayingInCampaignMode": true,
+          "EnableSceneRecording": false,
+          "SceneUpgradeLevel": 0,
+          "SceneHasMapPatch": false,
+          "PatchCoordinates": [
+            0,
+            0
+          ],
+          "PatchEncounterDir": [
+            0,
+            0
+          ],
+          "DoNotUseLoadingScreen": true,
+          "DisableDynamicPointlightShadows": false,
+          "DisableCorpseFadeOut": false,
+          "DecalAtlasGroup": 3,
+          "AtmosphereOnCampaign": "AtmosphereInfo"
+        },
+        "terrainSamples": [
+          {
+            "at": [
+              45.34,
+              71.958
+            ],
+            "terrainHeight": 0
+          },
+          {
+            "at": [
+              65.34,
+              71.958
+            ],
+            "terrainHeight": 0
+          },
+          {
+            "at": [
+              25.34,
+              71.958
+            ],
+            "terrainHeight": 0
+          },
+          {
+            "at": [
+              45.34,
+              91.958
+            ],
+            "terrainHeight": 0
+          },
+          {
+            "at": [
+              45.34,
+              51.958
+            ],
+            "terrainHeight": 0
+          }
+        ],
+        "mainAgentPosition": [
+          45.34,
+          71.958,
+          0.115244
+        ],
+        "combat": false,
+        "loadSeconds": 0.9550795000000107,
+        "spawns": {
+          "agents": 24,
+          "onNavmesh": 12,
+          "heightAdjusted": 0,
+          "offNavmesh": 0,
+          "offNavmeshUsingObject": 12,
+          "usedObjects": {
+            "ChairUsePoint": 11,
+            "PlayMusicPoint": 1
+          },
+          "boundaries": 0,
+          "outsideBoundaries": 0,
+          "mainOnNavmesh": true,
+          "samples": []
+        },
+        "screenshot": true,
+        "endedItself": false,
+        "missionResult": null,
+        "teardownSeconds": 0.31775979999997617
+      },
+      "tavernConversation": {
+        "started": true,
+        "agents": 24,
+        "agent": "Tavern Keeper",
+        "character": "tavernkeeper_vlandia",
+        "hero": null,
+        "notable": false,
+        "occupation": "Tavernkeeper",
+        "withAgent": true,
+        "conversationHero": null,
+        "firstLine": "Good day, sir. How can I help you?",
+        "ended": true
+      },
+      "afterNavigation": null,
+      "returnExpected": {
+        "position": [
+          917.1875,
+          838.0277
+        ],
+        "reason": "the settlement's gate, where the party entered"
+      },
+      "returnDisplacement": 0,
+      "returnBound": 0.635,
+      "seconds": 13.87081649999999,
+      "asserts": [],
+      "assertCount": 0,
+      "assertCanarySeen": true,
+      "log": {
+        "path": "rgl_log_<pid>.txt",
+        "read": true,
+        "missingLines": 2,
+        "kinds": {
+          "Missing shader from sack: pbr_shading_pointlight": 1,
+          "Voice object for text id is not found: #": 1
+        },
+        "worldMissing": [],
+        "worldMissingCount": 0,
+        "otherMissing": [],
+        "otherMissingCount": 0
+      }
+    },
+    "castle": {
+      "caseName": "castle",
+      "failures": [],
+      "settlement": "mnbl_1609fb72_c_00a466803b",
+      "name": "Borrak (Age 1) Watch 3",
+      "expectedScene": "sturgia_castle_siege_001",
+      "wallLevel": 1,
+      "setup": {
+        "givenToPlayer": true,
+        "previousOwner": "mnbl_1609fb72_h_e1fa5e48ae",
+        "givenBack": true
+      },
+      "entered": true,
+      "center": {
+        "scene": "sturgia_castle_siege_001",
+        "sceneNameProperty": "sturgia_castle_siege_001",
+        "module": "$BASE/Modules/SandBox/",
+        "terrainType": "Plain",
+        "hasEnemyTeam": true,
+        "screen": "TaleWorlds.MountAndBlade.View.Screens.MissionScreen",
+        "initializerRecordSource": "TaleWorlds.MountAndBlade.Mission.<InitializerRecord>k__BackingField",
+        "initializerRecord": {
+          "TerrainType": 1,
+          "DamageToFriendsMultiplier": 0.5,
+          "DamageFromPlayerToFriendsMultiplier": 0.5,
+          "NeedsRandomTerrain": false,
+          "RandomTerrainSeed": 0,
+          "SceneName": "sturgia_castle_siege_001",
+          "SceneLevels": "civilian level_1",
+          "PlayingInCampaignMode": true,
+          "EnableSceneRecording": false,
+          "SceneUpgradeLevel": 0,
+          "SceneHasMapPatch": false,
+          "PatchCoordinates": [
+            0,
+            0
+          ],
+          "PatchEncounterDir": [
+            0,
+            0
+          ],
+          "DoNotUseLoadingScreen": false,
+          "DisableDynamicPointlightShadows": false,
+          "DisableCorpseFadeOut": false,
+          "DecalAtlasGroup": 3,
+          "AtmosphereOnCampaign": "AtmosphereInfo"
+        },
+        "terrainSamples": [
+          {
+            "at": [
+              560.985,
+              578.479
+            ],
+            "terrainHeight": 73.66941
+          },
+          {
+            "at": [
+              580.985,
+              578.479
+            ],
+            "terrainHeight": 72.1784
+          },
+          {
+            "at": [
+              540.985,
+              578.479
+            ],
+            "terrainHeight": 78.05626
+          },
+          {
+            "at": [
+              560.985,
+              598.479
+            ],
+            "terrainHeight": 79.02242
+          },
+          {
+            "at": [
+              560.985,
+              558.479
+            ],
+            "terrainHeight": 68.83599
+          }
+        ],
+        "mainAgentPosition": [
+          560.985,
+          578.479,
+          73.66942
+        ],
+        "combat": false,
+        "loadSeconds": 1.5283014999999978,
+        "spawns": {
+          "agents": 15,
+          "onNavmesh": 15,
+          "heightAdjusted": 0,
+          "offNavmesh": 0,
+          "offNavmeshUsingObject": 0,
+          "usedObjects": {},
+          "boundaries": 1,
+          "outsideBoundaries": 0,
+          "mainOnNavmesh": true,
+          "samples": []
+        },
+        "screenshot": true,
+        "endedItself": false,
+        "missionResult": null,
+        "teardownSeconds": 0.39403939999999693
+      },
+      "afterNavigation": null,
+      "returnExpected": {
+        "position": [
+          564.5902,
+          703.125
+        ],
+        "reason": "the settlement's gate, where the party entered"
+      },
+      "returnDisplacement": 0,
+      "returnBound": 0.635,
+      "seconds": 10.43213860000003,
+      "asserts": [],
+      "assertCount": 0,
+      "assertCanarySeen": true,
+      "log": {
+        "path": "rgl_log_<pid>.txt",
+        "read": true,
+        "missingLines": 6,
+        "kinds": {
+          "Missing shader from sack: pbr_terrain": 2,
+          "Missing shader from sack: pbr_terrain_gbuffer": 2,
+          "Missing shader from sack: pbr_terrain_pointlight": 1,
+          "Missing shader from sack: pbr_terrain_shadowmap": 1
+        },
+        "worldMissing": [],
+        "worldMissingCount": 0,
+        "otherMissing": [],
+        "otherMissingCount": 0
+      }
+    },
+    "village": {
+      "caseName": "village",
+      "failures": [],
+      "settlement": "mnbl_1609fb72_v_000b8059fa",
+      "name": "Selweg (Age 1) Fields 2",
+      "expectedScene": "nord_village_a",
+      "entered": true,
+      "center": {
+        "scene": "nord_village_a",
+        "sceneNameProperty": "nord_village_a",
+        "module": "$BASE/Modules/NavalDLC/",
+        "terrainType": "Plain",
+        "hasEnemyTeam": true,
+        "screen": "TaleWorlds.MountAndBlade.View.Screens.MissionScreen",
+        "initializerRecordSource": "TaleWorlds.MountAndBlade.Mission.<InitializerRecord>k__BackingField",
+        "initializerRecord": {
+          "TerrainType": 1,
+          "DamageToFriendsMultiplier": 0.5,
+          "DamageFromPlayerToFriendsMultiplier": 0.5,
+          "NeedsRandomTerrain": false,
+          "RandomTerrainSeed": 0,
+          "SceneName": "nord_village_a",
+          "SceneLevels": "land_raid",
+          "PlayingInCampaignMode": true,
+          "EnableSceneRecording": false,
+          "SceneUpgradeLevel": 0,
+          "SceneHasMapPatch": false,
+          "PatchCoordinates": [
+            0,
+            0
+          ],
+          "PatchEncounterDir": [
+            0,
+            0
+          ],
+          "DoNotUseLoadingScreen": false,
+          "DisableDynamicPointlightShadows": false,
+          "DisableCorpseFadeOut": false,
+          "DecalAtlasGroup": 3,
+          "AtmosphereOnCampaign": "AtmosphereInfo"
+        },
+        "terrainSamples": [
+          {
+            "at": [
+              945.47,
+              638.986
+            ],
+            "terrainHeight": 18.5515118
+          },
+          {
+            "at": [
+              965.47,
+              638.986
+            ],
+            "terrainHeight": 16.9136524
+          },
+          {
+            "at": [
+              925.47,
+              638.986
+            ],
+            "terrainHeight": 22.07075
+          },
+          {
+            "at": [
+              945.47,
+              658.986
+            ],
+            "terrainHeight": 18.20631
+          },
+          {
+            "at": [
+              945.47,
+              618.986
+            ],
+            "terrainHeight": 22.0014324
+          }
+        ],
+        "mainAgentPosition": [
+          945.47,
+          638.986,
+          18.5514984
+        ],
+        "combat": false,
+        "loadSeconds": 3.6851728999999978,
+        "spawns": {
+          "agents": 23,
+          "onNavmesh": 23,
+          "heightAdjusted": 0,
+          "offNavmesh": 0,
+          "offNavmeshUsingObject": 0,
+          "usedObjects": {},
+          "boundaries": 1,
+          "outsideBoundaries": 0,
+          "mainOnNavmesh": true,
+          "samples": []
+        },
+        "screenshot": true,
+        "endedItself": false,
+        "missionResult": null,
+        "teardownSeconds": 0.3750236999999288
+      },
+      "afterNavigation": null,
+      "returnExpected": {
+        "position": [
+          635.9375,
+          909.375
+        ],
+        "reason": "the settlement's gate, where the party entered"
+      },
+      "returnDisplacement": 0,
+      "returnBound": 0.635,
+      "seconds": 9.77391149999994,
+      "asserts": [],
+      "assertCount": 0,
+      "assertCanarySeen": true,
+      "log": {
+        "path": "rgl_log_<pid>.txt",
+        "read": true,
+        "missingLines": 6,
+        "kinds": {
+          "Missing shader from sack: pbr_terrain": 2,
+          "Missing shader from sack: pbr_terrain_gbuffer": 2,
+          "Missing shader from sack: pbr_terrain_pointlight": 1,
+          "Missing shader from sack: pbr_terrain_shadowmap": 1
+        },
+        "worldMissing": [],
+        "worldMissingCount": 0,
+        "otherMissing": [],
+        "otherMissingCount": 0
+      }
+    },
+    "siege": {
+      "caseName": "siege",
+      "failures": [],
+      "nearestDefendingLord": 33.3915253,
+      "garrison": 100,
+      "settlement": "mnbl_1609fb72_c_481845094e",
+      "expectedScene": "nord_castle_b",
+      "wallLevel": 1,
+      "setup": {
+        "warDeclared": "mnbl_1609fb72_k_cb45569f1f",
+        "crewAdded": 120,
+        "outsideMenu": "castle_outside",
+        "campPosition": [
+          839.786,
+          685.067932
+        ],
+        "preparationPerHour": 0.0106314663,
+        "series": [
+          {
+            "hours": 0,
+            "menu": "menu_siege_strategies",
+            "siegeSame": true,
+            "progress": 0,
+            "playerBesieging": true,
+            "playerMapEvent": false,
+            "mode": "UnstoppableFastForward"
+          },
+          {
+            "hours": 0.51,
+            "menu": "menu_siege_strategies",
+            "siegeSame": true,
+            "progress": 0.00486646825,
+            "playerBesieging": true,
+            "playerMapEvent": false,
+            "mode": "UnstoppableFastForward"
+          },
+          {
+            "hours": 1.02,
+            "menu": "menu_siege_strategies",
+            "siegeSame": true,
+            "progress": 0.009655023,
+            "playerBesieging": true,
+            "playerMapEvent": false,
+            "mode": "UnstoppableFastForward"
+          },
+          {
+            "hours": 1.54,
+            "menu": "menu_siege_strategies",
+            "siegeSame": true,
+            "progress": 0.9901876,
+            "playerBesieging": true,
+            "playerMapEvent": false,
+            "mode": "UnstoppableFastForward"
+          },
+          {
+            "hours": 2.06,
+            "menu": "menu_siege_strategies",
+            "siegeSame": true,
+            "progress": 0.995048761,
+            "playerBesieging": true,
+            "playerMapEvent": false,
+            "mode": "UnstoppableFastForward"
+          },
+          {
+            "hours": 2.57,
+            "menu": "menu_siege_strategies",
+            "siegeSame": true,
+            "progress": 0.999896169,
+            "playerBesieging": true,
+            "playerMapEvent": false,
+            "mode": "UnstoppableFastForward"
+          },
+          {
+            "hours": 2.59,
+            "menu": "menu_siege_strategies",
+            "siegeSame": true,
+            "progress": 1,
+            "playerBesieging": true,
+            "playerMapEvent": false,
+            "mode": "Stop"
+          }
+        ],
+        "preparationAdvanced": {
+          "atHours": 1.515881555620581,
+          "observedProgress": 0.0143497176,
+          "to": 0.99,
+          "naturalHoursNeeded": 94.06040269984976
+        },
+        "preparationHours": 2.59465124970302,
+        "preparationProgress": 1,
+        "prepared": true,
+        "menuAfterPreparation": "menu_siege_strategies",
+        "menuAfterAssault": "encounter",
+        "peaceMade": true
+      },
+      "mission": {
+        "scene": "nord_castle_b",
+        "sceneNameProperty": "nord_castle_b",
+        "module": "$BASE/Modules/NavalDLC/",
+        "terrainType": "Plain",
+        "hasEnemyTeam": true,
+        "screen": "TaleWorlds.MountAndBlade.View.Screens.MissionScreen",
+        "initializerRecordSource": "TaleWorlds.MountAndBlade.Mission.<InitializerRecord>k__BackingField",
+        "initializerRecord": {
+          "TerrainType": 1,
+          "DamageToFriendsMultiplier": 0.5,
+          "DamageFromPlayerToFriendsMultiplier": 0.5,
+          "NeedsRandomTerrain": false,
+          "RandomTerrainSeed": 0,
+          "SceneName": "nord_castle_b",
+          "SceneLevels": "level_1 siege",
+          "PlayingInCampaignMode": true,
+          "EnableSceneRecording": false,
+          "SceneUpgradeLevel": 0,
+          "SceneHasMapPatch": false,
+          "PatchCoordinates": [
+            0,
+            0
+          ],
+          "PatchEncounterDir": [
+            0,
+            0
+          ],
+          "DoNotUseLoadingScreen": false,
+          "DisableDynamicPointlightShadows": false,
+          "DisableCorpseFadeOut": false,
+          "DecalAtlasGroup": 3,
+          "AtmosphereOnCampaign": "AtmosphereInfo"
+        },
+        "terrainSamples": [
+          {
+            "at": [
+              837.488647,
+              458.47818
+            ],
+            "terrainHeight": 55.6535645
+          },
+          {
+            "at": [
+              857.488647,
+              458.47818
+            ],
+            "terrainHeight": 56.579998
+          },
+          {
+            "at": [
+              817.488647,
+              458.47818
+            ],
+            "terrainHeight": 54.3275681
+          },
+          {
+            "at": [
+              837.488647,
+              478.47818
+            ],
+            "terrainHeight": 54.2728729
+          },
+          {
+            "at": [
+              837.488647,
+              438.47818
+            ],
+            "terrainHeight": 56.3695641
+          }
+        ],
+        "mainAgentPosition": [
+          837.488647,
+          458.47818,
+          55.65357
+        ],
+        "combat": true,
+        "loadSeconds": 3.6297276999999895,
+        "deployed": true,
+        "spawns": {
+          "agents": 375,
+          "onNavmesh": 375,
+          "heightAdjusted": 0,
+          "offNavmesh": 0,
+          "offNavmeshUsingObject": 0,
+          "usedObjects": {},
+          "boundaries": 1,
+          "outsideBoundaries": 0,
+          "mainOnNavmesh": true,
+          "samples": []
+        },
+        "missionTimeAdvanced": 3.008909836411476,
+        "screenshot": true,
+        "endedItself": false,
+        "missionResult": null,
+        "teardownSeconds": 0.5307432999999264
+      },
+      "gear": {
+        "agents": 375,
+        "playerPartyAgents": 115,
+        "incomplete": 0,
+        "byCulture": {
+          "empire": 115,
+          "nord": 260
+        },
+        "problems": []
+      },
+      "returnExpected": {
+        "position": [
+          839.786,
+          685.067932
+        ],
+        "reason": "the siege camp, where the assault began"
+      },
+      "returnDisplacement": 0,
+      "returnBound": 0.635,
+      "afterNavigation": null,
+      "siegeAfter": false,
+      "seconds": 17.112787600000047,
+      "asserts": [],
+      "assertCount": 0,
+      "assertCanarySeen": true,
+      "log": {
+        "path": "rgl_log_<pid>.txt",
+        "read": true,
+        "missingLines": 12,
+        "kinds": {
+          "Missing shader from sack: pbr_terrain": 4,
+          "Missing shader from sack: pbr_terrain_gbuffer": 4,
+          "Missing shader from sack: pbr_terrain_pointlight": 2,
+          "Missing shader from sack: pbr_terrain_shadowmap": 2
+        },
+        "worldMissing": [],
+        "worldMissingCount": 0,
+        "otherMissing": [],
+        "otherMissingCount": 0
+      }
+    },
+    "capture": {
+      "caseName": "capture",
+      "failures": [],
+      "setup": {
+        "playerTroops": 4,
+        "enemy": "mnbl_1609fb72_h_f1d8309dd9_party_1",
+        "enemyTroops": 98,
+        "warDeclared": "mnbl_1609fb72_k_b187081dc4",
+        "peaceMade": true
+      },
+      "fight": {
+        "fallen": 1,
+        "seconds": 9.877496199999996,
+        "defeated": true
+      },
+      "mission": {
+        "scene": "nord_village_b",
+        "sceneNameProperty": "nord_village_b",
+        "module": "$BASE/Modules/NavalDLC/",
+        "terrainType": "Plain",
+        "hasEnemyTeam": true,
+        "screen": "TaleWorlds.MountAndBlade.View.Screens.MissionScreen",
+        "initializerRecordSource": "TaleWorlds.MountAndBlade.Mission.<InitializerRecord>k__BackingField",
+        "initializerRecord": {
+          "TerrainType": 1,
+          "DamageToFriendsMultiplier": 0.5,
+          "DamageFromPlayerToFriendsMultiplier": 0.5,
+          "NeedsRandomTerrain": false,
+          "RandomTerrainSeed": 0,
+          "SceneName": "nord_village_b",
+          "SceneLevels": "land_raid",
+          "PlayingInCampaignMode": true,
+          "EnableSceneRecording": false,
+          "SceneUpgradeLevel": 0,
+          "SceneHasMapPatch": false,
+          "PatchCoordinates": [
+            0,
+            0
+          ],
+          "PatchEncounterDir": [
+            0,
+            0
+          ],
+          "DoNotUseLoadingScreen": false,
+          "DisableDynamicPointlightShadows": false,
+          "DisableCorpseFadeOut": false,
+          "DecalAtlasGroup": 2,
+          "AtmosphereOnCampaign": "AtmosphereInfo"
+        },
+        "terrainSamples": [
+          {
+            "at": [
+              481.284332,
+              880.776733
+            ],
+            "terrainHeight": 210.200912
+          },
+          {
+            "at": [
+              501.284332,
+              880.776733
+            ],
+            "terrainHeight": 209.596024
+          },
+          {
+            "at": [
+              461.284332,
+              880.776733
+            ],
+            "terrainHeight": 210.272736
+          },
+          {
+            "at": [
+              481.284332,
+              900.776733
+            ],
+            "terrainHeight": 210.552444
+          },
+          {
+            "at": [
+              481.284332,
+              860.776733
+            ],
+            "terrainHeight": 209.2597
+          }
+        ],
+        "mainAgentPosition": [
+          481.284332,
+          880.776733,
+          210.200928
+        ],
+        "combat": true,
+        "loadSeconds": 3.0120220000000018,
+        "spawns": {
+          "agents": 99,
+          "onNavmesh": 99,
+          "heightAdjusted": 0,
+          "offNavmesh": 0,
+          "offNavmeshUsingObject": 0,
+          "usedObjects": {},
+          "boundaries": 1,
+          "outsideBoundaries": 0,
+          "mainOnNavmesh": true,
+          "samples": []
+        },
+        "screenshot": true,
+        "endedItself": true,
+        "missionResult": {
+          "victory": false,
+          "defeated": true,
+          "enemyRetreated": false
+        },
+        "teardownSeconds": 0.4298210999999128
+      },
+      "gear": {
+        "agents": 99,
+        "playerPartyAgents": 1,
+        "incomplete": 0,
+        "byCulture": {
+          "aserai": 98,
+          "empire": 1
+        },
+        "problems": []
+      },
+      "menusAfterDefeat": [],
+      "captured": true,
+      "captor": "mnbl_1609fb72_h_f1d8309dd9_party_1",
+      "captivityMenu": "the map",
+      "timeModeInCaptivity": "Stop",
+      "encounterRadius": 0.5,
+      "releasedDisplacement": 0.727020264,
+      "menusAfterEscape": [
+        "the map"
+      ],
+      "escaped": true,
+      "afterNavigation": null,
+      "returnExpected": {
+        "position": [
+          843.746338,
+          683.0306
+        ],
+        "reason": "the captor's position, where the escape releases the party"
+      },
+      "returnDisplacement": 0.727020263671875,
+      "returnBound": 1.26,
+      "seconds": 15.127559700000006,
+      "asserts": [],
+      "assertCount": 0,
+      "assertCanarySeen": true,
+      "log": {
+        "path": "rgl_log_<pid>.txt",
+        "read": true,
+        "missingLines": 6,
+        "kinds": {
+          "Missing shader from sack: pbr_terrain": 2,
+          "Missing shader from sack: pbr_terrain_gbuffer": 2,
+          "Missing shader from sack: pbr_terrain_pointlight": 1,
+          "Missing shader from sack: pbr_terrain_shadowmap": 1
+        },
+        "worldMissing": [],
+        "worldMissingCount": 0,
+        "otherMissing": [],
+        "otherMissingCount": 0
+      }
+    },
+    "B.field.steppe": {
+      "caseName": "B.field.steppe",
+      "failures": [],
+      "candidate": {
+        "class": "steppe",
+        "cell": [
+          141,
+          31
+        ],
+        "position": [
+          566,
+          126
+        ],
+        "face": "Steppe",
+        "biome": null,
+        "landform": null
+      },
+      "retreat": false,
+      "setup": {
+        "crewAdded": 29,
+        "enemyLeftSettlement": null,
+        "enemy": "mnbl_00059042_ruler_1_party_1",
+        "enemyKind": "lord",
+        "enemyCulture": "empire",
+        "enemyTroops": 126,
+        "warDeclared": "mnbl_00059042_kingdom_1",
+        "enemyShips": 3,
+        "peaceMade": true,
+        "enemyRestored": [
+          608.689453,
+          164.183014
+        ]
+      },
+      "mapEvent": {
+        "naval": false,
+        "involved": [
+          "mnbl_00059042_ruler_1_party_1",
+          "player_party"
+        ]
+      },
+      "mission": {
+        "scene": "battle_terrain_biome_047",
+        "sceneNameProperty": "battle_terrain_biome_047",
+        "module": "$BASE/Modules/SandBoxCore/",
+        "terrainType": "Steppe",
+        "hasEnemyTeam": true,
+        "screen": "TaleWorlds.MountAndBlade.View.Screens.MissionScreen",
+        "initializerRecordSource": "TaleWorlds.MountAndBlade.Mission.<InitializerRecord>k__BackingField",
+        "initializerRecord": {
+          "TerrainType": 5,
+          "DamageToFriendsMultiplier": 0.5,
+          "DamageFromPlayerToFriendsMultiplier": 0.5,
+          "NeedsRandomTerrain": false,
+          "RandomTerrainSeed": 8504,
+          "SceneName": "battle_terrain_biome_047",
+          "SceneLevels": "",
+          "PlayingInCampaignMode": true,
+          "EnableSceneRecording": false,
+          "SceneUpgradeLevel": 0,
+          "SceneHasMapPatch": true,
+          "PatchCoordinates": [
+            0.8666667,
+            1
+          ],
+          "PatchEncounterDir": [
+            0.912652135,
+            -0.408737123
+          ],
+          "DoNotUseLoadingScreen": false,
+          "DisableDynamicPointlightShadows": false,
+          "DisableCorpseFadeOut": false,
+          "DecalAtlasGroup": 2,
+          "AtmosphereOnCampaign": "AtmosphereInfo"
+        },
+        "terrainSamples": [
+          {
+            "at": [
+              750.094055,
+              1293.98157
+            ],
+            "terrainHeight": 205.051117
+          },
+          {
+            "at": [
+              770.094055,
+              1293.98157
+            ],
+            "terrainHeight": 205.578278
+          },
+          {
+            "at": [
+              730.094055,
+              1293.98157
+            ],
+            "terrainHeight": 204.99556
+          },
+          {
+            "at": [
+              750.094055,
+              1313.98157
+            ],
+            "terrainHeight": 208.272644
+          },
+          {
+            "at": [
+              750.094055,
+              1273.98157
+            ],
+            "terrainHeight": 202.5063
+          }
+        ],
+        "mainAgentPosition": [
+          750.094055,
+          1293.98157,
+          205.051117
+        ],
+        "combat": true,
+        "loadSeconds": 1.7230175999999346,
+        "deployed": true,
+        "spawns": {
+          "agents": 156,
+          "onNavmesh": 156,
+          "heightAdjusted": 0,
+          "offNavmesh": 0,
+          "offNavmeshUsingObject": 0,
+          "usedObjects": {},
+          "boundaries": 1,
+          "outsideBoundaries": 0,
+          "mainOnNavmesh": true,
+          "samples": []
+        },
+        "missionTimeAdvanced": 3.008899822831154,
+        "screenshot": true,
+        "endedItself": false,
+        "missionResult": null,
+        "teardownSeconds": 0.35371280000003935
+      },
+      "gear": {
+        "agents": 156,
+        "playerPartyAgents": 30,
+        "incomplete": 0,
+        "byCulture": {
+          "empire": 156
+        },
+        "problems": []
+      },
+      "outcome": {
+        "menu": "encounter",
+        "battleState": "None",
+        "playerWon": false,
+        "enemyActive": true,
+        "enemyHealthy": 126,
+        "encounterState": "Wait"
+      },
+      "returnDisplacement": 0.565356656696471,
+      "returnBound": 0.635,
+      "sceneMatchesPatch": true,
+      "mismatchGuard": {
+        "index": 147,
+        "naval": false,
+        "terrainAtParty": "Steppe",
+        "opened": "battle_terrain_biome_047",
+        "expected": "battle_terrain_biome_047",
+        "candidates": [
+          "battle_terrain_biome_047"
+        ],
+        "rule": "a single scene lists the index",
+        "deterministic": true,
+        "agrees": true,
+        "problem": null,
+        "position": [
+          566,
+          126
+        ],
+        "patchCoordinates": [
+          0.8666667,
+          1
+        ],
+        "campaignHours": 2185856.999089778
+      },
+      "guardObservations": 1,
+      "afterNavigation": null,
+      "seconds": 8.547963900000013,
+      "asserts": [],
+      "assertCount": 0,
+      "assertCanarySeen": true,
+      "log": {
+        "path": "rgl_log_<pid>.txt",
+        "read": true,
+        "missingLines": 6,
+        "kinds": {
+          "Missing shader from sack: pbr_terrain": 2,
+          "Missing shader from sack: pbr_terrain_gbuffer": 2,
+          "Missing shader from sack: pbr_terrain_pointlight": 1,
+          "Missing shader from sack: pbr_terrain_shadowmap": 1
+        },
+        "worldMissing": [],
+        "worldMissingCount": 0,
+        "otherMissing": [],
+        "otherMissingCount": 0
+      }
+    },
+    "B.field.wetland": {
+      "class": "wetland",
+      "absent": true
+    },
+    "hideout": {
+      "caseName": "hideout",
+      "failures": [],
+      "settlement": "mnbl_1609fb72_o_0046b90bef",
+      "parties": 2,
+      "expectedScene": "desert_hideout_004_sv",
+      "setup": {
+        "crewAdded": 29,
+        "attackHours": [
+          23,
+          2
+        ],
+        "hoursRunPastNight": 0,
+        "hourOfDay": 8.998889,
+        "option": "assault",
+        "troopSelection": {
+          "offered": 30,
+          "selected": 15,
+          "max": 15,
+          "min": 8
+        }
+      },
+      "entered": true,
+      "fight": {
+        "controller": true,
+        "phases": [
+          {
+            "phase": "InitialFightBeforeBossFight",
+            "seconds": 0,
+            "killed": 0
+          },
+          {
+            "phase": "CutSceneBeforeBossFight",
+            "seconds": 5.15,
+            "killed": 20
+          },
+          {
+            "phase": "ConversationBetweenLeaders",
+            "seconds": 15.38,
+            "killed": 20
+          },
+          {
+            "phase": "BossFightWithAll",
+            "seconds": 18.49,
+            "killed": 20
+          }
+        ],
+        "bossDialogueSteps": [
+          "conversation open",
+          "choosing bandit_hideout_start_defender_2",
+          "chosen",
+          "closed"
+        ],
+        "bossConversationLine": "You! You've cut quite a swathe through my men there, damn you. How about we settle this, one-on-one?",
+        "bossOptions": [
+          {
+            "id": "bandit_hideout_start_defender_1",
+            "clickable": true,
+            "text": "Very well."
+          },
+          {
+            "id": "bandit_hideout_start_defender_2",
+            "clickable": true,
+            "text": "I don't fight duels with brigands."
+          }
+        ],
+        "bossOption": "bandit_hideout_start_defender_2",
+        "bossConversationEnded": true,
+        "killed": 25,
+        "bossConversations": 1,
+        "seconds": 19.353463900000065,
+        "victory": true
+      },
+      "mission": {
+        "scene": "desert_hideout_004_sv",
+        "sceneNameProperty": "desert_hideout_004_sv",
+        "module": "$BASE/Modules/SandBox/",
+        "terrainType": "Plain",
+        "hasEnemyTeam": true,
+        "screen": "TaleWorlds.MountAndBlade.View.Screens.MissionScreen",
+        "initializerRecordSource": "TaleWorlds.MountAndBlade.Mission.<InitializerRecord>k__BackingField",
+        "initializerRecord": {
+          "TerrainType": 1,
+          "DamageToFriendsMultiplier": 0.5,
+          "DamageFromPlayerToFriendsMultiplier": 0.5,
+          "NeedsRandomTerrain": false,
+          "RandomTerrainSeed": 0,
+          "SceneName": "desert_hideout_004_sv",
+          "SceneLevels": "level_2",
+          "PlayingInCampaignMode": true,
+          "EnableSceneRecording": false,
+          "SceneUpgradeLevel": 0,
+          "SceneHasMapPatch": false,
+          "PatchCoordinates": [
+            0,
+            0
+          ],
+          "PatchEncounterDir": [
+            0,
+            0
+          ],
+          "DoNotUseLoadingScreen": false,
+          "DisableDynamicPointlightShadows": false,
+          "DisableCorpseFadeOut": false,
+          "DecalAtlasGroup": 3,
+          "AtmosphereOnCampaign": "AtmosphereInfo"
+        },
+        "terrainSamples": [
+          {
+            "at": [
+              1097.37866,
+              199.2054
+            ],
+            "terrainHeight": 18.2313557
+          },
+          {
+            "at": [
+              1117.37866,
+              199.2054
+            ],
+            "terrainHeight": 17.527935
+          },
+          {
+            "at": [
+              1077.37866,
+              199.2054
+            ],
+            "terrainHeight": 18.83052
+          },
+          {
+            "at": [
+              1097.37866,
+              219.2054
+            ],
+            "terrainHeight": 21.2129669
+          },
+          {
+            "at": [
+              1097.37866,
+              179.2054
+            ],
+            "terrainHeight": 15.6634712
+          }
+        ],
+        "mainAgentPosition": [
+          1097.37866,
+          199.2054,
+          18.2313538
+        ],
+        "combat": true,
+        "loadSeconds": 1.425522800000067,
+        "spawns": {
+          "agents": 35,
+          "onNavmesh": 30,
+          "heightAdjusted": 0,
+          "offNavmesh": 0,
+          "offNavmeshUsingObject": 5,
+          "usedObjects": {
+            "ChairUsePoint": 5
+          },
+          "boundaries": 1,
+          "outsideBoundaries": 0,
+          "mainOnNavmesh": true,
+          "samples": []
+        },
+        "screenshot": true,
+        "endedItself": true,
+        "missionResult": {
+          "victory": true,
+          "defeated": false,
+          "enemyRetreated": false
+        },
+        "teardownSeconds": 0.5046768999999358
+      },
+      "gear": {
+        "agents": 35,
+        "playerPartyAgents": 15,
+        "incomplete": 0,
+        "byCulture": {
+          "desert_bandits": 20,
+          "empire": 15
+        },
+        "problems": []
+      },
+      "afterNavigation": null,
+      "infestedAfter": false,
+      "banditPartiesAfter": 0,
+      "returnExpected": {
+        "position": [
+          496.875,
+          771.875
+        ],
+        "reason": "the hideout's gate, where the party entered"
+      },
+      "returnDisplacement": 0,
+      "returnBound": 0.635,
+      "seconds": 28.195874300000014,
+      "asserts": [],
+      "assertCount": 0,
+      "assertCanarySeen": true,
+      "log": {
+        "path": "rgl_log_<pid>.txt",
+        "read": true,
+        "missingLines": 2,
+        "kinds": {
+          "Missing shader from sack: pbr_noshadow_pointlight": 1,
+          "Voice object for text id is not found: #": 1
+        },
+        "worldMissing": [],
+        "worldMissingCount": 0,
+        "otherMissing": [],
+        "otherMissingCount": 0
+      }
+    }
+  },
+  "captures": [
+    "BFieldSteppeMissionScreenshot",
+    "captureMissionScreenshot",
+    "castleCenterScreenshot",
+    "crossingMissionScreenshot",
+    "fieldColdMissionScreenshot",
+    "fieldDesertMissionScreenshot",
+    "fieldOpenMissionScreenshot",
+    "fieldRockMissionScreenshot",
+    "fieldWoodlandMissionScreenshot",
+    "hideoutMissionScreenshot",
+    "retreatMissionScreenshot",
+    "siegeMissionScreenshot",
+    "townCenterScreenshot",
+    "townTavernScreenshot",
+    "villageCenterScreenshot"
+  ]
+}

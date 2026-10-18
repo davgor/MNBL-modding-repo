@@ -52,6 +52,8 @@ namespace MNBL.ProceduralWorld.CampaignRegistry
         }
 
         public IEnumerable<string> Clans { get { return Points().Keys.OrderBy(k => k, StringComparer.Ordinal); } }
+        public int PlanCount { get { return spawnPoints.Count; } }
+        public int PlanCountFor(string clan) { return spawnPoints.Count(p => String.Equals(p.Clan, clan, StringComparison.Ordinal)); }
         public int Count(string clan) { List<(CampaignVec2, float)> list; return Points().TryGetValue(clan, out list) ? list.Count : 0; }
 
         // Game end: War Sails drops its wrapper (NavalDLCManager.OnGameEnd); ours must not keep the ended map scene alive through Inner.

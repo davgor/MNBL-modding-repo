@@ -113,7 +113,10 @@ namespace MNBL.ProceduralWorld.Persistence
             foreach (var key in StrictKeys)
             {
                 string a, b; saved.TryGetValue(key, out a); running.TryGetValue(key, out b);
-                if (a != b) strict.Add(key + ": saved " + (a ?? "(none)") + ", running " + (b ?? "(none)"));
+                if (a == b) continue;
+                // MMR-50: a War Sails save on a game without War Sails, said as such (WorldCompatibilityPolicy words it the same).
+                if (key == "naval" && (b == "absent" || b == null) && a != null && a != "absent") strict.Add("this campaign was saved with War Sails " + a + ", which is not installed");
+                else strict.Add(key + ": saved " + (a ?? "(none)") + ", running " + (b ?? "(none)"));
             }
             if (strict.Count > 0) return Refuse(IncompatibleBuild, String.Join("; ", strict));
             foreach (var key in RebuiltKeys)
@@ -122,6 +125,32 @@ namespace MNBL.ProceduralWorld.Persistence
                 if (a != b && notes != null) notes.Add(key + " differs (saved " + (a ?? "(none)") + ", running " + (b ?? "(none)") + "): the rebuilt world is verified instead");
             }
             return null;
+        }
+
+        // MMR-50: a save made before MMR-48 recorded no build keys; its header still records the game version (ApplicationVersion) and War
+        // Sails' (Module_NavalDLC; absent when the save was made without it). Null when the header records neither.
+        public static Dictionary<string, string> LegacyBuild(IDictionary<string, string> header)
+        {
+            string game, naval;
+            if (header == null || !header.TryGetValue("ApplicationVersion", out game)) return null;
+            if (!header.TryGetValue("Module_NavalDLC", out naval)) naval = "absent";
+            return new Dictionary<string, string>(StringComparer.Ordinal) { ["game"] = game, ["naval"] = naval };
+        }
+
+        // MMR-50: the refusal, or null, for a save without build keys: its header's game and War Sails versions against the running ones.
+        public static Refusal LegacyCompatibility(IDictionary<string, string> legacy, IDictionary<string, string> running, List<string> notes)
+        {
+            if (notes != null) notes.Add("saved before MMR-48: no build keys recorded; the header's game and War Sails versions are compared and the world's reconstruction is verified");
+            if (legacy == null) return null;
+            var strict = new List<string>();
+            foreach (var key in new[] { "game", "naval" })
+            {
+                string a, b; legacy.TryGetValue(key, out a); running.TryGetValue(key, out b);
+                if (a == b) continue;
+                if (key == "naval" && (b == "absent" || b == null) && a != null && a != "absent") strict.Add("this campaign was saved with War Sails " + a + ", which is not installed");
+                else strict.Add(key + ": saved " + (a ?? "(none)") + " (from the header), running " + (b ?? "(none)"));
+            }
+            return strict.Count == 0 ? null : Refuse(IncompatibleBuild, String.Join("; ", strict));
         }
 
         // The documents rebuilt from the bundle against the package's (id -> SHA-256): a refusal when they differ.

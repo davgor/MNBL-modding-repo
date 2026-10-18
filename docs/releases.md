@@ -14,6 +14,12 @@ Each player-facing mod is released on its own. A merge into `main` publishes a G
 A version is released once. To ship the same version again, delete its tag and release, then re-run
 **Mod releases** from the Actions tab.
 
+**Procedural World is not ready for a release.** It is `release: true` at v0.0.1 with no tag yet, so the first
+merge of its branch into `main` would publish it as an ordinary release. The release notes would not say that it is a
+local test package with open decisions (`docs/packaging.md`) and an unrun acceptance scenario
+(`evidence/one-shot/acceptance-index.json`). Before that merge, the owner decides: `release: false`, a prerelease, or
+releasing after MMR-1. `tools/Package.ps1` needs `release: true`, because `mods.py package` refuses a mod without it.
+
 ## Adding a mod
 
 Every `Modules/<id>/` and `src/<dir>/` folder must belong to a mod in [config/mods.json](../config/mods.json);
@@ -27,6 +33,14 @@ the checks fail otherwise. A new entry needs:
 A build script takes `-References`, `-Stage` and `-Work`, and fills `-Stage` with the module folder exactly as it
 should appear under `Modules/<id>/`. [tools/ci/Build-BattleScale.ps1](../tools/ci/Build-BattleScale.ps1) is the
 smallest example.
+
+`mods.py package` refuses any file named like an official game, DLC or dependency file, before it writes
+anything, and writes `<id>-<version>.manifest.json` with every file's size and SHA-256, which the release
+uploads beside the zip. An optional `package` block lists the only files the zip may hold (`files`), the
+provenance of each, the dependencies, runtime requirements, licenses and content notes, and what is
+deliberately not redistributed. With it, an unlisted file, a file without provenance, or a missing listed
+file is refused too. Procedural World has one; how its
+package was built and tested installed on its own is in [packaging.md](packaging.md).
 
 ## How the runner builds without the game
 

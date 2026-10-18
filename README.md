@@ -1,82 +1,65 @@
-# FWGC++ procedural Bannerlord campaigns
+# MNBL modding repository
 
-**Incomplete: this repository currently contains a diagnostic mod and tested producer tooling, not a playable procedural campaign.** The full implementation is tracked in Dark Mechanicus epic `ep_01m4fpnf646t254mnh69jhz107`.
+Mods for Mount & Blade II: Bannerlord v1.4.8 with War Sails. The main one is **MNBL Procedural World**: from the main menu, **New Procedural Campaign** generates a new world from a seed, inside the running game, and starts a Sandbox campaign in it. The world comes with its own terrain, settlements, kingdoms, clans, heroes, economy and land and sea routes, on a flat map that wraps from east to west. Its saves stay bound to that world.
 
-**Verified milestone (2026-10-13):** generated seed-42 native terrain renders, and
-a Sandbox campaign boots onto it with War Sails loaded. The diagnostic deliberately
-retains official campaign identities, settlement locations and navigation topology;
-it is paused and disables autosaves. It is not the completed generated campaign.
-The main menu now offers **FWGC: Preview generated terrain** and **FWGC: Sandbox
-terrain test (paused)**. The old procedural-mesh crash probes are no longer menu
-entries. Evidence and remaining limits are in `docs/runtime-capabilities.md`.
+**Status (2026-10-18): a tested local package, not a release.** The implementation of Dark Mechanicus epic `ep_01m4fpnf646t254mnh69jhz107` is complete up to its final one-shot acceptance run (MMR-1), which has not been run.
+- **Seeds:** only seed 42 makes a playable world today. Most seeds fail the generator's quality checks, and seed 73 previews but is refused at Start Campaign.
+- **First start:** each new world blocks the game for about 7 minutes while its navigation is prepared.
+- **Other open items:** a read-only game folder is unsupported, and the package needs the Visual C++ runtime. Copied official culture text sits in the assembly, which is an open decision before any public release.
 
-The required outcome is local world generation inside New Campaign, the full globe as a flat map with connected east/west edges, generated campaign content, War Sails travel and safe per-world saves. See `docs/decisions/001-product-contract.md`.
+Where each epic outcome stands, with its evidence, is in [evidence/one-shot/acceptance-index.json](evidence/one-shot/acceptance-index.json):
 
-## Build and inspect
+| Outcome | Status |
+|---|---|
+| s1 pinned producer and version-matched setup | pass |
+| s2 in-game generation from New Campaign | fail: only seed 42 gives a playable world |
+| s3 periodic flat globe | fail: minor known defects at the seam (planar UI lists, a missed storm tick); seam encounters not run |
+| s4 coherent generated campaign | fail: seed 73's villages cannot be bound |
+| s5 War Sails on the generated world | not run in full: ports, fleets, routes, caches, voyages and a pirate encounter pass on world A; boarding, ship damage, battles fought to the end and blockade battles were not run |
+| s6 two worlds saved and loaded across a cold restart | blocked: the second world is a fixture, since only one seed activates |
+| s7 clean package and the one-shot scenario | not run (MMR-1) |
 
-From PowerShell in this repository:
+Broad seed certification, long soaks, endurance, all-season play and performance certification are deferred and listed there as not run.
+
+**Merging this branch into `main` would publish a release.** `config/mods.json` marks `MNBL.ProceduralWorld` `release: true`, and its v0.0.1 has no tag yet. The release workflow therefore publishes it as an ordinary GitHub release, whose notes do not say it is a test package. Decide before merging: `release: false`, a prerelease, or waiting for MMR-1. See [docs/releases.md](docs/releases.md).
+
+## Start here
+
+- **Play:** [docs/runbooks/player-worlds.md](docs/runbooks/player-worlds.md) covers install, the New Campaign flow, seeds, times, where worlds and saves live, backup, compatibility, troubleshooting by error code, and known limits.
+- **Develop:** [docs/runbooks/development.md](docs/runbooks/development.md) covers prerequisites, build, offline and in-game tests, deploy, the package, and the shared-installation rules.
+- **Release:** [docs/releases.md](docs/releases.md) is the per-mod GitHub release process. [docs/packaging.md](docs/packaging.md) covers the local package and its clean-install test.
+- **Product contract:** [docs/decisions/001-product-contract.md](docs/decisions/001-product-contract.md).
+
+Quick build, from PowerShell in this repository, with the prerequisites in the development runbook:
 
 ```powershell
-./tools/Doctor.ps1
-./tools/Build-Fwg.ps1
+./tools/Build-Fwg.ps1 -Source <path to FWGC++ at the pinned commit>
+python tests/check_producer_lock.py --source <path to FWGC++>
+./tools/Test-ApiPins.ps1
 ./tools/Build.ps1
-./tools/Test-GenerationProbe.ps1
-./tools/Test-Heightfield.ps1
-python tests/test_source_reader.py
+./tools/Deploy-Dev.ps1      # refuses while the game is running
 ```
 
-To reproduce the native campaign bootstrap fixture locally after the seed-42
-heightfield has been extracted to `build/heightfield-source42/heightfield.bin`:
+## Mods in this repository
 
-```powershell
-python tools/scenebin/build_campaign_fixture.py
-python tests/check_campaign_fixture.py
-./tools/Build.ps1
-./tools/Deploy-Dev.ps1
-./tools/Deploy-SceneSlots.ps1 -Map 'build/campaign-fixture/mnbl_campaign_42=SceneObj/mnbl_campaign_42'
-./tools/Start-OwnedProbe.ps1 -Probe sandbox_boot
-# After the run exits:
-./tools/Collect-OwnedProbe.ps1
-```
+| Mod | What it is | Registry |
+|---|---|---|
+| `MNBL.ProceduralWorld` | Procedural campaign worlds (this README) | [config/mods.json](config/mods.json) |
+| `MNBL.BattleScale` | Battle Scale experiment ([docs/battle-scale.md](docs/battle-scale.md)) | [config/mods.json](config/mods.json) |
+| `MNBL.AgentGrowthProbe` | In-game engine probe for local tests; not released | [config/mods.json](config/mods.json) |
 
-The fixture extracts installed scene scaffolding into ignored local build output.
-It does not alter official modules. Do not save the diagnostic campaign or
-redistribute its extracted assets. The automated run captures its map and exits;
-the menu action stays on the paused map for inspection. Runtime world generation,
-generated campaign content/navigation, periodic edges and world-bound saves remain
-unfinished.
+## How the documentation is organised
 
-The scripts accept the documented local installation paths or use this PC's recorded defaults. Visual Studio 2022 Build Tools, Windows SDK 10.0.26100.0 and .NET Framework 4.8.1 references are required. FWGC++ source remains in its existing sibling repository; it is not modified. `tools.lock.json` pins the tested source and binary. No dependency download occurs during these builds.
+Each implementation ticket has a doc in `docs/` (named in its first line) and a review record in `evidence/fwg/*-review.md`.
 
-`config/runtime-api-lock.json` pins exact game/DLC/framework inputs. The build
-checks the compiler's resolved references and records source/output hashes in
-`evidence/runtime/build-api-inputs.json`. Deployment refuses changed APIs, stale
-sources or outputs, and missing build evidence. Run `./tools/Test-Deployment.ps1`
-to check these refusals against disposable copies; official files are untouched.
+- **World pipeline:** `world-projection`, `terrain-compiler`, `campaign-semantics`, `travel-graph`, `world-bundle`.
+- **Campaign content:** `campaign-registry`, `factions`, `heroes`, `settlements`, `campaign-behavior-compatibility`, `naval-content`, `campaign-graph-validation`.
+- **Runtime map:** `runtime-backend-decision`, `runtime-surface`, `runtime-navigation`, `water-climate`, `settlement-entities`, `playability`, `periodic-coordinates`, `periodic-movement`, `periodic-presentation`.
+- **Missions:** `mission-scenes`, `land-missions`, `naval-missions`.
+- **Player flow:** `world-setup`, `generation-job`, `world-activation`, `world-preview`, `recovery`, `first-test-profile`.
+- **Saves:** `save-binding`, `world-loading`, `save-compatibility`.
+- **Release:** `packaging`, `releases`.
 
-`tools/Deploy-Dev.ps1` copies only the diagnostic module into `Modules/MNBL.ProceduralWorld` and refuses deployment while Bannerlord is running. The module depends on the installed Native, SandBoxCore, Sandbox, StoryMode and NavalDLC modules. It does not replace official files or existing saves.
+`docs/runtime-capabilities.md` is the running log of what the engine was shown to do; later docs supersede some of its entries.
 
-The diagnostic menu offers seed 42/43 generation, cancellation, native terrain
-preview and the paused Sandbox terrain test. Successful source generation runs the
-pinned reader and stores reports beneath
-`%LOCALAPPDATA%/MNBL.ProceduralWorld/jobs/<unique job>/`. Those jobs are not
-automatically activated as campaigns: the preview and Sandbox test use the locally
-built seed-42 scene fixtures. The final Sandbox screenshot is
-`evidence/runtime/in-game/sandbox_boot-23152.png`. The shared bootstrap was verified
-through automated startup; the menu click itself has not been separately tested.
-
-The C++ `worldbridge` reads a split root with bounded JSON tokens, nesting and input size. It exports selected source blocks and a lossless diagnostic heightfield, checking pinned schema/block versions, a full square height grid, seam/pole continuity and exact layout-seed text. It refuses traversal and missing scene references. It does not ingest scene/plan files or compile gameplay objects, routes, materials, save bindings or a production world bundle. `source-validation.json` explicitly records `campaignReady: false`; it is not an activation receipt.
-
-## Verified checks
-
-- Fresh producer build and five CTest targets passed; seed 42/43 outputs differ; invalid uint32 seed is rejected with exit 2.
-- Supervisor harness passed generation, paths containing spaces, cancellation, pre-cancellation and producer-hash refusal.
-- C++ reader contract tests and fourteen source integration cases passed; real 129×129 worlds were read successfully.
-- Installed engine metadata is recorded with hashes; runtime capability claims remain open in `docs/runtime-capabilities.md`.
-
-The full playable campaign, terrain picking, generated land/sea navigation, globe
-wrapping, generated factions/settlements, New Campaign UI, mission transitions and
-save/load acceptance are unfinished. Passing the source tests and paused boot does
-not close those tickets.
-
-
+Generated scenes, user worlds, raw in-game run outputs and build outputs are never committed. The FWGC++ producer source stays in its own repository and is never modified here.

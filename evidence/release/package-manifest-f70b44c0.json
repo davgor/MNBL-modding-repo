@@ -1,0 +1,455 @@
+{
+    "schema":  "mnbl.package-record",
+    "version":  1,
+    "ticket":  "MMR-57",
+    "utc":  "2026-10-18T15:05:21.7570859Z",
+    "archive":  {
+                    "files":  11,
+                    "sha256":  "f70b44c0879d4389fced8c16e61ea5fb331995ae862acdd8bfe1ddf8d86b314f",
+                    "file":  "MNBL.ProceduralWorld-v0.0.1.zip",
+                    "bytes":  4115066
+                },
+    "manifest":  {
+                     "schema":  "mnbl.package-manifest",
+                     "version":  1,
+                     "mod":  "MNBL.ProceduralWorld",
+                     "name":  "FWGC Procedural World - Capability Probe",
+                     "modVersion":  "v0.0.1",
+                     "archive":  {
+                                     "file":  "MNBL.ProceduralWorld-v0.0.1.zip",
+                                     "sha256":  "f70b44c0879d4389fced8c16e61ea5fb331995ae862acdd8bfe1ddf8d86b314f",
+                                     "layout":  "MNBL.ProceduralWorld/... (extract into \u003cBannerlord install\u003e/Modules/)"
+                                 },
+                     "source":  {
+                                    "commit":  "ec27e813283158fd3447e0ad92254152f5ae9287",
+                                    "ownedFilesUncommitted":  true
+                                },
+                     "supportedBuild":  {
+                                            "game":  "v1.4.8.119303",
+                                            "gameLock":  "v1.4.8.119303",
+                                            "navalDlc":  "v1.2.8.119303",
+                                            "producer":  {
+                                                             "sourceCommit":  "ec5d1c10f5ae4c32fdcef092d23ad7d51e2a30de",
+                                                             "sha256":  "564c2629b5b92d49e52cd466a5a1aaa9339380464207ddcae669dd487d2f695e",
+                                                             "schemaVersion":  2
+                                                         },
+                                            "locks":  {
+                                                          "tools.lock.json":  "ad813831b5e61b9d950506a576d2e36dd6d17932ab04b12d8b6b5b02b0b8bd97",
+                                                          "config/runtime-api-lock.json":  "4af34d297c89a4d377861e5b18e558cf4b00cd5c11bd885920833618bb71d211",
+                                                          "config/ci-references.json":  "abcb2633abbcbf3e6d76bf800c89d8b6cc7a1e04a637a649c0d35081ae8428ef"
+                                                      }
+                                        },
+                     "dependencies":  [
+                                          {
+                                              "id":  "Bannerlord.Harmony",
+                                              "version":  "v2.4.2",
+                                              "optional":  false,
+                                              "installedSeparately":  "Harmony (Steam Workshop item 2859188632)"
+                                          },
+                                          {
+                                              "id":  "Native",
+                                              "version":  "v1.4.8",
+                                              "optional":  false,
+                                              "installedSeparately":  "Native (base game)"
+                                          },
+                                          {
+                                              "id":  "SandBoxCore",
+                                              "version":  "v1.4.8",
+                                              "optional":  false,
+                                              "installedSeparately":  "SandBoxCore (base game)"
+                                          },
+                                          {
+                                              "id":  "Sandbox",
+                                              "version":  "v1.4.8",
+                                              "optional":  false,
+                                              "installedSeparately":  "Sandbox (base game)"
+                                          },
+                                          {
+                                              "id":  "StoryMode",
+                                              "version":  "v1.4.8",
+                                              "optional":  false,
+                                              "installedSeparately":  "StoryMode (base game)"
+                                          },
+                                          {
+                                              "id":  "NavalDLC",
+                                              "version":  "v1.2.8",
+                                              "optional":  false,
+                                              "installedSeparately":  "War Sails DLC"
+                                          }
+                                      ],
+                     "files":  [
+                                   {
+                                       "path":  "bin/Win64_Shipping_Client/fwg.exe",
+                                       "bytes":  6172672,
+                                       "sha256":  "564c2629b5b92d49e52cd466a5a1aaa9339380464207ddcae669dd487d2f695e",
+                                       "provenance":  "the FWGC++ world producer pinned by tools.lock.json (producer.sourceCommit, producer.sha256)"
+                                   },
+                                   {
+                                       "path":  "bin/Win64_Shipping_Client/fwg.sha256",
+                                       "bytes":  65,
+                                       "sha256":  "e5532d1ef6aff50da73ff3def0490160e29978ea483a99a59a67014795866eb9",
+                                       "provenance":  "pins written at staging; the module refuses a producer or bridge whose hash differs"
+                                   },
+                                   {
+                                       "path":  "bin/Win64_Shipping_Client/MNBL.ProceduralWorld.dll",
+                                       "bytes":  4551680,
+                                       "sha256":  "a61d6dc78ed37c0198191e728b2711af866875706ab744a61acf1b8290a1a4e0",
+                                       "provenance":  "built from src/MNBL.ProceduralWorld; it embeds the worldgen policies, profiles, contracts, calibration and culture templates it reads (src/MNBL.ProceduralWorld/MNBL.ProceduralWorld.csproj EmbeddedResource)"
+                                   },
+                                   {
+                                       "path":  "bin/Win64_Shipping_Client/worldbridge.exe",
+                                       "bytes":  1556992,
+                                       "sha256":  "776c160626d029e6c9b911472db1a1e7d7992c5f51188259b81fd864e654fe34",
+                                       "provenance":  "built from src/WorldBridge"
+                                   },
+                                   {
+                                       "path":  "bin/Win64_Shipping_Client/worldbridge.sha256",
+                                       "bytes":  65,
+                                       "sha256":  "f301cdbfff6a76f9fc1eb5b2db6d8c22669c1f15a00578404cdf8f14a434ca88",
+                                       "provenance":  "pins written at staging; the module refuses a producer or bridge whose hash differs"
+                                   },
+                                   {
+                                       "path":  "GUI/Prefabs/WorldPreview.xml",
+                                       "bytes":  9471,
+                                       "sha256":  "c528c36e4823f34507a878aa8fc768da4fa80790ce9295708dc4f791d1c7b992",
+                                       "provenance":  "Modules/MNBL.ProceduralWorld/GUI/Prefabs (repository files)"
+                                   },
+                                   {
+                                       "path":  "GUI/Prefabs/WorldSetup.xml",
+                                       "bytes":  20723,
+                                       "sha256":  "2a79863e91e06ea84ddf68c5fe762bb3c0e78711a1995d0bc7dad2f11480f84f",
+                                       "provenance":  "Modules/MNBL.ProceduralWorld/GUI/Prefabs (repository files)"
+                                   },
+                                   {
+                                       "path":  "SubModule.xml",
+                                       "bytes":  1076,
+                                       "sha256":  "90e7cb5ea371d15108cba6914124c776f58c5121f9a3844dfa02582fc1a32412",
+                                       "provenance":  "Modules/MNBL.ProceduralWorld/SubModule.xml (repository file)"
+                                   },
+                                   {
+                                       "path":  "SurfaceTemplate/navmesh.bin",
+                                       "bytes":  84637,
+                                       "sha256":  "fdb57e1dd6457669a6100c9d1c7fd7ecd7198e7ef788210d24e4e42e89eb3dbe",
+                                       "provenance":  "this module\u0027s own surface template binaries (tools/scenebin/build_slot.py\u0027s writers; copied by tools/scenebin/make_surface_template.py)"
+                                   },
+                                   {
+                                       "path":  "SurfaceTemplate/template-recipe.json",
+                                       "bytes":  23978,
+                                       "sha256":  "4dbd8e9da05f0c2e02fc1f3fba7124ffe15e539f0e485d46da1041d39348b72c",
+                                       "provenance":  "tools/scenebin/make_surface_template.py: this module\u0027s values and the SHA-256 of every template file; scene.xscene and atmosphere.xml are derived from the player\u0027s installed SandBoxCore battle_terrain_001 at run time (World/SurfaceTemplateSource.cs), never shipped"
+                                   },
+                                   {
+                                       "path":  "SurfaceTemplate/terrain.bin",
+                                       "bytes":  92167,
+                                       "sha256":  "6946df6f1257b0124c4674e864bbd7b03d99474c2a21fb443e74e8ba3b339ea8",
+                                       "provenance":  "this module\u0027s own surface template binaries (tools/scenebin/build_slot.py\u0027s writers; copied by tools/scenebin/make_surface_template.py)"
+                                   }
+                               ],
+                     "totalBytes":  12513526,
+                     "runtimeRequirements":  [
+                                                 "Microsoft Visual C++ 2015-2022 Redistributable (x64): worldbridge.exe and fwg.exe import MSVCP140.dll, VCRUNTIME140.dll and VCRUNTIME140_1.dll, which the game does not ship (tools/Package.ps1 records the imports)."
+                                             ],
+                     "licenses":  {
+                                      "module":  "No license file: the module, WorldBridge and their sources are the repository owner\u0027s, all rights reserved; this archive is for local installation by its testers.",
+                                      "producer":  "fwg.exe is built from the owner\u0027s FWGC++ repository (no license file), same terms.",
+                                      "dependencies":  "Harmony (Bannerlord.Harmony, Steam Workshop 2859188632; MIT) and the game with War Sails (TaleWorlds, proprietary) are required and installed separately; neither is redistributed."
+                                  },
+                     "contentNotes":  [
+                                          "The module assembly embeds worldgen/templates/cultures/*.json, which carry about 1,051 name and lore strings with their localisation ids copied from the game\u0027s culture definitions (spcultures.xml), 7 of them culture lore paragraphs. They are not game files, but they are copied official text; whether to resolve them from the player\u0027s installation instead is an open decision (MMR-57)."
+                                      ],
+                     "notRedistributed":  [
+                                              "Bannerlord, its official modules and War Sails (assemblies, assets, scenes)",
+                                              "Harmony (0Harmony.dll)",
+                                              "development caches, research outputs and user worlds (the per-user store under %LOCALAPPDATA%\\MNBL.ProceduralWorld)",
+                                              "generated scenes (SceneObj/), made at run time in the installed module folder",
+                                              "the surface template\u0027s scene.xscene and atmosphere.xml (derived from the installed SandBoxCore battle_terrain_001 on the player\u0027s machine) and its empty flora.bin (written there)"
+                                          ]
+                 },
+    "localAudit":  {
+                       "officialRootsScanned":  [
+                                                    "bin",
+                                                    "Data",
+                                                    "DigitalCompanion",
+                                                    "GUI",
+                                                    "Icons",
+                                                    "modding_resources",
+                                                    "Shaders",
+                                                    "XmlEditor",
+                                                    "XmlSchemas",
+                                                    "Modules\\BirthAndDeath",
+                                                    "Modules\\CustomBattle",
+                                                    "Modules\\FastMode",
+                                                    "Modules\\Multiplayer",
+                                                    "Modules\\Native",
+                                                    "Modules\\NavalDLC",
+                                                    "Modules\\SandBox",
+                                                    "Modules\\SandBoxCore",
+                                                    "Modules\\StoryMode"
+                                                ],
+                       "officialFilesScanned":  30170,
+                       "identicalToOfficial":  [
+
+                                               ],
+                       "embeddedResources":  [
+                                                 {
+                                                     "sha256":  "ca985082c1813a935ba164bfcc48defff9c2d9ed790f30127dc7fcb6e7535c76",
+                                                     "resource":  "MNBL.ProceduralWorld.graph-validation.json",
+                                                     "source":  "worldgen/policies/graph-validation.json",
+                                                     "matchesRepository":  true
+                                                 },
+                                                 {
+                                                     "sha256":  "e4b18cb94f16e7944d6cbc07cc0d2cc8cb5d8de51d5c11f4fd2c6a3da2e37228",
+                                                     "resource":  "MNBL.ProceduralWorld.navigation.json",
+                                                     "source":  "worldgen/policies/navigation.json",
+                                                     "matchesRepository":  true
+                                                 },
+                                                 {
+                                                     "sha256":  "80299d3d50e682a10f3cae697f66e8ce4b85bafb6dae09edbad545c47611fad5",
+                                                     "resource":  "MNBL.ProceduralWorld.settlement-placement.json",
+                                                     "source":  "worldgen/policies/settlement-placement.json",
+                                                     "matchesRepository":  true
+                                                 },
+                                                 {
+                                                     "sha256":  "f8af37983c763ca0381121e70de6b6a8ee787c958450bf9fbb01af317eb50a3d",
+                                                     "resource":  "MNBL.ProceduralWorld.naval-content.json",
+                                                     "source":  "worldgen/policies/naval-content.json",
+                                                     "matchesRepository":  true
+                                                 },
+                                                 {
+                                                     "sha256":  "2cf08bceca6d7fd089b4ef99fcb77f8c06c247534dd3e5d4b5864233b38f4e85",
+                                                     "resource":  "MNBL.ProceduralWorld.naval-transitions.json",
+                                                     "source":  "worldgen/calibration/naval-transitions/naval-transitions.json",
+                                                     "matchesRepository":  true
+                                                 },
+                                                 {
+                                                     "sha256":  "974b64e23576d8842187e25e732368ec468bd6133a3038f0341571597aa08710",
+                                                     "resource":  "MNBL.ProceduralWorld.one-shot.json",
+                                                     "source":  "worldgen/profiles/one-shot.json",
+                                                     "matchesRepository":  true
+                                                 },
+                                                 {
+                                                     "sha256":  "86f8339fd695cc44a2ac7d47d89d38f90c6a061f49296b8e01d93707907708e1",
+                                                     "resource":  "MNBL.ProceduralWorld.producer-controls.json",
+                                                     "source":  "worldgen/contracts/producer-controls.json",
+                                                     "matchesRepository":  true
+                                                 },
+                                                 {
+                                                     "sha256":  "c411cafa021004fc86f06ef7469fc1e219e5d4c2e7227a7fcfdab8c78cef17d8",
+                                                     "resource":  "MNBL.ProceduralWorld.producer-seed-width.json",
+                                                     "source":  "worldgen/contracts/producer-seed-width.json",
+                                                     "matchesRepository":  true
+                                                 },
+                                                 {
+                                                     "sha256":  "34bc205b4a9360f847d03b7dd98a7ff8337291424d05c412c7694e0113f30956",
+                                                     "resource":  "MNBL.ProceduralWorld.product-policy.json",
+                                                     "source":  "worldgen/policies/product-policy.json",
+                                                     "matchesRepository":  true
+                                                 },
+                                                 {
+                                                     "sha256":  "23a59ce940b0ef4bacdc43c163ad2c6964c292b4e35982a3f877ea9f6fb33120",
+                                                     "resource":  "MNBL.ProceduralWorld.one-shot-budget.json",
+                                                     "source":  "worldgen/policies/one-shot-budget.json",
+                                                     "matchesRepository":  true
+                                                 },
+                                                 {
+                                                     "sha256":  "3e9640a2ac2302feb2762a40c90fbc98e0a58063ac19b286dcf626017624aedb",
+                                                     "resource":  "MNBL.ProceduralWorld.producer.lock.json",
+                                                     "source":  "worldgen/producer.lock.json",
+                                                     "matchesRepository":  true
+                                                 },
+                                                 {
+                                                     "sha256":  "efe9ba962fe7c1fe2ed7386ba04a2f39bb22222b52691ef21c3133728b781c3b",
+                                                     "resource":  "MNBL.ProceduralWorld.culture-presentations.json",
+                                                     "source":  "worldgen/policies/culture-presentations.json",
+                                                     "matchesRepository":  true
+                                                 },
+                                                 {
+                                                     "sha256":  "bcf72aa62e9abc4e3a1c0d9275d0820cc9f11e3b3f31593e38c1dd8623704718",
+                                                     "resource":  "MNBL.ProceduralWorld.world-quality.json",
+                                                     "source":  "worldgen/policies/world-quality.json",
+                                                     "matchesRepository":  true
+                                                 },
+                                                 {
+                                                     "sha256":  "8310a3b63eb3203dbfcfa061c689b01f0b21d2fa2356e54477d3789c163ec064",
+                                                     "resource":  "MNBL.ProceduralWorld.source-compatibility.json",
+                                                     "source":  "worldgen/contracts/source-compatibility.json",
+                                                     "matchesRepository":  true
+                                                 },
+                                                 {
+                                                     "sha256":  "4254e3c9cafdb9ced006ef172d1d5181242bd69df4c4bc9d75971f6657d41d3c",
+                                                     "resource":  "MNBL.ProceduralWorld.projection.json",
+                                                     "source":  "worldgen/policies/projection.json",
+                                                     "matchesRepository":  true
+                                                 },
+                                                 {
+                                                     "sha256":  "61837b4045938dc4ce394e891cb0c597f3849209dc3dec7f374d48daf573c13d",
+                                                     "resource":  "MNBL.ProceduralWorld.terrain-materials.json",
+                                                     "source":  "worldgen/policies/terrain-materials.json",
+                                                     "matchesRepository":  true
+                                                 },
+                                                 {
+                                                     "sha256":  "3b82a23f4d752736c82ed5db927d347c31cc0935f20b012a0b4b9d6d05f9cffd",
+                                                     "resource":  "MNBL.ProceduralWorld.terrain-import.json",
+                                                     "source":  "worldgen/calibration/terrain-import/terrain-import.json",
+                                                     "matchesRepository":  true
+                                                 },
+                                                 {
+                                                     "sha256":  "0c72298eac3fedb6c0bf9ea4bff9d3a52eb95a478f3acecd28f12d69608fb1f5",
+                                                     "resource":  "MNBL.ProceduralWorld.campaign-content.json",
+                                                     "source":  "worldgen/policies/campaign-content.json",
+                                                     "matchesRepository":  true
+                                                 },
+                                                 {
+                                                     "sha256":  "67343ec09ad3fee82022f007462b7e295fc72d04b67759c8b5114d713a66efc1",
+                                                     "resource":  "MNBL.ProceduralWorld.playability.json",
+                                                     "source":  "worldgen/policies/playability.json",
+                                                     "matchesRepository":  true
+                                                 },
+                                                 {
+                                                     "sha256":  "b5c29519521efa68c6579e6a5417aadbb639ab2e0a98e378fd66d62977ce916e",
+                                                     "resource":  "MNBL.ProceduralWorld.mission-scenes.json",
+                                                     "source":  "worldgen/policies/mission-scenes.json",
+                                                     "matchesRepository":  true
+                                                 },
+                                                 {
+                                                     "sha256":  "e66882c4d18f85d2e423a48d0d93c0da94e0779476dd88b0ad8cd9e119ea9cd3",
+                                                     "resource":  "MNBL.ProceduralWorld.factions.json",
+                                                     "source":  "worldgen/policies/factions.json",
+                                                     "matchesRepository":  true
+                                                 },
+                                                 {
+                                                     "sha256":  "c32092fefeb8791cb58f7cdc805fa4468b1d485873b094f9b8bd0bfcc8e4dfdd",
+                                                     "resource":  "MNBL.ProceduralWorld.rosters.json",
+                                                     "source":  "worldgen/policies/rosters.json",
+                                                     "matchesRepository":  true
+                                                 },
+                                                 {
+                                                     "sha256":  "30fecc08f226411c1d04bafe75ba757b91a1af345642450c5ad40df2cfe7efa4",
+                                                     "resource":  "MNBL.ProceduralWorld.economy.json",
+                                                     "source":  "worldgen/policies/economy.json",
+                                                     "matchesRepository":  true
+                                                 },
+                                                 {
+                                                     "sha256":  "1289a878f32a62d3f060e8d15bb0f202016478aca7dd0f7655c937257052de2d",
+                                                     "resource":  "MNBL.ProceduralWorld.startup.json",
+                                                     "source":  "worldgen/policies/startup.json",
+                                                     "matchesRepository":  true
+                                                 },
+                                                 {
+                                                     "sha256":  "52ef38f9c57d203663498c09bba7915686d1d7514915be6ae3af1635446092c8",
+                                                     "resource":  "MNBL.ProceduralWorld.campaign-catalog.json",
+                                                     "source":  "worldgen/policies/campaign-catalog.json",
+                                                     "matchesRepository":  true
+                                                 },
+                                                 {
+                                                     "sha256":  "9520391d53b48a5c707e8ca1be04c5015d4299085f3e7f0a7605efa730911b62",
+                                                     "resource":  "MNBL.ProceduralWorld.settlement-prototypes.json",
+                                                     "source":  "worldgen/templates/settlements/prototypes.json",
+                                                     "matchesRepository":  true
+                                                 },
+                                                 {
+                                                     "sha256":  "7c2558ae154f2a995901f7f1034f6151011c64fd92bfbc075b57dd14dd77dfb6",
+                                                     "resource":  "MNBL.ProceduralWorld.culture-aserai.json",
+                                                     "source":  "worldgen/templates/cultures/aserai.json",
+                                                     "matchesRepository":  true
+                                                 },
+                                                 {
+                                                     "sha256":  "1afc8ae4885e03bcecbaa030ab09c3155d7b9517eec8246a6609bcc555e741a1",
+                                                     "resource":  "MNBL.ProceduralWorld.culture-battania.json",
+                                                     "source":  "worldgen/templates/cultures/battania.json",
+                                                     "matchesRepository":  true
+                                                 },
+                                                 {
+                                                     "sha256":  "5d6a980bba1a7f697a95d7615eb7aed476e40b83dabe6b28fbf1de257684382a",
+                                                     "resource":  "MNBL.ProceduralWorld.culture-contract.json",
+                                                     "source":  "worldgen/templates/cultures/contract.json",
+                                                     "matchesRepository":  true
+                                                 },
+                                                 {
+                                                     "sha256":  "1348fe2dbd4779396a523a53ecb2ffde854462848e108d0a977cb383660f3182",
+                                                     "resource":  "MNBL.ProceduralWorld.culture-empire.json",
+                                                     "source":  "worldgen/templates/cultures/empire.json",
+                                                     "matchesRepository":  true
+                                                 },
+                                                 {
+                                                     "sha256":  "cad907b273ac5d7ebb8d648ad80f3f48480b670faffd5968740114505577640b",
+                                                     "resource":  "MNBL.ProceduralWorld.culture-khuzait.json",
+                                                     "source":  "worldgen/templates/cultures/khuzait.json",
+                                                     "matchesRepository":  true
+                                                 },
+                                                 {
+                                                     "sha256":  "c7713fdf2975f93a77e77ad9cc990803326b38098458e62c174815b876be49d3",
+                                                     "resource":  "MNBL.ProceduralWorld.culture-nord.json",
+                                                     "source":  "worldgen/templates/cultures/nord.json",
+                                                     "matchesRepository":  true
+                                                 },
+                                                 {
+                                                     "sha256":  "8bca083fb86cfccc07462e8b57e3d15d9ffa8b7c53c3db905fe95d62a3d93403",
+                                                     "resource":  "MNBL.ProceduralWorld.culture-sturgia.json",
+                                                     "source":  "worldgen/templates/cultures/sturgia.json",
+                                                     "matchesRepository":  true
+                                                 },
+                                                 {
+                                                     "sha256":  "ffd3c5ae6d42ac83b06e510ef54e3d23d8a33b35919082d97685db57ddc0e4e2",
+                                                     "resource":  "MNBL.ProceduralWorld.culture-vlandia.json",
+                                                     "source":  "worldgen/templates/cultures/vlandia.json",
+                                                     "matchesRepository":  true
+                                                 },
+                                                 {
+                                                     "sha256":  "4af34d297c89a4d377861e5b18e558cf4b00cd5c11bd885920833618bb71d211",
+                                                     "resource":  "MNBL.ProceduralWorld.runtime-api-lock.json",
+                                                     "source":  "config/runtime-api-lock.json",
+                                                     "matchesRepository":  true
+                                                 },
+                                                 {
+                                                     "sha256":  "00e7d6b5f64d72388b755ce7323d7517e1e60ed0305294f907f94f9423559019",
+                                                     "resource":  "MNBL.ProceduralWorld.axis-sea-datum-calibration.json",
+                                                     "source":  "worldgen/calibration/axis-sea-datum/calibration.json",
+                                                     "matchesRepository":  true
+                                                 }
+                                             ],
+                       "embeddedProblems":  [
+
+                                            ],
+                       "templateProblems":  [
+
+                                            ],
+                       "nativeImports":  {
+                                             "worldbridge.exe":  [
+                                                                     "api-ms-win-crt-convert-l1-1-0.dll",
+                                                                     "api-ms-win-crt-filesystem-l1-1-0.dll",
+                                                                     "api-ms-win-crt-heap-l1-1-0.dll",
+                                                                     "api-ms-win-crt-locale-l1-1-0.dll",
+                                                                     "api-ms-win-crt-math-l1-1-0.dll",
+                                                                     "api-ms-win-crt-runtime-l1-1-0.dll",
+                                                                     "api-ms-win-crt-stdio-l1-1-0.dll",
+                                                                     "api-ms-win-crt-string-l1-1-0.dll",
+                                                                     "bcrypt.dll",
+                                                                     "KERNEL32.dll",
+                                                                     "MSVCP140.dll",
+                                                                     "SHELL32.dll",
+                                                                     "VCRUNTIME140.dll",
+                                                                     "VCRUNTIME140_1.dll"
+                                                                 ],
+                                             "fwg.exe":  [
+                                                             "api-ms-win-crt-convert-l1-1-0.dll",
+                                                             "api-ms-win-crt-environment-l1-1-0.dll",
+                                                             "api-ms-win-crt-filesystem-l1-1-0.dll",
+                                                             "api-ms-win-crt-heap-l1-1-0.dll",
+                                                             "api-ms-win-crt-locale-l1-1-0.dll",
+                                                             "api-ms-win-crt-math-l1-1-0.dll",
+                                                             "api-ms-win-crt-runtime-l1-1-0.dll",
+                                                             "api-ms-win-crt-stdio-l1-1-0.dll",
+                                                             "api-ms-win-crt-string-l1-1-0.dll",
+                                                             "KERNEL32.dll",
+                                                             "MSVCP140.dll",
+                                                             "VCRUNTIME140.dll",
+                                                             "VCRUNTIME140_1.dll"
+                                                         ]
+                                         },
+                       "build":  {
+                                     "receipt":  "evidence/runtime/build-api-inputs.json",
+                                     "receiptSha256":  "af88d4e374cdd7bcc7df913e3d235a32859e2687f0b65d76508b751481178e1c"
+                                 }
+                   }
+}

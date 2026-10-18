@@ -11,6 +11,9 @@ using MNBL.ProceduralWorld.Persistence;
 // MMR-47: tools/Inspect-World.ps1's program. Inspects a world store (or one bundle) without the game and prints a summary; the full report
 // is written as JSON. Reads only.
 //   InspectWorld --store DIR [--saves DIR] [--bundle DIR] --game VERSION --naval VERSION --capabilities R01,R02,... [--lock SHA256] [--out FILE]
+//                [--save-ids BASE/vN] [--scenes DIR]
+// MMR-50: each save's compatibility decision against the running build this tool knows without the game (binding contract, save id
+// version, identity schema, game, War Sails, backend with the producer lock); --scenes (the module's SceneObj) adds the scene and reports.
 internal static class InspectWorld
 {
     private static int Main(string[] args)
@@ -35,7 +38,11 @@ internal static class InspectWorld
         if (o.ContainsKey("--store"))
         {
             string saves = o.ContainsKey("--saves") ? o["--saves"] : null;
-            var store = WorldInspector.Store(o["--store"], saves, host, o.ContainsKey("--lock") ? o["--lock"] : null, null);
+            var running = new Dictionary<string, string>(StringComparer.Ordinal) { ["contract"] = SaveBindingContract.Contract, ["worldIdentity"] = WorldBinding.IdentitySchema,
+                ["game"] = o["--game"], ["naval"] = o["--naval"] };
+            if (o.ContainsKey("--save-ids")) running["saveIds"] = o["--save-ids"];
+            if (o.ContainsKey("--lock")) running["backend"] = "mnbl.runtime-world-backend/R07; producerLock " + (o["--lock"].Length > 12 ? o["--lock"].Substring(0, 12) : o["--lock"]);
+            var store = WorldInspector.Store(o["--store"], saves, host, o.ContainsKey("--lock") ? o["--lock"] : null, null, running, o.ContainsKey("--scenes") ? o["--scenes"] : null);
             report["store"] = store;
             Console.WriteLine("store " + o["--store"]);
             foreach (Dictionary<string, object> b in (IEnumerable)store["bundles"])
@@ -44,7 +51,8 @@ internal static class InspectWorld
             foreach (Dictionary<string, object> a in (IEnumerable)store["activations"])
                 Console.WriteLine("  activation " + Short(a["instance"]) + "  " + a["state"] + (a.ContainsKey("worldContentId") ? "  world " + Short(a["worldContentId"]) + " (" + a["bundle"] + ")" : "") + (Equals(a.ContainsKey("receipt") ? a["receipt"] : null, true) ? "  receipt" : ""));
             foreach (Dictionary<string, object> s in (IEnumerable)store["saves"])
-                Console.WriteLine("  save " + s["name"] + (s.ContainsKey("error") ? "  unreadable: " + s["error"] : "  instance " + Short(s["instance"]) + "  world " + Short(s["contentId"]) + " (" + s["bundle"] + ")  package " + (Equals(s["packagePresent"], true) ? "present" : "missing") + "  " + (Equals(s["loadable"], true) ? "loadable" : "NOT loadable")));
+                Console.WriteLine("  save " + s["name"] + (s.ContainsKey("error") ? "  unreadable: " + s["error"] : "  instance " + Short(s["instance"]) + "  world " + Short(s["contentId"]) + " (" + s["bundle"] + ")  package " + (Equals(s["packagePresent"], true) ? "present" : "missing") + "  " + s["class"]
+                    + (s.ContainsKey("compatibility") && ((Dictionary<string, object>)s["compatibility"])["refusal"] is Dictionary<string, object> ? "  " + ((Dictionary<string, object>)((Dictionary<string, object>)s["compatibility"])["refusal"])["code"] : "")));
             foreach (Dictionary<string, object> j in (IEnumerable)store["jobs"])
                 Console.WriteLine("  job " + Short(j["id"]) + "  " + j["phase"] + "  " + (Equals(j["finished"], true) ? "finished (cleanup removes it)" : Equals(j["resumable"], true) ? "unfinished, resumable" : "unfinished: " + j["reason"]) + (j["seed"] != null ? "  seed " + j["seed"] : ""));
             foreach (var p in (IEnumerable)store["staging"]) Console.WriteLine("  staging " + p + " (cleanup removes it)");

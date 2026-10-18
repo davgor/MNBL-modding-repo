@@ -1,0 +1,57 @@
+ok    supported: the save, its build, its package and bundle, its scene and reports all usable as they are
+ok    supported: a save made before MMR-48 (no build keys) loads, its reconstruction verified at load
+ok    supported: another module build loads; the rebuilt world is verified at load (documents, scene, frame, climate must be the saved world's)
+ok    c3: a new generator build (another producer lock) makes new worlds and still reads the old world's frozen bundle as it is
+ok    rebuildable: another navigation cache key: the engine rebuilds its caches from the frozen navmesh
+ok    rebuildable: a swept scene (re-encoded by the surface encoder of the build that encoded it), reports restored from the activation's copies, the layout re-derived with the scene
+ok    rebuildable, conditional: a swept scene under another module build is re-encoded by this build's encoder and verified at load (refused if it differs); the report says so
+ok    rebuildable, conditional: a swept scene of a save that recorded no build keys (its encoder unknown)
+ok    unsupported: an installed scene that differs from the package's is never rewritten (not-rebuildable)
+ok    unsupported: a navigation report neither installed nor kept (not-rebuildable)
+ok    unsupported: another contract (incompatible-build), as the loader decides
+ok    unsupported: another saveIds (incompatible-build), as the loader decides
+ok    unsupported: another worldIdentity (incompatible-build), as the loader decides
+ok    unsupported: another game (incompatible-build), as the loader decides
+ok    unsupported: another naval (incompatible-build), as the loader decides
+ok    missing DLC: a War Sails save on a game without War Sails is refused (incompatible-build) saying so, by the policy and the loader alike
+ok    unsupported: a save needing a War Sails version that is not installed
+ok    unsupported: no world package (missing-world)
+ok    unsupported: a package whose hash is not the binding's (damaged-world)
+ok    unsupported: a missing data bundle is a missing world, not a cache miss, and the world is never regenerated from its seed
+ok    unsupported: a bundle built for another game version (incompatible-build)
+ok    unsupported: a bundle whose bytes changed (damaged-world)
+ok    unsupported: OpenForSave's missing bundle is missing (MMR-49 run 11568)
+ok    unsupported: a header another program holds (save-unavailable), a torn header or no save (damaged-save)
+ok    unsupported: a malformed binding, torn game data or an invalid campaign instance (damaged-save); no binding (not-generated)
+ok    precedence: the build is checked before the world, as the loader does (another game version with a missing bundle refuses as incompatible-build)
+ok    precedence: the build is checked before the campaign instance, as the loader does (review m1)
+ok    unsupported: game data another program holds is not damage (save-unavailable), as the loader decides (review M4)
+ok    unsupported: a header naming another world (scene or seed) than its package (damaged-save), as the loader decides
+ok    unsupported: a package manifest that hashes right but lacks its scene, seed, scene files or documents (damaged-world)
+ok    unsupported: a settlement layout of another world (not-rebuildable)
+ok    unsupported: a world file another program holds (load-failed, nothing changed), as the loader's unexpected-error refusal
+ok    a save made before MMR-48: its header's game version is compared (supported when equal, incompatible-build otherwise), by the policy and the loader alike (review m6)
+ok    a save made before MMR-48 with War Sails, on a game without it: refused saying War Sails is not installed; a header without Module_NavalDLC was made without it
+ok    fixture worlds: supported with their installed scene; a missing fixture scene cannot be rebuilt (not-rebuildable)
+ok    c1/c3: every decision is one of the three classes, and every report says no migration is offered
+ok    from files: a bound, whole save with its package, bundle, installed scene and reports is supported
+ok    from files: gathering the facts reads only (every save, package, bundle, scene and report byte unchanged)
+ok    from files: a save another program holds open for writing: unsupported (save-unavailable), not damaged
+ok    from files: a world file another program holds: unsupported (load-failed), and the gathering does not throw
+ok    from files: a settlement layout of another world: unsupported (not-rebuildable)
+ok    from files: the scene and reports swept, the activation's copies kept: rebuildable (re-encoded, restored)
+ok    from files: swept and the navigation report not kept: unsupported (not-rebuildable)
+ok    from files: a package file whose hash changed: unsupported (damaged-world)
+ok    from files: the package gone: unsupported (missing-world)
+ok    from files: torn game data: unsupported (damaged-save)
+ok    from files: a torn header: unsupported (damaged-save)
+ok    from files: no save: unsupported (damaged-save)
+ok    previous saves: 2 checked-in header fixtures
+ok    previous save mmr50-current.header.json: readable by this build, supported (its build keys)
+ok    previous save mmr50-current.header.json: refused by a build for another game version
+ok    previous save pre-mmr48-initial.header.json: readable by this build, supported (no build keys: verified at load)
+ok    previous save pre-mmr48-initial.header.json: refused by a build for another game version (compared from its header)
+ok    c3: the save type ledger lists no converter, and its rule refuses (never converts) a save of another save format
+ok    c3: no message of the module offers a migration
+ok    c3: a real bundle built for another game version is refused saying there is no migration (no tool offered)
+56/56 checks passed

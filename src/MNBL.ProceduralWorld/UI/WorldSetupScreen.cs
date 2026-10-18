@@ -103,20 +103,18 @@ namespace MNBL.ProceduralWorld.UI
             ScreenManager.PushScreen(new WorldSetupScreen(model));
         }
 
-        // The menu entry is disabled, with the reason, when this host cannot generate (War Sails, versions, generator files), while a
-        // developer diagnostic generation runs in the same store, or while a harness probe other than world_setup or new_campaign_flow (which drive this entry)
-        // is measuring.
+        // The menu entry is disabled, with the reason, while a generation job is unfinished or being released, or while a harness probe
+        // other than world_setup, new_campaign_flow or world_recovery (which drive this entry) is measuring.
         private static ValueTuple<bool, TextObject> DisabledReason()
         {
             // A world handed to the activation and back (withdrawn or failed) reopens on its model.
             if (Pending != null && Pending.State != SetupState.Starting && Current == null) return new ValueTuple<bool, TextObject>(false, null);
             // MMR-47: a host problem no longer disables the entry: the setup opens refusing to generate and shows each problem with its action
             // and reference (review finding: a disabled entry showed the message as a tooltip only, with no action, reference or diagnostics).
-            var module = SubModule.Instance;
             string probe = MNBL.ProceduralWorld.Automation.AutorunHost.RunningProbe;
             var job = GenerationRuntime.Coordinator.Current;
             bool jobBusy = job != null && (!JobStateMachine.IsTerminal(job.Phase) || (job.Released != null && !job.Released.IsCompleted)) && Current == null;
-            if ((module != null && module.GenerationTask != null && !module.GenerationTask.IsCompleted) || (probe != null && probe != "world_setup" && probe != "new_campaign_flow" && probe != "world_recovery") || jobBusy)
+            if ((probe != null && probe != "world_setup" && probe != "new_campaign_flow" && probe != "world_recovery") || jobBusy)
                 return new ValueTuple<bool, TextObject>(true, new TextObject(WorldSetupText.Busy));
             return new ValueTuple<bool, TextObject>(false, null);
         }

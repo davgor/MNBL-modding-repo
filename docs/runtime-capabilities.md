@@ -95,7 +95,7 @@ What the load rebuilds from those inputs, not compared with process 1:
 - **Re-save after load:** the identity behaviour is re-added on load with the header's entries, but no re-save was run. `SyncData` carries no mirror of the identity.
 - **Location:** the package lives in local app data for this diagnostic. The header stores its absolute path, which includes the Windows user name. Resolving by world id and manifest hash, and production location and ownership, belong to MMR-62. Done by MMR-62: the header now holds the package directory's name, and every loader resolves `<store>/worlds/<id>-<manifest12>` (`GeneratedWorldPackage.Resolve`, `docs/save-binding.md`).
 - **Not part of the snapshot:** anchors and storms (MMR-49). The snapshot compares settlement names and cultures, party positions with their land flag and next steering point, and party, settlement and player faces.
-- **First-chance exceptions:** recorded during each load, informational and not asserted. 30 handled `NullReferenceException`s per load, source not captured; worth tracing in MMR-49's load path.
+- **First-chance exceptions:** recorded during each load and not asserted. 30 handled `NullReferenceException`s per load, source not captured. They are caught where they are thrown, and no wrong state has been traced to them, but they are unexplained and not yet traced (open; `evidence/one-shot/acceptance-index.json` s6).
 - **Embarking was synthetic:** a ship and crew were granted, then `SetSailAtPosition` (as in MMR-17).
 
 ## Generated wind, storms and weather rebind (2026-10-14, MMR-59)
@@ -435,6 +435,27 @@ The mission terrain is the stock template's, chosen by generated geography; heig
 - **The seam:** canonical patch sampling and the short-way direction, proven at a seam battle in game.
 - **Guard:** a mismatch guard records any battle scene choice that departs from the generated patch.
 
+**Played by MMR-52** (`docs/land-missions.md`): on world A's designated save (world B for what A lacks), the following ran in game, each opening its mapped scene and returning the party where the installed path puts it (run 33816, 163/163):
+- a battle on every battle class present, including three substituted classes, plus a bridge crossing and a retreat;
+- a town center with a notable's conversation, and its tavern;
+- a castle and a village;
+- a siege assault with deployment;
+- a defeat with capture and escape;
+- a hideout cleared.
+
+Wetland is absent from both worlds.
+
+**Measured by MMR-56** (`docs/first-test-profile.md`): the F03 profile end to end on one machine, from the setup screen's Confirm to play (run 35468). A new world takes 32.7-55.7 s to generate and about 400 s to start the first time, while its navigation caches are generated on the engine thread (the game does not respond for 383 s). A save loads in 14.5 s afterwards. The game peaks at about 5.1 GB of working set. Seeds 42 and 73 from the same build differ in geography and engine routes. The setup screen states both waits.
+
+**Played by MMR-53** (`docs/naval-missions.md`): on world A's designated save, War Sails' installed paths ran in game (run 46036, 104/104):
+- a ship bought through the port screen's trade handler and one repaired at a port;
+- port-to-port and island voyages ordered as map clicks, a harbour-village drop-off, and a coastal landing by a click on land, each with re-boarding at the anchor;
+- a land siege of a port town that activated War Sails' blockade, its arcs on water;
+- a pirate battle at sea (a retreat), a seaborne village raid through War Sails' landing, and a naval defeat with capture and the raft;
+- AI sea travel and arrivals, island port towns included, and the pirates' patrol zones exactly the world's served spawn points.
+
+Boarding, crew reinforcement, battle damage and fought outcomes are not exercised (the doc's limits).
+
 ## Runtime native surface sequence (2026-10-13, MMR-16 accepted)
 
 The C++ bridge now encodes freshly generated MNBLHF01 fields into native terrain,
@@ -452,7 +473,9 @@ PIDs 34660 and 12748 completed calibration height, ground, ray, projection and
 adapter queries without a native crash. Sampled height errors were at most
 0.0262 m; independently planar normal error was 0.640 degrees. One grazing
 camera ray at the narrow ridge exceeded the recorded 0.1 m ray tolerance
-(0.2002 m); this remains a failure. PID 12748 fixes visible camera zoom and
+(0.2002 m); this remains a failure. (Superseded: the 0.2002 m came from a
+historical reference model; the same ray has a reference error of 3.8e-05 m
+in the accepted run 32896, `docs/runtime-backend-decision.md` R02.) PID 12748 fixes visible camera zoom and
 records an actual off-center click matching the quantized source within
 0.0303 m through both Scene and SceneView. Native selection returned four
 intersections in a scene containing seven engine-created entities; the prior

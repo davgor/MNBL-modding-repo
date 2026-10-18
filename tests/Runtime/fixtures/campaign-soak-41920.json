@@ -1,0 +1,5421 @@
+{
+ "schema": "mnbl.autorun-result",
+ "version": 1,
+ "requestId": "7ad80bf6ee1f49d1aea04f032ad37dbe",
+ "probe": "campaign_soak",
+ "args": {
+  "scenarios": "<repo>\\tests\\Runtime\\CampaignSoakScenarios.json",
+  "fixtureSeed": 364610,
+  "fixturePlacement": "<repo>\\build/research-env59/w42/placement.json",
+  "catalogReceipt": "<repo>\\evidence/runtime/in-game/campaign_catalog-10212.json"
+ },
+ "processId": 41920,
+ "status": "ok",
+ "final": true,
+ "error": null,
+ "checkpointWriteFailures": 0,
+ "quitPlanned": "TaleWorlds.Engine.Utilities.DoDelayedexit(0) (fallback TaleWorlds.Engine.Utilities.QuitGame after 30 s)",
+ "outputs": {
+  "scope": "MMR-51: generated campaign gameplay on worlds A and B (the bounded first test).",
+  "scenarioFile": {
+   "schema": "mnbl.campaign-soak-scenarios.v1",
+   "sha256": "e93187290a922ecb878e047907fb1e15abc3e035c4e94a29badc3f08bf995dce"
+  },
+  "rules": {
+   "stuckHours": 6,
+   "moveEpsilon": 0.05,
+   "movedDistance": 0.5,
+   "timeoutSeconds": 900,
+   "stallSeconds": 15,
+   "maxStalls": 3
+  },
+  "worldPlans": {
+   "A": {
+    "kind": "generated",
+    "seeds": [
+     42
+    ],
+    "culture": "empire",
+    "observeHours": 24,
+    "afterDiagnosticHours": 6,
+    "movedFraction": {
+     "lord": 0.5,
+     "caravan": 0.5,
+     "villager": 0.5,
+     "bandit": 0.5
+    }
+   },
+   "B": {
+    "kind": "fixture",
+    "fixtureSeed": 364610,
+    "fixturePlacement": "build/research-env59/w42/placement.json",
+    "catalogReceipt": "evidence/runtime/in-game/campaign_catalog-10212.json",
+    "observeHours": 12,
+    "movedFraction": {
+     "lord": 0.5,
+     "caravan": 0.5
+    }
+   }
+  },
+  "failures": [],
+  "checks": [
+   {
+    "scenario": "baselines",
+    "ok": true,
+    "what": "start: no game and every tracked static at its baseline"
+   },
+   {
+    "scenario": "A.init",
+    "ok": true,
+    "what": "a coherent initial state (0 invalid references, 0 unexpected objects, 0 parties off navigation)"
+   },
+   {
+    "scenario": "A.visit",
+    "ok": true,
+    "what": "the player's party travelled 8.67 h from mnbl_1609fb72_t_38c906c775 to mnbl_1609fb72_t_266d733fa8 and the engine opened its settlement encounter (menu town)"
+   },
+   {
+    "scenario": "A.trade",
+    "ok": true,
+    "what": "bought one clay for 25 and sold it back for 21 at mnbl_1609fb72_t_266d733fa8 through the trade screen's logic: stock moved one each way, the player's and the town's gold by exactly the quoted prices"
+   },
+   {
+    "scenario": "A.recruit",
+    "ok": true,
+    "what": "recruited one vlandian_recruit from CharacterObject_1563 for 20: roster, gold and the notable's slot changed"
+   },
+   {
+    "scenario": "A.visit",
+    "ok": true,
+    "what": "the player left mnbl_1609fb72_t_266d733fa8 through the menu's leave path, back on the map"
+   },
+   {
+    "scenario": "A.day",
+    "ok": true,
+    "what": "campaign time advanced 24.02 of 24 hours (0 stalls, 20.11 s)"
+   },
+   {
+    "scenario": "A.day",
+    "ok": true,
+    "what": "0 exceptions thrown from campaign code while time ran (0 in all), 0 engine asserts, 0 listener errors (canaries seen: exception True, assert True)"
+   },
+   {
+    "scenario": "A.day",
+    "ok": true,
+    "what": "0 party positions off navigation, 0 parties whose path to a settlement was not found (0 unfound paths in all), 0 stuck and 0 villager or fishing parties holding without an installed reason for 6 h"
+   },
+   {
+    "scenario": "A.war",
+    "ok": true,
+    "what": "mnbl_1609fb72_k_02c999f4ad declared war on mnbl_1609fb72_k_1088c05c8d: both stances at war, the event raised"
+   },
+   {
+    "scenario": "A.ownership",
+    "ok": true,
+    "what": "mnbl_1609fb72_t_caf0eeb8c4 passed from mnbl_1609fb72_l_0fd00a637c (mnbl_1609fb72_k_1088c05c8d) to mnbl_1609fb72_l_9d9e9268b9 (mnbl_1609fb72_k_02c999f4ad): owner, faction, 2 villages, fiefs, garrison, notables, governor and the event follow; mnbl_1609fb72_k_1088c05c8d survives at war"
+   },
+   {
+    "scenario": "A.succession.clan",
+    "ok": true,
+    "what": "mnbl_1609fb72_h_388053cf7f of mnbl_1609fb72_l_0d02cd80cc died of old age: mnbl_1609fb72_h_2ebdb97aff leads the clan, its 3 fiefs kept, 0 references to the dead hero"
+   },
+   {
+    "scenario": "A.succession.ruler",
+    "ok": true,
+    "what": "mnbl_1609fb72_h_c0de99aea1, ruler of mnbl_1609fb72_k_06eebb41b5, died of old age (2 candidate clans: king selection): mnbl_1609fb72_h_27b772cefc leads it, ruling clan mnbl_1609fb72_l_d78a71fdcb, a king selection held at once, electing mnbl_1609fb72_l_d78a71fdcb, 0 references to the dead ruler"
+   },
+   {
+    "scenario": "A.after",
+    "ok": true,
+    "what": "campaign time advanced 6.01 of 6 hours (0 stalls, 5.43 s)"
+   },
+   {
+    "scenario": "A.after",
+    "ok": true,
+    "what": "0 exceptions thrown from campaign code while time ran (0 in all), 0 engine asserts, 0 listener errors (canaries seen: exception True, assert True)"
+   },
+   {
+    "scenario": "A.after",
+    "ok": true,
+    "what": "0 party positions off navigation, 0 parties whose path to a settlement was not found (0 unfound paths in all), 0 stuck and 0 villager or fishing parties holding without an installed reason for 6 h"
+   },
+   {
+    "scenario": "A.after",
+    "ok": true,
+    "what": "the state stays coherent after the diagnostic actions (0 invalid references, 0 parties off navigation)"
+   },
+   {
+    "scenario": "baselines",
+    "ok": true,
+    "what": "after world A ended: no game and every tracked static at its baseline"
+   },
+   {
+    "scenario": "B.init",
+    "ok": true,
+    "what": "a coherent fresh state with nothing of world A (0 invalid references, 0 A objects, 0 foreign references)"
+   },
+   {
+    "scenario": "B.hours",
+    "ok": true,
+    "what": "campaign time advanced 12 of 12 hours (0 stalls, 10.44 s)"
+   },
+   {
+    "scenario": "B.hours",
+    "ok": true,
+    "what": "0 exceptions thrown from campaign code while time ran (0 in all), 0 engine asserts, 0 listener errors (canaries seen: exception True, assert True)"
+   },
+   {
+    "scenario": "B.hours",
+    "ok": true,
+    "what": "0 party positions off navigation, 0 parties whose path to a settlement was not found (0 unfound paths in all), 0 stuck and 0 villager or fishing parties holding without an installed reason for 6 h"
+   },
+   {
+    "scenario": "B.hours",
+    "ok": true,
+    "what": "the state stays coherent (0 invalid references, 0 parties off navigation)"
+   },
+   {
+    "scenario": "baselines",
+    "ok": true,
+    "what": "after world B ended: no game and every tracked static at its baseline"
+   }
+  ],
+  "worlds": {
+   "A": {
+    "seedsRefused": [],
+    "seed": 42,
+    "startSeconds": 412.3942419,
+    "worldId": "mnbl_1609fb72",
+    "prefix": "mnbl_1609fb72_",
+    "instance": "5c6f3297d06d4cb694c9853d76f766b2",
+    "package": "mnbl_1609fb72-11622bd00392",
+    "contentId": "f596b58cdcfc18798542fdef5a4d9c9f6d84abddca1425af8d0b87f521191d2d",
+    "frame": "158296e8d66ba5fc0c64645e2b0f89f0160cd725f826ee500ae2c1c98e70eb5a",
+    "init": {
+     "campaignDays": 91077.37496207407,
+     "census": {
+      "clan:bandit": 9,
+      "clan:minor": 1,
+      "clan:noble": 92,
+      "garrison": 71,
+      "hero:lord": 372,
+      "hero:notable": 909,
+      "hero:wanderer": 28,
+      "hideout:infested": 34,
+      "kingdom": 40,
+      "kingdom:fiefs:1": 22,
+      "kingdom:fiefs:2": 10,
+      "kingdom:fiefs:3": 5,
+      "kingdom:fiefs:4+": 3,
+      "party:bandit": 364,
+      "party:caravan": 118,
+      "party:fishing": 22,
+      "party:garrison": 71,
+      "party:lord": 151,
+      "party:militia": 286,
+      "party:patrol": 49,
+      "party:player": 1,
+      "settlement:castle": 26,
+      "settlement:hideout": 72,
+      "settlement:other": 1,
+      "settlement:town": 45,
+      "settlement:village": 215,
+      "town:noGold": 1
+     },
+     "invalid": [],
+     "invalidCount": 0,
+     "unexpected": [],
+     "unexpectedCount": 0,
+     "offNavigation": [],
+     "offNavigationCount": 0,
+     "wars": 0,
+     "villagesWithoutTradeTown": [],
+     "townsWithoutGold": [
+      "mnbl_1609fb72_t_30a1119e46"
+     ],
+     "townsWithoutTradeGoods": [],
+     "economy": {
+      "townCount": 45,
+      "food": 18000,
+      "gold": 1107432,
+      "tradeGoodStacks": 603,
+      "marketItems": 31138,
+      "villageItems": 14292,
+      "volunteerSlotsFilled": 758,
+      "volunteerSlotsEmpty": 760,
+      "towns": [
+       {
+        "id": "mnbl_1609fb72_t_02135fe588",
+        "food": 400,
+        "prosperity": 1700,
+        "gold": 18767,
+        "tradeGoods": 16,
+        "items": 530,
+        "volunteers": 16
+       },
+       {
+        "id": "mnbl_1609fb72_t_0c85a587ff",
+        "food": 400,
+        "prosperity": 3300,
+        "gold": 27698,
+        "tradeGoods": 17,
+        "items": 1044,
+        "volunteers": 16
+       },
+       {
+        "id": "mnbl_1609fb72_t_18dce31a8b",
+        "food": 400,
+        "prosperity": 1900,
+        "gold": 10478,
+        "tradeGoods": 5,
+        "items": 415,
+        "volunteers": 19
+       },
+       {
+        "id": "mnbl_1609fb72_t_266d733fa8",
+        "food": 400,
+        "prosperity": 3100,
+        "gold": 27067,
+        "tradeGoods": 14,
+        "items": 412,
+        "volunteers": 15
+       },
+       {
+        "id": "mnbl_1609fb72_t_26da4d0d23",
+        "food": 400,
+        "prosperity": 4200,
+        "gold": 37314,
+        "tradeGoods": 19,
+        "items": 585,
+        "volunteers": 16
+       },
+       {
+        "id": "mnbl_1609fb72_t_2b31fce358",
+        "food": 400,
+        "prosperity": 1700,
+        "gold": 19722,
+        "tradeGoods": 15,
+        "items": 441,
+        "volunteers": 18
+       },
+       {
+        "id": "mnbl_1609fb72_t_30a1119e46",
+        "food": 400,
+        "prosperity": 3000,
+        "gold": 0,
+        "tradeGoods": 7,
+        "items": 373,
+        "volunteers": 17
+       },
+       {
+        "id": "mnbl_1609fb72_t_33e9f6405e",
+        "food": 400,
+        "prosperity": 3200,
+        "gold": 24691,
+        "tradeGoods": 6,
+        "items": 504,
+        "volunteers": 24
+       },
+       {
+        "id": "mnbl_1609fb72_t_3591ac6a33",
+        "food": 400,
+        "prosperity": 3100,
+        "gold": 20294,
+        "tradeGoods": 7,
+        "items": 314,
+        "volunteers": 10
+       },
+       {
+        "id": "mnbl_1609fb72_t_35e7ca3644",
+        "food": 400,
+        "prosperity": 3900,
+        "gold": 32266,
+        "tradeGoods": 17,
+        "items": 892,
+        "volunteers": 21
+       },
+       {
+        "id": "mnbl_1609fb72_t_38c906c775",
+        "food": 400,
+        "prosperity": 3900,
+        "gold": 28928,
+        "tradeGoods": 17,
+        "items": 897,
+        "volunteers": 27
+       },
+       {
+        "id": "mnbl_1609fb72_t_3dd40e786f",
+        "food": 400,
+        "prosperity": 3700,
+        "gold": 23402,
+        "tradeGoods": 14,
+        "items": 500,
+        "volunteers": 17
+       },
+       {
+        "id": "mnbl_1609fb72_t_4a4ee84369",
+        "food": 400,
+        "prosperity": 2300,
+        "gold": 12519,
+        "tradeGoods": 9,
+        "items": 559,
+        "volunteers": 16
+       },
+       {
+        "id": "mnbl_1609fb72_t_511521f34a",
+        "food": 400,
+        "prosperity": 3100,
+        "gold": 27790,
+        "tradeGoods": 18,
+        "items": 907,
+        "volunteers": 12
+       },
+       {
+        "id": "mnbl_1609fb72_t_5372f23728",
+        "food": 400,
+        "prosperity": 3200,
+        "gold": 19537,
+        "tradeGoods": 7,
+        "items": 548,
+        "volunteers": 16
+       },
+       {
+        "id": "mnbl_1609fb72_t_5c564ff552",
+        "food": 400,
+        "prosperity": 3000,
+        "gold": 27827,
+        "tradeGoods": 18,
+        "items": 749,
+        "volunteers": 14
+       },
+       {
+        "id": "mnbl_1609fb72_t_64245c0202",
+        "food": 400,
+        "prosperity": 2300,
+        "gold": 23280,
+        "tradeGoods": 15,
+        "items": 971,
+        "volunteers": 20
+       },
+       {
+        "id": "mnbl_1609fb72_t_652a339695",
+        "food": 400,
+        "prosperity": 3000,
+        "gold": 25427,
+        "tradeGoods": 5,
+        "items": 473,
+        "volunteers": 14
+       },
+       {
+        "id": "mnbl_1609fb72_t_7c3c7cce5c",
+        "food": 400,
+        "prosperity": 1800,
+        "gold": 22557,
+        "tradeGoods": 16,
+        "items": 392,
+        "volunteers": 20
+       },
+       {
+        "id": "mnbl_1609fb72_t_7efe6a0c96",
+        "food": 400,
+        "prosperity": 1900,
+        "gold": 18508,
+        "tradeGoods": 6,
+        "items": 611,
+        "volunteers": 9
+       },
+       {
+        "id": "mnbl_1609fb72_t_803bc3052d",
+        "food": 400,
+        "prosperity": 3800,
+        "gold": 28209,
+        "tradeGoods": 16,
+        "items": 802,
+        "volunteers": 18
+       },
+       {
+        "id": "mnbl_1609fb72_t_8c18b565ee",
+        "food": 400,
+        "prosperity": 3100,
+        "gold": 16600,
+        "tradeGoods": 11,
+        "items": 523,
+        "volunteers": 15
+       },
+       {
+        "id": "mnbl_1609fb72_t_8e1456f833",
+        "food": 400,
+        "prosperity": 4300,
+        "gold": 37334,
+        "tradeGoods": 19,
+        "items": 777,
+        "volunteers": 15
+       },
+       {
+        "id": "mnbl_1609fb72_t_91e41e3505",
+        "food": 400,
+        "prosperity": 3800,
+        "gold": 33359,
+        "tradeGoods": 17,
+        "items": 1086,
+        "volunteers": 15
+       },
+       {
+        "id": "mnbl_1609fb72_t_9447ebbe75",
+        "food": 400,
+        "prosperity": 4500,
+        "gold": 33552,
+        "tradeGoods": 16,
+        "items": 1035,
+        "volunteers": 11
+       },
+       {
+        "id": "mnbl_1609fb72_t_96d91dc9a3",
+        "food": 400,
+        "prosperity": 4600,
+        "gold": 34190,
+        "tradeGoods": 7,
+        "items": 846,
+        "volunteers": 13
+       },
+       {
+        "id": "mnbl_1609fb72_t_a06de08e5b",
+        "food": 400,
+        "prosperity": 4000,
+        "gold": 30911,
+        "tradeGoods": 14,
+        "items": 481,
+        "volunteers": 21
+       },
+       {
+        "id": "mnbl_1609fb72_t_a81734c1d7",
+        "food": 400,
+        "prosperity": 1800,
+        "gold": 20268,
+        "tradeGoods": 15,
+        "items": 734,
+        "volunteers": 13
+       },
+       {
+        "id": "mnbl_1609fb72_t_a9bb2f10b0",
+        "food": 400,
+        "prosperity": 3700,
+        "gold": 26897,
+        "tradeGoods": 15,
+        "items": 608,
+        "volunteers": 14
+       },
+       {
+        "id": "mnbl_1609fb72_t_b58aa76d2e",
+        "food": 400,
+        "prosperity": 4900,
+        "gold": 40497,
+        "tradeGoods": 13,
+        "items": 1131,
+        "volunteers": 18
+       },
+       {
+        "id": "mnbl_1609fb72_t_bb5436b93b",
+        "food": 400,
+        "prosperity": 4500,
+        "gold": 20082,
+        "tradeGoods": 16,
+        "items": 1042,
+        "volunteers": 19
+       },
+       {
+        "id": "mnbl_1609fb72_t_bbe5821524",
+        "food": 400,
+        "prosperity": 1700,
+        "gold": 17213,
+        "tradeGoods": 6,
+        "items": 361,
+        "volunteers": 15
+       },
+       {
+        "id": "mnbl_1609fb72_t_c1093bcad9",
+        "food": 400,
+        "prosperity": 2200,
+        "gold": 28486,
+        "tradeGoods": 18,
+        "items": 781,
+        "volunteers": 22
+       },
+       {
+        "id": "mnbl_1609fb72_t_c5ddd8ea7e",
+        "food": 400,
+        "prosperity": 2600,
+        "gold": 30930,
+        "tradeGoods": 25,
+        "items": 1062,
+        "volunteers": 17
+       },
+       {
+        "id": "mnbl_1609fb72_t_caf0eeb8c4",
+        "food": 400,
+        "prosperity": 5000,
+        "gold": 31756,
+        "tradeGoods": 14,
+        "items": 547,
+        "volunteers": 24
+       },
+       {
+        "id": "mnbl_1609fb72_t_d92f348adf",
+        "food": 400,
+        "prosperity": 5100,
+        "gold": 12620,
+        "tradeGoods": 16,
+        "items": 782,
+        "volunteers": 18
+       },
+       {
+        "id": "mnbl_1609fb72_t_da31273eb4",
+        "food": 400,
+        "prosperity": 3900,
+        "gold": 26468,
+        "tradeGoods": 16,
+        "items": 976,
+        "volunteers": 20
+       },
+       {
+        "id": "mnbl_1609fb72_t_db07bde4dd",
+        "food": 400,
+        "prosperity": 5600,
+        "gold": 23681,
+        "tradeGoods": 16,
+        "items": 1050,
+        "volunteers": 16
+       },
+       {
+        "id": "mnbl_1609fb72_t_db2d888bf1",
+        "food": 400,
+        "prosperity": 2600,
+        "gold": 21432,
+        "tradeGoods": 11,
+        "items": 439,
+        "volunteers": 20
+       },
+       {
+        "id": "mnbl_1609fb72_t_de424cc7cd",
+        "food": 400,
+        "prosperity": 3200,
+        "gold": 24631,
+        "tradeGoods": 5,
+        "items": 674,
+        "volunteers": 15
+       },
+       {
+        "id": "mnbl_1609fb72_t_e60ca08fa1",
+        "food": 400,
+        "prosperity": 3900,
+        "gold": 22779,
+        "tradeGoods": 8,
+        "items": 816,
+        "volunteers": 20
+       },
+       {
+        "id": "mnbl_1609fb72_t_e7ed06396a",
+        "food": 400,
+        "prosperity": 3400,
+        "gold": 25670,
+        "tradeGoods": 14,
+        "items": 625,
+        "volunteers": 15
+       },
+       {
+        "id": "mnbl_1609fb72_t_eb208cfa45",
+        "food": 400,
+        "prosperity": 2200,
+        "gold": 20230,
+        "tradeGoods": 14,
+        "items": 643,
+        "volunteers": 21
+       },
+       {
+        "id": "mnbl_1609fb72_t_ecf4b31651",
+        "food": 400,
+        "prosperity": 3000,
+        "gold": 26492,
+        "tradeGoods": 19,
+        "items": 701,
+        "volunteers": 10
+       },
+       {
+        "id": "mnbl_1609fb72_t_eebd8fd293",
+        "food": 400,
+        "prosperity": 2800,
+        "gold": 25073,
+        "tradeGoods": 14,
+        "items": 499,
+        "volunteers": 16
+       }
+      ]
+     }
+    },
+    "playability": {
+     "activatable": true,
+     "routes": {
+      "total": 672,
+      "passed": 672,
+      "failed": 0,
+      "byCategory": {
+       "village-market": {
+        "routes": 430,
+        "passed": 430,
+        "types": {
+         "Default": 430
+        }
+       },
+       "capital-fief": {
+        "routes": 62,
+        "passed": 62,
+        "types": {
+         "Default": 62
+        }
+       },
+       "player-start": {
+        "routes": 42,
+        "passed": 42,
+        "types": {
+         "All": 16,
+         "Naval": 14,
+         "Default": 12
+        }
+       },
+       "port-to-port": {
+        "routes": 58,
+        "passed": 58,
+        "types": {
+         "Naval": 58
+        }
+       },
+       "faction-access": {
+        "routes": 80,
+        "passed": 80,
+        "types": {
+         "Default": 64,
+         "All": 16
+        }
+       }
+      }
+     },
+     "failures": [],
+     "failureCount": 0,
+     "notApplicable": [],
+     "startsChecked": true,
+     "flags": {
+      "total": 0,
+      "resolved": 0,
+      "failed": 0,
+      "byKind": {},
+      "failedFlags": []
+     },
+     "world": {
+      "sites": 286,
+      "portTowns": 30,
+      "kingdoms": [
+       {
+        "id": "mnbl_1609fb72_k_02c999f4ad",
+        "capital": "mnbl_1609fb72_t_30a1119e46",
+        "rulingClan": "mnbl_1609fb72_l_9d9e9268b9",
+        "naval": true,
+        "reason": "clan mnbl_1609fb72_l_9d9e9268b9 may hold ships (the fleet rule)"
+       },
+       {
+        "id": "mnbl_1609fb72_k_06eebb41b5",
+        "capital": "mnbl_1609fb72_t_18dce31a8b",
+        "rulingClan": "mnbl_1609fb72_l_d78a71fdcb",
+        "naval": true,
+        "reason": "clan mnbl_1609fb72_l_d78a71fdcb may hold ships (the fleet rule)"
+       },
+       {
+        "id": "mnbl_1609fb72_k_0828499ae3",
+        "capital": "mnbl_1609fb72_t_02135fe588",
+        "rulingClan": "mnbl_1609fb72_l_1cf250e5a9",
+        "naval": true,
+        "reason": "clan mnbl_1609fb72_l_1cf250e5a9 may hold ships (the fleet rule)"
+       },
+       {
+        "id": "mnbl_1609fb72_k_0a33a1e8bd",
+        "capital": "mnbl_1609fb72_t_bb5436b93b",
+        "rulingClan": "mnbl_1609fb72_l_c0df16c0d6",
+        "naval": true,
+        "reason": "clan mnbl_1609fb72_l_c0df16c0d6 may hold ships (the fleet rule)"
+       },
+       {
+        "id": "mnbl_1609fb72_k_0ec6776f68",
+        "capital": "mnbl_1609fb72_t_bbe5821524",
+        "rulingClan": "mnbl_1609fb72_l_0a68ec5a48",
+        "naval": true,
+        "reason": "clan mnbl_1609fb72_l_0a68ec5a48 may hold ships (the fleet rule)"
+       },
+       {
+        "id": "mnbl_1609fb72_k_1088c05c8d",
+        "capital": "mnbl_1609fb72_t_caf0eeb8c4",
+        "rulingClan": "mnbl_1609fb72_l_0fd00a637c",
+        "naval": true,
+        "reason": "clan mnbl_1609fb72_l_0fd00a637c may hold ships (the fleet rule)"
+       },
+       {
+        "id": "mnbl_1609fb72_k_12050ce578",
+        "capital": "mnbl_1609fb72_t_266d733fa8",
+        "rulingClan": "mnbl_1609fb72_l_227da99e96",
+        "naval": true,
+        "reason": "clan mnbl_1609fb72_l_227da99e96 may hold ships (the fleet rule)"
+       },
+       {
+        "id": "mnbl_1609fb72_k_182d59cd0c",
+        "capital": "mnbl_1609fb72_t_c1093bcad9",
+        "rulingClan": "mnbl_1609fb72_l_4589bbbe70",
+        "naval": true,
+        "reason": "clan mnbl_1609fb72_l_4589bbbe70 may hold ships (the fleet rule)"
+       },
+       {
+        "id": "mnbl_1609fb72_k_20495b7806",
+        "capital": "mnbl_1609fb72_t_7efe6a0c96",
+        "rulingClan": "mnbl_1609fb72_l_6e21250a6e",
+        "naval": true,
+        "reason": "clan mnbl_1609fb72_l_6e21250a6e may hold ships (the fleet rule)"
+       },
+       {
+        "id": "mnbl_1609fb72_k_233bf0b802",
+        "capital": "mnbl_1609fb72_t_da31273eb4",
+        "rulingClan": "mnbl_1609fb72_l_ddef31d573",
+        "naval": true,
+        "reason": "clan mnbl_1609fb72_l_ddef31d573 may hold ships (the fleet rule)"
+       },
+       {
+        "id": "mnbl_1609fb72_k_2f8a7b2695",
+        "capital": "mnbl_1609fb72_t_db07bde4dd",
+        "rulingClan": "mnbl_1609fb72_l_998c1993cf",
+        "naval": true,
+        "reason": "clan mnbl_1609fb72_l_998c1993cf may hold ships (the fleet rule)"
+       },
+       {
+        "id": "mnbl_1609fb72_k_35ccda72b0",
+        "capital": "mnbl_1609fb72_t_8e1456f833",
+        "rulingClan": "mnbl_1609fb72_l_5d04c7737a",
+        "naval": true,
+        "reason": "clan mnbl_1609fb72_l_5d04c7737a may hold ships (the fleet rule)"
+       },
+       {
+        "id": "mnbl_1609fb72_k_3f9b573679",
+        "capital": "mnbl_1609fb72_t_e7ed06396a",
+        "rulingClan": "mnbl_1609fb72_l_7a7349e94d",
+        "naval": true,
+        "reason": "clan mnbl_1609fb72_l_7a7349e94d may hold ships (the fleet rule)"
+       },
+       {
+        "id": "mnbl_1609fb72_k_4e1c3bc9eb",
+        "capital": "mnbl_1609fb72_t_de424cc7cd",
+        "rulingClan": "mnbl_1609fb72_l_dd54c573e2",
+        "naval": true,
+        "reason": "clan mnbl_1609fb72_l_dd54c573e2 may hold ships (the fleet rule)"
+       },
+       {
+        "id": "mnbl_1609fb72_k_582ebdd82f",
+        "capital": "mnbl_1609fb72_t_803bc3052d",
+        "rulingClan": "mnbl_1609fb72_l_7df35e15df",
+        "naval": true,
+        "reason": "clan mnbl_1609fb72_l_7df35e15df may hold ships (the fleet rule)"
+       },
+       {
+        "id": "mnbl_1609fb72_k_5e4d260b4b",
+        "capital": "mnbl_1609fb72_t_eebd8fd293",
+        "rulingClan": "mnbl_1609fb72_l_e375a51600",
+        "naval": true,
+        "reason": "clan mnbl_1609fb72_l_e375a51600 may hold ships (the fleet rule)"
+       },
+       {
+        "id": "mnbl_1609fb72_k_61b41cbb8e",
+        "capital": "mnbl_1609fb72_t_3591ac6a33",
+        "rulingClan": "mnbl_1609fb72_l_31aee57f34",
+        "naval": true,
+        "reason": "clan mnbl_1609fb72_l_31aee57f34 may hold ships (the fleet rule)"
+       },
+       {
+        "id": "mnbl_1609fb72_k_630b741d7c",
+        "capital": "mnbl_1609fb72_t_64245c0202",
+        "rulingClan": "mnbl_1609fb72_l_af22cabed9",
+        "naval": true,
+        "reason": "clan mnbl_1609fb72_l_af22cabed9 may hold ships (the fleet rule)"
+       },
+       {
+        "id": "mnbl_1609fb72_k_656790d73e",
+        "capital": "mnbl_1609fb72_t_35e7ca3644",
+        "rulingClan": "mnbl_1609fb72_l_b75d37c5f1",
+        "naval": true,
+        "reason": "clan mnbl_1609fb72_l_b75d37c5f1 may hold ships (the fleet rule)"
+       },
+       {
+        "id": "mnbl_1609fb72_k_69aee02e63",
+        "capital": "mnbl_1609fb72_t_33e9f6405e",
+        "rulingClan": "mnbl_1609fb72_l_02eaa73635",
+        "naval": true,
+        "reason": "clan mnbl_1609fb72_l_02eaa73635 may hold ships (the fleet rule)"
+       },
+       {
+        "id": "mnbl_1609fb72_k_7217a84b0e",
+        "capital": "mnbl_1609fb72_t_91e41e3505",
+        "rulingClan": "mnbl_1609fb72_l_86229a7e64",
+        "naval": true,
+        "reason": "clan mnbl_1609fb72_l_86229a7e64 may hold ships (the fleet rule)"
+       },
+       {
+        "id": "mnbl_1609fb72_k_721934292d",
+        "capital": "mnbl_1609fb72_t_652a339695",
+        "rulingClan": "mnbl_1609fb72_l_97bfc7cb60",
+        "naval": true,
+        "reason": "clan mnbl_1609fb72_l_97bfc7cb60 may hold ships (the fleet rule)"
+       },
+       {
+        "id": "mnbl_1609fb72_k_778d3bcb44",
+        "capital": "mnbl_1609fb72_t_d92f348adf",
+        "rulingClan": "mnbl_1609fb72_l_39f80f03bb",
+        "naval": true,
+        "reason": "clan mnbl_1609fb72_l_39f80f03bb may hold ships (the fleet rule)"
+       },
+       {
+        "id": "mnbl_1609fb72_k_7a91edb685",
+        "capital": "mnbl_1609fb72_t_96d91dc9a3",
+        "rulingClan": "mnbl_1609fb72_l_fe76b374cb",
+        "naval": true,
+        "reason": "clan mnbl_1609fb72_l_fe76b374cb may hold ships (the fleet rule)"
+       },
+       {
+        "id": "mnbl_1609fb72_k_8850480cb9",
+        "capital": "mnbl_1609fb72_t_26da4d0d23",
+        "rulingClan": "mnbl_1609fb72_l_ff3a0d335a",
+        "naval": true,
+        "reason": "clan mnbl_1609fb72_l_ff3a0d335a may hold ships (the fleet rule)"
+       },
+       {
+        "id": "mnbl_1609fb72_k_8b7bcd56ec",
+        "capital": "mnbl_1609fb72_t_a06de08e5b",
+        "rulingClan": "mnbl_1609fb72_l_2fde3b543e",
+        "naval": true,
+        "reason": "clan mnbl_1609fb72_l_2fde3b543e may hold ships (the fleet rule)"
+       },
+       {
+        "id": "mnbl_1609fb72_k_8d7719f9e6",
+        "capital": "mnbl_1609fb72_t_0c85a587ff",
+        "rulingClan": "mnbl_1609fb72_l_df410f9b83",
+        "naval": true,
+        "reason": "clan mnbl_1609fb72_l_df410f9b83 may hold ships (the fleet rule)"
+       },
+       {
+        "id": "mnbl_1609fb72_k_9ee7a5f56b",
+        "capital": "mnbl_1609fb72_t_4a4ee84369",
+        "rulingClan": "mnbl_1609fb72_l_49d3ef7273",
+        "naval": true,
+        "reason": "clan mnbl_1609fb72_l_49d3ef7273 may hold ships (the fleet rule)"
+       },
+       {
+        "id": "mnbl_1609fb72_k_a3436a4bb1",
+        "capital": "mnbl_1609fb72_t_3dd40e786f",
+        "rulingClan": "mnbl_1609fb72_l_17ad0f887d",
+        "naval": true,
+        "reason": "clan mnbl_1609fb72_l_17ad0f887d may hold ships (the fleet rule)"
+       },
+       {
+        "id": "mnbl_1609fb72_k_a4b4b957ac",
+        "capital": "mnbl_1609fb72_t_5c564ff552",
+        "rulingClan": "mnbl_1609fb72_l_79447272af",
+        "naval": true,
+        "reason": "clan mnbl_1609fb72_l_79447272af may hold ships (the fleet rule)"
+       },
+       {
+        "id": "mnbl_1609fb72_k_b187081dc4",
+        "capital": "mnbl_1609fb72_t_9447ebbe75",
+        "rulingClan": "mnbl_1609fb72_l_e0adf04fd2",
+        "naval": true,
+        "reason": "clan mnbl_1609fb72_l_e0adf04fd2 may hold ships (the fleet rule)"
+       },
+       {
+        "id": "mnbl_1609fb72_k_bee79b1465",
+        "capital": "mnbl_1609fb72_t_c5ddd8ea7e",
+        "rulingClan": "mnbl_1609fb72_l_ad3e82a4fc",
+        "naval": true,
+        "reason": "clan mnbl_1609fb72_l_ad3e82a4fc may hold ships (the fleet rule)"
+       },
+       {
+        "id": "mnbl_1609fb72_k_c31c68bd44",
+        "capital": "mnbl_1609fb72_t_b58aa76d2e",
+        "rulingClan": "mnbl_1609fb72_l_67771498b8",
+        "naval": true,
+        "reason": "clan mnbl_1609fb72_l_67771498b8 may hold ships (the fleet rule)"
+       },
+       {
+        "id": "mnbl_1609fb72_k_cb45569f1f",
+        "capital": "mnbl_1609fb72_t_8c18b565ee",
+        "rulingClan": "mnbl_1609fb72_l_89410c91f0",
+        "naval": true,
+        "reason": "clan mnbl_1609fb72_l_89410c91f0 may hold ships (the fleet rule)"
+       },
+       {
+        "id": "mnbl_1609fb72_k_cd29590fba",
+        "capital": "mnbl_1609fb72_t_a9bb2f10b0",
+        "rulingClan": "mnbl_1609fb72_l_c4498cca5b",
+        "naval": true,
+        "reason": "clan mnbl_1609fb72_l_c4498cca5b may hold ships (the fleet rule)"
+       },
+       {
+        "id": "mnbl_1609fb72_k_d2af303495",
+        "capital": "mnbl_1609fb72_t_e60ca08fa1",
+        "rulingClan": "mnbl_1609fb72_l_45e21fb560",
+        "naval": true,
+        "reason": "clan mnbl_1609fb72_l_45e21fb560 may hold ships (the fleet rule)"
+       },
+       {
+        "id": "mnbl_1609fb72_k_d4e5b2e1d4",
+        "capital": "mnbl_1609fb72_t_38c906c775",
+        "rulingClan": "mnbl_1609fb72_l_cc4edb27c6",
+        "naval": true,
+        "reason": "clan mnbl_1609fb72_l_cc4edb27c6 may hold ships (the fleet rule)"
+       },
+       {
+        "id": "mnbl_1609fb72_k_de9f25ee81",
+        "capital": "mnbl_1609fb72_t_eb208cfa45",
+        "rulingClan": "mnbl_1609fb72_l_1a568e7f5c",
+        "naval": true,
+        "reason": "clan mnbl_1609fb72_l_1a568e7f5c may hold ships (the fleet rule)"
+       },
+       {
+        "id": "mnbl_1609fb72_k_e01be0bf17",
+        "capital": "mnbl_1609fb72_t_2b31fce358",
+        "rulingClan": "mnbl_1609fb72_l_b3879ef01b",
+        "naval": true,
+        "reason": "clan mnbl_1609fb72_l_b3879ef01b may hold ships (the fleet rule)"
+       },
+       {
+        "id": "mnbl_1609fb72_k_f552348a1c",
+        "capital": "mnbl_1609fb72_t_5372f23728",
+        "rulingClan": "mnbl_1609fb72_l_cca5832749",
+        "naval": true,
+        "reason": "clan mnbl_1609fb72_l_cca5832749 may hold ships (the fleet rule)"
+       }
+      ],
+      "starts": [
+       {
+        "culture": "aserai",
+        "town": "mnbl_1609fb72_t_4a4ee84369",
+        "point": [
+         917.1875,
+         805.7222900390625
+        ]
+       },
+       {
+        "culture": "battania",
+        "town": "mnbl_1609fb72_t_a9bb2f10b0",
+        "point": [
+         1046.870849609375,
+         817.7028198242188
+        ]
+       },
+       {
+        "culture": "empire",
+        "town": "mnbl_1609fb72_t_38c906c775",
+        "point": [
+         1042.9791259765625,
+         699.3486938476562
+        ]
+       },
+       {
+        "culture": "khuzait",
+        "town": "mnbl_1609fb72_t_7efe6a0c96",
+        "point": [
+         482.8125,
+         879.1597900390625
+        ]
+       },
+       {
+        "culture": "nord",
+        "town": "mnbl_1609fb72_t_8c18b565ee",
+        "point": [
+         737.2064819335938,
+         671.1713256835938
+        ]
+       },
+       {
+        "culture": "sturgia",
+        "town": "mnbl_1609fb72_t_db07bde4dd",
+        "point": [
+         553.1632080078125,
+         694.23291015625
+        ]
+       },
+       {
+        "culture": "vlandia",
+        "town": "mnbl_1609fb72_t_02135fe588",
+        "point": [
+         917.1875,
+         838.0277099609375
+        ]
+       }
+      ],
+      "startCultures": null,
+      "excludedStarts": [],
+      "landGroups": 11,
+      "basins": 1,
+      "cachePairs": {
+       "Default": 64261,
+       "Naval": 5994,
+       "All": 109745
+      }
+     }
+    },
+    "visit": {
+     "setup": {
+      "playerIgnoredByOtherPartiesUntilDays": 91107.37496207407
+     },
+     "startTown": "mnbl_1609fb72_t_38c906c775",
+     "startDistance": 0,
+     "reachableTowns": 16,
+     "skippedNearer": [],
+     "town": "mnbl_1609fb72_t_266d733fa8",
+     "landDistance": 40.36994,
+     "volunteersOffered": 13,
+     "startHours": 2185856.999089778,
+     "encounterBefore": false,
+     "settlementBefore": null,
+     "travelHours": 8.674880305305123,
+     "travelSeconds": 8.851634700000034,
+     "inSettlement": "mnbl_1609fb72_t_266d733fa8",
+     "encounterSettlement": "mnbl_1609fb72_t_266d733fa8",
+     "menu": "town",
+     "trade": {
+      "tradeGoodsStocked": 3,
+      "item": "clay",
+      "buy": {
+       "direction": "buy",
+       "price": 25,
+       "totalAmount": 25,
+       "done": true
+      },
+      "sell": {
+       "direction": "sell",
+       "price": 21,
+       "totalAmount": -21,
+       "done": true
+      },
+      "before": {
+       "townStock": 7,
+       "partyStock": 0,
+       "gold": 1000,
+       "townGold": 38471
+      },
+      "afterBuy": {
+       "townStock": 6,
+       "partyStock": 1,
+       "gold": 975,
+       "townGold": 38496
+      },
+      "afterSell": {
+       "townStock": 7,
+       "partyStock": 0,
+       "gold": 996,
+       "townGold": 38475
+      }
+     },
+     "recruitment": {
+      "notables": 5,
+      "settlement": "mnbl_1609fb72_t_266d733fa8",
+      "notable": "CharacterObject_1563",
+      "slot": 2,
+      "troop": "vlandian_recruit",
+      "cost": 20,
+      "goldBefore": 996,
+      "countBefore": 0,
+      "dailyRefillChance": 0.5383527,
+      "goldAfter": 976,
+      "countAfter": 1,
+      "slotCleared": true
+     },
+     "leave": {
+      "inSettlement": null,
+      "encounter": false,
+      "menu": null
+     }
+    },
+    "day": {
+     "hours": 24,
+     "setup": {
+      "playerIgnoredByOtherPartiesUntilDays": 91107.73641542014,
+      "playerHolding": true
+     },
+     "startHours": 2185865.6739700832,
+     "before": {
+      "townCount": 45,
+      "food": 17875.6,
+      "gold": 1303906,
+      "tradeGoodStacks": 358,
+      "marketItems": 16939,
+      "villageItems": 15554,
+      "volunteerSlotsFilled": 416,
+      "volunteerSlotsEmpty": 1102,
+      "towns": [
+       {
+        "id": "mnbl_1609fb72_t_02135fe588",
+        "food": 400,
+        "prosperity": 1700,
+        "gold": 24219,
+        "tradeGoods": 2,
+        "items": 102,
+        "volunteers": 7
+       },
+       {
+        "id": "mnbl_1609fb72_t_0c85a587ff",
+        "food": 400,
+        "prosperity": 3300,
+        "gold": 25733,
+        "tradeGoods": 16,
+        "items": 922,
+        "volunteers": 16
+       },
+       {
+        "id": "mnbl_1609fb72_t_18dce31a8b",
+        "food": 400,
+        "prosperity": 1900,
+        "gold": 18588,
+        "tradeGoods": 0,
+        "items": 65,
+        "volunteers": 1
+       },
+       {
+        "id": "mnbl_1609fb72_t_266d733fa8",
+        "food": 400,
+        "prosperity": 3100,
+        "gold": 38475,
+        "tradeGoods": 3,
+        "items": 65,
+        "volunteers": 1
+       },
+       {
+        "id": "mnbl_1609fb72_t_26da4d0d23",
+        "food": 400,
+        "prosperity": 4200,
+        "gold": 38597,
+        "tradeGoods": 13,
+        "items": 307,
+        "volunteers": 3
+       },
+       {
+        "id": "mnbl_1609fb72_t_2b31fce358",
+        "food": 400,
+        "prosperity": 1700,
+        "gold": 21679,
+        "tradeGoods": 5,
+        "items": 76,
+        "volunteers": 4
+       },
+       {
+        "id": "mnbl_1609fb72_t_30a1119e46",
+        "food": 400,
+        "prosperity": 3000,
+        "gold": 13180,
+        "tradeGoods": 5,
+        "items": 197,
+        "volunteers": 1
+       },
+       {
+        "id": "mnbl_1609fb72_t_33e9f6405e",
+        "food": 400,
+        "prosperity": 3200,
+        "gold": 27450,
+        "tradeGoods": 0,
+        "items": 94,
+        "volunteers": 4
+       },
+       {
+        "id": "mnbl_1609fb72_t_3591ac6a33",
+        "food": 400,
+        "prosperity": 3100,
+        "gold": 20452,
+        "tradeGoods": 6,
+        "items": 313,
+        "volunteers": 10
+       },
+       {
+        "id": "mnbl_1609fb72_t_35e7ca3644",
+        "food": 400,
+        "prosperity": 3900,
+        "gold": 35789,
+        "tradeGoods": 10,
+        "items": 465,
+        "volunteers": 2
+       },
+       {
+        "id": "mnbl_1609fb72_t_38c906c775",
+        "food": 388.74,
+        "prosperity": 3900.2,
+        "gold": 33496,
+        "tradeGoods": 8,
+        "items": 296,
+        "volunteers": 13
+       },
+       {
+        "id": "mnbl_1609fb72_t_3dd40e786f",
+        "food": 400,
+        "prosperity": 3700,
+        "gold": 25792,
+        "tradeGoods": 8,
+        "items": 241,
+        "volunteers": 4
+       },
+       {
+        "id": "mnbl_1609fb72_t_4a4ee84369",
+        "food": 400,
+        "prosperity": 2300,
+        "gold": 14044,
+        "tradeGoods": 3,
+        "items": 183,
+        "volunteers": 2
+       },
+       {
+        "id": "mnbl_1609fb72_t_511521f34a",
+        "food": 393.12,
+        "prosperity": 3100.1,
+        "gold": 29976,
+        "tradeGoods": 13,
+        "items": 658,
+        "volunteers": 19
+       },
+       {
+        "id": "mnbl_1609fb72_t_5372f23728",
+        "food": 400,
+        "prosperity": 3200.3,
+        "gold": 21918,
+        "tradeGoods": 2,
+        "items": 217,
+        "volunteers": 6
+       },
+       {
+        "id": "mnbl_1609fb72_t_5c564ff552",
+        "food": 393.06,
+        "prosperity": 3000.4,
+        "gold": 29546,
+        "tradeGoods": 11,
+        "items": 476,
+        "volunteers": 17
+       },
+       {
+        "id": "mnbl_1609fb72_t_64245c0202",
+        "food": 400,
+        "prosperity": 2300,
+        "gold": 28041,
+        "tradeGoods": 8,
+        "items": 357,
+        "volunteers": 8
+       },
+       {
+        "id": "mnbl_1609fb72_t_652a339695",
+        "food": 400,
+        "prosperity": 3000,
+        "gold": 26668,
+        "tradeGoods": 1,
+        "items": 214,
+        "volunteers": 1
+       },
+       {
+        "id": "mnbl_1609fb72_t_7c3c7cce5c",
+        "food": 397.32,
+        "prosperity": 1799.6,
+        "gold": 24352,
+        "tradeGoods": 8,
+        "items": 219,
+        "volunteers": 19
+       },
+       {
+        "id": "mnbl_1609fb72_t_7efe6a0c96",
+        "food": 400,
+        "prosperity": 1900,
+        "gold": 24624,
+        "tradeGoods": 1,
+        "items": 105,
+        "volunteers": 2
+       },
+       {
+        "id": "mnbl_1609fb72_t_803bc3052d",
+        "food": 400,
+        "prosperity": 3800,
+        "gold": 38813,
+        "tradeGoods": 8,
+        "items": 416,
+        "volunteers": 4
+       },
+       {
+        "id": "mnbl_1609fb72_t_8c18b565ee",
+        "food": 376.88,
+        "prosperity": 3099.4,
+        "gold": 17502,
+        "tradeGoods": 7,
+        "items": 388,
+        "volunteers": 26
+       },
+       {
+        "id": "mnbl_1609fb72_t_8e1456f833",
+        "food": 400,
+        "prosperity": 4300,
+        "gold": 46636,
+        "tradeGoods": 16,
+        "items": 637,
+        "volunteers": 15
+       },
+       {
+        "id": "mnbl_1609fb72_t_91e41e3505",
+        "food": 400,
+        "prosperity": 3800,
+        "gold": 36543,
+        "tradeGoods": 12,
+        "items": 590,
+        "volunteers": 1
+       },
+       {
+        "id": "mnbl_1609fb72_t_9447ebbe75",
+        "food": 364.84,
+        "prosperity": 4500.1,
+        "gold": 36785,
+        "tradeGoods": 10,
+        "items": 577,
+        "volunteers": 16
+       },
+       {
+        "id": "mnbl_1609fb72_t_96d91dc9a3",
+        "food": 400,
+        "prosperity": 4600,
+        "gold": 36057,
+        "tradeGoods": 5,
+        "items": 573,
+        "volunteers": 3
+       },
+       {
+        "id": "mnbl_1609fb72_t_a06de08e5b",
+        "food": 400,
+        "prosperity": 4000,
+        "gold": 32787,
+        "tradeGoods": 11,
+        "items": 223,
+        "volunteers": 10
+       },
+       {
+        "id": "mnbl_1609fb72_t_a81734c1d7",
+        "food": 400,
+        "prosperity": 1800.3,
+        "gold": 21049,
+        "tradeGoods": 13,
+        "items": 619,
+        "volunteers": 19
+       },
+       {
+        "id": "mnbl_1609fb72_t_a9bb2f10b0",
+        "food": 400,
+        "prosperity": 3702.7,
+        "gold": 28256,
+        "tradeGoods": 14,
+        "items": 446,
+        "volunteers": 19
+       },
+       {
+        "id": "mnbl_1609fb72_t_b58aa76d2e",
+        "food": 361.66,
+        "prosperity": 4900.1,
+        "gold": 43587,
+        "tradeGoods": 9,
+        "items": 599,
+        "volunteers": 4
+       },
+       {
+        "id": "mnbl_1609fb72_t_bb5436b93b",
+        "food": 400,
+        "prosperity": 4500,
+        "gold": 32661,
+        "tradeGoods": 13,
+        "items": 735,
+        "volunteers": 19
+       },
+       {
+        "id": "mnbl_1609fb72_t_bbe5821524",
+        "food": 400,
+        "prosperity": 1700,
+        "gold": 19978,
+        "tradeGoods": 6,
+        "items": 321,
+        "volunteers": 15
+       },
+       {
+        "id": "mnbl_1609fb72_t_c1093bcad9",
+        "food": 400,
+        "prosperity": 2200,
+        "gold": 34660,
+        "tradeGoods": 9,
+        "items": 306,
+        "volunteers": 22
+       },
+       {
+        "id": "mnbl_1609fb72_t_c5ddd8ea7e",
+        "food": 400,
+        "prosperity": 2604.5,
+        "gold": 36590,
+        "tradeGoods": 4,
+        "items": 283,
+        "volunteers": 17
+       },
+       {
+        "id": "mnbl_1609fb72_t_caf0eeb8c4",
+        "food": 400,
+        "prosperity": 5000,
+        "gold": 39258,
+        "tradeGoods": 14,
+        "items": 317,
+        "volunteers": 2
+       },
+       {
+        "id": "mnbl_1609fb72_t_d92f348adf",
+        "food": 400,
+        "prosperity": 5100,
+        "gold": 14885,
+        "tradeGoods": 12,
+        "items": 641,
+        "volunteers": 3
+       },
+       {
+        "id": "mnbl_1609fb72_t_da31273eb4",
+        "food": 400,
+        "prosperity": 3900,
+        "gold": 39005,
+        "tradeGoods": 11,
+        "items": 661,
+        "volunteers": 20
+       },
+       {
+        "id": "mnbl_1609fb72_t_db07bde4dd",
+        "food": 400,
+        "prosperity": 5600,
+        "gold": 37069,
+        "tradeGoods": 14,
+        "items": 682,
+        "volunteers": 8
+       },
+       {
+        "id": "mnbl_1609fb72_t_db2d888bf1",
+        "food": 400,
+        "prosperity": 2604.7,
+        "gold": 22658,
+        "tradeGoods": 6,
+        "items": 266,
+        "volunteers": 12
+       },
+       {
+        "id": "mnbl_1609fb72_t_de424cc7cd",
+        "food": 400,
+        "prosperity": 3200,
+        "gold": 32282,
+        "tradeGoods": 2,
+        "items": 256,
+        "volunteers": 5
+       },
+       {
+        "id": "mnbl_1609fb72_t_e60ca08fa1",
+        "food": 400,
+        "prosperity": 3900,
+        "gold": 25033,
+        "tradeGoods": 4,
+        "items": 318,
+        "volunteers": 1
+       },
+       {
+        "id": "mnbl_1609fb72_t_e7ed06396a",
+        "food": 400,
+        "prosperity": 3400,
+        "gold": 28863,
+        "tradeGoods": 14,
+        "items": 467,
+        "volunteers": 4
+       },
+       {
+        "id": "mnbl_1609fb72_t_eb208cfa45",
+        "food": 400,
+        "prosperity": 2203.4,
+        "gold": 22044,
+        "tradeGoods": 6,
+        "items": 223,
+        "volunteers": 5
+       },
+       {
+        "id": "mnbl_1609fb72_t_ecf4b31651",
+        "food": 400,
+        "prosperity": 3001.2,
+        "gold": 25804,
+        "tradeGoods": 13,
+        "items": 708,
+        "volunteers": 24
+       },
+       {
+        "id": "mnbl_1609fb72_t_eebd8fd293",
+        "food": 400,
+        "prosperity": 2800,
+        "gold": 32482,
+        "tradeGoods": 2,
+        "items": 115,
+        "volunteers": 2
+       }
+      ]
+     },
+     "hoursAdvanced": 24.01963330572471,
+     "realSeconds": 20.090007100000037,
+     "stalls": [],
+     "timedOut": false,
+     "after": {
+      "townCount": 45,
+      "food": 17583,
+      "gold": 1146290,
+      "tradeGoodStacks": 387,
+      "marketItems": 14556,
+      "villageItems": 17844,
+      "volunteerSlotsFilled": 410,
+      "volunteerSlotsEmpty": 1108,
+      "towns": [
+       {
+        "id": "mnbl_1609fb72_t_02135fe588",
+        "food": 400,
+        "prosperity": 1701.9,
+        "gold": 23513,
+        "tradeGoods": 7,
+        "items": 139,
+        "volunteers": 3
+       },
+       {
+        "id": "mnbl_1609fb72_t_0c85a587ff",
+        "food": 400,
+        "prosperity": 3300.2,
+        "gold": 28201,
+        "tradeGoods": 9,
+        "items": 629,
+        "volunteers": 9
+       },
+       {
+        "id": "mnbl_1609fb72_t_18dce31a8b",
+        "food": 400,
+        "prosperity": 1903.8,
+        "gold": 20401,
+        "tradeGoods": 4,
+        "items": 172,
+        "volunteers": 1
+       },
+       {
+        "id": "mnbl_1609fb72_t_266d733fa8",
+        "food": 399.08,
+        "prosperity": 3100.4,
+        "gold": 39847,
+        "tradeGoods": 0,
+        "items": 52,
+        "volunteers": 3
+       },
+       {
+        "id": "mnbl_1609fb72_t_26da4d0d23",
+        "food": 349.19,
+        "prosperity": 4199.8,
+        "gold": 45986,
+        "tradeGoods": 11,
+        "items": 187,
+        "volunteers": 7
+       },
+       {
+        "id": "mnbl_1609fb72_t_2b31fce358",
+        "food": 397.61,
+        "prosperity": 1699.6,
+        "gold": 18823,
+        "tradeGoods": 3,
+        "items": 115,
+        "volunteers": 8
+       },
+       {
+        "id": "mnbl_1609fb72_t_30a1119e46",
+        "food": 400,
+        "prosperity": 3003.4,
+        "gold": 2307,
+        "tradeGoods": 11,
+        "items": 353,
+        "volunteers": 3
+       },
+       {
+        "id": "mnbl_1609fb72_t_33e9f6405e",
+        "food": 391.33,
+        "prosperity": 3200,
+        "gold": 30138,
+        "tradeGoods": 3,
+        "items": 116,
+        "volunteers": 6
+       },
+       {
+        "id": "mnbl_1609fb72_t_3591ac6a33",
+        "food": 398.12,
+        "prosperity": 3100.1,
+        "gold": 25095,
+        "tradeGoods": 5,
+        "items": 112,
+        "volunteers": 3
+       },
+       {
+        "id": "mnbl_1609fb72_t_35e7ca3644",
+        "food": 400,
+        "prosperity": 3901.3,
+        "gold": 20305,
+        "tradeGoods": 11,
+        "items": 558,
+        "volunteers": 3
+       },
+       {
+        "id": "mnbl_1609fb72_t_38c906c775",
+        "food": 391.11,
+        "prosperity": 3900.5,
+        "gold": 19000,
+        "tradeGoods": 9,
+        "items": 327,
+        "volunteers": 15
+       },
+       {
+        "id": "mnbl_1609fb72_t_3dd40e786f",
+        "food": 400,
+        "prosperity": 3701.3,
+        "gold": 30082,
+        "tradeGoods": 7,
+        "items": 151,
+        "volunteers": 1
+       },
+       {
+        "id": "mnbl_1609fb72_t_4a4ee84369",
+        "food": 389.55,
+        "prosperity": 2299.7,
+        "gold": 14255,
+        "tradeGoods": 6,
+        "items": 131,
+        "volunteers": 2
+       },
+       {
+        "id": "mnbl_1609fb72_t_511521f34a",
+        "food": 400,
+        "prosperity": 3101.8,
+        "gold": 34979,
+        "tradeGoods": 13,
+        "items": 603,
+        "volunteers": 22
+       },
+       {
+        "id": "mnbl_1609fb72_t_5372f23728",
+        "food": 391.08,
+        "prosperity": 3200.4,
+        "gold": 25906,
+        "tradeGoods": 2,
+        "items": 214,
+        "volunteers": 8
+       },
+       {
+        "id": "mnbl_1609fb72_t_5c564ff552",
+        "food": 395.54,
+        "prosperity": 3000.7,
+        "gold": 19647,
+        "tradeGoods": 10,
+        "items": 316,
+        "volunteers": 17
+       },
+       {
+        "id": "mnbl_1609fb72_t_64245c0202",
+        "food": 382.54,
+        "prosperity": 2299.4,
+        "gold": 23844,
+        "tradeGoods": 3,
+        "items": 133,
+        "volunteers": 4
+       },
+       {
+        "id": "mnbl_1609fb72_t_652a339695",
+        "food": 400,
+        "prosperity": 3000.4,
+        "gold": 24132,
+        "tradeGoods": 2,
+        "items": 219,
+        "volunteers": 9
+       },
+       {
+        "id": "mnbl_1609fb72_t_7c3c7cce5c",
+        "food": 397.6,
+        "prosperity": 1799,
+        "gold": 26626,
+        "tradeGoods": 7,
+        "items": 207,
+        "volunteers": 25
+       },
+       {
+        "id": "mnbl_1609fb72_t_7efe6a0c96",
+        "food": 400,
+        "prosperity": 1903.2,
+        "gold": 17402,
+        "tradeGoods": 9,
+        "items": 238,
+        "volunteers": 14
+       },
+       {
+        "id": "mnbl_1609fb72_t_803bc3052d",
+        "food": 380.36,
+        "prosperity": 3799.8,
+        "gold": 23119,
+        "tradeGoods": 13,
+        "items": 326,
+        "volunteers": 3
+       },
+       {
+        "id": "mnbl_1609fb72_t_8c18b565ee",
+        "food": 354.54,
+        "prosperity": 3098.7,
+        "gold": 15581,
+        "tradeGoods": 10,
+        "items": 228,
+        "volunteers": 19
+       },
+       {
+        "id": "mnbl_1609fb72_t_8e1456f833",
+        "food": 395.35,
+        "prosperity": 4300.1,
+        "gold": 41743,
+        "tradeGoods": 17,
+        "items": 440,
+        "volunteers": 6
+       },
+       {
+        "id": "mnbl_1609fb72_t_91e41e3505",
+        "food": 393.6,
+        "prosperity": 3799.7,
+        "gold": 35635,
+        "tradeGoods": 13,
+        "items": 531,
+        "volunteers": 2
+       },
+       {
+        "id": "mnbl_1609fb72_t_9447ebbe75",
+        "food": 360.01,
+        "prosperity": 4499.8,
+        "gold": 29016,
+        "tradeGoods": 9,
+        "items": 652,
+        "volunteers": 16
+       },
+       {
+        "id": "mnbl_1609fb72_t_96d91dc9a3",
+        "food": 385.79,
+        "prosperity": 4600.1,
+        "gold": 5768,
+        "tradeGoods": 10,
+        "items": 619,
+        "volunteers": 3
+       },
+       {
+        "id": "mnbl_1609fb72_t_a06de08e5b",
+        "food": 366.65,
+        "prosperity": 3999.8,
+        "gold": 25678,
+        "tradeGoods": 9,
+        "items": 263,
+        "volunteers": 6
+       },
+       {
+        "id": "mnbl_1609fb72_t_a81734c1d7",
+        "food": 400,
+        "prosperity": 1801.3,
+        "gold": 24496,
+        "tradeGoods": 10,
+        "items": 503,
+        "volunteers": 12
+       },
+       {
+        "id": "mnbl_1609fb72_t_a9bb2f10b0",
+        "food": 400,
+        "prosperity": 3705.4,
+        "gold": 15461,
+        "tradeGoods": 13,
+        "items": 468,
+        "volunteers": 13
+       },
+       {
+        "id": "mnbl_1609fb72_t_b58aa76d2e",
+        "food": 360.33,
+        "prosperity": 4899.8,
+        "gold": 14983,
+        "tradeGoods": 14,
+        "items": 536,
+        "volunteers": 14
+       },
+       {
+        "id": "mnbl_1609fb72_t_bb5436b93b",
+        "food": 400,
+        "prosperity": 4503.7,
+        "gold": 40852,
+        "tradeGoods": 10,
+        "items": 537,
+        "volunteers": 23
+       },
+       {
+        "id": "mnbl_1609fb72_t_bbe5821524",
+        "food": 400,
+        "prosperity": 1701.6,
+        "gold": 22106,
+        "tradeGoods": 4,
+        "items": 170,
+        "volunteers": 2
+       },
+       {
+        "id": "mnbl_1609fb72_t_c1093bcad9",
+        "food": 400,
+        "prosperity": 2201.6,
+        "gold": 36229,
+        "tradeGoods": 3,
+        "items": 88,
+        "volunteers": 13
+       },
+       {
+        "id": "mnbl_1609fb72_t_c5ddd8ea7e",
+        "food": 400,
+        "prosperity": 2608.2,
+        "gold": 38644,
+        "tradeGoods": 4,
+        "items": 152,
+        "volunteers": 10
+       },
+       {
+        "id": "mnbl_1609fb72_t_caf0eeb8c4",
+        "food": 356.68,
+        "prosperity": 5000.2,
+        "gold": 34843,
+        "tradeGoods": 12,
+        "items": 423,
+        "volunteers": 4
+       },
+       {
+        "id": "mnbl_1609fb72_t_d92f348adf",
+        "food": 380.59,
+        "prosperity": 5100.3,
+        "gold": 9222,
+        "tradeGoods": 17,
+        "items": 514,
+        "volunteers": 0
+       },
+       {
+        "id": "mnbl_1609fb72_t_da31273eb4",
+        "food": 400,
+        "prosperity": 3903.9,
+        "gold": 36843,
+        "tradeGoods": 13,
+        "items": 357,
+        "volunteers": 4
+       },
+       {
+        "id": "mnbl_1609fb72_t_db07bde4dd",
+        "food": 400,
+        "prosperity": 5600.5,
+        "gold": 41102,
+        "tradeGoods": 12,
+        "items": 607,
+        "volunteers": 11
+       },
+       {
+        "id": "mnbl_1609fb72_t_db2d888bf1",
+        "food": 400,
+        "prosperity": 2607.6,
+        "gold": 25135,
+        "tradeGoods": 8,
+        "items": 237,
+        "volunteers": 7
+       },
+       {
+        "id": "mnbl_1609fb72_t_de424cc7cd",
+        "food": 394.09,
+        "prosperity": 3200.1,
+        "gold": 25542,
+        "tradeGoods": 12,
+        "items": 429,
+        "volunteers": 10
+       },
+       {
+        "id": "mnbl_1609fb72_t_e60ca08fa1",
+        "food": 400,
+        "prosperity": 3901.3,
+        "gold": 10747,
+        "tradeGoods": 6,
+        "items": 248,
+        "volunteers": 21
+       },
+       {
+        "id": "mnbl_1609fb72_t_e7ed06396a",
+        "food": 400,
+        "prosperity": 3403.5,
+        "gold": 24042,
+        "tradeGoods": 10,
+        "items": 286,
+        "volunteers": 6
+       },
+       {
+        "id": "mnbl_1609fb72_t_eb208cfa45",
+        "food": 400,
+        "prosperity": 2204.8,
+        "gold": 24261,
+        "tradeGoods": 6,
+        "items": 224,
+        "volunteers": 21
+       },
+       {
+        "id": "mnbl_1609fb72_t_ecf4b31651",
+        "food": 400,
+        "prosperity": 3004.6,
+        "gold": 18836,
+        "tradeGoods": 18,
+        "items": 629,
+        "volunteers": 19
+       },
+       {
+        "id": "mnbl_1609fb72_t_eebd8fd293",
+        "food": 372.29,
+        "prosperity": 2800,
+        "gold": 35917,
+        "tradeGoods": 2,
+        "items": 117,
+        "volunteers": 2
+       }
+      ]
+     },
+     "counters": {
+      "battle:FieldBattle": 71,
+      "battle:FieldBattle:naval": 1,
+      "battleEnded:FieldBattle": 74,
+      "created:bandit": 56,
+      "created:fishing": 15,
+      "created:villager": 48,
+      "destroyed:bandit": 80,
+      "entered:bandit>hideout": 1,
+      "entered:caravan>town": 70,
+      "entered:lord>castle": 33,
+      "entered:lord>town": 82,
+      "entered:lord>village": 33,
+      "entered:patrol>town": 4,
+      "entered:villager>castle": 3,
+      "entered:villager>town": 29,
+      "entered:villager>village": 78,
+      "recruited:lord": 1014,
+      "recruited:none": 33,
+      "recruitedTroops:lord": 1026,
+      "recruitedTroops:none": 33,
+      "trade:caravan": 137,
+      "tradeItems:caravan": 5804,
+      "villagerItemsSold": 1602,
+      "villagerSold": 27,
+      "villagerSoldNothing:onlyPackAnimals": 2
+     },
+     "listenerErrors": [],
+     "thrown": [],
+     "thrownCount": 0,
+     "campaignThrown": 0,
+     "exceptionCanarySeen": true,
+     "asserts": [],
+     "assertCount": 0,
+     "assertCanarySeen": true,
+     "offNavigation": [],
+     "offNavigationCount": 0,
+     "motion": {
+      "bandit": {
+       "tracked": 369,
+       "moved": 294,
+       "travelled": 14440.08,
+       "maxTravelled": 90.77
+      },
+      "caravan": {
+       "tracked": 118,
+       "moved": 118,
+       "travelled": 8499.94,
+       "maxTravelled": 116.31
+      },
+      "fishing": {
+       "tracked": 42,
+       "moved": 42,
+       "travelled": 1026.77,
+       "maxTravelled": 50.69
+      },
+      "garrison": {
+       "tracked": 71,
+       "moved": 0,
+       "travelled": 0,
+       "maxTravelled": 0
+      },
+      "lord": {
+       "tracked": 151,
+       "moved": 142,
+       "travelled": 6313.26,
+       "maxTravelled": 72.38
+      },
+      "militia": {
+       "tracked": 286,
+       "moved": 0,
+       "travelled": 0,
+       "maxTravelled": 0
+      },
+      "patrol": {
+       "tracked": 49,
+       "moved": 49,
+       "travelled": 2394.69,
+       "maxTravelled": 66.82
+      },
+      "villager": {
+       "tracked": 65,
+       "moved": 43,
+       "travelled": 583.35,
+       "maxTravelled": 48.33
+      }
+     },
+     "stuck": [],
+     "stuckCount": 0,
+     "holding": [
+      {
+       "party": "looters_325",
+       "kind": "bandit",
+       "position": [
+        1050.88,
+        809.89
+       ],
+       "shortTerm": "Hold",
+       "default": "PatrolAroundPoint",
+       "target": "mnbl_1609fb72_v_9bc516298d [Hold]",
+       "atSea": false,
+       "landCapable": true,
+       "disbanding": false,
+       "goods": 1,
+       "navigation": null,
+       "home": "mnbl_1609fb72_v_9bc516298d",
+       "sinceHours": 2185882.55,
+       "reason": "own AI decision"
+      },
+      {
+       "party": "mnbl_1609fb72_l_02eaa73635_1",
+       "kind": "fishing",
+       "position": [
+        816.32,
+        879.72
+       ],
+       "shortTerm": "Hold",
+       "default": "Hold",
+       "target": "(816.32, 879.72) [Hold, at sea]",
+       "atSea": true,
+       "landCapable": false,
+       "disbanding": false,
+       "goods": 5,
+       "navigation": null,
+       "home": "mnbl_1609fb72_v_b23bd58e31",
+       "sinceHours": 2185871.51,
+       "fishing": true,
+       "roaming": true,
+       "reason": "fishing at its fishing point"
+      },
+      {
+       "party": "mnbl_1609fb72_l_02eaa73635_533",
+       "kind": "fishing",
+       "position": [
+        844.73,
+        897.73
+       ],
+       "shortTerm": "Hold",
+       "default": "Hold",
+       "target": "(844.73, 897.73) [Hold, at sea]",
+       "atSea": true,
+       "landCapable": false,
+       "disbanding": false,
+       "goods": 3,
+       "navigation": null,
+       "home": "mnbl_1609fb72_v_b23bd58e31",
+       "sinceHours": 2185874.51,
+       "fishing": true,
+       "roaming": true,
+       "reason": "fishing at its fishing point"
+      },
+      {
+       "party": "mnbl_1609fb72_l_0d02cd80cc_1",
+       "kind": "fishing",
+       "position": [
+        934.69,
+        784.37
+       ],
+       "shortTerm": "Hold",
+       "default": "Hold",
+       "target": "(934.69, 784.37) [Hold, at sea]",
+       "atSea": true,
+       "landCapable": false,
+       "disbanding": false,
+       "goods": 4,
+       "navigation": null,
+       "home": "mnbl_1609fb72_v_99c26e68bf",
+       "sinceHours": 2185871.51,
+       "fishing": true,
+       "roaming": true,
+       "reason": "fishing at its fishing point"
+      },
+      {
+       "party": "mnbl_1609fb72_l_1a568e7f5c_1",
+       "kind": "fishing",
+       "position": [
+        509.95,
+        861.14
+       ],
+       "shortTerm": "Hold",
+       "default": "Hold",
+       "target": "(509.95, 861.14) [Hold, at sea]",
+       "atSea": true,
+       "landCapable": false,
+       "disbanding": false,
+       "goods": 3,
+       "navigation": null,
+       "home": "mnbl_1609fb72_v_1b54c2686d",
+       "sinceHours": 2185871.51,
+       "fishing": true,
+       "roaming": true,
+       "reason": "fishing at its fishing point"
+      },
+      {
+       "party": "mnbl_1609fb72_l_413e07561c_1",
+       "kind": "fishing",
+       "position": [
+        461.14,
+        754.77
+       ],
+       "shortTerm": "Hold",
+       "default": "Hold",
+       "target": "(461.14, 754.77) [Hold, at sea]",
+       "atSea": true,
+       "landCapable": false,
+       "disbanding": false,
+       "goods": 2,
+       "navigation": null,
+       "home": "mnbl_1609fb72_v_5ed243ea57",
+       "sinceHours": 2185871.51,
+       "fishing": true,
+       "roaming": true,
+       "reason": "fishing at its fishing point"
+      },
+      {
+       "party": "mnbl_1609fb72_l_413e07561c_588",
+       "kind": "fishing",
+       "position": [
+        479.24,
+        745.57
+       ],
+       "shortTerm": "Hold",
+       "default": "Hold",
+       "target": "(479.24, 745.57) [Hold, at sea]",
+       "atSea": true,
+       "landCapable": false,
+       "disbanding": false,
+       "goods": 0,
+       "navigation": null,
+       "home": "mnbl_1609fb72_v_5ed243ea57",
+       "sinceHours": 2185885.55,
+       "fishing": true,
+       "roaming": true,
+       "reason": "fishing at its fishing point"
+      },
+      {
+       "party": "mnbl_1609fb72_l_4589bbbe70_1",
+       "kind": "fishing",
+       "position": [
+        1023.11,
+        779.37
+       ],
+       "shortTerm": "Hold",
+       "default": "Hold",
+       "target": "(1023.11, 779.37) [Hold, at sea]",
+       "atSea": true,
+       "landCapable": false,
+       "disbanding": false,
+       "goods": 1,
+       "navigation": null,
+       "home": "mnbl_1609fb72_v_ca565dacb8",
+       "sinceHours": 2185873.55,
+       "fishing": true,
+       "roaming": true,
+       "reason": "fishing at its fishing point"
+      },
+      {
+       "party": "mnbl_1609fb72_l_45e21fb560_1",
+       "kind": "fishing",
+       "position": [
+        645.32,
+        729.25
+       ],
+       "shortTerm": "Hold",
+       "default": "Hold",
+       "target": "(645.32, 729.25) [Hold, at sea]",
+       "atSea": true,
+       "landCapable": false,
+       "disbanding": false,
+       "goods": 3,
+       "navigation": null,
+       "home": "mnbl_1609fb72_v_639d3dddd4",
+       "sinceHours": 2185871.51,
+       "fishing": true,
+       "roaming": true,
+       "reason": "fishing at its fishing point"
+      },
+      {
+       "party": "mnbl_1609fb72_l_45e21fb560_587",
+       "kind": "fishing",
+       "position": [
+        670.98,
+        746.67
+       ],
+       "shortTerm": "Hold",
+       "default": "Hold",
+       "target": "(670.98, 746.67) [Hold, at sea]",
+       "atSea": true,
+       "landCapable": false,
+       "disbanding": false,
+       "goods": 3,
+       "navigation": null,
+       "home": "mnbl_1609fb72_v_639d3dddd4",
+       "sinceHours": 2185884.53,
+       "fishing": true,
+       "roaming": true,
+       "reason": "fishing at its fishing point"
+      },
+      {
+       "party": "mnbl_1609fb72_l_6e21250a6e_1",
+       "kind": "fishing",
+       "position": [
+        499.99,
+        864.1
+       ],
+       "shortTerm": "Hold",
+       "default": "Hold",
+       "target": "(499.99, 864.1) [Hold, at sea]",
+       "atSea": true,
+       "landCapable": false,
+       "disbanding": false,
+       "goods": 1,
+       "navigation": null,
+       "home": "mnbl_1609fb72_v_f924958cd5",
+       "sinceHours": 2185871.51,
+       "fishing": true,
+       "roaming": true,
+       "reason": "fishing at its fishing point"
+      },
+      {
+       "party": "mnbl_1609fb72_l_7df35e15df_1",
+       "kind": "fishing",
+       "position": [
+        470.46,
+        721.01
+       ],
+       "shortTerm": "Hold",
+       "default": "Hold",
+       "target": "(470.46, 721.01) [Hold, at sea]",
+       "atSea": true,
+       "landCapable": false,
+       "disbanding": false,
+       "goods": 2,
+       "navigation": null,
+       "home": "mnbl_1609fb72_v_634c7d9978",
+       "sinceHours": 2185888.55,
+       "fishing": true,
+       "roaming": true,
+       "reason": "fishing at its fishing point"
+      },
+      {
+       "party": "mnbl_1609fb72_l_86229a7e64_1",
+       "kind": "fishing",
+       "position": [
+        533.47,
+        682.9
+       ],
+       "shortTerm": "Hold",
+       "default": "Hold",
+       "target": "(533.47, 682.9) [Hold, at sea]",
+       "atSea": true,
+       "landCapable": false,
+       "disbanding": false,
+       "goods": 4,
+       "navigation": null,
+       "home": "mnbl_1609fb72_v_78cdb8a2de",
+       "sinceHours": 2185872.53,
+       "fishing": true,
+       "roaming": true,
+       "reason": "fishing at its fishing point"
+      },
+      {
+       "party": "mnbl_1609fb72_l_86229a7e64_542",
+       "kind": "fishing",
+       "position": [
+        531.68,
+        690.1
+       ],
+       "shortTerm": "Hold",
+       "default": "Hold",
+       "target": "(531.68, 690.1) [Hold, at sea]",
+       "atSea": true,
+       "landCapable": false,
+       "disbanding": false,
+       "goods": 3,
+       "navigation": null,
+       "home": "mnbl_1609fb72_v_78cdb8a2de",
+       "sinceHours": 2185882.55,
+       "fishing": true,
+       "roaming": true,
+       "reason": "fishing at its fishing point"
+      },
+      {
+       "party": "mnbl_1609fb72_l_89410c91f0_1",
+       "kind": "fishing",
+       "position": [
+        997.88,
+        662.68
+       ],
+       "shortTerm": "Hold",
+       "default": "Hold",
+       "target": "(997.88, 662.68) [Hold, at sea]",
+       "atSea": true,
+       "landCapable": false,
+       "disbanding": false,
+       "goods": 4,
+       "navigation": null,
+       "home": "mnbl_1609fb72_v_1072e7b63c",
+       "sinceHours": 2185871.51,
+       "fishing": true,
+       "roaming": true,
+       "reason": "fishing at its fishing point"
+      },
+      {
+       "party": "mnbl_1609fb72_l_89410c91f0_3",
+       "kind": "fishing",
+       "position": [
+        834.08,
+        732.8
+       ],
+       "shortTerm": "Hold",
+       "default": "Hold",
+       "target": "(834.08, 732.8) [Hold, at sea]",
+       "atSea": true,
+       "landCapable": false,
+       "disbanding": false,
+       "goods": 8,
+       "navigation": null,
+       "home": "mnbl_1609fb72_v_409df0ca19",
+       "sinceHours": 2185882.55,
+       "fishing": true,
+       "roaming": true,
+       "reason": "fishing at its fishing point"
+      },
+      {
+       "party": "mnbl_1609fb72_l_89410c91f0_4",
+       "kind": "fishing",
+       "position": [
+        704.7,
+        676.18
+       ],
+       "shortTerm": "Hold",
+       "default": "Hold",
+       "target": "(704.7, 676.18) [Hold, at sea]",
+       "atSea": true,
+       "landCapable": false,
+       "disbanding": false,
+       "goods": 6,
+       "navigation": null,
+       "home": "mnbl_1609fb72_v_7bc6d793dc",
+       "sinceHours": 2185871.51,
+       "fishing": true,
+       "roaming": true,
+       "reason": "fishing at its fishing point"
+      },
+      {
+       "party": "mnbl_1609fb72_l_89410c91f0_5",
+       "kind": "fishing",
+       "position": [
+        843.25,
+        733.79
+       ],
+       "shortTerm": "Hold",
+       "default": "Hold",
+       "target": "(843.25, 733.79) [Hold, at sea]",
+       "atSea": true,
+       "landCapable": false,
+       "disbanding": false,
+       "goods": 4,
+       "navigation": null,
+       "home": "mnbl_1609fb72_v_da5c94780c",
+       "sinceHours": 2185871.51,
+       "fishing": true,
+       "roaming": true,
+       "reason": "fishing at its fishing point"
+      },
+      {
+       "party": "mnbl_1609fb72_l_a80727fc08_1",
+       "kind": "fishing",
+       "position": [
+        549.95,
+        687.97
+       ],
+       "shortTerm": "Hold",
+       "default": "Hold",
+       "target": "(549.95, 687.97) [Hold, at sea]",
+       "atSea": true,
+       "landCapable": false,
+       "disbanding": false,
+       "goods": 10,
+       "navigation": null,
+       "home": "mnbl_1609fb72_v_2a544157c4",
+       "sinceHours": 2185881.53,
+       "fishing": true,
+       "roaming": true,
+       "reason": "fishing at its fishing point"
+      },
+      {
+       "party": "mnbl_1609fb72_l_af22cabed9_1",
+       "kind": "fishing",
+       "position": [
+        1029.35,
+        826.1
+       ],
+       "shortTerm": "Hold",
+       "default": "Hold",
+       "target": "(1029.35, 826.1) [Hold, at sea]",
+       "atSea": true,
+       "landCapable": false,
+       "disbanding": false,
+       "goods": 4,
+       "navigation": null,
+       "home": "mnbl_1609fb72_v_1289119b8c",
+       "sinceHours": 2185871.51,
+       "fishing": true,
+       "roaming": true,
+       "reason": "fishing at its fishing point"
+      },
+      {
+       "party": "mnbl_1609fb72_l_af22cabed9_528",
+       "kind": "fishing",
+       "position": [
+        1048.75,
+        845.58
+       ],
+       "shortTerm": "Hold",
+       "default": "Hold",
+       "target": "(1048.75, 845.58) [Hold, at sea]",
+       "atSea": true,
+       "landCapable": false,
+       "disbanding": false,
+       "goods": 1,
+       "navigation": null,
+       "home": "mnbl_1609fb72_v_b80b409813",
+       "sinceHours": 2185875.53,
+       "fishing": true,
+       "roaming": true,
+       "reason": "fishing at its fishing point"
+      },
+      {
+       "party": "mnbl_1609fb72_l_b75d37c5f1_1",
+       "kind": "fishing",
+       "position": [
+        971.79,
+        849.27
+       ],
+       "shortTerm": "Hold",
+       "default": "Hold",
+       "target": "(971.79, 849.27) [Hold, at sea]",
+       "atSea": true,
+       "landCapable": false,
+       "disbanding": false,
+       "goods": 4,
+       "navigation": null,
+       "home": "mnbl_1609fb72_v_edd9e5c871",
+       "sinceHours": 2185871.51,
+       "fishing": true,
+       "roaming": true,
+       "reason": "fishing at its fishing point"
+      },
+      {
+       "party": "mnbl_1609fb72_l_c2571ad737_1",
+       "kind": "fishing",
+       "position": [
+        617.27,
+        727.31
+       ],
+       "shortTerm": "Hold",
+       "default": "Hold",
+       "target": "(617.27, 727.31) [Hold, at sea]",
+       "atSea": true,
+       "landCapable": false,
+       "disbanding": false,
+       "goods": 4,
+       "navigation": null,
+       "home": "mnbl_1609fb72_v_b3af9cdfe9",
+       "sinceHours": 2185871.51,
+       "fishing": true,
+       "roaming": true,
+       "reason": "fishing at its fishing point"
+      },
+      {
+       "party": "mnbl_1609fb72_l_cc4edb27c6_1",
+       "kind": "fishing",
+       "position": [
+        1041.16,
+        675.25
+       ],
+       "shortTerm": "Hold",
+       "default": "Hold",
+       "target": "(1041.16, 675.25) [Hold, at sea]",
+       "atSea": true,
+       "landCapable": false,
+       "disbanding": false,
+       "goods": 9,
+       "navigation": null,
+       "home": "mnbl_1609fb72_v_672b9d802a",
+       "sinceHours": 2185881.53,
+       "fishing": true,
+       "roaming": true,
+       "reason": "fishing at its fishing point"
+      },
+      {
+       "party": "mnbl_1609fb72_l_cc4edb27c6_571",
+       "kind": "fishing",
+       "position": [
+        1025.65,
+        687.2
+       ],
+       "shortTerm": "Hold",
+       "default": "Hold",
+       "target": "(1025.65, 687.2) [Hold, at sea]",
+       "atSea": true,
+       "landCapable": false,
+       "disbanding": false,
+       "goods": 6,
+       "navigation": null,
+       "home": "mnbl_1609fb72_v_67d3a8dea8",
+       "sinceHours": 2185885.55,
+       "fishing": true,
+       "roaming": true,
+       "reason": "fishing at its fishing point"
+      },
+      {
+       "party": "mnbl_1609fb72_l_cca5832749_1",
+       "kind": "fishing",
+       "position": [
+        618.69,
+        877.02
+       ],
+       "shortTerm": "Hold",
+       "default": "Hold",
+       "target": "(618.69, 877.02) [Hold, at sea]",
+       "atSea": true,
+       "landCapable": false,
+       "disbanding": false,
+       "goods": 2,
+       "navigation": null,
+       "home": "mnbl_1609fb72_v_0b5854cbae",
+       "sinceHours": 2185871.51,
+       "fishing": true,
+       "roaming": true,
+       "reason": "fishing at its fishing point"
+      },
+      {
+       "party": "mnbl_1609fb72_l_d78a71fdcb_1",
+       "kind": "fishing",
+       "position": [
+        409.79,
+        724.25
+       ],
+       "shortTerm": "Hold",
+       "default": "Hold",
+       "target": "(409.79, 724.25) [Hold, at sea]",
+       "atSea": true,
+       "landCapable": false,
+       "disbanding": false,
+       "goods": 3,
+       "navigation": null,
+       "home": "mnbl_1609fb72_v_ac0e94ac23",
+       "sinceHours": 2185877.51,
+       "fishing": true,
+       "roaming": true,
+       "reason": "fishing at its fishing point"
+      },
+      {
+       "party": "mnbl_1609fb72_l_dd54c573e2_1",
+       "kind": "fishing",
+       "position": [
+        444.8,
+        906.25
+       ],
+       "shortTerm": "Hold",
+       "default": "Hold",
+       "target": "(444.8, 906.25) [Hold, at sea]",
+       "atSea": true,
+       "landCapable": false,
+       "disbanding": false,
+       "goods": 3,
+       "navigation": null,
+       "home": "mnbl_1609fb72_v_345b480686",
+       "sinceHours": 2185871.51,
+       "fishing": true,
+       "roaming": true,
+       "reason": "fishing at its fishing point"
+      },
+      {
+       "party": "mnbl_1609fb72_l_dd54c573e2_2",
+       "kind": "fishing",
+       "position": [
+        423.95,
+        905.3
+       ],
+       "shortTerm": "Hold",
+       "default": "Hold",
+       "target": "(423.95, 905.3) [Hold, at sea]",
+       "atSea": true,
+       "landCapable": false,
+       "disbanding": false,
+       "goods": 3,
+       "navigation": null,
+       "home": "mnbl_1609fb72_v_369f400c73",
+       "sinceHours": 2185871.51,
+       "fishing": true,
+       "roaming": true,
+       "reason": "fishing at its fishing point"
+      },
+      {
+       "party": "mnbl_1609fb72_l_ddef31d573_1",
+       "kind": "fishing",
+       "position": [
+        840.37,
+        824.56
+       ],
+       "shortTerm": "Hold",
+       "default": "Hold",
+       "target": "(840.37, 824.56) [Hold, at sea]",
+       "atSea": true,
+       "landCapable": false,
+       "disbanding": false,
+       "goods": 1,
+       "navigation": null,
+       "home": "mnbl_1609fb72_v_7fa61dfa9d",
+       "sinceHours": 2185871.51,
+       "fishing": true,
+       "roaming": true,
+       "reason": "fishing at its fishing point"
+      },
+      {
+       "party": "mnbl_1609fb72_l_ddef31d573_520",
+       "kind": "fishing",
+       "position": [
+        858.47,
+        804.63
+       ],
+       "shortTerm": "Hold",
+       "default": "Hold",
+       "target": "(858.47, 804.63) [Hold, at sea]",
+       "atSea": true,
+       "landCapable": false,
+       "disbanding": false,
+       "goods": 2,
+       "navigation": null,
+       "home": "mnbl_1609fb72_v_f4813dc745",
+       "sinceHours": 2185873.55,
+       "fishing": true,
+       "roaming": true,
+       "reason": "fishing at its fishing point"
+      },
+      {
+       "party": "mnbl_1609fb72_l_ddef31d573_538",
+       "kind": "fishing",
+       "position": [
+        845.62,
+        831.92
+       ],
+       "shortTerm": "Hold",
+       "default": "Hold",
+       "target": "(845.62, 831.92) [Hold, at sea]",
+       "atSea": true,
+       "landCapable": false,
+       "disbanding": false,
+       "goods": 4,
+       "navigation": null,
+       "home": "mnbl_1609fb72_v_7fa61dfa9d",
+       "sinceHours": 2185882.55,
+       "fishing": true,
+       "roaming": true,
+       "reason": "fishing at its fishing point"
+      },
+      {
+       "party": "mnbl_1609fb72_l_df410f9b83_1",
+       "kind": "fishing",
+       "position": [
+        470.66,
+        771.21
+       ],
+       "shortTerm": "Hold",
+       "default": "Hold",
+       "target": "(470.66, 771.21) [Hold, at sea]",
+       "atSea": true,
+       "landCapable": false,
+       "disbanding": false,
+       "goods": 4,
+       "navigation": null,
+       "home": "mnbl_1609fb72_v_653a0b6d02",
+       "sinceHours": 2185871.51,
+       "fishing": true,
+       "roaming": true,
+       "reason": "fishing at its fishing point"
+      },
+      {
+       "party": "mnbl_1609fb72_l_e0adf04fd2_1",
+       "kind": "fishing",
+       "position": [
+        556.58,
+        832.24
+       ],
+       "shortTerm": "Hold",
+       "default": "Hold",
+       "target": "(556.58, 832.24) [Hold, at sea]",
+       "atSea": true,
+       "landCapable": false,
+       "disbanding": false,
+       "goods": 5,
+       "navigation": null,
+       "home": "mnbl_1609fb72_v_016001a1be",
+       "sinceHours": 2185871.51,
+       "fishing": true,
+       "roaming": true,
+       "reason": "fishing at its fishing point"
+      },
+      {
+       "party": "mnbl_1609fb72_l_ec83f7c40f_1",
+       "kind": "fishing",
+       "position": [
+        1016.69,
+        947.66
+       ],
+       "shortTerm": "Hold",
+       "default": "Hold",
+       "target": "(1016.69, 947.66) [Hold, at sea]",
+       "atSea": true,
+       "landCapable": false,
+       "disbanding": false,
+       "goods": 4,
+       "navigation": null,
+       "home": "mnbl_1609fb72_v_89ec3c58d0",
+       "sinceHours": 2185880.51,
+       "fishing": true,
+       "roaming": true,
+       "reason": "fishing at its fishing point"
+      },
+      {
+       "party": "mnbl_1609fb72_h_649e106e20_party_1",
+       "kind": "lord",
+       "position": [
+        860.19,
+        741.16
+       ],
+       "shortTerm": "Hold",
+       "default": "Hold",
+       "target": "(860.19, 741.16) [Hold]",
+       "atSea": false,
+       "landCapable": true,
+       "disbanding": false,
+       "goods": 146,
+       "navigation": null,
+       "home": "mnbl_1609fb72_t_b58aa76d2e",
+       "sinceHours": 2185881.53,
+       "reason": "own AI decision"
+      },
+      {
+       "party": "mnbl_1609fb72_h_c49ac22a55_party_1",
+       "kind": "lord",
+       "position": [
+        1025.56,
+        765.04
+       ],
+       "shortTerm": "Hold",
+       "default": "Hold",
+       "target": "(1025.56, 765.04) [Hold]",
+       "atSea": false,
+       "landCapable": true,
+       "disbanding": false,
+       "goods": 259,
+       "navigation": null,
+       "home": "mnbl_1609fb72_t_c1093bcad9",
+       "sinceHours": 2185881.53,
+       "reason": "own AI decision"
+      },
+      {
+       "party": "mnbl_1609fb72_h_e1fa5e48ae_party_1",
+       "kind": "lord",
+       "position": [
+        552.33,
+        692.29
+       ],
+       "shortTerm": "Hold",
+       "default": "Hold",
+       "target": "(552.33, 692.29) [Hold]",
+       "atSea": false,
+       "landCapable": true,
+       "disbanding": false,
+       "goods": 261,
+       "navigation": null,
+       "home": "mnbl_1609fb72_t_db07bde4dd",
+       "sinceHours": 2185885.55,
+       "reason": "own AI decision"
+      },
+      {
+       "party": "patrol_party_1_party_368",
+       "kind": "patrol",
+       "position": [
+        987.32,
+        918.1
+       ],
+       "shortTerm": "Hold",
+       "default": "Hold",
+       "target": "(987.32, 918.1) [Hold]",
+       "atSea": false,
+       "landCapable": true,
+       "disbanding": false,
+       "goods": 25,
+       "navigation": null,
+       "home": "mnbl_1609fb72_t_d92f348adf",
+       "sinceHours": 2185875.53,
+       "reason": "own AI decision"
+      }
+     ],
+     "holdingCount": 39,
+     "holdingByKind": {
+      "bandit": 1,
+      "fishing": 34,
+      "lord": 3,
+      "patrol": 1
+     },
+     "holdingVillagersWithoutReason": 0,
+     "unfoundPaths": [],
+     "unfoundPathCount": 0,
+     "unfoundToSettlementCount": 0
+    },
+    "replenishment": {
+     "slots": 5388,
+     "emptyAtStart": 2731,
+     "refilled": 887,
+     "emptiedDuringDay": 342,
+     "emptyAtEnd": 2186,
+     "playerSlot": {
+      "slot": "CharacterObject_1563/2",
+      "now": "vlandian_recruit",
+      "refilled": true,
+      "dailyRefillChance": 0.5383527
+     },
+     "tradedGood": {
+      "item": "clay",
+      "stockAfterTrade": 7,
+      "stockAfterDay": 0
+     }
+    },
+    "afterDay": {
+     "campaignDays": 91078.73723347453,
+     "census": {
+      "clan:bandit": 9,
+      "clan:minor": 1,
+      "clan:noble": 92,
+      "garrison": 71,
+      "hero:lord": 372,
+      "hero:notable": 909,
+      "hero:wanderer": 28,
+      "hideout:infested": 33,
+      "kingdom": 40,
+      "kingdom:fiefs:1": 22,
+      "kingdom:fiefs:2": 10,
+      "kingdom:fiefs:3": 5,
+      "kingdom:fiefs:4+": 3,
+      "party:bandit": 289,
+      "party:caravan": 118,
+      "party:fishing": 42,
+      "party:garrison": 71,
+      "party:lord": 151,
+      "party:militia": 286,
+      "party:patrol": 49,
+      "party:player": 1,
+      "party:villager": 66,
+      "settlement:castle": 26,
+      "settlement:hideout": 72,
+      "settlement:other": 1,
+      "settlement:town": 45,
+      "settlement:village": 215,
+      "town:noTradeGoods": 1,
+      "town:noVolunteers": 1
+     },
+     "invalid": [],
+     "invalidCount": 0,
+     "unexpected": [],
+     "unexpectedCount": 0,
+     "offNavigation": [],
+     "offNavigationCount": 0,
+     "wars": 0,
+     "villagesWithoutTradeTown": [],
+     "townsWithoutGold": [],
+     "townsWithoutTradeGoods": [
+      "mnbl_1609fb72_t_266d733fa8"
+     ],
+     "economy": {
+      "townCount": 45,
+      "food": 17583,
+      "gold": 1146290,
+      "tradeGoodStacks": 387,
+      "marketItems": 14556,
+      "villageItems": 17844,
+      "volunteerSlotsFilled": 410,
+      "volunteerSlotsEmpty": 1108,
+      "towns": [
+       {
+        "id": "mnbl_1609fb72_t_02135fe588",
+        "food": 400,
+        "prosperity": 1701.9,
+        "gold": 23513,
+        "tradeGoods": 7,
+        "items": 139,
+        "volunteers": 3
+       },
+       {
+        "id": "mnbl_1609fb72_t_0c85a587ff",
+        "food": 400,
+        "prosperity": 3300.2,
+        "gold": 28201,
+        "tradeGoods": 9,
+        "items": 629,
+        "volunteers": 9
+       },
+       {
+        "id": "mnbl_1609fb72_t_18dce31a8b",
+        "food": 400,
+        "prosperity": 1903.8,
+        "gold": 20401,
+        "tradeGoods": 4,
+        "items": 172,
+        "volunteers": 1
+       },
+       {
+        "id": "mnbl_1609fb72_t_266d733fa8",
+        "food": 399.08,
+        "prosperity": 3100.4,
+        "gold": 39847,
+        "tradeGoods": 0,
+        "items": 52,
+        "volunteers": 3
+       },
+       {
+        "id": "mnbl_1609fb72_t_26da4d0d23",
+        "food": 349.19,
+        "prosperity": 4199.8,
+        "gold": 45986,
+        "tradeGoods": 11,
+        "items": 187,
+        "volunteers": 7
+       },
+       {
+        "id": "mnbl_1609fb72_t_2b31fce358",
+        "food": 397.61,
+        "prosperity": 1699.6,
+        "gold": 18823,
+        "tradeGoods": 3,
+        "items": 115,
+        "volunteers": 8
+       },
+       {
+        "id": "mnbl_1609fb72_t_30a1119e46",
+        "food": 400,
+        "prosperity": 3003.4,
+        "gold": 2307,
+        "tradeGoods": 11,
+        "items": 353,
+        "volunteers": 3
+       },
+       {
+        "id": "mnbl_1609fb72_t_33e9f6405e",
+        "food": 391.33,
+        "prosperity": 3200,
+        "gold": 30138,
+        "tradeGoods": 3,
+        "items": 116,
+        "volunteers": 6
+       },
+       {
+        "id": "mnbl_1609fb72_t_3591ac6a33",
+        "food": 398.12,
+        "prosperity": 3100.1,
+        "gold": 25095,
+        "tradeGoods": 5,
+        "items": 112,
+        "volunteers": 3
+       },
+       {
+        "id": "mnbl_1609fb72_t_35e7ca3644",
+        "food": 400,
+        "prosperity": 3901.3,
+        "gold": 20305,
+        "tradeGoods": 11,
+        "items": 558,
+        "volunteers": 3
+       },
+       {
+        "id": "mnbl_1609fb72_t_38c906c775",
+        "food": 391.11,
+        "prosperity": 3900.5,
+        "gold": 19000,
+        "tradeGoods": 9,
+        "items": 327,
+        "volunteers": 15
+       },
+       {
+        "id": "mnbl_1609fb72_t_3dd40e786f",
+        "food": 400,
+        "prosperity": 3701.3,
+        "gold": 30082,
+        "tradeGoods": 7,
+        "items": 151,
+        "volunteers": 1
+       },
+       {
+        "id": "mnbl_1609fb72_t_4a4ee84369",
+        "food": 389.55,
+        "prosperity": 2299.7,
+        "gold": 14255,
+        "tradeGoods": 6,
+        "items": 131,
+        "volunteers": 2
+       },
+       {
+        "id": "mnbl_1609fb72_t_511521f34a",
+        "food": 400,
+        "prosperity": 3101.8,
+        "gold": 34979,
+        "tradeGoods": 13,
+        "items": 603,
+        "volunteers": 22
+       },
+       {
+        "id": "mnbl_1609fb72_t_5372f23728",
+        "food": 391.08,
+        "prosperity": 3200.4,
+        "gold": 25906,
+        "tradeGoods": 2,
+        "items": 214,
+        "volunteers": 8
+       },
+       {
+        "id": "mnbl_1609fb72_t_5c564ff552",
+        "food": 395.54,
+        "prosperity": 3000.7,
+        "gold": 19647,
+        "tradeGoods": 10,
+        "items": 316,
+        "volunteers": 17
+       },
+       {
+        "id": "mnbl_1609fb72_t_64245c0202",
+        "food": 382.54,
+        "prosperity": 2299.4,
+        "gold": 23844,
+        "tradeGoods": 3,
+        "items": 133,
+        "volunteers": 4
+       },
+       {
+        "id": "mnbl_1609fb72_t_652a339695",
+        "food": 400,
+        "prosperity": 3000.4,
+        "gold": 24132,
+        "tradeGoods": 2,
+        "items": 219,
+        "volunteers": 9
+       },
+       {
+        "id": "mnbl_1609fb72_t_7c3c7cce5c",
+        "food": 397.6,
+        "prosperity": 1799,
+        "gold": 26626,
+        "tradeGoods": 7,
+        "items": 207,
+        "volunteers": 25
+       },
+       {
+        "id": "mnbl_1609fb72_t_7efe6a0c96",
+        "food": 400,
+        "prosperity": 1903.2,
+        "gold": 17402,
+        "tradeGoods": 9,
+        "items": 238,
+        "volunteers": 14
+       },
+       {
+        "id": "mnbl_1609fb72_t_803bc3052d",
+        "food": 380.36,
+        "prosperity": 3799.8,
+        "gold": 23119,
+        "tradeGoods": 13,
+        "items": 326,
+        "volunteers": 3
+       },
+       {
+        "id": "mnbl_1609fb72_t_8c18b565ee",
+        "food": 354.54,
+        "prosperity": 3098.7,
+        "gold": 15581,
+        "tradeGoods": 10,
+        "items": 228,
+        "volunteers": 19
+       },
+       {
+        "id": "mnbl_1609fb72_t_8e1456f833",
+        "food": 395.35,
+        "prosperity": 4300.1,
+        "gold": 41743,
+        "tradeGoods": 17,
+        "items": 440,
+        "volunteers": 6
+       },
+       {
+        "id": "mnbl_1609fb72_t_91e41e3505",
+        "food": 393.6,
+        "prosperity": 3799.7,
+        "gold": 35635,
+        "tradeGoods": 13,
+        "items": 531,
+        "volunteers": 2
+       },
+       {
+        "id": "mnbl_1609fb72_t_9447ebbe75",
+        "food": 360.01,
+        "prosperity": 4499.8,
+        "gold": 29016,
+        "tradeGoods": 9,
+        "items": 652,
+        "volunteers": 16
+       },
+       {
+        "id": "mnbl_1609fb72_t_96d91dc9a3",
+        "food": 385.79,
+        "prosperity": 4600.1,
+        "gold": 5768,
+        "tradeGoods": 10,
+        "items": 619,
+        "volunteers": 3
+       },
+       {
+        "id": "mnbl_1609fb72_t_a06de08e5b",
+        "food": 366.65,
+        "prosperity": 3999.8,
+        "gold": 25678,
+        "tradeGoods": 9,
+        "items": 263,
+        "volunteers": 6
+       },
+       {
+        "id": "mnbl_1609fb72_t_a81734c1d7",
+        "food": 400,
+        "prosperity": 1801.3,
+        "gold": 24496,
+        "tradeGoods": 10,
+        "items": 503,
+        "volunteers": 12
+       },
+       {
+        "id": "mnbl_1609fb72_t_a9bb2f10b0",
+        "food": 400,
+        "prosperity": 3705.4,
+        "gold": 15461,
+        "tradeGoods": 13,
+        "items": 468,
+        "volunteers": 13
+       },
+       {
+        "id": "mnbl_1609fb72_t_b58aa76d2e",
+        "food": 360.33,
+        "prosperity": 4899.8,
+        "gold": 14983,
+        "tradeGoods": 14,
+        "items": 536,
+        "volunteers": 14
+       },
+       {
+        "id": "mnbl_1609fb72_t_bb5436b93b",
+        "food": 400,
+        "prosperity": 4503.7,
+        "gold": 40852,
+        "tradeGoods": 10,
+        "items": 537,
+        "volunteers": 23
+       },
+       {
+        "id": "mnbl_1609fb72_t_bbe5821524",
+        "food": 400,
+        "prosperity": 1701.6,
+        "gold": 22106,
+        "tradeGoods": 4,
+        "items": 170,
+        "volunteers": 2
+       },
+       {
+        "id": "mnbl_1609fb72_t_c1093bcad9",
+        "food": 400,
+        "prosperity": 2201.6,
+        "gold": 36229,
+        "tradeGoods": 3,
+        "items": 88,
+        "volunteers": 13
+       },
+       {
+        "id": "mnbl_1609fb72_t_c5ddd8ea7e",
+        "food": 400,
+        "prosperity": 2608.2,
+        "gold": 38644,
+        "tradeGoods": 4,
+        "items": 152,
+        "volunteers": 10
+       },
+       {
+        "id": "mnbl_1609fb72_t_caf0eeb8c4",
+        "food": 356.68,
+        "prosperity": 5000.2,
+        "gold": 34843,
+        "tradeGoods": 12,
+        "items": 423,
+        "volunteers": 4
+       },
+       {
+        "id": "mnbl_1609fb72_t_d92f348adf",
+        "food": 380.59,
+        "prosperity": 5100.3,
+        "gold": 9222,
+        "tradeGoods": 17,
+        "items": 514,
+        "volunteers": 0
+       },
+       {
+        "id": "mnbl_1609fb72_t_da31273eb4",
+        "food": 400,
+        "prosperity": 3903.9,
+        "gold": 36843,
+        "tradeGoods": 13,
+        "items": 357,
+        "volunteers": 4
+       },
+       {
+        "id": "mnbl_1609fb72_t_db07bde4dd",
+        "food": 400,
+        "prosperity": 5600.5,
+        "gold": 41102,
+        "tradeGoods": 12,
+        "items": 607,
+        "volunteers": 11
+       },
+       {
+        "id": "mnbl_1609fb72_t_db2d888bf1",
+        "food": 400,
+        "prosperity": 2607.6,
+        "gold": 25135,
+        "tradeGoods": 8,
+        "items": 237,
+        "volunteers": 7
+       },
+       {
+        "id": "mnbl_1609fb72_t_de424cc7cd",
+        "food": 394.09,
+        "prosperity": 3200.1,
+        "gold": 25542,
+        "tradeGoods": 12,
+        "items": 429,
+        "volunteers": 10
+       },
+       {
+        "id": "mnbl_1609fb72_t_e60ca08fa1",
+        "food": 400,
+        "prosperity": 3901.3,
+        "gold": 10747,
+        "tradeGoods": 6,
+        "items": 248,
+        "volunteers": 21
+       },
+       {
+        "id": "mnbl_1609fb72_t_e7ed06396a",
+        "food": 400,
+        "prosperity": 3403.5,
+        "gold": 24042,
+        "tradeGoods": 10,
+        "items": 286,
+        "volunteers": 6
+       },
+       {
+        "id": "mnbl_1609fb72_t_eb208cfa45",
+        "food": 400,
+        "prosperity": 2204.8,
+        "gold": 24261,
+        "tradeGoods": 6,
+        "items": 224,
+        "volunteers": 21
+       },
+       {
+        "id": "mnbl_1609fb72_t_ecf4b31651",
+        "food": 400,
+        "prosperity": 3004.6,
+        "gold": 18836,
+        "tradeGoods": 18,
+        "items": 629,
+        "volunteers": 19
+       },
+       {
+        "id": "mnbl_1609fb72_t_eebd8fd293",
+        "food": 372.29,
+        "prosperity": 2800,
+        "gold": 35917,
+        "tradeGoods": 2,
+        "items": 117,
+        "volunteers": 2
+       }
+      ]
+     }
+    },
+    "diagnostics": {
+     "events": [
+      "warDeclared mnbl_1609fb72_k_02c999f4ad mnbl_1609fb72_k_1088c05c8d Default",
+      "ownerChanged mnbl_1609fb72_t_caf0eeb8c4 mnbl_1609fb72_h_289a533ef4 mnbl_1609fb72_h_4bb3293dfd Default",
+      "clanLeaderChanged mnbl_1609fb72_h_388053cf7f mnbl_1609fb72_h_2ebdb97aff",
+      "heroKilled mnbl_1609fb72_h_388053cf7f DiedOfOldAge",
+      "clanLeaderChanged mnbl_1609fb72_h_c0de99aea1 mnbl_1609fb72_h_27b772cefc",
+      "decisionAdded KingSelectionKingdomDecision mnbl_1609fb72_k_06eebb41b5",
+      "rulingClanChanged mnbl_1609fb72_k_06eebb41b5 mnbl_1609fb72_l_d78a71fdcb",
+      "decisionConcluded KingSelectionKingdomDecision mnbl_1609fb72_k_06eebb41b5",
+      "heroKilled mnbl_1609fb72_h_c0de99aea1 DiedOfOldAge"
+     ],
+     "listenerErrors": [],
+     "war": {
+      "declarer": "mnbl_1609fb72_k_02c999f4ad",
+      "target": "mnbl_1609fb72_k_1088c05c8d",
+      "targetFiefs": 3,
+      "atWar": true,
+      "warsBefore": 0,
+      "warsAfter": 1,
+      "event": true
+     },
+     "ownershipTown": "mnbl_1609fb72_t_caf0eeb8c4",
+     "ownershipClan": "mnbl_1609fb72_l_9d9e9268b9",
+     "ownership": {
+      "town": "mnbl_1609fb72_t_caf0eeb8c4",
+      "from": "mnbl_1609fb72_l_0fd00a637c",
+      "to": "mnbl_1609fb72_l_9d9e9268b9",
+      "newOwnerHero": "mnbl_1609fb72_h_4bb3293dfd",
+      "ownerClan": "mnbl_1609fb72_l_9d9e9268b9",
+      "faction": "mnbl_1609fb72_k_02c999f4ad",
+      "villages": [
+       "mnbl_1609fb72_v_2780f545e7:mnbl_1609fb72_l_9d9e9268b9:mnbl_1609fb72_k_02c999f4ad",
+       "mnbl_1609fb72_v_aa9755779b:mnbl_1609fb72_l_9d9e9268b9:mnbl_1609fb72_k_02c999f4ad"
+      ],
+      "inNewFiefs": true,
+      "inOldFiefs": false,
+      "garrisonFaction": "mnbl_1609fb72_k_02c999f4ad",
+      "notablesKept": true,
+      "targetKingdomSurvives": true,
+      "stillAtWar": true,
+      "governor": null,
+      "event": true
+     },
+     "heirClan": "mnbl_1609fb72_l_0d02cd80cc",
+     "heir": "mnbl_1609fb72_h_2ebdb97aff",
+     "succession.clan": {
+      "clan": "mnbl_1609fb72_l_0d02cd80cc",
+      "victim": "mnbl_1609fb72_h_388053cf7f",
+      "victimParty": "mnbl_1609fb72_h_388053cf7f_party_1",
+      "dead": true,
+      "newLeader": "mnbl_1609fb72_h_2ebdb97aff",
+      "newLeaderAlive": true,
+      "eliminated": false,
+      "fiefsKept": true,
+      "fiefs": 3,
+      "governedByVictim": [],
+      "event": true,
+      "deadReferences": []
+     },
+     "rulerKingdom": "mnbl_1609fb72_k_06eebb41b5",
+     "succession.ruler": {
+      "kingdom": "mnbl_1609fb72_k_06eebb41b5",
+      "victim": "mnbl_1609fb72_h_c0de99aea1",
+      "dead": true,
+      "rulingClanBefore": "mnbl_1609fb72_l_d78a71fdcb",
+      "candidates": [
+       "mnbl_1609fb72_l_119460bd0b",
+       "mnbl_1609fb72_l_d78a71fdcb"
+      ],
+      "rulingClanHadHeir": true,
+      "branch": "king selection",
+      "rulingClan": "mnbl_1609fb72_l_d78a71fdcb",
+      "leader": "mnbl_1609fb72_h_27b772cefc",
+      "leaderAlive": true,
+      "eliminated": false,
+      "kingSelectionPending": false,
+      "rulingClanChanged": false,
+      "kingSelectionAdded": true,
+      "kingSelectionConcluded": true,
+      "rulingClansApplied": [
+       "mnbl_1609fb72_l_d78a71fdcb"
+      ],
+      "playerKingdom": false,
+      "deadReferences": []
+     },
+     "warDeclarer": "mnbl_1609fb72_k_02c999f4ad",
+     "warTarget": "mnbl_1609fb72_k_1088c05c8d"
+    },
+    "after": {
+     "hours": 6,
+     "setup": {
+      "playerIgnoredByOtherPartiesUntilDays": 91108.73723347453,
+      "playerHolding": true
+     },
+     "startHours": 2185889.693603389,
+     "before": {
+      "townCount": 45,
+      "food": 17583,
+      "gold": 1146290,
+      "tradeGoodStacks": 387,
+      "marketItems": 14556,
+      "villageItems": 17844,
+      "volunteerSlotsFilled": 410,
+      "volunteerSlotsEmpty": 1108,
+      "towns": [
+       {
+        "id": "mnbl_1609fb72_t_02135fe588",
+        "food": 400,
+        "prosperity": 1701.9,
+        "gold": 23513,
+        "tradeGoods": 7,
+        "items": 139,
+        "volunteers": 3
+       },
+       {
+        "id": "mnbl_1609fb72_t_0c85a587ff",
+        "food": 400,
+        "prosperity": 3300.2,
+        "gold": 28201,
+        "tradeGoods": 9,
+        "items": 629,
+        "volunteers": 9
+       },
+       {
+        "id": "mnbl_1609fb72_t_18dce31a8b",
+        "food": 400,
+        "prosperity": 1903.8,
+        "gold": 20401,
+        "tradeGoods": 4,
+        "items": 172,
+        "volunteers": 1
+       },
+       {
+        "id": "mnbl_1609fb72_t_266d733fa8",
+        "food": 399.08,
+        "prosperity": 3100.4,
+        "gold": 39847,
+        "tradeGoods": 0,
+        "items": 52,
+        "volunteers": 3
+       },
+       {
+        "id": "mnbl_1609fb72_t_26da4d0d23",
+        "food": 349.19,
+        "prosperity": 4199.8,
+        "gold": 45986,
+        "tradeGoods": 11,
+        "items": 187,
+        "volunteers": 7
+       },
+       {
+        "id": "mnbl_1609fb72_t_2b31fce358",
+        "food": 397.61,
+        "prosperity": 1699.6,
+        "gold": 18823,
+        "tradeGoods": 3,
+        "items": 115,
+        "volunteers": 8
+       },
+       {
+        "id": "mnbl_1609fb72_t_30a1119e46",
+        "food": 400,
+        "prosperity": 3003.4,
+        "gold": 2307,
+        "tradeGoods": 11,
+        "items": 353,
+        "volunteers": 3
+       },
+       {
+        "id": "mnbl_1609fb72_t_33e9f6405e",
+        "food": 391.33,
+        "prosperity": 3200,
+        "gold": 30138,
+        "tradeGoods": 3,
+        "items": 116,
+        "volunteers": 6
+       },
+       {
+        "id": "mnbl_1609fb72_t_3591ac6a33",
+        "food": 398.12,
+        "prosperity": 3100.1,
+        "gold": 25095,
+        "tradeGoods": 5,
+        "items": 112,
+        "volunteers": 3
+       },
+       {
+        "id": "mnbl_1609fb72_t_35e7ca3644",
+        "food": 400,
+        "prosperity": 3901.3,
+        "gold": 20305,
+        "tradeGoods": 11,
+        "items": 558,
+        "volunteers": 3
+       },
+       {
+        "id": "mnbl_1609fb72_t_38c906c775",
+        "food": 391.11,
+        "prosperity": 3900.5,
+        "gold": 19000,
+        "tradeGoods": 9,
+        "items": 327,
+        "volunteers": 15
+       },
+       {
+        "id": "mnbl_1609fb72_t_3dd40e786f",
+        "food": 400,
+        "prosperity": 3701.3,
+        "gold": 30082,
+        "tradeGoods": 7,
+        "items": 151,
+        "volunteers": 1
+       },
+       {
+        "id": "mnbl_1609fb72_t_4a4ee84369",
+        "food": 389.55,
+        "prosperity": 2299.7,
+        "gold": 14255,
+        "tradeGoods": 6,
+        "items": 131,
+        "volunteers": 2
+       },
+       {
+        "id": "mnbl_1609fb72_t_511521f34a",
+        "food": 400,
+        "prosperity": 3101.8,
+        "gold": 34979,
+        "tradeGoods": 13,
+        "items": 603,
+        "volunteers": 22
+       },
+       {
+        "id": "mnbl_1609fb72_t_5372f23728",
+        "food": 391.08,
+        "prosperity": 3200.4,
+        "gold": 25906,
+        "tradeGoods": 2,
+        "items": 214,
+        "volunteers": 8
+       },
+       {
+        "id": "mnbl_1609fb72_t_5c564ff552",
+        "food": 395.54,
+        "prosperity": 3000.7,
+        "gold": 19647,
+        "tradeGoods": 10,
+        "items": 316,
+        "volunteers": 17
+       },
+       {
+        "id": "mnbl_1609fb72_t_64245c0202",
+        "food": 382.54,
+        "prosperity": 2299.4,
+        "gold": 23844,
+        "tradeGoods": 3,
+        "items": 133,
+        "volunteers": 4
+       },
+       {
+        "id": "mnbl_1609fb72_t_652a339695",
+        "food": 400,
+        "prosperity": 3000.4,
+        "gold": 24132,
+        "tradeGoods": 2,
+        "items": 219,
+        "volunteers": 9
+       },
+       {
+        "id": "mnbl_1609fb72_t_7c3c7cce5c",
+        "food": 397.6,
+        "prosperity": 1799,
+        "gold": 26626,
+        "tradeGoods": 7,
+        "items": 207,
+        "volunteers": 25
+       },
+       {
+        "id": "mnbl_1609fb72_t_7efe6a0c96",
+        "food": 400,
+        "prosperity": 1903.2,
+        "gold": 17402,
+        "tradeGoods": 9,
+        "items": 238,
+        "volunteers": 14
+       },
+       {
+        "id": "mnbl_1609fb72_t_803bc3052d",
+        "food": 380.36,
+        "prosperity": 3799.8,
+        "gold": 23119,
+        "tradeGoods": 13,
+        "items": 326,
+        "volunteers": 3
+       },
+       {
+        "id": "mnbl_1609fb72_t_8c18b565ee",
+        "food": 354.54,
+        "prosperity": 3098.7,
+        "gold": 15581,
+        "tradeGoods": 10,
+        "items": 228,
+        "volunteers": 19
+       },
+       {
+        "id": "mnbl_1609fb72_t_8e1456f833",
+        "food": 395.35,
+        "prosperity": 4300.1,
+        "gold": 41743,
+        "tradeGoods": 17,
+        "items": 440,
+        "volunteers": 6
+       },
+       {
+        "id": "mnbl_1609fb72_t_91e41e3505",
+        "food": 393.6,
+        "prosperity": 3799.7,
+        "gold": 35635,
+        "tradeGoods": 13,
+        "items": 531,
+        "volunteers": 2
+       },
+       {
+        "id": "mnbl_1609fb72_t_9447ebbe75",
+        "food": 360.01,
+        "prosperity": 4499.8,
+        "gold": 29016,
+        "tradeGoods": 9,
+        "items": 652,
+        "volunteers": 16
+       },
+       {
+        "id": "mnbl_1609fb72_t_96d91dc9a3",
+        "food": 385.79,
+        "prosperity": 4600.1,
+        "gold": 5768,
+        "tradeGoods": 10,
+        "items": 619,
+        "volunteers": 3
+       },
+       {
+        "id": "mnbl_1609fb72_t_a06de08e5b",
+        "food": 366.65,
+        "prosperity": 3999.8,
+        "gold": 25678,
+        "tradeGoods": 9,
+        "items": 263,
+        "volunteers": 6
+       },
+       {
+        "id": "mnbl_1609fb72_t_a81734c1d7",
+        "food": 400,
+        "prosperity": 1801.3,
+        "gold": 24496,
+        "tradeGoods": 10,
+        "items": 503,
+        "volunteers": 12
+       },
+       {
+        "id": "mnbl_1609fb72_t_a9bb2f10b0",
+        "food": 400,
+        "prosperity": 3705.4,
+        "gold": 15461,
+        "tradeGoods": 13,
+        "items": 468,
+        "volunteers": 13
+       },
+       {
+        "id": "mnbl_1609fb72_t_b58aa76d2e",
+        "food": 360.33,
+        "prosperity": 4899.8,
+        "gold": 14983,
+        "tradeGoods": 14,
+        "items": 536,
+        "volunteers": 14
+       },
+       {
+        "id": "mnbl_1609fb72_t_bb5436b93b",
+        "food": 400,
+        "prosperity": 4503.7,
+        "gold": 40852,
+        "tradeGoods": 10,
+        "items": 537,
+        "volunteers": 23
+       },
+       {
+        "id": "mnbl_1609fb72_t_bbe5821524",
+        "food": 400,
+        "prosperity": 1701.6,
+        "gold": 22106,
+        "tradeGoods": 4,
+        "items": 170,
+        "volunteers": 2
+       },
+       {
+        "id": "mnbl_1609fb72_t_c1093bcad9",
+        "food": 400,
+        "prosperity": 2201.6,
+        "gold": 36229,
+        "tradeGoods": 3,
+        "items": 88,
+        "volunteers": 13
+       },
+       {
+        "id": "mnbl_1609fb72_t_c5ddd8ea7e",
+        "food": 400,
+        "prosperity": 2608.2,
+        "gold": 38644,
+        "tradeGoods": 4,
+        "items": 152,
+        "volunteers": 10
+       },
+       {
+        "id": "mnbl_1609fb72_t_caf0eeb8c4",
+        "food": 356.68,
+        "prosperity": 5000.2,
+        "gold": 34843,
+        "tradeGoods": 12,
+        "items": 423,
+        "volunteers": 4
+       },
+       {
+        "id": "mnbl_1609fb72_t_d92f348adf",
+        "food": 380.59,
+        "prosperity": 5100.3,
+        "gold": 9222,
+        "tradeGoods": 17,
+        "items": 514,
+        "volunteers": 0
+       },
+       {
+        "id": "mnbl_1609fb72_t_da31273eb4",
+        "food": 400,
+        "prosperity": 3903.9,
+        "gold": 36843,
+        "tradeGoods": 13,
+        "items": 357,
+        "volunteers": 4
+       },
+       {
+        "id": "mnbl_1609fb72_t_db07bde4dd",
+        "food": 400,
+        "prosperity": 5600.5,
+        "gold": 41102,
+        "tradeGoods": 12,
+        "items": 607,
+        "volunteers": 11
+       },
+       {
+        "id": "mnbl_1609fb72_t_db2d888bf1",
+        "food": 400,
+        "prosperity": 2607.6,
+        "gold": 25135,
+        "tradeGoods": 8,
+        "items": 237,
+        "volunteers": 7
+       },
+       {
+        "id": "mnbl_1609fb72_t_de424cc7cd",
+        "food": 394.09,
+        "prosperity": 3200.1,
+        "gold": 25542,
+        "tradeGoods": 12,
+        "items": 429,
+        "volunteers": 10
+       },
+       {
+        "id": "mnbl_1609fb72_t_e60ca08fa1",
+        "food": 400,
+        "prosperity": 3901.3,
+        "gold": 10747,
+        "tradeGoods": 6,
+        "items": 248,
+        "volunteers": 21
+       },
+       {
+        "id": "mnbl_1609fb72_t_e7ed06396a",
+        "food": 400,
+        "prosperity": 3403.5,
+        "gold": 24042,
+        "tradeGoods": 10,
+        "items": 286,
+        "volunteers": 6
+       },
+       {
+        "id": "mnbl_1609fb72_t_eb208cfa45",
+        "food": 400,
+        "prosperity": 2204.8,
+        "gold": 24261,
+        "tradeGoods": 6,
+        "items": 224,
+        "volunteers": 21
+       },
+       {
+        "id": "mnbl_1609fb72_t_ecf4b31651",
+        "food": 400,
+        "prosperity": 3004.6,
+        "gold": 18836,
+        "tradeGoods": 18,
+        "items": 629,
+        "volunteers": 19
+       },
+       {
+        "id": "mnbl_1609fb72_t_eebd8fd293",
+        "food": 372.29,
+        "prosperity": 2800,
+        "gold": 35917,
+        "tradeGoods": 2,
+        "items": 117,
+        "volunteers": 2
+       }
+      ]
+     },
+     "hoursAdvanced": 6.014736277516931,
+     "realSeconds": 5.4137344999999755,
+     "stalls": [],
+     "timedOut": false,
+     "after": {
+      "townCount": 45,
+      "food": 17472.3,
+      "gold": 1115236,
+      "tradeGoodStacks": 406,
+      "marketItems": 15155,
+      "villageItems": 17770,
+      "volunteerSlotsFilled": 472,
+      "volunteerSlotsEmpty": 1046,
+      "towns": [
+       {
+        "id": "mnbl_1609fb72_t_02135fe588",
+        "food": 400,
+        "prosperity": 1701.9,
+        "gold": 23513,
+        "tradeGoods": 7,
+        "items": 139,
+        "volunteers": 3
+       },
+       {
+        "id": "mnbl_1609fb72_t_0c85a587ff",
+        "food": 400,
+        "prosperity": 3301.4,
+        "gold": 30589,
+        "tradeGoods": 9,
+        "items": 638,
+        "volunteers": 11
+       },
+       {
+        "id": "mnbl_1609fb72_t_18dce31a8b",
+        "food": 400,
+        "prosperity": 1903.8,
+        "gold": 16935,
+        "tradeGoods": 2,
+        "items": 162,
+        "volunteers": 1
+       },
+       {
+        "id": "mnbl_1609fb72_t_266d733fa8",
+        "food": 399.08,
+        "prosperity": 3100.4,
+        "gold": 39847,
+        "tradeGoods": 0,
+        "items": 52,
+        "volunteers": 3
+       },
+       {
+        "id": "mnbl_1609fb72_t_26da4d0d23",
+        "food": 313.38,
+        "prosperity": 4199.4,
+        "gold": 46432,
+        "tradeGoods": 6,
+        "items": 204,
+        "volunteers": 19
+       },
+       {
+        "id": "mnbl_1609fb72_t_2b31fce358",
+        "food": 397.61,
+        "prosperity": 1699.6,
+        "gold": 18823,
+        "tradeGoods": 3,
+        "items": 115,
+        "volunteers": 6
+       },
+       {
+        "id": "mnbl_1609fb72_t_30a1119e46",
+        "food": 400,
+        "prosperity": 3003.4,
+        "gold": 59,
+        "tradeGoods": 13,
+        "items": 360,
+        "volunteers": 3
+       },
+       {
+        "id": "mnbl_1609fb72_t_33e9f6405e",
+        "food": 384.66,
+        "prosperity": 3200.2,
+        "gold": 14555,
+        "tradeGoods": 8,
+        "items": 315,
+        "volunteers": 16
+       },
+       {
+        "id": "mnbl_1609fb72_t_3591ac6a33",
+        "food": 398.12,
+        "prosperity": 3100.1,
+        "gold": 28960,
+        "tradeGoods": 6,
+        "items": 121,
+        "volunteers": 3
+       },
+       {
+        "id": "mnbl_1609fb72_t_35e7ca3644",
+        "food": 397.86,
+        "prosperity": 3901.5,
+        "gold": 18292,
+        "tradeGoods": 12,
+        "items": 557,
+        "volunteers": 16
+       },
+       {
+        "id": "mnbl_1609fb72_t_38c906c775",
+        "food": 391.11,
+        "prosperity": 3900.5,
+        "gold": 12969,
+        "tradeGoods": 12,
+        "items": 465,
+        "volunteers": 15
+       },
+       {
+        "id": "mnbl_1609fb72_t_3dd40e786f",
+        "food": 386.95,
+        "prosperity": 3701.5,
+        "gold": 27946,
+        "tradeGoods": 9,
+        "items": 282,
+        "volunteers": 16
+       },
+       {
+        "id": "mnbl_1609fb72_t_4a4ee84369",
+        "food": 364.92,
+        "prosperity": 2299.8,
+        "gold": 11986,
+        "tradeGoods": 7,
+        "items": 170,
+        "volunteers": 20
+       },
+       {
+        "id": "mnbl_1609fb72_t_511521f34a",
+        "food": 400,
+        "prosperity": 3101.8,
+        "gold": 32355,
+        "tradeGoods": 14,
+        "items": 692,
+        "volunteers": 22
+       },
+       {
+        "id": "mnbl_1609fb72_t_5372f23728",
+        "food": 391.08,
+        "prosperity": 3200.4,
+        "gold": 23251,
+        "tradeGoods": 5,
+        "items": 293,
+        "volunteers": 6
+       },
+       {
+        "id": "mnbl_1609fb72_t_5c564ff552",
+        "food": 395.54,
+        "prosperity": 3000.7,
+        "gold": 19647,
+        "tradeGoods": 10,
+        "items": 316,
+        "volunteers": 17
+       },
+       {
+        "id": "mnbl_1609fb72_t_64245c0202",
+        "food": 382.54,
+        "prosperity": 2299.4,
+        "gold": 26914,
+        "tradeGoods": 5,
+        "items": 180,
+        "volunteers": 4
+       },
+       {
+        "id": "mnbl_1609fb72_t_652a339695",
+        "food": 395.82,
+        "prosperity": 3000.4,
+        "gold": 29101,
+        "tradeGoods": 3,
+        "items": 167,
+        "volunteers": 18
+       },
+       {
+        "id": "mnbl_1609fb72_t_7c3c7cce5c",
+        "food": 397.6,
+        "prosperity": 1799,
+        "gold": 26626,
+        "tradeGoods": 7,
+        "items": 207,
+        "volunteers": 25
+       },
+       {
+        "id": "mnbl_1609fb72_t_7efe6a0c96",
+        "food": 400,
+        "prosperity": 1903.2,
+        "gold": 17402,
+        "tradeGoods": 9,
+        "items": 238,
+        "volunteers": 8
+       },
+       {
+        "id": "mnbl_1609fb72_t_803bc3052d",
+        "food": 380.36,
+        "prosperity": 3799.8,
+        "gold": 21525,
+        "tradeGoods": 16,
+        "items": 471,
+        "volunteers": 3
+       },
+       {
+        "id": "mnbl_1609fb72_t_8c18b565ee",
+        "food": 354.54,
+        "prosperity": 3098.7,
+        "gold": 15581,
+        "tradeGoods": 10,
+        "items": 228,
+        "volunteers": 19
+       },
+       {
+        "id": "mnbl_1609fb72_t_8e1456f833",
+        "food": 395.35,
+        "prosperity": 4300.1,
+        "gold": 39856,
+        "tradeGoods": 16,
+        "items": 421,
+        "volunteers": 6
+       },
+       {
+        "id": "mnbl_1609fb72_t_91e41e3505",
+        "food": 388.11,
+        "prosperity": 3799.3,
+        "gold": 39195,
+        "tradeGoods": 12,
+        "items": 496,
+        "volunteers": 15
+       },
+       {
+        "id": "mnbl_1609fb72_t_9447ebbe75",
+        "food": 360.01,
+        "prosperity": 4499.8,
+        "gold": 29016,
+        "tradeGoods": 9,
+        "items": 652,
+        "volunteers": 6
+       },
+       {
+        "id": "mnbl_1609fb72_t_96d91dc9a3",
+        "food": 376.82,
+        "prosperity": 4600.2,
+        "gold": 9729,
+        "tradeGoods": 12,
+        "items": 336,
+        "volunteers": 19
+       },
+       {
+        "id": "mnbl_1609fb72_t_a06de08e5b",
+        "food": 341.56,
+        "prosperity": 3999.8,
+        "gold": 33981,
+        "tradeGoods": 6,
+        "items": 211,
+        "volunteers": 7
+       },
+       {
+        "id": "mnbl_1609fb72_t_a81734c1d7",
+        "food": 400,
+        "prosperity": 1801.3,
+        "gold": 24150,
+        "tradeGoods": 10,
+        "items": 554,
+        "volunteers": 12
+       },
+       {
+        "id": "mnbl_1609fb72_t_a9bb2f10b0",
+        "food": 400,
+        "prosperity": 3705.4,
+        "gold": 9116,
+        "tradeGoods": 16,
+        "items": 489,
+        "volunteers": 12
+       },
+       {
+        "id": "mnbl_1609fb72_t_b58aa76d2e",
+        "food": 360.33,
+        "prosperity": 4899.8,
+        "gold": 14216,
+        "tradeGoods": 11,
+        "items": 450,
+        "volunteers": 14
+       },
+       {
+        "id": "mnbl_1609fb72_t_bb5436b93b",
+        "food": 400,
+        "prosperity": 4503.7,
+        "gold": 40629,
+        "tradeGoods": 10,
+        "items": 538,
+        "volunteers": 11
+       },
+       {
+        "id": "mnbl_1609fb72_t_bbe5821524",
+        "food": 400,
+        "prosperity": 1701.6,
+        "gold": 22106,
+        "tradeGoods": 4,
+        "items": 170,
+        "volunteers": 2
+       },
+       {
+        "id": "mnbl_1609fb72_t_c1093bcad9",
+        "food": 400,
+        "prosperity": 2201.6,
+        "gold": 35033,
+        "tradeGoods": 6,
+        "items": 205,
+        "volunteers": 13
+       },
+       {
+        "id": "mnbl_1609fb72_t_c5ddd8ea7e",
+        "food": 400,
+        "prosperity": 2608.2,
+        "gold": 37986,
+        "tradeGoods": 6,
+        "items": 197,
+        "volunteers": 6
+       },
+       {
+        "id": "mnbl_1609fb72_t_caf0eeb8c4",
+        "food": 356.68,
+        "prosperity": 5000.2,
+        "gold": 6762,
+        "tradeGoods": 20,
+        "items": 737,
+        "volunteers": 4
+       },
+       {
+        "id": "mnbl_1609fb72_t_d92f348adf",
+        "food": 395.89,
+        "prosperity": 5101.5,
+        "gold": 23870,
+        "tradeGoods": 16,
+        "items": 471,
+        "volunteers": 7
+       },
+       {
+        "id": "mnbl_1609fb72_t_da31273eb4",
+        "food": 400,
+        "prosperity": 3903.9,
+        "gold": 38217,
+        "tradeGoods": 9,
+        "items": 308,
+        "volunteers": 4
+       },
+       {
+        "id": "mnbl_1609fb72_t_db07bde4dd",
+        "food": 400,
+        "prosperity": 5600.5,
+        "gold": 41551,
+        "tradeGoods": 11,
+        "items": 493,
+        "volunteers": 11
+       },
+       {
+        "id": "mnbl_1609fb72_t_db2d888bf1",
+        "food": 400,
+        "prosperity": 2607.6,
+        "gold": 23385,
+        "tradeGoods": 9,
+        "items": 295,
+        "volunteers": 7
+       },
+       {
+        "id": "mnbl_1609fb72_t_de424cc7cd",
+        "food": 394.09,
+        "prosperity": 3200.1,
+        "gold": 26484,
+        "tradeGoods": 11,
+        "items": 341,
+        "volunteers": 10
+       },
+       {
+        "id": "mnbl_1609fb72_t_e60ca08fa1",
+        "food": 400,
+        "prosperity": 3901.3,
+        "gold": 10747,
+        "tradeGoods": 6,
+        "items": 248,
+        "volunteers": 21
+       },
+       {
+        "id": "mnbl_1609fb72_t_e7ed06396a",
+        "food": 400,
+        "prosperity": 3403.5,
+        "gold": 26070,
+        "tradeGoods": 7,
+        "items": 175,
+        "volunteers": 3
+       },
+       {
+        "id": "mnbl_1609fb72_t_eb208cfa45",
+        "food": 400,
+        "prosperity": 2204.8,
+        "gold": 22911,
+        "tradeGoods": 9,
+        "items": 278,
+        "volunteers": 7
+       },
+       {
+        "id": "mnbl_1609fb72_t_ecf4b31651",
+        "food": 400,
+        "prosperity": 3004.6,
+        "gold": 21001,
+        "tradeGoods": 15,
+        "items": 601,
+        "volunteers": 19
+       },
+       {
+        "id": "mnbl_1609fb72_t_eebd8fd293",
+        "food": 372.29,
+        "prosperity": 2800,
+        "gold": 35917,
+        "tradeGoods": 2,
+        "items": 117,
+        "volunteers": 2
+       }
+      ]
+     },
+     "counters": {
+      "battle:FieldBattle": 11,
+      "battle:FieldBattle:naval": 1,
+      "battle:Raid": 1,
+      "battleEnded:FieldBattle": 9,
+      "created:bandit": 16,
+      "created:fishing": 2,
+      "created:villager": 7,
+      "destroyed:bandit": 8,
+      "destroyed:patrol": 1,
+      "entered:caravan>town": 21,
+      "entered:lord>castle": 7,
+      "entered:lord>town": 12,
+      "entered:lord>village": 3,
+      "entered:patrol>town": 2,
+      "entered:villager>castle": 1,
+      "entered:villager>town": 21,
+      "entered:villager>village": 21,
+      "heroKilled:Lost": 1,
+      "recruited:lord": 138,
+      "recruited:none": 2,
+      "recruitedTroops:lord": 143,
+      "recruitedTroops:none": 2,
+      "trade:caravan": 37,
+      "tradeItems:caravan": 2029,
+      "villagerItemsSold": 1163,
+      "villagerSold": 16,
+      "villagerSoldNothing:onlyPackAnimals": 3
+     },
+     "listenerErrors": [],
+     "thrown": [],
+     "thrownCount": 0,
+     "campaignThrown": 0,
+     "exceptionCanarySeen": true,
+     "asserts": [],
+     "assertCount": 0,
+     "assertCanarySeen": true,
+     "offNavigation": [],
+     "offNavigationCount": 0,
+     "motion": {
+      "bandit": {
+       "tracked": 305,
+       "moved": 212,
+       "travelled": 3021.85,
+       "maxTravelled": 25.7
+      },
+      "caravan": {
+       "tracked": 118,
+       "moved": 117,
+       "travelled": 2078.42,
+       "maxTravelled": 30.91
+      },
+      "fishing": {
+       "tracked": 44,
+       "moved": 40,
+       "travelled": 408.42,
+       "maxTravelled": 22.64
+      },
+      "garrison": {
+       "tracked": 71,
+       "moved": 0,
+       "travelled": 0,
+       "maxTravelled": 0
+      },
+      "lord": {
+       "tracked": 151,
+       "moved": 126,
+       "travelled": 1588.66,
+       "maxTravelled": 17.91
+      },
+      "militia": {
+       "tracked": 286,
+       "moved": 0,
+       "travelled": 0,
+       "maxTravelled": 0
+      },
+      "patrol": {
+       "tracked": 48,
+       "moved": 47,
+       "travelled": 594.71,
+       "maxTravelled": 25.41
+      },
+      "villager": {
+       "tracked": 73,
+       "moved": 43,
+       "travelled": 332.07,
+       "maxTravelled": 17.13
+      }
+     },
+     "stuck": [],
+     "stuckCount": 0,
+     "holding": [
+      {
+       "party": "mnbl_1609fb72_l_af22cabed9_528",
+       "kind": "fishing",
+       "position": [
+        1041.94,
+        822.97
+       ],
+       "shortTerm": "Hold",
+       "default": "Hold",
+       "target": "(1041.94, 822.97) [Hold, at sea]",
+       "atSea": true,
+       "landCapable": false,
+       "disbanding": false,
+       "goods": 4,
+       "navigation": null,
+       "home": "mnbl_1609fb72_v_b80b409813",
+       "sinceHours": 2185895.51,
+       "fishing": true,
+       "roaming": true,
+       "reason": "fishing at its fishing point"
+      },
+      {
+       "party": "mnbl_1609fb72_l_c0df16c0d6_1",
+       "kind": "fishing",
+       "position": [
+        1131.99,
+        854.33
+       ],
+       "shortTerm": "Hold",
+       "default": "Hold",
+       "target": "(1131.99, 854.33) [Hold, at sea]",
+       "atSea": true,
+       "landCapable": false,
+       "disbanding": false,
+       "goods": 1,
+       "navigation": null,
+       "home": "mnbl_1609fb72_v_055ff8d216",
+       "sinceHours": 2185895.51,
+       "fishing": true,
+       "roaming": true,
+       "reason": "fishing at its fishing point"
+      },
+      {
+       "party": "mnbl_1609fb72_l_cc4edb27c6_1",
+       "kind": "fishing",
+       "position": [
+        1038.04,
+        687.21
+       ],
+       "shortTerm": "Hold",
+       "default": "Hold",
+       "target": "(1038.04, 687.21) [Hold, at sea]",
+       "atSea": true,
+       "landCapable": false,
+       "disbanding": false,
+       "goods": 13,
+       "navigation": null,
+       "home": "mnbl_1609fb72_v_672b9d802a",
+       "sinceHours": 2185895.51,
+       "fishing": true,
+       "roaming": true,
+       "reason": "fishing at its fishing point"
+      },
+      {
+       "party": "mnbl_1609fb72_h_e1fa5e48ae_party_1",
+       "kind": "lord",
+       "position": [
+        552.33,
+        692.29
+       ],
+       "shortTerm": "Hold",
+       "default": "Hold",
+       "target": "(552.33, 692.29) [Hold]",
+       "atSea": false,
+       "landCapable": true,
+       "disbanding": false,
+       "goods": 261,
+       "navigation": null,
+       "home": "mnbl_1609fb72_t_db07bde4dd",
+       "sinceHours": 2185895.51,
+       "reason": "own AI decision"
+      }
+     ],
+     "holdingCount": 4,
+     "holdingByKind": {
+      "fishing": 3,
+      "lord": 1
+     },
+     "holdingVillagersWithoutReason": 0,
+     "unfoundPaths": [],
+     "unfoundPathCount": 0,
+     "unfoundToSettlementCount": 0
+    },
+    "followUp": {
+     "declarerEliminated": false,
+     "targetEliminated": false,
+     "stillAtWar": true,
+     "partiesTargetingEnemy": 6,
+     "armies": 0,
+     "townOwner": "mnbl_1609fb72_l_9d9e9268b9",
+     "townBesieged": false,
+     "heirLeads": "mnbl_1609fb72_h_2ebdb97aff",
+     "ruler": "mnbl_1609fb72_h_27b772cefc",
+     "kingSelectionPending": false
+    },
+    "final": {
+     "campaignDays": 91078.98784748612,
+     "census": {
+      "clan:bandit": 9,
+      "clan:minor": 1,
+      "clan:noble": 92,
+      "garrison": 71,
+      "hero:lord": 370,
+      "hero:notable": 908,
+      "hero:wanderer": 28,
+      "hideout:infested": 33,
+      "kingdom": 40,
+      "kingdom:fiefs:1": 21,
+      "kingdom:fiefs:2": 12,
+      "kingdom:fiefs:3": 4,
+      "kingdom:fiefs:4+": 3,
+      "party:bandit": 297,
+      "party:caravan": 118,
+      "party:fishing": 44,
+      "party:garrison": 71,
+      "party:lord": 151,
+      "party:militia": 286,
+      "party:patrol": 47,
+      "party:player": 1,
+      "party:villager": 74,
+      "settlement:castle": 26,
+      "settlement:hideout": 72,
+      "settlement:other": 1,
+      "settlement:town": 45,
+      "settlement:village": 215,
+      "town:noTradeGoods": 1
+     },
+     "invalid": [],
+     "invalidCount": 0,
+     "unexpected": [],
+     "unexpectedCount": 0,
+     "offNavigation": [],
+     "offNavigationCount": 0,
+     "wars": 1,
+     "villagesWithoutTradeTown": [],
+     "townsWithoutGold": [],
+     "townsWithoutTradeGoods": [
+      "mnbl_1609fb72_t_266d733fa8"
+     ],
+     "economy": {
+      "townCount": 45,
+      "food": 17472.3,
+      "gold": 1115236,
+      "tradeGoodStacks": 406,
+      "marketItems": 15155,
+      "villageItems": 17770,
+      "volunteerSlotsFilled": 472,
+      "volunteerSlotsEmpty": 1046,
+      "towns": [
+       {
+        "id": "mnbl_1609fb72_t_02135fe588",
+        "food": 400,
+        "prosperity": 1701.9,
+        "gold": 23513,
+        "tradeGoods": 7,
+        "items": 139,
+        "volunteers": 3
+       },
+       {
+        "id": "mnbl_1609fb72_t_0c85a587ff",
+        "food": 400,
+        "prosperity": 3301.4,
+        "gold": 30589,
+        "tradeGoods": 9,
+        "items": 638,
+        "volunteers": 11
+       },
+       {
+        "id": "mnbl_1609fb72_t_18dce31a8b",
+        "food": 400,
+        "prosperity": 1903.8,
+        "gold": 16935,
+        "tradeGoods": 2,
+        "items": 162,
+        "volunteers": 1
+       },
+       {
+        "id": "mnbl_1609fb72_t_266d733fa8",
+        "food": 399.08,
+        "prosperity": 3100.4,
+        "gold": 39847,
+        "tradeGoods": 0,
+        "items": 52,
+        "volunteers": 3
+       },
+       {
+        "id": "mnbl_1609fb72_t_26da4d0d23",
+        "food": 313.38,
+        "prosperity": 4199.4,
+        "gold": 46432,
+        "tradeGoods": 6,
+        "items": 204,
+        "volunteers": 19
+       },
+       {
+        "id": "mnbl_1609fb72_t_2b31fce358",
+        "food": 397.61,
+        "prosperity": 1699.6,
+        "gold": 18823,
+        "tradeGoods": 3,
+        "items": 115,
+        "volunteers": 6
+       },
+       {
+        "id": "mnbl_1609fb72_t_30a1119e46",
+        "food": 400,
+        "prosperity": 3003.4,
+        "gold": 59,
+        "tradeGoods": 13,
+        "items": 360,
+        "volunteers": 3
+       },
+       {
+        "id": "mnbl_1609fb72_t_33e9f6405e",
+        "food": 384.66,
+        "prosperity": 3200.2,
+        "gold": 14555,
+        "tradeGoods": 8,
+        "items": 315,
+        "volunteers": 16
+       },
+       {
+        "id": "mnbl_1609fb72_t_3591ac6a33",
+        "food": 398.12,
+        "prosperity": 3100.1,
+        "gold": 28960,
+        "tradeGoods": 6,
+        "items": 121,
+        "volunteers": 3
+       },
+       {
+        "id": "mnbl_1609fb72_t_35e7ca3644",
+        "food": 397.86,
+        "prosperity": 3901.5,
+        "gold": 18292,
+        "tradeGoods": 12,
+        "items": 557,
+        "volunteers": 16
+       },
+       {
+        "id": "mnbl_1609fb72_t_38c906c775",
+        "food": 391.11,
+        "prosperity": 3900.5,
+        "gold": 12969,
+        "tradeGoods": 12,
+        "items": 465,
+        "volunteers": 15
+       },
+       {
+        "id": "mnbl_1609fb72_t_3dd40e786f",
+        "food": 386.95,
+        "prosperity": 3701.5,
+        "gold": 27946,
+        "tradeGoods": 9,
+        "items": 282,
+        "volunteers": 16
+       },
+       {
+        "id": "mnbl_1609fb72_t_4a4ee84369",
+        "food": 364.92,
+        "prosperity": 2299.8,
+        "gold": 11986,
+        "tradeGoods": 7,
+        "items": 170,
+        "volunteers": 20
+       },
+       {
+        "id": "mnbl_1609fb72_t_511521f34a",
+        "food": 400,
+        "prosperity": 3101.8,
+        "gold": 32355,
+        "tradeGoods": 14,
+        "items": 692,
+        "volunteers": 22
+       },
+       {
+        "id": "mnbl_1609fb72_t_5372f23728",
+        "food": 391.08,
+        "prosperity": 3200.4,
+        "gold": 23251,
+        "tradeGoods": 5,
+        "items": 293,
+        "volunteers": 6
+       },
+       {
+        "id": "mnbl_1609fb72_t_5c564ff552",
+        "food": 395.54,
+        "prosperity": 3000.7,
+        "gold": 19647,
+        "tradeGoods": 10,
+        "items": 316,
+        "volunteers": 17
+       },
+       {
+        "id": "mnbl_1609fb72_t_64245c0202",
+        "food": 382.54,
+        "prosperity": 2299.4,
+        "gold": 26914,
+        "tradeGoods": 5,
+        "items": 180,
+        "volunteers": 4
+       },
+       {
+        "id": "mnbl_1609fb72_t_652a339695",
+        "food": 395.82,
+        "prosperity": 3000.4,
+        "gold": 29101,
+        "tradeGoods": 3,
+        "items": 167,
+        "volunteers": 18
+       },
+       {
+        "id": "mnbl_1609fb72_t_7c3c7cce5c",
+        "food": 397.6,
+        "prosperity": 1799,
+        "gold": 26626,
+        "tradeGoods": 7,
+        "items": 207,
+        "volunteers": 25
+       },
+       {
+        "id": "mnbl_1609fb72_t_7efe6a0c96",
+        "food": 400,
+        "prosperity": 1903.2,
+        "gold": 17402,
+        "tradeGoods": 9,
+        "items": 238,
+        "volunteers": 8
+       },
+       {
+        "id": "mnbl_1609fb72_t_803bc3052d",
+        "food": 380.36,
+        "prosperity": 3799.8,
+        "gold": 21525,
+        "tradeGoods": 16,
+        "items": 471,
+        "volunteers": 3
+       },
+       {
+        "id": "mnbl_1609fb72_t_8c18b565ee",
+        "food": 354.54,
+        "prosperity": 3098.7,
+        "gold": 15581,
+        "tradeGoods": 10,
+        "items": 228,
+        "volunteers": 19
+       },
+       {
+        "id": "mnbl_1609fb72_t_8e1456f833",
+        "food": 395.35,
+        "prosperity": 4300.1,
+        "gold": 39856,
+        "tradeGoods": 16,
+        "items": 421,
+        "volunteers": 6
+       },
+       {
+        "id": "mnbl_1609fb72_t_91e41e3505",
+        "food": 388.11,
+        "prosperity": 3799.3,
+        "gold": 39195,
+        "tradeGoods": 12,
+        "items": 496,
+        "volunteers": 15
+       },
+       {
+        "id": "mnbl_1609fb72_t_9447ebbe75",
+        "food": 360.01,
+        "prosperity": 4499.8,
+        "gold": 29016,
+        "tradeGoods": 9,
+        "items": 652,
+        "volunteers": 6
+       },
+       {
+        "id": "mnbl_1609fb72_t_96d91dc9a3",
+        "food": 376.82,
+        "prosperity": 4600.2,
+        "gold": 9729,
+        "tradeGoods": 12,
+        "items": 336,
+        "volunteers": 19
+       },
+       {
+        "id": "mnbl_1609fb72_t_a06de08e5b",
+        "food": 341.56,
+        "prosperity": 3999.8,
+        "gold": 33981,
+        "tradeGoods": 6,
+        "items": 211,
+        "volunteers": 7
+       },
+       {
+        "id": "mnbl_1609fb72_t_a81734c1d7",
+        "food": 400,
+        "prosperity": 1801.3,
+        "gold": 24150,
+        "tradeGoods": 10,
+        "items": 554,
+        "volunteers": 12
+       },
+       {
+        "id": "mnbl_1609fb72_t_a9bb2f10b0",
+        "food": 400,
+        "prosperity": 3705.4,
+        "gold": 9116,
+        "tradeGoods": 16,
+        "items": 489,
+        "volunteers": 12
+       },
+       {
+        "id": "mnbl_1609fb72_t_b58aa76d2e",
+        "food": 360.33,
+        "prosperity": 4899.8,
+        "gold": 14216,
+        "tradeGoods": 11,
+        "items": 450,
+        "volunteers": 14
+       },
+       {
+        "id": "mnbl_1609fb72_t_bb5436b93b",
+        "food": 400,
+        "prosperity": 4503.7,
+        "gold": 40629,
+        "tradeGoods": 10,
+        "items": 538,
+        "volunteers": 11
+       },
+       {
+        "id": "mnbl_1609fb72_t_bbe5821524",
+        "food": 400,
+        "prosperity": 1701.6,
+        "gold": 22106,
+        "tradeGoods": 4,
+        "items": 170,
+        "volunteers": 2
+       },
+       {
+        "id": "mnbl_1609fb72_t_c1093bcad9",
+        "food": 400,
+        "prosperity": 2201.6,
+        "gold": 35033,
+        "tradeGoods": 6,
+        "items": 205,
+        "volunteers": 13
+       },
+       {
+        "id": "mnbl_1609fb72_t_c5ddd8ea7e",
+        "food": 400,
+        "prosperity": 2608.2,
+        "gold": 37986,
+        "tradeGoods": 6,
+        "items": 197,
+        "volunteers": 6
+       },
+       {
+        "id": "mnbl_1609fb72_t_caf0eeb8c4",
+        "food": 356.68,
+        "prosperity": 5000.2,
+        "gold": 6762,
+        "tradeGoods": 20,
+        "items": 737,
+        "volunteers": 4
+       },
+       {
+        "id": "mnbl_1609fb72_t_d92f348adf",
+        "food": 395.89,
+        "prosperity": 5101.5,
+        "gold": 23870,
+        "tradeGoods": 16,
+        "items": 471,
+        "volunteers": 7
+       },
+       {
+        "id": "mnbl_1609fb72_t_da31273eb4",
+        "food": 400,
+        "prosperity": 3903.9,
+        "gold": 38217,
+        "tradeGoods": 9,
+        "items": 308,
+        "volunteers": 4
+       },
+       {
+        "id": "mnbl_1609fb72_t_db07bde4dd",
+        "food": 400,
+        "prosperity": 5600.5,
+        "gold": 41551,
+        "tradeGoods": 11,
+        "items": 493,
+        "volunteers": 11
+       },
+       {
+        "id": "mnbl_1609fb72_t_db2d888bf1",
+        "food": 400,
+        "prosperity": 2607.6,
+        "gold": 23385,
+        "tradeGoods": 9,
+        "items": 295,
+        "volunteers": 7
+       },
+       {
+        "id": "mnbl_1609fb72_t_de424cc7cd",
+        "food": 394.09,
+        "prosperity": 3200.1,
+        "gold": 26484,
+        "tradeGoods": 11,
+        "items": 341,
+        "volunteers": 10
+       },
+       {
+        "id": "mnbl_1609fb72_t_e60ca08fa1",
+        "food": 400,
+        "prosperity": 3901.3,
+        "gold": 10747,
+        "tradeGoods": 6,
+        "items": 248,
+        "volunteers": 21
+       },
+       {
+        "id": "mnbl_1609fb72_t_e7ed06396a",
+        "food": 400,
+        "prosperity": 3403.5,
+        "gold": 26070,
+        "tradeGoods": 7,
+        "items": 175,
+        "volunteers": 3
+       },
+       {
+        "id": "mnbl_1609fb72_t_eb208cfa45",
+        "food": 400,
+        "prosperity": 2204.8,
+        "gold": 22911,
+        "tradeGoods": 9,
+        "items": 278,
+        "volunteers": 7
+       },
+       {
+        "id": "mnbl_1609fb72_t_ecf4b31651",
+        "food": 400,
+        "prosperity": 3004.6,
+        "gold": 21001,
+        "tradeGoods": 15,
+        "items": 601,
+        "volunteers": 19
+       },
+       {
+        "id": "mnbl_1609fb72_t_eebd8fd293",
+        "food": 372.29,
+        "prosperity": 2800,
+        "gold": 35917,
+        "tradeGoods": 2,
+        "items": 117,
+        "volunteers": 2
+       }
+      ]
+     }
+    },
+    "endDays": 91078.98784748612
+   },
+   "B": {
+    "fixture": true,
+    "seed": 364610,
+    "startSeconds": 38.04786939999997,
+    "worldId": "mnbl_00059042",
+    "prefix": "mnbl_00059042_",
+    "instance": "3439942df5084a87b509f5291a192fbd",
+    "package": "mnbl_00059042-5fc1927a2ae3",
+    "contentId": "none",
+    "frame": null,
+    "init": {
+     "campaignDays": 91077.37496207407,
+     "census": {
+      "clan:noble": 3,
+      "garrison": 2,
+      "hero:lord": 5,
+      "hero:notable": 16,
+      "kingdom": 2,
+      "kingdom:fiefs:1": 2,
+      "party:caravan": 4,
+      "party:garrison": 2,
+      "party:lord": 2,
+      "party:militia": 4,
+      "party:patrol": 4,
+      "party:player": 1,
+      "settlement:town": 2,
+      "settlement:village": 2
+     },
+     "invalid": [],
+     "invalidCount": 0,
+     "unexpected": [],
+     "unexpectedCount": 0,
+     "offNavigation": [],
+     "offNavigationCount": 0,
+     "wars": 0,
+     "villagesWithoutTradeTown": [],
+     "townsWithoutGold": [],
+     "townsWithoutTradeGoods": [],
+     "economy": {
+      "townCount": 2,
+      "food": 600,
+      "gold": 80266,
+      "tradeGoodStacks": 7,
+      "marketItems": 2299,
+      "villageItems": 32,
+      "volunteerSlotsFilled": 29,
+      "volunteerSlotsEmpty": 31,
+      "towns": [
+       {
+        "id": "mnbl_00059042_town_1",
+        "food": 300,
+        "prosperity": 4700,
+        "gold": 39540,
+        "tradeGoods": 3,
+        "items": 1153,
+        "volunteers": 16
+       },
+       {
+        "id": "mnbl_00059042_town_2",
+        "food": 300,
+        "prosperity": 4700,
+        "gold": 40726,
+        "tradeGoods": 4,
+        "items": 1146,
+        "volunteers": 13
+       }
+      ]
+     }
+    },
+    "independence": {
+     "aObjects": 0,
+     "bObjects": 22,
+     "foreign": [],
+     "foreignCount": 0,
+     "campaignDays": 91077.37496207407,
+     "aStartDays": 91077.37496207407,
+     "unprefixedIdsAlsoInA": [
+      "CharacterObject_1",
+      "caravan_template_empire_1",
+      "naval_patrol_party_1_party_1",
+      "patrol_party_1_party_1"
+     ],
+     "unprefixedIdsAlsoInACount": 4,
+     "townsFed": 2,
+     "towns": 2,
+     "marketItems": 2299,
+     "volunteerSlotsFilled": 29
+    },
+    "playability": {
+     "activatable": false,
+     "routes": {
+      "total": 11,
+      "passed": 10,
+      "failed": 1,
+      "byCategory": {
+       "village-market": {
+        "routes": 4,
+        "passed": 4,
+        "types": {
+         "Default": 4
+        }
+       },
+       "capital-fief": {
+        "routes": 0,
+        "passed": 0,
+        "types": {}
+       },
+       "player-start": {
+        "routes": 1,
+        "passed": 0,
+        "types": {
+         "Default": 1
+        }
+       },
+       "port-to-port": {
+        "routes": 2,
+        "passed": 2,
+        "types": {
+         "Naval": 2
+        }
+       },
+       "faction-access": {
+        "routes": 4,
+        "passed": 4,
+        "types": {
+         "Default": 4
+        }
+       }
+      }
+     },
+     "failures": [],
+     "failureCount": 0,
+     "notApplicable": [
+      {
+       "id": "player-start (no start) -> (no start)",
+       "category": "player-start",
+       "problems": [
+        "refused: no town can be a player start (MMR-34 refuses such a world)"
+       ]
+      }
+     ],
+     "startsChecked": false,
+     "flags": {
+      "total": 0,
+      "resolved": 0,
+      "failed": 0,
+      "byKind": {},
+      "failedFlags": []
+     },
+     "world": {
+      "sites": 4,
+      "portTowns": 2,
+      "kingdoms": [
+       {
+        "id": "mnbl_00059042_kingdom_1",
+        "capital": "mnbl_00059042_town_1",
+        "rulingClan": "mnbl_00059042_clan_1",
+        "naval": true,
+        "reason": "2 port towns in clan mnbl_00059042_clan_1's home mnbl_00059042_town_1's land group (no fleet rule registered)"
+       },
+       {
+        "id": "mnbl_00059042_kingdom_2",
+        "capital": "mnbl_00059042_town_2",
+        "rulingClan": "mnbl_00059042_clan_2",
+        "naval": true,
+        "reason": "2 port towns in clan mnbl_00059042_clan_2's home mnbl_00059042_town_2's land group (no fleet rule registered)"
+       }
+      ],
+      "starts": [],
+      "startCultures": [],
+      "excludedStarts": [
+       {
+        "culture": "aserai",
+        "town": "mnbl_00059042_town_1",
+        "point": [
+         367,
+         251
+        ]
+       },
+       {
+        "culture": "battania",
+        "town": "mnbl_00059042_town_2",
+        "point": [
+         397,
+         476
+        ]
+       },
+       {
+        "culture": "empire",
+        "town": "mnbl_00059042_town_1",
+        "point": [
+         609.375,
+         165.625
+        ]
+       },
+       {
+        "culture": "khuzait",
+        "town": "mnbl_00059042_town_1",
+        "point": [
+         841,
+         541
+        ]
+       },
+       {
+        "culture": "nord",
+        "town": "mnbl_00059042_town_1",
+        "point": [
+         725,
+         811
+        ]
+       },
+       {
+        "culture": "sturgia",
+        "town": "mnbl_00059042_town_1",
+        "point": [
+         523,
+         603
+        ]
+       },
+       {
+        "culture": "vlandia",
+        "town": "mnbl_00059042_town_2",
+        "point": [
+         305,
+         414
+        ]
+       }
+      ],
+      "landGroups": 1,
+      "basins": 1,
+      "cachePairs": {
+       "Default": 6,
+       "Naval": 1,
+       "All": 15
+      }
+     }
+    },
+    "hours": {
+     "hours": 12,
+     "setup": {
+      "playerIgnoredByOtherPartiesUntilDays": 91107.37496207407,
+      "playerHolding": true
+     },
+     "startHours": 2185856.999089778,
+     "before": {
+      "townCount": 2,
+      "food": 600,
+      "gold": 80266,
+      "tradeGoodStacks": 7,
+      "marketItems": 2299,
+      "villageItems": 32,
+      "volunteerSlotsFilled": 29,
+      "volunteerSlotsEmpty": 31,
+      "towns": [
+       {
+        "id": "mnbl_00059042_town_1",
+        "food": 300,
+        "prosperity": 4700,
+        "gold": 39540,
+        "tradeGoods": 3,
+        "items": 1153,
+        "volunteers": 16
+       },
+       {
+        "id": "mnbl_00059042_town_2",
+        "food": 300,
+        "prosperity": 4700,
+        "gold": 40726,
+        "tradeGoods": 4,
+        "items": 1146,
+        "volunteers": 13
+       }
+      ]
+     },
+     "hoursAdvanced": 12.000662916339934,
+     "realSeconds": 10.428178799999955,
+     "stalls": [],
+     "timedOut": false,
+     "after": {
+      "townCount": 2,
+      "food": 539.4,
+      "gold": 88352,
+      "tradeGoodStacks": 5,
+      "marketItems": 2275,
+      "villageItems": 48,
+      "volunteerSlotsFilled": 39,
+      "volunteerSlotsEmpty": 21,
+      "towns": [
+       {
+        "id": "mnbl_00059042_town_1",
+        "food": 300,
+        "prosperity": 4700,
+        "gold": 47626,
+        "tradeGoods": 1,
+        "items": 1129,
+        "volunteers": 16
+       },
+       {
+        "id": "mnbl_00059042_town_2",
+        "food": 239.4,
+        "prosperity": 4699.9,
+        "gold": 40726,
+        "tradeGoods": 4,
+        "items": 1146,
+        "volunteers": 23
+       }
+      ]
+     },
+     "counters": {},
+     "listenerErrors": [],
+     "thrown": [],
+     "thrownCount": 0,
+     "campaignThrown": 0,
+     "exceptionCanarySeen": true,
+     "asserts": [],
+     "assertCount": 0,
+     "assertCanarySeen": true,
+     "offNavigation": [],
+     "offNavigationCount": 0,
+     "motion": {
+      "caravan": {
+       "tracked": 4,
+       "moved": 3,
+       "travelled": 76.85,
+       "maxTravelled": 26.51
+      },
+      "garrison": {
+       "tracked": 2,
+       "moved": 0,
+       "travelled": 0,
+       "maxTravelled": 0
+      },
+      "lord": {
+       "tracked": 2,
+       "moved": 2,
+       "travelled": 66.26,
+       "maxTravelled": 33.76
+      },
+      "militia": {
+       "tracked": 4,
+       "moved": 0,
+       "travelled": 0,
+       "maxTravelled": 0
+      },
+      "patrol": {
+       "tracked": 4,
+       "moved": 4,
+       "travelled": 134.78,
+       "maxTravelled": 38.52
+      }
+     },
+     "stuck": [],
+     "stuckCount": 0,
+     "holding": [],
+     "holdingCount": 0,
+     "holdingByKind": {},
+     "holdingVillagersWithoutReason": 0,
+     "unfoundPaths": [],
+     "unfoundPathCount": 0,
+     "unfoundToSettlementCount": 0
+    },
+    "final": {
+     "campaignDays": 91077.8749896956,
+     "census": {
+      "clan:noble": 3,
+      "garrison": 2,
+      "hero:lord": 5,
+      "hero:notable": 16,
+      "kingdom": 2,
+      "kingdom:fiefs:1": 2,
+      "party:caravan": 4,
+      "party:garrison": 2,
+      "party:lord": 2,
+      "party:militia": 4,
+      "party:patrol": 4,
+      "party:player": 1,
+      "settlement:town": 2,
+      "settlement:village": 2
+     },
+     "invalid": [],
+     "invalidCount": 0,
+     "unexpected": [],
+     "unexpectedCount": 0,
+     "offNavigation": [],
+     "offNavigationCount": 0,
+     "wars": 0,
+     "villagesWithoutTradeTown": [],
+     "townsWithoutGold": [],
+     "townsWithoutTradeGoods": [],
+     "economy": {
+      "townCount": 2,
+      "food": 539.4,
+      "gold": 88352,
+      "tradeGoodStacks": 5,
+      "marketItems": 2275,
+      "villageItems": 48,
+      "volunteerSlotsFilled": 39,
+      "volunteerSlotsEmpty": 21,
+      "towns": [
+       {
+        "id": "mnbl_00059042_town_1",
+        "food": 300,
+        "prosperity": 4700,
+        "gold": 47626,
+        "tradeGoods": 1,
+        "items": 1129,
+        "volunteers": 16
+       },
+       {
+        "id": "mnbl_00059042_town_2",
+        "food": 239.4,
+        "prosperity": 4699.9,
+        "gold": 40726,
+        "tradeGoods": 4,
+        "items": 1146,
+        "volunteers": 23
+       }
+      ]
+     }
+    }
+   }
+  },
+  "baselines": [
+   {
+    "at": "start",
+    "game": false,
+    "held": {},
+    "tracked": 20
+   },
+   {
+    "at": "after world A ended",
+    "game": false,
+    "held": {},
+    "tracked": 20
+   },
+   {
+    "at": "after world B ended",
+    "game": false,
+    "held": {},
+    "tracked": 20
+   }
+  ],
+  "completed": true,
+  "ownedWorkCleanupComplete": true
+ },
+ "moduleAssembly": "D:\\SteamLibrary\\steamapps\\common\\Mount & Blade II Bannerlord\\Modules\\MNBL.ProceduralWorld\\bin\\Win64_Shipping_Client\\MNBL.ProceduralWorld.dll",
+ "moduleSha256": "fcae6eea451693e0318a7dbc57b34862c6cd7f7db5564de9a13e15bae67d586c",
+ "utc": "2026-10-18T06:13:40.6911395Z"
+}

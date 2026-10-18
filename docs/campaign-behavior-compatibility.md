@@ -246,13 +246,123 @@ What it showed:
 - 39908: the gameplay probe stalled on a bandit encounter.
 - 31864: entering the town without an encounter broke the town menu.
 
+## Gameplay in the bounded first test (MMR-51, 2026-10-18)
+
+MMR-34's audit starts a campaign; MMR-51 plays the integrated worlds. World A is the full generated world (seed 42) started from the world setup screen. World B is MMR-19's fixture world (seed 364610), started after A ends in the same process: the production generator activates only seed 42 today.
+
+| | |
+|---|---|
+| Probe | `campaign_soak` (`Automation/CampaignSoakProbe.cs`); it reads its worlds and rules from the scenario file and checks every input and file before any game starts |
+| Scenarios and regressions | `tests/Runtime/CampaignSoakScenarios.json`: 14 scenarios, each natural, player, diagnostic or harness; 13 regressions, each with its guard |
+| Verdict | `tools/summarize_campaign_soak.py <pid>` recomputes every scenario from the run's outputs, with the rules, hours and motion fractions the run recorded, into `evidence/gameplay/campaign-soak.json`. The probe's own pass lines are a subset; the summary is the verdict |
+| Regression fixture | `tests/Runtime/fixtures/campaign-soak-41920.json` (the accepted run's output, trimmed and with user paths replaced) |
+| Offline | `tools/Test-CampaignSoak.ps1` runs `tests/Runtime/check_campaign_soak_scenarios.py` (the scenario file) and `tests/Runtime/test_campaign_soak_regressions.py` (the replay): `evidence/gameplay/campaign-soak-tests.txt` |
+
+**What a run does.**
+- **World A:**
+  - Its initial state is audited (below), and MMR-41's semantic routes are checked against the live campaign (`CampaignPlayability`: engine paths and the registered navigation caches).
+  - **The player (setup, recorded):**
+    - Other parties ignore the player for the whole test (`IgnoreByOtherPartiesTill`).
+    - The player's party travels from its start town to the nearest town by land (`MapDistanceModel`) that offers it a volunteer and an affordable trade good. The engine opens the town menu on arrival.
+    - There it buys and sells a trade good through the trade screen's logic: an `InventoryLogic` built as `InventoryScreenHelper.OpenScreenAsTrade` builds it, committed by `DoneLogic`.
+    - It recruits through the recruitment screen's domain sequence (`RecruitmentVM.OnDone`), then leaves through the menu's leave path.
+  - **One natural campaign day** (fast forward), while the player holds:
+    - every hour, each active party's kind, motion, navigation and any stuck or holding streak;
+    - every frame, each party's unfound path (`MobileParty._aiPathNotFound`, which the AI clears when it decides again);
+    - battles, settlement entries, caravan trades, villagers' sales in their towns, recruitment, ownership changes, deaths and kingdom decisions;
+    - every exception thrown from campaign code, and every engine assert (a wrapper around `Debug.DebugManager`, through which every assert passes). Each hook is proven by a canary.
+  - **Volunteer replenishment** after the day.
+  - **The diagnostic actions**, each through an installed action with time stopped: a declared war, a town's ownership change, a clan leader's death and a ruler's death.
+  - Six more hours observed, and a final audit.
+- **World B:** its fresh state audited for coherence and independence from A, its routes checked, then twelve hours observed.
+
+**The audit** (initial, after the day, final; both worlds):
+- **Every reference the simulation dereferences:**
+  - towns' and castles' owner, faction, garrison and governor;
+  - villages' bound settlement and owner;
+  - clans' and kingdoms' living leaders and rulers;
+  - heroes' clans, parties and governorships, and dead heroes kept out of parties;
+  - parties' leaders, clans, home settlements, armies and factions.
+- **No settlement, clan or kingdom outside the world or its aliases**, and **every party on valid navigation**.
+- **The census and the economy:**
+  - each town's food, prosperity, gold, market and volunteers;
+  - towns without gold, without trade goods or without food;
+  - villages without a trade town;
+  - kingdoms by fief count.
+- **What the summary requires at initialization:** every town fed, offering volunteers and stocking trade goods; every town and castle garrisoned; lords, lord parties, caravans and bandits present.
+
+**Run 41920 (55/55 recomputed checks, 14/14 scenarios, status ok):**
+- **A initializes coherently:**
+  - 0 invalid references, 0 objects outside the world, 0 parties off navigation;
+  - 45 towns and 26 castles, all garrisoned; 215 villages, all with a trade town;
+  - 40 kingdoms and 92 noble clans; 372 lords and 909 notables;
+  - parties: 151 lord, 118 caravan, 364 bandit (34 infested hideouts), 22 fishing, 49 patrol;
+  - all 672 semantic routes hold in the live campaign: 430 village-market, 62 capital-fief, 42 player-start, 58 port-to-port, 80 faction-access.
+- **The visit:**
+  - the player travelled 8.67 hours over 40.4 by land to the nearest town offering it volunteers (13 offered); the engine opened the town menu;
+  - **trade:** bought one clay for 25 and sold it back for 21 through `DoneLogic`. Stock moved one each way; the player's and the town's gold moved by exactly those prices;
+  - **recruitment:** one vlandian recruit for 20 gold;
+  - left through the leave path.
+- **The day (24.02 hours in 20.1 s):**
+  - 0 stalls, 0 exceptions, 0 asserts (both canaries seen);
+  - 0 positions off navigation, 0 unfound paths, 0 stuck parties;
+  - **parties that moved:** lords 142 of 151, caravans 118 of 118, villagers 43 of 65, bandits 294 of 369, fishing parties 42 of 42;
+  - **natural activity:** 72 battles (1 naval); caravans traded in towns 137 times (5,804 items); villagers entered towns 29 times and sold their village's goods 27 times (1,602 items; the other 2 carried only pack animals, which the sale keeps); lords recruited 1,014 times;
+  - **the holding parties** (still for six hours outside a settlement) were 34 fishing parties at their fishing points, 3 lords, 1 bandit and 1 patrol (their own AI decisions); no villager or fishing party held without an installed reason;
+  - **food and markets:** no town ran out of food (world food 17,876 → 17,583). Market items fell 16,939 → 14,556 while trade-good stacks rose 358 → 387 and village stocks 15,554 → 17,844;
+  - the one town that began without gold (below) earned some.
+- **Replenishment:**
+  - 887 of 2,731 volunteer slots empty at the start refilled, and 342 emptied;
+  - the slot the player emptied refilled (the model's daily chance 0.54);
+  - the town sold the clay out by the end of the day.
+- **The diagnostic actions:**
+  - **war:** `k_02c999f4ad` declared war on `k_1088c05c8d` (3 fiefs). Both stances at war, the event raised;
+  - **ownership:** town `t_caf0eeb8c4` passed to a lord of the declarer. Owner, faction, both villages, fiefs, garrison, notables, governor and the event followed; the target survived, still at war;
+  - **clan succession:** the leader of `l_0d02cd80cc` died of old age. Its heir leads it and the clan kept its 3 fiefs; the event was raised and no reference to the dead hero was left;
+  - **ruler succession:** the ruler of `k_06eebb41b5` (2 candidate clans) died of old age. A king selection was added and held at once, electing the heir's clan `l_d78a71fdcb`; the decision concluded, and the heir leads the kingdom. No reference to the dead ruler was left.
+- **Six hours after:**
+  - 0 stalls, exceptions, asserts, positions off navigation, unfound paths or stuck parties; the state stayed coherent;
+  - the war held, with 6 lord parties targeting the enemy; the town stayed with its new owner; the heir and the new ruler still lead.
+- **B:**
+  - nothing of A registered (0 objects) or referenced (0 ids of A's world); its campaign time starts at the new-game day;
+  - its 2 towns are fed and stocked (2,299 items), with 29 volunteer slots offered; both towns garrisoned; 2 lord parties;
+  - its 10 applicable routes hold. The player-start route is not applicable: the fixture world replaces no creation culture's start;
+  - over 12 hours: 0 stalls, exceptions, asserts, positions off navigation or stuck parties; lords 2 of 2 and caravans 3 of 4 moved;
+  - 4 engine-minted unprefixed ids recur in both campaigns (`CharacterObject_1`, `caravan_template_empire_1` and two patrol parties): the engine's counters restart with each campaign. They are not A's objects.
+- **Every baseline held:** start, after A, after B.
+
+**Small-world behaviour the runs showed** (the installed rules, recorded, nothing changed):
+- **Single-fief kingdoms.** Seed 42 has 40 kingdoms for 45 towns (MMR-31: one kingdom per realm with a town); 22 hold a single fief. A kingdom that loses its last fief is dissolved at once by `FactionDiscontinuationCampaignBehavior`, and its clans keep its wars. Run 21164 showed this when the diagnostic ownership change took a kingdom's only town. The war diagnostic now targets a kingdom of two or more fiefs; that kingdoms consolidate as towns change hands is long-term balance, outside this test.
+- **A town that starts without gold.** Towns start at 0 gold and earn their first through the new-game consumption passes (`ItemConsumptionBehavior.MakeConsumptionAllTowns`), which pay only for market items in categories with a demand budget. Town `t_30a1119e46`'s opening market earned nothing, so it starts poor, buys nothing until it earns, and earns within the day (2,277 gold in run 21164).
+- **Markets.** They halve in the first hours after the new game (run 41920: 31,138 items at the start, 16,939 when the day began, after the player's 8.67-hour journey) and then fall about 7% a day while trade-good stacks restock. Single towns sell out (run 34968: one sold its last stack 30 hours in). This is recorded as a state of the economy, not an incoherence.
+- **Fishing parties.** War Sails' fishing parties are villager parties (`FishingPartyComponent` extends `VillagerPartyComponent`) that sail only. `FishingPartyCampaignBehavior` holds them at their fishing point for hours while they fish.
+- **Elections.** `Kingdom.AddDecision` holds the election of a kingdom other than the player's at once (`KingdomElection.StartElection`); only the player's kingdom keeps a king selection pending. With one candidate clan there is no election.
+- **Villagers sell on entry.** A villager party sells its village's goods on entering a town (`SellGoodsForTradeAction.ApplyByVillagerTrade`, limited by the town's gold). It keeps its pack animals, and the sale raises no transaction event.
+
+**Failures found, and their regression guards.** The scenario file lists 13 regressions; each names the run or review finding, the cause, the fix and the guard:
+- **Twelve are guarded by a mutation of the committed fixture** that reintroduces the failure and must fail its scenario. The replay checks all twelve and the clean fixture (13/13).
+- **One is guarded by the probe's input check** (B's fixture paths).
+
+None was a crash or an invalid reference in the game. They were the probe's assumptions about the installed rules, corrected against the IL:
+- the tax a town keeps on an AI sale;
+- `IsMoving` for an AI party;
+- the dispatch order of event listeners;
+- immediate elections;
+- kingdom discontinuation;
+- the trade screen's callbacks;
+- the volunteer relation limit;
+- fishing parties;
+- the fixture world's starts;
+- market sell-outs and towns without gold.
+
 ## What this does not prove
 
-- **Live multi-day behaviour:** trade, recruitment, raids, sieges, rebellion, succession and prisoner escape over many days are MMR-51's. The startup audit covers a two-day window.
-- **The full world in game:** MMR-45 registers the full world, with its 72 hideouts, the retreat and 7 starts, and runs the startup plan in its campaign. The activation checks the registry's closure and the hideouts' run-time entities, not each notable: MMR-51/52 exercise them in play. The fixture world shares the initializer's record builders and rules, but not its placement (hideouts, retreat and starts are fixture points there).
+- **Missions:** MMR-51 plays the campaign map. The land missions the player enters on a generated world (battles, settlements, a siege, a capture, a hideout) are MMR-52's: `docs/land-missions.md`. The naval ones (shipyard, voyages, landings, a blockade, pirate battles, a seaborne raid, a defeat with the raft) are MMR-53's: `docs/naval-missions.md`.
+- **Multi-day behaviour beyond the test:** MMR-51 plays one campaign day and six hours on A and twelve hours on B (above). Raids, sieges, rebellion and prisoner escape over many days, and long-term balance (kingdom consolidation, market levels), are not soaked; the epic leaves long soaks to follow-up.
+- **The full world in game:** MMR-45 registers the full world, with its 72 hideouts, the retreat and 7 starts, and runs the startup plan in its campaign; MMR-51 audits it in play (above). The fixture world shares the initializer's record builders and rules, but not its placement (hideouts, retreat and starts are fixture points there).
 - **A real wanderer conversation:** the condition was run on the campaign map with a stand-in conversation agent, up to the point that needs the tavern mission.
 - **Exact save fidelity of moving parties:** see the path-state differences above (MMR-49, forwarded by MMR-62).
 - **Templates of the full world:** every literal template lookup names an installed record or an engine default item, but the full world's template closure must keep them (MMR-45).
-- **Pirates:** MMR-35 re-creates the pirate clans and emits their spawn-point intents (docs/naval-content.md); the spawn-point entities are not placed yet (MMR-40 placed the settlement entities; handed to MMR-53).
+- **Pirates:** MMR-35 re-creates the pirate clans and emits their spawn points (docs/naval-content.md); MMR-39's naval scene wrapper serves them in place of `PirateSpawnPoint` entities. MMR-53 found War Sails' patrol zones exactly the 53 served points of world A, and its 44 pirate parties at sea, each assigned one (`docs/naval-missions.md`).
 - **Engine snapping:** in a world, ports are MMR-38's navigation points and gates MMR-40's resolved gates (`docs/settlement-entities.md`); hideouts are MMR-34's. The offline passability check uses the travel cells, not the navmesh.
 - **Prisoner escape and quest destinations** choose among the world's settlements at runtime. The scan found no Calradia id in their behaviours; they are exercised in play by MMR-51.

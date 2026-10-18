@@ -80,8 +80,8 @@ internal static class WorldDataBundleTests
         var oldGame = Bundle.Problems(real, new Bundle.HostProfile("v1.4.7.118000", "v1.2.8.119303", AllCapabilities), true);
         Check(Has(oldGame, "built for Bannerlord v1.4.8.119303, installed v1.4.7.118000"), "a different Bannerlord version is refused");
         var oldNaval = Rejection(() => Bundle.Open(real, new Bundle.HostProfile("v1.4.8.119303", "v1.2.7.0", AllCapabilities)));
-        Check(oldNaval != null && oldNaval.Contains("built for War Sails v1.2.8.119303, installed v1.2.7.0") && oldNaval.Contains("migration tool"),
-              "a different War Sails version is refused with an actionable message");
+        Check(oldNaval != null && oldNaval.Contains("built for War Sails v1.2.8.119303, installed v1.2.7.0") && oldNaval.Contains("there is no migration") && !oldNaval.Contains("migration tool"),
+              "a different War Sails version is refused with an actionable message (MMR-50: install the versions it was built for; no migration is offered)");
         var noR08 = Rejection(() => Bundle.Open(real, new Bundle.HostProfile("v1.4.8.119303", "v1.2.8.119303", AllCapabilities.Where(c => c != "R08"))));
         Check(noR08 != null && noR08.Contains("requires runtime capability R08") && noR08.Contains("Update MNBL"), "a host without a required capability is refused");
 

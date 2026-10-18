@@ -1,0 +1,280 @@
+{
+  "schema": "mnbl.evidence.two-world-matrix",
+  "version": 1,
+  "ticket": "MMR-49",
+  "create": {
+    "pid": "48048",
+    "kind": "create",
+    "result": "evidence/runtime/in-game/two_world_matrix-48048.json",
+    "status": "ok",
+    "failures": [],
+    "checks": [
+      {
+        "check": "A: an AI lord party embarked at sea",
+        "passed": true
+      },
+      {
+        "check": "A: an AI lord fleet came out of a naval battle with pirates",
+        "passed": true
+      },
+      {
+        "check": "A: town ownership changed, a lord party spawned, a lord taken prisoner, a relation changed",
+        "passed": true
+      },
+      {
+        "check": "A: a town under siege",
+        "passed": true
+      },
+      {
+        "check": "A: a fleet called across the seam, its anchor moving at the save; another anchored by the seam",
+        "passed": true
+      },
+      {
+        "check": "A: the player crossed the seam just before the save; a bandit pursuing from across the seam",
+        "passed": true
+      },
+      {
+        "check": "B (fixture world mnbl_00059042): a second distinct world; town ownership changed",
+        "passed": true
+      },
+      {
+        "check": "A saved: published through the save journal, every saved position canonical",
+        "passed": true
+      },
+      {
+        "check": "A saved: the non-canonical values planted in fields the per-tick pass does not cover (MobilePartyAi.BehaviorTarget, AnchorPoint._lastUsedDisembarkPosition, Track.Position, MapEvent.Position) were written canonical",
+        "passed": true
+      },
+      {
+        "check": "B saved: published through the save journal, every saved position canonical",
+        "passed": true
+      },
+      {
+        "check": "A same process: routed from the normal load entry (Continue (preload state)) to the world loader, restored, the installed load never ran",
+        "passed": true
+      },
+      {
+        "check": "A same process: equal to its save (time, parties and fleets, anchors, settlements, prisoners, relations, player); 0 AI parties chose a new movement target before the snapshot (control without a load: 0)",
+        "passed": true
+      },
+      {
+        "check": "A same process: nothing of the other world registered; this world's objects, frame and terrain context only",
+        "passed": true
+      },
+      {
+        "check": "A same process: no generator process started (only the surface encoder may run, to re-install a swept scene)",
+        "passed": true
+      },
+      {
+        "check": "A same process: every position canonical after the load",
+        "passed": true
+      },
+      {
+        "check": "A same process: the preload screen behind Continue called the load on every frame; one load started, the repeats were ignored",
+        "passed": true
+      },
+      {
+        "check": "A same process: the embarked AI party is still at sea",
+        "passed": true
+      },
+      {
+        "check": "A same process: the pursuit across the seam ends in one encounter with the one pursuer; the player does not cross again",
+        "passed": true
+      },
+      {
+        "check": "A same process: the fleet called across the seam kept its target and transit and arrived where it was sent",
+        "passed": true
+      },
+      {
+        "check": "B same process: routed from the normal load entry (load screen (SandBoxSaveHelper.TryLoadSave)) to the world loader, restored, the installed load never ran",
+        "passed": true
+      },
+      {
+        "check": "B same process: equal to its save (time, parties and fleets, anchors, settlements, prisoners, relations, player); 0 AI parties chose a new movement target before the snapshot (control without a load: 0)",
+        "passed": true
+      },
+      {
+        "check": "B same process: nothing of the other world registered; this world's objects, frame and terrain context only",
+        "passed": true
+      },
+      {
+        "check": "B same process: no generator process started (only the surface encoder may run, to re-install a swept scene)",
+        "passed": true
+      },
+      {
+        "check": "B same process: every position canonical after the load",
+        "passed": true
+      },
+      {
+        "check": "B same process: campaign time runs and parties move; the town the player took stays so; the lord the player took is held at the load (then held); party positions and targets canonical",
+        "passed": true
+      },
+      {
+        "check": "B same process: loaded from inside the running world A (the loader ended A first)",
+        "passed": true
+      },
+      {
+        "check": "the refused loads ran from inside a running campaign (world B)",
+        "passed": true
+      },
+      {
+        "check": "refused load torn: damaged-save before anything changed; the running campaign kept running on its map, the caller's cancel ran",
+        "passed": true
+      },
+      {
+        "check": "refused load missing-bundle: missing-world before anything changed; the running campaign kept running on its map, the caller's cancel ran",
+        "passed": true
+      },
+      {
+        "check": "refused load other-game-version: incompatible-build before anything changed; the running campaign kept running on its map, the caller's cancel ran",
+        "passed": true
+      },
+      {
+        "check": "the refused loads changed nothing in world A",
+        "passed": true
+      },
+      {
+        "check": "refused Continue: one refusal (missing-world) for the preload screen's repeated calls; its OK returned to the main menu, no game started",
+        "passed": true
+      },
+      {
+        "check": "baseline start: no game, every tracked static at its baseline",
+        "passed": true
+      },
+      {
+        "check": "baseline after world A ended: no game, every tracked static at its baseline",
+        "passed": true
+      },
+      {
+        "check": "baseline after world B ended: no game, every tracked static at its baseline",
+        "passed": true
+      },
+      {
+        "check": "baseline after the same-process loads and the refused loads: no game, every tracked static at its baseline",
+        "passed": true
+      },
+      {
+        "check": "baseline after the refused Continue: no game, every tracked static at its baseline",
+        "passed": true
+      }
+    ],
+    "passed": 37,
+    "total": 37
+  },
+  "cold": {
+    "pid": "39860",
+    "kind": "cold",
+    "result": "evidence/runtime/in-game/two_world_matrix-39860.json",
+    "status": "ok",
+    "failures": [],
+    "checks": [
+      {
+        "check": "cold: world A's scene and reports swept before its load",
+        "passed": true
+      },
+      {
+        "check": "A cold restart: routed from the normal load entry (load screen (SandBoxSaveHelper.TryLoadSave)) to the world loader, restored, the installed load never ran",
+        "passed": true
+      },
+      {
+        "check": "A cold restart: equal to its save (time, parties and fleets, anchors, settlements, prisoners, relations, player); 0 AI parties chose a new movement target before the snapshot (control without a load: 0)",
+        "passed": true
+      },
+      {
+        "check": "A cold restart: nothing of the other world registered; this world's objects, frame and terrain context only",
+        "passed": true
+      },
+      {
+        "check": "A cold restart: no generator process started (only the surface encoder may run, to re-install a swept scene)",
+        "passed": true
+      },
+      {
+        "check": "A cold restart: every position canonical after the load",
+        "passed": true
+      },
+      {
+        "check": "A cold restart: the embarked AI party is still at sea",
+        "passed": true
+      },
+      {
+        "check": "A cold restart: the pursuit across the seam ends in one encounter with the one pursuer; the player does not cross again",
+        "passed": true
+      },
+      {
+        "check": "A cold restart: the fleet called across the seam kept its target and transit and arrived where it was sent",
+        "passed": true
+      },
+      {
+        "check": "A cold: the swept scene re-encoded from the bundle (surface encoder only); navigation and playability reports restored from the activation evidence, the settlement layout re-derived",
+        "passed": true
+      },
+      {
+        "check": "B cold restart: routed from the normal load entry (load screen (SandBoxSaveHelper.TryLoadSave)) to the world loader, restored, the installed load never ran",
+        "passed": true
+      },
+      {
+        "check": "B cold restart: equal to its save (time, parties and fleets, anchors, settlements, prisoners, relations, player); 0 AI parties chose a new movement target before the snapshot (control without a load: 0)",
+        "passed": true
+      },
+      {
+        "check": "B cold restart: nothing of the other world registered; this world's objects, frame and terrain context only",
+        "passed": true
+      },
+      {
+        "check": "B cold restart: no generator process started (only the surface encoder may run, to re-install a swept scene)",
+        "passed": true
+      },
+      {
+        "check": "B cold restart: every position canonical after the load",
+        "passed": true
+      },
+      {
+        "check": "B cold restart: campaign time runs and parties move; the town the player took stays so; the lord the player took is held at the load (then held); party positions and targets canonical",
+        "passed": true
+      },
+      {
+        "check": "B cold restart: loaded from inside the running world A (the loader ended A first)",
+        "passed": true
+      },
+      {
+        "check": "baseline start: no game, every tracked static at its baseline",
+        "passed": true
+      },
+      {
+        "check": "baseline after the cold loads: no game, every tracked static at its baseline",
+        "passed": true
+      },
+      {
+        "check": "cold: the probe's saves and the campaigns' initial saves deleted",
+        "passed": true
+      }
+    ],
+    "passed": 20,
+    "total": 20
+  },
+  "loadChecks": [
+    {
+      "pid": "28224",
+      "kind": "load",
+      "result": "evidence/runtime/in-game/two_world_matrix-28224.json",
+      "status": "ok",
+      "failures": [],
+      "checks": [
+        {
+          "check": "load check: restored through the world loader",
+          "passed": true
+        },
+        {
+          "check": "baseline start: no game, every tracked static at its baseline",
+          "passed": true
+        },
+        {
+          "check": "baseline after the load check: no game, every tracked static at its baseline",
+          "passed": true
+        }
+      ],
+      "passed": 3,
+      "total": 3
+    }
+  ]
+}

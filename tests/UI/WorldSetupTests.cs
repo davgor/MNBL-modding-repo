@@ -124,8 +124,20 @@ internal static class WorldSetupTests
               "only the producer controls the profile fixes are shown, each locked with why; world size is explained as content (a different world), never as quality");
         var wait = WaitTime.Variables(contract);
         var noGenerate = WorldSetupContract.FromDocuments(Edit(docs, "one-shot-budget.json", "\"generateWorld\"", "\"otherPhase\""));
-        Check(wait.Count == 1 && wait["GENERATE"] == "35" && WaitTime.Available(contract) && !WaitTime.Available(noGenerate) && contract.BudgetStatus == "provisional" && !WorldSetupText.Wait.Contains("{START}"),
-              "the waiting time is the budget's largest generation measurement rounded up to 5 s (35 s from the generation job's 27.2-30.4); nothing is promised without a measurement, and no campaign-start time is stated while starting is not offered");
+        var noStart = WorldSetupContract.FromDocuments(Edit(docs, "one-shot-budget.json", "\"startCampaign\"", "\"otherStartPhase\""));
+        string waitText = WaitTime.Text(contract, (t, v) => v.Aggregate(t, (x, kv) => x.Replace("{" + kv.Key + "}", kv.Value)));
+        // The expected values from the budget itself: its largest generation measurement rounded up to roundToSeconds, its largest first campaign
+        // start in whole minutes rounded up.
+        var budgetDoc = (IDictionary<string, object>)new System.Web.Script.Serialization.JavaScriptSerializer().DeserializeObject(Encoding.UTF8.GetString(docs["one-shot-budget.json"]).TrimStart('﻿'));
+        var budgetPhases = (IDictionary<string, object>)budgetDoc["phases"];
+        Func<string, double> largest = id => ((object[])((IDictionary<string, object>)budgetPhases[id])["seconds"]).Select(v => Convert.ToDouble(v, CultureInfo.InvariantCulture)).Max();
+        int round = Convert.ToInt32(budgetDoc["roundToSeconds"], CultureInfo.InvariantCulture);
+        string expectGenerate = (Math.Ceiling(largest("generateWorld") / round) * round).ToString("0", CultureInfo.InvariantCulture);
+        string expectStart = Math.Max(1, Math.Ceiling(largest("startCampaign") / 60)).ToString("0", CultureInfo.InvariantCulture);
+        Check(wait.Count == 2 && wait["GENERATE"] == expectGenerate && wait["START"] == expectStart && WaitTime.Available(contract) && !WaitTime.Available(noGenerate) && contract.BudgetStatus == "provisional"
+              && !WaitTime.Variables(noStart).ContainsKey("START") && waitText.Contains("about " + expectGenerate + " seconds") && waitText.Contains("about " + expectStart + " minutes") && waitText.Contains("may stop responding")
+              && !WaitTime.Text(noStart, (t, v) => t).Contains(WorldSetupText.WaitStart),
+              "the waiting time is the budget's largest generation measurement rounded up to 5 s (" + expectGenerate + " s) and its largest first campaign start in whole minutes (" + expectStart + "), with the warning that the game may stop responding; nothing is promised without a measurement: " + waitText);
 
         // Host and generation error categories.
         var ok = GenerationErrors.Host("v1.4.8.119303", "v1.4.8.119303", "v1.2.8", "v1.2.8", true, null);

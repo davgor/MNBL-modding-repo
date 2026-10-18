@@ -19,10 +19,10 @@ The player's way into a procedural world: a main-menu entry, **New Procedural Ca
 - **The entry.**
   - `WorldSetupScreen.Register()` runs from `SubModule.OnBeforeInitialModuleScreenSetAsRoot`. It adds the initial-state option `MNBLProceduralCampaign` at order 4, directly after Sandbox (vanilla order: Saved Games 0, Continue 1, New Campaign 2, SandBox 3).
   - This is the extension point R01 used for its developer entries: an `InitialStateOption`, executed by `Module.ExecuteInitialStateOptionWithId`.
-  - The developer "FWGC: …" entries are no longer in the player's menu. They are registered only for a harness probe (`generation_menu` drives them) or when the store holds a `developer` marker file.
+  - It is the module's only main-menu entry. The developer "FWGC: …" entries, and the `generation_menu` probe that drove them, were removed on 2026-10-18; `world_setup` checks that no `fwgc_` entry is registered.
 - **Disabled with a reason** in two cases (MMR-47: a host problem no longer disables it; the setup opens refusing to generate and shows each problem with its action and reference, see Errors below):
-  - a developer generation is running;
-  - a harness probe other than `world_setup` or `new_campaign_flow` is measuring.
+  - a generation job is unfinished or still being released;
+  - a harness probe other than `world_setup`, `new_campaign_flow` or `world_recovery` is measuring.
 - **Lifecycle stage.**
   - The setup and its generation run on the main menu, before any `Game` exists. Nothing is registered with the engine; generation produces files only.
   - The world's cultures are registered when its campaign starts. `GeneratedGameManager` registers the world's objects before initialization (R04), and `GeneratedCharacterCreation` restricts character creation to the cultures the world presents through (MMR-32, `docs/heroes.md`).
@@ -66,12 +66,13 @@ The screen shows:
   - **Generation stages 16 of 16:** a campaign needs the complete world.
 
   No other producer option appears, working or otherwise.
-- **Waiting time.** "Generating the world takes about 35 seconds": the budget's largest generation measurement, rounded up to 5 s. Without a measurement the text is hidden.
+- **Waiting time.** Before MMR-56: "Generating the world takes about 35 seconds", the budget's largest generation measurement rounded up to 5 s. Without a measurement the text is hidden. MMR-56 measured the F03 profile end to end (`docs/first-test-profile.md`), and the screen now reads: "Generating the world takes about 60 seconds. The first start of its campaign takes about 7 minutes more while the world's navigation is prepared; the game may stop responding until it is done." The first start is stated in whole minutes, rounded up, once the budget holds a `startCampaign` measurement.
   - **Measurements:** MMR-44's whole generation job, from job start or Confirm to the world ready for review: 28.6, 27.2 and 29.4 s (`generation_job` runs 30220, 27272 and 29872), and 28.3 and 30.4 s (`world_setup` runs 41228 and 26012). Run 26012 exceeded the 30 s then stated, so its measurement was added. The earlier 11.2-15.4 s measured the R01 job, which the setup no longer runs.
   - **Not used:** those runs' own Confirm-to-result times (20.1 and 26.7 s). They included a world.json parse on the engine thread, which the review found and the screen no longer does.
   - **Run 13032 (MMR-44 build):** Confirm to result took 28.1 s, with a largest frame gap of 0.19 s.
-  - **No campaign-start time** is stated. Start Campaign exists (MMR-46), but the start phase is measured on F03 worlds by MMR-56.
-  - The budget is **provisional**: MMR-56 replaces it and adds the start phase.
+  - **Campaign-start time:** MMR-56 added the `startCampaign` phase (410.5 s and 398.9 s, the navigation caches built), the tested settings and the provisional limits. Its generations (35.6, 56.6, 32.7 and 55.7 s; seed 73's world is larger) raised the stated generation time to 60 s.
+  - The budget stays **provisional**: its values are one machine's.
+  - Re-summarizing an MMR-43 run needs the budget that run's build embedded (`--budget`), since the stated times have changed since.
   - The probe fails a run whose generation exceeds the stated time.
 
 ## Generate, cancel, back
@@ -134,7 +135,7 @@ MMR-47 (`docs/recovery.md`) adds two things:
 
 ## Evidence
 
-- **Offline:** `tools/Test-WorldSetup.ps1`, 20 checks (`evidence/runtime/world-setup-tests.json`, log `world-setup-tests.txt`). They cover:
+- **Offline:** `tools/Test-WorldSetup.ps1`, 29 checks since MMR-46 and MMR-56 (`evidence/runtime/world-setup-tests.json`, log `world-setup-tests.txt`). They cover:
   - the contract and nine refusals;
   - a 17-row seed table;
   - Random World uniformity;
@@ -171,11 +172,11 @@ MMR-47 (`docs/recovery.md`) adds two things:
   - **41228:** first MMR-44 build. Generation took 28.3 s against a stated 20 s, and the run exposed the asynchronous release (a second Generate refused) and a closed-screen input error. Both are fixed.
   - **28788:** an interim MMR-44 build. Confirm to result took 33.6 s.
   - **26012:** 30.4 s against a stated 30 s; its measurement was added to the budget.
-- **Regression:** `generation_menu` run 26188 passed. The developer entries are still registered and every case ran under the harness after the menu gating.
+- **Regression:** `generation_menu` run 26188 passed. The developer entries were still registered then, and every case ran under the harness after the menu gating. (The entries and that probe were removed on 2026-10-18.)
 
 ## Limits
 
 - **Physical keyboard and controller devices are not driven.** The probe feeds synthetic key states through the screen's own mapping (`SetupInput.Map` via `WorldSetupScreen.HandleInput`, including the typing gate). The edit box's two-way binding is checked statically (prefab against view model), and the probe writes the seed through the bound property, not through the widget.
 - **The campaign start** is MMR-46's Start Campaign over MMR-45's activation (`docs/world-preview.md`, `docs/world-activation.md`). The cultures the setup names come from the source world and the presentation policy; their equality with the compiled campaign is shown on two bundles offline and on the started world in game, not proven for every world.
-- **Waiting times are provisional** (MMR-56).
+- **Waiting times are provisional**: one machine's measurements (`docs/first-test-profile.md`).
 - **Harness fix found here.** `AutorunHost.TryClaim` could not claim a request when an earlier run with the same, reused process id had left `request.<pid>.taken.json`; the game then idled at the menu. Such files are now renamed `*.stale-<utc>`, never deleted.

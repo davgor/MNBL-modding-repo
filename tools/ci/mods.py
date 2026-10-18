@@ -7,9 +7,13 @@
   info ID                  one mod's id, version, tag and build script (JSON)
   references --out DIR     download the pinned compile references (config/ci-references.json) laid out like a game install
   package ID --stage DIR --out DIR
-                           zip a staged module folder as <id>/..., with a .sha256 file and release notes
+                           zip a staged module folder as <id>/..., with a .sha256 file, release notes and a manifest
+                           (<id>-<version>.manifest.json: every file's size, SHA-256 and provenance, the dependencies, the
+                           build fingerprints and licenses); the mod's "package" block in config/mods.json lists the only
+                           files a package may hold, and no file may carry an official game or DLC name
 """
 import argparse
+import fnmatch
 import hashlib
 import json
 import os
@@ -32,6 +36,11 @@ KNOWN_DEPENDENCIES = {
     'Bannerlord.Harmony': 'Harmony (Steam Workshop item 2859188632)',
     'NavalDLC': 'War Sails DLC',
 }
+
+
+# File names that belong to the game, its DLC or a separately installed dependency: a package never carries them.
+PROPRIETARY = re.compile(r'^(TaleWorlds\..*|NavalDLC.*|SandBox.*|StoryMode.*|CustomBattle.*|Bannerlord(\..*)?\.(exe|dll)|0Harmony\.dll|steam_api.*|Steamworks.*|'
+                         r'MCMv\d.*|Bannerlord\.(ButterLib|UIExtenderEx|MBOptionScreen).*|Newtonsoft\.Json.*|.*\.(tpac|brf|xscene|xsb|xsoundevent))$', re.I)
 
 
 class CheckError(Exception):
@@ -153,6 +162,9 @@ def registry_errors(root):
         if mod.get('release'):
             if not mod.get('build') or not (root / mod['build']).is_file():
                 errors.append(f'{mod_id}: release mods need an existing "build" script')
+            block = mod.get('package')
+            if block is not None and (not block.get('files') or not block.get('provenance')):
+                errors.append(f'{mod_id}: a "package" block needs "files" and "provenance"')
         elif not mod.get('reason'):
             errors.append(f'{mod_id}: mods with "release": false need a "reason"')
     errors += reference_errors(root)
@@ -273,9 +285,10 @@ def package(root, mod_id, stage, out):
     if (staged['id'], staged['version']) != (mod_id, source['version']):
         raise CheckError(f'staged SubModule.xml is {staged["id"]} {staged["version"]}, expected {mod_id} {source["version"]}')
     version = source['version']
+    files = sorted(path for path in stage.rglob('*') if path.is_file())
+    rows = package_rows(mod, stage, files)   # refuses before anything is written
     out.mkdir(parents=True, exist_ok=True)
     archive = out / f'{mod_id}-{version}.zip'
-    files = sorted(path for path in stage.rglob('*') if path.is_file())
     with zipfile.ZipFile(archive, 'w', zipfile.ZIP_DEFLATED) as bundle:
         for path in files:
             entry = zipfile.ZipInfo(f'{mod_id}/{path.relative_to(stage).as_posix()}', date_time=(1980, 1, 1, 0, 0, 0))
@@ -302,10 +315,62 @@ def package(root, mod_id, stage, out):
         f'SHA-256 of the zip: `{digest}`',
         '',
     ]), encoding='utf-8')
+    manifest = out / f'{mod_id}-{version}.manifest.json'
+    manifest.write_text(json.dumps(package_manifest(root, mod, source, rows, archive.name, digest, commit, game), indent=1) + '\n', encoding='utf-8')
     result = {'tag': tag_for(mod_id, version), 'title': f'{source["name"]} {version}', 'zip': str(archive),
-              'sha256': str(checksum), 'notes': str(notes), 'files': len(files)}
+              'sha256': str(checksum), 'notes': str(notes), 'manifest': str(manifest), 'files': len(files)}
     github_output({key: value for key, value in result.items() if key != 'files'})
     return result
+
+
+def file_sha(path):
+    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+
+
+def package_rows(mod, stage, files):
+    """Every staged file's size, SHA-256 and provenance. Every package refuses a file named like an official game, DLC or dependency
+    file; a mod with a "package" block also refuses a file the block does not list or give a provenance, and a package that lacks a
+    listed file (every literal entry present, every pattern matched at least once)."""
+    block = mod.get('package')
+    allowed, provenance = (block or {}).get('files') or [], (block or {}).get('provenance') or {}
+    rows, problems = [], []
+    for path in files:
+        rel = path.relative_to(stage).as_posix()
+        origin = next((text for pattern, text in provenance.items() if fnmatch.fnmatchcase(rel, pattern)), None)
+        rows.append({'path': rel, 'bytes': path.stat().st_size, 'sha256': file_sha(path), 'provenance': origin})
+        if PROPRIETARY.match(PurePosixPath(rel).name):
+            problems.append(f'{rel} is named like an official game, DLC or dependency file')
+        if block is not None and not any(fnmatch.fnmatchcase(rel, pattern) for pattern in allowed):
+            problems.append(f'{rel} is not a file the package may hold (config/mods.json package.files)')
+        if block is not None and origin is None:
+            problems.append(f'{rel} has no provenance (config/mods.json package.provenance)')
+    staged = [r['path'] for r in rows]
+    for pattern in allowed:
+        if not any(fnmatch.fnmatchcase(rel, pattern) for rel in staged):
+            problems.append(f'the package lacks {pattern} (config/mods.json package.files)')
+    if problems:
+        raise CheckError('package refused: ' + '; '.join(problems))
+    return rows
+
+
+def package_manifest(root, mod, source, rows, archive_name, digest, commit, game):
+    """What a package holds and where each file comes from, the dependencies, the supported build and the licenses."""
+    block = mod.get('package')
+    locks = {}
+    for name in ('tools.lock.json', 'config/runtime-api-lock.json', REFERENCES):
+        if (root / name).is_file():
+            locks[name] = file_sha(root / name)
+    tools = json.loads((root / 'tools.lock.json').read_text(encoding='utf-8')) if (root / 'tools.lock.json').is_file() else {}
+    dirty = git(root, 'status', '--porcelain', '--', *mod.get('owns', []), check=False).stdout.strip() != ''
+    return {'schema': 'mnbl.package-manifest', 'version': 1, 'mod': mod['id'], 'name': source['name'], 'modVersion': source['version'],
+            'archive': {'file': archive_name, 'sha256': digest, 'layout': f'{mod["id"]}/... (extract into <Bannerlord install>/Modules/)'},
+            'source': {'commit': commit, 'ownedFilesUncommitted': dirty},
+            'supportedBuild': {'game': game, 'gameLock': (tools.get('game') or {}).get('version'), 'navalDlc': (tools.get('game') or {}).get('navalVersion'),
+                               'producer': {k: (tools.get('producer') or {}).get(k) for k in ('sourceCommit', 'sha256', 'schemaVersion')}, 'locks': locks},
+            'dependencies': [{'id': mod_id, 'version': version, 'optional': optional, 'installedSeparately': KNOWN_DEPENDENCIES.get(mod_id, f'{mod_id} (base game)')}
+                             for mod_id, version, optional in source['depends']],
+            'files': rows, 'totalBytes': sum(r['bytes'] for r in rows), 'runtimeRequirements': (block or {}).get('runtimeRequirements') or [],
+            'licenses': (block or {}).get('licenses') or {}, 'contentNotes': (block or {}).get('contentNotes') or [], 'notRedistributed': (block or {}).get('notRedistributed') or []}
 
 
 def main(argv=None):

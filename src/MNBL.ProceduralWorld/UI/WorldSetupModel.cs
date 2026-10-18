@@ -43,6 +43,7 @@ namespace MNBL.ProceduralWorld.UI
         public const string Cancel = "{=mnbl_ws_cancel}Cancel";
         public const string Settings = "{=mnbl_ws_settings}World settings";
         public const string Wait = "{=mnbl_ws_wait}Generating the world takes about {GENERATE} seconds.";
+        public const string WaitStart = "{=mnbl_ws_wait_start}The first start of its campaign takes about {START} minutes more while the world's navigation is prepared; the game may stop responding until it is done.";
         public const string Diagnostics = "{=mnbl_ws_diagnostics}Diagnostics";
         public const string Generated = "{=mnbl_ws_generated}World generated from seed {SEED}: {CITIES} cities of {PEOPLE_COUNT} peoples.";
         public const string Peoples = "{=mnbl_ws_peoples}Peoples of this world, with the culture each is shown as: {PEOPLES}";
@@ -317,8 +318,9 @@ namespace MNBL.ProceduralWorld.UI
 
     internal static class WaitTime
     {
-        // The budget's measured upper bound for generating the world, rounded up; without a measurement nothing is promised. Starting a
-        // campaign is not offered in this build, so its time is not stated (MMR-46 adds the action, MMR-56 measures it on F03 worlds).
+        // The budget's measured upper bound for generating the world, rounded up; without a measurement nothing is promised. MMR-56: the
+        // first start of a new world's campaign (its navigation caches built, the initial save written) as its measured upper bound in whole
+        // minutes, rounded up, once the budget holds a startCampaign measurement.
         public static Dictionary<string, string> Variables(WorldSetupContract c)
         {
             var vars = new Dictionary<string, string>(StringComparer.Ordinal);
@@ -328,9 +330,20 @@ namespace MNBL.ProceduralWorld.UI
                 double step = Math.Max(1, c.RoundToSeconds);
                 vars["GENERATE"] = (Math.Ceiling(phase.MaxSeconds / step) * step).ToString("0", CultureInfo.InvariantCulture);
             }
+            var start = c.Wait.FirstOrDefault(p => p.Id == "startCampaign");
+            if (start != null) vars["START"] = Math.Max(1, Math.Ceiling(start.MaxSeconds / 60)).ToString("0", CultureInfo.InvariantCulture);
             return vars;
         }
         public static bool Available(WorldSetupContract c) { return Variables(c).ContainsKey("GENERATE"); }
+
+        // The waiting text: generation, and the first campaign start when it is measured.
+        public static string Text(WorldSetupContract c, Func<string, Dictionary<string, string>, string> render)
+        {
+            var vars = Variables(c);
+            if (!vars.ContainsKey("GENERATE")) return "";
+            string text = render(WorldSetupText.Wait, vars);
+            return vars.ContainsKey("START") ? text + " " + render(WorldSetupText.WaitStart, vars) : text;
+        }
     }
 
     // What the player chose: the hand-off to the generation job. RequestFields are the player-determined fields of the generation request

@@ -63,15 +63,55 @@ namespace MNBL.ProceduralWorld.CampaignBootstrap
             return resolver;
         }
 
+        // The battle map's cells over the map's terrain: the reader's own cell size (terrain size / map dimension), so sampled cells are the
+        // cells it reads.
+        internal static void Cells(GeneratedMapScene map, out int width, out int height, out float cellX, out float cellY, out Vec2 terrainSize)
+        {
+            terrainSize = (Vec2)MapField("_terrainSize").GetValue(map);
+            Require(terrainSize.X > 0 && terrainSize.Y > 0, "terrain size is not loaded");
+            width = (int)Math.Ceiling(terrainSize.X / CellSize); height = (int)Math.Ceiling(terrainSize.Y / CellSize);
+            Require(width > 0 && height > 0 && width <= 4096 && height <= 4096, "battle map dimensions out of range");
+            cellX = terrainSize.X / width; cellY = terrainSize.Y / height;
+        }
+
+        // The world's terrain context for its map scene (compiled worlds), or null (fixtures: their face terrain decides).
+        internal static Func<double, double, TerrainContext> Context(GeneratedMapScene map)
+        {
+            Func<double, double, TerrainContext> context; string sceneName = map.Scene == null ? null : map.Scene.GetName();
+            return sceneName != null && ContextSources.TryGetValue(sceneName, out context) ? context : null;
+        }
+
+        // A cell's 3x3 samples classified by the navigation model itself: terrain a land party may stand on, terrain a ship may stand on
+        // (CoastalSea, OpenSea, Lake, River, UnderBridge, ...), and terrain neither may enter (Mountain); and its terrain context. The battle
+        // map's cell choice and MMR-52's probe classify cells through this one sampling.
+        internal static CellSamples SampleCell(int cx, int y, float cellX, float cellY, Func<double, double, TerrainContext> context, TaleWorlds.CampaignSystem.ComponentInterfaces.PartyNavigationModel navigation)
+        {
+            var s = new CellSamples();
+            for (int sy = 0; sy < 3; ++sy)
+                for (int sx = 0; sx < 3; ++sx)
+                {
+                    var p = new Vec2((cx + .05f + .45f * sx) * cellX, (y + .05f + .45f * sy) * cellY);
+                    bool centre = sx == 1 && sy == 1;
+                    foreach (var face in new[] { new CampaignVec2(p, true).Face, new CampaignVec2(p, false).Face })
+                    {
+                        if (!face.IsValid()) continue;
+                        var t = (TerrainType)face.FaceGroupIndex;
+                        bool onLand = navigation.IsTerrainTypeValidForNavigationType(t, MobileParty.NavigationType.Default);
+                        bool atSea = navigation.IsTerrainTypeValidForNavigationType(t, MobileParty.NavigationType.Naval);
+                        if (onLand) { s.Land.Add((int)t); if (centre) s.CentreLand = (int)t; }
+                        if (atSea) s.Sea.Add((int)t); // terrain valid for both still allows a naval battle
+                        if (!onLand && !atSea) { s.Blocked.Add((int)t); if (centre) s.CentreBlocked = (int)t; }
+                    }
+                }
+            if (context != null) { var c = context((cx + .5) * cellX, (y + .5) * cellY); if (c != null) { s.Biome = c.Biome; s.Landform = c.Landform; } }
+            return s;
+        }
+
         public static Dictionary<string, object> Install(GeneratedMapScene map, string worldId)
         {
             Require(map != null && Campaign.Current != null && ReferenceEquals(Campaign.Current.MapSceneWrapper, map), "map is not the active campaign wrapper");
-            var terrainSize = (Vec2)MapField("_terrainSize").GetValue(map);
-            Require(terrainSize.X > 0 && terrainSize.Y > 0, "terrain size is not loaded");
-            int width = (int)Math.Ceiling(terrainSize.X / CellSize), height = (int)Math.Ceiling(terrainSize.Y / CellSize);
-            Require(width > 0 && height > 0 && width <= 4096 && height <= 4096, "battle map dimensions out of range");
-            // The reader's own cell size (terrain size / map dimension), so sampled cells are the cells it reads.
-            float cellX = terrainSize.X / width, cellY = terrainSize.Y / height;
+            int width, height; float cellX, cellY; Vec2 terrainSize;
+            Cells(map, out width, out height, out cellX, out cellY, out terrainSize);
             var coordinates = map.Periodic == null ? null : map.Periodic.Coordinates;
             int originCell = 0, periodCells = width;
             if (coordinates != null)
@@ -81,8 +121,7 @@ namespace MNBL.ProceduralWorld.CampaignBootstrap
                 originCell = (int)Math.Round(origin); periodCells = (int)Math.Round(period);
             }
             var r = Resolver();
-            Func<double, double, TerrainContext> context; string sceneName = map.Scene == null ? null : map.Scene.GetName();
-            if (sceneName == null || !ContextSources.TryGetValue(sceneName, out context)) context = null;
+            var context = Context(map);
             var navigation = Campaign.Current.Models.PartyNavigationModel;
             // The cells around every settlement's position, gate and port (a ring of one cell), in canonical columns: naval map events at a
             // settlement read the patch at the main party, which may stand on land there.
@@ -105,26 +144,7 @@ namespace MNBL.ProceduralWorld.CampaignBootstrap
             var watch = System.Diagnostics.Stopwatch.StartNew();
             var built = r.Build(width, height, originCell, periodCells, coordinates != null, worldId, (cx, y) =>
             {
-                // 3x3 samples classified by the navigation model itself: terrain a land party may stand on, terrain a ship may stand on
-                // (CoastalSea, OpenSea, Lake, River, UnderBridge, ...), and terrain neither may enter (Mountain).
-                var s = new CellSamples();
-                for (int sy = 0; sy < 3; ++sy)
-                    for (int sx = 0; sx < 3; ++sx)
-                    {
-                        var p = new Vec2((cx + .05f + .45f * sx) * cellX, (y + .05f + .45f * sy) * cellY);
-                        bool centre = sx == 1 && sy == 1;
-                        foreach (var face in new[] { new CampaignVec2(p, true).Face, new CampaignVec2(p, false).Face })
-                        {
-                            if (!face.IsValid()) continue;
-                            var t = (TerrainType)face.FaceGroupIndex;
-                            bool onLand = navigation.IsTerrainTypeValidForNavigationType(t, MobileParty.NavigationType.Default);
-                            bool atSea = navigation.IsTerrainTypeValidForNavigationType(t, MobileParty.NavigationType.Naval);
-                            if (onLand) { s.Land.Add((int)t); if (centre) s.CentreLand = (int)t; }
-                            if (atSea) s.Sea.Add((int)t); // terrain valid for both still allows a naval battle
-                            if (!onLand && !atSea) { s.Blocked.Add((int)t); if (centre) s.CentreBlocked = (int)t; }
-                        }
-                    }
-                if (context != null) { var c = context((cx + .5) * cellX, (y + .5) * cellY); if (c != null) { s.Biome = c.Biome; s.Landform = c.Landform; } }
+                var s = SampleCell(cx, y, cellX, cellY, context, navigation);
                 s.Robust = settlementCells.Contains((long)y * 1000003 + (coordinates == null ? cx : cx - originCell));
                 return s;
             });

@@ -59,6 +59,8 @@ namespace MNBL.ProceduralWorld.Automation
                 ["entry"] = entry == null ? null : entry.Name.ToString(), ["order"] = entry == null ? -1 : entry.OrderIndex, ["sandboxOrder"] = sandbox == null ? -1 : sandbox.OrderIndex, ["disabled"] = disabled.Item1,
                 ["host"] = WorldSetupHost.Problems().Select(p => p.ToString()).ToList() };
             expect(entry != null && sandbox != null && entry.OrderIndex == sandbox.OrderIndex + 1 && !disabled.Item1, "the entry is beside Sandbox's and enabled on this host");
+            // The module adds no other main-menu entry (the developer "FWGC: ..." diagnostics were removed).
+            expect(!options.Any(o => o.Id != null && o.Id.StartsWith("fwgc_", StringComparison.Ordinal)), "no developer diagnostic entry is in the main menu");
             context.Checkpoint();
 
             WorldSetupScreen screen = null;

@@ -199,39 +199,13 @@ namespace MNBL.ProceduralWorld.Automation
                 // own scene lookup; the battle map's resolver record; the mismatch guard so far.
                 if (context.Int("missionScenesProbe", 0) != 0)
                 {
-                    var catalogue = MNBL.ProceduralWorld.Missions.MissionScenes.Installed();
-                    var contractLocations = new HashSet<string>(new[] { "center", "lordshall", "port", "village_center", "hideout_center" }, StringComparer.Ordinal);
-                    var settlementRows = new List<object>(); var engineMissing = new SortedSet<string>(StringComparer.Ordinal); int references = 0;
-                    foreach (var s in Settlement.All.Where(x => x.StringId.StartsWith(registration.WorldId + "_", StringComparison.Ordinal) && (x.IsTown || x.IsCastle || x.IsVillage || x.IsHideout)).OrderBy(x => x.StringId, StringComparer.Ordinal))
-                    {
-                        string kind = s.IsTown ? "town" : s.IsCastle ? "castle" : s.IsVillage ? "village" : "hideout";
-                        bool port = (s.IsTown || s.IsVillage) && s.HasPort;
-                        var locations = new Dictionary<string, string[]>(StringComparer.Ordinal);
-                        if (s.LocationComplex != null)
-                            foreach (var l in s.LocationComplex.GetListOfLocations())
-                            {
-                                // The scene each wall level opens (GetSceneName: the level's own, else level 0's); GetSceneCount counts only the
-                                // non-empty names, so it cannot bound the levels.
-                                var names = new string[4];
-                                for (int level = 0; level < 4; level++) { string n = null; try { n = l.GetSceneName(level); } catch (Exception) { n = null; } names[level] = String.IsNullOrEmpty(n) ? null : n; }
-                                locations[l.StringId] = names;
-                            }
-                        var contract = locations.Where(l => contractLocations.Contains(l.Key) && (l.Key != "port" || (kind == "town" && port))).ToDictionary(l => l.Key, l => l.Value, StringComparer.Ordinal);
-                        var problems = catalogue.LocationProblems(kind, port, contract);
-                        foreach (var r in MNBL.ProceduralWorld.Missions.MissionScenes.References(locations))
-                        {
-                            string path; references++;
-                            if (!TaleWorlds.Engine.Utilities.TryGetFullFilePathOfScene(r.Scene, out path) || String.IsNullOrEmpty(path)) engineMissing.Add(r.Scene);
-                        }
-                        settlementRows.Add(new Dictionary<string, object> { ["id"] = s.StringId, ["kind"] = kind, ["port"] = port, ["locations"] = locations.ToDictionary(l => l.Key, l => (object)l.Value),
-                            ["contractProblems"] = problems, ["references"] = catalogue.ReferenceRecord(contract) });
-                        if (problems.Count > 0) failures.Add("mission scenes: " + s.StringId + ": " + problems[0]);
-                    }
-                    if (engineMissing.Count > 0) failures.Add("mission scenes: the engine finds no scene file for " + String.Join(", ", engineMissing.Take(5)));
+                    var audit = MNBL.ProceduralWorld.Missions.LocationSceneAudit.Run(registration.WorldId);
+                    foreach (var problem in audit.Problems) failures.Add("mission scenes: " + problem);
+                    if (audit.EngineMissing.Count > 0) failures.Add("mission scenes: the engine finds no scene file for " + String.Join(", ", audit.EngineMissing.Take(5)));
                     var guard = MNBL.ProceduralWorld.Missions.MissionScenePatches.Snapshot();
-                    world["missionScenes"] = new Dictionary<string, object> { ["catalogueSha256"] = catalogue.Sha256, ["settlements"] = settlementRows, ["sceneReferences"] = references,
-                        ["engineMissing"] = engineMissing.ToList(), ["guardObservationsAtStart"] = guard.Count, ["guardMismatchesAtStart"] = MNBL.ProceduralWorld.Missions.MissionScenePatches.Mismatches };
-                    trace("mission_scenes_checked:" + settlementRows.Count + ":" + references);
+                    world["missionScenes"] = new Dictionary<string, object> { ["catalogueSha256"] = audit.CatalogueSha256, ["settlements"] = audit.Settlements, ["sceneReferences"] = audit.References,
+                        ["engineMissing"] = audit.EngineMissing.ToList(), ["guardObservationsAtStart"] = guard.Count, ["guardMismatchesAtStart"] = MNBL.ProceduralWorld.Missions.MissionScenePatches.Mismatches };
+                    trace("mission_scenes_checked:" + audit.Settlements.Count + ":" + audit.References);
                 }
                 // MMR-41: the semantic route set through the campaign's engine queries and navigation caches (the first world).
                 if (context.Int("playabilityProbe", 0) != 0)

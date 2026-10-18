@@ -115,9 +115,13 @@
     "saveTypeLedger": {
       "description": "worldgen/contracts/save-type-ledger.json: the module-fixed save definitions, versioned and append-only.",
       "type": "object", "additionalProperties": false,
-      "required": ["schema", "version", "module", "rule", "saveIdBase", "reservedRange", "entries"],
+      "required": ["schema", "version", "module", "rule", "saveIdBase", "reservedRange", "converterRule", "converters", "entries"],
       "properties": {
         "schema": { "const": "mnbl.save-type-ledger" },
+        "converterRule": { "type": "string" },
+        "converters": { "type": "array", "description": "MMR-50: the tested converters from an earlier save format; empty: none is implemented, so such saves are refused.",
+          "items": { "type": "object", "additionalProperties": false, "required": ["from", "to", "fixture", "test"],
+            "properties": { "from": { "type": "string" }, "to": { "type": "string" }, "fixture": { "type": "string" }, "test": { "type": "string" } } } },
         "version": { "const": 1 },
         "module": { "const": "MNBL.ProceduralWorld" },
         "rule": { "type": "string" },

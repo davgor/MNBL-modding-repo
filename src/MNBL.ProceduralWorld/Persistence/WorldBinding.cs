@@ -13,6 +13,8 @@ namespace MNBL.ProceduralWorld.Persistence
     internal sealed class WorldBinding
     {
         public const string Prefix = "mnbl.world.";
+        // MMR-50: the world identity schema a save's header records (WorldIdentity.Schema), here so tools without the game can compare it.
+        public const string IdentitySchema = "mnbl.world-identity.v1";
         public const string NoContent = "none";
         private static readonly Regex Hex64 = new Regex("^[0-9a-f]{64}$", RegexOptions.CultureInvariant);
         private static readonly Regex Hex32 = new Regex("^[0-9a-f]{32}$", RegexOptions.CultureInvariant);

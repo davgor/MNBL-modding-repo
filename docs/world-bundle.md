@@ -109,7 +109,7 @@ worldbridge also cross-checks the travel outputs against the compiled files besi
 
 `WorldDataBundle.Open(directory, host)` runs before any resource is constructed from a bundle. It is pure managed code with no TaleWorlds types, so the tests run it without the game.
 - It applies the rules above. Then it checks that `compiled/compatibility.json` names the installed game and War Sails versions and only capabilities the host provides.
-- It never throws for a damaged bundle. Every problem is collected into one `RejectedException`, with a message that says what to do: restore an intact copy, install the matching versions or migrate explicitly, or update MNBL.
+- It never throws for a damaged bundle. Every problem is collected into one `RejectedException`, with a message that says what to do: restore an intact copy, install the matching versions, or update MNBL. No migration is offered (MMR-50, `docs/save-compatibility.md`).
 - `ReadVerified(path)` checks a file's hash again when it is read.
 - The caller supplies the installed versions and capabilities. No construction path consumes the class yet; the runtime surface and the generation job wire it in (MMR-37, MMR-44).
 
@@ -131,7 +131,7 @@ Receipts live outside the bundle, so identical content can back separate campaig
 
 - **Engine activation is not proven here.** Neither are file locks during play, resource lifetime, or whether engine-generated resources can be moved or renamed. A filesystem rename is not proof of a safe engine activation. What is known: MMR-16 (R02) observed that a loaded scene's `terrain.bin` cannot be replaced while it is loaded, so scene names must be immutable. A bundle is never renamed or rewritten after publication. The activation transaction and its runtime proof belong to MMR-44 and U03.
 - **Cleanup is not implemented.** The bundle records what cleanup needs (`retention`: kind, what references it, when it may be deleted). The cleanup service is MMR-47, and abandoned staging is MMR-62 (done: `docs/save-binding.md`).
-- **Migration is not implemented.** A newer schema needs an explicit migration tool. Nothing is rewritten at load.
+- **Migration is not implemented.** A bundle of another schema is refused. No migration tool exists or is offered (MMR-50, `docs/save-compatibility.md`); the manifest's `migration` field states that one would be needed. Nothing is rewritten at load.
 
 ## Real bundle (size 129)
 

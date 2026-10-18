@@ -136,7 +136,7 @@ namespace MNBL.ProceduralWorld.CampaignBootstrap
         private static string Advice(IList<string> problems)
         {
             if (problems.Any(p => p.StartsWith("built for", StringComparison.Ordinal)))
-                return "Install the Bannerlord and War Sails versions it was built for, or convert it with the explicit migration tool; bundles are never rewritten at load.";
+                return "Install the Bannerlord and War Sails versions it was built for; there is no migration, and bundles are never rewritten at load.";
             if (problems.Any(p => p.StartsWith("requires runtime capability", StringComparison.Ordinal)))
                 return "Update MNBL to a version that provides the listed capabilities.";
             return "Restore an intact copy of the bundle; MNBL never repairs or regenerates a bundle at load.";

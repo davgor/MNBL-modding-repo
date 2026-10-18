@@ -506,6 +506,8 @@ namespace MNBL.ProceduralWorld.Persistence
             using (var output = new FileStream(path, FileMode.CreateNew, FileAccess.Write, FileShare.None, 4096, FileOptions.WriteThrough)) { output.Write(bytes, 0, bytes.Length); output.Flush(true); }
         }
 
+        public static string Sha256Bytes(byte[] bytes) { using (var hash = SHA256.Create()) return Hex(hash.ComputeHash(bytes)); }
+
         public static string Sha256File(string path)
         {
             using (var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read))

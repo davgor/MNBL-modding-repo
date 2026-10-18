@@ -23,7 +23,6 @@ namespace MNBL.ProceduralWorld.Automation
             {
                 case "noop": return Noop(context);
                 case "capabilities": return CapabilityProbe.Run(context);
-                case "generation_menu": return GenerationMenuProbe.Run(context);
                 case "generation_job": return GenerationJobProbe.Run(context);
                 case "world_activation": return WorldActivationProbe.Run(context);
                 case "scene_query": return SceneQueryProbe.Run(context);
@@ -37,6 +36,12 @@ namespace MNBL.ProceduralWorld.Automation
                 case "world_recovery": return WorldRecoveryProbe.Run(context);
                 case "save_binding": return SaveBindingProbe.Run(context);
                 case "two_world_matrix": return TwoWorldMatrixProbe.Run(context);
+                case "compat_matrix": return CompatibilityProbe.Run(context);
+                case "campaign_soak": return CampaignSoakProbe.Run(context);
+                case "land_missions": return LandMissionsProbe.Run(context);
+                case "naval_missions": return NavalMissionsProbe.Run(context);
+                case "first_test_profile": return FirstTestProfileProbe.Run(context);
+                case "clean_install": return CleanInstallProbe.Run(context);
                 case "sandbox_boot": return SandboxBootProbe.Run(context);
                 case "campaign_catalog": return CampaignCatalogProbe.Run(context);
                 case "generated_campaign": return GeneratedCampaignBootProbe.Run(context);
@@ -63,7 +68,7 @@ namespace MNBL.ProceduralWorld.Automation
                     int seed = Seed(parameter, 0);
                     return ScreenProbe(context, () => new HeightfieldProbeScreen(seed), null, 240);
                 }
-                default: throw new ArgumentException("Unknown probe id '" + id + "'. Known: noop, capabilities, generation_menu, scene_query, scene_sequence, native_render, runtime_surface, world_surface, world_navigation, world_setup, sandbox_boot, baseline_scenario, baseline_load, baseline_combat, surface, nav, generate:<seed>, render:<seed>, ray:<seed>, grid:<seed>.");
+                default: throw new ArgumentException("Unknown probe id '" + id + "'. Known: noop, capabilities, generation_job, world_activation, scene_query, scene_sequence, native_render, runtime_surface, world_surface, world_navigation, world_setup, new_campaign_flow, world_recovery, save_binding, two_world_matrix, compat_matrix, campaign_soak, land_missions, naval_missions, first_test_profile, clean_install, sandbox_boot, campaign_catalog, generated_campaign, generated_save_load, save_recovery, baseline_scenario, baseline_load, baseline_combat, surface, nav, generate:<seed>, render:<seed>, ray:<seed>, grid:<seed>.");
             }
         }
 

@@ -113,9 +113,45 @@ class ModsTests(unittest.TestCase):
         with zipfile.ZipFile(result['zip']) as archive:
             self.assertEqual(sorted(archive.namelist()), ['MNBL.A/SubModule.xml', 'MNBL.A/bin/Win64_Shipping_Client/MNBL.A.dll'])
         self.assertIn('Harmony (Steam Workshop item 2859188632) v2.4.2', Path(result['notes']).read_text(encoding='utf-8'))
+        manifest = json.loads(Path(result['manifest']).read_text(encoding='utf-8'))
+        self.assertEqual(sorted(f['path'] for f in manifest['files']), ['SubModule.xml', 'bin/Win64_Shipping_Client/MNBL.A.dll'])
+        self.assertEqual(manifest['archive']['sha256'], Path(result['sha256']).read_text(encoding='utf-8').split()[0])
+        self.assertEqual([d['id'] for d in manifest['dependencies']], ['Native', 'Bannerlord.Harmony'])
         (stage / 'SubModule.xml').write_text(submodule('MNBL.A', 'v9.9.9'), encoding='utf-8')
         with self.assertRaises(mods.CheckError):
             mods.package(self.repo.root, 'MNBL.A', stage, self.repo.root / 'dist')
+
+    def test_package_block_lists_and_traces_every_file_and_no_official_file_ships(self):
+        stage = self.repo.root / 'stage'
+        (stage / 'bin/Win64_Shipping_Client').mkdir(parents=True)
+        (stage / 'SubModule.xml').write_text(submodule('MNBL.A', 'v0.1.0'), encoding='utf-8')
+        (stage / 'bin/Win64_Shipping_Client/MNBL.A.dll').write_bytes(b'dll')
+        self.repo.registry([{'id': 'MNBL.A', 'release': True, 'build': 'tools/ci/Build-A.ps1', 'owns': ['Modules/MNBL.A/', 'src/MNBL.A/'],
+                             'package': {'files': ['SubModule.xml', 'bin/Win64_Shipping_Client/MNBL.A.dll'],
+                                         'provenance': {'SubModule.xml': 'repository', 'bin/*': 'built'}, 'licenses': {'module': 'test'}}},
+                            {'id': 'MNBL.Probe', 'release': False, 'reason': 'test probe', 'owns': ['Modules/MNBL.Probe/']}])
+        with redirect_stdout(io.StringIO()):
+            result = mods.package(self.repo.root, 'MNBL.A', stage, self.repo.root / 'dist')
+        manifest = json.loads(Path(result['manifest']).read_text(encoding='utf-8'))
+        self.assertEqual({f['path']: f['provenance'] for f in manifest['files']}, {'SubModule.xml': 'repository', 'bin/Win64_Shipping_Client/MNBL.A.dll': 'built'})
+        self.assertEqual(manifest['licenses'], {'module': 'test'})
+        (stage / 'bin/Win64_Shipping_Client/extra.dll').write_bytes(b'x')
+        with self.assertRaises(mods.CheckError):
+            mods.package(self.repo.root, 'MNBL.A', stage, self.repo.root / 'dist')
+        (stage / 'bin/Win64_Shipping_Client/extra.dll').unlink()
+        (stage / 'bin/Win64_Shipping_Client/MNBL.A.dll').unlink()
+        with self.assertRaises(mods.CheckError):   # a listed file missing
+            mods.package(self.repo.root, 'MNBL.A', stage, self.repo.root / 'dist')
+        (stage / 'bin/Win64_Shipping_Client/MNBL.A.dll').write_bytes(b'dll')
+        # The official-name refusal on its own: a block that allows every file still refuses these names.
+        self.repo.registry([{'id': 'MNBL.A', 'release': True, 'build': 'tools/ci/Build-A.ps1', 'owns': ['Modules/MNBL.A/', 'src/MNBL.A/'],
+                             'package': {'files': ['*'], 'provenance': {'*': 'any'}}},
+                            {'id': 'MNBL.Probe', 'release': False, 'reason': 'test probe', 'owns': ['Modules/MNBL.Probe/']}])
+        for official in ('TaleWorlds.Core.dll', '0Harmony.dll', 'NavalDLC.dll', 'scene.xscene', 'MCMv5.dll', 'Newtonsoft.Json.dll'):
+            (stage / 'bin/Win64_Shipping_Client' / official).write_bytes(b'x')
+            with self.assertRaises(mods.CheckError):
+                mods.package(self.repo.root, 'MNBL.A', stage, self.repo.root / 'dist')
+            (stage / 'bin/Win64_Shipping_Client' / official).unlink()
 
 
 if __name__ == '__main__':

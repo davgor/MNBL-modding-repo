@@ -171,7 +171,7 @@ namespace MNBL.ProceduralWorld.Surface
                 throw new SettlementPlacementRefusedException("World " + bundle.WorldContentId.Substring(0, 12), settlements.Problems);
             }
             string settlementXml = SettlementEntityFactory.ToXml(SettlementEntityFactory.Build(settlements, settlementGround, contract, placementPolicy, HelperPrefix, surface.Extent, surface.High + 100));
-            string module = ModuleRoot(), template = Path.Combine(module, "SurfaceTemplate"), encoderPath = Path.Combine(Path.GetDirectoryName(typeof(RuntimeWorldBackend).Assembly.Location), "worldbridge.exe");
+            string module = ModuleRoot(), template = MNBL.ProceduralWorld.World.SurfaceTemplateSource.Ensure(), encoderPath = Path.Combine(Path.GetDirectoryName(typeof(RuntimeWorldBackend).Assembly.Location), "worldbridge.exe");
             PlainPath(template);
             // MMR-39: the water bodies inserted after encoding (the sea plane and the lake planes, GeneratedWaterSystem) are part of the
             // encoding's identity: their XML (with placeholder names) is hashed into the scene name.

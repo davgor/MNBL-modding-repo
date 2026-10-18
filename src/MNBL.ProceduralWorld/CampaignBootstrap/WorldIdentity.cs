@@ -18,7 +18,7 @@ namespace MNBL.ProceduralWorld.CampaignBootstrap
     // (which holds the user name), and loaders resolve the package by world id and manifest hash (GeneratedWorldPackage.Resolve).
     internal static class WorldIdentity
     {
-        public const string Schema = "mnbl.world-identity.v1";
+        public const string Schema = MNBL.ProceduralWorld.Persistence.WorldBinding.IdentitySchema;
         public static readonly string[] Keys = { "schema", "id", "seed", "scene", "package", "manifestSha256", "placementSha256",
             "sceneFilesSha256", "documentsSha256", "periodic", "coordinatePolicy", "climate", "sceneXmlCrc", "navMeshCrc", "instance", "contentId" };
 

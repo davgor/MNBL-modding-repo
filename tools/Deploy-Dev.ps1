@@ -39,6 +39,8 @@ $files = @(
     @{source='build/worldbridge/Release/worldbridge.exe'; relative='bin/Win64_Shipping_Client/worldbridge.exe'}
 )
 # MMR-43: the Gauntlet prefabs (GUI/Prefabs/*.xml), after the four fixed outputs (the producer and bridge are manifest[2] and manifest[3]).
+# MMR-57: the surface template's own files and recipe, as the package ships them (the module derives the rest per user).
+foreach ($name in @('terrain.bin','navmesh.bin','template-recipe.json')) { $files += @{source="Modules/MNBL.ProceduralWorld/SurfaceTemplate/$name"; relative="SurfaceTemplate/$name"} }
 $gui = Join-Path $repo 'Modules/MNBL.ProceduralWorld/GUI'
 if (Test-Path -LiteralPath $gui) {
     $files += @(Get-ChildItem -LiteralPath $gui -Recurse -File | Sort-Object FullName | ForEach-Object {

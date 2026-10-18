@@ -194,4 +194,4 @@ The record, timings and events are deleted with the directory; durable logs are 
   - Retention of committed worlds is MMR-47/MMR-48.
   - The scene store and navigation report leftovers are listed above.
 - **Crash testing.** The producer crash test kills the fwg process this job started (by start time); it is not a natural crash. The bridge classifies the result as a mechanical failure and never retries it (MMR-24).
-- **Waiting time.** It covers generation to review only, from measured jobs on this machine (`one-shot-budget.json`, provisional; MMR-56). A run longer than the stated time fails the setup probe and adds its measurement.
+- **Waiting time.** Generation to review and, since MMR-56, the first campaign start, from measured runs on this machine (`one-shot-budget.json`, provisional; `docs/first-test-profile.md`). A run longer than the stated time fails the setup probe and adds its measurement.

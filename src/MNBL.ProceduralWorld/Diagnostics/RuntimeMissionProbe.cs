@@ -247,7 +247,7 @@ namespace MNBL.ProceduralWorld.Diagnostics
         // Waits (up to 15 s) until the map camera frame itself has stopped moving (origin moves < 0.002 per frame for
         // 30 consecutive frames) and follows the party (see Camera). The outcome goes into the next snapshot.
         private static Dictionary<string, object> lastSettle;
-        private static IEnumerator SettleCamera(ProbeContext context)
+        internal static IEnumerator SettleCamera(ProbeContext context)
         {
             double start = context.Seconds;
             float[] last = null;
@@ -389,7 +389,7 @@ namespace MNBL.ProceduralWorld.Diagnostics
 
         // ---- observations ----
 
-        private static Dictionary<string, object> Snapshot(bool naval)
+        internal static Dictionary<string, object> Snapshot(bool naval)
         {
             var main = MobileParty.MainParty;
             var map = Campaign.Current.MapSceneWrapper;
@@ -413,7 +413,7 @@ namespace MNBL.ProceduralWorld.Diagnostics
                 ["ships"] = main.Ships.Count, ["troops"] = main.MemberRoster.TotalManCount };
         }
 
-        private static void CompareReturn(Dictionary<string, object> row, List<string> failures, bool naval)
+        internal static void CompareReturn(Dictionary<string, object> row, List<string> failures, bool naval)
         {
             var before = (Dictionary<string, object>)row["before"];
             var after = (Dictionary<string, object>)row["after"];
@@ -475,7 +475,7 @@ namespace MNBL.ProceduralWorld.Diagnostics
             }
         }
 
-        private static Dictionary<string, object> MissionInfo(Mission mission, object state)
+        internal static Dictionary<string, object> MissionInfo(Mission mission, object state)
         {
             var info = new Dictionary<string, object> {
                 ["scene"] = mission.Scene.GetName(), ["sceneNameProperty"] = mission.SceneName, ["module"] = mission.Scene.GetModulePath(),
@@ -658,7 +658,7 @@ namespace MNBL.ProceduralWorld.Diagnostics
             return count;
         }
 
-        private static CampaignVec2 FindPoint(CampaignVec2 center, MobileParty.NavigationType navigation, float max, float min)
+        internal static CampaignVec2 FindPoint(CampaignVec2 center, MobileParty.NavigationType navigation, float max, float min)
         {
             var point = NavigationHelper.FindPointAroundPosition(center, navigation, max, min, true, false);
             if (!point.IsValid() || !point.Face.IsValid() || point.IsOnLand != (navigation == MobileParty.NavigationType.Default))
@@ -718,14 +718,14 @@ namespace MNBL.ProceduralWorld.Diagnostics
                 throw new InvalidOperationException("Mission changed or ended during measurement.");
         }
 
-        private static bool IsMissionScreen()
+        internal static bool IsMissionScreen()
         {
             for (var type = ScreenManager.TopScreen == null ? null : ScreenManager.TopScreen.GetType(); type != null; type = type.BaseType)
                 if (type.FullName == "TaleWorlds.MountAndBlade.View.Screens.MissionScreen") return true;
             return false;
         }
 
-        private static int ShipCount(Mission mission)
+        internal static int ShipCount(Mission mission)
         { return mission.MissionObjects.Count(o => o.GetType().FullName == "NavalDLC.Missions.Objects.MissionShip"); }
 
         internal static void Pause()
