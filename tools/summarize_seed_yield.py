@@ -1,7 +1,8 @@
 """Seed yield at the one-shot profile, offline: one quality attempt per seed through worldbridge --generate (the module's policy list,
 size 129, phase 16), then each accepted seed's bundle through the settlement harness tools/Test-Settlements.ps1 compiles (SettlementFactory
 and VillageBinding, as activation builds the settlements), the navigation sweep (tools/Test-NavigationSweep.ps1: the runtime navigation
-build, plan and validator over the stand-in engine) and the per-bundle activation harnesses (tools/Test-NavalContent.ps1, Test-SpawnPolicy,
+build, plan and validator over the stand-in engine, and the playability validator's host-check and transition flags from that report)
+and the per-bundle activation harnesses (tools/Test-NavalContent.ps1, Test-SpawnPolicy,
 Test-GraphValidation, Test-Factions, Test-Characters, Test-CampaignRegistry, Test-WaterClimate). Reads an earlier sweep and the current one
 (each a directory holding sweep.jsonl and, for the current one, settlement-checks.jsonl, navigation/navigation-sweep.jsonl and
 harnesses/harnesses.jsonl) and writes evidence/world/seed-yield.json.
@@ -111,9 +112,10 @@ def main():
             'bundle': bundle,
             'settlements': None if c is None else {'built': not fails, 'failures': [f[:240] for f in fails],
                                                    'selfTestOnly': bool(c.get('fails')) and not fails},
-            'navigation': None if nav is None else {'activatable': nav.get('activatable') is True, 'error': nav.get('error'),
+            # A failed host-check or transition flag refuses the world at runtime.playability as a failed route refuses it at navigation.
+            'navigation': None if nav is None else {'activatable': nav.get('activatable') is True and not nav.get('flagsFailed'), 'error': nav.get('error'),
                                                     'diagnostics': (nav.get('buildDiagnostics') or []) + (nav.get('planDiagnostics') or []),
-                                                    'failures': nav.get('failures') or []},
+                                                    'failures': nav.get('failures') or [], 'flagsFailed': nav.get('flagsFailed')},
             'harnesses': None if not runs else {'run': sorted(h['harness'] for h in runs), 'refusals': refusals, 'fixtureLines': fixture},
         })
     reproduced = None
@@ -142,9 +144,11 @@ def main():
         'note': ('Before: the bridge that rejected a world for one unplaceable or unreachable town. After: the town repairs, the harbour-role '
                  'and trade-distance village repairs (docs/travel-graph.md) and the village binding\'s evening out (docs/settlements.md). '
                  'settlements.built is the activation\'s settlement build on the bundle (no game); navigation.activatable is the runtime '
-                 'navigation build and validator over the stand-in engine; harnesses.refusals are exceptions from the activation\'s managed '
-                 'stages. offlineActivatable counts the seeds that pass all three. The in-game activation of seeds other than 42 and 73 is not '
-                 'shown here.'),
+                 'navigation build and validator over the stand-in engine, with no failed host-check or transition flag (flagsFailed: null '
+                 'when the sweep did not resolve them); harnesses.refusals are exceptions from the activation\'s managed stages. '
+                 'offlineActivatable counts the seeds that pass all three. Not run here: the runtime settlement placement '
+                 '(SettlementPositionResolver). In game on 2026-10-19 seeds 56 and 67 were refused there (settlement.port_far); the in-game '
+                 'activation of seeds other than 42 and 73 is otherwise not shown here.'),
     }
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     with open(OUT, 'w', encoding='utf-8', newline='\n') as f:

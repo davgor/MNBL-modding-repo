@@ -63,7 +63,7 @@ namespace MNBL.ProceduralWorld.Surface
     {
         public const string PolicyPath = "worldgen/policies/navigation.json";
         private const string Resource = "MNBL.ProceduralWorld.navigation.json";
-        public double ZOffset, SeaDatum, DeckClearance, DeckInset, SnapRadius, Interior, Separation, LandRadius, ExtraCost, SampleStep, DistanceSlack, MaxStaticFactor, StaticSlack, MinDetourExtraCells, MaxDetourFactor;
+        public double ZOffset, SeaDatum, DeckClearance, DeckInset, SnapRadius, Interior, Separation, LandRadius, ExtraCost, SampleStep, DistanceSlack, MaxStaticFactor, MaxStaticFactorAll, StaticSlack, MinDetourExtraCells, MaxDetourFactor;
         public string Sha256 { get; private set; }
 
         // The policy ships inside the module (an embedded copy of worldgen/policies/navigation.json).
@@ -84,12 +84,12 @@ namespace MNBL.ProceduralWorld.Surface
                 ZOffset = n("mesh", "zOffset"), SeaDatum = n("mesh", "seaDatum"), DeckClearance = n("mesh", "deckClearance"), DeckInset = n("mesh", "deckInsetFraction"),
                 SnapRadius = n("snapping", "radiusFraction"), Interior = n("snapping", "interiorFraction"), Separation = n("snapping", "separationFraction"),
                 LandRadius = n("routes", "landRadius"), ExtraCost = n("routes", "extraCostMultiplier"), SampleStep = n("routes", "sampleStep"), DistanceSlack = n("routes", "distanceSlack"),
-                MaxStaticFactor = n("routes", "maxStaticFactor"), StaticSlack = n("routes", "staticSlackFraction"),
+                MaxStaticFactor = n("routes", "maxStaticFactor"), MaxStaticFactorAll = n("routes", "maxStaticFactorAll"), StaticSlack = n("routes", "staticSlackFraction"),
                 MinDetourExtraCells = n("barrier", "minDetourExtraCells"), MaxDetourFactor = n("barrier", "maxDetourFactor") };
             if (!(p.DeckInset > 0 && p.DeckInset < .5)) throw new InvalidDataException("mesh.deckInsetFraction must lie in (0, 0.5).");
             if (!(p.SnapRadius >= 0 && p.SnapRadius <= 2)) throw new InvalidDataException("snapping.radiusFraction must lie in [0, 2].");
             if (!(p.Interior > 0 && p.Interior < .25) || !(p.Separation > 0 && p.Separation < .5)) throw new InvalidDataException("snapping fractions out of range.");
-            if (!(p.SampleStep > 0) || !(p.LandRadius > 0) || !(p.ExtraCost > 0) || !(p.DeckClearance > 0) || !(p.MaxDetourFactor > 1) || !(p.MaxStaticFactor >= 1) || !(p.StaticSlack >= 0)) throw new InvalidDataException("route or mesh constants out of range.");
+            if (!(p.SampleStep > 0) || !(p.LandRadius > 0) || !(p.ExtraCost > 0) || !(p.DeckClearance > 0) || !(p.MaxDetourFactor > 1) || !(p.MaxStaticFactor >= 1) || !(p.MaxStaticFactorAll >= p.MaxStaticFactor) || !(p.StaticSlack >= 0)) throw new InvalidDataException("route or mesh constants out of range.");
             p.Sha256 = Json.Sha(bytes);
             return p;
         }

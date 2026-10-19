@@ -1,6 +1,7 @@
 // The navigation half of a seed sweep (tools/Test-NavigationSweep.ps1): each given world bundle through the runtime navigation build, its
 // static plan and the validator over the managed stand-in engine, as activation runs them (RuntimeNavigationBuilder, NavigationPlan,
-// NavigationValidator), with no game process. One JSON line per bundle: the build's diagnostics, the plan's, the validator's verdict.
+// NavigationValidator), with no game process. One JSON line per bundle: the build's diagnostics, the plan's, the validator's verdict, and the
+// host-check and transition flags the playability validator resolves from that report (RuntimePlayabilityValidator.ResolveFlags).
 // Usage: NavigationSweep REPO GAME_ROOT OUT_JSONL BUNDLE...
 using System;
 using System.Collections.Generic;
@@ -62,12 +63,18 @@ internal static class NavigationSweep
                     var report = NavigationValidator.Run(plan, new MeshNavigationEngine(build.Mesh, model), "sweep", null);
                     row["activatable"] = report["activatable"];
                     row["failures"] = ((System.Collections.IEnumerable)report["failures"]).Cast<Dictionary<string, object>>().Take(12).Select(f => (object)(f["subject"] + ": " + f["detail"])).ToList();
-                    if (!(bool)report["activatable"] || build.Diagnostics.Count > 0) refused++;
+                    // The host checks and transitions the activation's playability report resolves from this navigation report (the settlement
+                    // entity checks and semantic routes need the game: taken as passed here, so only the navigation-decided flags count).
+                    var flags = RuntimePlayabilityValidator.ResolveFlags(bundle.ReadVerified("compiled/travel/travel-graph.json"), bundle.ReadVerified("compiled/travel/ports.json"), new string[0], report,
+                        new Dictionary<string, object> { ["passed"] = true }, true, 0);
+                    var failedFlags = flags.Where(f => (string)f["status"] != "resolved" && ((string)f["kind"] == "hostCheck" || (string)f["kind"] == "transition")).ToList();
+                    row["flagsFailed"] = failedFlags.Take(12).Select(f => (object)(f["kind"] + " " + f["check"] + " " + f["subject"] + ": " + f["by"])).ToList();
+                    if (!(bool)report["activatable"] || build.Diagnostics.Count > 0 || failedFlags.Count > 0) refused++;
                 }
                 catch (Exception e) { row["error"] = e.GetType().Name + ": " + e.Message; row["stack"] = e.StackTrace; refused++; }
                 output.WriteLine(Serializer.Serialize(row));
                 output.Flush();
-                Console.WriteLine(row["bundle"] + " " + (row.ContainsKey("error") ? "error " + row["error"] : "activatable " + row["activatable"]));
+                Console.WriteLine(row["bundle"] + " " + (row.ContainsKey("error") ? "error " + row["error"] : "activatable " + row["activatable"] + (row.ContainsKey("flagsFailed") && ((List<object>)row["flagsFailed"]).Count > 0 ? ", flags failed " + ((List<object>)row["flagsFailed"]).Count : "")));
             }
         Console.WriteLine("navigation sweep: " + (args.Length - 3 - refused) + "/" + (args.Length - 3) + " activatable");
         return refused == 0 ? 0 : 1;

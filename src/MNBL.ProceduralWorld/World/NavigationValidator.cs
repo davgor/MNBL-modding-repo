@@ -552,6 +552,19 @@ namespace MNBL.ProceduralWorld.Surface
                         int step = Math.Max(1, cells.Count / 16);
                         for (int k = 0; k < cells.Count; k += step)
                             Face(h.Check, h.Subject, "openSea " + h.Subject + " cell " + (cells[k] / t.Cols) + "," + (cells[k] % t.Cols), CellCentre(cells[k] / t.Cols, cells[k] % t.Cols), false, new[] { TerrainTypes.Name(Build.FaceGroups["openSea"]) }, new[] { h.Subject });
+                        if (cells.Count == 0)
+                        {
+                            // A basin with no OpenSea cell ("storms cannot spawn"): its water cells carry their own faces, none OpenSea (2026-10-19: 10 of
+                            // 19 swept worlds have one; with no row the flag failed as unchecked).
+                            var water = Enumerable.Range(0, t.Classes.Length).Where(i => Build.BasinOf[i] == basin && TravelCells.Water(t.Classes[i])).ToList();
+                            int waterStep = Math.Max(1, water.Count / 16);
+                            for (int k = 0; k < water.Count; k += waterStep)
+                            {
+                                byte c = t.Classes[water[k]];
+                                Face(h.Check, h.Subject, "openSea " + h.Subject + " water cell " + (water[k] / t.Cols) + "," + (water[k] % t.Cols), CellCentre(water[k] / t.Cols, water[k] % t.Cols), false,
+                                     new[] { input.FaceGroupNames[c == TravelCells.Lake ? "lake" : c == TravelCells.River ? "river" : "coastalSea"] }, new[] { h.Subject });
+                            }
+                        }
                         break;
                     }
                     case "islands":
@@ -863,7 +876,7 @@ namespace MNBL.ProceduralWorld.Surface
     internal static class NavigationValidator
     {
         public const string ReportSchema = "mnbl.navigation-report";
-        public const string Version = "mmr38/2";
+        public const string Version = "mmr38/3";   // 3 (2026-10-19): All routes take routes.maxStaticFactorAll; a basin with no OpenSea cell is checked by its water faces
 
         // The route matrix, face checks, face table and islands through an engine. Returns the report; its "activatable" is false when the
         // static plan or any gating engine result disagrees with the intended topology. engineFaults names any fault injected into the engine
@@ -1044,8 +1057,11 @@ namespace MNBL.ProceduralWorld.Surface
                 if (r.Through != null && !PassesThrough(engine, plan, polyline, policy.SampleStep, r)) problems.Add("does not cross " + (TerrainTypes.Name(r.ThroughGroup) ?? "?") + " faces of cell(s) " + String.Join(" ", r.Through.Select(c => c[0] + "," + c[1])));
             }
             if (reachable && !double.IsNaN(distance) && distance < straight - policy.DistanceSlack) problems.Add("distance " + Math.Round(distance, 3) + " is shorter than the straight " + Math.Round(straight, 3));
-            if (found && !double.IsNaN(length) && !double.IsNaN(r.StaticLength) && length > policy.MaxStaticFactor * r.StaticLength + policy.StaticSlack * spacing)
-                problems.Add("path length " + Math.Round(length, 3) + " exceeds " + policy.MaxStaticFactor + " x the mesh's shortest path " + Math.Round(r.StaticLength, 3) + " + " + policy.StaticSlack + " cell (a detour)");
+            // An All route (land and sea, with region switches) takes its own bound: the engine's route over the square sea faces can run longer than the
+            // shortest corridor with its faces and switches right, up to a staircase's sqrt 2 at 45 degrees (seed 43's world: one route across the seam, 1.29 x).
+            double factor = r.Type == "All" ? policy.MaxStaticFactorAll : policy.MaxStaticFactor;
+            if (found && !double.IsNaN(length) && !double.IsNaN(r.StaticLength) && length > factor * r.StaticLength + policy.StaticSlack * spacing)
+                problems.Add("path length " + Math.Round(length, 3) + " exceeds " + factor + " x the mesh's shortest path " + Math.Round(r.StaticLength, 3) + " + " + policy.StaticSlack + " cell (a detour)");
             if (found && !double.IsNaN(length))
             {
                 if (length < straight - policy.DistanceSlack) problems.Add("path length " + Math.Round(length, 3) + " is shorter than the straight " + Math.Round(straight, 3));

@@ -185,6 +185,17 @@ internal static class NavigationContractTests
         Check(!(bool)faultReport["activatable"] && buildA.Bridges.All(b => b.Subjects.All(s => faultFailures.Any(f => (string)f["subject"] == "bridge crossing " + s && ((string[])f["sourceIds"]).Contains(s)))),
               "A with Bridge faces disabled in the engine: not activatable; every bridge crossing route fails naming its crossing (" + faultFailures.Count + " failures)");
 
+        // The detour bound by route type (2026-10-19): an All route takes routes.maxStaticFactorAll (sqrt 2), the others maxStaticFactor (1.25).
+        // An engine that lengthens every path by a factor stands in for the native route over the square sea faces (seed 43's world: 1.29). The
+        // routes are over 100 units, so the bound's slack (half a cell) does not decide.
+        Check(policy.MaxStaticFactor == 1.25 && Math.Abs(policy.MaxStaticFactorAll - Math.Sqrt(2)) < 1e-6, "the policy bounds All routes at sqrt 2 x the mesh's shortest path, the others at 1.25");
+        Func<double, RouteCheck, bool> detour = (factor, route) =>
+            NavigationValidator.EvaluateRoute(planA, new StretchedEngine(new MeshNavigationEngine(buildA.Mesh, model), factor), route, null).Problems.Any(x => x.EndsWith("(a detour)", StringComparison.Ordinal));
+        var allRoute = planA.Routes.FirstOrDefault(r => r.Type == "All" && r.Expected && !double.IsNaN(r.StaticLength) && r.StaticLength > 100);
+        var landRoute = planA.Routes.FirstOrDefault(r => r.Type == "Default" && r.Expected && !double.IsNaN(r.StaticLength) && r.StaticLength > 100);
+        Check(allRoute != null && landRoute != null && !detour(1.0, allRoute) && !detour(1.3, allRoute) && detour(1.5, allRoute) && !detour(1.0, landRoute) && detour(1.3, landRoute),
+              "an All route " + (allRoute == null ? "" : allRoute.Id) + " 1.3 x its mesh path passes and 1.5 x is a detour; a Default route " + (landRoute == null ? "" : landRoute.Id) + " 1.3 x is a detour");
+
         // The fixture world: designed expectations, production builder and validator.
         var fixtureInput = NavigationVariants.Apply(NavigationFixtures.Variant, inputA, policy);
         var fixture = RuntimeNavigationBuilder.Build(fixtureInput, policy);
@@ -260,6 +271,42 @@ internal static class NavigationContractTests
         // Scene identity includes the navmesh.
         Check(SceneNames.ForWorld(inputA.WorldContentId, "encoder", "template", 1600, buildA.Sha256) != SceneNames.ForWorld(inputA.WorldContentId, "encoder", "template", 1600, fixture.Sha256),
               "the content-addressed scene name changes with the navmesh (production and fixture navigation of one world are different scenes)");
+    }
+
+    // The managed stand-in with every path lengthened to factor times its own: an excursion back along the first segment and out again
+    // (the cost grows by the same length, so the region switches still count right).
+    private sealed class StretchedEngine : INavigationEngine
+    {
+        private readonly MeshNavigationEngine inner; private readonly double factor;
+        public StretchedEngine(MeshNavigationEngine inner, double factor) { this.inner = inner; this.factor = factor; }
+        public string Name { get { return "stretched stand-in"; } }
+        public bool Face(double x, double y, bool land, out int face, out int group, out int island) { return inner.Face(x, y, land, out face, out group, out island); }
+        public bool Path(int fromFace, int toFace, double[] from, double[] to, double radius, int[] excluded, double extraCost, int costToSea, int costToLand, out List<double[]> points)
+        {
+            if (!inner.Path(fromFace, toFace, from, to, radius, excluded, extraCost, costToSea, costToLand, out points) || points == null || factor == 1) return points != null;
+            var line = new List<double[]> { from }; line.AddRange(points); line.Add(to);
+            double length = 0; for (int i = 1; i < line.Count; i++) length += NavigationPlan.Distance(line[i - 1], line[i]);
+            int k = Enumerable.Range(1, line.Count - 1).First(i => NavigationPlan.Distance(line[i - 1], line[i]) > 1e-9);
+            double dx = line[k][0] - line[k - 1][0], dy = line[k][1] - line[k - 1][1], d = Math.Sqrt(dx * dx + dy * dy), half = (factor - 1) * length / 2;
+            var back = new[] { from[0] - dx / d * half, from[1] - dy / d * half };
+            points = new List<double[]> { back, new[] { from[0], from[1] } }.Concat(points).ToList();
+            return true;
+        }
+        public bool Distance(int fromFace, int toFace, double[] from, double[] to, double radius, double limit, int[] excluded, int costToSea, int costToLand, out double distance)
+        {
+            if (!inner.Distance(fromFace, toFace, from, to, radius, limit, excluded, costToSea, costToLand, out distance)) return false;
+            List<double[]> points;
+            if (factor != 1 && inner.Path(fromFace, toFace, from, to, radius, excluded, 1, costToSea, costToLand, out points) && points != null)
+            {
+                var line = new List<double[]> { from }; line.AddRange(points); line.Add(to);
+                double length = 0; for (int i = 1; i < line.Count; i++) length += NavigationPlan.Distance(line[i - 1], line[i]);
+                distance += (factor - 1) * length;
+            }
+            return true;
+        }
+        public int FaceCount { get { return inner.FaceCount; } }
+        public int FaceGroup(int face) { return inner.FaceGroup(face); }
+        public double[] FaceCenter(int face) { return inner.FaceCenter(face); }
     }
 
     private static IEnumerable<Dictionary<string, object>> Failures(Dictionary<string, object> report) { return ((System.Collections.IEnumerable)report["failures"]).Cast<Dictionary<string, object>>(); }

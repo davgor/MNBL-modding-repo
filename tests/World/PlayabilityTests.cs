@@ -259,6 +259,27 @@ internal static class PlayabilityTests
                 ["notFlags"] = play["notFlags"], ["engine"] = mesh.Name };
         }
 
+        // A coast transition on a seam column (2026-10-19, seed 43's world): its seamTransition host check ("coast group G") resolves from the
+        // coastTransition rows of the group's seam-column coast transitions; a group with none routed fails, as does a disagreeing row.
+        {
+            Func<bool, byte[]> seamReport = agrees => Encoding.UTF8.GetBytes(Serializer.Serialize(new Dictionary<string, object> { ["activatable"] = true, ["failures"] = new object[0],
+                ["engine"] = new Dictionary<string, object> { ["faces"] = new object[0], ["islands"] = new Dictionary<string, object> { ["problems"] = new object[0] },
+                    ["routes"] = new object[] { new Dictionary<string, object> { ["check"] = "coastTransition", ["subject"] = "group 1 cell 2,3", ["agrees"] = agrees } } } }));
+            byte[] seamGraph = Encoding.UTF8.GetBytes(Serializer.Serialize(new Dictionary<string, object> { ["engineValidation"] = "pending", ["grid"] = new Dictionary<string, object> { ["cols"] = 4 },
+                ["hostChecks"] = new object[] { new Dictionary<string, object> { ["check"] = "seamTransition", ["subject"] = "coast group 1" }, new Dictionary<string, object> { ["check"] = "seamTransition", ["subject"] = "coast group 2" } },
+                ["transitions"] = new object[] {
+                    new Dictionary<string, object> { ["kind"] = "coast", ["group"] = 1, ["landCell"] = new[] { 2, 3 }, ["seaCell"] = new[] { 2, 0 }, ["status"] = "pendingEngineValidation" },
+                    new Dictionary<string, object> { ["kind"] = "coast", ["group"] = 2, ["landCell"] = new[] { 1, 1 }, ["seaCell"] = new[] { 1, 2 }, ["status"] = "pendingEngineValidation" } } }));
+            byte[] seamPorts = Encoding.UTF8.GetBytes("{\"engineValidation\":\"pending\"}");
+            Func<bool, Dictionary<string, Dictionary<string, object>>> seamFlags = agrees => RuntimePlayabilityValidator.ResolveFlags(seamGraph, seamPorts, new string[0],
+                    (IDictionary<string, object>)Serializer.DeserializeObject(Encoding.UTF8.GetString(seamReport(agrees))), new Dictionary<string, object> { ["passed"] = true }, true, 0)
+                .Where(f => (string)f["kind"] == "hostCheck").ToDictionary(f => (string)f["subject"]);
+            var agreeing = seamFlags(true); var disagreeing = seamFlags(false);
+            Check((string)agreeing["coast group 1"]["status"] == "resolved" && (string)agreeing["coast group 2"]["status"] == "failed" && (string)disagreeing["coast group 1"]["status"] == "failed",
+                "a coast seamTransition host check resolves from its group's seam-column coastTransition rows (" + agreeing["coast group 1"]["by"] + "); a group with none routed fails ("
+                + agreeing["coast group 2"]["by"] + "), as does a disagreeing row");
+        }
+
         // Capability refusals (per clan: the moving clan's ships decide).
         var small = new PlayabilityWorld { Distance = (x, y) => Math.Sqrt((x[0] - y[0]) * (x[0] - y[0]) + (x[1] - y[1]) * (x[1] - y[1])) };
         Action<string, string, string, string, double, int> site = (id, kind, kingdom, owner, x, group) => small.Sites[id] = new PlayabilityWorld.Site { Id = id, Kind = kind, Kingdom = kingdom, Owner = owner, Gate = new double[] { x, 0 }, Group = group };

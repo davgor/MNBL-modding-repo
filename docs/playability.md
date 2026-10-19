@@ -113,7 +113,7 @@ Only towns have ports in the route set; harbour villages' drop-off ports are in 
 | Flag | Source | Resolved when |
 |---|---|---|
 | travel graph `engineValidation: pending` | `compiled/travel/travel-graph.json` | MMR-38's navigation report is activatable |
-| each host check (`check`, `subject`, status pending) | travel graph `hostChecks` (634 on A, 905 on B) | every engine face and route MMR-38 ran for it agrees; `distinctPositions`: no static diagnostic names it; `islands`: the engine islands check found no problem |
+| each host check (`check`, `subject`, status pending) | travel graph `hostChecks` (634 on A, 905 on B) | every engine face and route MMR-38 ran for it agrees; `distinctPositions`: no static diagnostic names it; `islands`: the engine islands check found no problem; `seamTransition` of a coast group (`coast group G`): the coastTransition rows of the group's coast transitions on a seam column agree (2026-10-19: seed 43's world was refused before, its flag unresolved) |
 | each transition `pendingEngineValidation` | travel graph `transitions` (51 on A, 34 on B) | its portFace or seamTransition rows (port), or its coastTransition rows (coast), agree |
 | ports `engineValidation: pending` | `compiled/travel/ports.json` | every portFace and portGate host check resolved and the settlement entity checks passed |
 | W05 | the campaign graph's `pendingRuntime` (runtime settlement, gate and port positions) | MMR-40's settlement entity checks passed |

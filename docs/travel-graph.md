@@ -150,10 +150,11 @@ Each round starts again from the compiled classes with the joins and moves found
 - seeds 42–73 went from 1 of 32 accepted to 19 of 32, world A (42) and world B (73) among them, both with their content ids unchanged;
 - each of the 19 passes the activation's managed stages offline:
   - it builds its settlements through SettlementFactory and the village binding (the harness of `tools/Test-Settlements.ps1`);
-  - it passes the runtime navigation build, plan and validator over the stand-in engine (`tools/Test-NavigationSweep.ps1`);
+  - it passes the runtime navigation build, plan and validator over the stand-in engine, and every host-check and transition flag the playability validator resolves from that report (`tools/Test-NavigationSweep.ps1`). The flags were added on 2026-10-19: seed 43's world had passed the sweep and was refused in game on an unresolved seam flag. The first flagged sweep failed 10 of the 19 on basins with no OpenSea cell, which the validator now checks (`docs/runtime-navigation.md`); the re-sweep passes all 19 (`build/seed-sweep/after5/navigation`; the earlier run is kept beside it);
   - its naval content, spawn policy, graph validation, factions, characters, registry and water stages raise no refusal (their harnesses);
 - 12 of the 13 rejected seeds fail on a repair bound (snaps, passes, footprints or harbour shifts), and seed 71 on too many excluded villages;
-- the built worldbridge reproduces every one of the 19 bundles byte for byte (`build/seed-sweep/after6`, `after6-73`).
+- the built worldbridge reproduces every one of the 19 bundles byte for byte (`build/seed-sweep/after6`, `after6-73`);
+- not run offline: the runtime settlement placement (`SettlementPositionResolver`). In game on 2026-10-19, seeds 56 and 67 were refused there with `settlement.port_far`: a port 13.813 and 13.321 units from the town's placed gate, against 12.5. The bridge bounds the port's path from its own gate point. This is open.
 
 The harnesses also carry world A's fixture counts (ruler and slot counts) and their negative self-tests are written against A; on other worlds those lines fail without a refusal and are listed as `fixtureLines`. One describes the world rather than the fixture, and is follow-up for broad seed certification: B and seed 57 present 6 of the 7 character-creation cultures (no Khuzait realm); a player who picks the missing culture starts through the spawn policy's culture fallback. A third line, lake copies cut by the terrain's edge on 8 worlds (B among them), was a presentation defect, fixed the same day (`docs/water-climate.md`, Edge copies).
 

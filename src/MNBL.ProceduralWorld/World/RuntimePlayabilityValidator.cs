@@ -234,7 +234,8 @@ namespace MNBL.ProceduralWorld.Surface
         // Every compiler pending-runtime flag, resolved or failed, with what decided it:
         //   travel graph       engineValidation: the navigation report (MMR-38) is activatable
         //   host checks        each (check, subject): every engine face and route MMR-38 ran for it agrees; distinctPositions: no static
-        //                      diagnostic names it; islands: the engine islands check found no problem
+        //                      diagnostic names it; islands: the engine islands check found no problem; a coast seamTransition
+        //                      ("coast group G"): the coastTransition rows of the group's coast transitions on a seam column
         //   transitions        each port transition: its portFace or seamTransition rows agree; each coast transition: its coastTransition rows
         //   ports              ports.json engineValidation: every portFace and portGate host check resolved and the settlement entity checks
         //                      passed (MMR-40: ports, arcs and drop-offs over sea faces)
@@ -265,6 +266,21 @@ namespace MNBL.ProceduralWorld.Surface
                 string engineSubject = check == "seamTransition" ? subject.Replace("port ", "") : subject;
                 bool ok; string by;
                 if (check == "distinctPositions") { ok = !failures.Any(f => (f.ContainsKey("subject") ? f["subject"] as string : null) == "distinctPositions"); by = ok ? "every listed settlement was separated (no static diagnostic)" : "a listed settlement was not separated"; }
+                else if (check == "seamTransition" && subject.StartsWith("coast group ", StringComparison.Ordinal))
+                {
+                    // A coast transition on a seam column: the validator routes it with every coast transition (coastTransition, by its group and
+                    // land cell), so its rows decide (seed 43's world: coast group 0 at cell 0,0, failed as unrouted before).
+                    string group = subject.Substring("coast group ".Length);
+                    int cols = Json.I(Json.O(graph, "grid"), "cols");
+                    Func<object, bool> seam = c => { var cell = Json.Cell(c); return cell[1] == 0 || cell[1] == cols - 1; };
+                    var rows = Json.A(graph, "transitions").Cast<IDictionary<string, object>>()
+                        .Where(t => Json.S(t, "kind") == "coast" && Convert.ToString(Json.I(t, "group"), CultureInfo.InvariantCulture) == group && (seam(t["landCell"]) || seam(t["seaCell"])))
+                        .SelectMany(t => { var cell = Json.Cell(t["landCell"]); List<IDictionary<string, object>> list; return rowsByCheck.TryGetValue("coastTransition|group " + group + " cell " + cell[0] + "," + cell[1], out list) ? list : new List<IDictionary<string, object>>(); })
+                        .ToList();
+                    int agree = rows.Count(r => Equals(r["agrees"], true));
+                    ok = rows.Count > 0 && agree == rows.Count;
+                    by = rows.Count == 0 ? "no coastTransition route ran for the group's seam transition" : agree + " of " + rows.Count + " coastTransition routes of the group's seam transition agree";
+                }
                 else if (check == "islands") { ok = islandProblems != null && islandProblems.Count == 0; by = ok ? "the engine islands check found no problem" : "engine islands problems: " + (islandProblems == null ? "no report" : islandProblems.Count.ToString(CultureInfo.InvariantCulture)); }
                 else
                 {

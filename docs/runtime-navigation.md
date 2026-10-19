@@ -151,6 +151,7 @@ The static plan also computes each expected route's shortest path on the mesh. T
 - **Per found path:**
   - It is sampled every 0.25 units, MMR-17's step, and must stay in its domain. A sample whose own lookup fails counts as in its domain when a point 0.05 units away does; MMR-17 had no such tolerance. This keeps a path along a sea/mountain edge, where the lookup may answer with either face, from counting as a shortcut, which crosses whole cells.
   - Its length must lie between the straight distance and 1.25 × the mesh's shortest path + half a cell. The worst ratio was 1.14.
+  - **All routes** (land and sea, with region switches) take √2 instead of 1.25 (`routes.maxStaticFactorAll`, validator `mmr38/3`, 2026-10-19). The engine's own route over the square sea faces can leave the shortest corridor even when its faces and switches are right. The `route_trace` probe on seed 43's world showed one: a route across the seam that turned at coast corners, crossed the seam column at a lattice corner, overshot 28 units west and doubled back, 1.29 × the stand-in's straight diagonal. That one route refused an otherwise playable world. √2 is how much a staircase through square faces exceeds the straight line at 45°, the worst case for a path that moves steadily across the grid. A path that wanders more than that still fails. Default and Naval routes keep 1.25, since there a detour means a missing connection. Changing the bound makes every stored navigation report stale, so a campaign saved before it loads as not-rebuildable.
   - Its region switches are counted exactly, as (engine cost − path length) / 50.
   - A bridge route must cross its deck's Bridge face, or its UnderBridge face for a sea route under the deck.
 - **Islands:** the MMR-28 members.
@@ -173,10 +174,10 @@ For each world:
 | `pass`, `footprint` | Plain land face |
 | `seaRoute` | Naval route from the group's port to the nearest main-group coast or port in the same basin, both ways |
 | `distinctPositions` | Separated (above) |
-| `openSea` | OpenSea faces on up to 16 of the basin's OpenSea cells |
+| `openSea` | OpenSea faces on up to 16 of the basin's OpenSea cells. A basin with no OpenSea cell ("storms cannot spawn"): up to 16 of its water cells carry their own CoastalSea, Lake or River face (validator `mmr38/3`, 2026-10-19; before, no row ran and the flag failed, which the offline sweep showed on 10 of the 19 swept worlds) |
 | `islands` | Static: gates, ports and kept castles on one All component. Engine: on one engine island. This is weak: each mesh is one connected piece, and the engine reports one island |
 | `padding` | No face, land or sea, beyond either pole line |
-| `seamTransition` | The port transition route across the seam column. The embark action at the seam is MMR-65's |
+| `seamTransition` | The port transition route across the seam column. A coast transition on a seam column (`coast group G`) is routed with every coast transition (below), and its flag resolves from those rows (`docs/playability.md`). The embark action at the seam is MMR-65's |
 | (coast transitions) | All route from each coast transition's land point to its sea point, exactly one region switch |
 
 **Results (run 42984, matched by run 42956)**

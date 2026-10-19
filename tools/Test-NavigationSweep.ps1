@@ -1,6 +1,8 @@
 # The navigation half of a seed sweep: compiles the runtime navigation builder, its validator and tests/World/NavigationSweep.cs against the
 # pinned framework and game assemblies (as tools/Test-WorldNavigation.ps1 does) and runs every bundle under -Root (or the -Bundle paths)
-# through the navigation build, the static plan and the validator over the managed stand-in engine, as activation runs them. No game.
+# through the navigation build, the static plan and the validator over the managed stand-in engine, as activation runs them, then the
+# playability validator's host-check and transition flags from that report (World/RuntimePlayabilityValidator.cs, with the sources it
+# compiles with in tools/Test-Playability.ps1; 2026-10-19: seed 43's world passed the sweep and failed a seam flag in game). No game.
 # Writes <Out>/navigation-sweep.jsonl.
 param([string]$Root, [string[]]$Bundle, [string]$Out, [string]$GameRoot = 'D:\SteamLibrary\steamapps\common\Mount & Blade II Bannerlord')
 $ErrorActionPreference = 'Stop'
@@ -14,7 +16,11 @@ if ($paths.Count -eq 0) { throw 'No bundle given (-Root or -Bundle).' }
 $csc = 'C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/MSBuild/Current/Bin/Roslyn/csc.exe'
 $sources = @('src/MNBL.ProceduralWorld/World/RuntimeNavigationBuilder.cs', 'src/MNBL.ProceduralWorld/World/NavigationValidator.cs', 'src/MNBL.ProceduralWorld/World/NavigationFixtures.cs',
     'src/MNBL.ProceduralWorld/World/WorldSurface.cs', 'src/MNBL.ProceduralWorld/World/WorldLifetime.cs', 'src/MNBL.ProceduralWorld/World/PeriodicWorldCoordinates.cs', 'src/MNBL.ProceduralWorld/World/PeriodicDistanceModel.cs',
-    'src/MNBL.ProceduralWorld/CampaignBootstrap/WorldDataBundle.cs', 'tests/World/NavigationSweep.cs')
+    'src/MNBL.ProceduralWorld/CampaignBootstrap/WorldDataBundle.cs', 'src/MNBL.ProceduralWorld/World/RuntimePlayabilityValidator.cs', 'src/MNBL.ProceduralWorld/World/NavigationCacheKey.cs',
+    'src/MNBL.ProceduralWorld/Persistence/DurableFile.cs', 'src/MNBL.ProceduralWorld/World/SettlementPositionResolver.cs', 'src/MNBL.ProceduralWorld/World/SettlementEntityFactory.cs',
+    'src/MNBL.ProceduralWorld/Campaign/CampaignIdentity.cs', 'src/MNBL.ProceduralWorld/Campaign/FactionFactory.cs', 'src/MNBL.ProceduralWorld/Campaign/CharacterTemplateResolver.cs',
+    'src/MNBL.ProceduralWorld/Campaign/HeroFactory.cs', 'src/MNBL.ProceduralWorld/Campaign/SettlementFactory.cs', 'src/MNBL.ProceduralWorld/Campaign/VillageBinding.cs',
+    'src/MNBL.ProceduralWorld/Missions/MissionScenes.cs', 'src/MNBL.ProceduralWorld/Campaign/RegistrationPlan.cs', 'tests/World/NavigationSweep.cs')
 $lock = Get-Content "$repo/config/runtime-api-lock.json" -Raw | ConvertFrom-Json
 $references = @()
 foreach ($name in @('mscorlib', 'netstandard', 'System', 'System.Core', 'System.Xml', 'System.Web.Extensions')) {

@@ -3,7 +3,7 @@
 Mods for Mount & Blade II: Bannerlord v1.4.8 with War Sails. The main one is **MNBL Procedural World**: from the main menu, **New Procedural Campaign** generates a new world from a seed, inside the running game, and starts a Sandbox campaign in it. The world comes with its own terrain, settlements, kingdoms, clans, heroes, economy and land and sea routes, on a flat map that wraps from east to west. Its saves stay bound to that world.
 
 **Status (2026-10-19): a tested local package, not a release.** Dark Mechanicus epic `ep_01m4fpnf646t254mnh69jhz107` is implemented, and its final one-shot acceptance run (MMR-1) passes on package `e20f2667…`: every step, on worlds A (seed 42) and B (seed 73).
-- **Seeds:** offline, 19 of seeds 42–73 give a world at the first quality attempt, and all 19 pass the activation's checks offline; a request gets three attempts. In game, seeds 42 and 73 were played. Seed 43's world was refused at runtime navigation with an error and a Generate-again action.
+- **Seeds:** offline, 19 of seeds 42–73 give a world at the first quality attempt, and all 19 pass the activation's offline checks; a request gets three attempts. In game, seeds 42 and 73 were played, and seed 43 generates and starts (refused at runtime navigation before the 2026-10-19 fixes). Seeds 56 and 67 were refused in game at settlement placement (`settlement.port_far`), which the offline checks don't run (open).
 - **First start:** each new world blocks the game for about 7 minutes while its navigation is prepared.
 - **Other open items:** a read-only game folder is unsupported, and the package needs the Visual C++ runtime. Copied official culture text sits in the assembly, which is an open decision before any public release.
 
