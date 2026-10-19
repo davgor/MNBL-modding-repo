@@ -264,7 +264,8 @@ namespace MNBL.ProceduralWorld.Surface
             }
             if (travelGraph != null)
             {
-                var settlements = List(travelGraph, "settlements").OfType<IDictionary<string, object>>().OrderBy(e => Text(e, "id"), StringComparer.Ordinal).ToList();
+                // Unplaceable (excluded) settlements have no point.
+                var settlements = List(travelGraph, "settlements").OfType<IDictionary<string, object>>().Where(e => Obj(e, "point") != null).OrderBy(e => Text(e, "id"), StringComparer.Ordinal).ToList();
                 int take = Math.Min(settlementCount, settlements.Count);
                 for (int i = 0; i < take; i++)
                 {

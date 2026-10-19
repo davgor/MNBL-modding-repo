@@ -43,7 +43,7 @@ namespace MNBL.ProceduralWorld.World
             public object Visual;
             public List<GameEntity> Originals = new List<GameEntity>(), Mirrors = new List<GameEntity>();   // pairwise, in hierarchy order
             public List<UIntPtr> Registered = new List<UIntPtr>();
-            public int Syncs;
+            public int Syncs, AddedChildren;
         }
 
         public static readonly List<DisplayCopy> Copies = new List<DisplayCopy>();
@@ -53,6 +53,7 @@ namespace MNBL.ProceduralWorld.World
         private static AccessTools.FieldRef<object, CampaignVec2> anchorCache;
         private static Type tracksType, anchorsType;
         private static int nameplateCalls, refreshes;
+        private static MethodInfo visibleOrFading;
 
         internal static void ApplyAll(Harmony harmony, List<Dictionary<string, object>> applied)
         {
@@ -90,6 +91,12 @@ namespace MNBL.ProceduralWorld.World
             foreach (var method in new[] { "SetSettlementLevelVisibility", "RefreshWallState", "RefreshSiegePreparations", "ValidateIsDirty" })
                 Postfix(harmony, applied, "SandBox.View.Map.Visuals.SettlementVisual", method, nameof(SettlementSyncPostfix), true, "display copy mirrors the settlement's entity visibility (" + method + ")");
             Postfix(harmony, applied, "SandBox.View.Map.Visuals.SettlementVisual", "OnPartyRemoved", nameof(SettlementRemovedPostfix), true, "display copy removed with the settlement visual's party");
+            var managerType = AccessTools.TypeByName("SandBox.View.Map.Managers.SettlementVisualManager");
+            var intersected = managerType == null ? null : AccessTools.Method(managerType, "OnVisualIntersected");
+            visibleOrFading = AccessTools.Method(AccessTools.TypeByName("SandBox.View.Map.Visuals.MapEntityVisual"), "IsVisibleOrFadingOut");
+            if (intersected == null || visibleOrFading == null) throw new MissingMethodException("SandBox.View.Map.Managers.SettlementVisualManager", "OnVisualIntersected or MapEntityVisual.IsVisibleOrFadingOut");
+            harmony.Patch(intersected, prefix: new HarmonyMethod(typeof(PeriodicMapPresentation), nameof(SettlementIntersectedPrefix)));
+            applied.Add(new Dictionary<string, object> { ["target"] = "SandBox.View.Map.Managers.SettlementVisualManager::OnVisualIntersected", ["patch"] = "settlement hover and selection -> the settlement the ray meets first", ["kind"] = "prefix" });
             // Visuals framed on their own changes, refreshed when the camera wraps or has moved far.
             tracksType = AccessTools.TypeByName("SandBox.View.Map.Managers.MapTracksVisualManager");
             if (tracksType == null || tracksType.GetField("_tracksDirty", Members) == null) throw new MissingMemberException("MapTracksVisualManager._tracksDirty is not installed.");
@@ -259,6 +266,51 @@ namespace MNBL.ProceduralWorld.World
             }
         }
 
+        // ---- settlement hover and selection ----
+        // The installed manager walks the collided entities from the last to the first: the first settlement it meets is hovered, the last
+        // selected. The native list follows entity creation, not the ray, and display copies are created after the settlements, so along
+        // one ray a copy and its settlement could resolve to different settlements where two overlap (a town and its village side by side:
+        // seed 73's world, run 9524, the copy to the village and the settlement to the town). With a periodic world, the entries of every
+        // visible settlement but the one the ray meets first move behind the count this manager reads, so both hover and selection are that
+        // settlement. The arrays keep every entry for the other components, which read their own count.
+        private static void SettlementIntersectedPrefix(UIntPtr[] intersectedEntityIDs, Intersection[] intersectionInfos, ref int entityCount, Vec3 worldMouseNear)
+        {
+            try
+            {
+                if (PeriodicWorld.Current == null || intersectedEntityIDs == null || intersectionInfos == null || entityCount < 2) return;
+                var registry = visualsOfEntities.GetValue(null) as IDictionary;
+                if (registry == null) return;
+                Func<int, object> settlementVisual = i =>
+                {
+                    var v = registry.Contains(intersectedEntityIDs[i]) ? registry[intersectedEntityIDs[i]] : null;
+                    return v != null && v.GetType().Name == "SettlementVisual" && (bool)visibleOrFading.Invoke(v, null) ? v : null;
+                };
+                object nearest = null; float best = float.MaxValue;
+                for (int i = 0; i < entityCount; i++)
+                {
+                    var v = settlementVisual(i);
+                    if (v == null) continue;
+                    float d = (intersectionInfos[i].IntersectionPoint - worldMouseNear).LengthSquared;
+                    if (d < best) { best = d; nearest = v; }
+                }
+                if (nearest == null) return;
+                int kept = 0;
+                for (int i = 0; i < entityCount; i++)
+                {
+                    var v = settlementVisual(i);
+                    if (v != null && !ReferenceEquals(v, nearest)) continue;
+                    if (i != kept)
+                    {
+                        var id = intersectedEntityIDs[kept]; intersectedEntityIDs[kept] = intersectedEntityIDs[i]; intersectedEntityIDs[i] = id;
+                        var info = intersectionInfos[kept]; intersectionInfos[kept] = intersectionInfos[i]; intersectionInfos[i] = info;
+                    }
+                    kept++;
+                }
+                entityCount = kept;
+            }
+            catch (Exception e) { if (CopyErrors.Count < 20) CopyErrors.Add("pick " + e.GetType().Name + ": " + e.Message); }
+        }
+
         // ---- settlement display copies ----
         private static void SettlementStartupPostfix(object __instance)
         {
@@ -323,8 +375,7 @@ namespace MNBL.ProceduralWorld.World
             frame.origin.x = image;
             copy.SetGlobalFrame(in frame);
             record.Copy = copy;
-            record.Originals.Add(entity); entity.GetChildrenRecursive(ref record.Originals);
-            record.Mirrors.Add(copy); copy.GetChildrenRecursive(ref record.Mirrors);
+            Pair(scene, entity, copy, record);
             // No tag on the copy: scene-wide tag queries (ports, drop-offs, siege spawns) find the settlement's entities only. Its script
             // components stay, inert (copied without script callbacks; removing them would call removal callbacks on uninitialised scripts).
             foreach (var e in record.Mirrors)
@@ -334,6 +385,32 @@ namespace MNBL.ProceduralWorld.World
                 if (!registry.Contains(e.Pointer)) { registry[e.Pointer] = visual; record.Registered.Add(e.Pointer); }
             Sync(record);
             Copies.Add(record);
+        }
+
+        // The settlement's entities and the copy's, pairwise in hierarchy order, walking both hierarchies together by child name. The native
+        // copy leaves out children added at run time (an MMR-34 hideout's icon, SettlementEntityRuntime: seed 73's 115 hideouts had copies
+        // without their icon); each child the copy lacks is copied on its own under its mirror parent, at the child's local frame.
+        private static void Pair(Scene scene, GameEntity original, GameEntity mirror, DisplayCopy record)
+        {
+            record.Originals.Add(original); record.Mirrors.Add(mirror);
+            var used = new HashSet<int>();
+            for (int i = 0; i < original.ChildCount; i++)
+            {
+                var child = original.GetChild(i);
+                GameEntity match = null;
+                for (int j = 0; j < mirror.ChildCount && match == null; j++)
+                    if (!used.Contains(j) && mirror.GetChild(j).Name == child.Name) { match = mirror.GetChild(j); used.Add(j); }
+                if (match == null)
+                {
+                    match = GameEntity.CopyFrom(scene, child, true, false);
+                    mirror.AddChild(match, false);
+                    var local = child.GetLocalFrame();
+                    match.SetLocalFrame(ref local, true);
+                    used.Add(mirror.ChildCount - 1);
+                    record.AddedChildren++;
+                }
+                Pair(scene, child, match, record);
+            }
         }
 
         // The fixture names its copies <worldId>_display_<settlement id without the world prefix>_<side>; world ids are mnbl_<8 digits>.

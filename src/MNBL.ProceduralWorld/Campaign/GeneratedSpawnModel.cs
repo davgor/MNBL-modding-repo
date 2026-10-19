@@ -64,6 +64,7 @@ namespace MNBL.ProceduralWorld.CampaignRegistry
                 Conflicts = new List<string>();
                 foreach (var s in travelSettlements)
                 {
+                    if (!s.ContainsKey("point")) continue;   // an unplaceable (excluded) settlement: no point, no group
                     var p = (IDictionary<string, object>)s["point"];
                     int comp = Component(Convert.ToDouble(p["x"], CultureInfo.InvariantCulture), Convert.ToDouble(p["y"], CultureInfo.InvariantCulture));
                     int group = Convert.ToInt32(s["group"], CultureInfo.InvariantCulture);

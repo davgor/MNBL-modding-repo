@@ -26,7 +26,9 @@ namespace MNBL.ProceduralWorld.Surface
     //     the group's bounding box grown by half a sample, inside the terrain. The plane never rises above a sample that is not the lake's: its height is at
     //     most the lowest other sample within one sample of the box, less 0.001 (the 257 sample grid resamples the 129 source grid, so a
     //     shore sample can lie below the source level); a lake whose plane would then not clear its own bed is left out (counted). A
-    //     strip copy of a lake is its own group with the same level. A river follows its slope, so a flat plane cannot carry it: rivers have no water surface of their
+    //     strip copy of a lake is its own group with the same level. A copy cut by the terrain's east or west edge holds only part of its
+    //     lake, so it shows, or is left out, at its whole twin's level one width away (the group holding the copy of its first sample).
+    //     A river follows its slope, so a flat plane cannot carry it: rivers have no water surface of their
     //     own (recorded in docs/water-climate.md).
     public static class GeneratedWaterSystem
     {
@@ -76,6 +78,9 @@ namespace MNBL.ProceduralWorld.Surface
             var heights = surface.Quantized;
             var seen = new bool[side * side];
             var lakes = new List<Lake>(); unmatched = 0; hidden = 0;
+            // Every group in scan order (null: no source lake cell), its samples, and each lake sample's group.
+            var candidates = new List<Lake>(); var groups = new List<List<int>>(); var owner = new int[side * side];
+            for (int i = 0; i < owner.Length; i++) owner[i] = -1;
             for (int start = 0; start < side * side; start++)
             {
                 if (seen[start] || surface.Intent(start % side, start / side) != 2) continue;
@@ -118,7 +123,8 @@ namespace MNBL.ProceduralWorld.Surface
                     }
                     if (!double.IsNegativeInfinity(level)) { lake.Matched++; lake.LevelM = Math.Max(lake.LevelM, level); }
                 }
-                if (lake.Matched == 0) { unmatched++; continue; }
+                groups.Add(group); foreach (int i in group) owner[i] = groups.Count - 1;
+                if (lake.Matched == 0) { unmatched++; candidates.Add(null); continue; }
                 // The other samples within one sample of the box (the plane's half-sample margin interpolates towards them).
                 // Past the terrain's east or west edge the rim continues in the copy one width away (strip samples copy canonical ones), so a
                 // lake cut by the edge has its canonical twin's rim and level.
@@ -139,9 +145,32 @@ namespace MNBL.ProceduralWorld.Surface
                 lake.LevelZ = (lake.LevelM - datum) * perMetre;
                 lake.Z = Math.Min(lake.LevelZ, lake.ShoreMinZ - .001);
                 lake.Clamped = lake.Z < lake.LevelZ;
-                if (!(lake.Z > lake.BedMaxZ)) { hidden++; continue; }
-                lake.Index = lakes.Count;
-                lakes.Add(lake);
+                candidates.Add(lake);
+            }
+            // A copy cut by the terrain's east or west edge takes its whole twin's verdict and level: otherwise the far edge could show a
+            // lake the canonical map leaves out, or at another height (world B and seven more of the 2026-10-19 seed sweep had one).
+            int samplePeriod = (int)Math.Round(c.Width / spacing);
+            var shown = candidates.Select(l => l != null && l.Z > l.BedMaxZ).ToArray();
+            var verdict = (bool[])shown.Clone();
+            for (int k = 0; k < candidates.Count; k++)
+            {
+                var lake = candidates[k];
+                if (lake == null || !groups[k].Any(i => i % side == 0 || i % side == side - 1)) continue;
+                int first = groups[k][0], col = first % side, row = first / side;
+                int copy = col + samplePeriod < side ? col + samplePeriod : col - samplePeriod;
+                int twin = copy >= 0 && copy < side ? owner[row * side + copy] : -1;
+                if (twin < 0 || twin == k) continue;
+                verdict[k] = shown[twin];
+                if (!shown[twin]) continue;
+                var t = candidates[twin];
+                lake.LevelM = t.LevelM; lake.LevelZ = t.LevelZ; lake.Z = t.Z; lake.Clamped = t.Clamped;
+            }
+            for (int k = 0; k < candidates.Count; k++)
+            {
+                if (candidates[k] == null) continue;
+                if (!verdict[k]) { hidden++; continue; }
+                candidates[k].Index = lakes.Count;
+                lakes.Add(candidates[k]);
             }
             return lakes;
         }

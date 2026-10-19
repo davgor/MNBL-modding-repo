@@ -141,6 +141,26 @@ def recompute(result, plan):
          bool(pb.get('fleetBefore')) and bool(pb.get('fleetAfter')) and len((pb.get('fleetAfter') or {}).get('ships') or []) == len((pb.get('fleetBefore') or {}).get('ships') or []) > 0),
         ('the pirate sent back where it was found, patrolling its zone (%s)' % ps.get('pirateRestored'), ps.get('pirateRestored') == 'patrol')]
 
+    rs = cases.get('route.seam') or {}
+    sv = rs.get('voyage') or {}
+    rows['route.seam'] = clean(rs) + [
+        ('sailed across the seam: arrived %s, %s rebase(s), %.1f travelled for %.1f straight (periodic), %s hourly samples off naval navigation, %s outside the canonical range, at sea at the end %s'
+         % (sv.get('arrived'), sv.get('rebases'), sv.get('travelledPeriodic') or 0, sv.get('straightPeriodic') or 0, sv.get('offNavigationSamples'), sv.get('nonCanonicalSamples'), sv.get('atSea')),
+         sv.get('arrived') is True and (sv.get('rebases') or 0) >= 1 and (sv.get('travelledPeriodic') or 0) <= 2 * (sv.get('straightPeriodic') or 0) + 5
+         and sv.get('offNavigationSamples') == 0 and sv.get('nonCanonicalSamples') == 0 and sv.get('atSea') is True)]
+    psm = cases.get('pirate.seam') or {}
+    sm, sme, sps = psm.get('mission') or {}, psm.get('mapEvent') or {}, psm.get('setup') or {}
+    across = sps.get('acrossSeam') or {}
+    rows['pirate.seam'] = clean(psm) + [
+        ('the party and the pirate %s beside each other across the seam (%s apart periodically, %s planar)' % (sps.get('pirate'), across.get('periodic'), across.get('planar')),
+         bool(across) and (across.get('periodic') or 99) <= 3 and (across.get('planar') or 0) > 100),
+        ('met in a naval map event of exactly the two parties (%s)' % sme.get('involved'), sme.get('naval') is True and len(sme.get('involved') or []) == 2 and 'player_party' in (sme.get('involved') or [])),
+        patch_scene(psm),
+        ('the naval battle mission ran (%.2f s of mission time), then the retreat' % (sm.get('missionTimeAdvanced') or 0), (sm.get('missionTimeAdvanced') or 0) > 0),
+        ('back at sea within the naval return bound (%s)' % psm.get('returnDisplacement'), (psm.get('after') or {}).get('atSea') is True and psm.get('returnDisplacement') is not None and psm.get('returnDisplacement') <= rules['returnBoundNaval']),
+        ('on naval navigation (%s)' % psm.get('afterNavigation'), 'after' in psm and psm.get('afterNavigation') is None),
+        ('the pirate sent back where it was found, patrolling its zone (%s)' % sps.get('pirateRestored'), sps.get('pirateRestored') == 'patrol')]
+
     nd = cases.get('naval.defeat') or {}
     nf, rf, ae, ns = nd.get('fight') or {}, nd.get('raft') or {}, nd.get('afterEscape') or {}, nd.get('setup') or {}
     raft_menus = nd.get('raftMenus') or []

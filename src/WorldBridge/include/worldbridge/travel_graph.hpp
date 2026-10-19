@@ -15,6 +15,11 @@
 //                within maxPortGateCells (the installed War Sails envelope), never shared by two towns
 //   reachability the player embarks at a town port and disembarks on any coast of an open basin; a group is
 //                player-safe when it can be reached from the main group and can return to it
+//   town repairs no generated town is dropped (docs/travel-graph.md "Town repairs"): a town that is not player-safe gets,
+//                in order, a coast port (its group holds a kept village for each of its towns and castles), a mountain
+//                pass joining its group to a player-safe one (at most maxAccessCells), or a move to the nearest land cell
+//                of a player-safe group; a town with no cell moves too. They run only for towns that would otherwise
+//                reject the world, outside the repair bounds, and are recorded with the town's UID
 #pragma once
 #include <cstdint>
 #include <filesystem>
@@ -85,6 +90,7 @@ public:
     Cells(int cols, int rows, double spacing) : cols_(cols), rows_(rows), spacing_(spacing) {}
     int cols() const { return cols_; }
     int rows() const { return rows_; }
+    double spacing() const { return spacing_; }
     std::size_t size() const { return static_cast<std::size_t>(cols_) * rows_; }
     std::size_t index(Cell c) const { return static_cast<std::size_t>(c.row) * cols_ + c.col; }
     Cell at(std::size_t i) const { return {static_cast<int>(i / cols_), static_cast<int>(i % cols_)}; }
@@ -117,7 +123,7 @@ struct Input {
     std::vector<Road> roads;
 };
 
-// method: direct, footprint, snap, unplaceable. point: the source point clamped into the cell, a quarter cell inside its edges.
+// method: direct, footprint, snap, move (a town repair), unplaceable. point: the source point clamped into the cell, a quarter cell inside its edges.
 struct Placement { std::string id, uid, kind, method; Cell cell; Point point; double shift = 0; int land = -1, group = -1; };
 struct Crossing { std::vector<Cell> cells; std::string kind; bool producer = false; int land_a = -1, land_b = -1; bool joins = false; };
 struct ProducerCrossing { int piece = 0, step = 0; std::string outcome; };   // outcome: matched, no_compiled_water
@@ -139,8 +145,10 @@ struct Group { int id = 0; std::vector<int> lands; std::size_t towns = 0; std::s
 struct Basin { int id = 0; std::size_t cells = 0, sea = 0, lake = 0, river = 0, open_sea = 0; bool open = false; std::vector<std::string> ports; };
 // gate_distance: port cell to gate cell; entrance_distance: land entrance to gate cell; harbour_shift: producer sea
 // point to the harbour cell (the navigable cell its sea node resolves to).
+// kind: empty for a harbour candidate (a producer harbour record), "coast" for a town repair's coast port (no harbour village,
+// sea node or harbour cell).
 struct PortCandidate {
-    std::string village_id, village_uid, status, reason;  // status: valid, invalid
+    std::string village_id, village_uid, status, reason, kind;  // status: valid, invalid
     std::int64_t sea_node = 0;
     Cell harbour_cell, sea_cell, land_cell;
     double harbour_shift = 0, gate_distance = 0, entrance_distance = 0, quality = 0;
@@ -149,7 +157,8 @@ struct PortCandidate {
 struct Port { std::string town_id, town_uid; bool valid = false; PortCandidate chosen; std::vector<PortCandidate> candidates; };
 struct Transition { std::string kind, town_id; int group = -1, basin = -1; Cell land_cell, sea_cell; std::size_t coast_pairs = 0; };  // kind: port, coast
 struct Exclusion { std::string id, uid, kind, reason; };
-struct Repair { std::string kind, subject, detail; Cell cell, from; double distance = 0; };   // kind: pass, access, footprint, snap, harbour_shift
+// kind: pass, access, footprint, snap, harbour_shift; the town repairs coast_port, join and move
+struct Repair { std::string kind, subject, detail; Cell cell, from; double distance = 0; };
 struct Reason { std::string code, message; std::vector<std::string> uids; };
 struct HostCheck { std::string check, subject, expected; };
 
@@ -188,6 +197,10 @@ Result analyze(const Input& input, const Policy& policy);
 Result analyze_cells(const Input& input, const Policy& policy, std::vector<std::uint8_t> classes);
 // Port binding (port_compiler.cpp): harbour candidates per town after placement, components and exclusions.
 void bind_ports(const Input& input, const Policy& policy, const Cells& cells, Result& result);
+// The cells of joining crossings (port_compiler.cpp): the runtime lays a bridge deck over each, and no port's sea point snaps there.
+std::set<std::size_t> deck_cells(const Cells& cells, const Result& result);
+// A lower bound on the engine's port-to-gate path (port_compiler.cpp), in units: see there.
+double port_path_bound(const Cells& cells, const Result& result, const std::set<std::size_t>& decks, Cell sea, int basin, Point gate, double limit);
 
 // The real-world adapter: canonical grid from the compiled terrain, settlements from the campaign records joined to
 // their source positions through the projection, harbours from the campaign ports, roads from roads.routes.

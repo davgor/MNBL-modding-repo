@@ -211,8 +211,10 @@ namespace MNBL.ProceduralWorld.Surface
             // This module's code shapes the content (the periodic path queries GeneratedMapScene answers, the patched closest-settlement order).
             key.Set("moduleSha256", ModuleSha256());
             key.Set("schema", NavigationCacheStore.Schema + " " + NavigationCacheStore.Version);
-            // The registration order breaks ties in the closest-entrance-per-face cache.
-            key.Set("settlementOrder", NavigationCacheKey.Sha(new System.Text.UTF8Encoding(false).GetBytes(String.Join("\n", Settlement.All.Select(s => s.StringId)))));
+            // Not Settlement.All's order. It decides only which of two equidistant entrances the face cache keeps, and the files name
+            // settlements by id. A new game registers the settlements that heroes, kingdoms and factions reference first (presumed
+            // objects); a load replays only the Settlements document, so a world's first load would always miss the caches its start
+            // published and rebuild them (one-shot run 35948: 397 s). Reusing them keeps the caches the campaign played with before the save.
             foreach (var s in Settlement.All.OrderBy(s => s.StringId, StringComparer.Ordinal))
             {
                 string kind = s.IsTown ? "town" : s.IsCastle ? "castle" : s.IsVillage ? "village" : s.IsHideout ? "hideout" : "other";

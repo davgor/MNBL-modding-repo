@@ -49,14 +49,14 @@ The mechanism is MMR-63's, approved under R10. MMR-65 adds no second mechanism; 
 | Disposition | Rule | Measures and grid searches | Native scene calls | `Vec3` distances |
 |---|---|---|---|---|
 | exact | the measure itself (`CampaignVec2`'s own members) | 8 | | |
-| view | SandBox.View, NavalDLC.View, ViewModelCollection, the quest map arrow, the atmosphere grid (cosmetic; MMR-66) | 37 | 154 | 18 |
+| view | SandBox.View, NavalDLC.View, ViewModelCollection, the quest map arrow, the atmosphere grid (cosmetic; MMR-66), except the views read as campaign distances (periodic, below) | 28 | 154 | 18 |
 | mission | mission-scene coordinates (naval missions, agents, conversations, DWA steering, board games, tournaments, mission weather) | 125 | 326 | 118 |
 | inactive | War Sails storyline, story mode, cheats: none runs on a generated world (the startup audit checks the storyline is inactive) | 26 | 49 | 16 |
 | covered | MMR-63/64 patches (distance-model legs, distance helpers, encounter and visibility ranges, directions, click translation, closest-settlement order), MMR-39's storm model, the locator wrappers, grid search starts; native calls through `IMapScene` (GeneratedMapScene re-implements it) or inside `SandBox.MapScene` (the implementation it derives from) | 27 | 155 | |
 | generic | `LocatorGrid<T>` and `NavigationCache<T>` (Harmony refuses generic types); the grid's own planar filter is answered by the image pass; the cache's are MMR-64's findings | 5 | | |
-| callee-patched | callers of the locator wrappers and the point helpers (their callee carries the image pass or the canonical postfix) | 65 | | |
-| periodic | transpiled from the table | 124 rows (98 methods, 161 calls) | | |
-| recompile | callers of the table's 11 small methods: 27 methods patched unchanged | | | |
+| callee-patched | callers of the locator wrappers and the point helpers (their callee carries the image pass or the canonical postfix) | 67 | | |
+| periodic | transpiled from the table; since 2026-10-19 also the views the player reads as campaign distances: the clan screen's distance sorts, the army overlay, the game-menu party list and the nearby culture's map music (`VIEW_PERIODIC`; not the hero behaviour text, whose class initializer cannot run that early) | 131 rows (105 methods, 168 calls) | | |
+| recompile | callers of the table's 15 small methods: 31 methods patched unchanged | | | |
 
 Counts are audit rows (one per method and callee) in `evidence/world/periodic-consumers.tsv`.
 
@@ -66,7 +66,7 @@ Counts are audit rows (one per method and callee) in `evidence/world/periodic-co
 - The calls it finds must equal the table's counts, per column. Otherwise the whole periodic set is refused: `PeriodicPatches.Apply` is all or nothing, the preflight refuses the campaign start, and a world whose load-time patches fail is frozen. A required consumer is never left planar silently.
 - The grid delegates are built while the set is applied, so a failure there refuses the set too.
 - When another patch later recompiles a table method, the transpiler runs again. If it then finds other counts, it throws, so that patch fails instead of leaving the method planar.
-- **Inlining.** Harmony marks a patched method as not inlinable for code compiled after the patch. Code compiled before it, such as a vanilla campaign earlier in the same process, can hold an inlined planar copy of a small table method. The 27 recompile entries are the callers of the 11 small table methods. They are patched with their IL unchanged, after their callees, so they are compiled again and call the periodic bodies.
+- **Inlining.** Harmony marks a patched method as not inlinable for code compiled after the patch. Code compiled before it, such as a vanilla campaign earlier in the same process, can hold an inlined planar copy of a small table method. The 31 recompile entries are the callers of the 15 small table methods. They are patched with their IL unchanged, after their callees, so they are compiled again and call the periodic bodies.
 - **Offline check.** The harness checks against the pinned assemblies:
   - the same counts;
   - that every recompiled caller calls a table method or another recompiled caller;
@@ -126,7 +126,7 @@ Counts are audit rows (one per method and callee) in `evidence/world/periodic-co
 - No unattached party left non-canonical at the end.
 
 **Patches.**
-- 20 periodic patch entries, including the spatial table: 98 methods with 161 replaced calls, and 27 recompiled callers.
+- 20 periodic patch entries, including the spatial table: 98 methods with 161 replaced calls, and 27 recompiled callers (105, 168 and 31 since the views were added on 2026-10-19).
 - The MMR-63 wrap regression passes every one of its checks with 20 entries.
 
 **Synthetic setup.** All of it is recorded in the report.

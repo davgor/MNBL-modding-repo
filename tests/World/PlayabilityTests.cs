@@ -54,7 +54,7 @@ internal static class PlayabilityTests
             new KeyValuePair<string, string>("Default.neighbourCostMultiplier", "1.2"), new KeyValuePair<string, string>("worldId", "mnbl_00040042"), new KeyValuePair<string, string>("scene", "mnbl_generated_00040042"),
             new KeyValuePair<string, string>("navmeshSha256", new string('a', 64)), new KeyValuePair<string, string>("sceneXmlCrc", "146201570"), new KeyValuePair<string, string>("navigationMeshCrc", "123456"),
             new KeyValuePair<string, string>("periodic", "planar"), new KeyValuePair<string, string>("distanceVersion", "mmr64/1"), new KeyValuePair<string, string>("adapter", WorldNavigationCacheAdapter),
-            new KeyValuePair<string, string>("moduleSha256", new string('c', 64)), new KeyValuePair<string, string>("settlementOrder", new string('d', 64)), new KeyValuePair<string, string>("schema", NavigationCacheStore.Schema + " 1") };
+            new KeyValuePair<string, string>("moduleSha256", new string('c', 64)), new KeyValuePair<string, string>("schema", NavigationCacheStore.Schema + " 1") };
         if (reverse) inputs.Reverse();
         foreach (var kv in inputs) k.Set(kv.Key, kv.Value);
         var settlements = new List<Action>
@@ -105,7 +105,7 @@ internal static class PlayabilityTests
             ["worldId"] = k => k.Set("worldId", "mnbl_00040043"), ["scene"] = k => k.Set("scene", "mnbl_world_x"), ["navmeshSha256"] = k => k.Set("navmeshSha256", new string('b', 64)),
             ["sceneXmlCrc"] = k => k.Set("sceneXmlCrc", "1"), ["navigationMeshCrc"] = k => k.Set("navigationMeshCrc", "1"), ["periodic"] = k => k.Set("periodic", "mmr64/1 " + new string('e', 64)),
             ["distanceVersion"] = k => k.Set("distanceVersion", "mmr65/1"), ["adapter"] = k => k.Set("adapter", "mmr41/2"), ["moduleSha256"] = k => k.Set("moduleSha256", new string('f', 64)),
-            ["settlementOrder"] = k => k.Set("settlementOrder", new string('0', 64)), ["schema"] = k => k.Set("schema", NavigationCacheStore.Schema + " 2") };
+            ["schema"] = k => k.Set("schema", NavigationCacheStore.Schema + " 2") };
         var keyRows = new List<object>(); bool allChange = true;
         foreach (var c in changes)
         {

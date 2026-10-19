@@ -1,9 +1,9 @@
 # Playing procedural worlds
 
-How to install the MNBL Procedural World module, make a world from New Campaign, play it, keep its saves safe and recover when something goes wrong. Everything here is what the module does today, as tested on one PC (2026-10-18). The developer side is in [development.md](development.md).
+How to install the MNBL Procedural World module, make a world from New Campaign, play it, keep its saves safe and recover when something goes wrong. Everything here is what the module does today, as tested on one PC (2026-10-19). The developer side is in [development.md](development.md).
 
 > **This is a local test package, not a release.** It has not been certified across seeds, long campaigns, other mods or other machines.
-> **Today only seed 42 makes a world you can play.** Most other seeds are refused by the generator's quality checks. Seed 73 is generated and previewed, but refused when you start its campaign. See [Seeds](#seeds).
+> **Most seeds make a world you can play, not every one.** Seeds 42 and 73 were played end to end; some seeds are refused, with a message and an offer to try another. See [Seeds](#seeds).
 
 ## What you need
 
@@ -47,24 +47,24 @@ The tests start the game with a module list directly, so the launcher itself was
 
 - **The same seed makes the same world** with the same game, War Sails and module version. Each world is identified by a content id that covers its source, its compiled data and the rules it was made with. The same seed under another game or War Sails version therefore makes a new world.
 - **Different seeds make different worlds**: different coasts, climates, peoples and routes.
-- **Only seed 42 starts a campaign today.**
-  - Most seeds fail the generator's quality checks, which reject a whole world when one town cannot be placed or reached. The game then shows "No playable world for this seed", with an offer to try another. An earlier build's one-attempt search rejected 30 of 31 seeds; from that, a random seed is estimated to fail about 9 times in 10. On this build only seeds 42, 43 and 73 were tried.
-  - **Seed 73 passes generation and preview, but its campaign is refused when you press Start Campaign.** Its villages cannot be bound to their towns. By the code, the message is "The campaign could not be started in this world. The attempt was undone". That message was not observed in a run.
-  - Making more seeds playable is follow-up work.
+- **Most seeds give a world, not every one** (2026-10-19).
+  - The generator now repairs towns it cannot place or reach (moving them, carving a pass, or giving an island town a coast port) instead of rejecting the whole world. Of seeds 42 to 73, 19 of 32 give a world at the first attempt, and each of those 19 passed the activation's checks offline. A seed gets three attempts, the later ones from seeds derived from it.
+  - In the game, **seeds 42 and 73 were played end to end**: generation, the campaign, land and sea play and saves.
+  - **Seed 43 was refused** after its world was generated: the in-game navigation check found one sea route that runs too far out of its way. The game shows the error with its code and an offer to generate again; nothing is left behind.
+  - When every attempt fails, the game shows "No playable world for this seed", with an offer to try another.
 
 ## The world you get
 
 **One generated globe, shown as a flat map that wraps from east to west.**
 - Sailing or riding off the east edge brings you in from the west. The camera, the map labels and clicking work across that edge, and so do saves.
-  - Travel, pursuit and fleets across the edge, with a save and load, were tested on seed 42's world.
-  - The camera and clicking were tested on a small test world only.
+  - Travel, pursuit and fleets across the edge, with a save and load, were tested on seed 42's world; sailing across it and a pirate encounter across it too.
+  - The camera, clicking, tracks and a town menu across the edge were tested on seed 73's world.
   - Dragging the map across the edge was not tested.
 - North and south do not connect. The polar bands are ocean, and east-west distances grow toward the poles (twice the true distance at 60° latitude).
-- Near the east-west edge a few things still use flat positions:
-  - distance-sorted lists, some menu texts and map step sounds;
-  - siege machines, which are drawn only on their settlement's side of the edge;
-  - a storm crossing the edge can miss one hour of damage.
-- A naval battle, a siege or a raid exactly at the edge has not been tested.
+- Near the east-west edge a few things still differ:
+  - the text that says where a hero is can name the wrong nearby settlement;
+  - siege machines are drawn only on their settlement's side of the edge.
+- A siege or a raid exactly at the edge has not been tested.
 
 **Peoples and cultures.** The world's peoples are generated. Each is shown through one of the game's seven cultures:
 
@@ -185,10 +185,10 @@ Every failure on the setup screen shows a **Reference** (for example `MNBL-20261
 ## Known limits
 
 All of these are listed with their evidence in `evidence/one-shot/acceptance-index.json` and `docs/packaging.md`.
-- **Seeds:** only seed 42 makes a playable world today; world size 129 only.
+- **Seeds:** not every seed makes a playable world (see Seeds); world size 129 only.
 - **First start:** about 7 minutes without response, for each new world and after each module update.
 - **Folders:** a read-only game folder cannot make or load worlds, and a Windows user name outside the ANSI code page cannot generate.
 - **Untested:** the launcher, other mods, long campaigns and many seeds. Performance was measured on one PC only.
-- **Edge of the map:** the few flat-position leftovers described under The world you get.
+- **Edge of the map:** the few leftovers described under The world you get.
 - **Backups:** the backup and transfer tool is a developer tool, not part of the package, and a transferred campaign has not been loaded in game.
 - **Without the module:** do not load a generated campaign's save while the module is disabled or removed.

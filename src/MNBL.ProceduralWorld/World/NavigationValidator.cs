@@ -478,6 +478,9 @@ namespace MNBL.ProceduralWorld.Surface
                     case "portFace":
                     case "seamTransition":
                     {
+                        // A coast transition on a seam column ("coast group <g>"): every coast transition is routed below (coastTransition),
+                        // this one with them. Only a port's seam transition is routed here (seed 43's world: input_inconsistent before).
+                        if (h.Check == "seamTransition" && h.Subject.StartsWith("coast ", StringComparison.Ordinal)) break;
                         string town = h.Check == "portFace" ? h.Subject : h.Subject.Replace("port ", "");
                         var port = Point("port:" + town); var entrance = Point("portEntrance:" + town);
                         if (port == null || entrance == null) { Diagnostics.Add(new NavigationDiagnostic("navigation.input_inconsistent", h.Check + " " + town, "the host check names a port with no transition", town)); break; }

@@ -340,8 +340,9 @@ namespace MNBL.ProceduralWorld.CampaignRegistry
                 result.Diagnostics.Add(new Diagnostic { Kind = "impossible_port", Subject = t, Reason = "a coastal town without a producer harbour record (the MMR-28 compiler makes ports only from harbour records)" });
             int main = Int(travel, "mainGroup");
             var open = new HashSet<int>(Records(travel, "basins").Where(b => Bool(b, "open")).Select(b => Int(b, "id")));
-            // Every land group other than the main one that holds a settlement (a town, a castle or a village).
-            var settled = Records(travel, "settlements").GroupBy(s => Int(s, "group")).ToDictionary(g => g.Key, g => g.Count());
+            // Every land group other than the main one that holds a settlement (a town, a castle or a village); an unplaceable (excluded)
+            // settlement has no group.
+            var settled = Records(travel, "settlements").Where(s => s.ContainsKey("group")).GroupBy(s => Int(s, "group")).ToDictionary(g => g.Key, g => g.Count());
             foreach (var g in Records(travel, "groups").Where(g => settled.ContainsKey(Int(g, "id"))).OrderBy(g => Int(g, "id")))
             {
                 int id = Int(g, "id");

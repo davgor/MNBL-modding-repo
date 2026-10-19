@@ -7,14 +7,14 @@ The campaign map shows one canonical world. Its camera, the visuals drawn for ca
 | Camera | `UI/PeriodicMapCameraView.cs` |
 | Display rule, visual positions, decals, nameplates, settlement display copies | `World/PeriodicMapPresentation.cs` |
 | Patch set (applied with the periodic patches; all or nothing) | `CampaignBootstrap/PeriodicPatches.cs` |
-| In-game check | `Diagnostics/PeriodicPresentationProbe.cs` (`generated_campaign` with `presentationProbe=1`, after `wrapProbe=1`, on the MMR-63 fixture) |
+| In-game check | `Diagnostics/PeriodicPresentationProbe.cs` (`generated_campaign` with `presentationProbe=1`, after `wrapProbe=1`, on the MMR-63 fixture). On a generated world: the `seam_presentation` probe (`Automation/SeamPresentationProbe.cs`, `save=`) loads a save and runs every section except the wrap probe's mission. Its seam towns are the pair joined by land across the seam that lies nearest it, and it runs on a campaign the game ticks itself (`LoadedCampaignTicker`). The copies check counts the settlements whose strip image lies inside the terrain |
 | Evidence | `evidence/world/periodic-camera-picking.json` (`tools/summarize_periodic_presentation.py`), `evidence/fwg/periodic-presentation-review.md` |
 
 SandBox.View, SandBox.ViewModelCollection and NavalDLC.View are not referenced at compile time. Their types are reached by name and patched with Harmony in the periodic set.
 - A missing required target refuses the whole set, so a periodic campaign does not start, as for every periodic patch.
 - Every transpiler must replace exactly the audited sites, or a site count stated in the code.
 - The War Sails views are optional: absent without War Sails.
-- With War Sails, the set holds 52 entries: MMR-63..65's 20 and 32 presentation entries.
+- With War Sails, the set holds 53 entries: MMR-63..65's 20 and 33 presentation entries. The 33rd (2026-10-19) is the settlement hover and selection prefix below.
 
 ## The camera
 
@@ -53,12 +53,15 @@ A visual's position is presentation only. Gameplay reads `MobileParty.Position` 
 **Settlements have display copies.** Settlement entities are static scene entities that gameplay reads (siege camp frames), so they are never moved.
 - Each settlement gets one display copy at its strip image. The strips are half a width wide, so every canonical x has exactly one strip image.
 - The copy is a clone of the settlement's entity (`GameEntity.CopyFrom` with physics and without script callbacks), renamed `<settlement>_display_<east|west>`. It is built when the settlement's visual starts up.
+- The native copy leaves out children added at run time. An MMR-34 hideout is built as live entities (`SettlementEntityRuntime`), and its icon child was missing from all 115 hideout copies on seed 73's world (run 29576). The copy's hierarchy is now walked together with the settlement's by child name: each missing child is copied on its own under its mirror parent at the child's local frame (`DisplayCopy.AddedChildren`), and the entity pairs come from that walk.
 - The clone carries no tags, so scene-wide tag queries (ports, drop-offs, siege spawns) find only the settlement's entities. Its script components stay, inert: no script callback ever runs on them.
 - Every entity of the copy is registered in `MapScreen.VisualsOfEntities` to the settlement's own visual. A click, hover or tooltip on the copy (resolved by `MapScreen.HandleMouse`'s own path) is therefore the settlement itself, with the canonical identity and the canonical interaction position.
 - The copy mirrors the visibility of the settlement's entities whenever the settlement visual changes them: `SetSettlementLevelVisibility`, `RefreshWallState`, `RefreshSiegePreparations` and `ValidateIsDirty`.
 - It is removed, with its registrations, when the visual's party is removed (`OnPartyRemoved`).
 - A fixture's static copy of the same settlement (`tools/scenebin/build_periodic_world.py`) is removed and replaced by the runtime copy.
 - No campaign object is created: the copy has no settlement, party or id.
+
+**Hover and selection over overlapping settlements.** `SettlementVisualManager.OnVisualIntersected` walks the collided entities from the last to the first: the first settlement it meets is hovered, the last selected. The native list follows entity creation, not the ray. Display copies are created after the settlements, so along one ray a copy and its settlement could resolve to different settlements where two overlap (a town and its village side by side). On seed 73's world, run 9524, the copy resolved to the village and the settlement to the town. A prefix (periodic worlds only) now moves the entries of every visible settlement but the one the ray meets first behind the count that manager reads, so hover and selection are both the nearest settlement. The arrays keep every entry for the other visual components, which read their own count.
 
 **Labels.** Party and settlement nameplates are placed at the same images:
 - `PartyNameplateVM.RefreshPosition` and `PartyPlayerNameplateVM.RefreshPosition` take the position's `AsVec3` there.
@@ -125,5 +128,6 @@ The fixes are recorded in `evidence/fwg/periodic-presentation-review.md`.
   - Engine clicks (`FrameAndVisualOfEngines`) work on the settlement's side.
 - **Static framing.** Blockade visuals take their image when they are initialized.
 - **Not fixture-tested.** A settlement whose port or siege camp straddles the cut is averaged beside the settlement by construction, but the MMR-63 fixture has none (its ports lie on their town's side).
-- **Planar user-interface lists.** Lists sorted or described by distance (the army overlay, the game-menu party list, clan sorting, hero behaviour texts) and map step sounds still measure planar positions. Near the cut, their order, text or sound position can differ; no gameplay depends on them.
+- **User-interface lists measure periodically** (2026-10-19). The lists sorted or described by distance (the army overlay, the game-menu party list, the clan screen's sorts) and the nearby culture's map music are in the spatial table (`docs/periodic-movement.md`, `VIEW_PERIODIC`). Map step sounds already did: they search through the patched `MobileParty.FindNextLocatable` and sound at the party's visual, which takes the image nearest the camera. Before, these were planar near the cut.
+- **The hero behaviour text stays planar.** `CampaignUIHelper.GetHeroBehaviorText` cannot be patched when the periodic set is applied: that runs its class initializer before the campaign's game texts exist, and the failed class breaks character creation (one-shot run, 2026-10-19). Near the cut, the text naming where a hero is can pick the wrong nearby settlement.
 - **No memory limit.** MMR-21 recorded no visible-copy memory limit. The budget here is no growth across wraps, with memory recorded rather than judged.

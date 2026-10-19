@@ -292,7 +292,13 @@ std::vector<std::uint8_t> classify(const Grid& g, const Policy& policy) {
 
 Result analyze(const Input& input, const Policy& policy) { return analyze_cells(input, policy, classify(input.grid, policy)); }
 
-Result analyze_cells(const Input& input, const Policy& policy, std::vector<std::uint8_t> compiled) {
+namespace {
+// The town repairs carried from one analysis round to the next (docs/travel-graph.md "Town repairs"): mountain cells carved to join a
+// town's land group to a player-safe group (cell index -> the UID of the town it serves) and towns moved to a land cell of a player-safe
+// group (town id -> cell).
+struct TownPlan { std::map<std::size_t, std::string> joins; std::map<std::string, Cell> moves; };
+
+Result analyze_round(const Input& input, const Policy& policy, std::vector<std::uint8_t> compiled, const TownPlan& plan) {
     const Grid& g = input.grid;
     check_grid(g);
     const Cells cells(g.cols, g.rows, g.spacing);
@@ -320,6 +326,12 @@ Result analyze_cells(const Input& input, const Policy& policy, std::vector<std::
         auto& pl = out.placements[i];
         pl.id = s.id; pl.uid = s.uid; pl.kind = s.kind;
         const auto touching = cells.touching(s.position);
+        if (const auto moved = plan.moves.find(s.id); moved != plan.moves.end()) {
+            pl.cell = moved->second; pl.method = "move"; pl.shift = cells.distance(s.position, pl.cell);
+            out.repairs.push_back({"move", s.uid, "the town has no cell, or its land group is not player-safe and cannot be joined; it moves to the nearest land cell of a player-safe group",
+                                   pl.cell, touching.front(), pl.shift});
+            continue;
+        }
         for (const auto& c : touching) if (at(c) == Land) { pl.cell = c; pl.method = "direct"; break; }
         if (pl.method.empty() && policy.settlement_footprint)
             for (const auto& c : touching)
@@ -448,6 +460,15 @@ Result analyze_cells(const Input& input, const Policy& policy, std::vector<std::
             }
     }
 
+    // Town joins (the plan's): mountain cells carved to join a town's land group to a player-safe group. A town repair: outside
+    // maxPassFraction, each with a pass host check.
+    std::vector<std::size_t> joined_cells;
+    for (const auto& [k, uid] : plan.joins)
+        if (cls[k] == Mountain) {
+            cls[k] = Land; joined_cells.push_back(k);
+            out.repairs.push_back({"join", uid, "a mountain cell between the town's land group and a player-safe group becomes a pass", cells.at(k), {}, 0});
+        }
+
     // Snaps: settlements still without a cell go to the nearest land cell within the policy radius.
     std::size_t snaps = 0;
     for (std::size_t i = 0; i < input.settlements.size(); ++i) {
@@ -547,6 +568,7 @@ Result analyze_cells(const Input& input, const Policy& policy, std::vector<std::
     UnionFind uf(out.lands.size());
     std::set<std::pair<int, int>> joined_pairs;
     std::vector<std::string> bridge_uids;
+    std::map<std::size_t, std::pair<int, int>> deck_pair;   // cell of a joining crossing -> the land components it joins
     for (std::size_t ri = 0; ri < out.roads.size(); ++ri) {
         auto& rr = out.roads[ri];
         for (const auto& piece : road_pieces[ri]) {
@@ -562,6 +584,13 @@ Result analyze_cells(const Input& input, const Policy& policy, std::vector<std::
                 x.land_b = after.valid() ? out.land_of[cells.index(after)] : -1;
                 x.joins = x.land_a >= 0 && x.land_b >= 0 && x.land_a != x.land_b && policy.bridge_kinds.count(x.kind) != 0 &&
                           run.size() <= static_cast<std::size_t>(policy.max_bridge_cells);
+                // One deck per cell: a cell an earlier joining crossing bridges between two other land components cannot carry this
+                // crossing too (the runtime lays one passage per deck cell). The 2026-10-19 sweep's world ae2f24ef: a river cell between
+                // three components, the second join never realized (navigation.group_not_realized).
+                const std::pair<int, int> lands{std::min(x.land_a, x.land_b), std::max(x.land_a, x.land_b)};
+                if (x.joins)
+                    for (const auto& c : run) { const auto it = deck_pair.find(cells.index(c)); if (it != deck_pair.end() && it->second != lands) x.joins = false; }
+                if (x.joins) for (const auto& c : run) deck_pair.emplace(cells.index(c), lands);
                 if (x.joins) {
                     uf.unite(static_cast<std::size_t>(x.land_a), static_cast<std::size_t>(x.land_b));
                     if (joined_pairs.insert({std::min(x.land_a, x.land_b), std::max(x.land_a, x.land_b)}).second) { bridge_uids.push_back(rr.from_uid); bridge_uids.push_back(rr.to_uid); }
@@ -621,6 +650,38 @@ Result analyze_cells(const Input& input, const Policy& policy, std::vector<std::
         }
     }
 
+    // A village farther than the engine trade distance from every town and castle of its land group is excluded (before the ports, so a
+    // harbour candidate sees it; the castle exclusions below never touch a village's group, which holds its player-safe town): the binding
+    // (VillageBinding, economy.json binding) could bind it to none within that limit, and activation would refuse the world. The limit is
+    // kEngineTradeRatio x the world's town spacing, the mean periodic distance from each town's point to its nearest town's (the
+    // installed DefaultVillageTradeModel limit, economy.json binding.distance.engineTradeRatio). Seed 62: a village by the pole line 183
+    // units from the nearest settlement of its group, against a limit of 128.8.
+    {
+        constexpr double kEngineTradeRatio = 3.0;
+        const double width = g.cols * g.spacing;
+        auto between = [&](Point a, Point b) { double dx = std::abs(a.x - b.x); dx = std::min(dx, width - dx); return std::hypot(dx, a.y - b.y); };
+        std::vector<const Placement*> towns, forts;
+        for (const auto& pl : out.placements)
+            if (pl.cell.valid() && pl.kind != "village" && !excluded(pl.id)) { forts.push_back(&pl); if (pl.kind == "town") towns.push_back(&pl); }
+        if (towns.size() >= 2) {
+            double sum = 0;
+            for (const auto* t : towns) {
+                double nearest = std::numeric_limits<double>::max();
+                for (const auto* u : towns) if (u != t) nearest = std::min(nearest, between(t->point, u->point));
+                sum += nearest;
+            }
+            const double limit = kEngineTradeRatio * sum / static_cast<double>(towns.size());
+            for (const auto& pl : out.placements) {
+                if (pl.kind != "village" || !pl.cell.valid() || excluded(pl.id)) continue;
+                double nearest = std::numeric_limits<double>::max();
+                for (const auto* f : forts) if (f->group == pl.group) nearest = std::min(nearest, between(pl.point, f->point));
+                if (nearest > limit)
+                    out.exclusions.push_back({pl.id, pl.uid, "village", "beyond the engine trade distance of every town and castle of its land group (" + std::to_string(nearest) + " > " +
+                                                                         std::to_string(limit) + " units)"});
+            }
+        }
+    }
+
     // Ports, then player reachability over land groups and open basins.
     bind_ports(input, policy, cells, out);
     for (const auto& port : out.ports) {
@@ -648,8 +709,10 @@ Result analyze_cells(const Input& input, const Policy& policy, std::vector<std::
             const auto& m = out.groups[static_cast<std::size_t>(out.main_group)];
             if (gr.towns > m.towns || (gr.towns == m.towns && min_town_uid[gr.id] < min_town_uid[m.id])) out.main_group = gr.id;
         }
-    if (out.main_group >= 0) {
+    auto reach = [&]() {
+        if (out.main_group < 0) return;
         auto& groups = out.groups;
+        for (auto& gr : groups) gr.forward = gr.backward = gr.safe = false;
         groups[static_cast<std::size_t>(out.main_group)].forward = groups[static_cast<std::size_t>(out.main_group)].backward = true;
         for (bool changed = true; changed;) {
             changed = false;
@@ -665,6 +728,64 @@ Result analyze_cells(const Input& input, const Policy& policy, std::vector<std::
             }
         }
         for (auto& gr : groups) gr.safe = gr.forward && gr.backward;
+    };
+    reach();
+    // Coast ports (a town repair): a town of a group that is not player-safe, without a valid harbour port, whose group holds a kept
+    // village for each of its towns and castles, takes the coast pair of its own land component on an open basin that a group returning
+    // to the main group touches: the pair whose sea cell is nearest the gate, then whose land cell is, then cell order; never a held pair
+    // or a deck cell (deck_cells), the port cell at most maxPortGateCells from the gate cell, the first such pair whose path bound
+    // (port_path_bound) is at most maxPortGateCells x spacing. Towns in input order; then reachability again.
+    if (out.main_group >= 0) {
+        std::set<std::size_t> held_land, held_sea;
+        for (const auto& port : out.ports) if (port.valid) { held_land.insert(cells.index(port.chosen.land_cell)); held_sea.insert(cells.index(port.chosen.sea_cell)); }
+        const auto decks = deck_cells(cells, out);
+        const double limit = policy.max_port_gate_cells * cells.spacing();
+        std::map<int, int> kept_villages, fortifications;
+        for (const auto& pl : out.placements)
+            if (pl.group >= 0 && !excluded(pl.id)) ++(pl.kind == "village" ? kept_villages : fortifications)[pl.group];
+        bool added = false;
+        for (std::size_t i = 0; i < input.settlements.size(); ++i) {
+            const auto& pl = out.placements[i];
+            if (pl.kind != "town" || pl.group < 0 || out.groups[static_cast<std::size_t>(pl.group)].safe || kept_villages[pl.group] < fortifications[pl.group]) continue;
+            auto existing = std::find_if(out.ports.begin(), out.ports.end(), [&](const Port& p) { return p.town_id == pl.id; });
+            if (existing != out.ports.end() && existing->valid) continue;
+            std::vector<PortCandidate> pairs;
+            for (std::size_t k = 0; k < cells.size(); ++k) {
+                if (cls[k] != Land || out.land_of[k] != pl.land || held_land.count(k)) continue;
+                const Cell l = cells.at(k);
+                for (const auto& s : cells.neighbours(l)) {
+                    const std::size_t si = cells.index(s);
+                    const int b = out.basin_of[si];
+                    if (b < 0 || !out.basins[static_cast<std::size_t>(b)].open || held_sea.count(si) || decks.count(si)) continue;
+                    if (std::none_of(out.groups.begin(), out.groups.end(), [&](const Group& gr) { return gr.backward && gr.coast_basins.count(b); })) continue;
+                    PortCandidate pair;
+                    pair.land_cell = l; pair.sea_cell = s; pair.basin = b; pair.gate_distance = cells.distance(s, pl.cell); pair.entrance_distance = cells.distance(l, pl.cell);
+                    if (pair.gate_distance <= policy.max_port_gate_cells) pairs.push_back(pair);
+                }
+            }
+            std::sort(pairs.begin(), pairs.end(), [](const PortCandidate& a, const PortCandidate& b) {
+                if (a.gate_distance != b.gate_distance) return a.gate_distance < b.gate_distance;
+                if (a.entrance_distance != b.entrance_distance) return a.entrance_distance < b.entrance_distance;
+                return a.land_cell < b.land_cell || (a.land_cell == b.land_cell && a.sea_cell < b.sea_cell);
+            });
+            auto pick = std::find_if(pairs.begin(), pairs.end(), [&](const PortCandidate& c) { return port_path_bound(cells, out, decks, c.sea_cell, c.basin, pl.point, limit) <= limit; });
+            if (pick == pairs.end()) continue;
+            PortCandidate best = *pick;
+            best.kind = "coast"; best.status = "valid";
+            if (existing == out.ports.end()) {
+                Port p; p.town_id = pl.id; p.town_uid = pl.uid;
+                existing = out.ports.insert(std::find_if(out.ports.begin(), out.ports.end(), [&](const Port& q) { return q.town_id > pl.id; }), p);
+            }
+            existing->valid = true; existing->chosen = best; existing->candidates.push_back(best);
+            held_land.insert(cells.index(best.land_cell)); held_sea.insert(cells.index(best.sea_cell));
+            out.groups[static_cast<std::size_t>(pl.group)].port_basins.insert(best.basin);
+            auto& basin_ports = out.basins[static_cast<std::size_t>(best.basin)].ports;
+            basin_ports.insert(std::upper_bound(basin_ports.begin(), basin_ports.end(), pl.id), pl.id);
+            out.repairs.push_back({"coast_port", pl.uid, "the town's land group cannot reach and return to the main group and the town has no valid harbour port; its coast pair nearest the gate on an open basin becomes its port",
+                                   best.sea_cell, best.land_cell, best.gate_distance});
+            added = true;
+        }
+        if (added) reach();
     }
     auto safe = [&](int group) { return group >= 0 && out.groups[static_cast<std::size_t>(group)].safe; };
     for (std::size_t i = 0; i < input.settlements.size(); ++i) {
@@ -759,6 +880,7 @@ Result analyze_cells(const Input& input, const Policy& policy, std::vector<std::
                                                                                                                    policy.face_groups.at("bridge") + " over " + policy.face_groups.at("underBridge") +
                                                                                                                    "; no shipped campaign map authors Bridge faces, so MMR-38 chooses) and a Default route crosses them");
     for (std::size_t i : carved) host("pass", "cell " + std::to_string(cells.at(i).row) + "," + std::to_string(cells.at(i).col), "a Default-valid face, not " + policy.face_groups.at("mountain"));
+    for (std::size_t i : joined_cells) host("pass", "cell " + std::to_string(cells.at(i).row) + "," + std::to_string(cells.at(i).col), "a Default-valid face, not " + policy.face_groups.at("mountain"));
     for (std::size_t i : footprint_cells) host("footprint", "cell " + std::to_string(cells.at(i).row) + "," + std::to_string(cells.at(i).col), "a Default-valid face, not " + policy.face_groups.at("mountain"));
     for (const auto& rr : out.roads)
         if (rr.same_group) host("landRoute", "road " + std::to_string(rr.index), "a Default route joins the gates of " + rr.from_uid + " and " + rr.to_uid);
@@ -782,6 +904,85 @@ Result analyze_cells(const Input& input, const Policy& policy, std::vector<std::
     out.max_port_gate_units = policy.max_port_gate_cells * g.spacing;
     out.status = out.reasons.empty() ? "ok" : "rejected";
     return out;
+}
+
+bool town_reasons(const Result& r) {
+    return std::any_of(r.reasons.begin(), r.reasons.end(), [](const Reason& x) { return x.code == "quality.unplaceable_town" || x.code == "quality.unreachable_town"; });
+}
+
+// Grows the plan from a round's result; false when it adds nothing. Each land group holding a town that is not player-safe joins a
+// player-safe group through the shortest run of mountain cells, at most maxAccessCells (breadth-first from the group's land cells in
+// cell order, neighbours in cell order), served for the group's first town in input order. A town of a group that cannot join, and a
+// town with no cell, moves to the nearest land cell of a player-safe group from its source point that was land before any repair and
+// holds no settlement, then cell order; with none it stays, and the world is rejected.
+bool extend(TownPlan& plan, const Result& r, const Input& input, const Policy& policy, const std::vector<std::uint8_t>& compiled) {
+    if (r.main_group < 0) return false;
+    const Cells cells(input.grid.cols, input.grid.rows, input.grid.spacing);
+    auto group_of = [&](std::size_t k) { return r.cls[k] == Land && r.land_of[k] >= 0 ? r.lands[static_cast<std::size_t>(r.land_of[k])].group : -1; };
+    auto safe_land = [&](std::size_t k) { const int gr = group_of(k); return gr >= 0 && r.groups[static_cast<std::size_t>(gr)].safe; };
+    std::set<std::size_t> occupied;
+    for (const auto& pl : r.placements) if (pl.cell.valid()) occupied.insert(cells.index(pl.cell));
+    bool changed = false;
+    std::map<int, bool> joins;   // group -> joined this round
+    std::vector<std::size_t> stranded;
+    for (std::size_t i = 0; i < r.placements.size(); ++i) {
+        const auto& pl = r.placements[i];
+        if (pl.kind != "town") continue;
+        if (!pl.cell.valid() || pl.group < 0) { stranded.push_back(i); continue; }
+        if (r.groups[static_cast<std::size_t>(pl.group)].safe) continue;
+        if (const auto it = joins.find(pl.group); it != joins.end()) { if (!it->second) stranded.push_back(i); continue; }
+        std::vector<int> depth(cells.size(), -1);
+        std::vector<std::size_t> prev(cells.size(), cells.size());
+        std::deque<std::size_t> queue;
+        for (std::size_t k = 0; k < cells.size(); ++k) if (group_of(k) == pl.group) { depth[k] = 0; queue.push_back(k); }
+        std::size_t target = cells.size();
+        while (!queue.empty() && target == cells.size()) {
+            const std::size_t j = queue.front(); queue.pop_front();
+            std::vector<Cell> next = cells.neighbours(cells.at(j));
+            std::sort(next.begin(), next.end());
+            for (const auto& nb : next) {
+                const std::size_t k = cells.index(nb);
+                if (depth[k] >= 0) continue;
+                if (r.cls[j] == Mountain && safe_land(k)) { target = k; prev[k] = j; break; }
+                if (r.cls[k] == Mountain && depth[j] < policy.max_access_cells) { depth[k] = depth[j] + 1; prev[k] = j; queue.push_back(k); }
+            }
+        }
+        bool fresh = false;
+        if (target != cells.size())
+            for (std::size_t k = prev[target]; depth[k] > 0; k = prev[k]) fresh |= plan.joins.emplace(k, pl.uid).second;
+        joins[pl.group] = fresh;
+        changed |= fresh;
+        if (!fresh) stranded.push_back(i);
+    }
+    for (std::size_t i : stranded) {
+        const auto& s = input.settlements[i];
+        if (plan.moves.count(s.id)) continue;
+        Cell found;
+        double best = 0;
+        for (std::size_t k = 0; k < cells.size(); ++k) {
+            if (compiled[k] != Land || !safe_land(k) || occupied.count(k)) continue;
+            const Cell c = cells.at(k);
+            const double d = cells.distance(s.position, c);
+            if (!found.valid() || d < best || (d == best && c < found)) { found = c; best = d; }
+        }
+        if (!found.valid()) continue;
+        plan.moves[s.id] = found;
+        occupied.insert(cells.index(found));
+        changed = true;
+    }
+    return changed;
+}
+}  // namespace
+
+// Towns are never dropped (docs/travel-graph.md "Town repairs"): a round with no town reason is the result; otherwise the plan grows
+// (joins, then moves) and the analysis runs again from the compiled classes, at most four rounds. A world whose towns are all
+// player-safe in the first round (world A) is analysed once, unchanged.
+Result analyze_cells(const Input& input, const Policy& policy, std::vector<std::uint8_t> compiled) {
+    TownPlan plan;
+    for (int round = 1;; ++round) {
+        Result r = analyze_round(input, policy, compiled, plan);
+        if (!town_reasons(r) || round == 4 || !extend(plan, r, input, policy, compiled)) return r;
+    }
 }
 
 Input input_of(const source::SourceWorld& world, const projection::Projection& projection, const terrain::Compiled& terrain, const campaign::Compiled& campaign) {
@@ -889,14 +1090,18 @@ Value reasons_value(const std::vector<Reason>& reasons) {
 }
 Value candidate_value(const PortCandidate& c, double spacing) {
     Value v = Value::object();
-    v.set("village", str(c.village_id)); v.set("villageUid", str(c.village_uid)); v.set("seaNode", integer(c.sea_node)); v.set("status", str(c.status));
+    // A coast port (a town repair) has no harbour village, sea node or harbour cell; a harbour candidate carries no kind.
+    if (c.kind == "coast") v.set("kind", str(c.kind));
+    else { v.set("village", str(c.village_id)); v.set("villageUid", str(c.village_uid)); v.set("seaNode", integer(c.sea_node)); }
+    v.set("status", str(c.status));
     if (!c.reason.empty()) v.set("reason", str(c.reason));
     if (c.harbour_cell.valid()) v.set("harbourCell", cell_value(c.harbour_cell));
     if (c.status == "valid") {
         v.set("seaCell", cell_value(c.sea_cell)); v.set("landCell", cell_value(c.land_cell));
         v.set("seaPoint", point_value({(c.sea_cell.col + 0.5) * spacing, (c.sea_cell.row + 0.5) * spacing}));
         v.set("landPoint", point_value({(c.land_cell.col + 0.5) * spacing, (c.land_cell.row + 0.5) * spacing}));
-        v.set("harbourShiftCells", num(c.harbour_shift)); v.set("gateDistanceCells", num(c.gate_distance)); v.set("entranceDistanceCells", num(c.entrance_distance)); v.set("basin", integer(c.basin));
+        if (c.kind != "coast") v.set("harbourShiftCells", num(c.harbour_shift));
+        v.set("gateDistanceCells", num(c.gate_distance)); v.set("entranceDistanceCells", num(c.entrance_distance)); v.set("basin", integer(c.basin));
     }
     v.set("quality", num(c.quality));
     return v;
@@ -1040,6 +1245,25 @@ Run run(const source::SourceWorld& world, const fs::path& world_json, const Poli
     out.result = analyze(in, policy);
     // The exclusions must keep the campaign records closed (campaign::exclude re-checks closure).
     for (const auto& e : out.result.exclusions) campaign::exclude(c, e.id, e.reason);
+    // A kept harbour village whose producer sea node resolves to no navigable cell (sea_node_not_navigable) loses its harbour role: it has
+    // no harbour cell for its port, and activation refuses a harbour village without one (SettlementFactory). Seed 60. So does one whose
+    // harbour cell lies on a closed basin (closed_basin): activation lands only on open basins and refuses the village's port otherwise
+    // (NavalContentFactory landings, quality.naval_port; 11 of the 17 other accepted worlds of the 2026-10-19 seed sweep). Its town's port
+    // record keeps its other harbour villages.
+    std::set<std::string> no_harbour;
+    for (const auto& port : out.result.ports)
+        for (const auto& cand : port.candidates)
+            if (cand.kind.empty() && ((!cand.harbour_cell.valid() && cand.reason == "sea_node_not_navigable") || cand.reason == "closed_basin")) no_harbour.insert(cand.village_id);
+    if (!no_harbour.empty()) {
+        for (auto& v : c.villages) if (no_harbour.count(v.id)) { v.harbour = false; v.sea_node.reset(); v.harbour_quality = 0; }
+        for (auto& record : c.ports) {
+            record.village_ids.erase(std::remove_if(record.village_ids.begin(), record.village_ids.end(), [&](const std::string& id) { return no_harbour.count(id) != 0; }), record.village_ids.end());
+            record.sea_nodes.clear(); record.best_quality = 0;
+            for (const auto& id : record.village_ids)
+                for (const auto& v : c.villages)
+                    if (v.id == id) { if (v.sea_node) record.sea_nodes.push_back(*v.sea_node); record.best_quality = std::max(record.best_quality, v.harbour_quality); }
+        }
+    }
     // Resolve the slots MMR-27 left to MMR-28: settlement positions and port sites. A town whose port is invalid here
     // loses its port record (ports.json keeps the reason).
     auto resolve = [](std::vector<campaign::Slot>& slots, const std::string& name, const std::string& value) {
@@ -1061,8 +1285,19 @@ Run run(const source::SourceWorld& world, const fs::path& world_json, const Poli
             continue;
         }
         const auto& chosen = travel_port.at(it->town_id)->chosen;
-        resolve(it->slots, "portSite", "port " + xy(grid_cells.centre(chosen.sea_cell)) + "; land entrance " + xy(grid_cells.centre(chosen.land_cell)) + "; harbour village " + chosen.village_id);
+        resolve(it->slots, "portSite", "port " + xy(grid_cells.centre(chosen.sea_cell)) + "; land entrance " + xy(grid_cells.centre(chosen.land_cell)) +
+                                       (chosen.kind == "coast" ? std::string("; coast port (town repair)") : "; harbour village " + chosen.village_id));
         ++it;
+    }
+    // A coast port (a town repair) of a town without a port record: a port record without harbour villages, and the town is a port.
+    for (const auto& [town_id, port] : travel_port) {
+        if (port->chosen.kind != "coast" || std::any_of(c.ports.begin(), c.ports.end(), [&](const campaign::Port& p) { return p.town_id == town_id; })) continue;
+        campaign::Port record;
+        record.town_id = town_id;
+        record.slots = {{"portSite", "resolved", "MMR-28", "port " + xy(grid_cells.centre(port->chosen.sea_cell)) + "; land entrance " + xy(grid_cells.centre(port->chosen.land_cell)) + "; coast port (town repair)"},
+                        {"navalFacility", "pending", "MMR-35", ""}, {"shipyardAndFleet", "pending", "MMR-35", ""}};
+        for (auto& town : c.towns) if (town.id == town_id) town.port = true;
+        c.ports.push_back(record);
     }
     if (const auto problems = campaign::closure_problems(c); !problems.empty()) refuse("broken_join", "Travel results break the campaign records: " + problems.front());
     auto& id = out.identity;

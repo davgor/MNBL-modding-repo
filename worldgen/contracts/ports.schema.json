@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "mnbl.ports/1",
   "title": "MNBL port candidates",
-  "description": "ports.json written by worldbridge --compile-travel (MMR-28), canonical JSON. One entry per town with at least one kept harbour village (MMR-27 ports). A port comes only from a producer harbour record on an open basin, never from a shore cell; it serves its gate: the coast pair of the gate's own land component nearest the gate, never a pair another town holds, with the port cell at most maxPortGateCells from the gate cell (the installed War Sails envelope). The chosen candidate is the valid one nearest the gate, then with the highest harbour quality, then by village UID. Towns on an open coast without a harbour record are listed in coastalTownsWithoutHarbourRecord. Every port is pending engine validation (MMR-38 host checks portFace and portGate).",
+  "description": "ports.json written by worldbridge --compile-travel (MMR-28), canonical JSON. One entry per town with at least one kept harbour village (MMR-27 ports) or a coast port. A port comes from a producer harbour record on an open basin, never from a shore cell, except a town repair's coast port (kind coast: a town of a group that is not player-safe, without a valid harbour port, whose group holds a kept village for each town and castle; docs/travel-graph.md \"Town repairs\"); it serves its gate: the coast pair of the gate's own land component nearest the gate, never a pair another town holds, with the port cell at most maxPortGateCells from the gate cell (the installed War Sails envelope). The chosen candidate is the valid one nearest the gate, then with the highest harbour quality, then by village UID. Towns on an open coast without a harbour record are listed in coastalTownsWithoutHarbourRecord. Every port is pending engine validation (MMR-38 host checks portFace and portGate).",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -49,13 +49,14 @@
       "type": "object",
       "additionalProperties": false,
       "required": [
-        "village",
-        "villageUid",
-        "seaNode",
         "status",
         "quality"
       ],
       "properties": {
+        "kind": {
+          "const": "coast",
+          "description": "a town repair's coast port: no harbour village, sea node or harbour cell (absent for a harbour candidate)"
+        },
         "village": {
           "type": "string"
         },
@@ -73,8 +74,8 @@
         },
         "reason": {
           "type": "string",
-          "description": "invalid only: harbour_village_excluded, town_unplaceable, sea_node_not_navigable, closed_basin, basin_not_reachable_from_gate, port_pair_taken, port_too_far_from_gate (with the distance)",
-          "pattern": "^(harbour_village_excluded|town_unplaceable|sea_node_not_navigable|closed_basin|basin_not_reachable_from_gate|port_pair_taken|port_too_far_from_gate( \\(.*\\))?)$"
+          "description": "invalid only: harbour_village_excluded, town_unplaceable, sea_node_not_navigable, closed_basin, basin_not_reachable_from_gate, port_pair_taken, port_pair_under_bridge, port_too_far_from_gate (with the distance), port_path_too_long (with the path bound)",
+          "pattern": "^(harbour_village_excluded|town_unplaceable|sea_node_not_navigable|closed_basin|basin_not_reachable_from_gate|port_pair_taken|port_pair_under_bridge|(port_too_far_from_gate|port_path_too_long)( \\(.*\\))?)$"
         },
         "harbourCell": {
           "$ref": "#/$defs/cell"
@@ -123,12 +124,10 @@
           },
           "then": {
             "required": [
-              "harbourCell",
               "seaCell",
               "landCell",
               "seaPoint",
               "landPoint",
-              "harbourShiftCells",
               "gateDistanceCells",
               "entranceDistanceCells",
               "basin"
@@ -146,6 +145,44 @@
           "then": {
             "required": [
               "reason"
+            ]
+          }
+        },
+        {
+          "if": {
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "properties": {
+              "status": {
+                "const": "valid"
+              }
+            }
+          },
+          "else": {
+            "required": [
+              "village",
+              "villageUid",
+              "seaNode"
+            ],
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "status": {
+                      "const": "valid"
+                    }
+                  }
+                },
+                "then": {
+                  "required": [
+                    "harbourCell",
+                    "harbourShiftCells"
+                  ]
+                }
+              }
             ]
           }
         }

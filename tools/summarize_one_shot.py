@@ -20,7 +20,7 @@ import sys
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 RAW = os.path.join(REPO, 'build', 'mmr1', 'one-shot-raw.json')
 OUT = os.path.join(REPO, 'evidence', 'one-shot', 'one-shot-run.json')
-BLOCKED_B = 'needs a second activatable world: only seed 42 activates (seed 73 is refused at the village binding), and MMR-19\'s fixture world is not in the package'
+BLOCKED_B = 'the land missions probe\'s second world is MMR-19\'s fixture world, which the package does not hold'
 
 
 def load(rel):
@@ -95,8 +95,26 @@ def main():
                  note if run_ok(name) else '%s: %s' % (name, runs.get(name, {}).get('failures') or runs.get(name, {}).get('error') or runs.get(name, {}).get('stopped') or 'no result'), [name])
 
     profile, flow = probes.get('step1 profile', {}), probes.get('step1 identities', {})
+    land_cases = [c for c in ((probes.get('step2 land', {}) or {}).get('cases') or {}).values() if isinstance(c, dict) and isinstance(c.get('before'), dict) and isinstance(c.get('after'), dict)]
+    identities_checked = sum(1 for c in land_cases if c['before'].get('world'))
+    identities_equal = sum(1 for c in land_cases if c['before'].get('world') and c['before'].get('world') == c['after'].get('world'))
+    identities_back = identities_checked > 0 and identities_equal == identities_checked
+    # World B's land cases (B.<case>): run, passed, or absent from B too (a class neither world has).
+    land_all = (probes.get('step2 land', {}) or {}).get('cases') or {}
+    land_b = {k: v for k, v in land_all.items() if k.startswith('B.')}
+    land_b_run = {k: v for k, v in land_b.items() if isinstance(v, dict) and not v.get('absent')}
+    land_b_absent = sorted(k for k, v in land_b.items() if isinstance(v, dict) and v.get('absent'))
+    land_b_failed = sorted(k for k, v in land_b_run.items() if v.get('failures') or v.get('error'))
     land, naval, visit = probes.get('step2 land', {}), probes.get('step3 naval', {}), probes.get('step2 visit', {})
+    if not land.get('lackingInA'):
+        land_b_status, land_b_note = 'pass', 'nothing lacking'
+    elif get(land, 'worldB', 'blocked') or not land_b:
+        land_b_status, land_b_note = 'blocked' if get(land, 'worldB', 'blocked') else 'not-run', str(get(land, 'worldB', 'blocked') or get(land, 'worldB', 'error') or 'no world B cases')
+    else:
+        land_b_status = 'fail' if land_b_failed else 'pass'
+        land_b_note = 'ran %s, failed %s; absent from B too (neither world has them) %s' % (sorted(land_b_run), land_b_failed, land_b_absent)
     create, cold, compat = probes.get('step4-5 create', {}), probes.get('step5 cold', {}), probes.get('step6 refusals', {})
+    seam = probes.get('step4 seam', {})
     manifest = load('evidence/release/package-manifest.json') or {}
     files = {f['path']: f['sha256'] for f in get(manifest, 'manifest', 'files') or []}
     tools = load('tools.lock.json') or {}
@@ -123,8 +141,23 @@ def main():
             caches[name] = {'keys': sorted(set(re.findall(r'navigation-caches[\\/]([0-9a-f]{8})', text))), 'built': 'cache creation progress % 0' in text}
     built_in = sorted(n for n, c in caches.items() if c['built'])
     cache_keys = sorted(set(k for c in caches.values() for k in c['keys']))
+    # The caches each world start and load used, from the probes' own records: a start builds its world's caches once; every load reuses
+    # the key its world was started under (A's start in the profile, B's in the matrix's create).
+    def cache_of(record):
+        n = get(record, 'loader', 'support', 'generatedNavigationCaches', 'navigationCache') or {}
+        return {'status': n.get('status'), 'key': (n.get('keySha256') or '')[:8] or None}
+    a_start = get(profile, 'A', 'start', 'host', 'StartCampaign', 'navigationCaches') or {}
+    world_loads = [('A', 'profile same-process', cache_of(get(profile, 'A', 'load') or {})),
+                   ('A', 'matrix same-process', cache_of(get(create, 'worlds', 'A', 'load') or {})), ('B', 'matrix same-process', cache_of(get(create, 'worlds', 'B', 'load') or {})),
+                   ('A', 'matrix cold', cache_of(get(cold, 'worlds', 'A', 'load') or {})), ('B', 'matrix cold', cache_of(get(cold, 'worlds', 'B', 'load') or {})),
+                   ('B', 'seam presentation', cache_of(get(seam, 'load', 'loader') and {'loader': get(seam, 'load', 'loader')} or {}))]
+    a_key = (a_start.get('keySha256') or '')[:8] or None
+    b_keys = sorted(set(l['key'] for w, _, l in world_loads if w == 'B' and l['key']))
+    loads_reused = all(l['status'] == 'reused' for _, _, l in world_loads if l['status'] is not None) and any(l['status'] for _, _, l in world_loads)
+    loads_keyed = all(l['key'] == a_key for w, _, l in world_loads if w == 'A' and l['key']) and len(b_keys) <= 1
+    caches_ok = a_start.get('cacheStatus') == 'generated' and loads_reused and loads_keyed and set(cache_keys) <= set([a_key] + b_keys)
     # The producer's pinned runtime against this installation (the producer process contract re-run with the offline suites).
-    contract = load('evidence/one-shot/producer-process-contract-20261019.json') or {}
+    contract = load('evidence/fwg/producer-process-contract.json') or {}
     preflight = get(contract, 'results', 'preflight') or {}
 
     plan = [
@@ -134,7 +167,8 @@ def main():
             A('the running module, fwg.exe and worldbridge.exe are the package\'s and the pins', 'pass' if identity_ok else ('not-run' if not build else 'fail'),
               'module %s, producer %s, worldbridge %s; game %s, War Sails %s' % ((build.get('moduleAssemblySha256') or '')[:12], (build.get('producerSha256') or '')[:12], (build.get('worldbridgeSha256') or '')[:12], build.get('game'), build.get('navalDlc')), ['step1 profile']),
             A('the producer\'s pinned runtime (ucrtbase.dll) matches this installation', 'fail' if preflight.get('passed') is False else ('pass' if preflight.get('passed') is True else 'not-run'),
-              'the producer process contract\'s preflight (evidence/one-shot/producer-process-contract-20261019.json) fails %s: a Windows update replaced the system UCRT after the pin (evidence/one-shot/ucrt-drift.json). The in-game generation path does not check it; world A\'s content id is the accepted one' % preflight.get('failedChecks'), []),
+              ('the producer process contract\'s preflight (evidence/fwg/producer-process-contract.json, re-run with the offline suites) passed: the UCRT pin was renewed on 2026-10-19 after a Windows update replaced the system UCRT (evidence/one-shot/ucrt-drift.json); world A\'s content id is unchanged'
+               if preflight.get('passed') is True else 'the producer process contract\'s preflight (evidence/fwg/producer-process-contract.json) fails %s' % preflight.get('failedChecks')), []),
             by_run('step1 profile', 'world A generated from the New Campaign screen, its culture chosen, character creation finished, the map entered, saved and loaded',
                    'seed %s: generated in %.1f s, content id %s; the map after %.1f s (navigation caches built); save %s, loaded in %.1f s' % (a.get('seed'), get(a, 'generate', 'seconds') or 0, (get(a, 'geography', 'worldContentId') or '')[:16],
                    get(a, 'start', 'mapAfter') or 0, get(a, 'save', 'name'), get(a, 'load', 'loaderSeconds') or 0)),
@@ -146,19 +180,24 @@ def main():
         ('2', 'Travel on land, enter a generated settlement, trade/recruit, enter one land mission and return to the same world.', [
             by_run('step2 visit', 'travel by land to a generated town, trade and recruit there, leave; a day of campaign stays coherent', 'campaign_soak world A (trade and recruitment through the screens\' logic, not the screens)'),
             by_run('step2 land', 'land missions and settlement interactions, returning to the map each time', 'land_missions world A cases %s' % sorted((land.get('cases') or {}).keys())),
-            A('land missions needing a battle class world A lacks', 'blocked' if get(land, 'worldB', 'blocked') else 'not-run', BLOCKED_B + ' (world A lacks %s)' % land.get('lackingInA'), ['step2 land']),
-            A('the same world after a mission (world identity re-checked)', 'not-run', 'the mission cases check position, land or sea, navigation and camera on return; the world identity is checked at the load only', ['step2 land']),
+            A('land missions needing a battle class world A lacks, on world B', land_b_status,
+              'world A lacks %s; on B (seed %s): %s' % (land.get('lackingInA'), get(land, 'worldB', 'seed'), land_b_note), ['step2 land']),
+            A('the same world after a mission (world identity re-checked)', 'pass' if run_ok('step2 land') and identities_back else ('not-run' if not identities_checked else 'fail'),
+              '%d mission returns with the world identity recorded before and after, %d equal (the campaign\'s bound world id, content id and instance, and its periodic frame)' % (identities_checked, identities_equal), ['step2 land']),
         ]),
         ('3', 'Reach a generated operational port, embark, sail to another valid destination, enter/return from a naval encounter and disembark; the seaborne raid, blockade and anchor scenario.', [
             by_run('step3 naval', 'ship purchase, port and island voyages, drop-off and coastal landing, blockade and anchor, pirate battle (retreat), seaborne raid, defeat with the raft', 'naval_missions world A cases %s' % sorted((naval.get('cases') or {}).keys())),
         ]),
         ('4', 'East/west crossing for player and AI on land and sea, route execution, nearby-party encounter/visibility, distance caches, camera and picking.', [
             by_run('step4-5 create', 'the player crosses the seam on land, an AI party pursues across it, a fleet is called across it and an anchored fleet stays by it; all survive save and load', 'two_world_matrix create, world A'),
-            A('the navigation caches built once and reused for the generated world', 'pass' if built_in == ['step1 profile'] and len(cache_keys) == 1 else ('not-run' if not caches else 'fail'),
-              'cache keys read: %s; built in: %s (expected: only A\'s first start). %s' % (cache_keys, built_in,
-              'The matrix\'s same-process load built them again although they existed (its load took %.0f s); the cold load after its scene was swept and re-encoded read another key (%.1f s). Cause not identified.' % (get(create, 'worlds', 'A', 'load', 'seconds') or 0, get(cold, 'worlds', 'A', 'load', 'seconds') or 0)
-              if built_in != ['step1 profile'] or len(cache_keys) != 1 else ''), [n for n in caches]),
-            A('camera and picking across the seam on the generated world; the player and an AI party sailing across it; a naval encounter at the seam', 'not-run', 'no probe drives these on world A (camera and picking were shown on the periodic fixture, MMR-66)', []),
+            A('the navigation caches built once per world and reused by every load', 'pass' if caches_ok else ('not-run' if not a_start else 'fail'),
+              'A built at its start (%s, key %s); loads: %s; B\'s key %s; keys in the engine logs %s, built in runs %s (A\'s start, and B\'s start in the matrix)' % (a_start.get('cacheStatus'), a_key,
+              '; '.join('%s %s %s %s' % (w, how, l['status'], l['key']) for w, how, l in world_loads if l['status'] is not None), b_keys, cache_keys, built_in), ['step1 profile', 'step4-5 create', 'step5 cold', 'step4 seam']),
+            by_run('step4 seam', 'camera and picking across the seam on the generated world: display copies, the camera following the player across and back, free pan, fast moves, picking through the strip and on a display copy, tracks, terrain alignment, a town menu across the seam, the wrap budget',
+                   'seam_presentation on world B\'s matrix save (%s), towns %s; world A\'s only land across the seam has no town west of it' % (get(seam, 'load', 'save'), json.dumps(get(seam, 'seamTowns', 'chosen')))),
+            A('the player sailing across the seam and a naval encounter at the seam', 'pass' if run_ok('step3 naval') else ('not-run' if 'step3 naval' not in runs or not any(get(naval, 'cases', c) for c in ('route.seam', 'pirate.seam')) else
+              ('pass' if all(not ((get(naval, 'cases', c) or {}).get('failures')) and 'error' not in (get(naval, 'cases', c) or {}) and get(naval, 'cases', c) for c in ('route.seam', 'pirate.seam')) else 'fail')),
+              'naval_missions route.seam %s, pirate.seam %s' % (json.dumps(get(naval, 'cases', 'route.seam', 'voyage')), json.dumps(get(naval, 'cases', 'pirate.seam', 'setup', 'acrossSeam'))), ['step3 naval']),
         ]),
         ('5', 'Save A with mutable state; generate B in the same process and note the difference; save B, cold-restart, load A then B; ordinary loads must not launch FWGC++.', [
             by_run('step4-5 create', 'A saved with mutable ownership, party, prisoner, siege, ship and anchor state, loaded in the same process and equal to its save', 'two_world_matrix create'),
@@ -166,7 +205,10 @@ def main():
             A('B (seed 73) generated in the same process as A, with different geography and routes', 'pass' if run_ok('step1 profile') and get(b, 'generate', 'state') == 'Generated'
               and get(b, 'geography', 'worldContentId') and get(b, 'geography', 'coastlineSha256') != get(a, 'geography', 'coastlineSha256') else ('not-run' if not b else 'fail'),
               'B generated in %.1f s, content id %s; land cells A %s vs B %s, coastlines differ' % (get(b, 'generate', 'seconds') or 0, (get(b, 'geography', 'worldContentId') or '')[:16], get(a, 'geography', 'landCells'), get(b, 'geography', 'landCells')), ['step1 profile']),
-            A('save B, load B after the cold restart, B\'s landmarks, ownership, parties, ships and anchors', 'blocked', BLOCKED_B, []),
+            A('B started from the setup screen, changed, saved; loaded in the same process from inside A and after the cold restart, each equal to its save', 'pass' if run_ok('step4-5 create') and run_ok('step5 cold') and get(create, 'worlds', 'B', 'contentId')
+              and get(create, 'worlds', 'B', 'contentId') != get(create, 'worlds', 'A', 'contentId') else ('not-run' if 'step4-5 create' not in runs else 'fail'),
+              'B seed %s, content id %s (A %s); save %s; loads %s and %s' % (get(create, 'worlds', 'B', 'seed'), (get(create, 'worlds', 'B', 'contentId') or '')[:16], (get(create, 'worlds', 'A', 'contentId') or '')[:16],
+              get(create, 'worlds', 'B', 'save'), get(create, 'worlds', 'B', 'load', 'how'), get(cold, 'worlds', 'B', 'load', 'how')), ['step4-5 create', 'step5 cold']),
         ]),
         ('6', 'Cancel another generation and load an isolated invalid copy of world data; usable-menu recovery, unchanged original hashes, no orphan producer or cross-world callbacks.', [
             by_run('step1 identities', 'a second generation cancelled through the setup screen (New Seed, then Back): interrupted, the committed world unchanged', 'new_campaign_flow'),
@@ -174,8 +216,12 @@ def main():
             by_run('step6 refusals', 'more invalid copies (incompatible schema and build, missing DLC, corrupted manifest hash) refused; A\'s save, package and bundle unchanged', 'compat_matrix'),
             A('no generator process left after any run', 'pass' if runs and not orphans else 'fail', 'fwg and worldbridge after every run: %s' % (orphans or 'none'), list(runs)),
             A('the world bundles unchanged through the matrix, refusal and cold-load runs', 'pass' if bundles_kept else 'fail', 'store snapshots before and after the two_world_matrix and compat_matrix runs', []),
-            A('an invalid copy of world data loaded from a separate test root', 'not-run', 'the store and save paths are fixed (SubModule.Store); the invalid copies are written beside the originals and removed', []),
-            A('no cross-world callbacks', 'blocked', BLOCKED_B, []),
+            A('an isolated invalid copy of world data, from a separate test root, refused before anything loads', 'pass' if get(compat, 'isolatedCopy', 'refused') is True and get(compat, 'isolatedCopy', 'removed') is True
+              and get(compat, 'preserved', 'bundleAndPackage') is True else ('not-run' if not get(compat, 'isolatedCopy') else 'fail'),
+              'compat_matrix: %s with %s damaged, opened by the bundle verifier: %s; the copy removed %s; the original bundle and package unchanged %s' % (get(compat, 'isolatedCopy', 'root'), get(compat, 'isolatedCopy', 'damaged'),
+              (get(compat, 'isolatedCopy', 'refusal') or '')[:160], get(compat, 'isolatedCopy', 'removed'), get(compat, 'preserved', 'bundleAndPackage')), ['step6 refusals']),
+            A('no cross-world callbacks: after each load nothing of the other world is registered, and the frame and terrain context are the loaded world\'s only', 'pass' if run_ok('step4-5 create') and run_ok('step5 cold') and get(create, 'worlds', 'B', 'contentId') and get(cold, 'worlds', 'B', 'load', 'loader') else ('not-run' if 'step4-5 create' not in runs else 'fail'),
+              'two_world_matrix create and cold, A and B each loaded from inside the other', ['step4-5 create', 'step5 cold']),
         ]),
         ('sequence', 'The sequence itself: the installation and the development environment.', [
             A('the official module descriptors and engine binaries unchanged', 'pass' if official_same else 'fail', 'snapshots before and after', []),
@@ -213,14 +259,18 @@ def main():
         'worlds': {'A': {'seed': a.get('seed'), 'worldContentId': get(a, 'geography', 'worldContentId'), 'save': get(a, 'save', 'name'),
                          'binding': get(a, 'load', 'loader', 'binding'), 'scene': get(a, 'load', 'loader', 'scene'),
                          'seconds': {'generate': get(a, 'generate', 'seconds'), 'mapAfterStart': get(a, 'start', 'mapAfter'), 'load': get(a, 'load', 'loaderSeconds')}},
-                   'B': {'seed': b.get('seed'), 'worldContentId': get(b, 'geography', 'worldContentId'), 'activated': False, 'seconds': {'generate': get(b, 'generate', 'seconds')}}},
+                   'B': {'seed': b.get('seed'), 'worldContentId': get(b, 'geography', 'worldContentId'), 'activated': bool(get(create, 'worlds', 'B', 'contentId')),
+                         'matrixContentId': get(create, 'worlds', 'B', 'contentId'), 'save': get(create, 'worlds', 'B', 'save'), 'instance': get(create, 'worlds', 'B', 'instance'),
+                         'seconds': {'generate': get(b, 'generate', 'seconds'), 'matrixStart': get(create, 'worlds', 'B', 'startSeconds')}}},
         'request': {'jobA': get(a, 'job', 'jobId'), 'jobB': get(b, 'job', 'jobId'), 'recipeVersion': build.get('recipeVersion'), 'overrides': build.get('overrides'),
                     'qualityAttempts': build.get('qualityAttempts')},
         'campaigns': {'profile': get(a, 'load', 'loader', 'binding', 'instance'), 'matrix': get(create, 'worlds', 'A', 'instance'),
                       'designated': get(probes.get('step3 prepare', {}), 'prepare', 'instance')},
         'matrixSave': get(create, 'worlds', 'A', 'save'), 'designatedSave': 'mnbl_oneshot_A_designated',
-        'navigationCaches': {'keys': cache_keys, 'builtIn': built_in, 'loadSeconds': {'profile same-process': get(a, 'load', 'loaderSeconds'),
-                             'matrix same-process': get(create, 'worlds', 'A', 'load', 'seconds'), 'matrix cold': get(cold, 'worlds', 'A', 'load', 'seconds')}},
+        'navigationCaches': {'keys': cache_keys, 'builtIn': built_in, 'aStart': a_key, 'loads': [{'world': w, 'how': how, 'status': l['status'], 'key': l['key']} for w, how, l in world_loads],
+                             'loadSeconds': {'profile same-process': get(a, 'load', 'loaderSeconds'), 'matrix same-process A': get(create, 'worlds', 'A', 'load', 'seconds'),
+                                             'matrix same-process B': get(create, 'worlds', 'B', 'load', 'seconds'), 'matrix cold A': get(cold, 'worlds', 'A', 'load', 'seconds'),
+                                             'matrix cold B': get(cold, 'worlds', 'B', 'load', 'seconds')}},
     }
     doc = {'schema': 'mnbl.one-shot-run', 'version': 1, 'ticket': 'MMR-1', 'raw': 'build/mmr1/one-shot-raw.json',
            'startedUtc': raw.get('startedUtc'), 'finishedUtc': raw.get('finishedUtc'),

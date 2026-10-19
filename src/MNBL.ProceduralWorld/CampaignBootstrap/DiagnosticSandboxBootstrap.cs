@@ -17,10 +17,28 @@ using MNBL.ProceduralWorld.Surface;
 
 namespace MNBL.ProceduralWorld.CampaignBootstrap
 {
+    // What a diagnostic drives a campaign through while it runs time: the fixture's owned game loop (DiagnosticSandboxBootstrap), or a
+    // campaign the game runs itself, such as a loaded save (LoadedCampaignTicker: Tick does nothing and it never fails).
+    internal interface ICampaignTicker
+    {
+        bool HoldPaused { get; set; }
+        void Tick();
+        bool Failed { get; }
+        string Error { get; }
+    }
+
+    internal sealed class LoadedCampaignTicker : ICampaignTicker
+    {
+        public bool HoldPaused { get; set; } = true;
+        public void Tick() { }
+        public bool Failed { get { return false; } }
+        public string Error { get { return null; } }
+    }
+
     // Opt-in diagnostic only. Root calls Tick on the game thread; no automatic entry point. The generated-campaign seams
     // (behaviours, registration dispatch, closure, map-scene creator) are GeneratedGameManager's (MMR-30); this class adds
     // the probe driver: character creation, pausing, no autosave and a census at every phase.
-    internal sealed class DiagnosticSandboxBootstrap : GeneratedGameManager
+    internal sealed class DiagnosticSandboxBootstrap : GeneratedGameManager, ICampaignTicker
     {
         private readonly string cultureId;
         private readonly string characterName;

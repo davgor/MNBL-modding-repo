@@ -248,7 +248,7 @@ What it showed:
 
 ## Gameplay in the bounded first test (MMR-51, 2026-10-18)
 
-MMR-34's audit starts a campaign; MMR-51 plays the integrated worlds. World A is the full generated world (seed 42) started from the world setup screen. World B is MMR-19's fixture world (seed 364610), started after A ends in the same process: the production generator activates only seed 42 today.
+MMR-34's audit starts a campaign; MMR-51 plays the integrated worlds. World A is the full generated world (seed 42) started from the world setup screen. World B is MMR-19's fixture world (seed 364610), started after A ends in the same process: the production generator activated only seed 42 then. Since 2026-10-19 seed 73 activates, and the final one-shot run plays it as world B.
 
 | | |
 |---|---|

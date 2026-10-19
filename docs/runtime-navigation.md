@@ -107,7 +107,7 @@ Each cell carries four attributes besides its TerrainType: domain, water class, 
 
 ## Required points
 
-**Snapping.** A required point is a settlement, a port, a port entrance or a coast transition.
+**Snapping.** A required point is a settlement, a port, a port entrance or a coast transition. An unplaceable village or castle is not one: the travel graph lists it with no cell or point, excludes it, and the campaign never builds it. A settlement without a cell that is not such an exclusion refuses activation (2026-10-19; 12 of the 19 accepted worlds of that day's seed sweep hold one).
 - It stays where it is when its cell is in its intended domain and component (the travel graph's land component or basin).
 - Otherwise it moves to the nearest interior point of a matching cell within 0.5 cell (3.125 units).
 - Otherwise activation is refused, naming the point's ids.

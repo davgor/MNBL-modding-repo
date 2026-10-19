@@ -56,6 +56,22 @@ COVERED_PREFIX = {
         'MMR-64 closest-settlement order lambdas',
 }
 VIEW_METHODS = {'Helpers.QuestHelper::AddMapArrowFromPointToTarget': 'quest map arrow (a view; MMR-66)'}
+# View code the player reads as distances between campaign positions: lists sorted by distance, distance texts, the nearby culture's
+# music and the step sounds of the parties around the main party. Transpiled like campaign code, so near the cut their order, text and
+# sounds follow the periodic topology (2026-10-19; a documented limit of MMR-66 before). The transpiler measures periodically only
+# between campaign positions, as everywhere. Not CampaignUIHelper::GetHeroBehaviorText: patching it when the periodic set is applied (before
+# the campaign's game texts exist) runs CampaignUIHelper's type initializer, which reads GameTexts and fails, and the failed type then
+# breaks character creation (one-shot run, 2026-10-19); the hero behaviour text stays planar near the cut.
+VIEW_PERIODIC = {
+    'TaleWorlds.CampaignSystem.ViewModelCollection.ClanManagement.Categories.ClanIncomeSortControllerVM/AlleyItemLocationComparer::GetDistanceToMainParty': 'clan income list sorted by distance (alleys)',
+    'TaleWorlds.CampaignSystem.ViewModelCollection.ClanManagement.Categories.ClanIncomeSortControllerVM/WorkshopItemLocationComparer::GetDistanceToMainParty': 'clan income list sorted by distance (workshops)',
+    'TaleWorlds.CampaignSystem.ViewModelCollection.ClanManagement.Categories.ClanMembersSortControllerVM/ItemLocationComparer::GetDistanceToMainHero': 'clan members sorted by distance',
+    'TaleWorlds.CampaignSystem.ViewModelCollection.ClanManagement.Categories.ClanPartiesSortControllerVM/ItemLocationComparer::GetDistanceToMainParty': 'clan parties sorted by distance',
+    'TaleWorlds.CampaignSystem.ViewModelCollection.GameMenu.Overlay.ArmyMenuOverlayVM::ExecuteOnSetAsActiveContextMenuItem': 'army overlay: a party near enough to join',
+    'TaleWorlds.CampaignSystem.ViewModelCollection.GameMenu.Overlay.GameMenuPartyItemVM::RefreshProperties': 'game-menu party list distance',
+    'SandBox.View.CampaignMusicHandler::GetNearbyCulture': 'the nearby culture\'s map music',
+    'SandBox.View.Map.MapScreen::TickStepSounds': 'step sounds of the parties around the main party',
+}
 GENERIC = ('TaleWorlds.CampaignSystem.Map.LocatorGrid`1::', 'TaleWorlds.CampaignSystem.Map.DistanceCache.NavigationCache`1::')
 GENERIC_REASON = {
     'TaleWorlds.CampaignSystem.Map.LocatorGrid`1::': 'the spatial index itself (generic, Harmony refuses it); its planar filter is answered by the image pass',
@@ -83,6 +99,8 @@ COSMETIC_SCENE = {'TaleWorlds.CampaignSystem.AtmosphereGrid': 'atmosphere interp
 def disposition(assembly, method):
     if method.startswith('TaleWorlds.CampaignSystem.CampaignVec2::'):
         return 'exact', 'the planar measure itself'
+    if method in VIEW_PERIODIC:
+        return 'periodic', 'transpiled (PeriodicSpatialQueries): a view read as campaign distances, ' + VIEW_PERIODIC[method]
     if assembly in VIEW_ASSEMBLIES:
         return 'view', 'view code (camera, UI; MMR-66)'
     if method in VIEW_METHODS:
@@ -176,7 +194,7 @@ def main():
         return '%s::%s(%s)' % (owner, name, params)
     in_table = {k for k, _ in table}
     seen, recompile = set(), collections.OrderedDict()
-    frontier = [k for k in in_table if sizes.get(k, INLINE_LIMIT + 1) <= INLINE_LIMIT]
+    frontier = sorted(k for k in in_table if sizes.get(k, INLINE_LIMIT + 1) <= INLINE_LIMIT)   # sorted: the table's order is reproducible
     small_table = sorted(frontier)
     while frontier:
         nxt = []

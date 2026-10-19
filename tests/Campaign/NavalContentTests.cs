@@ -178,7 +178,7 @@ internal static class NavalContentTests
 
         // c2: islands and impossible ports.
         int main = Convert.ToInt32(travel["mainGroup"]);
-        var settledGroups = new HashSet<int>(Records(travel, "settlements").Select(s => Convert.ToInt32(s["group"])));
+        var settledGroups = new HashSet<int>(Records(travel, "settlements").Where(s => s.ContainsKey("group")).Select(s => Convert.ToInt32(s["group"])));   // unplaceable (excluded) settlements have no group
         var islands = Records(travel, "groups").Where(g => Convert.ToInt32(g["towns"]) > 0 && Convert.ToInt32(g["id"]) != main).ToList();
         var settledIslands = Records(travel, "groups").Where(g => settledGroups.Contains(Convert.ToInt32(g["id"])) && Convert.ToInt32(g["id"]) != main).ToList();
         var openIds = new HashSet<int>(basins.Where(b => (bool)b.Value["open"]).Select(b => b.Key));

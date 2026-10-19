@@ -107,7 +107,8 @@ Fixed:
 - **L13. A leaked colour-grade patch would go unreported, and `End` had no ownership guard.**
   - **Fixed:** only the scene that began the patch ends it, and a new `Begin` removes any leftover. The startup audit checks the patch is applied on a generated map.
 - **L14. One tick of missed damage for a storm in a strip between moving and its rebase.**
-  - **Not fixed (documented limit):** the locator's image pass assumes a canonical search centre. A fix would need another patch, for at most one hourly tick in the frame a storm crosses.
+  - **Not fixed here (documented limit then):** the locator's image pass assumed a canonical search centre.
+  - **Fixed later by MMR-65:** an image pass is marked by its own search data, so a search centred in a strip continues at its canonical copy (`PeriodicPatches.TryImage`; docs/periodic-movement.md, "The periodic radius query"). The storm's damage search in that frame finds the parties across the seam.
 
 ## Confirming runs
 

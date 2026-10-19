@@ -57,6 +57,8 @@ The tested package is `MNBL.ProceduralWorld-v0.0.1.zip`: 11 files, SHA-256 `f70b
 - **New package:** SHA-256 `b06d222abd87d4f3606281785ad4f7f726bbbb647b3548a07e1d280b48fa8f9c`, module assembly `c2200e51…`, manifest `evidence/release/package-manifest.json`.
 - **Unchanged:** `worldbridge.exe` and `fwg.exe`. The package audits passed again.
 - **Not yet tested:** the new package has not been through the clean-install sequence. The previous package is kept locally under `artifacts/release/previous-f70b44c0/`.
+
+**The final package (2026-10-19).** `e20f26676ea91410f82a8176368d9af602507324bc7b0c645e5c08bae069e0a5`, module assembly `3070d8bc…`, `worldbridge.exe` `2bfdbb9d…`, `fwg.exe` unchanged; the package the final one-shot run passed on (`docs/one-shot-acceptance.md`). The whole clean-install sequence ran on it again: install 31240, reload 50880 and read-only 25652, with the boots in between, 27 of 27 checks once the package path test had run on the same archive (`evidence/release/clean-install.json`). The read-only and code-page findings below still hold. Earlier packages are kept locally under `artifacts/release/previous-*/`.
 - **Raw outputs archived:** the raw in-game outputs of the runs below were moved out of the repository in the evidence cleanup. The summaries stay, but `summarize_clean_install.py` can no longer re-derive them. The confirming sequence holds the battle-scale lock for its whole length. It moves the development module and the development store aside, and puts both back at the end.
 
 | Step | Run | Outcome |

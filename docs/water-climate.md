@@ -27,7 +27,7 @@ A generated world gets its own water bodies, wind field, snow and rain, colour g
   - the periodic open-sea fixture `build/research-water39/fixture-d`, with the synthesized seed-42 climate in `fixture-d39`;
   - the MMR-59 w42 world with generated pirate points, in `w42p`.
 - Production worlds have no campaign until MMR-45. Their scenes' water bodies were checked by the `world_surface` probe on bundles f596b58c and f63c6841 (run 32884):
-  - 8 and 51 lake planes, all placed, and every lake ray met its plane;
+  - 8 and 51 lake planes, all placed, and every lake ray met its plane (f63c6841 shows 50 since the edge-copy rule below, 2026-10-19);
   - the borders stayed [0, 1600];
   - every MMR-37 surface check passed with the water-aware expectations.
 - The MMR-38 navigation reports are unchanged apart from the content-addressed scene names (run 34508).
@@ -44,8 +44,9 @@ A generated world gets its own water bodies, wind field, snow and rain, colour g
   - **Box.** The plane covers the group's bounding box grown by half a sample.
   - **Clamp.** The plane never rises above a sample that is not the lake's: at most the lowest other sample within one sample of its box, less 0.001. Past the terrain's east or west edge, that rim continues in the copy one width away.
   - **Left out.** A lake whose plane would not clear its own bed is left out. The 257 sample grid resamples the 129 source grid, so many small lakes are shallower than a sample's error.
+  - **Edge copies** (2026-10-19). A strip copy cut by the terrain's east or west edge holds only part of its lake. It is shown, or left out, at its whole twin's level one width away: the group holding the copy of its first sample. Before this, a partial copy could clear a bed its twin did not, and the terrain's far edge showed a lake the canonical map left out (world B's west edge; 8 of the 19 accepted worlds of that day's seed sweep had an edge copy that differed).
   - **Bundle f596b58c:** 8 lake planes are shown, and 15 lake groups are left out (67 lake samples in all). The 4 strip lakes are copies of canonical lakes one width away, at the same level.
-  - **Bundle f63c6841:** 51 planes are shown and 62 groups left out.
+  - **Bundle f63c6841:** 50 planes are shown and 63 groups left out (51 and 62 before the edge-copy rule).
   - Lake boxes stay inside the terrain. A box half a sample past the edge widened world B's borders to −3.125 in run 6540.
 - **Water classes stay apart.** The bundle's intent mask (0 land, 1 ocean, 2 lake, 3 river) is carried unchanged.
   - Navigation is MMR-38's: sea faces are OpenSea or CoastalSea, lakes are typed Lake, rivers River, and an enclosed lake is refused from the sea.

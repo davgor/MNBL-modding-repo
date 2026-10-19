@@ -159,9 +159,9 @@ namespace MNBL.ProceduralWorld.Automation
                 var lacking = st.RuleList("battleClasses").Where(c => !candidates.ByClass.ContainsKey(c)).ToList();
                 if (candidates.Crossing == null) lacking.Add("crossing");
                 context.Outputs["lackingInA"] = lacking;
-                // fixtureB=false (a package-only installation, which holds no fixture world): B's cases are recorded as blocked, and world A
-                // stays loaded for the hideout.
-                bool runB = lacking.Count > 0 && context.Bool("fixtureB", true);
+                // seedB= starts a second production world for them; else MMR-19's fixture world. fixtureB=false without seedB (a package-only
+                // installation, which holds no fixture world): B's cases are recorded as blocked, and world A stays loaded for the hideout.
+                bool runB = lacking.Count > 0 && (context.Int("seedB", 0) != 0 || context.Bool("fixtureB", true));
                 if (runB) yield return WorldB(st, plan, path, lacking);
                 else if (lacking.Count > 0) context.Outputs["worldB"] = new Dictionary<string, object> { ["for"] = lacking, ["blocked"] = TwoWorldMatrixProbe.FixtureBlockedReason };
                 // The hideout last: the game hung at its boss conversation twice (runs 25280 and 17928), and a hang loses only what follows.
@@ -189,21 +189,30 @@ namespace MNBL.ProceduralWorld.Automation
 
         // ---------------------------------------------------------------- world B
 
-        // World B (MMR-19's fixture world: the production generator activates only seed 42) for what world A lacks: started fresh after A ends,
-        // its placement and catalog receipt named by the scenario file (relative to the repository), its cells sampled as A's; one field
-        // battle per battle class A lacks and the crossing if A has none. Its cases are B.<case>; a case B lacks too is absent.
+        // World B for what world A lacks, started fresh after A ends: a second production world from the setup screen (seedB=), else MMR-19's
+        // fixture world, its placement and catalog receipt named by the scenario file (relative to the repository); its cells sampled as A's;
+        // one field battle per battle class A lacks and the crossing if A has none. Its cases are B.<case>; a case B lacks too is absent.
         private static IEnumerator WorldB(State st, Dictionary<string, object> plan, string scenarioPath, List<string> lacking)
         {
             var context = st.Context;
             var planB = (Dictionary<string, object>)plan["worldB"];
             var b = new Dictionary<string, object> { ["for"] = lacking }; context.Outputs["worldB"] = b;
-            string repo = Path.GetDirectoryName(Path.GetDirectoryName(Path.GetDirectoryName(Path.GetFullPath(scenarioPath))));
-            string placement = Path.Combine(repo, (string)planB["fixturePlacement"]), receipt = Path.Combine(repo, (string)planB["catalogReceipt"]);
-            var missing = new[] { placement, receipt }.Where(f => !File.Exists(f)).Select(f => Path.GetFileName(f)).ToList();
-            if (missing.Count > 0) { b["error"] = "missing input " + String.Join(", ", missing); st.Failures.Add("world B: its input is missing: " + String.Join(", ", missing)); yield break; }
-            yield return TwoWorldMatrixProbe.EndGame(context);
-            context.Args["fixtureSeed"] = planB["fixtureSeed"]; context.Args["fixturePlacement"] = placement; context.Args["catalogReceipt"] = receipt;
-            yield return TwoWorldMatrixProbe.StartFixture(context, b, "B", "land_missions");
+            uint seedB = (uint)context.Int("seedB", 0);
+            if (seedB != 0)
+            {
+                yield return TwoWorldMatrixProbe.EndGame(context);
+                yield return TwoWorldMatrixProbe.StartGenerated(context, b, "B", new[] { seedB }, context.Str("culture", "empire"), "land_missions");
+            }
+            else
+            {
+                string repo = Path.GetDirectoryName(Path.GetDirectoryName(Path.GetDirectoryName(Path.GetFullPath(scenarioPath))));
+                string placement = Path.Combine(repo, (string)planB["fixturePlacement"]), receipt = Path.Combine(repo, (string)planB["catalogReceipt"]);
+                var missing = new[] { placement, receipt }.Where(f => !File.Exists(f)).Select(f => Path.GetFileName(f)).ToList();
+                if (missing.Count > 0) { b["error"] = "missing input " + String.Join(", ", missing); st.Failures.Add("world B: its input is missing: " + String.Join(", ", missing)); yield break; }
+                yield return TwoWorldMatrixProbe.EndGame(context);
+                context.Args["fixtureSeed"] = planB["fixtureSeed"]; context.Args["fixturePlacement"] = placement; context.Args["catalogReceipt"] = receipt;
+                yield return TwoWorldMatrixProbe.StartFixture(context, b, "B", "land_missions");
+            }
             st.WorldId = (string)b["worldId"]; st.Prefix = (string)b["prefix"]; st.NoReload = true;
             st.Tally = new Dictionary<string, Dictionary<string, object>>(StringComparer.Ordinal); context.Outputs["culturesB"] = st.Tally;
             b["setup"] = Setup(st);
@@ -425,6 +434,7 @@ namespace MNBL.ProceduralWorld.Automation
             setup["crewAdded"] = Crew(main, (int)st.Rule("playerTroops"));
             main.Position = new CampaignVec2(c.Position, true); main.SetMoveModeHold();
             IFaction war = null; MobileParty enemyParty = null; CampaignVec2 enemyHome = default(CampaignVec2);
+            var aside = new List<KeyValuePair<MobileParty, CampaignVec2>>();
             try
             {
                 string left;
@@ -437,6 +447,8 @@ namespace MNBL.ProceduralWorld.Automation
                 var point = RuntimeMissionProbe.FindPoint(main.Position, MobileParty.NavigationType.Default, 2, 1);
                 enemyHome = enemy.Position; enemyParty = enemy;
                 enemy.Position = point; enemy.SetMoveModeHold();
+                aside = Isolate(point, main, enemy);
+                setup["movedAside"] = aside.Select(kv => kv.Key.StringId).ToArray();
                 yield return RuntimeMissionProbe.SettleCamera(context);
                 row["before"] = RuntimeMissionProbe.Snapshot(false);
                 int observedBefore = MNBL.ProceduralWorld.Missions.MissionScenePatches.Observed;
@@ -481,6 +493,7 @@ namespace MNBL.ProceduralWorld.Automation
             }
             finally
             {
+                setup["putBack"] = Restore(aside);
                 if (war != null && war.IsAtWarWith(Clan.PlayerClan)) { MakePeaceAction.Apply(Clan.PlayerClan, war); setup["peaceMade"] = !war.IsAtWarWith(Clan.PlayerClan); }
                 // The enemy back where it was (into its settlement if it left one), so no later case meets it.
                 if (enemyParty != null && enemyParty.IsActive && enemyParty.MapEvent == null)
@@ -491,6 +504,35 @@ namespace MNBL.ProceduralWorld.Automation
                     setup["enemyRestored"] = home != null ? (object)home.StringId : new[] { enemyHome.X, enemyHome.Y };
                 }
             }
+        }
+
+        // One-shot run 29368: an AI lord's party standing near the battle point joined the case's battle (normal joining, not a defect). Every
+        // other free party within IsolationRadius of the point (periodic distance) is moved aside for the case, to a point 20-30 units from where
+        // it stood on its own navigation, and put back after it (Restore: the ids put back).
+        internal const float IsolationRadius = 12f;
+        internal static List<KeyValuePair<MobileParty, CampaignVec2>> Isolate(CampaignVec2 point, params MobileParty[] keep)
+        {
+            var periodic = PeriodicWorld.Current;
+            Func<CampaignVec2, float> distance = p => periodic != null ? periodic.Distance(p.ToVec2(), point.ToVec2()) : p.ToVec2().Distance(point.ToVec2());
+            var moved = new List<KeyValuePair<MobileParty, CampaignVec2>>();
+            foreach (var p in MobileParty.All.Where(p => !keep.Contains(p) && p.IsActive && p.CurrentSettlement == null && p.MapEvent == null && p.AttachedTo == null
+                                                      && distance(p.Position) < IsolationRadius).OrderBy(p => p.StringId, StringComparer.Ordinal).ToList())
+            {
+                var navigation = p.IsCurrentlyAtSea ? MobileParty.NavigationType.Naval : MobileParty.NavigationType.Default;
+                var away = NavigationHelper.FindPointAroundPosition(p.Position, navigation, 30, 20, true, false);
+                if (!away.IsValid() || !away.Face.IsValid() || away.IsOnLand != !p.IsCurrentlyAtSea) continue;
+                moved.Add(new KeyValuePair<MobileParty, CampaignVec2>(p, p.Position));
+                p.Position = away;
+            }
+            return moved;
+        }
+
+        internal static string[] Restore(List<KeyValuePair<MobileParty, CampaignVec2>> moved)
+        {
+            var back = new List<string>();
+            foreach (var kv in moved)
+                if (kv.Key.IsActive && kv.Key.MapEvent == null && kv.Key.CurrentSettlement == null) { kv.Key.Position = kv.Value; back.Add(kv.Key.StringId); }
+            return back.ToArray();
         }
 
         // A lord party of the culture (its kingdom put at war with the player; a lord in a settlement not under siege leaves it first, recorded as

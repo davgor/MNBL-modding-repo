@@ -121,6 +121,41 @@ namespace MNBL.ProceduralWorld.CampaignRegistry
                     if (nearest == null) break;
                     rebind(nearest, castle.Id, "balance");
                 }
+            // (5) Evening out, only where (1)-(4) leave a town or castle outside the policy's limits, so a world that needs none (world A)
+            // keeps its binding byte for byte. Seed 73's world left towns with 6-8 villages and towns and castles with none.
+            //   (a) A town above townMaximum or a castle above castleVillages (step (2) rebinds without counting) gives its villages, the
+            //       nearest move first, to a town or castle of the village's land group that has room: a village that is not remote first,
+            //       then within the preferred limit, then one without a village, then one of its own kingdom (seed 66: a castle with 4).
+            //   (b) A town or castle below its floor (one village; townMinimum for a town the compiler gave at least that many) takes the
+            //       nearest village from a town above townMinimum or a castle above one village: within the preferred limit first, its own
+            //       kingdom first, then the fullest donor.
+            //   A move beyond the preferred limit stays within the engine trade limit and makes the village remote, as (2) does.
+            Func<Fortification, int> cap = f => f.Kind == "town" ? townMaximum : castleVillages;
+            var source = villages.GroupBy(v => Text(v, "bound") ?? "").ToDictionary(g => g.Key, g => g.Count(), StringComparer.Ordinal);
+            Func<Fortification, int> floor = f => f.Kind == "town" && source.ContainsKey(f.Id) && source[f.Id] >= townMinimum ? townMinimum : 1;
+            Func<Fortification, int> donorFloor = f => f.Kind == "town" ? townMinimum : 1;
+            Action<string, Fortification> even = (v, to) => { if (villageDistance(v, to) > result.PreferredLimit) remote.Add(v); else remote.Remove(v); rebind(v, to.Id, "even"); };
+            foreach (var over in fortifications)
+                while (countOf(over.Id) > cap(over))
+                {
+                    var move = boundOf.Where(x => x.Value == over.Id).ToList()
+                        .SelectMany(x => fortifications.Where(f => f != over && f.LandGroup == groupOf(x.Key) && countOf(f.Id) < cap(f) && villageDistance(x.Key, f) <= result.EngineLimit)
+                            .Select(f => new { Village = x.Key, To = f, Distance = villageDistance(x.Key, f) }))
+                        .OrderBy(m => remote.Contains(m.Village) ? 1 : 0).ThenBy(m => m.Distance <= result.PreferredLimit ? 0 : 1).ThenBy(m => countOf(m.To.Id) == 0 ? 0 : 1)
+                        .ThenBy(m => m.To.Kingdom == over.Kingdom ? 0 : 1).ThenBy(m => m.Distance).ThenBy(m => m.Village, StringComparer.Ordinal).ThenBy(m => m.To.Id, StringComparer.Ordinal).FirstOrDefault();
+                    if (move == null) break;
+                    even(move.Village, move.To);
+                }
+            foreach (var short_ in fortifications)
+                while (countOf(short_.Id) < floor(short_))
+                {
+                    var take = boundOf.Where(x => !remote.Contains(x.Key) && byId.ContainsKey(x.Value) && x.Value != short_.Id && countOf(x.Value) > donorFloor(byId[x.Value])
+                                                  && groupOf(x.Key) == short_.LandGroup && villageDistance(x.Key, short_) <= result.EngineLimit).ToList()
+                        .OrderBy(x => villageDistance(x.Key, short_) <= result.PreferredLimit ? 0 : 1).ThenBy(x => byId[x.Value].Kingdom == short_.Kingdom ? 0 : 1)
+                        .ThenByDescending(x => countOf(x.Value)).ThenBy(x => villageDistance(x.Key, short_)).ThenBy(x => x.Key, StringComparer.Ordinal).Select(x => x.Key).FirstOrDefault();
+                    if (take == null) break;
+                    even(take, short_);
+                }
             result.BoundOf = boundOf;
             return result;
         }

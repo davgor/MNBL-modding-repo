@@ -588,7 +588,10 @@ internal static class PeriodicCoordinateTests
         var assemblies = new Dictionary<string, Assembly> {
             ["TaleWorlds.CampaignSystem"] = Assembly.LoadFrom(Path.Combine(gameRoot, "bin/Win64_Shipping_Client/TaleWorlds.CampaignSystem.dll")),
             ["SandBox"] = Assembly.LoadFrom(Path.Combine(gameRoot, "Modules/SandBox/bin/Win64_Shipping_Client/SandBox.dll")),
-            ["NavalDLC"] = Assembly.LoadFrom(Path.Combine(gameRoot, "Modules/NavalDLC/bin/Win64_Shipping_Client/NavalDLC.dll")) };
+            ["NavalDLC"] = Assembly.LoadFrom(Path.Combine(gameRoot, "Modules/NavalDLC/bin/Win64_Shipping_Client/NavalDLC.dll")),
+            // The views read as campaign distances (build_spatial_table.py VIEW_PERIODIC).
+            ["TaleWorlds.CampaignSystem.ViewModelCollection"] = Assembly.LoadFrom(Path.Combine(gameRoot, "bin/Win64_Shipping_Client/TaleWorlds.CampaignSystem.ViewModelCollection.dll")),
+            ["SandBox.View"] = Assembly.LoadFrom(Path.Combine(gameRoot, "Modules/SandBox/bin/Win64_Shipping_Client/SandBox.View.dll")) };
         var unresolved = new List<string>(); var mismatched = new List<object>(); int calls = 0, methods = 0;
         var resolved = new Dictionary<MethodBase, MNBL.ProceduralWorld.CampaignBootstrap.PeriodicSpatialQueries.Entry>();
         foreach (var entry in MNBL.ProceduralWorld.CampaignBootstrap.PeriodicSpatialQueries.Table)

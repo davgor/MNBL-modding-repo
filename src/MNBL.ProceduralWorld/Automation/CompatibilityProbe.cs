@@ -138,6 +138,35 @@ namespace MNBL.ProceduralWorld.Automation
                     "fixture " + fixture.Name + ": reported unsupported (" + row["reportCode"] + ") and refused by the load with the same code before any game started; the fixture's bytes unchanged");
                 try { SaveBindingRuntime.Store.Saves.Delete(name); } catch (Exception) { }
             }
+            // ---- an isolated invalid copy of the world data from a separate test root (the one-shot's step 6): the world's bundle copied into
+            // a fresh folder outside the store, one byte of its compiled travel cells flipped, then opened by the verifier every load runs
+            // (WorldDataBundle.Open with this host): refused before anything loads. The copy is removed; the original's bytes are checked
+            // with the others below.
+            var isolated = new Dictionary<string, object>(); context.Outputs["isolatedCopy"] = isolated;
+            string testRoot = Path.Combine(Path.GetTempPath(), "mnbl-isolated-" + context.ProcessId);
+            try
+            {
+                string copy = Path.Combine(testRoot, "bundles", Path.GetFileName(bundleDir));
+                foreach (var file in Directory.GetFiles(bundleDir, "*", SearchOption.AllDirectories))
+                {
+                    string to = Path.Combine(copy, file.Substring(bundleDir.Length).TrimStart('\\', '/'));
+                    Directory.CreateDirectory(Path.GetDirectoryName(to));
+                    File.Copy(file, to);
+                }
+                string damaged = Path.Combine(copy, "compiled", "travel", "cells.bin");
+                var cells = File.ReadAllBytes(damaged); cells[cells.Length / 2] ^= 0x5a; File.WriteAllBytes(damaged, cells);
+                isolated["root"] = "<temp>/mnbl-isolated-<pid>/bundles/" + Path.GetFileName(bundleDir); isolated["damaged"] = "compiled/travel/cells.bin";
+                string refusal = null;
+                try { WorldDataBundle.Open(copy, MNBL.ProceduralWorld.UI.WorldSetupHost.BundleHost()); }
+                catch (WorldDataBundle.RejectedException error) { refusal = error.Message.Replace(testRoot, "<test root>"); }
+                isolated["refused"] = refusal != null; isolated["refusal"] = refusal;
+                expect(refusal != null, "an isolated invalid copy of the world's data, from a separate test root, is refused by the bundle verifier before anything loads");
+            }
+            finally
+            {
+                try { if (Directory.Exists(testRoot)) Directory.Delete(testRoot, true); } catch (Exception) { }
+                isolated["removed"] = !Directory.Exists(testRoot);
+            }
             var preserved = new Dictionary<string, object> { ["sourceSave"] = WorldSaveTransfer.Sha256File(BannerlordSaveCatalog.SavePath(source)) == sourceSaveHash,
                 ["currentSave"] = WorldSaveTransfer.Sha256File(BannerlordSaveCatalog.SavePath(current)) == currentSaveHash, ["bundleAndPackage"] = TwoWorldMatrixProbe.TreeHash(bundleDir) + TwoWorldMatrixProbe.TreeHash(packageDir) == worldBefore };
             context.Outputs["preserved"] = preserved;

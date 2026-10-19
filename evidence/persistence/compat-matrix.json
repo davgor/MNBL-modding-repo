@@ -2,13 +2,13 @@
   "schema": "mnbl.evidence.compat-matrix",
   "version": 1,
   "ticket": "MMR-50",
-  "pid": "24328",
-  "result": "evidence/runtime/in-game/compat_matrix-24328.json",
+  "pid": "49820",
+  "result": "evidence/runtime/in-game/compat_matrix-49820.json",
   "status": "ok",
   "failures": [],
   "checks": [
     {
-      "check": "c1 supported: the source save is reported supported (mnbl_1609fb72_start_a762a2d366bc)",
+      "check": "c1 supported: the source save is reported supported (mnbl_1609fb72_start_87d79ccdefd0)",
       "passed": true
     },
     {
@@ -65,204 +65,7 @@
   "reports": {
     "source": {
       "schema": "mnbl.world-compatibility.v1",
-      "save": "mnbl_1609fb72_start_a762a2d366bc",
-      "class": "supported",
-      "refusal": null,
-      "rebuilds": [],
-      "conditional": [],
-      "migration": "none: no migration is implemented; a save or world this build cannot read is refused, never converted",
-      "rows": [
-        {
-          "component": "save header",
-          "verdict": "same",
-          "detail": "readable",
-          "code": null,
-          "conditional": false
-        },
-        {
-          "component": "world binding",
-          "verdict": "same",
-          "detail": "mnbl_1609fb72, world f596b58cdcfc",
-          "code": null,
-          "conditional": false
-        },
-        {
-          "component": "save data",
-          "verdict": "same",
-          "detail": "whole",
-          "code": null,
-          "conditional": false
-        },
-        {
-          "component": "build keys",
-          "verdict": "verified-at-load",
-          "detail": "not recorded (a save made before MMR-48): its header's game and War Sails versions are compared, and the world's reconstruction is verified at load",
-          "code": null,
-          "conditional": false
-        },
-        {
-          "component": "build game",
-          "verdict": "same",
-          "detail": "v1.4.8.119303 (from the header)",
-          "code": null,
-          "conditional": false
-        },
-        {
-          "component": "build naval",
-          "verdict": "same",
-          "detail": "v1.2.8.119303 (from the header)",
-          "code": null,
-          "conditional": false
-        },
-        {
-          "component": "world package",
-          "verdict": "same",
-          "detail": "mnbl_1609fb72-7e5b8b6f7385",
-          "code": null,
-          "conditional": false
-        },
-        {
-          "component": "data bundle",
-          "verdict": "same",
-          "detail": "f596b58cdcfc",
-          "code": null,
-          "conditional": false
-        },
-        {
-          "component": "scene",
-          "verdict": "same",
-          "detail": "mnbl_world_f596b58cdcfc1879_171df43a3a14: installed, every file the package's",
-          "code": null,
-          "conditional": false
-        },
-        {
-          "component": "report navigation.json",
-          "verdict": "same",
-          "detail": "installed; its gate runs at load",
-          "code": null,
-          "conditional": false
-        },
-        {
-          "component": "report settlement-layout.json",
-          "verdict": "same",
-          "detail": "installed",
-          "code": null,
-          "conditional": false
-        },
-        {
-          "component": "report playability.json",
-          "verdict": "same",
-          "detail": "installed; its gate runs at load",
-          "code": null,
-          "conditional": false
-        }
-      ]
-    },
-    "afterSweep": {
-      "schema": "mnbl.world-compatibility.v1",
-      "save": "mnbl_1609fb72_start_a762a2d366bc",
-      "class": "rebuildable-derived-cache",
-      "refusal": null,
-      "rebuilds": [
-        "scene",
-        "report navigation.json",
-        "report settlement-layout.json",
-        "report playability.json"
-      ],
-      "conditional": [
-        "scene"
-      ],
-      "migration": "none: no migration is implemented; a save or world this build cannot read is refused, never converted",
-      "rows": [
-        {
-          "component": "save header",
-          "verdict": "same",
-          "detail": "readable",
-          "code": null,
-          "conditional": false
-        },
-        {
-          "component": "world binding",
-          "verdict": "same",
-          "detail": "mnbl_1609fb72, world f596b58cdcfc",
-          "code": null,
-          "conditional": false
-        },
-        {
-          "component": "save data",
-          "verdict": "same",
-          "detail": "whole",
-          "code": null,
-          "conditional": false
-        },
-        {
-          "component": "build keys",
-          "verdict": "verified-at-load",
-          "detail": "not recorded (a save made before MMR-48): its header's game and War Sails versions are compared, and the world's reconstruction is verified at load",
-          "code": null,
-          "conditional": false
-        },
-        {
-          "component": "build game",
-          "verdict": "same",
-          "detail": "v1.4.8.119303 (from the header)",
-          "code": null,
-          "conditional": false
-        },
-        {
-          "component": "build naval",
-          "verdict": "same",
-          "detail": "v1.2.8.119303 (from the header)",
-          "code": null,
-          "conditional": false
-        },
-        {
-          "component": "world package",
-          "verdict": "same",
-          "detail": "mnbl_1609fb72-7e5b8b6f7385",
-          "code": null,
-          "conditional": false
-        },
-        {
-          "component": "data bundle",
-          "verdict": "same",
-          "detail": "f596b58cdcfc",
-          "code": null,
-          "conditional": false
-        },
-        {
-          "component": "scene",
-          "verdict": "rebuilt-from-frozen-world",
-          "detail": "mnbl_world_f596b58cdcfc1879_171df43a3a14: swept; re-encoded from the bundle by the surface encoder and installed only when every file is the package's (this build's module, assembly or backend differ from the one that encoded it, or were not recorded: the re-encoding is verified at load and refused, not-rebuildable, if it differs)",
-          "code": null,
-          "conditional": true
-        },
-        {
-          "component": "report navigation.json",
-          "verdict": "rebuilt-from-frozen-world",
-          "detail": "restored from the copy the campaign's activation kept; its gate runs at load",
-          "code": null,
-          "conditional": false
-        },
-        {
-          "component": "report settlement-layout.json",
-          "verdict": "rebuilt-from-frozen-world",
-          "detail": "re-derived by the surface encoder with the scene, and checked against the layout the campaign was activated with",
-          "code": null,
-          "conditional": false
-        },
-        {
-          "component": "report playability.json",
-          "verdict": "rebuilt-from-frozen-world",
-          "detail": "restored from the copy the campaign's activation kept; its gate runs at load",
-          "code": null,
-          "conditional": false
-        }
-      ]
-    },
-    "current": {
-      "schema": "mnbl.world-compatibility.v1",
-      "save": "mnbl_probe50_current_24328",
+      "save": "mnbl_1609fb72_start_87d79ccdefd0",
       "class": "supported",
       "refusal": null,
       "rebuilds": [],
@@ -335,14 +138,14 @@
         {
           "component": "build moduleAssemblySha256",
           "verdict": "same",
-          "detail": "cd0b452d37c50b96857620ca9b1496f1355ec03b86d2c9d9f4127559e2315b66",
+          "detail": "3070d8bc3ae0848d01948a1cffdaf0044bf9f62f50ea70427280f68285aac0be",
           "code": null,
           "conditional": false
         },
         {
           "component": "build backend",
           "verdict": "same",
-          "detail": "mnbl.runtime-world-backend/R07; producerLock 3e9640a2ac23",
+          "detail": "mnbl.runtime-world-backend/R07; producerLock a374affb43f1",
           "code": null,
           "conditional": false
         },
@@ -356,7 +159,7 @@
         {
           "component": "world package",
           "verdict": "same",
-          "detail": "mnbl_1609fb72-7e5b8b6f7385",
+          "detail": "mnbl_1609fb72-0059d972a2b2",
           "code": null,
           "conditional": false
         },
@@ -370,7 +173,286 @@
         {
           "component": "scene",
           "verdict": "same",
-          "detail": "mnbl_world_f596b58cdcfc1879_171df43a3a14: installed, every file the package's",
+          "detail": "mnbl_world_f596b58cdcfc1879_019bf8ec927e: installed, every file the package's",
+          "code": null,
+          "conditional": false
+        },
+        {
+          "component": "report navigation.json",
+          "verdict": "same",
+          "detail": "installed; its gate runs at load",
+          "code": null,
+          "conditional": false
+        },
+        {
+          "component": "report settlement-layout.json",
+          "verdict": "same",
+          "detail": "installed",
+          "code": null,
+          "conditional": false
+        },
+        {
+          "component": "report playability.json",
+          "verdict": "same",
+          "detail": "installed; its gate runs at load",
+          "code": null,
+          "conditional": false
+        }
+      ]
+    },
+    "afterSweep": {
+      "schema": "mnbl.world-compatibility.v1",
+      "save": "mnbl_1609fb72_start_87d79ccdefd0",
+      "class": "rebuildable-derived-cache",
+      "refusal": null,
+      "rebuilds": [
+        "scene",
+        "report navigation.json",
+        "report settlement-layout.json",
+        "report playability.json"
+      ],
+      "conditional": [],
+      "migration": "none: no migration is implemented; a save or world this build cannot read is refused, never converted",
+      "rows": [
+        {
+          "component": "save header",
+          "verdict": "same",
+          "detail": "readable",
+          "code": null,
+          "conditional": false
+        },
+        {
+          "component": "world binding",
+          "verdict": "same",
+          "detail": "mnbl_1609fb72, world f596b58cdcfc",
+          "code": null,
+          "conditional": false
+        },
+        {
+          "component": "save data",
+          "verdict": "same",
+          "detail": "whole",
+          "code": null,
+          "conditional": false
+        },
+        {
+          "component": "build contract",
+          "verdict": "same",
+          "detail": "mnbl.save-binding.v1",
+          "code": null,
+          "conditional": false
+        },
+        {
+          "component": "build saveIds",
+          "verdict": "same",
+          "detail": "7910000/v1",
+          "code": null,
+          "conditional": false
+        },
+        {
+          "component": "build worldIdentity",
+          "verdict": "same",
+          "detail": "mnbl.world-identity.v1",
+          "code": null,
+          "conditional": false
+        },
+        {
+          "component": "build game",
+          "verdict": "same",
+          "detail": "v1.4.8.119303",
+          "code": null,
+          "conditional": false
+        },
+        {
+          "component": "build naval",
+          "verdict": "same",
+          "detail": "v1.2.8.119303",
+          "code": null,
+          "conditional": false
+        },
+        {
+          "component": "build module",
+          "verdict": "same",
+          "detail": "v0.0.1.0",
+          "code": null,
+          "conditional": false
+        },
+        {
+          "component": "build moduleAssemblySha256",
+          "verdict": "same",
+          "detail": "3070d8bc3ae0848d01948a1cffdaf0044bf9f62f50ea70427280f68285aac0be",
+          "code": null,
+          "conditional": false
+        },
+        {
+          "component": "build backend",
+          "verdict": "same",
+          "detail": "mnbl.runtime-world-backend/R07; producerLock a374affb43f1",
+          "code": null,
+          "conditional": false
+        },
+        {
+          "component": "build navigationCache",
+          "verdict": "same",
+          "detail": "mnbl.navigation-cache-key/1; adapter mmr41/1",
+          "code": null,
+          "conditional": false
+        },
+        {
+          "component": "world package",
+          "verdict": "same",
+          "detail": "mnbl_1609fb72-0059d972a2b2",
+          "code": null,
+          "conditional": false
+        },
+        {
+          "component": "data bundle",
+          "verdict": "same",
+          "detail": "f596b58cdcfc",
+          "code": null,
+          "conditional": false
+        },
+        {
+          "component": "scene",
+          "verdict": "rebuilt-from-frozen-world",
+          "detail": "mnbl_world_f596b58cdcfc1879_019bf8ec927e: swept; re-encoded from the bundle by the surface encoder and installed only when every file is the package's",
+          "code": null,
+          "conditional": false
+        },
+        {
+          "component": "report navigation.json",
+          "verdict": "rebuilt-from-frozen-world",
+          "detail": "restored from the copy the campaign's activation kept; its gate runs at load",
+          "code": null,
+          "conditional": false
+        },
+        {
+          "component": "report settlement-layout.json",
+          "verdict": "rebuilt-from-frozen-world",
+          "detail": "re-derived by the surface encoder with the scene, and checked against the layout the campaign was activated with",
+          "code": null,
+          "conditional": false
+        },
+        {
+          "component": "report playability.json",
+          "verdict": "rebuilt-from-frozen-world",
+          "detail": "restored from the copy the campaign's activation kept; its gate runs at load",
+          "code": null,
+          "conditional": false
+        }
+      ]
+    },
+    "current": {
+      "schema": "mnbl.world-compatibility.v1",
+      "save": "mnbl_probe50_current_49820",
+      "class": "supported",
+      "refusal": null,
+      "rebuilds": [],
+      "conditional": [],
+      "migration": "none: no migration is implemented; a save or world this build cannot read is refused, never converted",
+      "rows": [
+        {
+          "component": "save header",
+          "verdict": "same",
+          "detail": "readable",
+          "code": null,
+          "conditional": false
+        },
+        {
+          "component": "world binding",
+          "verdict": "same",
+          "detail": "mnbl_1609fb72, world f596b58cdcfc",
+          "code": null,
+          "conditional": false
+        },
+        {
+          "component": "save data",
+          "verdict": "same",
+          "detail": "whole",
+          "code": null,
+          "conditional": false
+        },
+        {
+          "component": "build contract",
+          "verdict": "same",
+          "detail": "mnbl.save-binding.v1",
+          "code": null,
+          "conditional": false
+        },
+        {
+          "component": "build saveIds",
+          "verdict": "same",
+          "detail": "7910000/v1",
+          "code": null,
+          "conditional": false
+        },
+        {
+          "component": "build worldIdentity",
+          "verdict": "same",
+          "detail": "mnbl.world-identity.v1",
+          "code": null,
+          "conditional": false
+        },
+        {
+          "component": "build game",
+          "verdict": "same",
+          "detail": "v1.4.8.119303",
+          "code": null,
+          "conditional": false
+        },
+        {
+          "component": "build naval",
+          "verdict": "same",
+          "detail": "v1.2.8.119303",
+          "code": null,
+          "conditional": false
+        },
+        {
+          "component": "build module",
+          "verdict": "same",
+          "detail": "v0.0.1.0",
+          "code": null,
+          "conditional": false
+        },
+        {
+          "component": "build moduleAssemblySha256",
+          "verdict": "same",
+          "detail": "3070d8bc3ae0848d01948a1cffdaf0044bf9f62f50ea70427280f68285aac0be",
+          "code": null,
+          "conditional": false
+        },
+        {
+          "component": "build backend",
+          "verdict": "same",
+          "detail": "mnbl.runtime-world-backend/R07; producerLock a374affb43f1",
+          "code": null,
+          "conditional": false
+        },
+        {
+          "component": "build navigationCache",
+          "verdict": "same",
+          "detail": "mnbl.navigation-cache-key/1; adapter mmr41/1",
+          "code": null,
+          "conditional": false
+        },
+        {
+          "component": "world package",
+          "verdict": "same",
+          "detail": "mnbl_1609fb72-0059d972a2b2",
+          "code": null,
+          "conditional": false
+        },
+        {
+          "component": "data bundle",
+          "verdict": "same",
+          "detail": "f596b58cdcfc",
+          "code": null,
+          "conditional": false
+        },
+        {
+          "component": "scene",
+          "verdict": "same",
+          "detail": "mnbl_world_f596b58cdcfc1879_019bf8ec927e: installed, every file the package's",
           "code": null,
           "conditional": false
         },
@@ -400,7 +482,7 @@
     "fixtures": {
       "incompatible-schema": {
         "schema": "mnbl.world-compatibility.v1",
-        "save": "mnbl_probe50_incompatible-schema_24328",
+        "save": "mnbl_probe50_incompatible-schema_49820",
         "class": "unsupported-world",
         "refusal": {
           "code": "incompatible-build",
@@ -476,14 +558,14 @@
           {
             "component": "build moduleAssemblySha256",
             "verdict": "same",
-            "detail": "cd0b452d37c50b96857620ca9b1496f1355ec03b86d2c9d9f4127559e2315b66",
+            "detail": "3070d8bc3ae0848d01948a1cffdaf0044bf9f62f50ea70427280f68285aac0be",
             "code": null,
             "conditional": false
           },
           {
             "component": "build backend",
             "verdict": "same",
-            "detail": "mnbl.runtime-world-backend/R07; producerLock 3e9640a2ac23",
+            "detail": "mnbl.runtime-world-backend/R07; producerLock a374affb43f1",
             "code": null,
             "conditional": false
           },
@@ -497,7 +579,7 @@
           {
             "component": "world package",
             "verdict": "same",
-            "detail": "mnbl_1609fb72-7e5b8b6f7385",
+            "detail": "mnbl_1609fb72-0059d972a2b2",
             "code": null,
             "conditional": false
           },
@@ -511,7 +593,7 @@
           {
             "component": "scene",
             "verdict": "same",
-            "detail": "mnbl_world_f596b58cdcfc1879_171df43a3a14: installed, every file the package's",
+            "detail": "mnbl_world_f596b58cdcfc1879_019bf8ec927e: installed, every file the package's",
             "code": null,
             "conditional": false
           },
@@ -540,7 +622,7 @@
       },
       "incompatible-build": {
         "schema": "mnbl.world-compatibility.v1",
-        "save": "mnbl_probe50_incompatible-build_24328",
+        "save": "mnbl_probe50_incompatible-build_49820",
         "class": "unsupported-world",
         "refusal": {
           "code": "incompatible-build",
@@ -616,14 +698,14 @@
           {
             "component": "build moduleAssemblySha256",
             "verdict": "same",
-            "detail": "cd0b452d37c50b96857620ca9b1496f1355ec03b86d2c9d9f4127559e2315b66",
+            "detail": "3070d8bc3ae0848d01948a1cffdaf0044bf9f62f50ea70427280f68285aac0be",
             "code": null,
             "conditional": false
           },
           {
             "component": "build backend",
             "verdict": "same",
-            "detail": "mnbl.runtime-world-backend/R07; producerLock 3e9640a2ac23",
+            "detail": "mnbl.runtime-world-backend/R07; producerLock a374affb43f1",
             "code": null,
             "conditional": false
           },
@@ -637,7 +719,7 @@
           {
             "component": "world package",
             "verdict": "same",
-            "detail": "mnbl_1609fb72-7e5b8b6f7385",
+            "detail": "mnbl_1609fb72-0059d972a2b2",
             "code": null,
             "conditional": false
           },
@@ -651,7 +733,7 @@
           {
             "component": "scene",
             "verdict": "same",
-            "detail": "mnbl_world_f596b58cdcfc1879_171df43a3a14: installed, every file the package's",
+            "detail": "mnbl_world_f596b58cdcfc1879_019bf8ec927e: installed, every file the package's",
             "code": null,
             "conditional": false
           },
@@ -680,7 +762,7 @@
       },
       "missing-dlc": {
         "schema": "mnbl.world-compatibility.v1",
-        "save": "mnbl_probe50_missing-dlc_24328",
+        "save": "mnbl_probe50_missing-dlc_49820",
         "class": "unsupported-world",
         "refusal": {
           "code": "incompatible-build",
@@ -756,14 +838,14 @@
           {
             "component": "build moduleAssemblySha256",
             "verdict": "same",
-            "detail": "cd0b452d37c50b96857620ca9b1496f1355ec03b86d2c9d9f4127559e2315b66",
+            "detail": "3070d8bc3ae0848d01948a1cffdaf0044bf9f62f50ea70427280f68285aac0be",
             "code": null,
             "conditional": false
           },
           {
             "component": "build backend",
             "verdict": "same",
-            "detail": "mnbl.runtime-world-backend/R07; producerLock 3e9640a2ac23",
+            "detail": "mnbl.runtime-world-backend/R07; producerLock a374affb43f1",
             "code": null,
             "conditional": false
           },
@@ -777,7 +859,7 @@
           {
             "component": "world package",
             "verdict": "same",
-            "detail": "mnbl_1609fb72-7e5b8b6f7385",
+            "detail": "mnbl_1609fb72-0059d972a2b2",
             "code": null,
             "conditional": false
           },
@@ -791,7 +873,7 @@
           {
             "component": "scene",
             "verdict": "same",
-            "detail": "mnbl_world_f596b58cdcfc1879_171df43a3a14: installed, every file the package's",
+            "detail": "mnbl_world_f596b58cdcfc1879_019bf8ec927e: installed, every file the package's",
             "code": null,
             "conditional": false
           },
@@ -820,11 +902,11 @@
       },
       "corrupted-hash": {
         "schema": "mnbl.world-compatibility.v1",
-        "save": "mnbl_probe50_corrupted-hash_24328",
+        "save": "mnbl_probe50_corrupted-hash_49820",
         "class": "unsupported-world",
         "refusal": {
           "code": "damaged-world",
-          "detail": "mnbl_1609fb72-7e5b8b6f7385: world.json does not hash to the binding's manifest hash"
+          "detail": "mnbl_1609fb72-0059d972a2b2: world.json does not hash to the binding's manifest hash"
         },
         "rebuilds": [],
         "conditional": [],
@@ -896,14 +978,14 @@
           {
             "component": "build moduleAssemblySha256",
             "verdict": "same",
-            "detail": "cd0b452d37c50b96857620ca9b1496f1355ec03b86d2c9d9f4127559e2315b66",
+            "detail": "3070d8bc3ae0848d01948a1cffdaf0044bf9f62f50ea70427280f68285aac0be",
             "code": null,
             "conditional": false
           },
           {
             "component": "build backend",
             "verdict": "same",
-            "detail": "mnbl.runtime-world-backend/R07; producerLock 3e9640a2ac23",
+            "detail": "mnbl.runtime-world-backend/R07; producerLock a374affb43f1",
             "code": null,
             "conditional": false
           },
@@ -917,7 +999,7 @@
           {
             "component": "world package",
             "verdict": "refused",
-            "detail": "mnbl_1609fb72-7e5b8b6f7385: world.json does not hash to the binding's manifest hash",
+            "detail": "mnbl_1609fb72-0059d972a2b2: world.json does not hash to the binding's manifest hash",
             "code": "damaged-world",
             "conditional": false
           },

@@ -3,9 +3,9 @@
   "version": 1,
   "ticket": "MMR-49",
   "create": {
-    "pid": "48048",
+    "pid": "43576",
     "kind": "create",
-    "result": "evidence/runtime/in-game/two_world_matrix-48048.json",
+    "result": "evidence/runtime/in-game/two_world_matrix-43576.json",
     "status": "ok",
     "failures": [],
     "checks": [
@@ -34,7 +34,7 @@
         "passed": true
       },
       {
-        "check": "B (fixture world mnbl_00059042): a second distinct world; town ownership changed",
+        "check": "B (production world mnbl_214f6557, seed 73, content f63c6841085725e2): a second distinct world; town ownership changed",
         "passed": true
       },
       {
@@ -47,6 +47,10 @@
       },
       {
         "check": "B saved: published through the save journal, every saved position canonical",
+        "passed": true
+      },
+      {
+        "check": "B saved: the non-canonical values planted in fields the per-tick pass does not cover (MobilePartyAi.BehaviorTarget, AnchorPoint._lastUsedDisembarkPosition) were written canonical",
         "passed": true
       },
       {
@@ -90,7 +94,7 @@
         "passed": true
       },
       {
-        "check": "B same process: equal to its save (time, parties and fleets, anchors, settlements, prisoners, relations, player); 0 AI parties chose a new movement target before the snapshot (control without a load: 0)",
+        "check": "B same process: equal to its save (time, parties and fleets, anchors, settlements, prisoners, relations, player); 1 AI parties chose a new movement target before the snapshot (control without a load: 0)",
         "passed": true
       },
       {
@@ -158,13 +162,13 @@
         "passed": true
       }
     ],
-    "passed": 37,
-    "total": 37
+    "passed": 38,
+    "total": 38
   },
   "cold": {
-    "pid": "39860",
+    "pid": "44704",
     "kind": "cold",
-    "result": "evidence/runtime/in-game/two_world_matrix-39860.json",
+    "result": "evidence/runtime/in-game/two_world_matrix-44704.json",
     "status": "ok",
     "failures": [],
     "checks": [
@@ -213,7 +217,7 @@
         "passed": true
       },
       {
-        "check": "B cold restart: equal to its save (time, parties and fleets, anchors, settlements, prisoners, relations, player); 0 AI parties chose a new movement target before the snapshot (control without a load: 0)",
+        "check": "B cold restart: equal to its save (time, parties and fleets, anchors, settlements, prisoners, relations, player); 1 AI parties chose a new movement target before the snapshot (control without a load: 0)",
         "passed": true
       },
       {
@@ -245,36 +249,12 @@
         "passed": true
       },
       {
-        "check": "cold: the probe's saves and the campaigns' initial saves deleted",
+        "check": "cold: the probe's saves kept for the caller's later steps (cleanup=false), none deleted",
         "passed": true
       }
     ],
     "passed": 20,
     "total": 20
   },
-  "loadChecks": [
-    {
-      "pid": "28224",
-      "kind": "load",
-      "result": "evidence/runtime/in-game/two_world_matrix-28224.json",
-      "status": "ok",
-      "failures": [],
-      "checks": [
-        {
-          "check": "load check: restored through the world loader",
-          "passed": true
-        },
-        {
-          "check": "baseline start: no game, every tracked static at its baseline",
-          "passed": true
-        },
-        {
-          "check": "baseline after the load check: no game, every tracked static at its baseline",
-          "passed": true
-        }
-      ],
-      "passed": 3,
-      "total": 3
-    }
-  ]
+  "loadChecks": []
 }

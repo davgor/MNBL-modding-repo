@@ -78,7 +78,8 @@ def create_checks(o):
         ('A: a town under siege', step_ok(sa, 'siege') and (sa.get('siege') or {}).get('siege') is True),
         ('A: a fleet called across the seam, its anchor moving at the save; another anchored by the seam', step_ok(sa, 'anchors') and anchors.get('moving') is True),
         ('A: the player crossed the seam just before the save; a bandit pursuing from across the seam', a.get('crossed') is True and step_ok(sa, 'pursuit')),
-        ('B (fixture world %s): a second distinct world; town ownership changed' % b.get('worldId'), b.get('fixture') is True and b.get('prefix') != a.get('prefix') and step_ok(sb, 'ownership')),
+        ('B (%s %s%s): a second distinct world; town ownership changed' % ('fixture world' if b.get('fixture') else 'production world', b.get('worldId'), '' if b.get('fixture') else ', seed %s, content %s' % (b.get('seed'), (b.get('contentId') or '')[:16])),
+         (b.get('fixture') is True or (bool(b.get('contentId')) and b.get('contentId') != a.get('contentId'))) and b.get('prefix') != a.get('prefix') and step_ok(sb, 'ownership')),
     ]
     for key, world in (('A', a), ('B', b)):
         j = world.get('saveJournal') or {}
@@ -118,7 +119,12 @@ def run(pid, kind):
         w = o.get('worlds') or {}
         rows = [('cold: world A\'s scene and reports swept before its load', 'scene' in ((o.get('sweptA') or {}).get('removed') or []))]
         rows += loaded(w.get('A') or {}, 'A', 'cold restart', cold=True) + loaded(w.get('B') or {}, 'B', 'cold restart', cold=True) + baselines(o)
-        rows.append(('cold: the probe\'s saves and the campaigns\' initial saves deleted', bool(o.get('cleanup')) and all(v is True for v in (o.get('cleanup') or {}).values())))
+        # A caller that keeps the saves for later steps (tools/Test-OneShot.ps1: cleanup=false, the seam and compatibility steps load them)
+        # asks for no deletion; the row then records that none was made.
+        if (r.get('args') or {}).get('cleanup') is False:
+            rows.append(('cold: the probe\'s saves kept for the caller\'s later steps (cleanup=false), none deleted', o.get('cleanup') is None))
+        else:
+            rows.append(('cold: the probe\'s saves and the campaigns\' initial saves deleted', bool(o.get('cleanup')) and all(v is True for v in (o.get('cleanup') or {}).values())))
     else:
         rows = [('load check: restored through the world loader', (o.get('loader') or {}).get('state') == 'Loaded' and o.get('vanillaStarted') is False)] + baselines(o)
     checks = [{'check': n, 'passed': bool(ok)} for n, ok in rows]

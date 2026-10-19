@@ -74,7 +74,11 @@ World B (MMR-19's fixture world) supplies what A lacks. Stock in-mission mechani
 
   So the party must be within 2 × 1.25 × the encounter model's land radius of the captor's position.
 
-**World B**, for the classes and the crossing A lacks: started from its fixture after A, sampled as A, one battle each. It keeps its own culture tally. World A's designated save is then loaded again.
+**World B**, for the classes and the crossing A lacks: started after A, sampled as A, one battle each. With `seedB=` it is a second production world started from the setup screen (the one-shot uses seed 73); otherwise it is MMR-19's fixture. It keeps its own culture tally. World A's designated save is then loaded again.
+
+**Field battles keep to their two parties.** Every other free party within 12 units (periodic) of the battle point is moved 20–30 units aside on its own navigation for the case, then put back (`setup.movedAside`, `setup.putBack`). One-shot run 29368's field.rock was joined by an AI lord's party standing near the point, which is normal Bannerlord joining, not a defect.
+
+**Back in the same world.** Every mission snapshot records the campaign's bound world (world id, content id, campaign instance) and its periodic frame, and a return to another world fails the case.
 
 **The hideout**, last of all (the game hung at its boss conversation twice while the probe was wrong, below):
 - **Timing:** outside the hideout model's night hours, running campaign time past them if needed. Sneaking in by night opens a different, stealth mission.
@@ -95,7 +99,9 @@ World B (MMR-19's fixture world) supplies what A lacks. Stock in-mission mechani
 
 Loaded from the designated save in 399 s (the first campaign of a module build regenerates world A's navigation caches). World B started in 38 s; world A loaded again for the hideout in 15 s.
 
-MMR-53 changed the shared harness (placements recorded by `Enter`, a stage and screenshot tag, the return check's bound and domain). Run 38972 on that build passed the same 163/163 checks and 14/14 cases (wetland absent), status ok. This document's evidence stays run 33816's.
+MMR-53 changed the shared harness (placements recorded by `Enter`, a stage and screenshot tag, the return check's bound and domain). Run 38972 on that build passed the same 163/163 checks and 14/14 cases (wetland absent), status ok.
+
+**The final one-shot run 18492** (2026-10-19, package `e20f2667…`, `seedB=73`): 163/163 recomputed checks, 14/14 cases, status ok. World B (seed 73, a production world) played the wetland battle A lacks; neither world has steppe. `evidence/gameplay/land-missions.json` is now its summary; the regression fixture stays run 33816's.
 
 **Terrain.**
 - **World A:** 5,548 land cells (4,695 with a land centre): cold 2,807, desert 1,308, woodland 740, open 663, rock 30. There are 10 crossing cells, all Bridge.

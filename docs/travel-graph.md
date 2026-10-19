@@ -16,7 +16,7 @@ It also resolves the slots MMR-27 left to MMR-28: settlement positions and port 
 | Policy | `worldgen/policies/playability.json` (`mnbl.playability` v1). It pins the calibration by SHA-256, resolved relative to the policy file |
 | Engine contract | `worldgen/calibration/naval-transitions/naval-transitions.json`. From the accepted MMR-17 run 2248:<br>• the invalid-terrain sets for Default, Naval and All;<br>• the TerrainType ids;<br>• region switch costs 50/50 and the 0.5 embark threshold;<br>• the observed embark and disembark rules.<br>Plus the installed War Sails port-gate envelope (`settlements.xml`, 29 port towns, at most 10.97 units) and what MMR-17 left open |
 | Outputs | • `travel-graph.json` (`worldgen/contracts/travel-graph.schema.json`);<br>• `ports.json` (`ports.schema.json`);<br>• `cells.bin`, the cell classes after repairs plus the OpenSea flags;<br>• `campaign.json`, the MMR-27 records after the exclusions, with positions and port sites resolved.<br>All are deterministic, and every input hash is recorded |
-| Tests | `src/WorldBridge/tests/travel_graph_tests.cpp` (CTest `travel`, 77 checks), plus 3 road-crossing cases in `source_reader_tests` (142 checks). Logs: `evidence/fwg/travel-tests.txt`, `evidence/fwg/travel-ctest.log` (8/8 suites) |
+| Tests | `src/WorldBridge/tests/travel_graph_tests.cpp` (CTest `travel`, 83 checks), plus 3 road-crossing cases in `source_reader_tests` (142 checks). Logs: `evidence/fwg/travel-tests.txt`, `evidence/fwg/travel-ctest.log` (8/8 suites) |
 | Evidence | `evidence/fwg/travel-graph.json` (`tools/summarize_travel.py`): every research size, from 33 to 1025, re-derived independently from the MMR-26 terrain artifact and the MMR-27 records, 22/22 checks each. It includes schema validation, the recomputed reasons and bounds, the completeness of the repair records, and the calibration evidence hashes. A repeat compile is byte-identical. `evidence/fwg/travel-gate.json` (`tools/Test-TravelGate.ps1`) records the gate inside `--generate`. Review and disposition: `evidence/fwg/travel-review.md` |
 
 ```
@@ -75,6 +75,7 @@ Cells are the compiled grid's cells: 6.25 world units at 257 vertices.
   - `lake` or `river` otherwise;
   - `blocked` when it holds an uncarved mountain.
 - **Bridges.** Crossings of the listed kinds (river, lake) that are at most `maxCells` (2) long join land components into **groups**. These are bridge candidates: each is a `bridge` host check, and there are at most `maxRequired` (32).
+- **One deck per cell** (2026-10-19). A crossing on a cell that an earlier joining crossing already bridges between two other land components joins nothing: the runtime lays one passage per deck cell. In world ae2f24ef of that day's sweep, a river cell between three components carried two joins, and the second was never realized (`navigation.group_not_realized`).
 - **Coast crossings join nothing.** Sea separation is crossed only through ports.
 - **Producer crossings.** Every producer-reported river crossing gets an outcome: `matched` by a compiled crossing, or `no_compiled_water`. The generator records a bank step as a crossing.
 - **Bridge faces are unproven.** No shipped campaign map authors Bridge 17 faces, and MMR-17 authored none.
@@ -93,8 +94,9 @@ A basin is a set of water cells joined by edges. It is **open** when it holds at
    - then it is nearest the harbour cell;
    - then cell order.
 
-   Pairs another town already holds are skipped (towns in id order). When no pair exists: `basin_not_reachable_from_gate`. When only held pairs exist: `port_pair_taken`.
+   Pairs another town already holds are skipped (towns in id order). So are pairs whose sea cell is a deck cell, a cell of a joining crossing: the runtime lays a bridge deck over it, and a port's sea point cannot snap there (2026-10-19, seed 43's world, refused at activation with `navigation.snap_refused`). When no pair exists: `basin_not_reachable_from_gate`. When only held pairs exist: `port_pair_taken`. When only held and deck pairs exist: `port_pair_under_bridge`.
 4. **Gate distance.** The port cell must lie within `maxPortGateCells` (2) of the gate cell, or the candidate is `port_too_far_from_gate`. Two cells is 12.5 units, the smallest whole-cell bound covering the installed War Sails maximum of 10.97 units. MMR-17's fixture ports sat 5–6.25 units from the gate.
+5. **Engine path** (2026-10-19). Of the pairs within `maxPortGateCells`, in the order above, the candidate takes the first whose path bound is at most `maxPortGateCells` × spacing (12.5 units). When none fits: `port_path_too_long`, with the first pair's bound. The bound is the shortest plane path from the port cell's point nearest the gate point to the gate point that enters no mountain cell, no row off the grid and no water of another basin (deck cells excepted). The engine's port-to-gate path avoids the same cells and starts inside the port cell, so it is never shorter; the runtime validator checks it against the same envelope (`portGate`). Seed 43's world had a port two cells from its gate with a mountain cell between them: an engine path of 15.02 units, refused at activation.
 
 **Choosing the port.** A town's port is its best valid candidate: nearest the gate, then highest harbour quality, then village UID. A town whose harbours all fail has no port. Its record is dropped from the travel output's `campaign.json`, and `ports.json` keeps the reasons.
 
@@ -117,12 +119,52 @@ A group is **player-safe** when the player can reach it from the main group and 
 
 | Outcome | Rule | Code |
 |---|---|---|
-| Rejected | A town is unplaceable | `quality.unplaceable_town` |
-| Rejected | A town's group is not player-safe | `quality.unreachable_town` (names the UID, the group and why) |
+| Repaired | A town is unplaceable, or its group is not player-safe | a town repair (below); rejected only when none applies |
+| Rejected | A town is still unplaceable after the town repairs | `quality.unplaceable_town` |
+| Rejected | A town's group is still not player-safe after the town repairs | `quality.unreachable_town` (names the UID, the group and why) |
 | Excluded | A village outside its town's land group, or unplaceable | reason recorded; at most `maxExcludedVillageFraction` (0.1) |
 | Excluded | A castle that is not player-safe, or unplaceable | reason recorded; at most `maxExcludedCastleFraction` (0.25) |
 | Rejected | Too many exclusions | `quality.too_many_exclusions` (names the UIDs) |
 | Rejected | A repair or bridge bound exceeded | `quality.repair_bound_exceeded` (names the UIDs) |
+
+## Town repairs (2026-10-19)
+
+No generated town is dropped (owner decision, `docs/research/map-epic-2-findings.md` section 14). Before this change a single unplaceable or unreachable town rejected the whole world: 30 of 31 seeds (43–73) at the one-shot profile, mostly islet towns without a port and towns whose source point lies in the sea at size 129. Now the compiler repairs such towns and runs the analysis again:
+
+1. **Coast port**, inside each round. A town whose group is not player-safe and that has no valid harbour port takes a coast pair of its own land component as its port when:
+   - its group holds a kept village for each of its towns and castles, so the binding can give every fortification a village;
+   - the pair's basin is open and a group that returns to the main group touches it;
+   - the pair is not held by another port, its sea cell is not a deck cell and lies within `maxPortGateCells` of the gate, and its path bound fits the envelope (steps 3–5 above).
+
+   The pair chosen is the one whose sea cell is nearest the gate, then whose land cell is, then by cell order. Towns are taken in input order. The port has no harbour village: `ports.json` marks it `"kind": "coast"`, and `campaign.json` gets a port record with no villages, so the town is a port town.
+2. **Join**, between rounds. A group that is still not player-safe joins a player-safe group through the shortest run of mountain cells, at most `maxAccessCells` (6). The search is breadth-first from the group's land cells. Each carved cell is a `join` repair with a `pass` host check.
+3. **Move**, between rounds. A town whose group cannot join, or a town with no cell, moves to the nearest land cell of a player-safe group, measured from its source point. The cell must have been land before any repair and must hold no settlement. The settlement method is `move`. Its own villages outside the new group are then excluded as usual, within `maxExcludedVillageFraction`.
+
+Each round starts again from the compiled classes with the joins and moves found so far. There are at most four rounds. A town that no repair can make player-safe still rejects the world, for example when no free land cell is left.
+
+**What stays the same.** The town repairs run only for towns that would otherwise reject the world, and they sit outside the repair bounds. All other bounds still apply: passes, footprints, snaps, bridges, harbour shifts and exclusions. A world whose towns are all player-safe in the first round is analysed once and unchanged. World A's travel outputs (`travel-graph.json`, `ports.json`, `cells.bin`, `campaign.json`) and its world content id are byte-identical.
+
+`playability.json` is unchanged, because it is a world input in the bundle's `policies/`. Its notes still say that ports come only from harbour records and that unplaceable or unreachable towns reject the world; this section supersedes them.
+
+**Yield** (`evidence/world/seed-yield.json`, `tools/summarize_seed_yield.py`). This is an offline sweep (`build/seed-sweep/after5`, 2026-10-19) at the one-shot profile (size 129, phase 16), with one quality attempt per seed:
+- seeds 42–73 went from 1 of 32 accepted to 19 of 32, world A (42) and world B (73) among them, both with their content ids unchanged;
+- each of the 19 passes the activation's managed stages offline:
+  - it builds its settlements through SettlementFactory and the village binding (the harness of `tools/Test-Settlements.ps1`);
+  - it passes the runtime navigation build, plan and validator over the stand-in engine (`tools/Test-NavigationSweep.ps1`);
+  - its naval content, spawn policy, graph validation, factions, characters, registry and water stages raise no refusal (their harnesses);
+- 12 of the 13 rejected seeds fail on a repair bound (snaps, passes, footprints or harbour shifts), and seed 71 on too many excluded villages;
+- the built worldbridge reproduces every one of the 19 bundles byte for byte (`build/seed-sweep/after6`, `after6-73`).
+
+The harnesses also carry world A's fixture counts (ruler and slot counts) and their negative self-tests are written against A; on other worlds those lines fail without a refusal and are listed as `fixtureLines`. One describes the world rather than the fixture, and is follow-up for broad seed certification: B and seed 57 present 6 of the 7 character-creation cultures (no Khuzait realm); a player who picks the missing culture starts through the spawn policy's culture fallback. A third line, lake copies cut by the terrain's edge on 8 worlds (B among them), was a presentation defect, fixed the same day (`docs/water-climate.md`, Edge copies).
+
+A request gets three quality attempts, so a seed whose first attempt is rejected usually still generates.
+
+**Village repairs found by the sweep** (worlds the gate used to reject, which reached activation for the first time):
+- a kept harbour village whose producer sea node resolves to no navigable cell (`sea_node_not_navigable`) loses its harbour role in `campaign.json`, since activation refuses a harbour village without a harbour cell (seed 60);
+- so does a kept harbour village whose harbour cell lies on a closed basin (`closed_basin`), since activation lands only on open basins and refuses its port otherwise (`quality.naval_port`; 11 of the 17 other accepted worlds of the 2026-10-19 sweep);
+- a village farther than the engine trade distance (3 × the world's town spacing) from every town and castle of its land group is excluded, since no binding could keep it (seed 62).
+
+**Verification.** `travel_graph_tests` (88 checks) covers each repair: coast port, join, move, a move with no free cell (rejected), no repair on player-safe worlds, the coast-port marking in `ports.json`, and the trade-distance exclusion. It also covers the port rules: a river-mouth harbour skipping a deck cell, `port_pair_under_bridge`, and `port_path_too_long` around a mountain cell, with the bound's value checked; and one deck per cell. `tools/summarize_travel.py` re-derives worlds without town repairs, including the deck, one-deck-per-cell and path-bound rules; it does not re-derive the town repairs.
 
 **Applying the results to the campaign records.** The exclusions are applied to the MMR-27 records with `campaign::exclude`, which re-checks closure, and the travel output writes the result as `campaign.json`. Its `position` slots (towns, villages, castles) and `portSite` slots are resolved with owner MMR-28. `landComponents` lists every placed settlement, excluded ones included; `exclusions` names the dropped ones.
 

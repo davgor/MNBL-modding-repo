@@ -29,15 +29,15 @@ using Path = System.IO.Path;
 
 namespace MNBL.ProceduralWorld.Automation
 {
-    // MMR-49: the two-world load matrix in the running game (two_world_matrix; phase=create|cold|load, seed=, fixtureSeed=, culture=).
+    // MMR-49: the two-world load matrix in the running game (two_world_matrix; phase=create|cold|load, seed=, seedB=, fixtureSeed=, culture=).
     //   create (one process): world A (seed 42) is generated, started (activation, character creation) and given mutable land and naval state:
     //     an AI lord's party embarked at sea, an AI lord's fleet after a simulated naval battle with pirates, a town's owner changed, a newly
     //     spawned lord party, a lord taken prisoner by the player, a changed relation, a siege, one fleet called across the seam (saved while
     //     its anchor moves) and one anchored by the seam, the player's party saved just after crossing the seam with a bandit pursuing it from
     //     across the seam; non-canonical values planted in the saved fields the per-tick pass does not cover (a BehaviorTarget, an anchor's last
     //     disembark position, a map track, a map event when one exists), which the save must write canonical; saved; the game ended (every
-    //     tracked static back at its baseline). World B: MMR-19's fixture world (the production generator yields no second activatable world
-    //     today), with the instant changes. Then A is loaded through the main menu's Continue (the preload state, whose screen calls the
+    //     tracked static back at its baseline). World B: a second production world (seedB=), else MMR-19's fixture world, with the
+    //     instant changes. Then A is loaded through the main menu's Continue (the preload state, whose screen calls the
     //     installed load on every frame) and compared value for value with its saved state, then B through the load screen's entry
     //     (SandBoxSaveHelper.TryLoadSave) from inside A (the loader checks B, then ends A) and compared. After each load: no object of the other
     //     world, the loaded world's frame and terrain context only, no generator started; the pursuit ends in one encounter and the party does
@@ -92,10 +92,16 @@ namespace MNBL.ProceduralWorld.Automation
                 context.Outputs["scope"] = "MMR-49 create phase: worlds A and B generated, played into mutable land and naval state, saved; A then B loaded through the normal load entry in the same process and compared with their saves; refused loads; tracked statics back at baseline after each game.";
                 yield return CreateWorld(context, st, "A", new[] { (uint)context.Int("seed", 42) });
                 Baseline(context, st, "after world A ended");
-                // World B: MMR-19's fixture world (seed 364610), a second distinct world: the production generator yields no second activatable
-                // world today (seeds 43-72 refused by its quality gate, MMR-37; 73 refused by the campaign's village binding at activation).
-                // fixtureB=false (a package-only installation, which holds no fixture world): B is recorded as blocked and every B step skipped.
-                if (context.Bool("fixtureB", true))
+                // World B: seedB= generates and starts a second production world from the setup screen, as A (the town repairs of
+                // docs/travel-graph.md make most seeds activate); else MMR-19's fixture world (seed 364610). fixtureB=false without seedB (a
+                // package-only installation, which holds no fixture world): B is recorded as blocked and every B step skipped.
+                uint seedB = (uint)context.Int("seedB", 0);
+                if (seedB != 0)
+                {
+                    yield return CreateProductionWorld(context, st, "B", seedB);
+                    Baseline(context, st, "after world B ended");
+                }
+                else if (context.Bool("fixtureB", true))
                 {
                     yield return CreateFixtureWorld(context, st, "B");
                     Baseline(context, st, "after world B ended");
@@ -161,7 +167,7 @@ namespace MNBL.ProceduralWorld.Automation
         }
 
         // A probe's second world when it cannot run here (fixtureB=false).
-        internal const string FixtureBlockedReason = "not run (fixtureB=false): the production generator activates only seed 42 (seed 73 is refused at the village binding), and MMR-19's fixture world is not part of the package";
+        internal const string FixtureBlockedReason = "not run (fixtureB=false, no seedB): MMR-19's fixture world is not part of the package, and no second production seed was given";
 
         internal static Dictionary<string, object> BlockedFixture()
         {
@@ -244,6 +250,24 @@ namespace MNBL.ProceduralWorld.Automation
             var binding = WorldSaveBinding.BindingOf(Campaign.Current.GetCampaignBehavior<WorldIdentityBehavior>());
             world["worldId"] = binding.WorldId; world["prefix"] = binding.WorldId + "_"; world["instance"] = binding.Instance; world["package"] = binding.PackageName; world["contentId"] = binding.ContentId;
             world["frame"] = PeriodicWorld.Current == null ? null : PeriodicWorld.Current.Coordinates.FrameIdentity;
+        }
+
+        // A second production world (seedB=): generated and started from the setup screen as A is, then the generic mutable state (Instant: A's
+        // scenario is A's geography) and the save. Its initial save is the activation's, as A's.
+        private static IEnumerator CreateProductionWorld(ProbeContext context, State st, string key, uint seed)
+        {
+            var world = new Dictionary<string, object>();
+            st.Worlds[key] = world;
+            var steps = new Dictionary<string, object>(); world["steps"] = steps;
+            yield return StartGenerated(context, world, key, new[] { seed }, context.Str("culture", "empire"), "two_world_matrix");
+            var binding = WorldSaveBinding.BindingOf(Campaign.Current.GetCampaignBehavior<WorldIdentityBehavior>());
+            var initial = SaveBindingRuntime.Store.Journal(binding.Instance);
+            world["initialSave"] = initial == null ? null : initial.SaveName;
+            var a = st.Worlds.ContainsKey("A") ? st.Worlds["A"] as Dictionary<string, object> : null;
+            st.Expect(a == null || !Equals(a["contentId"], world["contentId"]), "world " + key + " is a different world from A (content " + world["contentId"] + ")");
+            var watched = new List<string>(); world["watchedHeroes"] = watched;
+            Instant(st, world, steps, watched, (string)world["prefix"], key);
+            yield return SaveAndEnd(context, st, key, world, (string)world["prefix"], watched);
         }
 
         // MMR-19's fixture world through the diagnostic bootstrap (as generated_campaign starts it): its package and identity are written once
@@ -348,10 +372,21 @@ namespace MNBL.ProceduralWorld.Automation
                 battleLord = Lords(landlocked).FirstOrDefault(p => p.MemberRoster.TotalManCount >= 20);
                 if (battleLord == null) throw new InvalidOperationException("no lord party of a seafaring clan");
                 if (battleLord.Ships.Count == 0) Grant(battleLord);
+                // The step checks the fleet a battle leaves, not the battle's odds: the pirate keeps at most a third of the lord's men, so the lord
+                // comes out of it with a fleet (run 48984: 92 lord men against 67 pirates, the lord lost and had no fleet left).
+                int keep = Math.Max(1, battleLord.MemberRoster.TotalManCount / 3), removed = 0;
+                foreach (var element in pirate.MemberRoster.GetTroopRoster().ToList())
+                {
+                    if (pirate.MemberRoster.TotalManCount <= keep) break;
+                    if (element.Character.IsHero) continue;
+                    int n = Math.Min(element.Number, pirate.MemberRoster.TotalManCount - keep);
+                    pirate.MemberRoster.AddToCounts(element.Character, -n, false, -Math.Min(element.WoundedNumber, n));
+                    removed += n;
+                }
                 battleLord.SetSailAtPosition(NavalPoint(pirate.Position));
                 StartBattleAction.ApplyStartBattle(battleLord, pirate);
                 return new Dictionary<string, object> { ["lord"] = battleLord.StringId, ["pirate"] = pirate.StringId, ["naval"] = battleLord.MapEvent != null && battleLord.MapEvent.IsNavalMapEvent,
-                    ["lordMen"] = battleLord.MemberRoster.TotalManCount, ["pirateMen"] = pirate.MemberRoster.TotalManCount, ["lordShips"] = ShipsOf(battleLord) };
+                    ["lordMen"] = battleLord.MemberRoster.TotalManCount, ["pirateMen"] = pirate.MemberRoster.TotalManCount, ["pirateMenRemoved"] = removed, ["lordShips"] = ShipsOf(battleLord) };
             });
             if (battleLord != null && battleLord.MapEvent != null)
             {

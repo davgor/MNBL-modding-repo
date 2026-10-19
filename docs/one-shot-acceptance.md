@@ -2,17 +2,14 @@
 
 The final acceptance of epic `ep_01m4fpnf646t254mnh69jhz107`: the one-shot scenario on the clean local package, with the development module and store unavailable, and the established offline suites on the integrated sources.
 
-**Verdict: the scenario fails.**
+**Verdict: the scenario passes.** Every aspect of steps 1–6 and of the sequence passed in one run on one package (`evidence/one-shot/one-shot-run.json`). **The package is a local test package, not release-certified.**
 
 | | |
 |---|---|
-| Passed | Every in-game check of step 1 |
-| Observed failures | **Pinned runtime:** a Windows update replaced the producer's pinned UCRT. **Land:** a battle was joined by a third party. **Naval:** an island voyage turned back. **Navigation caches:** they were rebuilt on a load although they already existed |
-| Reruns | The land and naval failures did not reproduce when rerun on the same build from another save. Whether they are intermittent or depend on the campaign state is not established |
-| Blocked | Every step that needs a second playable world (only seed 42 activates) |
-| Not run | The seam camera, picking and sea crossing on the generated world |
-
-By the epic's rule an observed failure in the required scenario remains failed. **The package is a local test package, not release-certified.**
+| Passed | Steps 1–6 and the sequence, every aspect, on package `e20f2667…` |
+| Found and fixed before the final run | Two runs earlier the same day found three failures; each was fixed before the final run (below) |
+| Not part of the verdict | Seed 43, the profile's "next seed", was refused at runtime navigation with its error and action, as the step records (s2 in the acceptance index) |
+| Deferred | Broad seed certification, long soaks, endurance, all-season play, resolution and performance certification (the acceptance index, not run) |
 
 | | |
 |---|---|
@@ -24,10 +21,10 @@ By the epic's rule an observed failure in the required scenario remains failed. 
 ## What ran
 
 **Identities:**
-- **Package:** `MNBL.ProceduralWorld-v0.0.1.zip`, SHA-256 `ed63d689da10e7c58369bdc6ed1938d8484d0cc5abb4633b06177601132e52aa`, 11 files.
-- **Binaries:** module assembly `bc3235345ea2…`, `worldbridge.exe` `776c160626d0…`, `fwg.exe` `564c2629b5b9…` (the pin).
+- **Package:** `MNBL.ProceduralWorld-v0.0.1.zip`, SHA-256 `e20f26676ea91410f82a8176368d9af602507324bc7b0c645e5c08bae069e0a5`, 11 files.
+- **Binaries:** module assembly `3070d8bc3ae0…`, `worldbridge.exe` `2bfdbb9d0e2a…`, `fwg.exe` `564c2629b5b9…` (the pin).
 - **Game:** Bannerlord v1.4.8.119303 with War Sails v1.2.8.119303.
-- **Source:** commit `55576ca` plus the MMR-1 changes (probe options and the one-shot tooling), recorded by the MMR-1 commit. No source changed after the package was built.
+- **Source:** commit `7c56032` plus the uncommitted 2026-10-19 fixes. The run records `sourceTreeClean: false`; the commit that follows records them. No source changed after the package was built.
 
 **Setup** (`tools/Test-OneShot.ps1`):
 - held the battle-scale lock for the whole sequence;
@@ -36,78 +33,65 @@ By the epic's rule an observed failure in the required scenario remains failed. 
 - ran each step as its own game process, so every load after the first is a cold restart;
 - put everything back afterwards.
 
-**Saves:**
-- The land and naval scenario files were copied with their own designated save name (`mnbl_oneshot_A_designated`), so no existing save was overwritten.
-- Every save from before the sequence (107) and the official files were unchanged afterwards.
-- The 8 saves the sequence wrote are bound to its own store, which was set aside, so Continue would have offered them and then refused them. They were moved out of `Game Saves` into `build/mmr1/one-shot-saves/`, and that store is kept in `build/mmr1/one-shot-store-20261019003951/`.
+**Saves:** the land and naval scenario files were copied with their own designated save name (`mnbl_oneshot_A_designated`), so no existing save was overwritten. Every save from before the sequence (123) and the official files were unchanged afterwards. The sequence's store is kept in `build/mmr1/one-shot-store-20261019122025/`.
 
 | Run | Probe | Seconds | Result |
 |---|---|---|---|
-| 23796 | `first_test_profile` (A seed 42, refused 43, B seed 73) | 690 | ok |
-| 29176 | `new_campaign_flow` (seed 42) | 180 | ok |
-| 42980 | `land_missions` prepare | 105 | ok |
-| 48692 | `naval_missions` | 120 | **error**: `route.island` did not arrive; 5 later cases cascaded |
-| 29368 | `land_missions` run, `fixtureB=false` | 270 | **error**: `field.rock` had 3 parties |
-| 37128 | `campaign_soak`, `fixtureB=false` | 135 | ok |
-| 35948 | `two_world_matrix` create, `fixtureB=false` | 540 | ok (its load rebuilt the navigation caches, 397 s) |
-| 31404 | `two_world_matrix` cold | 90 | ok |
-| 31460 | `compat_matrix` | 75 | ok |
-| 7368 | rerun `naval_missions`: same build, development install, from `mnbl_probe52_A_designated` | | ok, all 9 cases |
-| 11472 | rerun `land_missions`: same build, development install, from `mnbl_probe52_A_designated` | | ok, all 13 cases world A has |
+| 40412 | `first_test_profile` (A seed 42, next seed 43, B seed 73) | 661 | ok |
+| 50244 | `new_campaign_flow` (seed 42; a second generation cancelled) | 150 | ok |
+| 48948 | `land_missions` prepare | 90 | ok |
+| 39772 | `naval_missions` | 360 | ok: 117/117 checks, 15/15 cases |
+| 18492 | `land_missions` run, `seedB=73` | 1186 | ok: 163/163 checks, 14/14 cases (no world has steppe) |
+| 20424 | `campaign_soak` | 120 | ok |
+| 43576 | `two_world_matrix` create, `seedB=73` | 1081 | ok: 38/38 |
+| 44704 | `two_world_matrix` cold | 120 | ok: 20/20 (the saves kept for the next steps, as asked) |
+| 44028 | `seam_presentation` on B's matrix save | 120 | ok |
+| 49820 | `compat_matrix` | 75 | ok: 13/13 |
 
-**World A** (seed 42):
-- **Identity:** content id `f596b58cdcfc1879…`, scene `mnbl_world_f596b58cdcfc1879_171df43a3a14`.
-- **Timings:** generated in 37.4 s from the New Campaign screen. The map came after 403.4 s, most of it the first build of the navigation caches, during which the game does not respond. Its save loaded in 15.0 s in the same process.
+**World A** (seed 42): content id `f596b58cdcfc1879…`, scene `mnbl_world_f596b58cdcfc1879_019bf8ec927e`. Generated in 35.7 s from the New Campaign screen. The map came after 395.3 s, most of it the first build of the navigation caches, during which the game does not respond. Its save loaded in 14.3 s in the same process.
 
-**World B** (seed 73):
-- **Generation:** generated in the same process in 56.3 s, content id `f63c6841085725e2…`.
-- **Difference from A:** different geography (2,389 vs 4,192 land cells, different coastlines).
-- **Not started:** its activation is refused at the village binding.
+**World B** (seed 73): content id `f63c6841085725e2…`, scene `mnbl_world_f63c6841085725e2_c36448e016ee`. Generated in the same process in 56.3 s; 2,389 vs 4,192 land cells and different coastlines from A. Started from the setup screen in the matrix, played in the land missions (its wetland battle, which A lacks) and in the seam presentation.
 
-No generator process was left after any run.
+**Seed 43** (the profile's next seed): its first attempt was rejected by the quality gate; its second attempt's world (`8cb59e18…`) was refused by the in-game navigation validator (`runtime.navigation_refused`: one sea route across the seam is 1.29 × the mesh's shortest path, against the bound of 1.25), shown with its error code and a Generate-again action. A refusal at that stage ends the job; it does not try the next derived seed.
+
+No generator process was left after any run. The navigation caches were built once per world and reused by every load (A `b00bfd27`, B `59e4ce7f`).
 
 ## Step by step
 
 | Step | Status | Notes |
 |---|---|---|
-| 1. Identities, world A from New Campaign, culture, character creation, play, full globe, source-derived identities | **fail** | **In game, everything passed:** the running module, `fwg.exe` and `worldbridge.exe` are the package's and the pins; every preview settlement and kingdom matches the live campaign; character creation lists exactly the world's cultures; every cell of the 128 × 64 periodic grid is classified. **Failed:** the producer's pinned runtime. A Windows update (KB5127647 and KB5127648, 2026-10-13 and 14) replaced `ucrtbase.dll` after the pin, so the producer contract's preflight fails `ucrtbase_matches_lock` (`evidence/one-shot/ucrt-drift.json`). The in-game generation path does not check the UCRT, and world A's content id is the accepted one |
-| 2. Land travel, settlement, trade and recruitment, a land mission, return | **fail** | Travel, trade and recruitment in a generated town passed (`campaign_soak`; through the screens' logic, not the screens). 12 of 13 land mission cases passed. **`field.rock` failed:** an AI lord's party joined the player's battle, which the probe requires to have exactly two parties; the mission itself opened and returned. Rerun 11472, from a different designated save, passed every case. World A has no steppe or wetland, so those battle classes are **blocked** (they need world B). The world identity is not re-checked after a mission (not-run) |
-| 3. Port, embark, sail, naval encounter, disembark; raid, blockade, anchor | **fail** | The ship purchase, port voyage and repair passed. **`route.island` failed:** the voyage from Korpor toward the island town Frosrin landed after about 9 hours and walked back to Korpor, where the town menu ended the voyage. The blockade, drop-off, pirate battle, raid and defeat cases then failed only because each starts where the previous one ends. Rerun 7368, from a different designated save, passed all 9 cases (the island voyage in 32.2 h, all at sea). The cause is not identified, and whether the failure depends on the freshly prepared campaign's state is not established |
-| 4. East/west crossing for player and AI on land and sea, routes, encounters and visibility, caches, camera and picking | **fail** | On world A the player crossed the seam on land, an AI party pursued across it, a fleet was called across it and an anchored fleet stayed by it, and all of it survived save and load. **Failed:** the navigation caches. They were built at A's first start (key `2a603033…`), then built again in the matrix's same-process load (397 s) although they existed. The cold load, after its scene was swept and re-encoded, read another key (`175479b6…`, 34.9 s). The cause is not identified. **Not run on a generated world:** camera and picking at the seam (shown on the MMR-66 fixture only), the player and an AI party sailing across it, and a naval encounter at the seam |
-| 5. Save A with mutable state; B in the same process; save B, cold restart, load A then B; no generator on load | **blocked** | A was saved with changed ownership, a spawned party, a prisoner, a siege, ships and anchors. It loaded in the same process and again after a cold restart (scene swept and re-encoded), equal to its save over 1,006 parties, with no generator process started. B was generated in the same process and differs from A. **Saving and loading B are blocked:** only seed 42 activates |
-| 6. Cancel a generation, an invalid copy of world data; recovery, unchanged hashes, no orphans or cross-world callbacks | **blocked** | A second generation was cancelled through the setup screen. Invalid copies of A's save were refused before anything loaded: torn, missing world, other build and a Continue into a missing world (`two_world_matrix`), plus incompatible schema and build, missing DLC and a corrupted manifest hash (`compat_matrix`). A's save, package and bundle were unchanged, and no generator process was left. **Not run:** a separate test root (the store and save paths are fixed). **Blocked:** cross-world callbacks (no second world; with B blocked, the matrix's "nothing of world B is registered" check is vacuous) |
+| 1. Identities, world A from New Campaign, culture, character creation, play, full globe, source-derived identities | pass | The running module, `fwg.exe` and `worldbridge.exe` are the package's and the pins; the producer's pinned runtime matches (the UCRT pin was renewed after a Windows update); every preview settlement and kingdom matches the live campaign; creation lists exactly the world's cultures; every cell of the 128 × 64 periodic grid is classified |
+| 2. Land travel, settlement, trade and recruitment, a land mission, return | pass | Travel, trade and recruitment in a generated town (`campaign_soak`; through the screens' logic, not the screens). Every land case of A and B's wetland battle; 14 mission returns with the world identity equal before and after |
+| 3. Port, embark, sail, naval encounter, disembark; raid, blockade, anchor | pass | Shipyard purchase and repair, port and island voyages, drop-off and coastal landing, blockade and anchor, a pirate battle, a voyage and a pirate encounter across the seam, a seaborne raid won, defeat with the raft |
+| 4. East/west crossing for player and AI on land and sea, routes, encounters and visibility, caches, camera and picking | pass | On A the player crossed the seam on land, an AI party pursued across it, a fleet was called across it and an anchored fleet stayed by it, all through save and load. On B: display copies, camera follow and pan, fast moves, picking, tracks, alignment, a town menu across the seam and the wrap budget between two towns joined by land across it. The caches were reused by every load |
+| 5. Save A with mutable state; B in the same process; save B, cold restart, load A then B; no generator on load | pass | A saved with changed ownership, a spawned party, a prisoner, a siege, ships and anchors, and an AI lord's fleet after a naval battle; loaded in the same process and after a cold restart (scene swept and re-encoded), equal to its save. B generated, started, changed and saved; loaded in the same process from inside A and after the cold restart |
+| 6. Cancel a generation, an invalid copy of world data; recovery, unchanged hashes, no orphans or cross-world callbacks | pass | A second generation cancelled through the setup screen; torn, missing-world and other-build saves and a Continue into a missing world refused; incompatible schema and build, missing DLC, a corrupted manifest hash and an isolated damaged copy of A's world data refused; the bundles unchanged; no generator process left; no cross-world callbacks after any load |
 
 Step 7 is this record: `evidence/one-shot/one-shot-run.json`, and s7 and `finalScenario` in the acceptance index.
+
+## Found and fixed on the way
+
+The day's runs before the final one, on packages `4a390d27…` and `f91a42f4…` (the second's record is `build/mmr1/one-shot-run-f91a42f4.json`):
+- **Character creation broke** when the spatial table first included `CampaignUIHelper.GetHeroBehaviorText`: patching it ran the class's initializer before the game texts existed. That method is left out (`docs/periodic-presentation.md`).
+- **The naval raid stalled** when War Sails' landing left the player's agent down: the probe killed defenders only with the main agent. The killer is now any active agent of the player's team (regression `raid-main-agent-down`).
+- **The matrix's AI fleet battle was left to chance:** a lord with 92 men lost to 67 pirates and had no fleet to save. The pirate now keeps at most a third of the lord's men.
+
+The offline seed sweep before the runs fixed the bridge and the runtime for worlds other than A and B (`docs/travel-graph.md`, Yield): ports on bridged cells or beyond the engine's port envelope, harbours on closed basins, decks shared by two joins, unplaceable villages crashing three runtime readers, and lake copies cut by the terrain's edge.
 
 ## The offline suites
 
 `tools/Test-OfflineSuites.ps1` runs, each in its own process:
 - every csc harness, on worlds A and B;
 - the producer and bridge suites, including worldbridge's CTest in an isolated build;
-- the package path test, the scenario checks and the replays;
+- the package path test, the scenario checks and the replays (the naval fixture is now the final run's, `naval-missions-39772.json`, with the seam cases);
 - the release tooling tests, the registry check, the producer lock check and the Python format tests.
 
 `tools/Test-GenerationIdentity.ps1` is not run: it rewrites the embedded `worldgen/contracts/producer-seed-width.json`, a build input. MMR-24's evidence stands.
 
-**45 of 46 pass.** The one failure is `Test-ProducerProcess`'s preflight check `ucrtbase_matches_lock`, the UCRT drift above. Its CTest (9/9) and every generation outcome pass. Today's run is `evidence/one-shot/producer-process-contract-20261019.json`; MMR-22's accepted run, from before the update, is unchanged.
-
-**Two regressions fixed on the way:**
-- `Test-Deployment.ps1` had not given its fixture the surface template files that the deploy copies since MMR-57.
-- The evidence cleanup had moved eight raw run files that harnesses read; they are back, and `docs/runbooks/development.md` lists them.
-
-## After the run
-
-The independent review's points about the orchestrator were applied, without a rerun:
-- it creates and holds the battle-scale lock even if the lock file does not exist yet;
-- it refuses to start if its designated save already exists;
-- `-Restore` refuses while a game is running.
-
 ## What this does not establish
 
-- **The second world:** two playable production-generated worlds. Only seed 42 activates (`docs/runbooks/player-worlds.md`, Seeds).
-- **The causes of the failures:** the land and naval failures, and the cache rebuild, are untraced. Until the land and naval causes are found, those two probes are unreliable as single-run acceptance.
-- **The seam on a generated world:** camera, picking and naval play at the seam.
-- **The package lifecycle:** the disable, remove, reinstall and read-only sequence ran on the previous package (MMR-57, `f70b44c0`), not on this one.
+- **Every seed:** 19 of 32 seeds (42–73) are accepted at one attempt and pass the activation's managed stages offline, but only seeds 42 and 73 were played in game, and seed 43 was refused at runtime navigation.
+- **The named presentation limits** (`docs/periodic-presentation.md`, Limits): the hero behaviour text measures planar near the cut; siege machines are drawn on the settlement's side only; a route whose path leaves the terrain cannot be represented.
 - **Deferred certification** (seed corpus, runtime-world sweep, long soaks, endurance, all-season play, resolution and performance certification) is listed in the acceptance index as not run.
 
 ## Handoff
@@ -117,10 +101,9 @@ Open owner decisions are on the epic:
 - the Visual C++ runtime;
 - read-only installations;
 - ANSI user names;
-- a release on merge into `main`;
-- re-pinning the producer's UCRT after the Windows update. That pin is in `worldgen/producer.lock.json`, a world input.
+- a release on merge into `main`.
 
 Possible follow-up work:
-- make more seeds activate (map epic 2's MMR-251 repairs towns instead of rejecting worlds);
-- trace the land and naval failures and the cache rebuild. For the land and naval failures, a rerun from the kept `mnbl_oneshot_A_designated` save and its store would tell intermittent from state-dependent;
-- drive camera, picking and naval encounters at the seam on world A.
+- the engine's sea-route detour that refused seed 43's world, or a refused attempt falling through to the next derived seed;
+- the in-game activation of the other accepted seeds (a runtime-world sweep);
+- siege machines on the display copies.

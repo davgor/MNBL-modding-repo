@@ -71,6 +71,11 @@ The binding runs in four steps (`economy.json` binding). Since MMR-46 it lives i
    - Results: the compiler's binding reached 3.61× (153 units). 5 villages were rebound, 3 of them to another kingdom's castle or town. 2 villages are remote, the farthest at 2.32×.
 3. **Castles from their garrison town:** each castle of a town, in id order, takes its nearest remaining village within the limit, until it has 2 or the town is down to 2. This rebinds 39 villages.
 4. **Short castles:** a castle still short takes a village from the fullest town of its kingdom that has more than 2, within the limit. No candidate exists at size 129.
+5. **Evening out**, only where steps 1–4 leave a fortification outside its limits. World A needs none, so its binding is unchanged byte for byte. This step is in `VillageBinding.cs`; `economy.json`'s rule text describes steps 1–4.
+   - A town above 5 villages, or a castle above 2, gives villages to a town or castle of the village's land group that has room, within the engine limit, the nearest move first. A village that is not remote goes first, then one within the preferred limit, then a fortification without a village, then one of its own kingdom.
+   - Then a town or castle below its floor takes the nearest village from a town above 2 or a castle above 1, within the preferred limit first and its own kingdom first. The floor is one village, or 2 for a town the compiler gave at least 2.
+   - A village moved beyond the preferred limit is remote; one moved within it is not.
+   - Seed 73's world (B) left towns with 6–8 villages and towns and castles with none. Seed 66's left a castle with 4.
 
 | | Generated (size 129) | Installed | Bound |
 |---|---|---|---|

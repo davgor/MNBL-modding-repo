@@ -144,7 +144,8 @@ internal static class SettlementTests
         Check(Math.Abs(spacing - r.Spacing) < 1e-6 &&
               vIntents.All(s => byId.ContainsKey(s.Bound) && byId[s.Bound].Kind != "village" && byId[s.Bound].LandGroup == s.LandGroup && Math.Abs(between(s, byId[s.Bound]) - s.BoundDistance) < 1e-6) &&
               vIntents.Where(v => !v.Remote).All(v => v.BoundDistance <= preferred) && vIntents.All(v => v.BoundDistance <= engine) &&
-              remote.All(v => forts.Where(f => f.LandGroup == v.LandGroup).All(f => between(v, f) > preferred)),
+              // A remote village has no town or castle of its land group within the limit, or was evened out beyond it (VillageBinding (5)).
+              remote.All(v => (r.ReboundReason.ContainsKey(v.Id) && r.ReboundReason[v.Id] == "even") || forts.Where(f => f.LandGroup == v.LandGroup).All(f => between(v, f) > preferred)),
               "every village is bound to a town or castle of its land group within " + D(distance, "preferredRatio") + " x the town spacing " + Math.Round(spacing, 1) + " (" + Math.Round(preferred, 1) +
               "; installed maximum " + D(distance, "installedMaxRatio") + " x): the compiler's binding reached " + Math.Round(compilerFar, 2) + " x, " + r.ReboundReason.Count(x => x.Value == "distance") + " villages were rebound for distance (" +
               Json.Serialize(((IDictionary<string, object>)r.Balance["binding"])["crossKingdom"]) + " to another kingdom's fortification), and the " + remote.Count + " remote villages, with no town or castle of their land group within the limit, stay within the engine's trade limit " +
@@ -188,11 +189,11 @@ internal static class SettlementTests
         double envelope = D(villagePorts, "installedPortCentreMax") + D(villagePorts, "allowance");
         var harbourIds = villages.Where(v => (bool)v["harbour"]).Select(v => S(v, "id")).ToList();
         Check(harbourIds.All(id => byId[id].Port && harbourCells.ContainsKey(id) && byId[id].PortX == (harbourCells[id][1] + 0.5) * cell && byId[id].PortY == (harbourCells[id][0] + 0.5) * cell &&
-                                   Math.Sqrt(Math.Pow(byId[id].PortX.Value - byId[id].X, 2) + Math.Pow(byId[id].PortY.Value - byId[id].Y, 2)) <= envelope &&
+                                   dist(byId[id].PortX.Value, byId[id].PortY.Value, byId[id].X, byId[id].Y) <= envelope &&
                                    elements[id].GetAttribute("port_posX") == byId[id].PortX.Value.ToString("R", System.Globalization.CultureInfo.InvariantCulture)) &&
               vIntents.Where(v => !harbourIds.Contains(v.Id)).All(v => !v.Port && !elements[v.Id].HasAttribute("port_posX")),
               "each of the " + harbourIds.Count + " MMR-27 harbour villages has its port at the centre of its MMR-28 harbour cell, within the installed village port-centre maximum " + D(villagePorts, "installedPortCentreMax") +
-              " plus one cell (farthest " + Math.Round(harbourIds.Max(id => Math.Sqrt(Math.Pow(byId[id].PortX.Value - byId[id].X, 2) + Math.Pow(byId[id].PortY.Value - byId[id].Y, 2))), 2) + "), and no other village has one");
+              " plus one cell (farthest " + Math.Round(harbourIds.Max(id => dist(byId[id].PortX.Value, byId[id].PortY.Value, byId[id].X, byId[id].Y)), 2) + ", periodic), and no other village has one");
         var townRange = new[] { "small", "capital" }.SelectMany(k => L(O(O(economy, "prosperity"), "towns"), k)).Select(int.Parse).ToList();
         var castleRange = L(O(O(economy, "prosperity"), "castles"), "values").Select(int.Parse).ToList();
         var hearthRange = L(O(economy, "hearth"), "values").Select(int.Parse).ToList();

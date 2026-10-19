@@ -410,7 +410,21 @@ namespace MNBL.ProceduralWorld.Diagnostics
                 ["expectedBattleScene"] = ExpectedScene(patch.sceneIndex, naval, terrainAtPosition),
                 ["mapHeight"] = hasHeight ? (object)height : null,
                 ["camera"] = Camera(), ["cameraSettle"] = lastSettle, ["campaignHours"] = CampaignTime.Now.ToHours,
-                ["ships"] = main.Ships.Count, ["troops"] = main.MemberRoster.TotalManCount };
+                ["ships"] = main.Ships.Count, ["troops"] = main.MemberRoster.TotalManCount, ["world"] = WorldIdentity() };
+        }
+
+        // The campaign's world as its save binds it (world id, content id, campaign instance) and its periodic frame; CompareReturn requires
+        // the same after a mission as before it (the one-shot's step 2: back in the same world).
+        internal static string WorldIdentity()
+        {
+            try
+            {
+                var behavior = Campaign.Current == null ? null : Campaign.Current.GetCampaignBehavior<WorldIdentityBehavior>();
+                var binding = behavior == null ? null : MNBL.ProceduralWorld.Persistence.WorldSaveBinding.BindingOf(behavior);
+                var periodic = PeriodicWorld.Current;
+                return (binding == null ? "unbound" : binding.WorldId + " " + binding.ContentId + " " + binding.Instance) + " | " + (periodic == null ? "planar" : Convert.ToString(periodic.Coordinates.FrameIdentity));
+            }
+            catch (Exception error) { return "unreadable: " + error.GetType().Name; }
         }
 
         internal static void CompareReturn(Dictionary<string, object> row, List<string> failures, bool naval)
@@ -428,6 +442,8 @@ namespace MNBL.ProceduralWorld.Diagnostics
             if (moved > bound) failures.Add("Returned " + moved.ToString("0.###") + " map units from the entry position (bound " + bound + ").");
             if ((bool)before["atSea"] != (bool)after["atSea"] || (bool)before["isOnLand"] != (bool)after["isOnLand"])
                 failures.Add("Land/sea domain changed across the mission.");
+            if (before.ContainsKey("world") && !Equals(before["world"], after.ContainsKey("world") ? after["world"] : null))
+                failures.Add("The world changed across the mission: " + before["world"] + " -> " + (after.ContainsKey("world") ? after["world"] : null) + ".");
             if (naval && !(bool)after["atSea"]) failures.Add("Naval return is not at sea.");
             foreach (var label in new[] { "before", "after" })
             {

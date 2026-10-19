@@ -44,18 +44,29 @@ namespace MNBL.ProceduralWorld.Diagnostics
     {
         private const BindingFlags Members = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
 
-        internal static IEnumerator Run(ProbeContext context, DiagnosticSandboxBootstrap boot, string worldId, Dictionary<string, object> wrapReport, Dictionary<string, object> report)
+        internal static readonly string[] Sections = { "copies", "follow", "pan", "moves", "picking", "tracks", "alignment", "menu", "mission", "budget" };
+
+        // On the MMR-63 fixture: its two seam towns, every section.
+        internal static IEnumerator Run(ProbeContext context, ICampaignTicker boot, string worldId, Dictionary<string, object> wrapReport, Dictionary<string, object> report)
+        {
+            return Run(context, boot, Settlement.Find(worldId + "_town_1"), Settlement.Find(worldId + "_town_2"), wrapReport, report, Sections);
+        }
+
+        // town1 by the east edge of the canonical range, town2 by the west edge, joined by land across the seam; the sections to run (the
+        // seam_presentation probe runs them on a generated world, without the wrap probe's mission).
+        internal static IEnumerator Run(ProbeContext context, ICampaignTicker boot, Settlement town1, Settlement town2, Dictionary<string, object> wrapReport, Dictionary<string, object> report,
+                                        IEnumerable<string> sections)
         {
             var failures = new List<string>(); report["failures"] = failures;
             var world = PeriodicWorld.Current;
-            var town1 = Settlement.Find(worldId + "_town_1"); var town2 = Settlement.Find(worldId + "_town_2");
             if (world == null || town1 == null || town2 == null) { failures.Add("No periodic world or seam towns."); yield break; }
             double start = context.Seconds;
             while (PeriodicMapCameraView.Current == null && context.Seconds - start < 10) yield return null;
             if (PeriodicMapCameraView.Current == null) { failures.Add("No map camera."); yield break; }
             report["towns"] = new Dictionary<string, object> { ["east"] = Xy(town1.Position), ["west"] = Xy(town2.Position) };
             var before = Budget();
-            foreach (var name in new[] { "copies", "follow", "pan", "moves", "picking", "tracks", "alignment", "menu", "mission", "budget" })
+            var wanted = new HashSet<string>(sections, StringComparer.Ordinal);
+            foreach (var name in Sections.Where(n => wanted.Contains(n)))
             {
                 context.Stage("presentation_section:" + name);
                 var row = new Dictionary<string, object>(); report[name] = row;
@@ -103,7 +114,9 @@ namespace MNBL.ProceduralWorld.Diagnostics
                 if (Math.Abs(Math.Abs(c.ImageX - c.CanonicalX) - world.Width) > 0.01f || Math.Abs(at.x - c.ImageX) > 0.01f) failures.Add(c.Settlement + ": the copy is not at the strip image.");
                 if (settlement == null || settlement.StringId != c.Settlement) failures.Add(c.Settlement + ": the copy's entity does not resolve to the settlement.");
             }
-            var missing = Settlement.All.Where(s => s.Party != null && PeriodicMapPresentation.Copies.All(c => c.Settlement != s.StringId)).Select(s => s.StringId).ToList();
+            // Every settlement whose strip image lies inside the terrain (all of the fixture's; on a generated world, those near the seam).
+            var missing = Settlement.All.Where(s => s.Party != null && world.Coordinates.Images(s.Position.X).Any(i => i.Shift != 0) && PeriodicMapPresentation.Copies.All(c => c.Settlement != s.StringId))
+                .Select(s => s.StringId).ToList();
             row["settlementsWithoutCopy"] = missing; row["copyErrors"] = PeriodicMapPresentation.CopyErrors.ToList();
             row["identities"] = new Dictionary<string, object> { ["settlements"] = Settlement.All.Count, ["settlementIdsUnique"] = Settlement.All.Select(s => s.StringId).Distinct().Count() == Settlement.All.Count,
                 ["campaignObjectsNamedDisplay"] = Settlement.All.Count(s => s.StringId.Contains("_display_")) + MobileParty.All.Count(p => p.StringId.Contains("_display_")) };
@@ -113,7 +126,7 @@ namespace MNBL.ProceduralWorld.Diagnostics
         }
 
         // ---- follow ----
-        private static IEnumerator Follow(ProbeContext context, DiagnosticSandboxBootstrap boot, PeriodicWorld world, Settlement town1, Settlement town2, Dictionary<string, object> row)
+        private static IEnumerator Follow(ProbeContext context, ICampaignTicker boot, PeriodicWorld world, Settlement town1, Settlement town2, Dictionary<string, object> row)
         {
             var failures = (List<string>)row["failures"];
             var main = MobileParty.MainParty;
@@ -170,7 +183,7 @@ namespace MNBL.ProceduralWorld.Diagnostics
         }
 
         // ---- pan ----
-        private static IEnumerator Pan(ProbeContext context, DiagnosticSandboxBootstrap boot, PeriodicWorld world, Settlement town1, Settlement town2, Dictionary<string, object> row)
+        private static IEnumerator Pan(ProbeContext context, ICampaignTicker boot, PeriodicWorld world, Settlement town1, Settlement town2, Dictionary<string, object> row)
         {
             var failures = (List<string>)row["failures"];
             var main = MobileParty.MainParty;
@@ -327,7 +340,7 @@ namespace MNBL.ProceduralWorld.Diagnostics
         }
 
         // ---- moves ----
-        private static IEnumerator Moves(ProbeContext context, DiagnosticSandboxBootstrap boot, PeriodicWorld world, Settlement town2, Dictionary<string, object> row)
+        private static IEnumerator Moves(ProbeContext context, ICampaignTicker boot, PeriodicWorld world, Settlement town2, Dictionary<string, object> row)
         {
             var failures = (List<string>)row["failures"];
             var main = MobileParty.MainParty;
@@ -368,7 +381,7 @@ namespace MNBL.ProceduralWorld.Diagnostics
         }
 
         // ---- picking ----
-        private static IEnumerator Picking(ProbeContext context, DiagnosticSandboxBootstrap boot, PeriodicWorld world, Settlement town2, Dictionary<string, object> row)
+        private static IEnumerator Picking(ProbeContext context, ICampaignTicker boot, PeriodicWorld world, Settlement town2, Dictionary<string, object> row)
         {
             var failures = (List<string>)row["failures"];
             var main = MobileParty.MainParty;
@@ -415,41 +428,62 @@ namespace MNBL.ProceduralWorld.Diagnostics
             var copy = PeriodicMapPresentation.Copies.FirstOrDefault(c => c.Settlement == town2.StringId);
             if (copy == null) { failures.Add("No display copy of " + town2.StringId + "."); yield break; }
             var copyAt = copy.Copy.GlobalPosition;
-            var copyAim = new Vec3(copyAt.x, copyAt.y, copyAt.z + 0.5f);
-            hitSomething = scene.RayCastForClosestEntityOrTerrain(eye, eye + (copyAim - eye) * 1.5f, out distance, out hit, out entity, 0.01f, BodyFlags.CommonFocusRayCastExcludeFlags);
-            // Resolved as MapScreen.HandleMouse resolves a hover or click: the entities the ray collides with, then each visual component.
-            var dir = copyAim - eye; float length = dir.Length; dir.Normalize();
-            var ray = new Ray(eye, dir, length * 1.5f);
-            var infos = new Intersection[64]; var ids = new UIntPtr[64];
-            int collided = scene.SelectEntitiesCollidedWith(ref ray, infos, ids);
-            object visual = null;
+            // Resolved as MapScreen.HandleMouse resolves a hover or click: the entities the ray collides with, then each visual component. The
+            // same ray one width over, at the settlement itself, must resolve to the same settlement: a click on the copy is a click on the
+            // settlement. Aims 0.5, 2 and 4 above the copy's origin, the first whose canonical ray resolves to the town (on a generated world
+            // a village beside the town can lie in front of a low ray, run 29576), else the last.
             var manager = HarmonyLib.AccessTools.TypeByName("SandBox.View.SandBoxViewSubModule").GetProperty("SandBoxViewVisualManager", BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic).GetValue(null);
             var components = manager.GetType().GetMethods(Members).First(m => m.Name == "GetComponents" && !m.IsGenericMethodDefinition && m.GetParameters().Length == 0).Invoke(manager, null) as IEnumerable;
-            foreach (var component in components)
+            float shift = copy.CanonicalX - copy.ImageX;
+            Func<Vec3, Vec3, Tuple<object, int, Vec3, string>> resolve = (from, toward) =>
             {
-                var intersect = component.GetType().GetMethod("OnVisualIntersected", Members);
-                var args = new object[] { ray, ids, infos, collided, eye, copyAim, hit, null, null };
-                intersect.Invoke(component, args);
-                if (args[7] != null) { visual = args[7]; break; }
+                Vec3 struck; WeakGameEntity first; float d;
+                scene.RayCastForClosestEntityOrTerrain(from, from + (toward - from) * 1.5f, out d, out struck, out first, 0.01f, BodyFlags.CommonFocusRayCastExcludeFlags);
+                var direction = toward - from; float span = direction.Length; direction.Normalize();
+                var r = new Ray(from, direction, span * 1.5f);
+                var hits = new Intersection[64]; var pointers = new UIntPtr[64];
+                int n = scene.SelectEntitiesCollidedWith(ref r, hits, pointers);
+                object found = null;
+                foreach (var component in components)
+                {
+                    var intersect = component.GetType().GetMethod("OnVisualIntersected", Members);
+                    var args = new object[] { r, pointers, hits, n, from, toward, struck, null, null };
+                    intersect.Invoke(component, args);
+                    if (args[7] != null) { found = args[7]; break; }
+                }
+                return Tuple.Create(found, n, struck, first.IsValid ? first.Name : null);
+            };
+            Tuple<object, int, Vec3, string> onCopy = null, onSettlement = null; Vec3 copyAim = copyAt;
+            foreach (var lift in new[] { 0.5f, 2f, 4f })
+            {
+                copyAim = new Vec3(copyAt.x, copyAt.y, copyAt.z + lift);
+                onSettlement = resolve(new Vec3(eye.x + shift, eye.y, eye.z), new Vec3(copyAim.x + shift, copyAim.y, copyAim.z));
+                onCopy = resolve(eye, copyAim);
+                if (onSettlement.Item1 != null && SettlementOf(onSettlement.Item1) == town2) break;
             }
+            object visual = onCopy.Item1; hit = onCopy.Item3;
             var resolved = visual == null ? null : SettlementOf(visual);
-            var copyPick = new Dictionary<string, object> { ["copy"] = copy.Entity, ["copyAt"] = Xy(copyAt), ["hit"] = hitSomething ? new[] { hit.x, hit.y, hit.z } : null,
-                ["hitEntity"] = entity.IsValid ? entity.Name : null, ["entitiesCollided"] = collided, ["resolvedBy"] = "Scene.SelectEntitiesCollidedWith + OnVisualIntersected", ["resolvesTo"] = resolved == null ? null : resolved.StringId };
+            var canonical = onSettlement.Item1 == null ? null : SettlementOf(onSettlement.Item1);
+            var copyPick = new Dictionary<string, object> { ["copy"] = copy.Entity, ["copyAt"] = Xy(copyAt), ["aim"] = new[] { copyAim.x, copyAim.y, copyAim.z }, ["hit"] = new[] { hit.x, hit.y, hit.z },
+                ["hitEntity"] = onCopy.Item4, ["entitiesCollided"] = onCopy.Item2, ["resolvedBy"] = "Scene.SelectEntitiesCollidedWith + OnVisualIntersected", ["resolvesTo"] = resolved == null ? null : resolved.StringId,
+                ["canonicalRay"] = new Dictionary<string, object> { ["hitEntity"] = onSettlement.Item4, ["entitiesCollided"] = onSettlement.Item2, ["resolvesTo"] = canonical == null ? null : canonical.StringId } };
             row["copy"] = copyPick;
-            if (resolved != town2) { failures.Add("The ray at " + town2.StringId + "'s display copy does not resolve to the town (" + collided + " entities collided)."); yield break; }
+            if (resolved == null || resolved != canonical) { failures.Add("The ray at " + town2.StringId + "'s display copy resolves to " + (resolved == null ? "nothing" : resolved.StringId) + ", the same ray at the settlement to " + (canonical == null ? "nothing" : canonical.StringId) + "."); yield break; }
+            if (resolved != town2) copyPick["note"] = "another settlement lies in front of the town along every aim; the copy and the settlement resolve to it alike";
+            var target = resolved;
             var copyPoint = new CampaignVec2(hit.AsVec2, true);
             var copyFace = Campaign.Current.MapSceneWrapper.GetFaceIndex(in copyPoint);
             click.Invoke(screen, new object[] { visual, copyPoint, copyFace, false });
             copyPick["targetSettlement"] = main.TargetSettlement == null ? null : main.TargetSettlement.StringId; copyPick["behavior"] = main.DefaultBehavior.ToString();
             copyPick["order"] = Xy(main.MoveTargetPoint); copyPick["orderCanonical"] = world.IsCanonical(main.MoveTargetPoint.X);
-            if (main.TargetSettlement != town2) failures.Add("The click on the display copy does not target " + town2.StringId + ".");
+            if (main.TargetSettlement != target) failures.Add("The click on the display copy does not target " + target.StringId + ".");
             if (!world.IsCanonical(main.MoveTargetPoint.X)) failures.Add("The click on the display copy stored a non-canonical target.");
             main.SetMoveModeHold();
             try { PeriodicMapCameraView.Call("TeleportCameraToMainParty"); } catch (Exception) { }
         }
 
         // ---- menu ----
-        private static IEnumerator Menu(ProbeContext context, DiagnosticSandboxBootstrap boot, PeriodicWorld world, Settlement town2, Dictionary<string, object> row)
+        private static IEnumerator Menu(ProbeContext context, ICampaignTicker boot, PeriodicWorld world, Settlement town2, Dictionary<string, object> row)
         {
             var failures = (List<string>)row["failures"];
             var main = MobileParty.MainParty;
@@ -516,11 +550,15 @@ namespace MNBL.ProceduralWorld.Diagnostics
             var scene = ((GeneratedMapScene)Campaign.Current.MapSceneWrapper).Scene;
             using (var process = System.Diagnostics.Process.GetCurrentProcess())
                 return new Dictionary<string, object> { ["copies"] = PeriodicMapPresentation.Copies.Count, ["copyRegistrations"] = PeriodicMapPresentation.Copies.Sum(c => c.Registered.Count),
-                    ["visualsOfEntities"] = registry == null ? -1 : registry.Count, ["rootEntities"] = scene.RootEntityCount, ["managedBytes"] = GC.GetTotalMemory(true),
+                    ["visualsOfEntities"] = registry == null ? -1 : registry.Count, ["rootEntities"] = scene.RootEntityCount,
+                    ["settlementRegistrations"] = registry == null ? -1 : registry.Values.Cast<object>().Count(v => v != null && v.GetType().Name == "SettlementVisual"),
+                    ["partyRegistrations"] = registry == null ? -1 : registry.Values.Cast<object>().Count(v => v != null && v.GetType().Name.EndsWith("PartyVisual", StringComparison.Ordinal)),
+                    ["displayRootEntities"] = PeriodicMapPresentation.Copies.Count(c => c.Copy != null && c.Copy.Scene != null),
+                    ["copyAddedChildren"] = PeriodicMapPresentation.Copies.Sum(c => c.AddedChildren), ["managedBytes"] = GC.GetTotalMemory(true),
                     ["privateBytes"] = process.PrivateMemorySize64 };
         }
 
-        private static IEnumerator Wraps(ProbeContext context, DiagnosticSandboxBootstrap boot, PeriodicWorld world, Settlement town1, Settlement town2, Dictionary<string, object> start, Dictionary<string, object> row)
+        private static IEnumerator Wraps(ProbeContext context, ICampaignTicker boot, PeriodicWorld world, Settlement town1, Settlement town2, Dictionary<string, object> start, Dictionary<string, object> row)
         {
             var failures = (List<string>)row["failures"];
             var main = MobileParty.MainParty;
@@ -563,9 +601,13 @@ namespace MNBL.ProceduralWorld.Diagnostics
             if ((int)row["cameraWraps"] < 20) failures.Add("Only " + row["cameraWraps"] + " camera wraps for 20 seam passes.");
             // Copies, their registrations and the scene's root entities must be unchanged; the visual registry also holds the gameplay's
             // party visuals (a party that despawns leaves it), so only its growth would be the copies'.
-            foreach (var key in new[] { "copies", "copyRegistrations", "rootEntities" })
+            // On a generated world AI parties spawn and despawn while time runs (run 29576: 58 root entities and visual registrations more after
+            // the wraps), so the scene's root entities and the whole registry are recorded; what must not change is the copies' own share.
+            foreach (var key in new[] { "copies", "copyRegistrations", "settlementRegistrations", "displayRootEntities" })
                 if (Convert.ToInt64(after[key]) != Convert.ToInt64(before[key])) failures.Add(key + " changed from " + before[key] + " to " + after[key] + " across the wraps.");
-            if (Convert.ToInt64(after["visualsOfEntities"]) > Convert.ToInt64(before["visualsOfEntities"])) failures.Add("The visual registry grew from " + before["visualsOfEntities"] + " to " + after["visualsOfEntities"] + " across the wraps.");
+            row["rootEntitiesDelta"] = Convert.ToInt64(after["rootEntities"]) - Convert.ToInt64(before["rootEntities"]);
+            row["visualsOfEntitiesDelta"] = Convert.ToInt64(after["visualsOfEntities"]) - Convert.ToInt64(before["visualsOfEntities"]);
+            row["partyVisualRegistrationsDelta"] = Convert.ToInt64(after["partyRegistrations"]) - Convert.ToInt64(before["partyRegistrations"]);
             long managed = Convert.ToInt64(after["managedBytes"]) - Convert.ToInt64(before["managedBytes"]);
             row["managedBytesDelta"] = managed; row["privateBytesDelta"] = Convert.ToInt64(after["privateBytes"]) - Convert.ToInt64(before["privateBytes"]);
             row["budget"] = "no growth of display copies, their registrations, the visual registry or the scene's root entities across the wraps; MMR-21 recorded no visible-copy memory limit (memory is recorded, not judged)";
@@ -607,7 +649,7 @@ namespace MNBL.ProceduralWorld.Diagnostics
             }
         }
 
-        private static IEnumerator RunFor(ProbeContext context, DiagnosticSandboxBootstrap boot, double seconds)
+        private static IEnumerator RunFor(ProbeContext context, ICampaignTicker boot, double seconds)
         {
             double t0 = context.Seconds;
             boot.HoldPaused = false; DiagnosticSandboxBootstrap.Run(Campaign.Current, CampaignTimeControlMode.UnstoppablePlay);
@@ -710,7 +752,7 @@ namespace MNBL.ProceduralWorld.Diagnostics
         }
 
         // ---- tracks ----
-        private static IEnumerator Tracks(ProbeContext context, DiagnosticSandboxBootstrap boot, PeriodicWorld world, Settlement town1, Dictionary<string, object> row)
+        private static IEnumerator Tracks(ProbeContext context, ICampaignTicker boot, PeriodicWorld world, Settlement town1, Dictionary<string, object> row)
         {
             var failures = (List<string>)row["failures"];
             float y = WorldWrapProbe.LandRow(town1.Position.Y, world.MaxX - 3, world.MaxX - 12, world.OriginX + 3, world.OriginX + 12);

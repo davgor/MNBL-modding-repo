@@ -46,7 +46,7 @@
 |---|---|
 | game | the game and War Sails versions; the distance and party navigation models (type and assembly version); `Campaign.PathFindingMaxCostLimit`; per navigation type the cache's excluded faces, region switch costs, agent radius and neighbour cost multiplier |
 | world | the world id, the scene name, `navmesh.bin`'s hash, the native scene XML and navigation mesh CRCs |
-| positions | every settlement's id, kind (with port), position, gate and port as the campaign holds them: MMR-40's placement, with the harbour villages' drop-off ports applied (below); the hash of `Settlement.All`'s registration order (the face cache keeps the first of tied entrances) |
+| positions | every settlement's id, kind (with port), position, gate and port as the campaign holds them: MMR-40's placement, with the harbour villages' drop-off ports applied (below) |
 | periodic | `planar`, or the coordinate policy version (`mmr64/1`) and `PeriodicWorldCoordinates.Identity` (width, origin, extent: MMR-64 builds the caches through the periodic map scene, so their distances are periodic); `PeriodicDistanceModel.Version` |
 | code | the adapter (`mmr41/1`) and this module's SHA-256, since the periodic path queries and the closest-settlement order are this module's code |
 | schema | the key and cache schema |

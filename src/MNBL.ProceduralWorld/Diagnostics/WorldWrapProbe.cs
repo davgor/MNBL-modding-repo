@@ -904,7 +904,7 @@ namespace MNBL.ProceduralWorld.Diagnostics
             if (!(bool)record["canonicalThroughout"]) failures.Add(leg + ": party was left non-canonical for more than one sample.");
         }
 
-        internal static IEnumerator Travel(ProbeContext context, DiagnosticSandboxBootstrap boot, PeriodicWorld world, MobileParty party, Func<bool> done,
+        internal static IEnumerator Travel(ProbeContext context, ICampaignTicker boot, PeriodicWorld world, MobileParty party, Func<bool> done,
             double timeoutSeconds, Dictionary<string, object> record)
         {
             var campaign = Campaign.Current;

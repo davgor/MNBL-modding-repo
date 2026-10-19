@@ -2,11 +2,9 @@
  "schema": "mnbl.first-test-measurements",
  "version": 2,
  "ticket": "MMR-56",
- "pid": "35468",
- "result": "evidence/runtime/in-game/first_test_profile-35468.json",
- "otherRuns": [
-  "17872"
- ],
+ "pid": "40412",
+ "result": "evidence/runtime/in-game/first_test_profile-40412.json",
+ "otherRuns": [],
  "status": "ok",
  "error": null,
  "passed": 20,
@@ -17,31 +15,31 @@
    "passed": true
   },
   {
-   "check": "the run's module is the build recorded (build-api-inputs.json e10a2e6944b77f2293cde078335d0fcdc62a0972c478e825ac3bde21beff1145, run e10a2e6944b77f2293cde078335d0fcdc62a0972c478e825ac3bde21beff1145)",
+   "check": "the run's module is the build recorded (build-api-inputs.json 3070d8bc3ae0848d01948a1cffdaf0044bf9f62f50ea70427280f68285aac0be, run 3070d8bc3ae0848d01948a1cffdaf0044bf9f62f50ea70427280f68285aac0be)",
    "passed": true
   },
   {
-   "check": "A (seed 42) was generated cold through the setup screen's Confirm: its bundle was not in the store (32.7003045 s)",
+   "check": "A (seed 42) was generated cold through the setup screen's Confirm: its bundle was not in the store (35.6745861 s)",
    "passed": true
   },
   {
-   "check": "every generation phase is timed, with worldbridge's receipts and the producer's own run (['BuildingScene', 'Compiling', 'GeneratingSource', 'RegisteringCampaign', 'ValidatingData', 'ValidatingRequest', 'ValidatingRuntime']; producer [{'run': 'attempt-0-run-1', 'elapsedSeconds': 5.657, 'peakJobMemoryMB': 246.6, 'processes': 1}])",
+   "check": "every generation phase is timed, with worldbridge's receipts and the producer's own run (['BuildingScene', 'Compiling', 'GeneratingSource', 'RegisteringCampaign', 'ValidatingData', 'ValidatingRequest', 'ValidatingRuntime']; producer [{'run': 'attempt-0-run-1', 'elapsedSeconds': 5.618, 'peakJobMemoryMB': 249.7, 'processes': 1}])",
    "passed": true
   },
   {
-   "check": "the setup screen kept drawing while A and B generated (longest frames 0.18743799999999666 s and 0.20153960000004645 s, limit 0.5)",
+   "check": "the setup screen kept drawing while A and B generated (longest frames 0.18449910000000358 s and 0.20882219999998597 s, limit 0.5)",
    "passed": true
   },
   {
-   "check": "Start Campaign reached the campaign map through character creation (398.25695509999997 s to the map)",
+   "check": "Start Campaign reached the campaign map through character creation (395.27612550000003 s to the map)",
    "passed": true
   },
   {
-   "check": "every activation step is timed, the navigation caches with their source (caches generated, 382.3070687 s)",
+   "check": "every activation step is timed, the navigation caches with their source (caches generated, 379.6650344 s)",
    "passed": true
   },
   {
-   "check": "the start's responsiveness was measured frame by frame (369 frames, longest gap 383.1171985 s)",
+   "check": "the start's responsiveness was measured frame by frame (366 frames, longest gap 380.44216539999996 s)",
    "passed": true
   },
   {
@@ -49,19 +47,19 @@
    "passed": true
   },
   {
-   "check": "play speed and fast forward advanced campaign time (5.975187500007451 h and 24.019700666423887 h)",
+   "check": "play speed and fast forward advanced campaign time (5.984959388617426 h and 24.019900138955563 h)",
    "passed": true
   },
   {
-   "check": "a manual save was published (1.0798103000000197 s)",
+   "check": "a manual save was published (1.1314958000000388 s)",
    "passed": true
   },
   {
-   "check": "the save loaded through the normal load entry to the map (14.45165250000008 s)",
+   "check": "the save loaded through the normal load entry to the map (14.297780200000034 s)",
    "passed": true
   },
   {
-   "check": "memory was sampled in every phase (['A.end', 'A.generate', 'A.load', 'A.map', 'A.save', 'A.start', 'B.generate', 'R.generate', 'close', 'setup', 'start'])",
+   "check": "memory was sampled in every phase (['A.end', 'A.generate', 'A.load', 'A.map', 'A.save', 'A.start', 'B.generate', 'R.generate', 'close', 'setup'])",
    "passed": true
   },
   {
@@ -94,8 +92,8 @@
   }
  ],
  "findings": [
-  "The game did not respond for 383 s in total during the first campaign start (longest gap 383 s, on GameLoadingScreen / None): the navigation caches are generated on the engine thread while the loading screen shows.",
-  "The first start of a world after any module build generates its navigation caches (382 s of the start's 400 s of work)."
+  "The game did not respond for 380 s in total during the first campaign start (longest gap 380 s, on GameLoadingScreen / None): the navigation caches are generated on the engine thread while the loading screen shows.",
+  "The first start of a world after any module build generates its navigation caches (380 s of the start's 397 s of work)."
  ],
  "profile": {
   "seed": 42,
@@ -183,7 +181,7 @@
    "occlusion_technique": "1",
    "particle_detail": "2",
    "particle_quality": "2",
-   "physics_tick_rate": "58.8438",
+   "physics_tick_rate": "58.6865",
    "postfx_bloom": "1",
    "postfx_chromatic_aberration": "0",
    "postfx_dof": "1",
@@ -256,7 +254,7 @@
    "IAPNoticeConfirmed": "True",
    "KillFeedVisualType": "1",
    "Language": "English",
-   "LatestSaveGameName": "mnbl_probe56_A_17872",
+   "LatestSaveGameName": "mnbl_probe50_current_43952",
    "LockTarget": "False",
    "MapDoubleClickBehavior": "0",
    "NumberOfCorpses": "3",
@@ -283,11 +281,11 @@
    "name": "C:\\",
    "format": "NTFS",
    "totalBytes": 2016523128832,
-   "freeBytes": 1160407044096
+   "freeBytes": 1074376699904
   }
  },
  "build": {
-  "moduleAssemblySha256": "e10a2e6944b77f2293cde078335d0fcdc62a0972c478e825ac3bde21beff1145",
+  "moduleAssemblySha256": "3070d8bc3ae0848d01948a1cffdaf0044bf9f62f50ea70427280f68285aac0be",
   "producerSha256": "564c2629b5b92d49e52cd466a5a1aaa9339380464207ddcae669dd487d2f695e",
   "producerToolsLockSha256": "ad813831b5e61b9d950506a576d2e36dd6d17932ab04b12d8b6b5b02b0b8bd97",
   "recipeVersion": 3,
@@ -299,7 +297,7 @@
   },
   "game": "v1.4.8.119303",
   "navalDlc": "v1.2.8.119303",
-  "worldbridgeSha256": "776c160626d029e6c9b911472db1a1e7d7992c5f51188259b81fd864e654fe34",
+  "worldbridgeSha256": "2bfdbb9d0e2ae55dc356e9a8873bd70a5cded3b647faed28d261e5abc442f53a",
   "binaries": {
    "NavalDLC.dll": "146e16de9ac242ef63047cc337c858ffaf24a7b153f7bd7e18f1ccca1d268a94",
    "SandBox.dll": "587c6e94c425745c1478f632f3b66226ff8298666cb27e8e6d9a62488df5956a",
@@ -313,83 +311,83 @@
    "TaleWorlds.Native.dll": "2a5e0e0b15513ebb7052d747a621b82c50ee834553eba283b33bbbc33766e12a"
   },
   "embeddedDocuments": {
-   "one-shot-budget.json": "824279bc64c94bad2feec69207eb103bcc03a71abc9980f9cfba55ed8444e541",
+   "one-shot-budget.json": "23a59ce940b0ef4bacdc43c163ad2c6964c292b4e35982a3f877ea9f6fb33120",
    "one-shot.json": "974b64e23576d8842187e25e732368ec468bd6133a3038f0341571597aa08710",
-   "producer.lock.json": "3e9640a2ac2302feb2762a40c90fbc98e0a58063ac19b286dcf626017624aedb",
+   "producer.lock.json": "a374affb43f1ec0621fc885218a9232bea356ed7bfd82917115096bc44dcb824",
    "product-policy.json": "34bc205b4a9360f847d03b7dd98a7ff8337291424d05c412c7694e0113f30956"
   }
  },
- "moduleSha256OfRun": "e10a2e6944b77f2293cde078335d0fcdc62a0972c478e825ac3bde21beff1145",
+ "moduleSha256OfRun": "3070d8bc3ae0848d01948a1cffdaf0044bf9f62f50ea70427280f68285aac0be",
  "buildRecord": {
-  "moduleOutputSha256": "e10a2e6944b77f2293cde078335d0fcdc62a0972c478e825ac3bde21beff1145",
+  "moduleOutputSha256": "3070d8bc3ae0848d01948a1cffdaf0044bf9f62f50ea70427280f68285aac0be",
   "inputs": "evidence/runtime/build-api-inputs.json"
  },
  "repositoryFilesAtSummary": {
-  "tools.lock.json": "ad813831b5e61b9d950506a576d2e36dd6d17932ab04b12d8b6b5b02b0b8bd97",
-  "worldgen/producer.lock.json": "3e9640a2ac2302feb2762a40c90fbc98e0a58063ac19b286dcf626017624aedb",
+  "tools.lock.json": "b4534a8a892fa23decba4b3f4051699efc9ed4329b28776b8d3e4df03dd17548",
+  "worldgen/producer.lock.json": "a374affb43f1ec0621fc885218a9232bea356ed7bfd82917115096bc44dcb824",
   "worldgen/profiles/one-shot.json": "974b64e23576d8842187e25e732368ec468bd6133a3038f0341571597aa08710"
  },
  "measurements": {
   "generate": {
    "seed": 42,
    "state": "Generated",
-   "confirmToReviewSeconds": 32.7003045,
+   "confirmToReviewSeconds": 35.6745861,
    "jobPhases": {
-    "ValidatingRequest": 0.157,
-    "GeneratingSource": 8.557,
-    "Compiling": 5.94,
-    "ValidatingData": 0.189,
-    "BuildingScene": 13.822,
+    "ValidatingRequest": 0.14,
+    "GeneratingSource": 8.571,
+    "Compiling": 5.916,
+    "ValidatingData": 0.194,
+    "BuildingScene": 16.796,
     "RegisteringCampaign": 0.001,
-    "ValidatingRuntime": 1.78
+    "ValidatingRuntime": 1.736
    },
    "split": {
-    "producerSeconds": 5.657,
-    "bridgeAroundProducerSeconds": 2.889,
-    "bundleReadAndConvertSeconds": 2.8241641,
-    "bundleWriteSeconds": 3.061,
-    "sceneEncodeSeconds": 13.7248211,
-    "sceneInstallSeconds": 0.097,
-    "previewAndSummarySeconds": 2.254
+    "producerSeconds": 5.618,
+    "bridgeAroundProducerSeconds": 2.944,
+    "bundleReadAndConvertSeconds": 2.8494345,
+    "bundleWriteSeconds": 3.011,
+    "sceneEncodeSeconds": 14.3580542,
+    "sceneInstallSeconds": 2.438,
+    "previewAndSummarySeconds": 2.321
    },
    "processes": [
     {
      "process": "worldbridge --new-request",
-     "elapsedSeconds": 0.081,
-     "peakWorkingSetMB": 33.1,
+     "elapsedSeconds": 0.074,
+     "peakWorkingSetMB": 32.7,
      "exitCode": 0
     },
     {
      "process": "worldbridge --generate (supervises the producer)",
-     "elapsedSeconds": 8.546,
-     "peakWorkingSetMB": 51.2,
+     "elapsedSeconds": 8.562,
+     "peakWorkingSetMB": 50.8,
      "exitCode": 0
     },
     {
      "process": "worldbridge --bundle (reads the source, converts, writes the bundle)",
-     "elapsedSeconds": 5.93,
-     "peakWorkingSetMB": 255.1,
+     "elapsedSeconds": 5.906,
+     "peakWorkingSetMB": 254.6,
      "exitCode": 0
     }
    ],
    "producer": [
     {
      "run": "attempt-0-run-1",
-     "elapsedSeconds": 5.657,
-     "peakJobMemoryMB": 246.6,
+     "elapsedSeconds": 5.618,
+     "peakJobMemoryMB": 249.7,
      "processes": 1
     }
    ],
    "bundleExisted": false,
    "bundleMB": 137.0,
    "frames": {
-    "frames": 1917,
-    "meanSeconds": 0.017050499739175756,
-    "medianSeconds": 0.016665099999997324,
-    "p95Seconds": 0.017122200000001087,
-    "p99Seconds": 0.026604700000000037,
-    "maxSeconds": 0.18743799999999666,
-    "fps": 58.64930736911887
+    "frames": 2098,
+    "meanSeconds": 0.016997650953288822,
+    "medianSeconds": 0.016671900000000406,
+    "p95Seconds": 0.017062100000000413,
+    "p99Seconds": 0.02682559999999512,
+    "maxSeconds": 0.18449910000000358,
+    "fps": 58.8316587243788
    },
    "peakJobDirectoryMB": 136.0,
    "jobDirectoryAtReviewMB": 136.0
@@ -397,156 +395,156 @@
   "generateB": {
    "seed": 73,
    "state": "Generated",
-   "confirmToReviewSeconds": 55.73010869999996,
+   "confirmToReviewSeconds": 56.33799549999992,
    "jobPhases": {
-    "ValidatingRequest": 0.117,
-    "GeneratingSource": 13.528,
-    "Compiling": 8.764,
-    "ValidatingData": 0.289,
-    "BuildingScene": 26.693,
+    "ValidatingRequest": 0.099,
+    "GeneratingSource": 13.437,
+    "Compiling": 9.312,
+    "ValidatingData": 0.294,
+    "BuildingScene": 26.829,
     "RegisteringCampaign": 0,
-    "ValidatingRuntime": 3.188
+    "ValidatingRuntime": 3.186
    },
    "split": {
-    "producerSeconds": 9.334,
-    "bridgeAroundProducerSeconds": 4.186,
-    "bundleReadAndConvertSeconds": 4.1251512,
-    "bundleWriteSeconds": 4.587,
-    "sceneEncodeSeconds": 23.9619993,
-    "sceneInstallSeconds": 2.731,
-    "previewAndSummarySeconds": 3.151
+    "producerSeconds": 9.246,
+    "bridgeAroundProducerSeconds": 4.184,
+    "bundleReadAndConvertSeconds": 4.0268999,
+    "bundleWriteSeconds": 5.233,
+    "sceneEncodeSeconds": 23.742131699999998,
+    "sceneInstallSeconds": 3.087,
+    "previewAndSummarySeconds": 3.181
    },
    "processes": [
     {
      "process": "worldbridge --new-request",
-     "elapsedSeconds": 0.059,
-     "peakWorkingSetMB": 33.1,
+     "elapsedSeconds": 0.052,
+     "peakWorkingSetMB": 32.6,
      "exitCode": 0
     },
     {
      "process": "worldbridge --generate (supervises the producer)",
-     "elapsedSeconds": 13.52,
-     "peakWorkingSetMB": 56.8,
+     "elapsedSeconds": 13.43,
+     "peakWorkingSetMB": 56.4,
      "exitCode": 0
     },
     {
      "process": "worldbridge --bundle (reads the source, converts, writes the bundle)",
-     "elapsedSeconds": 8.756,
-     "peakWorkingSetMB": 322.2,
+     "elapsedSeconds": 9.304,
+     "peakWorkingSetMB": 322.0,
      "exitCode": 0
     }
    ],
    "producer": [
     {
      "run": "attempt-0-run-1",
-     "elapsedSeconds": 9.334,
-     "peakJobMemoryMB": 269.5,
+     "elapsedSeconds": 9.246,
+     "peakJobMemoryMB": 264.8,
      "processes": 1
     }
    ],
    "bundleExisted": false,
    "bundleMB": 184.7,
    "frames": {
-    "frames": 3269,
-    "meanSeconds": 0.017041789568674904,
-    "medianSeconds": 0.01668819999997595,
-    "p95Seconds": 0.01750860000004195,
-    "p99Seconds": 0.026458800000000338,
-    "maxSeconds": 0.20153960000004645,
-    "fps": 58.67928341505485
+    "frames": 3304,
+    "meanSeconds": 0.01704563613801443,
+    "medianSeconds": 0.01666499999998905,
+    "p95Seconds": 0.017405999999937194,
+    "p99Seconds": 0.026398099999937585,
+    "maxSeconds": 0.20882219999998597,
+    "fps": 58.666041672087786
    },
    "peakJobDirectoryMB": 183.7,
    "jobDirectoryAtReviewMB": 183.7
   },
   "startCampaign": {
    "steps": {
-    "Admit": 0.008,
-    "VerifyData": 0.171,
-    "VerifyRuntime": 0.24,
-    "BuildWorld": 6.031,
-    "PromotePackage": 0.063,
-    "StartCampaign": 391.864,
-    "PostBuild": 0.422,
-    "BindIdentity": 0.052,
-    "PublishSave": 1.484
+    "Admit": 0.009,
+    "VerifyData": 0.192,
+    "VerifyRuntime": 0.259,
+    "BuildWorld": 6.116,
+    "PromotePackage": 0.064,
+    "StartCampaign": 388.776,
+    "PostBuild": 0.383,
+    "BindIdentity": 0.037,
+    "PublishSave": 1.394
    },
-   "workSeconds": 400.335,
-   "creationOnScreenSeconds": 1.4211879999999155,
-   "workWithoutCreationSeconds": 398.914,
-   "startCampaignBesideCachesAndCreationSeconds": 8.136,
+   "workSeconds": 397.23,
+   "creationOnScreenSeconds": 1.49507600000004,
+   "workWithoutCreationSeconds": 395.735,
+   "startCampaignBesideCachesAndCreationSeconds": 7.616,
    "navigationCaches": {
     "status": "registered",
     "cacheStatus": "generated",
-    "elapsedSeconds": 382.3070687,
+    "elapsedSeconds": 379.6650344,
     "caches": [
      {
       "navigationType": "Default",
       "source": "generated",
-      "generateSeconds": 48.3947909,
+      "generateSeconds": 48.555559,
       "deserializeSeconds": null
      },
      {
       "navigationType": "Naval",
       "source": "generated",
-      "generateSeconds": 33.3771307,
+      "generateSeconds": 32.972567600000005,
       "deserializeSeconds": null
      },
      {
       "navigationType": "All",
       "source": "generated",
-      "generateSeconds": 300.1896432,
+      "generateSeconds": 297.8046372,
       "deserializeSeconds": null
      }
     ]
    },
-   "initialSaveSeconds": 1.26,
-   "startToMapSeconds": 398.25695509999997,
+   "initialSaveSeconds": 1.19,
+   "startToMapSeconds": 395.27612550000003,
    "state": "Started",
    "frames": {
-    "frames": 369,
-    "meanSeconds": 1.0858381861788622,
-    "medianSeconds": 0.0166593000000006,
-    "p95Seconds": 0.1301136000000156,
-    "p99Seconds": 1.3297977000000003,
-    "maxSeconds": 383.1171985,
-    "fps": 0.92094753410641
+    "frames": 366,
+    "meanSeconds": 1.0862111978142075,
+    "medianSeconds": 0.01667300000000438,
+    "p95Seconds": 0.13323520000000144,
+    "p99Seconds": 1.289765899999999,
+    "maxSeconds": 380.44216539999996,
+    "fps": 0.92063127503409
    },
    "longGaps": [
     {
-     "after": 6.610775699999998,
-     "seconds": 1.3297977000000003,
+     "after": 6.706365600000005,
+     "seconds": 1.289765899999999,
      "screen": "GameLoadingScreen",
      "state": null
     },
     {
-     "after": 8.025308500000001,
-     "seconds": 1.7139416999999995,
+     "after": 8.275025600000006,
+     "seconds": 1.662641299999997,
      "screen": "GameLoadingScreen",
      "state": null
     },
     {
-     "after": 9.759515000000022,
-     "seconds": 383.1171985,
+     "after": 9.95920190000004,
+     "seconds": 380.44216539999996,
      "screen": "GameLoadingScreen",
      "state": null
     },
     {
-     "after": 392.87671489999997,
-     "seconds": 2.108408499999996,
+     "after": 390.40136800000005,
+     "seconds": 2.0240976999999702,
      "screen": "GameLoadingScreen",
      "state": null
     },
     {
-     "after": 397.2522803,
-     "seconds": 1.2058352999999897,
+     "after": 394.30411560000005,
+     "seconds": 1.1621334999999817,
      "screen": "NavalMapScreen",
      "state": "MapState"
     }
    ],
-   "frozenSeconds": 383.117,
+   "frozenSeconds": 380.442,
    "longestGap": {
-    "after": 9.759515000000022,
-    "seconds": 383.1171985,
+    "after": 9.95920190000004,
+    "seconds": 380.44216539999996,
     "screen": "GameLoadingScreen",
     "state": null
    }
@@ -554,56 +552,56 @@
   "map": {
    "Stop": {
     "frames": 1201,
-    "meanSeconds": 0.01666566794337994,
-    "medianSeconds": 0.016660000000001673,
-    "p95Seconds": 0.016978699999981473,
-    "p99Seconds": 0.017105599999979404,
-    "maxSeconds": 0.027457299999980478,
-    "fps": 60.00359561929395,
-    "realSeconds": 20.0161569,
+    "meanSeconds": 0.01666540291423874,
+    "medianSeconds": 0.01667170000001761,
+    "p95Seconds": 0.016963499999974374,
+    "p99Seconds": 0.01708930000000919,
+    "maxSeconds": 0.0259265000000255,
+    "fps": 60.00454985373386,
+    "realSeconds": 20.01574869999996,
     "campaignHours": 0,
     "hoursPerSecond": 0,
     "menu": null
    },
    "UnstoppablePlay": {
-    "frames": 1188,
-    "meanSeconds": 0.016835219023568312,
-    "medianSeconds": 0.016647100000000137,
-    "p95Seconds": 0.01816150000001926,
-    "p99Seconds": 0.027842899999996007,
-    "maxSeconds": 0.12885579999999663,
-    "fps": 59.399286614570265,
-    "realSeconds": 20.00068779999998,
-    "campaignHours": 5.975187500007451,
-    "hoursPerSecond": 0.29874910101878877,
+    "frames": 1189,
+    "meanSeconds": 0.016821109756097737,
+    "medianSeconds": 0.01665730000001986,
+    "p95Seconds": 0.01763999999997168,
+    "p99Seconds": 0.028341599999976097,
+    "maxSeconds": 0.12685749999997142,
+    "fps": 59.44910974958088,
+    "realSeconds": 20.000753499999973,
+    "campaignHours": 5.984959388617426,
+    "hoursPerSecond": 0.29923669568836164,
     "menu": null
    },
    "UnstoppableFastForward": {
     "frames": 1201,
-    "meanSeconds": 0.01666726278101688,
-    "medianSeconds": 0.016664900000023408,
-    "p95Seconds": 0.017552300000033938,
-    "p99Seconds": 0.018980499999997846,
-    "maxSeconds": 0.04611760000000231,
-    "fps": 59.997854065092596,
-    "realSeconds": 20.01779959999999,
-    "campaignHours": 24.019700666423887,
-    "hoursPerSecond": 1.1999171310728827,
+    "meanSeconds": 0.016667115487093785,
+    "medianSeconds": 0.0166601999999898,
+    "p95Seconds": 0.017554899999993268,
+    "p99Seconds": 0.018707500000004984,
+    "maxSeconds": 0.0457318999999643,
+    "fps": 59.99838428997219,
+    "realSeconds": 20.017645600000037,
+    "campaignHours": 24.019900138955563,
+    "hoursPerSecond": 1.19993632712508,
     "menu": null
    },
-   "parties": 1018,
-   "partiesAfter": 1074,
+   "parties": 1015,
+   "partiesAfter": 1046,
    "settlements": 359,
    "playerIgnoredDays": 2
   },
   "save": {
-   "seconds": 1.0798103000000197,
+   "seconds": 1.1314958000000388,
    "published": true,
-   "bytes": 3907944
+   "bytes": 3902846
   },
   "load": {
-   "loaderSeconds": 14.45155010000002,
-   "toMapSeconds": 14.45165250000008,
+   "loaderSeconds": 14.297690999999986,
+   "toMapSeconds": 14.297780200000034,
    "loaded": true,
    "loaderPhases": [
     {
@@ -612,218 +610,212 @@
     },
     {
      "step": "planned",
-     "seconds": 0.268
+     "seconds": 0.24
     },
     {
      "phase": "Reconstructing",
-     "seconds": 0.268
+     "seconds": 0.241
     },
     {
      "step": "scene and reports",
-     "seconds": 0.52
+     "seconds": 0.503
     },
     {
      "step": "campaign rebuilt",
-     "seconds": 6.096
+     "seconds": 6.09
     },
     {
      "step": "replay plan checked",
-     "seconds": 6.147
+     "seconds": 6.144
     },
     {
      "step": "start checked",
-     "seconds": 6.722
+     "seconds": 6.712
     },
     {
      "step": "checked",
-     "seconds": 6.723
+     "seconds": 6.713
     },
     {
      "phase": "Installing",
-     "seconds": 6.723
+     "seconds": 6.714
     },
     {
      "step": "installed",
-     "seconds": 6.76
+     "seconds": 6.756
     },
     {
      "phase": "Deserializing",
-     "seconds": 6.76
+     "seconds": 6.758
     },
     {
      "phase": "Starting",
-     "seconds": 8.017
+     "seconds": 7.988
     },
     {
      "phase": "Loading",
-     "seconds": 9.003
+     "seconds": 8.968
     },
     {
      "phase": "Loaded",
-     "seconds": 14.362
+     "seconds": 14.199
     }
    ],
    "mapFrames": {
-    "frames": 596,
-    "meanSeconds": 0.016788930369124037,
-    "medianSeconds": 0.016660200000046643,
-    "p95Seconds": 0.01699550000000727,
-    "p99Seconds": 0.01759279999998853,
-    "maxSeconds": 0.07195119999994404,
-    "fps": 59.56305601451935
+    "frames": 597,
+    "meanSeconds": 0.016758246566165987,
+    "medianSeconds": 0.016653899999937494,
+    "p95Seconds": 0.017013899999938076,
+    "p99Seconds": 0.01838359999999284,
+    "maxSeconds": 0.05727450000006229,
+    "fps": 59.67211402766606
    }
   },
-  "totalWaitSeconds": 431.61,
+  "totalWaitSeconds": 431.41,
   "memory": {
    "A.end": {
-    "maxWorkingSetMB": 4921.4,
-    "maxPrivateMB": 7323.0,
-    "gcHeapMBAtMax": 300.5,
+    "maxWorkingSetMB": 5017.0,
+    "maxPrivateMB": 7255.6,
+    "gcHeapMBAtMax": 298.8,
     "samples": 18
    },
    "A.generate": {
-    "maxWorkingSetMB": 4100.2,
-    "maxPrivateMB": 5968.2,
-    "gcHeapMBAtMax": 220.8,
-    "samples": 132
+    "maxWorkingSetMB": 4179.8,
+    "maxPrivateMB": 5957.9,
+    "gcHeapMBAtMax": 463.6,
+    "samples": 142
    },
    "A.load": {
-    "maxWorkingSetMB": 5049.2,
-    "maxPrivateMB": 7473.5,
-    "gcHeapMBAtMax": 572.4,
-    "samples": 94
+    "maxWorkingSetMB": 5132.0,
+    "maxPrivateMB": 7433.0,
+    "gcHeapMBAtMax": 511.7,
+    "samples": 93
    },
    "A.map": {
-    "maxWorkingSetMB": 4622.7,
-    "maxPrivateMB": 7150.1,
-    "gcHeapMBAtMax": 245.2,
-    "samples": 246
+    "maxWorkingSetMB": 4721.1,
+    "maxPrivateMB": 7091.9,
+    "gcHeapMBAtMax": 238.6,
+    "samples": 245
    },
    "A.save": {
-    "maxWorkingSetMB": 4928.8,
-    "maxPrivateMB": 7365.4,
-    "gcHeapMBAtMax": 591.0,
-    "samples": 5
+    "maxWorkingSetMB": 5037.4,
+    "maxPrivateMB": 7385.7,
+    "gcHeapMBAtMax": 580.7,
+    "samples": 4
    },
    "A.start": {
-    "maxWorkingSetMB": 4970.3,
-    "maxPrivateMB": 7411.3,
-    "gcHeapMBAtMax": 658.4,
-    "samples": 1597
+    "maxWorkingSetMB": 4988.8,
+    "maxPrivateMB": 7280.9,
+    "gcHeapMBAtMax": 656.1,
+    "samples": 1584
    },
    "B.generate": {
-    "maxWorkingSetMB": 5109.0,
-    "maxPrivateMB": 6959.6,
-    "gcHeapMBAtMax": 526.5,
-    "samples": 224
+    "maxWorkingSetMB": 5193.4,
+    "maxPrivateMB": 6992.3,
+    "gcHeapMBAtMax": 393.6,
+    "samples": 225
    },
    "R.generate": {
-    "maxWorkingSetMB": 4872.3,
-    "maxPrivateMB": 6884.8,
-    "gcHeapMBAtMax": 301.0,
-    "samples": 110
+    "maxWorkingSetMB": 5145.4,
+    "maxPrivateMB": 6949.9,
+    "gcHeapMBAtMax": 352.9,
+    "samples": 158
    },
    "close": {
-    "maxWorkingSetMB": 5139.0,
-    "maxPrivateMB": 6951.0,
-    "gcHeapMBAtMax": 540.3,
-    "samples": 5
+    "maxWorkingSetMB": 5228.1,
+    "maxPrivateMB": 6954.5,
+    "gcHeapMBAtMax": 536.5,
+    "samples": 4
    },
    "setup": {
-    "maxWorkingSetMB": 4894.3,
-    "maxPrivateMB": 6928.3,
-    "gcHeapMBAtMax": 303.4,
+    "maxWorkingSetMB": 4972.8,
+    "maxPrivateMB": 6681.9,
+    "gcHeapMBAtMax": 301.8,
     "samples": 3
-   },
-   "start": {
-    "maxWorkingSetMB": 3750.1,
-    "maxPrivateMB": 5524.3,
-    "gcHeapMBAtMax": 64.0,
-    "samples": 2
    }
   },
   "peaks": {
-   "workingSetMB": 5139.1,
-   "pagedMB": 7475.3,
-   "virtualMB": 81461.1
+   "workingSetMB": 5228.2,
+   "pagedMB": 7433.2,
+   "virtualMB": 81414.0
   },
   "disk": [
    {
     "at": "start",
-    "storeMB": 4957.9,
+    "storeMB": 0.0,
     "bundlesMB": 0.0,
-    "jobsMB": 272.1,
-    "worldsMB": 429.9,
-    "activationsMB": 74.3,
-    "navigationCachesMB": 438.3,
-    "gameSavesMB": 332.1,
-    "freeGB": 1080.7
+    "jobsMB": 0.0,
+    "worldsMB": 0.0,
+    "activationsMB": 0.0,
+    "navigationCachesMB": 0.0,
+    "gameSavesMB": 429.3,
+    "freeGB": 1000.6
    },
    {
     "at": "A generated",
-    "storeMB": 5230.1,
+    "storeMB": 275.6,
     "bundlesMB": 137.1,
-    "jobsMB": 408.1,
-    "worldsMB": 429.9,
-    "activationsMB": 74.3,
-    "navigationCachesMB": 438.3,
-    "gameSavesMB": 332.1,
-    "freeGB": 1080.4
+    "jobsMB": 136.0,
+    "worldsMB": 0.0,
+    "activationsMB": 0.0,
+    "navigationCachesMB": 0.0,
+    "gameSavesMB": 429.3,
+    "freeGB": 1000.3
    },
    {
     "at": "A started",
-    "storeMB": 5105.6,
+    "storeMB": 151.1,
     "bundlesMB": 137.1,
-    "jobsMB": 272.1,
-    "worldsMB": 432.1,
-    "activationsMB": 76.6,
-    "navigationCachesMB": 445.4,
-    "gameSavesMB": 335.4,
-    "freeGB": 1080.5
+    "jobsMB": 0.0,
+    "worldsMB": 2.2,
+    "activationsMB": 2.2,
+    "navigationCachesMB": 7.0,
+    "gameSavesMB": 432.7,
+    "freeGB": 1000.4
    },
    {
     "at": "A played",
-    "storeMB": 5105.6,
+    "storeMB": 151.1,
     "bundlesMB": 137.1,
-    "jobsMB": 272.1,
-    "worldsMB": 432.1,
-    "activationsMB": 76.6,
-    "navigationCachesMB": 445.4,
-    "gameSavesMB": 335.4,
-    "freeGB": 1080.5
+    "jobsMB": 0.0,
+    "worldsMB": 2.2,
+    "activationsMB": 2.2,
+    "navigationCachesMB": 7.0,
+    "gameSavesMB": 432.7,
+    "freeGB": 1000.4
    },
    {
     "at": "A saved",
-    "storeMB": 5105.6,
+    "storeMB": 151.1,
     "bundlesMB": 137.1,
-    "jobsMB": 272.1,
-    "worldsMB": 432.1,
-    "activationsMB": 76.6,
-    "navigationCachesMB": 445.4,
-    "gameSavesMB": 339.1,
-    "freeGB": 1080.5
+    "jobsMB": 0.0,
+    "worldsMB": 2.2,
+    "activationsMB": 2.2,
+    "navigationCachesMB": 7.0,
+    "gameSavesMB": 436.4,
+    "freeGB": 1000.4
    },
    {
     "at": "B generated",
-    "storeMB": 5475.4,
+    "storeMB": 524.4,
     "bundlesMB": 322.0,
-    "jobsMB": 455.8,
-    "worldsMB": 432.1,
-    "activationsMB": 76.6,
-    "navigationCachesMB": 445.4,
-    "gameSavesMB": 339.1,
-    "freeGB": 1080.2
+    "jobsMB": 183.7,
+    "worldsMB": 2.2,
+    "activationsMB": 2.2,
+    "navigationCachesMB": 7.0,
+    "gameSavesMB": 436.4,
+    "freeGB": 1000.1
    },
    {
     "at": "end",
-    "storeMB": 5106.8,
+    "storeMB": 155.8,
     "bundlesMB": 137.1,
-    "jobsMB": 272.1,
-    "worldsMB": 432.1,
-    "activationsMB": 76.6,
-    "navigationCachesMB": 445.4,
-    "gameSavesMB": 339.1,
-    "freeGB": 1080.6
+    "jobsMB": 0.0,
+    "worldsMB": 2.2,
+    "activationsMB": 2.2,
+    "navigationCachesMB": 7.0,
+    "gameSavesMB": 436.4,
+    "freeGB": 1000.4
    }
   ]
  },
@@ -831,7 +823,7 @@
   "A": {
    "seed": 42,
    "state": "Generated",
-   "seconds": 32.7003045,
+   "seconds": 35.6745861,
    "error": null,
    "attempts": 1,
    "attemptSeed": 42,
@@ -842,57 +834,32 @@
   "R": {
    "seed": 43,
    "state": "Failed",
-   "seconds": 27.598813800000016,
+   "seconds": 39.618988100000024,
    "error": {
-    "category": "ExhaustedQualityAttempts",
-    "code": "generate.exhausted",
-    "detail": "worldbridge --generate exit 3; attempt failure quality, producer succeeded; quality.unplaceable_town: Town surface-city-2-13422-human_cold has no land, mountain or reachable land cell within 2 cells [uids: surface-city-2-13422-human_cold]; quality.repair_bound_exceeded: 45 road and access passes exceed maxPassFraction of 382 mountain cells [uids: surface-city-0-6801-human_heartland surface-city-0-7446-human_desert surface-city-1-4704-human_heartland surface-city-2-10479-human_heartland surface-city-2-10900-human_heartland surface-city-2-11036-gnome surface-city-2-11762-hill_dwarf surface-city-2-14471-human_cold surface-city-2-3924-human_cold surface-city-2-5896-human_rainforest surface-city-2-6104-human_desert surface-city-2-6881-human_heartland]"
+    "category": "RuntimeCapabilityFailure",
+    "code": "runtime.navigation_refused",
+    "detail": "Activating mnbl_world_8cb59e185502c942_89dba7127cfd refused (1 navigation diagnostic): navigation.engine_route_failed land to group 15 (All): All: path length 308.821 exceeds 1.25 x the mesh's shortest path 239.329 + 0.5 cell (a detour) [group 3, group 15]"
    },
-   "attempts": 3,
-   "attemptSeed": null,
+   "attempts": 2,
+   "attemptSeed": 642655365,
    "reasons": [
-    {
-     "attempt": 0,
-     "code": "quality.unreachable_town",
-     "message": "Town surface-city-2-10334-human_large_island in land group 7 is not player-safe (cannot return to the main group; 0 port basins, 1 open coast basins; its port is invalid) [uids: surface-city-2-10334-human_large_island]"
-    },
     {
      "attempt": 0,
      "code": "quality.repair_bound_exceeded",
      "message": "23 road and access passes exceed maxPassFraction of 221 mountain cells [uids: hamlet-node-9690 surface-city-0-4610-human_heartland surface-city-0-9700-human_desert surface-city-1-6821-elf surface-city-2-10793-gnome surface-city-2-5354-elf surface-city-2-5488-gnome surface-city-2-7139-human_rainforest surface-city-2-7976-human_rainforest surface-city-2-9254-human_rainforest]"
-    },
-    {
-     "attempt": 1,
-     "code": "quality.unreachable_town",
-     "message": "Town surface-city-0-6572-human_large_island in land group 6 is not player-safe (cannot return to the main group; 0 port basins, 1 open coast basins; no valid port) [uids: surface-city-0-6572-human_large_island]"
-    },
-    {
-     "attempt": 1,
-     "code": "quality.unreachable_town",
-     "message": "Town surface-city-1-10906-elf in land group 15 is not player-safe (unreachable from the main group; cannot return to the main group; 0 port basins, 0 open coast basins; no valid port) [uids: surface-city-1-10906-elf]"
-    },
-    {
-     "attempt": 2,
-     "code": "quality.unplaceable_town",
-     "message": "Town surface-city-2-13422-human_cold has no land, mountain or reachable land cell within 2 cells [uids: surface-city-2-13422-human_cold]"
-    },
-    {
-     "attempt": 2,
-     "code": "quality.repair_bound_exceeded",
-     "message": "45 road and access passes exceed maxPassFraction of 382 mountain cells [uids: surface-city-0-6801-human_heartland surface-city-0-7446-human_desert surface-city-1-4704-human_heartland surface-city-2-10479-human_heartland surface-city-2-10900-human_heartland surface-city-2-11036-gnome surface-city-2-11762-hill_dwarf surface-city-2-14471-human_cold surface-city-2-3924-human_cold surface-city-2-5896-human_rainforest surface-city-2-6104-human_desert surface-city-2-6881-human_heartland]"
     }
    ],
-   "worldContentId": null,
+   "worldContentId": "8cb59e185502c94250d127b8413ad7bd358240eebc215e2f37403e6d861a61a2",
    "jobError": {
-    "category": "ExhaustedQualityAttempts",
-    "code": "generate.exhausted",
-    "detail": "worldbridge --generate exit 3; attempt failure quality, producer succeeded; quality.unplaceable_town: Town surface-city-2-13422-human_cold has no land, mountain or reachable land cell within 2 cells [uids: surface-city-2-13422-human_cold]; quality.repair_bound_exceeded: 45 road and access passes exceed maxPassFraction of 382 mountain cells [uids: surface-city-0-6801-human_heartland surface-city-0-7446-human_desert surface-city-1-4704-human_heartland surface-city-2-10479-human_heartland surface-city-2-10900-human_heartland surface-city-2-11036-gnome surface-city-2-11762-hill_dwarf surface-city-2-14471-human_cold surface-city-2-3924-human_cold surface-city-2-5896-human_rainforest surface-city-2-6104-human_desert surface-city-2-6881-human_heartland]"
+    "category": "RuntimeCapabilityFailure",
+    "code": "runtime.navigation_refused",
+    "detail": "Activating mnbl_world_8cb59e185502c942_89dba7127cfd refused (1 navigation diagnostic): navigation.engine_route_failed land to group 15 (All): All: path length 308.821 exceeds 1.25 x the mesh's shortest path 239.329 + 0.5 cell (a detour) [group 3, group 15]"
    }
   },
   "B": {
    "seed": 73,
    "state": "Generated",
-   "seconds": 55.73010869999996,
+   "seconds": 56.33799549999992,
    "error": null,
    "attempts": 1,
    "attemptSeed": 73,
@@ -1081,9 +1048,9 @@
     }
    },
    "routes": {
-    "sceneName": "mnbl_world_f596b58cdcfc1879_171df43a3a14",
+    "sceneName": "mnbl_world_f596b58cdcfc1879_019bf8ec927e",
     "navmeshSha256": "ac9a499dfe946f4b832416eee1949429498842f7ce8c198b42a732d58203ba15",
-    "reportSha256": "dcf12ce3b267a03f44fa21b3a5b7d2f34ad58dcd74d42d34c5cb4c616f6d83bf",
+    "reportSha256": "af2e193651c9404ca7689690d7f0f71cc07a8fa15cc7e02553a46fe47abfac65",
     "playabilityRoutes": 810,
     "playabilityRoutesFailed": 0,
     "reportIsTheJobs": true,
@@ -1174,9 +1141,9 @@
     }
    },
    "routes": {
-    "sceneName": "mnbl_world_f63c6841085725e2_f10240a5a408",
+    "sceneName": "mnbl_world_f63c6841085725e2_c36448e016ee",
     "navmeshSha256": "8cf1a20aa47aebb5e0281d4bf4dce7ba41639ab66f0c47d4855110242ad76a85",
-    "reportSha256": "bc9df039a52f7a66e1a6e3e6c3ae56eb8e576a282c6df944f3f0e6bdeef2d0a9",
+    "reportSha256": "7af435cfc0fbcd8ee87b6a664bfad2bf39c82fb13db01448dde72e51beb75391",
     "playabilityRoutes": 1018,
     "playabilityRoutesFailed": 0,
     "reportIsTheJobs": true,

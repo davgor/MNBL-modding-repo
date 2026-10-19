@@ -11,7 +11,7 @@ import re
 import sys
 
 REPO = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-CASES = ('shipyard', 'route.port', 'route.island', 'dropoff', 'targets', 'ai', 'pirates', 'pirate.battle', 'naval.defeat', 'raid', 'blockade', 'assets', 'baselines')
+CASES = ('shipyard', 'route.port', 'route.island', 'dropoff', 'targets', 'ai', 'pirates', 'pirate.battle', 'route.seam', 'pirate.seam', 'naval.defeat', 'raid', 'blockade', 'assets', 'baselines')
 RULES = ('crew', 'defeatTroops', 'grain', 'goldMargin', 'repairDamageFraction', 'voyageHours', 'voyageSeconds', 'raftSeconds', 'raidSeconds', 'landingSeconds', 'coastSeconds', 'straitEndDistance', 'returnBoundLand',
          'returnBoundNaval', 'missionReadySeconds', 'teardownSeconds', 'sampleSeconds', 'stockMissingPatterns')
 TARGETS = ('start', 'mainland', 'island', 'village', 'raidVillage', 'blockadeTown')

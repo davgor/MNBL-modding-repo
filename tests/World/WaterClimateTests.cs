@@ -292,12 +292,19 @@ internal static class WaterClimateTests
             "each lake's plane clears its bed, never rises above another sample within one sample of its box, and is its source level projected as the terrain (level x " + perMetre + ") unless that would",
             lakes.Select(l => new { l.Z, l.LevelZ, l.BedMaxZ, l.ShoreMinZ }));
         int copies = 0, copyMismatch = 0;
+        int cutCopies = 0;
         foreach (var l in lakes.Where(l => !c.IsCanonicalX(l.CenterX)))
         {
-            var twin = lakes.FirstOrDefault(o => c.IsCanonicalX(o.CenterX) && Math.Abs(Math.Abs(o.CenterX - l.CenterX) - c.Width) < 1e-6 && Math.Abs(o.CenterY - l.CenterY) < 1e-6);
-            copies++; if (twin == null || twin.Z != l.Z || twin.Samples != l.Samples) copyMismatch++;
+            // A copy cut by the terrain's edge holds part of its lake: its twin is the canonical lake holding the copy of its first sample.
+            bool cut = l.MinX <= 1e-9 || l.MaxX >= surface.Extent - 1e-9;
+            double copyX = l.FirstSampleX + (c.IsCanonicalX(l.FirstSampleX + c.Width) ? c.Width : -c.Width);
+            var twin = cut ? lakes.FirstOrDefault(o => o != l && c.IsCanonicalX(o.CenterX) && copyX >= o.MinX - 1e-6 && copyX <= o.MaxX + 1e-6 && l.FirstSampleY >= o.MinY - 1e-6 && l.FirstSampleY <= o.MaxY + 1e-6)
+                           : lakes.FirstOrDefault(o => c.IsCanonicalX(o.CenterX) && Math.Abs(Math.Abs(o.CenterX - l.CenterX) - c.Width) < 1e-6 && Math.Abs(o.CenterY - l.CenterY) < 1e-6);
+            copies++; if (cut) cutCopies++;
+            if (twin == null || twin.Z != l.Z || (!cut && twin.Samples != l.Samples)) copyMismatch++;
         }
-        Check(copyMismatch == 0, "every strip lake is a copy of a canonical lake one width away, at the same level (" + copies + " strip copies)", new { copies, copyMismatch });
+        Check(copyMismatch == 0, "every strip lake is a copy of a canonical lake one width away, at the same level, a copy cut by the terrain's edge at its whole twin's (" +
+              copies + " strip copies, " + cutCopies + " cut by the edge)", new { copies, cutCopies, copyMismatch });
         string withLakes = GeneratedWaterSystem.WithWaterBodies(scene, "mnbl_generated_test_water", surface.Extent, lakes);
         var lakeDoc = new System.Xml.XmlDocument(); lakeDoc.LoadXml(withLakes);
         Check(lakeDoc.SelectNodes("/scene/entities/game_entity").Count == 1 + lakes.Count && lakeDoc.SelectNodes("/scene/entities/game_entity/tags/tag[@name='snapped_water_body']").Count == 1 + lakes.Count,

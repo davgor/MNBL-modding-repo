@@ -49,6 +49,16 @@ def raid_without_landing_setup(r):
     cases(r)['raid']['fight']['sceneTags']['landing'] = 0
 
 
+def raid_main_agent_down(r):
+    # Run 42168: War Sails' landing left the player's agent down; the probe killed only with the main agent, so no defender died, the mission
+    # ended without a result and the case timed out at the encounter.
+    c = cases(r)['raid']
+    c['fight']['killed'] = 0
+    c['fight']['victory'] = False
+    c['villageState'] = 'Normal'
+    c['error'] = 'System.TimeoutException: the party did not come back idle to the map (at encounter)'
+
+
 def raid_return_checked_on_land(r):
     # Run 36684: MMR-52's shared return check required land; the seaborne raid's return at sea failed with the land bound.
     c = cases(r)['raid']
@@ -79,6 +89,7 @@ MUTATIONS = {
     'raid-left-off-sea': raid_left_off_sea,
     'raid-without-landing-setup': raid_without_landing_setup,
     'raid-return-checked-on-land': raid_return_checked_on_land,
+    'raid-main-agent-down': raid_main_agent_down,
 }
 
 

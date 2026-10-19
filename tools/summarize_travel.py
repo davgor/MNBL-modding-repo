@@ -84,6 +84,7 @@ def validate(schema, value, root, path='$', errors=None):
     for sub in schema.get('allOf', []):
         if 'if' in sub:
             if not validate(sub['if'], value, root, path, []): validate(sub.get('then', {}), value, root, path, errors)
+            else: validate(sub.get('else', {}), value, root, path, errors)
         else: validate(sub, value, root, path, errors)
     return errors
 
@@ -352,7 +353,7 @@ def verify(name, split, terrain_dir, campaign_dir, travel_dir, policy, schemas):
     def find(a):
         while parent[a] != a: parent[a] = parent[parent[a]]; a = parent[a]
         return a
-    pairs, bridge_uids, road_ok = set(), [], True
+    pairs, bridge_uids, road_ok, decks, deck_pair = set(), [], True, set(), {}
     for rr, out in zip(roads, graph['roads']):
         xs = []
         for piece in rr['pieces']:
@@ -363,7 +364,10 @@ def verify(name, split, terrain_dir, campaign_dir, travel_dir, policy, schemas):
                 la = land_of[grid.idx(*last)] if last else -1
                 lb = land_of[grid.idx(*after)] if after else -1
                 joins = la >= 0 and lb >= 0 and la != lb and kind in B['kinds'] and len(run) <= B['maxCells']
+                # One deck per cell (travel_graph.cpp): a cell an earlier joining crossing bridges between other components joins nothing more.
+                if joins and any(deck_pair.get(grid.idx(*c), (min(la, lb), max(la, lb))) != (min(la, lb), max(la, lb)) for c in run): joins = False
                 if joins:
+                    for c in run: deck_pair.setdefault(grid.idx(*c), (min(la, lb), max(la, lb)))
                     a_, b_ = find(la), find(lb)
                     if a_ != b_: parent[max(a_, b_)] = min(a_, b_)
                     key = (min(la, lb), max(la, lb))
@@ -376,6 +380,7 @@ def verify(name, split, terrain_dir, campaign_dir, travel_dir, policy, schemas):
                 else: run.append(c)
             if run: emit(None); run = []
         crossing_cells = {grid.idx(*c) for x in xs for c in x['cells']}
+        decks |= {grid.idx(*c) for x in xs if x['joins'] for c in x['cells']}
         producer = [{'piece': k[0], 'step': k[1], 'outcome': 'matched' if any(i in crossing_cells for i in v) else 'no_compiled_water'} for k, v in sorted(rr['steps'].items())]
         road_ok = road_ok and xs == out['crossings'] and [list(c) for c in rr['passes']] == out['passes'] and sum(len(p) for p in rr['pieces']) == out['cells'] and \
             out['producerCrossings'] == producer and out['producerPoleCrossings'] == rr['pole']
@@ -394,7 +399,8 @@ def verify(name, split, terrain_dir, campaign_dir, travel_dir, policy, schemas):
         c, m = place[sid]
         if m == 'unplaceable': exclusions[sid] = kind; continue
         if kind == 'village' and place[bound][0] is not None and group_at(c) != group_at(place[bound][0]): exclusions[sid] = kind
-    # Ports: the gate's component, nearest the gate, held pairs skipped, within maxPortGateCells.
+    # Ports: the gate's component, nearest the gate, held and deck pairs skipped, within maxPortGateCells, the first pair in that order
+    # whose path bound is within maxPortGateCells x spacing.
     village_by_id = {v['id']: v for v in campaign['villages']}
     harb = collections.defaultdict(list)
     for p in campaign['ports']:
@@ -403,6 +409,53 @@ def verify(name, split, terrain_dir, campaign_dir, travel_dir, policy, schemas):
             row, col = node_rc(h['sea_node'])
             harb[p['town']].append((v['uid'], vid, sample(col, row), h['harbor_quality']))
     navigable = lambda k: k in (SEA, LAKE, RIVER)
+    gate_point = {sid: points[sid] for sid in points}
+
+    def path_bound(sea, basin, gate, limit):
+        # port_compiler.cpp port_path_bound: the shortest plane path from the sea cell's point nearest the gate point to the gate point
+        # entering no mountain cell, no row off the grid and no navigable cell of another basin (a deck cell excepted), over the
+        # visibility graph of the obstacle corners within limit; past limit it returns a length over limit.
+        sp, width = g['spacing'], cols * g['spacing']
+        gx, gy = gate
+        sx = (sea[1] + 0.5) * sp
+        while gx - sx > width / 2: gx -= width
+        while sx - gx > width / 2: gx += width
+        start = (min(max(gx, sea[1] * sp), (sea[1] + 1) * sp), min(max(gy, sea[0] * sp), (sea[0] + 1) * sp))
+        blocked = []
+        for r in range(math.floor((start[1] - limit) / sp), math.floor((start[1] + limit) / sp) + 1):
+            for c in range(math.floor((start[0] - limit) / sp), math.floor((start[0] + limit) / sp) + 1):
+                if r < 0 or r >= rows: blocked.append((r, c)); continue
+                i = grid.idx(r, c)
+                if cls[i] == MOUNTAIN or (navigable(cls[i]) and basin_of[i] != basin and i not in decks): blocked.append((r, c))
+
+        def enters(a, b_, x0, y0):
+            e, dx, dy = sp * 1e-7, b_[0] - a[0], b_[1] - a[1]
+            t0, t1 = 0.0, 1.0
+            for pp, qq in ((-dx, a[0] - (x0 + e)), (dx, (x0 + sp - e) - a[0]), (-dy, a[1] - (y0 + e)), (dy, (y0 + sp - e) - a[1])):
+                if pp == 0:
+                    if qq <= 0: return False
+                    continue
+                t = qq / pp
+                if pp < 0: t0 = max(t0, t)
+                else: t1 = min(t1, t)
+                if t1 - t0 <= 1e-9: return False
+            return True
+        nodes, seen = [start, (gx, gy)], set()
+        for r, c in blocked:
+            for dr in (0, 1):
+                for dc in (0, 1):
+                    if (r + dr, c + dc) not in seen: seen.add((r + dr, c + dc)); nodes.append(((c + dc) * sp, (r + dr) * sp))
+        dist, done = [math.inf] * len(nodes), [False] * len(nodes)
+        dist[0] = 0.0
+        while True:
+            u = min((i for i in range(len(nodes)) if not done[i]), key=lambda i: dist[i], default=None)
+            if u is None or dist[u] == math.inf: return math.inf
+            if u == 1 or dist[u] > limit: return dist[u]
+            done[u] = True
+            for v in range(len(nodes)):
+                if done[v]: continue
+                d = dist[u] + math.hypot(nodes[v][0] - nodes[u][0], nodes[v][1] - nodes[u][1])
+                if d < dist[v] and not any(enters(nodes[u], nodes[v], o[1] * sp, o[0] * sp) for o in blocked): dist[v] = d
     held, ports, shift_uids = set(), {}, []
     for tid in sorted(harb):
         gate = place[tid][0]; gl = land_of[grid.idx(*gate)] if gate else -1
@@ -426,7 +479,7 @@ def verify(name, split, terrain_dir, campaign_dir, travel_dir, policy, schemas):
             if hc is None: cand['reason'] = 'sea_node_not_navigable'; cands.append(cand); continue
             b = basin_of[grid.idx(*hc)]
             if not basins[b]['open']: cand['reason'] = 'closed_basin'; cands.append(cand); continue
-            best, any_pair = None, False
+            keys, any_pair, any_free = [], False, False
             for i in range(n_cells):
                 if cls[i] != LAND or land_of[i] != gl: continue
                 l = divmod(i, cols)
@@ -434,10 +487,15 @@ def verify(name, split, terrain_dir, campaign_dir, travel_dir, policy, schemas):
                     if basin_of[grid.idx(*s)] != b: continue
                     any_pair = True
                     if ('L', i) in held or ('S', grid.idx(*s)) in held: continue
-                    key = (grid.dist_cells(s, gate), grid.dist_cells(l, gate), grid.dist_cells(s, hc), l, s)
-                    if best is None or key < best: best = key
-            if best is None: cand['reason'] = 'port_pair_taken' if any_pair else 'basin_not_reachable_from_gate'; cands.append(cand); continue
-            if best[0] > P['maxPortGateCells']: cand['reason'] = 'port_too_far_from_gate'; cands.append(cand); continue
+                    any_free = True
+                    if grid.idx(*s) in decks: continue
+                    keys.append((grid.dist_cells(s, gate), grid.dist_cells(l, gate), grid.dist_cells(s, hc), l, s))
+            if not keys: cand['reason'] = 'port_pair_under_bridge' if any_free else 'port_pair_taken' if any_pair else 'basin_not_reachable_from_gate'; cands.append(cand); continue
+            keys.sort()
+            if keys[0][0] > P['maxPortGateCells']: cand['reason'] = 'port_too_far_from_gate'; cands.append(cand); continue
+            limit = P['maxPortGateCells'] * g['spacing']
+            best = next((k for k in keys if k[0] <= P['maxPortGateCells'] and path_bound(k[4], b, gate_point[tid], limit) <= limit), None)
+            if best is None: cand['reason'] = 'port_path_too_long'; cands.append(cand); continue
             cand.update(status='valid', sea=best[4], land=best[3], gate=best[0], basin=b); cands.append(cand)
         valid = [c for c in cands if c['status'] == 'valid']
         chosen = min(valid, key=lambda c: (c['gate'], -c['quality'], c['uid'])) if valid else None

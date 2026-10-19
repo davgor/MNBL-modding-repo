@@ -2,8 +2,8 @@
 
 Mods for Mount & Blade II: Bannerlord v1.4.8 with War Sails. The main one is **MNBL Procedural World**: from the main menu, **New Procedural Campaign** generates a new world from a seed, inside the running game, and starts a Sandbox campaign in it. The world comes with its own terrain, settlements, kingdoms, clans, heroes, economy and land and sea routes, on a flat map that wraps from east to west. Its saves stay bound to that world.
 
-**Status (2026-10-19): a tested local package, not a release.** Dark Mechanicus epic `ep_01m4fpnf646t254mnh69jhz107` is implemented, and its final one-shot acceptance run (MMR-1) has been run. By the epic's rules the run fails, because failures were observed (see s7 below).
-- **Seeds:** only seed 42 makes a playable world today. Most seeds fail the generator's quality checks, and seed 73 previews but is refused at Start Campaign.
+**Status (2026-10-19): a tested local package, not a release.** Dark Mechanicus epic `ep_01m4fpnf646t254mnh69jhz107` is implemented, and its final one-shot acceptance run (MMR-1) passes on package `e20f2667…`: every step, on worlds A (seed 42) and B (seed 73).
+- **Seeds:** offline, 19 of seeds 42–73 give a world at the first quality attempt, and all 19 pass the activation's checks offline; a request gets three attempts. In game, seeds 42 and 73 were played. Seed 43's world was refused at runtime navigation with an error and a Generate-again action.
 - **First start:** each new world blocks the game for about 7 minutes while its navigation is prepared.
 - **Other open items:** a read-only game folder is unsupported, and the package needs the Visual C++ runtime. Copied official culture text sits in the assembly, which is an open decision before any public release.
 
@@ -11,13 +11,13 @@ Where each epic outcome stands, with its evidence, is in [evidence/one-shot/acce
 
 | Outcome | Status |
 |---|---|
-| s1 pinned producer and version-matched setup | fail: everything else passes, but a Windows update replaced the system's `ucrtbase.dll` after the producer's runtime was pinned, so the producer contract's runtime check now fails. Re-pinning is an owner decision |
-| s2 in-game generation from New Campaign | fail: only seed 42 gives a playable world |
-| s3 periodic flat globe | fail: minor known defects at the seam (planar UI lists, a missed storm tick); seam encounters not run |
-| s4 coherent generated campaign | fail: seed 73's villages cannot be bound |
-| s5 War Sails on the generated world | fail. Earlier runs passed ports, fleets, routes, voyages and a pirate encounter on world A. On the current package, the one-shot island voyage turned back (it did not reproduce from another save), and the navigation caches were rebuilt on one load although they existed. Boarding, ship damage, battles fought to the end and blockade battles were not run |
-| s6 two worlds saved and loaded across a cold restart | blocked: the second world is a fixture, since only one seed activates |
-| s7 clean package and the one-shot scenario | fail. The one-shot run is in [docs/one-shot-acceptance.md](docs/one-shot-acceptance.md). Every in-game check of step 1 passed; it fails only on the pinned UCRT. A land battle (a third party joined) and the naval island voyage (turned back) each failed and did not reproduce from another save. The navigation caches were rebuilt on one load. The second-world steps are blocked, and the seam camera, picking and sailing on a generated world were not run |
+| s1 pinned producer and version-matched setup | pass. The producer's UCRT pin was renewed after a Windows update replaced the system's `ucrtbase.dll` |
+| s2 in-game generation from New Campaign | pass, with the seed limit above (an owner's judgement: chosen seeds generally play, not every one) |
+| s3 periodic flat globe | pass, with three named presentation limits near the cut (an owner's judgement): the hero behaviour text, siege machines on the far side, routes leaving the terrain ([docs/periodic-presentation.md](docs/periodic-presentation.md)) |
+| s4 coherent generated campaign | pass |
+| s5 War Sails on the generated world | pass. Boarding, ship damage, battles fought to the end and blockade battles were not run |
+| s6 two worlds saved and loaded across a cold restart | pass: A and B, both production worlds |
+| s7 clean package and the one-shot scenario | pass: [docs/one-shot-acceptance.md](docs/one-shot-acceptance.md) |
 
 Broad seed certification, long soaks, endurance, all-season play and performance certification are deferred and listed there as not run.
 

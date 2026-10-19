@@ -5,6 +5,7 @@ MMR-53 plays War Sails on the generated world. It loads world A's designated tes
 - **Voyages:** setting sail at a port, port-to-port and island voyages, a village drop-off with re-embarking at the anchor, and a coastal landing by a click on land with re-embarking at the anchor it leaves.
 - **Blockade:** a coastal blockade.
 - **Battles:** a pirate battle at sea ending in a retreat, a seaborne village raid, and a naval defeat with capture and the raft.
+- **The seam (2026-10-19):** a voyage across the periodic seam (`route.seam`: the short way, at least one rebase, every hourly sample on naval navigation and canonical), then a pirate encounter with the pirate placed across the seam from the party (`pirate.seam`: 1.5 apart periodically, more than half the width planar).
 
 Meanwhile it records AI sea travel and audits the pirates against MMR-35's spawn points (C06) as MMR-39's wrapper serves them (W03).
 
@@ -18,9 +19,9 @@ Owned elsewhere and cited, not retested:
 | | |
 |---|---|
 | Probe | `naval_missions` (`Automation/NavalMissionsProbe.cs`), on MMR-52's harness: `LandMissionsProbe`'s state, cases, menus, mission runner, spawn and return checks, and log window |
-| Scenarios and regressions | `tests/Runtime/NavalScenarios.json`: the world, the pinned regression targets, the rules, 13 cases and every regression with its guard |
+| Scenarios and regressions | `tests/Runtime/NavalScenarios.json`: the world, the pinned regression targets, the rules, 15 cases and every regression with its guard |
 | Verdict | `tools/summarize_naval_missions.py <pid>` recomputes every case from the run's outputs with the scenario file's rules into `evidence/gameplay/naval-scenarios.json` |
-| Regression fixture | `tests/Runtime/fixtures/naval-missions-46036.json`: run 46036, trimmed, with user paths replaced |
+| Regression fixture | `tests/Runtime/fixtures/naval-missions-39772.json`: the final one-shot run 39772, trimmed, with user paths replaced (with the seam cases; run 46036's fixture before) |
 | Offline | `tools/Test-NavalMissions.ps1`: the scenario check (`tests/Runtime/check_naval_scenarios.py`) and the regression replay (`tests/Runtime/test_naval_regressions.py`), logged to `evidence/gameplay/naval-scenarios-tests.txt` |
 | Review | `evidence/fwg/naval-missions-review.md` |
 
@@ -31,6 +32,8 @@ Owned elsewhere and cited, not retested:
 - the purchase starts from the designated save's position, so its placement at the start town is a relocation;
 - the blockade moves the party to the besieged town (`relocatedFrom`) and, after the siege, back to where it found it (`movedBack`);
 - the pirate battles move the pirate beside the party (`pirateFrom`, `pirateMoved`) and send it back afterwards.
+- the seam voyage moves the party to a sea point 4 inside the east edge of the canonical range (`movedFrom`), and the seam encounter moves it just inside the west edge.
+- every hourly voyage sample records the movement state: the target settlement, whether its port is targeted, the short-term target, the behaviour, the target position and the navigation type. One-shot run 48692's island voyage went ashore half way and walked back to its start town, and its samples could not say what the party was heading for.
 
 A step that fails stops the steps that need its result, which report "the previous step did not finish".
 
@@ -107,6 +110,10 @@ Every shortcut is recorded in the run's outputs:
 - **Placements:** the party at each town's gate (`relocations`), at the besieged town and back, and the pirates beside the party and back (see "Order and placement").
 - **The escape is forced** at once after the capture (`EndCaptivityAction.ApplyByEscape`).
 - **The raid's defenders** are killed by the probe; no AI combat decides the raid.
+
+## The final one-shot run 39772 (2026-10-19)
+
+On package `e20f2667…` (`docs/one-shot-acceptance.md`): 117/117 recomputed checks, 15/15 cases, status ok, the two seam cases (`route.seam`, `pirate.seam`) included. `evidence/gameplay/naval-scenarios.json` is its summary. The raid's fight now kills with any active agent of the player's team when War Sails' landing leaves the player's agent down (regression `raid-main-agent-down`, found in run 42168).
 
 ## Run 46036 (104/104 recomputed checks, 13/13 cases, status ok)
 

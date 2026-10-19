@@ -106,6 +106,9 @@ namespace MNBL.ProceduralWorld.Automation
                     yield return LandMissionsProbe.Case(st, "blockade", row => Blockade(st, row, voyage));
                     yield return LandMissionsProbe.Case(st, "dropoff", row => DropOff(st, row, voyage.Island, voyage.Village));
                     yield return LandMissionsProbe.Case(st, "pirate.battle", row => PirateBattle(st, row, false));
+                    // The seam at sea: the party sails across it, then meets a pirate placed across it from the party.
+                    yield return LandMissionsProbe.Case(st, "route.seam", row => SeamVoyage(st, row));
+                    yield return LandMissionsProbe.Case(st, "pirate.seam", row => PirateBattle(st, row, false, true));
                     yield return LandMissionsProbe.Case(st, "raid", row => Raid(st, row, voyage));
                     yield return LandMissionsProbe.Case(st, "naval.defeat", row => PirateBattle(st, row, true));
                 }
@@ -340,8 +343,14 @@ namespace MNBL.ProceduralWorld.Automation
                     bool open = p.Distance(departure) > st.Rule("straitEndDistance") && p.Distance(to.PortPosition.ToVec2()) > st.Rule("straitEndDistance");
                     float width = main.IsCurrentlyAtSea && !main.IsTransitionInProgress && open ? Width(main.Position) : -1f;
                     if (width >= 0 && (minWidth < 0 || width < minWidth)) { minWidth = width; narrowest = p; }
+                    // The movement state too (one-shot run 48692: the island voyage went ashore half way and walked back to its start town, and
+                    // the samples could not say what the party was heading for).
                     if (samples.Count < 200) samples.Add(new Dictionary<string, object> { ["hours"] = Math.Round(now - hours, 1), ["position"] = new[] { p.X, p.Y }, ["atSea"] = main.IsCurrentlyAtSea,
-                        ["transition"] = main.IsTransitionInProgress, ["problem"] = problem, ["width"] = width });
+                        ["transition"] = main.IsTransitionInProgress, ["problem"] = problem, ["width"] = width,
+                        ["target"] = main.TargetSettlement == null ? null : main.TargetSettlement.StringId, ["targetingPort"] = main.IsTargetingPort,
+                        ["shortTermTarget"] = main.ShortTermTargetSettlement == null ? null : main.ShortTermTargetSettlement.StringId,
+                        ["behavior"] = main.DefaultBehavior + "/" + main.ShortTermBehavior, ["targetPosition"] = new[] { main.TargetPosition.X, main.TargetPosition.Y },
+                        ["navigation"] = main.DesiredAiNavigationType.ToString() });
                 }
                 if (context.Seconds - lastProgress > 30) { failures.Add("the party stopped moving at sea (" + LandMissionsProbe.CurrentMenu() + ")"); break; }
                 if (LandMissionsProbe.CurrentMenu() != "the map" && main.CurrentSettlement != to) { row["menuOnTheWay"] = LandMissionsProbe.CurrentMenu(); break; }
@@ -560,7 +569,7 @@ namespace MNBL.ProceduralWorld.Automation
         //     (the player taken prisoner); the escape forced; at sea without a seaworthy fleet the raft menus (War Sails' RaftStateCampaignBehavior),
         //     campaign time running until the raft washes ashore; the party on land, on land navigation.
         // The pirate goes back where it was found, patrolling its zone.
-        private static IEnumerator PirateBattle(State st, Dictionary<string, object> row, bool lose)
+        private static IEnumerator PirateBattle(State st, Dictionary<string, object> row, bool lose, bool acrossSeam = false)
         {
             var context = st.Context; var failures = (List<string>)row["failures"]; var main = MobileParty.MainParty;
             var setup = new Dictionary<string, object>(); row["setup"] = setup;
@@ -587,6 +596,18 @@ namespace MNBL.ProceduralWorld.Automation
             setup["pirate"] = pirate.StringId; setup["clan"] = pirate.ActualClan.StringId; setup["pirateShips"] = pirate.Ships.Count; setup["pirateTroops"] = pirate.MemberRoster.TotalManCount;
             setup["pirateFrom"] = new[] { home.X, home.Y };
             var point = RuntimeMissionProbe.FindPoint(main.Position, MobileParty.NavigationType.Naval, 2, 1);
+            if (acrossSeam)
+            {
+                // The party just inside the west edge of the canonical range, the pirate just inside the east edge: 1.5 apart across the seam.
+                var world = PeriodicWorld.Current;
+                if (world == null) throw new InvalidOperationException("no periodic world");
+                var side = RuntimeMissionProbe.FindPoint(new CampaignVec2(new Vec2(world.OriginX + 0.75f, main.Position.Y), false), MobileParty.NavigationType.Naval, 0.5f, 0);
+                main.Position = side; main.SetMoveModeHold();
+                point = RuntimeMissionProbe.FindPoint(new CampaignVec2(new Vec2(world.MaxX - 0.75f, main.Position.Y), false), MobileParty.NavigationType.Naval, 0.5f, 0);
+                setup["acrossSeam"] = new Dictionary<string, object> { ["party"] = new[] { side.X, side.Y }, ["pirate"] = new[] { point.X, point.Y },
+                    ["periodic"] = world.Distance(side.ToVec2(), point.ToVec2()), ["planar"] = side.ToVec2().Distance(point.ToVec2()) };
+                if (world.Distance(side.ToVec2(), point.ToVec2()) > 3 || side.ToVec2().Distance(point.ToVec2()) < world.Width / 2) failures.Add("the party and the pirate are not beside each other across the seam");
+            }
             pirate.Position = point; pirate.SetMoveModeHold();
             setup["pirateMoved"] = home.ToVec2().Distance(point.ToVec2());
             try
@@ -629,6 +650,68 @@ namespace MNBL.ProceduralWorld.Automation
             {
                 if (pirate.IsActive && pirate.MapEvent == null) { pirate.Position = home; setup["pirateRestored"] = Patrol(pirate); }
             }
+        }
+
+        // The party at sea sails across the seam: from a sea point 4 inside the east edge of the canonical range to one 4 inside the west
+        // edge, on the sea row nearest the party that is navigable at 1, 4 and 8 inside both edges, as a map click on the sea orders it
+        // (SetMoveGoToPoint, Naval); campaign time runs until it arrives. Its seam rebases (PeriodicSeam events), the periodic distance
+        // travelled against the straight periodic distance, and every hourly sample on naval navigation and canonical.
+        private static IEnumerator SeamVoyage(State st, Dictionary<string, object> row)
+        {
+            var context = st.Context; var failures = (List<string>)row["failures"]; var main = MobileParty.MainParty;
+            if (!main.IsCurrentlyAtSea || main.Ships.Count == 0) throw new InvalidOperationException("the party is not at sea with its fleet (the previous step did not finish)");
+            var world = PeriodicWorld.Current;
+            if (world == null) throw new InvalidOperationException("no periodic world");
+            float y = SeaRow(world, main.Position.Y);
+            if (float.IsNaN(y)) throw new InvalidOperationException("no sea row navigable on both sides of the seam");
+            var from = RuntimeMissionProbe.FindPoint(new CampaignVec2(new Vec2(world.MaxX - 4, y), false), MobileParty.NavigationType.Naval, 1, 0);
+            var to = RuntimeMissionProbe.FindPoint(new CampaignVec2(new Vec2(world.OriginX + 4, y), false), MobileParty.NavigationType.Naval, 1, 0);
+            row["setup"] = new Dictionary<string, object> { ["row"] = y, ["movedFrom"] = new[] { main.Position.X, main.Position.Y }, ["from"] = new[] { from.X, from.Y }, ["to"] = new[] { to.X, to.Y } };
+            main.Position = from; main.SetMoveModeHold();
+            yield return RuntimeMissionProbe.SettleCamera(context);
+            int events = PeriodicSeam.Events.Count;
+            double hours = CampaignTime.Now.ToHours, next = hours, begin = context.Seconds;
+            main.SetMoveGoToPoint(to, MobileParty.NavigationType.Naval);
+            var samples = new List<object>(); row["samples"] = samples;
+            int offNavigation = 0, nonCanonical = 0; float travelled = 0; var last = main.Position.ToVec2();
+            DiagnosticSandboxBootstrap.Run(Campaign.Current, CampaignTimeControlMode.UnstoppableFastForward);
+            while (world.Distance(main.Position.ToVec2(), to.ToVec2()) > 0.5f && context.Seconds - begin < st.Rule("voyageSeconds"))
+            {
+                if (Campaign.Current.TimeControlMode == CampaignTimeControlMode.Stop && LandMissionsProbe.CurrentMenu() == "the map") DiagnosticSandboxBootstrap.Run(Campaign.Current, CampaignTimeControlMode.UnstoppableFastForward);
+                var p = main.Position.ToVec2(); travelled += world.Distance(last, p); last = p;
+                if (CampaignTime.Now.ToHours >= next)
+                {
+                    next += 1;
+                    string problem = main.IsTransitionInProgress ? null : GeneratedSpawnAssertions.Problem(main);
+                    if (problem != null) offNavigation++;
+                    if (!world.IsCanonical(p.X)) nonCanonical++;
+                    if (samples.Count < 100) samples.Add(new Dictionary<string, object> { ["hours"] = Math.Round(CampaignTime.Now.ToHours - hours, 1), ["position"] = new[] { p.X, p.Y }, ["atSea"] = main.IsCurrentlyAtSea, ["problem"] = problem });
+                }
+                if (LandMissionsProbe.CurrentMenu() != "the map") { row["menuOnTheWay"] = LandMissionsProbe.CurrentMenu(); break; }
+                yield return null;
+            }
+            RuntimeMissionProbe.Pause();
+            var crossings = PeriodicSeam.Events.Skip(events).Where(e => e.Party == main.StringId).ToList();
+            bool arrived = world.Distance(main.Position.ToVec2(), to.ToVec2()) <= 0.5f;
+            float straight = world.Distance(from.ToVec2(), to.ToVec2());
+            row["voyage"] = new Dictionary<string, object> { ["arrived"] = arrived, ["hours"] = CampaignTime.Now.ToHours - hours, ["travelledPeriodic"] = travelled, ["straightPeriodic"] = straight,
+                ["rebases"] = crossings.Count, ["rebaseShifts"] = crossings.Select(e => (object)e.Shift).ToList(), ["atSea"] = main.IsCurrentlyAtSea, ["offNavigationSamples"] = offNavigation, ["nonCanonicalSamples"] = nonCanonical };
+            if (!arrived) failures.Add("the party did not arrive across the seam (" + LandMissionsProbe.CurrentMenu() + ")");
+            if (crossings.Count == 0) failures.Add("the party did not cross the seam (no rebase)");
+            if (travelled > 2 * straight + 5) failures.Add("the voyage went the long way (" + travelled + " for " + straight + ")");
+            if (offNavigation > 0) failures.Add(offNavigation + " hourly samples off naval navigation");
+            if (nonCanonical > 0) failures.Add(nonCanonical + " hourly samples outside the canonical range");
+            if (!main.IsCurrentlyAtSea) failures.Add("the party is not at sea after the voyage");
+        }
+
+        // The sea row nearest y0 navigable at 1, 4 and 8 inside both edges of the canonical range (NaN when none within 600).
+        private static float SeaRow(PeriodicWorld world, float y0)
+        {
+            var xs = new[] { world.MaxX - 8, world.MaxX - 4, world.MaxX - 1, world.OriginX + 1, world.OriginX + 4, world.OriginX + 8 };
+            for (float dy = 0; dy < 600; dy += 0.5f)
+                foreach (float y in new[] { y0 + dy, y0 - dy })
+                    if (xs.All(x => GeneratedSpawnAssertions.Problem(new CampaignVec2(new Vec2(x, y), false), MobileParty.NavigationType.Naval) == null)) return y;
+            return float.NaN;
         }
 
         // A value an earlier case's setup recorded, or null.
@@ -897,14 +980,19 @@ namespace MNBL.ProceduralWorld.Automation
             tags["playerSpawnFrame"] = m.Scene.FindEntitiesWithTag("player_spawn_frame").Count();
             fight["sceneLevels"] = m.SceneLevels;
             row["gear"] = LandMissionsProbe.Gear(st, m);
+            // The player's agent after the landing: War Sails' landing can leave it down (run 42168: no main agent, so no kill, and the mission
+            // ended 6 s later without a result). The killer is then any active agent of the player's team.
+            fight["mainAgentAfterLanding"] = m.MainAgent == null ? "none" : m.MainAgent.IsActive() ? "active" : m.MainAgent.State.ToString();
             int killed = 0; double start = st.Context.Seconds, last = 0;
             while (st.Context.Seconds - start < 120 && Mission.Current == m)
             {
                 if (m.MissionResult != null) break;
-                if (st.Context.Seconds - last > 0.5 && m.MainAgent != null && m.PlayerEnemyTeam != null)
+                if (st.Context.Seconds - last > 0.5 && m.PlayerEnemyTeam != null)
                 {
                     last = st.Context.Seconds;
-                    foreach (var a in m.PlayerEnemyTeam.ActiveAgents.ToList()) if (a.IsHuman && a.IsActive()) { LandMissionsProbe.Kill(a, m.MainAgent); killed++; }
+                    var by = m.MainAgent != null && m.MainAgent.IsActive() ? m.MainAgent
+                        : m.PlayerTeam == null ? null : m.PlayerTeam.ActiveAgents.FirstOrDefault(x => x.IsHuman && x.IsActive());
+                    foreach (var a in m.PlayerEnemyTeam.ActiveAgents.ToList()) if (a.IsHuman && a.IsActive()) { LandMissionsProbe.Kill(a, by); killed++; }
                 }
                 yield return null;
             }

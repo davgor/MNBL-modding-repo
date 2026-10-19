@@ -253,6 +253,13 @@ namespace MNBL.ProceduralWorld.Surface
             foreach (IDictionary<string, object> x in Json.A(graph, "exclusions")) input.Excluded.Add(Json.S(x, "id"));
             foreach (IDictionary<string, object> s in Json.A(graph, "settlements"))
             {
+                // An unplaceable village or castle has no cell or point: the travel graph excludes it and the campaign never builds it
+                // (12 of the 19 accepted worlds of the 2026-10-19 seed sweep hold one; activation threw KeyNotFoundException here).
+                if (!s.ContainsKey("cell"))
+                {
+                    if (Json.S(s, "method") != "unplaceable" || !input.Excluded.Contains(Json.S(s, "id"))) throw new InvalidDataException("Settlement " + Json.S(s, "id") + " has no cell and is not an excluded unplaceable settlement.");
+                    continue;
+                }
                 var cell = Json.Cell(s["cell"]); var p = Json.Point(s, "point");
                 input.Settlements.Add(new SettlementRecord { Id = Json.S(s, "id"), Uid = Json.S(s, "uid"), Kind = Json.S(s, "kind"), Method = Json.S(s, "method"), Row = cell[0], Col = cell[1],
                     Land = Json.I(s, "land"), Group = Json.I(s, "group"), X = p[0], Y = p[1] });

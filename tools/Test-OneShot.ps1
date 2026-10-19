@@ -9,12 +9,19 @@
 #      cancelled through the screen.
 #   3. land_missions phase=prepare: A's designated save (named mnbl_oneshot_A_designated through copies of the scenario files, so no
 #      existing save is overwritten).
-#   4. naval_missions: port, ship purchase, voyages, drop-off and coastal landing, blockade and anchor, pirate battle, seaborne raid, defeat.
-#   5. land_missions phase=run fixtureB=false: field battles, town, castle, village, siege, capture, hideout on A.
+#   4. naval_missions: port, ship purchase, voyages, drop-off and coastal landing, blockade and anchor, pirate battle, a voyage across
+#      the seam and a pirate encounter across it, seaborne raid, defeat.
+#   5. land_missions phase=run seedB=73: field battles, town, castle, village, siege, capture, hideout on A; the battle classes and the
+#      crossing A lacks on B (seed 73, started from the setup screen).
 #   6. campaign_soak fixtureB=false: travel by land, trade and recruitment in a generated town, a day of campaign on A.
-#   7. two_world_matrix phase=create fixtureB=false: A played into mutable land and naval state across the seam, saved, loaded, refusals.
-#   8. two_world_matrix phase=cold: a new process loads that save (scene swept and re-encoded) and compares it with what was saved.
-#   9. compat_matrix: invalid copies of A's save refused, A's save, package and bundle unchanged.
+#   7. two_world_matrix phase=create seedB=73: A played into mutable land and naval state across the seam, saved; B (seed 73) generated,
+#      started and changed, saved; A then B loaded in the same process; refusals.
+#   8. two_world_matrix phase=cold: a new process loads A (scene swept and re-encoded) then B and compares each with what was saved.
+#   9. seam_presentation on B's matrix save: MMR-66's seam sections (display copies, camera follow and pan, fast moves, picking, tracks,
+#      alignment, a town menu across the seam, the wrap budget) on a generated world. B, not A: A's only land across the seam is a
+#      two-row strip with no town west of the seam, and the sections travel between two towns joined by land across it.
+#  10. compat_matrix: invalid copies of A's save refused, an isolated damaged copy of A's world data refused, A's save, package and
+#      bundle unchanged.
 # After each step: generator processes (fwg, worldbridge) left running are recorded. Writes build\mmr1\one-shot-raw.json;
 # tools/summarize_one_shot.py grades it.
 param(
@@ -192,13 +199,16 @@ try {
     $null = Run-Probe 'step1 identities' 'new_campaign_flow' @{ seed = 42; culture = 'empire' }
     $null = Run-Probe 'step3 prepare' 'land_missions' @{ scenarios = $landPlan; phase = 'prepare' }
     $null = Run-Probe 'step3 naval' 'naval_missions' @{ scenarios = $navalPlan }
-    $null = Run-Probe 'step2 land' 'land_missions' @{ scenarios = $landPlan; phase = 'run'; fixtureB = $false }
+    $null = Run-Probe 'step2 land' 'land_missions' @{ scenarios = $landPlan; phase = 'run'; fixtureB = $false; seedB = 73 }
     $null = Run-Probe 'step2 visit' 'campaign_soak' @{ scenarios = (Join-Path $repo 'tests/Runtime/CampaignSoakScenarios.json'); fixtureB = $false }
     Snapshot 'before matrix' -WithStore
-    $create = Run-Probe 'step4-5 create' 'two_world_matrix' @{ phase = 'create'; seed = 42; culture = 'empire'; fixtureB = $false }
+    $create = Run-Probe 'step4-5 create' 'two_world_matrix' @{ phase = 'create'; seed = 42; seedB = 73; culture = 'empire'; fixtureB = $false }
     $createResult = Join-Path $repo $raw.steps['probe step4-5 create'].result
     if ($create) { $null = Run-Probe 'step5 cold' 'two_world_matrix' @{ phase = 'cold'; previous = $createResult; fixtureB = $false; cleanup = $false } }
     else { $raw.steps['probe step5 cold'] = [ordered]@{ skipped = 'the create phase left no result' }; Save-Raw }
+    $bSave = if ($create -and $create.outputs -and $create.outputs.worlds.B.save) { [string]$create.outputs.worlds.B.save } else { $null }
+    if ($bSave) { $null = Run-Probe 'step4 seam' 'seam_presentation' @{ save = $bSave } }
+    else { $raw.steps['probe step4 seam'] = [ordered]@{ skipped = 'the create phase left no save of world B' }; Save-Raw }
     $null = Run-Probe 'step6 refusals' 'compat_matrix' @{}
     Snapshot 'after probes' -WithStore
 }

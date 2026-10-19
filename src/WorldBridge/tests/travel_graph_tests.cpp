@@ -3,9 +3,10 @@
 //   '.' land  '^' mountain  '~' sea  'L' lake  'R' river      (settlements and nodes sit at cell centres)
 // two islands with ports, an island without a port, closed basins (lake-only, too small), river bridge candidates
 // (with and without the producer's report), road passes and their bound, footprints with access passes, snaps and
-// unplaceable towns,
+// unplaceable towns, town repairs (coast ports, mountain joins, moves),
 // village and castle exclusions and their bounds, harbour shifts, seam wrap, OpenSea, pole passages, determinism.
 #include <algorithm>
+#include <cmath>
 #include <filesystem>
 #include <fstream>
 #include <functional>
@@ -160,15 +161,29 @@ void topology_tests(const Policy& strict) {
           checks_of(ra, "seaRoute") == 1 && checks_of(ra, "islands") == 1, "host checks cover gates, village faces and routes, ports and their gate distance, the sea route and islands");
     check(placement(ra, "t1")->point.x == at(1, 2).x && placement(ra, "t1")->point.y == at(1, 2).y && ra.collisions.empty(), "a settlement at its cell centre keeps that point; no collisions");
 
-    // An island town without a harbour record can be reached by sea but never left: rejected.
+    // An island town without a harbour record can be reached by sea but never left. Town repairs: with a kept village on its island it
+    // takes a coast port; without one it moves to the nearest free land cell of the main group. No town is dropped.
     World b = map(kTwoIslands);
     town(b, "t1", 1, 2); town(b, "t2", 1, 12);
     village(b, "v1", "t1", 2, 2); harbour(b, "v1", "t1", 3, 2);
     const Result rb = run(b, strict);
-    const auto& g2 = rb.groups[static_cast<std::size_t>(placement(rb, "t2")->group)];
-    check(rb.status == "rejected" && has_reason(rb, "quality.unreachable_town", "uid-t2") && g2.forward && !g2.backward,
-          "an island town without a port is reachable but cannot return: quality.unreachable_town names its UID");
-    check(!port(rb, "t2"), "a shore without a harbour record is never a port");
+    check(rb.status == "ok" && placement(rb, "t2")->method == "move" && placement(rb, "t2")->group == placement(rb, "t1")->group && repairs(rb, "move") == 1 &&
+          placement(rb, "t2")->cell == Cell{1, 1} && !has_reason(rb, "quality.unreachable_town"),
+          "an island town without a port or a kept village on its island moves to the nearest free land cell of the main group (a recorded move)");
+    check(!port(rb, "t2"), "a shore without a harbour record is never a harbour port");
+    World b2 = map(kTwoIslands);
+    town(b2, "t1", 1, 2); town(b2, "t2", 1, 12);
+    village(b2, "v1", "t1", 2, 2); village(b2, "v2", "t2", 2, 12); harbour(b2, "v1", "t1", 3, 2);
+    const Result rb2 = run(b2, strict);
+    const Port* coast = port(rb2, "t2");
+    check(rb2.status == "ok" && placement(rb2, "t2")->method == "direct" && coast && coast->valid && coast->chosen.kind == "coast" && coast->chosen.village_id.empty() &&
+          coast->chosen.gate_distance <= strict.max_port_gate_cells && repairs(rb2, "coast_port") == 1 && rb2.groups[static_cast<std::size_t>(placement(rb2, "t2")->group)].safe,
+          "an island town without a port but with a kept village on its island takes a coast port (a recorded town repair) and its group becomes player-safe");
+    check(port(rb2, "t1")->chosen.kind.empty() && repairs(ra, "coast_port") == 0 && repairs(ra, "move") == 0 && repairs(ra, "join") == 0, "player-safe worlds get no town repair");
+    Identity coast_id; coast_id.world_sha256 = std::string(64, 'a'); coast_id.side = 257;
+    const std::string coast_doc = ports_document(b2.in, rb2, coast_id);
+    check(coast_doc.find("\"kind\":\"coast\"") != std::string::npos && ports_document(a.in, ra, coast_id).find("\"kind\"") == std::string::npos,
+          "ports.json marks a coast port with kind coast; harbour candidates carry no kind");
 
     // Closed basins: a lake and a sea pocket below minOpenCells.
     World c = map({"................", "..LLL...........", "..LLL.....~~....", "................"});
@@ -192,9 +207,19 @@ void topology_tests(const Policy& strict) {
     World d2 = map(river);
     town(d2, "t1", 1, 1); town(d2, "t2", 1, 6);
     const Result rd2 = run(d2, strict);
-    check(rd2.status == "rejected" && has_reason(rd2, "quality.unreachable_town", "uid-t2"), "without the road the far town is unreachable (no ports): rejected");
+    check(rd2.status == "ok" && placement(rd2, "t2")->method == "move" && placement(rd2, "t2")->cell == Cell{1, 0} && rd2.groups.size() == 2,
+          "without the road the far town is unreachable (no ports, no mountain to carve): it moves to the nearest free land cell of the main group");
     Policy no_rivers = strict; no_rivers.bridge_kinds = {"coast"};
-    check(run(d, no_rivers).status == "rejected" && !run(d, no_rivers).roads[0].crossings[0].joins, "a crossing kind the policy does not list joins nothing");
+    check(!run(d, no_rivers).roads[0].crossings[0].joins && placement(run(d, no_rivers), "t2")->method == "move", "a crossing kind the policy does not list joins nothing");
+    // One deck per cell: a river cell between three land components carries the first joining crossing only.
+    World d3 = map({"RRR.RRR", "R..R..R", "RRRRRRR"});
+    town(d3, "t1", 1, 1); town(d3, "t2", 1, 5); town(d3, "t3", 0, 3);
+    road(d3, "t1", "t2", {{{1, 1}, {1, 2}, {1, 3}, {1, 4}, {1, 5}}});
+    road(d3, "t3", "t1", {{{0, 3}, {1, 3}, {1, 2}, {1, 1}}});
+    const Result rd3 = run(d3, lenient);
+    check(rd3.roads[0].crossings.size() == 1 && rd3.roads[0].crossings[0].joins && rd3.roads[1].crossings.size() == 1 && rd3.roads[1].crossings[0].cells == std::vector<Cell>{{1, 3}} &&
+          !rd3.roads[1].crossings[0].joins && rd3.required_bridges == 1,
+          "a crossing on a cell an earlier crossing already decks between two other components joins nothing (one deck per cell)");
 
     // A mountain ridge: a road over it becomes a pass, within the bound or not.
     const std::vector<std::string> ridge = {"....^....^", "....^....^", "....^....^"};
@@ -208,7 +233,11 @@ void topology_tests(const Policy& strict) {
     check(run(e, strict).status == "rejected" && has_reason(run(e, strict), "quality.repair_bound_exceeded"), "one pass among 6 mountain cells exceeds maxPassFraction 0.1: rejected");
     Policy no_pass = passes; no_pass.road_passes = false;
     const Result re2 = run(e, no_pass);
-    check(re2.status == "rejected" && re2.roads[0].crossings[0].kind == "blocked", "with passes disabled the ridge blocks the road and the far town is unreachable");
+    check(re2.roads[0].crossings[0].kind == "blocked" && re2.status == "ok" && repairs(re2, "join") == 1 && repairs(re2, "pass") == 0 && re2.cls[0 * 10 + 4] == Land &&
+          checks_of(re2, "pass") == 1 && re2.lands.size() == 1 && placement(re2, "t2")->method == "direct",
+          "with passes disabled the ridge blocks the road; the far town's group joins the main group through one carved mountain cell (a recorded join with a pass host check)");
+    Policy no_join = no_pass; no_join.max_access_cells = 0;
+    check(placement(run(e, no_join), "t2")->method == "move", "beyond maxAccessCells no join is carved and the town moves");
 
     // Placement: a footprint on a mountain, a snap from the sea, and an unplaceable town.
     World f = map({"~~~~~~~~", "~^.....~", "~......~", "~~~~~~~~"});
@@ -231,7 +260,13 @@ void topology_tests(const Policy& strict) {
     World f2 = map({"~~~~~~~~~~~~", "~~~~~~~~~~~~", "~~~~~~~~~~~~", "~~~~~~~~~~~~", "~~~~~~~~~~~~", "..~~~~~~~~~~"});
     town(f2, "t1", 5, 0); town(f2, "t2", 0, 8);
     const Result rf2 = run(f2, lenient);
-    check(rf2.status == "rejected" && has_reason(rf2, "quality.unplaceable_town", "uid-t2") && placement(rf2, "t2")->method == "unplaceable", "a town with no land within reach is unplaceable: rejected");
+    check(rf2.status == "ok" && placement(rf2, "t2")->method == "move" && placement(rf2, "t2")->cell == Cell{5, 1} && !has_reason(rf2, "quality.unplaceable_town"),
+          "a town with no land within maxSnapCells moves to the nearest free land cell of a player-safe group");
+    World f3 = map({"~~~~~~~~~~~~", "~~~~~~~~~~~~", "~~~~~~~~~~~~", "~~~~~~~~~~~~", "~~~~~~~~~~~~", ".~~~~~~~~~~~"});
+    town(f3, "t1", 5, 0); town(f3, "t2", 0, 8);
+    const Result rf3 = run(f3, lenient);
+    check(rf3.status == "rejected" && has_reason(rf3, "quality.unplaceable_town", "uid-t2") && placement(rf3, "t2")->method == "unplaceable",
+          "a town with no land within reach and no free land cell to move to is unplaceable: rejected");
 
     // A village on the other island is excluded; too many exclusions reject the world.
     World g = map(kTwoIslands);
@@ -241,6 +276,13 @@ void topology_tests(const Policy& strict) {
     const Result rg = run(g, lenient);
     check(rg.status == "ok" && excluded(rg, "vx", "not land-reachable"), "a village outside its town's land group is excluded with the reason");
     check(has_reason(run(g, strict), "quality.too_many_exclusions", "uid-vx"), "1 of 3 villages excluded exceeds maxExcludedVillageFraction 0.1: rejected, naming the UID");
+
+    // A village beyond the engine trade distance (3 x the town spacing) of every town and castle of its land group is excluded.
+    World gt = map({std::string(40, '.'), std::string(40, '.')});
+    town(gt, "t1", 0, 0); town(gt, "t2", 0, 2); village(gt, "vn", "t1", 1, 4); village(gt, "vf", "t1", 1, 20);
+    const Result rgt = run(gt, lenient);
+    check(rgt.status == "ok" && excluded(rgt, "vf", "beyond the engine trade distance") && !excluded(rgt, "vn"),
+          "a village 20 cells from every town of its group, with towns 2 cells apart (limit 6 cells), is excluded; one 4 cells away is kept");
 
     // A castle on an island without a port is not player-safe.
     World h = map({"~~~~~~~~~~~~~~~~", "~....~~~~~~..~~~", "~....~~~~~~..~~~", "~~~~~~~~~~~~~~~~"});
@@ -284,8 +326,8 @@ void topology_tests(const Policy& strict) {
     town(l, "t1", 1, 1); town(l, "t2", 1, 6);
     road(l, "t1", "t2", {{{1, 1}, {1, 3}}, {{1, 5}, {1, 6}}});
     const Result rl = run(l, strict);
-    check(rl.roads[0].pole_passages == 1 && rl.roads[0].crossings.empty() && !rl.roads[0].same_group && rl.status == "rejected",
-          "a pole passage splits the road: the river the unsplit road would bridge is never crossed");
+    check(rl.roads[0].pole_passages == 1 && rl.roads[0].crossings.empty() && placement(rl, "t2")->method == "move" && rl.roads[0].same_group,
+          "a pole passage splits the road: the river the unsplit road would bridge is never crossed (the far town moves into the first town's group)");
 
     // Ports: a held pair, a port too far from the gate, a basin the gate cannot reach, excluded and unplaceable towns.
     World pa = map({"~~~~~~~~~~~~~~~~~~~~", "^^^^^.^^^^^^^^^^^^^^", "^^^^...^^^^^^^^^^^^^"});
@@ -315,6 +357,37 @@ void topology_tests(const Policy& strict) {
     town(pe, "t1", 5, 0); town(pe, "t2", 0, 8); village(pe, "v2", "t2", 5, 1); harbour(pe, "v2", "t2", 4, 1);
     const Result rpe = run(pe, lenient);
     check(port(rpe, "t2") && port(rpe, "t2")->candidates[0].reason == "town_unplaceable", "a harbour of an unplaceable town is invalid (town_unplaceable)");
+    // A port's sea cell is never a deck cell (a joining crossing's cell: the runtime lays a bridge deck over it). Seed 43's world.
+    const std::vector<std::string> estuary = {"~~~~~~~~~~", "~...R...~~", "~...R...~~", "~~~~~~~~~~"};
+    World pf = map(estuary);
+    town(pf, "t1", 1, 3); town(pf, "t2", 1, 6); village(pf, "v1", "t1", 2, 2); village(pf, "v2", "t2", 2, 6); harbour(pf, "v1", "t1", 1, 4);
+    World pf_road = pf;
+    road(pf_road, "t1", "t2", {{{1, 3}, {1, 4}, {1, 5}, {1, 6}}});
+    const Result rpf = run(pf, lenient), rpf_road = run(pf_road, lenient);
+    check(port(rpf, "t1")->valid && port(rpf, "t1")->chosen.sea_cell == Cell{1, 4} && rpf_road.roads[0].crossings[0].joins && deck_cells(Cells(10, 4, kSpacing), rpf_road) == std::set<std::size_t>{14} &&
+          port(rpf_road, "t1")->valid && port(rpf_road, "t1")->chosen.sea_cell == Cell{0, 3},
+          "a harbour on a river mouth takes the river cell, unless a joining crossing bridges it: then the next pair (deck cells are skipped)");
+    World pg = map({"^^^^~~~~~~", "^...R...~~", "^^^^R^^^~~", "^^^^~~~~~~"});
+    town(pg, "t1", 1, 3); town(pg, "t2", 1, 6); village(pg, "v1", "t1", 1, 2); village(pg, "v2", "t2", 1, 7); harbour(pg, "v1", "t1", 1, 4);
+    road(pg, "t1", "t2", {{{1, 3}, {1, 4}, {1, 5}, {1, 6}}});
+    const Result rpg = run(pg, lenient);
+    check(!port(rpg, "t1")->valid && port(rpg, "t1")->candidates[0].reason == "port_pair_under_bridge", "a gate whose only coast pair is a deck cell has no port (port_pair_under_bridge)");
+    // The engine path from the port to the gate must fit the envelope: a mountain cell between a port cell two cells from the gate and
+    // the gate makes the path 2.21 cells (seed 43's town mnbl_add01e64_t_80ec1de1a0, 15.02 units against 12.5).
+    const std::vector<std::string> spur = {"~~~~~~~~~~~~", "~~~~.......~", "~~~~.......~", "~~~~~^.....~", "~~~~~^^....~", "~~~~~~~~~~~~"};
+    World ph = map(spur);
+    town(ph, "t1", 3, 6); village(ph, "v1", "t1", 2, 8); harbour(ph, "v1", "t1", 3, 4);
+    const Result rph = run(ph, strict);
+    const double bound = port_path_bound(Cells(12, 6, kSpacing), rph, {}, Cell{3, 4}, rph.basin_of[3 * 12 + 4], at(3, 6), 2 * kSpacing);
+    check(rph.status == "ok" && !port(rph, "t1")->valid && port(rph, "t1")->candidates[0].reason.rfind("port_path_too_long (13.79", 0) == 0 && std::abs(bound - (0.5 + 1 + std::sqrt(0.5)) * kSpacing) < 1e-9,
+          "a port cell two cells from the gate behind a mountain cell: the path bound goes round its corner (2.21 cells) and the candidate is port_path_too_long");
+    World ph_open = map(spur);
+    ph_open.cls[3 * 12 + 5] = Land;
+    town(ph_open, "t1", 3, 6); village(ph_open, "v1", "t1", 2, 8); harbour(ph_open, "v1", "t1", 3, 4);
+    const Result rph_open = run(ph_open, strict);
+    check(port(rph_open, "t1")->valid && port(rph_open, "t1")->chosen.sea_cell == Cell{3, 4} &&
+          port_path_bound(Cells(12, 6, kSpacing), rph_open, {}, Cell{3, 4}, rph_open.basin_of[3 * 12 + 4], at(3, 6), 2 * kSpacing) == 1.5 * kSpacing,
+          "without the mountain the same port cell is valid: a straight 1.5-cell path");
 
     // Bridge kinds and bounds: lake joins, coast does not, length and count bounds name the road's towns.
     World ba = map({"....L...L", "....L...L", "....L...L"});
@@ -326,12 +399,14 @@ void topology_tests(const Policy& strict) {
     town(bb, "t1", 1, 1); town(bb, "t2", 1, 6);
     road(bb, "t1", "t2", {{{1, 1}, {1, 6}}});
     const Result rbb = run(bb, strict);
-    check(rbb.status == "rejected" && rbb.roads[0].crossings[0].kind == "coast" && !rbb.roads[0].crossings[0].joins, "a sea crossing is recorded as coast but never joins land: sea is crossed through ports");
+    check(rbb.roads[0].crossings[0].kind == "coast" && !rbb.roads[0].crossings[0].joins && placement(rbb, "t2")->method == "move",
+          "a sea crossing is recorded as coast but never joins land: sea is crossed through ports (the far town moves)");
     World bc = map({"...RRR..RRRR", "...RRR..RRRR", "...RRR..RRRR"});
     town(bc, "t1", 1, 1); town(bc, "t2", 1, 6);
     road(bc, "t1", "t2", {{{1, 1}, {1, 6}}});
     Policy wide = strict; wide.max_bridge_cells = 3;
-    check(run(bc, strict).status == "rejected" && !run(bc, strict).roads[0].crossings[0].joins && run(bc, wide).status == "ok", "a river crossing longer than bridges.maxCells joins nothing");
+    check(!run(bc, strict).roads[0].crossings[0].joins && placement(run(bc, strict), "t2")->method == "move" && run(bc, wide).roads[0].crossings[0].joins &&
+          placement(run(bc, wide), "t2")->method == "direct", "a river crossing longer than bridges.maxCells joins nothing");
     Policy no_bridges = strict; no_bridges.max_bridges = 0;
     check(has_reason(run(d, no_bridges), "quality.repair_bound_exceeded", "uid-t1") && has_reason(run(d, no_bridges), "quality.repair_bound_exceeded", "uid-t2"),
           "required bridges beyond maxRequired reject the world, naming the road's towns");
