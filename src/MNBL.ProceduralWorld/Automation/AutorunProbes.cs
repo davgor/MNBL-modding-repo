@@ -31,6 +31,7 @@ namespace MNBL.ProceduralWorld.Automation
                 case "runtime_surface": return RuntimeSurfaceSequenceProbe.Run(context);
                 case "world_surface": return WorldSurfaceProbe.Run(context);
                 case "world_navigation": return WorldNavigationProbe.Run(context);
+                case "route_trace": return RouteTraceProbe.Run(context);
                 case "world_setup": return WorldSetupProbe.Run(context);
                 case "new_campaign_flow": return NewCampaignFlowProbe.Run(context);
                 case "world_recovery": return WorldRecoveryProbe.Run(context);

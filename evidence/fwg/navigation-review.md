@@ -111,7 +111,7 @@ Fixed:
 - The fixture label is corrected.
 - "Cell for cell" now reads "per-label cell counts".
 - The snap wording is corrected.
-- `navmesh-bin.md` §2.1 now records that zeroed scratch fields load.
+- `navmesh-bin.md` §2.1 now records that zeroed scratch fields load. (Since 2026-10-19 that answer is in `docs/formats/navmesh-bin-loading.md`: `navmesh-bin.md` is back at the bytes the naval-transitions calibration pins.)
 
 **17. NIT: the sanity routes were listed as forbidden, `group_not_realized` had empty source ids, and portFace's expected type came from the builder's typing.**
 

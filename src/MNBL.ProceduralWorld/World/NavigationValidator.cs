@@ -980,6 +980,7 @@ namespace MNBL.ProceduralWorld.Surface
             public bool Agrees, Found, Reachable, Sampled, CornerHop;
             public double Distance = double.NaN, Length = double.NaN, Straight = double.NaN;
             public int Switches = -1;
+            public List<double[]> Points;   // the found path's polyline, start to end (diagnostics: route_trace)
         }
 
         // One route through the engine (Steps' route matrix and MMR-41's semantic route set): every placement of the route (MMR-64); the shortest
@@ -1026,6 +1027,7 @@ namespace MNBL.ProceduralWorld.Surface
             if (found && points != null)
             {
                 var polyline = new List<double[]> { a }; polyline.AddRange(points.Where(q => q != null)); polyline.Add(b);
+                e.Points = polyline;
                 length = PolylineLength(a, points, b);
                 samples = Sample(engine, model, polyline, policy.SampleStep); e.Sampled = true;
                 lines = Crossings(polyline, plan.Build.Input.Surface.NodeSize, plan.Build.Input.Surface.Extent);

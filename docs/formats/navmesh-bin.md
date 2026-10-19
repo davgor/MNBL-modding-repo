@@ -56,7 +56,7 @@ All values are little endian.
 | 40 | u64 | never 0; pointer-like (e.g. `0x7ff964cea460`), different in each file | uninitialised engine memory |
 | 48 | … | raw LZ4 block (no frame, no checksum), running to EOF | NMG payload |
 
-The two values at offsets 32 and 40 look like stack, heap or code addresses, and they change from file to file. **Inferred**: the loader ignores them, because no meaningful reader could depend on values like these. **Verified (MMR-38, runs 42984/42956)**: a file with both set to 0 loads; the engine read every face of the generated campaign navmeshes. The codec writes 0 by default and keeps the original values on round trip. CSC's in-game-proven writer
+The two values at offsets 32 and 40 look like stack, heap or code addresses, and they change from file to file. **Inferred**: the loader ignores them, because no meaningful reader could depend on values like these. **Unknown**: whether a file with both set to 0 loads. The codec writes 0 by default and keeps the original values on round trip. CSC's in-game-proven writer
 copies the original 48-byte header rather than zeroing it, so its success does not answer this question.
 
 **LZ4 block.** The engine's encoder is stronger than greedy LZ4. Its parse picks the nearest of
@@ -341,10 +341,10 @@ Example outputs are under `build/navmeshbin/synth/`.
 
 ## 8. Open questions (unknown / untested)
 
-1. **Answered (MMR-38, run 32580):** a `navmesh.bin` with zeroed scratch fields loads. The engine read every face of the generated
-   campaign navmeshes (`evidence/world/navigation-routes.json`).
-2. **Answered (MMR-38):** a `store` LZ4 block (one literal run, the form written by the surface encoder and `NavMesh.Encode`) loads.
-   The `fast` blocks that `tools/scenebin` builders write by default (`write_scene_navmesh`) are the ones that loaded in the MMR-17/18 campaign scene slots.
+1. Whether the engine loads a `navmesh.bin` with zeroed scratch fields (offsets 32/40). If it does not,
+   copy those 16 bytes from an installed file (`Rnm1Container.scratch0/1`).
+2. Whether the engine accepts our `fast` or `store` LZ4 blocks. Third-party evidence says a greedy encoder works,
+   but this has not been tested with our bytes.
 3. The meanings of meta1, meta3, meta4 and the flag byte, and of the 32-entry zero tail. The writer uses the
    campaign-map values (0, 0, -1, 0).
 4. Limits on face, vertex and edge counts. The largest installed file has 188,606 faces. The largest synthesized and

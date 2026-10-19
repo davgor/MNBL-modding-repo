@@ -219,7 +219,7 @@ An unreadable record is a refusal. `GeneratedMapScene.Load` checks the gate for 
 - **Distances are costs.** `GetPathDistanceBetweenAIFaces` returns the path length plus 50 per embark or disembark.
 - **Islands.** Every world is one mesh island, and the engine reports one island. The fixture's mountain-closed pocket, a separate All component, shares it, so `FaceIslandIndex` is not All connectivity.
 - **Region-strict lookups.** A land lookup on a lake returns no face. Mountain faces are in region 0, the sea region, because the region map is Default validity.
-- **Container.** A store-mode LZ4 block with zeroed scratch fields loads (`docs/formats/navmesh-bin.md`).
+- **Container.** A store-mode LZ4 block with zeroed scratch fields loads (`docs/formats/navmesh-bin-loading.md`; the format itself is `docs/formats/navmesh-bin.md`).
 
 ## The fixture world
 
