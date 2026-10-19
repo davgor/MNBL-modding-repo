@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "status": "stopped-at-user-request-before-implementation",
+  "scope": "Separate private element probe host/runner v2 with verified stock watchdog shutdown",
+  "implementationFilesCreated": [],
+  "testsRun": [],
+  "buildsRun": [],
+  "gameLaunched": false,
+  "installedFilesModified": false,
+  "existingSourcesReceiptsPackagesModified": false,
+  "approvedNativeDll": {
+    "path": "build/agent-storage/MNBL.RelocatedNativeElementProbe.dll",
+    "sha256": "9d1f6a512dd63c833d44a4fd0bf0e7f5ede9750dcb022ef50608144306347d05",
+    "independentReview": "evidence/engine-extension/native-relocated-binding-independent-review.json",
+    "independentReviewSha256": "b027c74bcf573639f833917e23570c81dfbc819c83f0b215fd9e85792bca7962",
+    "note": "Previously reviewed identity; no rebuild or fresh hashing during shutdown checkpoint. Preserve frozen output."
+  },
+  "missingPrerequisite": "Parent has not yet created native-original-watchdog-shutdown-contract.json or supplied its reviewed SHA256.",
+  "nextActionWhenResumed": "Parent supplies the new exact-original watchdog contract; implement the separate v2 host, build script, runner, inert tests and package, then obtain independent review before any game launch.",
+  "plannedNewFiles": [
+    "src/MNBL.AgentGrowthProbe/managed-v2/SubModule.cs",
+    "tools/battle-scale/Build-ElementProbeHostV2.ps1",
+    "tools/battle-scale/Test-ElementProbeInGameV2.ps1"
+  ],
+  "requiredBehavior": [
+    "Reuse unchanged frozen managed/ProbeRequest.cs and managed/ProbeInterop.cs, original module manifest, and reviewed relocated native DLL; use a new build/element-probe-host-v2 package path.",
+    "Host validates private object cleanup counters first, captures Utilities.GetReturnCode() before QuitGame, and requires zero.",
+    "Reuse unchanged Test-NativeExitContract.ps1 with sourceSha256 and patchedSha256 both equal to exact original 2a5e0e0b15513ebb7052d747a621b82c50ee834553eba283b33bbbc33766e12a and pin the new exit contract.",
+    "Capture watchdog child PID, parent PID, start time, absolute executable path and file hash while polling the owned game process. Never control foreign processes.",
+    "Report verifiedShutdownProtocol separately from normalExitVerified. A verified watchdog exit is not a normal zero exit, and all native process destructors remain unverified.",
+    "Retain strict foreign-session checks before every deployment copy and launch, exclusive lease, exact source/package pins, child-only arming environment, owned-process identity checks, and transactional restore after all game sessions exit.",
+    "Inert tests must reject wrong watchdog hash/PID, wrong log PID/order, exception or dump logs, missing identity, and invalid native cleanup; separately cover zero exit and verified stock watchdog shutdown.",
+    "No game launch until parent independently reviews the complete new package and prerequisites. This prerequisite does not complete the user's engine-growth goal."
+  ],
+  "relatedWorkerHandoff": {
+    "artifact": "evidence/engine-extension/native-remaining-agent-owner-proofs-v6.json",
+    "sha256ReportedByProducer": "4234cdf417611934d723d95ebfd7d73e2d259acf8cb71c8b9fdce58ef7b0f453",
+    "state": "Producer reports frozen corrected alias checker, same 713316 contribution, 12 remaining gaps and 14 negative checks. Not independently reviewed by this worker; preserve v5 historical evidence."
+  }
+}

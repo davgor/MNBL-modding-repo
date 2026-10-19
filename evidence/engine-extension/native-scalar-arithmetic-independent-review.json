@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "status": "accepted-seven-exact-non-Mission-exclusions",
+  "reviewedArtifact": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\evidence\\engine-extension\\native-scalar-arithmetic-exclusions.json",
+  "reviewedArtifactSha256": "2d5980c63421580e530aa4183d123781ab037254eadb711739495eb5f9b283fd",
+  "targetSha256": "2a5e0e0b15513ebb7052d747a621b82c50ee834553eba283b33bbbc33766e12a",
+  "originalInstructionEntriesMatched": 2702,
+  "excludedSites": [
+    "0x18018ba8f",
+    "0x1801c99b3",
+    "0x180312080",
+    "0x1804a0820",
+    "0x1804a0826",
+    "0x1804a082d",
+    "0x1804a0834"
+  ],
+  "findings": [],
+  "review": [
+    "18ba8f restores precisely the8109f0 stack allocation before register pops andRET.",
+    "1c99b3 consumes float-converted32-bit alpha shifted24; itsffffff fillsRGB beforeDWORD localstore.",
+    "312080 receiver is separate8107b0 allocation constructed30eae0, storedScene+628, passed directly1da668 and preservedfromdestructor30f050. Actual311fa8 preservesRCX toRBX. Thus8106c0 membervector belongs to separate allocation, not Mission.",
+    "Four4a082x additions modify32-bit coefficient sums which are shifted17, clamped0..255 and storedasbytes. FullrawandREA confirm scalartransform.",
+    "All2702 retained instructions independently match originaltarget. All declared sourcehashes current."
+  ],
+  "limitations": [
+    "Only exact seven exclusions; no wholepatch runtime certification."
+  ],
+  "gameExecuted": false
+}

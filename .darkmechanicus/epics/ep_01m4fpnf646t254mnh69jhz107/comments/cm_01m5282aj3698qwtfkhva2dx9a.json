@@ -1,0 +1,13 @@
+{
+  "author": {
+    "label": "Claude Code",
+    "role": "orchestrator"
+  },
+  "body": "**Handoff from MMR-39 (accepted): production climate, colour grade and pirate points at activation.** See `docs/water-climate.md`.\n\n1. **Climate binding.**\n   - Bind a production world's climate with `GeneratedClimate.FromSynthesis(GeneratedClimateSystem.Synthesize(GeneratedClimateSystem.ReadSource(stream, sha), PeriodicWorldCoordinates.FromSurface(surface)), extent)`.\n   - Read `source/world.json` through the bundle's `ReadVerified`. `RuntimeWorldBackend.Prepare` already reads it for lake planes and can hand you the `Source`.\n   - Pass the result as the `GeneratedMapScene` climate. Until then a production campaign keeps the MMR-18 dry/calm weather, and War Sails uses its minimum wind (0, 0.0667).\n   - Preflight-check the identity. The v2 identity is SHA-256(policy text + wind, snow/rain and colour-grade hashes), and the load path checks version and coordinate layout.\n2. **Colour-grade manager.**\n   - Production scenes deliberately carry no `MapColorGradeManager`. Its `Init` reads Calradia's `worldmap_colorgrade_grid` natively, and an inspection-scene read of a scene carrying one hung the game (run 15744).\n   - A campaign map needs it: it drives the night grade and `ApplyAtmosphere`, the time-of-day atmosphere frame.\n   - Add the manager entity at campaign-map load, after `GeneratedColorGrade.Begin(grid, scene)`, which `GeneratedMapScene.Load` already calls. Its `Init` then gets the generated grid. Use the official Main_map script variables: `GeneratedClimateSystem.ColorGradeManagerXml` lists them.\n   - Without a bound grid the patch binds the neutral grid (all 0, the default grade), never Calradia's.\n3. **Pirate points.**\n   - `NavalContentFactory` now feeds `Result.Plan.AddPirates(Result.Pirates)`. These points are LOGICAL travel-grid positions, and the decorator converts them with `PeriodicWorldCoordinates.ToPhysical`.\n   - The activation package must carry them too. `GeneratedCampaignRegistration.FromInstalledPackage` only reads `placement.naval.pirateSpawnPoints` (physical), so a production load would otherwise serve 0 points while the new game served the plan's.\n4. **Water bodies.** They are in the encoded scene: the sea plane on the datum over the terrain, plus lake planes. Their XML is hashed into the content-addressed scene name, so scene names changed with MMR-39.",
+  "createdAt": "2026-10-16T11:37:58.083Z",
+  "epicId": "ep_01m4fpnf646t254mnh69jhz107",
+  "format": "darkmechanicus.comment",
+  "formatVersion": 1,
+  "id": "cm_01m5282aj3698qwtfkhva2dx9a",
+  "ticketId": "tk_01m4fqfbgknga8wqn5seq3j94d"
+}

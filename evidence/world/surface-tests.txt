@@ -1,0 +1,25 @@
+ok    A f596b58cdcfc: the native terrain is the projection's square physical domain: 257 samples over 1600 units (spacing 6.25), 4 x 4 nodes of 64 cells (heightmap level 6)
+ok    A: the scale record keeps campaign XY (logical 800 x 400, strip 400, pole margin 600) apart from source metres (0.004 units/m horizontal, 0.01 vertical) and records the vertical exaggeration 2.5
+ok    A: the 16 chunks tile the domain exactly, each over its own 65 x 65 samples (borders shared), with its height range and material layers recomputed here, identically on a second read (16 chunks carry rock_k)
+ok    A: every compiled sample column c equals column c + 128 (the strips copy the other side of the seam), and so do the quantized samples
+ok    A: the compiler's published 16-bit heights (height-q16.bin) are the model's quantization codes (0 of 66049 differ)
+ok    A: the pinned surface encoder's published heights equal the model byte for byte (66049 samples), with the model's bounds -36.321..78.353, step 0.00174981307698177 and node size
+ok    A: the encoded scene's 16 terrain nodes carry the model chunks' height ranges and material layer masks, at the model's node size
+ok    A: the encoded terrain.bin has no chunk seam tear: 1569 shared edge samples with equal heights, normals and material weights; every decoded height is the model's (8/8)
+ok    A: 70 landmarks inside the domain: 24 compiler settlements (logical + strip, pole margin; first settlement_castle_mnbl_1609fb72_c_00a466803b at 567.1875,703.125), 25 chunk corners and centres, 9 MMR-16 grid points, 12 coast samples above the datum
+ok    A: model queries: vertex heights are samples, interior heights the main-diagonal triangle, normals unit, a vertical ray meets the collision reference (within 0.03 of the height everywhere), and a query outside the domain throws (no fallback heights)
+ok    B f63c68410857: the native terrain is the projection's square physical domain: 257 samples over 1600 units (spacing 6.25), 4 x 4 nodes of 64 cells (heightmap level 6)
+ok    B: the scale record keeps campaign XY (logical 800 x 400, strip 400, pole margin 600) apart from source metres (0.004 units/m horizontal, 0.01 vertical) and records the vertical exaggeration 2.5
+ok    B: the 16 chunks tile the domain exactly, each over its own 65 x 65 samples (borders shared), with its height range and material layers recomputed here, identically on a second read (16 chunks carry rock_k)
+ok    B: every compiled sample column c equals column c + 128 (the strips copy the other side of the seam), and so do the quantized samples
+ok    B: the compiler's published 16-bit heights (height-q16.bin) are the model's quantization codes (0 of 66049 differ)
+ok    B: the pinned surface encoder's published heights equal the model byte for byte (66049 samples), with the model's bounds -31.347..54.048, step 0.00130304417486839 and node size
+ok    B: the encoded scene's 16 terrain nodes carry the model chunks' height ranges and material layer masks, at the model's node size
+ok    B: the encoded terrain.bin has no chunk seam tear: 1569 shared edge samples with equal heights, normals and material weights; every decoded height is the model's (8/8)
+ok    B: 70 landmarks inside the domain: 24 compiler settlements (logical + strip, pole margin; first settlement_castle_mnbl_214f6557_c_0eb63fe848 at 485.9375,715.625), 25 chunk corners and centres, 9 MMR-16 grid points, 12 coast samples above the datum
+ok    B: model queries: vertex heights are samples, interior heights the main-diagonal triangle, normals unit, a vertical ray meets the collision reference (within 0.03 of the height everywhere), and a query outside the domain throws (no fallback heights)
+ok    the two worlds differ at 69 of world A's 70 landmark positions, so world B's answers there can be told from A's
+ok    generation tokens: beginning a world supersedes the previous one (its install and queries are refused), retiring a superseded token changes nothing, a disposed world is retired but may finish its own teardown, and a callback that completes after a later world began is refused (refused)
+ok    the resource ledger releases latest first, each once, records a failing release without skipping the rest, hands a resource another owner releases to that owner (not recorded as released), and refuses holding a resource twice
+ok    scene names are content-addressed (mnbl_world_f596b58cdcfc1879_daad98f5073a: the same world and encoder give the same name, any other world, encoder or template another; only that exact form is the scene store's, never a fixture slot such as mnbl_world_a), and no world generation begins while a campaign map is live
+24/24 checks passed

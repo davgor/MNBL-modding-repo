@@ -1,0 +1,103 @@
+{
+  "schemaVersion": 1,
+  "status": "verified-static-layout-not-a-patch",
+  "binarySha256": "2a5e0e0b15513ebb7052d747a621b82c50ee834553eba283b33bbbc33766e12a",
+  "imageBase": "0x180000000",
+  "reportedAgentLimit": 2040,
+  "missionAllocationBytes": 18369344,
+  "pools": [
+    {
+      "name": "agent_slots",
+      "missionOffset": "0x2d50",
+      "elementStride": "0xc60",
+      "capacity": 2040,
+      "indexTableOffset": "0x62ca50",
+      "indexEntryBytes": 2,
+      "counterOffset": "0x62da40",
+      "highWaterOffset": "0x62da44"
+    },
+    {
+      "name": "second_agent_slots_role_unresolved",
+      "missionOffset": "0x62da50",
+      "elementStride": "0xc60",
+      "capacity": 2040,
+      "indexTableOffset": "0xc57750",
+      "indexEntryBytes": 2,
+      "counterOffset": "0xc58740",
+      "highWaterOffset": "0xc58744"
+    },
+    {
+      "name": "companion_230",
+      "missionOffset": "0xc58750",
+      "elementStride": "0x230",
+      "capacity": 2040,
+      "indexTableOffset": "0xd6f5d0",
+      "indexEntryBytes": 2,
+      "counterOffset": "0xd705c0",
+      "highWaterOffset": "0xd705c4"
+    },
+    {
+      "name": "companion_2c8_A",
+      "missionOffset": "0xd705c8",
+      "elementStride": "0x2c8",
+      "capacity": 2040,
+      "indexTableOffset": "0xed2f88",
+      "indexEntryBytes": 2,
+      "counterOffset": "0xed3f78",
+      "highWaterOffset": "0xed3f7c"
+    },
+    {
+      "name": "companion_2c8_B",
+      "missionOffset": "0xed3f80",
+      "elementStride": "0x2c8",
+      "capacity": 2040,
+      "indexTableOffset": "0x1036940",
+      "indexEntryBytes": 2,
+      "counterOffset": "0x1037930",
+      "highWaterOffset": "0x1037934"
+    }
+  ],
+  "evidence": {
+    "nativeCreateAgent": "ev_d295d56ae8ee7dfcd255a740e452d45ec2effe18812dc4f32ff8ca7d04dba0be",
+    "nativeSpawn": "ev_dfb98378f137f5a33808202322c0990689820bc73324d52f1132fedd0276b4c1",
+    "poolAllocator": "ev_40b75526055e785b6b865134dbd598c15e9b9549c22360d518174118fa2d645e",
+    "poolAllocatorAssembly": "ev_dadb798639bc4607d3de99e6f6ce234bb5dcbf84a07fc3a21467001b4e6fe7c0",
+    "poolConstructor": "ev_4f5a59b459d9bd42134b6a04526426703562592a98e3d1f1edd0933abc3765fd",
+    "poolConstructorAssembly": "ev_e4f7d53e6dc6ea77537b85cdb5412b08461175600d9b1d57cba97e37a49979fa",
+    "missionConstructor": "ev_90ad9a7baaa3b0f2b80f3df4f7faf4fd00d4e014b70c5a6efcac40c6ec88ffa5",
+    "missionDestructor": "ev_2e66addcbd3fa6ed8bd4b88142627b8176f1a14d22220b5e8e84944c290aaa07",
+    "missionAllocation": "ev_22457a00f574250a4f77bb1a03ae850dfcf64c14a88bfd5d4a36241c7166bb98",
+    "gpuBoneBufferGrowth": "ev_70bee16fde214426269422c1c8d2c3b42f8f277216b81ea4fd32de4903af0194",
+    "gpuSkinningPass": "ev_61644414f0a0313a0fbfb07d605503667e5168477a8124c354d4a9c4e67872a3"
+  },
+  "observations": [
+    "Agent allocator0x1805d8020 scans slots0..2039 and returns0xffffffff if exhausted. Assembly compare at0x1805d8044 is CMP EBX,0x7f8.",
+    "Agent address is Mission+0x2d50+index*0xc60, independently confirmed in native callback assembly.",
+    "Constructor0x1805d8220 constructs2040 agents and initializes2040 signed-short index entries. Mission constructor calls it twice; second pool role unresolved.",
+    "Slot2040 would begin exactly at the first pool index table, Mission+0x62ca50. Raising only bounds would therefore corrupt live mission bookkeeping.",
+    "Three companion pools indexed by the same agent index are used by spawn, with strides0x230,0x2c8,0x2c8. Constructors and update helpers use2040 counts.",
+    "Inspected GPU bone-buffer update recreates undersized buffers and rounds allocations to chunks (8192-bone grouping for one buffer and2048 entries for other buffers). These local chunk sizes are not evidence of a2048-soldier maximum.",
+    "GPU skinning pass batches at most512 items per dispatch, advances through paged2048-entry storage and repeats. A per-dispatch batch is not the total scene capacity."
+  ],
+  "requiredForLargerFullAgentPool": [
+    "Change mission allocation/layout and both agent pool construction/destruction paths together.",
+    "Replace or redirect all baked base+index*stride accesses, not just CreateAgent or the maximum getter.",
+    "Resize all companion pools and index tables, and update count limits and2041 sentinels. Audit signed-short capacity before selecting larger limits.",
+    "Preserve all native pointers retained by managed Agent objects for their full lifetimes.",
+    "Audit iteration, job partitions, collision, AI, removal/deletion, serialization and multiplayer11-bit IDs before claiming working capacity."
+  ],
+  "separateVisibleArmyRoute": [
+    "Keep combat Agent pool bounded; own stable soldier identities and formation state outside it.",
+    "Use an independent crowd renderer with shared mesh/pose resources and bounded per-frame work. Existing AgentVisuals creation is a seam, but the current high-count probe stalls and has not validated this implementation.",
+    "Retain near-agent promotion/demotion and account for every soldier exactly once."
+  ],
+  "unknowns": [
+    "Cause of visual-only probe stall after2344 creations; no failing native stack has been captured.",
+    "Complete native reference inventory and verified ABIs for a safe hook implementation.",
+    "Complete renderer capacity/resource lifetime audit; inspected dynamic buffers do not prove unlimited rendering.",
+    "Production performance, campaign outcomes and a working limit-raising patch."
+  ],
+  "corrections": [
+    "Second agent pool base corrected from0x62da48 to0x62da50: original pseudocode param_1+0xc5b4a uses8-byte elements. Exact instruction0x1805ce476 LEA RCX,[RBX+0x62da50] independently confirms8-byte alignment gap afterprimarypool. Its table/count/highwater follow at0xc57750/0xc58740/0xc58744."
+  ]
+}

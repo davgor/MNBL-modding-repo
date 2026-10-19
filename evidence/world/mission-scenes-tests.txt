@@ -1,0 +1,36 @@
+ok    catalogue: the installed battle and conversation tables are the catalogue's sources; the battle table hash is the one MMR-60 recorded in game (3aa0154c...), and the inventory hash (forest density, ground) is the catalogue's (d592b24e967c)
+ok    catalogue: all 370 battle, conversation and location scenes are installed (NavalDLC 67, SandBox 124, SandBoxCore 179), in allowed modules; 40 sampled scene files hash as inventoried
+ok    catalogue: every installed seaborne-raid scene's landing and jumping points are visible in its naval_raid level (per-entity level inventory)
+ok    fieldBattle/navalBattle: every installed battle scene has spawn paths for the patch placement (96 land, 30 naval; min 1)
+ok    contracts: every installed prototype meets its kind's contracts: town and castle centers have level_1..3 with siege at each wall level and a lord's hall with siege, port towns a port scene, coastal villages a seaborne-raid village_center (naval_raid, landing and jumping points), hideouts level_1/level_2, spawnpoint_player and CommonAreaMarker areas
+ok    contracts: every culture with fiefs has coastal village prototypes, so a harbour village always draws from raid-capable prototypes (aserai, battania, empire, khuzait, nord, sturgia, vlandia)
+ok    contracts refuse: a battle scene as a wall level 2 center (no level_2, no siege), no lord's hall, a port town without a port scene, an inland village scene for a harbour village (no naval_raid), a village scene as a hideout, a scene that is not installed, a lord's hall with no scene at wall level 3 (GetSceneName falls back to an empty level 0)
+ok    cells: grassland, forest, desert, marsh, snow, tundra, rock, coasts, open sea, shelf, river, bridge, ford, lake shore, river mouth and blocked mountain each get an index the engine resolves to exactly one land scene (where land was sampled) of the class's terrain, and exactly one naval scene per sea terrain under the party
+ok    woodland: a forest biome takes a Plain scene of high forest density (battle_terrain_001, High)
+ok    fallback: a desert coast with no Desert + coast index installed falls back to Steppe, then Plain, never to another class's terrain (battle_terrain_biome_044, Steppe, tier fallback Steppe land + own sea)
+ok    rock: exposed rock takes a scene with Mountain or Canyon ground (the installed ones are Plain: battle_terrain_020)
+ok    desert and marsh take Desert and Swamp scenes (battle_terrain_008, battle_terrain_005)
+ok    crossings: a ship under a bridge gets an UnderBridge scene and a ship on a river a River scene (river_bt_empireEast_01_4x4km, river_bt_vlandia_02_4x4km); MMR-60's map never selected either
+ok    lake: no naval scene is a Lake's own, so the index names one naval scene only, a CoastalSea one (battle_terrain_coastal_caspian_sea_02, tier class land + own sea)
+ok    relief: a mountain ridge takes a scene with mountain ground (battle_terrain_020) and a valley one with river or water ground (battle_terrain_021), within the open class
+ok    settlements: a gate cell and a port cell take indices every naval-valid terrain (Lake, Water, River, CoastalSea, OpenSea, LandRestriction, SeaRestriction, UnderBridge) resolves, so a naval map event at a settlement read on land is still deterministic (13, 117; 28 such indices installed)
+ok    cells: all 247 combinations of 13 biomes, 10 sea terrain sets and land present or not resolve deterministically
+ok    coasts: 66 installed indices resolve both a land battle and a CoastalSea or OpenSea naval battle deterministically through the engine's terrain tie-break (MMR-60 used only the 8 indices naming exactly one naval scene)
+ok    A: the periodic strip and width are whole battle-map cells (400 cells of 4; strip 100, period 200), as the in-game builder requires
+ok    A: every one of 5548 cells with land resolves one land scene and every one of 16076 (cell, sea terrain) pairs one naval scene (15692 of the sea terrain itself) in 1.8 s
+ok    A: representative geography: biomes boreal_forest 92, cold_tundra 2965, desert 1438, exposed_rock 153, forest 513, grassland 237, lake 80, land_ice 562, ocean 73715, rainforest 245 -> classes cold 3527, desert 1438, open 74032, rock 153, woodland 850; 79673 of 80000 canonical cells take their class's preferred scenes
+ok    A: dense check: 678457 land and sea party points (6 x 6 per cell) all resolve deterministically through the engine's rule for their cell's index
+ok    A: the 1661 cells around the 292 settlements take naval-robust indices; 1013 cells take relief-preferred scenes (landforms Mountain / ridge 2299, Plain / hillside 2514, Submerged 73715, Valley 1472)
+ok    A: canonical patch sampling: every strip cell holds its canonical cell's bytes and a 16-cell block starts at the seam column 100
+ok    A: a seam-adjacent pair (attacker 0.3 before the seam, defender 0.2 after it): the attacker's position and its other image read the same patch (index 222), and the encounter direction is the short way through the seam (-1, PeriodicWorldCoordinates.DeltaX -0.5; planar would be 1)
+ok    B: the periodic strip and width are whole battle-map cells (400 cells of 4; strip 100, period 200), as the in-game builder requires
+ok    B: every one of 10591 cells with land resolves one land scene and every one of 12172 (cell, sea terrain) pairs one naval scene (10060 of the sea terrain itself) in 2.8 s
+ok    B: representative geography: biomes boreal_forest 292, cold_tundra 4474, desert 3114, exposed_rock 63, forest 624, grassland 475, lake 2048, land_ice 61970, marsh 20, ocean 6717, rainforest 203 -> classes cold 66444, desert 3114, open 9240, rock 63, wetland 20, woodland 1119; 79039 of 80000 canonical cells take their class's preferred scenes
+ok    B: dense check: 682478 land and sea party points (6 x 6 per cell) all resolve deterministically through the engine's rule for their cell's index
+ok    B: the 2460 cells around the 411 settlements take naval-robust indices; 1706 cells take relief-preferred scenes (landforms Mountain / ridge 3171, Plain / hillside 35629, Submerged 7977, Valley 33223)
+ok    B: canonical patch sampling: every strip cell holds its canonical cell's bytes and a 16-cell block starts at the seam column 100
+ok    B: a seam-adjacent pair (attacker 0.3 before the seam, defender 0.2 after it): the attacker's position and its other image read the same patch (index 9), and the encounter direction is the short way through the seam (-1, PeriodicWorldCoordinates.DeltaX -0.5; planar would be 1)
+ok    conversations: GetConversationSceneForMapPosition's rule on the generated terrains: Plain and the sea terrains have conversation scenes of their own; Bridge and UnderBridge are not counted (the dominant counted terrain around them decides)
+ok    seam fixture (80 x 16 cells, strip 20, period 40): every cell equals all its images, the first canonical column and its east image read the same patch with x = 0 (a block starts at the seam), and a seam-adjacent attacker and defender get the short-way direction (-0.447, -0.894)
+ok    mismatch: index 0 (no generated map: Calradia indexing would be silent), an index that resolves randomly (46 naval on CoastalSea: two scenes), an opened scene other than the patch's and an index no scene lists are each flagged; the patch's own scene agrees
+35/35 checks passed

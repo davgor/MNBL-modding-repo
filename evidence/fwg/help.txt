@@ -1,0 +1,94 @@
+fwg -- fantasy world generator
+
+usage:
+  fwg [--terse-errors] generate [options]
+  fwg registry            dump the civilization registry as JSON
+  fwg materialize --stage N [-o PATH] DOCUMENT
+                          rebuild the world at stage N from a document written
+                          with --include-build-stages (compact JSON)
+  fwg asset-list --output PATH
+                          compile the exhaustive potential-state asset list
+  fwg capabilities [--version N] --output PATH
+                          export the capability descriptor (version 1)
+  fwg controls [--group G] [--name N]... [--query TEXT] [--include-pinned]
+               [--output PATH]
+                          describe the generator controls without generating;
+                          open controls only unless --include-pinned
+  fwg patch --request PATH [--latitude DEG] [--longitude DEG] [--span M]
+            [--spacing M] [--detail-height M] [--detail-scale M] [--output PATH]
+                          regenerate the world a request file describes and cut a
+                          local patch of ground from it: a metre mesh around one
+                          point, as the fwg.patch document (compact JSON). Defaults
+                          0, 0, 64 m, 0.5 m, 0.4 m, 8 m; a refusal is printed as
+                          for generate --request
+  fwg weather --request PATH [--day D] [--latitude DEG --longitude DEG]
+              [--hours N] [--output PATH]
+                          regenerate the world a request file describes and read
+                          its weather hour by hour for N hours (default 1) from
+                          day D (real days since founding year 0; default the
+                          world's clock): each hour's storm systems and, given a
+                          place, its intensity, cloud, wind and summer percentage
+                          then, as the fwg.weather document (compact JSON). A
+                          refused day or place is printed as a failure document,
+                          exit 2
+
+--terse-errors          a refused request's JSON envelope carries only code,
+                        message and field, not received/expected/suggestion
+
+generate options:
+  --request PATH        a JSON request {"seed", "recipe_version", "overrides"},
+                        overrides keyed by published control name (see
+                        `fwg controls`); cannot be combined with the flags below
+                        that shape the world. A refusal is printed to stdout as a
+                        fantasy-world-generator.failure document; exit 2.
+  --seed N              master seed (default 42)
+  --size N              grid cells along one edge, odd, 3..1025 (default 129)
+  --phase N             stop after stage N, 1..16 (default 16; see below)
+  --world-size NAME     small | medium | large (default small)
+  --circumference-km X  authored world width; overrides --world-size
+  --relief-m X          authored relief budget (default 1667)
+  --plates N            plate count (default 12)
+  --erosion-passes N    0..40 (default 6)
+  --erosion-strength X  0..1 (default 0.5)
+  --sea-level X         design-space datum (default 0)
+  --magic-enabled N     0 leaves every ley network unmanifested (default 1)
+  --settlement-count N  maximum surface cities; 0 for an empty world
+  --population-profile  a civilization id, or "mixed" for all of them (default)
+  --option NAME=VALUE   set one of the 164 world options by its published name;
+                        repeatable. `fwg registry` lists them.
+  -o, --out, --output PATH
+                        write JSON here (default stdout); the destination is
+                        checked before a world is spent on it
+  --split DIR           write the world as a directory a game reads in parts:
+                        world.json without the plans and the world scene, one
+                        file per plan under plans/, the scene as scene.json;
+                        each catalogue once. DIR must be new or empty
+  --pretty              indent the document for reading; interchange output
+                        is compact by default, as the reference's is
+  --compact             one-line JSON (the default; kept for old scripts)
+  --timings, --include-timings
+                        include wall-clock timings in the document; off by
+                        default so two runs of one seed are byte-identical
+  --include-build-stages
+                        embed the stage inspector's per-stage snapshots as
+                        `build_stages` (several times the document's size)
+  --threads N           worker threads for the stage-16 planners: 0 is every
+                        hardware thread, 1 is serial (default: FWG_THREADS,
+                        else 0). Not part of the world: the document is
+                        byte-identical at every count
+  --quiet               no progress on stderr
+  -h, --help            this text
+
+the sixteen-stage ladder:
+  1  plate layout                 9  leylines, astrology, ecology,
+  2  hypsometric surface            biome variants
+  3  surface detail              10  founding: cities
+  4  erosion                     11  roads
+  5  land mask, water            12  populated regions
+  6  tectonic transition         13  nests, beasts, religion
+  7  relic carving               14  an age turns: wars, fates,
+  8  climate, biomes                 ruins, villains, rebuilding
+                                 15  the second, final age turn
+                                 16  plans, bands, heroes, NPCs,
+                                     key locations
+See docs/porting-status.md.

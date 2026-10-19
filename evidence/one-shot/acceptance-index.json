@@ -1,0 +1,2579 @@
+{
+ "schema": "mnbl.one-shot-acceptance-index",
+ "version": 1,
+ "ticket": "MMR-58",
+ "epic": "ep_01m4fpnf646t254mnh69jhz107",
+ "note": "The local test package is not release-certified. Statuses: pass (the aspect's stated scope is evidenced and passes; what the criterion needs beyond that scope is its own not-run aspect), fail (an observed or recorded correctness failure), blocked (cannot be exercised because of a recorded failure or an unsupported capability), not-run (no evidence yet). A criterion is fail if any aspect fails, otherwise blocked if any is blocked, otherwise not-run if any has not run, otherwise pass. An aspect is graded when the criterion's text or the one-shot scenario it names asks for it; play the criterion does not name and that no run exercised is listed under the criterion's notExercised, ungraded. Deferred certification is listed once, under deferredCertification, and is not part of any criterion's status. Built by tools/build_acceptance_index.py; MMR-1 adds the final scenario.",
+ "summary": {
+  "s1": "pass",
+  "s2": "pass",
+  "s3": "pass",
+  "s4": "pass",
+  "s5": "pass",
+  "s6": "pass",
+  "s7": "pass"
+ },
+ "criteria": [
+  {
+   "id": "s1",
+   "text": "A pinned FWGC++ build and version-matched Bannerlord/Modding Kit/War Sails setup are reproducibly identified and verified; the existing stale generator binary is not accepted as installation evidence.",
+   "status": "pass",
+   "aspects": [
+    {
+     "aspect": "the producer is pinned and its build verified",
+     "status": "pass",
+     "evidence": [
+      {
+       "path": "tools.lock.json",
+       "sha256": "b4534a8a892fa23decba4b3f4051699efc9ed4329b28776b8d3e4df03dd17548",
+       "trackedByGit": true,
+       "recorded": null
+      },
+      {
+       "path": "worldgen/producer.lock.json",
+       "sha256": "a374affb43f1ec0621fc885218a9232bea356ed7bfd82917115096bc44dcb824",
+       "trackedByGit": true,
+       "recorded": null
+      },
+      {
+       "path": "evidence/fwg/build.log",
+       "sha256": "76b3921b9f362be5898a3feb00d579454b811bd79c739c000392934908ed600c",
+       "trackedByGit": true,
+       "recorded": null
+      },
+      {
+       "path": "evidence/fwg/ctest.log",
+       "sha256": "8950f902ff14a5afb52951006f8b683cd053ec07c011a9fea0a876b7dbc0d881",
+       "trackedByGit": true,
+       "recorded": null
+      },
+      {
+       "path": "evidence/fwg/producer-verification.json",
+       "sha256": "c723a6d2158962f6b55cfc9e81ebd8f627238c8ea330cbf8f563368c81528af2",
+       "trackedByGit": true,
+       "recorded": null
+      },
+      {
+       "path": "evidence/fwg/producer-process-contract.json",
+       "sha256": "dc497106d51c1d7367883c63024265bb648196300f8aad3bf2e0fb93f3285f23",
+       "trackedByGit": true,
+       "recorded": {
+        "passed": true,
+        "results.preflight.passed": true,
+        "utc": "2026-10-19T22:20:56.8276663Z"
+       }
+      }
+     ],
+     "note": "fwg.exe 564c2629... from FWGC++ commit ec5d1c10; CTest 5/5; MMR-22 22/22 lock and process checks. tests/check_producer_lock.py re-checks the lock, the binary and the FWGC++ checkout. Whether a fresh build reproduces the pinned bytes is not shown; tools/Build-Fwg.ps1 does not check out the pinned commit."
+    },
+    {
+     "aspect": "the stale generator binary is not accepted",
+     "status": "pass",
+     "evidence": [
+      {
+       "path": "evidence/fwg/supervisor-tests.log",
+       "sha256": "5f14d3a9da99110bb9c70fa302f10706af3a993e001b35aa1893f2c56e005bd2",
+       "trackedByGit": true,
+       "recorded": null
+      },
+      {
+       "path": "evidence/fwg/producer-process-contract.json",
+       "sha256": "dc497106d51c1d7367883c63024265bb648196300f8aad3bf2e0fb93f3285f23",
+       "trackedByGit": true,
+       "recorded": {
+        "passed": true,
+        "results.preflight.passed": true,
+        "utc": "2026-10-19T22:20:56.8276663Z"
+       }
+      }
+     ],
+     "note": "Any binary other than the pin is refused before launch (pin_mismatch), by the deploy, the package and the module itself. The stale binary in the FWGC++ tree (generator/build/apps/Release/fwg.exe) hashes 5867006c40876b4c..., not the pin (hashed by this audit, 2026-10-18)."
+    },
+    {
+     "aspect": "the game and War Sails versions are identified and pinned",
+     "status": "pass",
+     "evidence": [
+      {
+       "path": "evidence/baseline/environment.json",
+       "sha256": "bc918117e89d59f56ad1a6a64d58c70bb29fcab4fb0f550838dca264e8bb708c",
+       "trackedByGit": true,
+       "recorded": {
+        "failures": 0
+       }
+      },
+      {
+       "path": "config/runtime-api-lock.json",
+       "sha256": "4af34d297c89a4d377861e5b18e558cf4b00cd5c11bd885920833618bb71d211",
+       "trackedByGit": true,
+       "recorded": null
+      },
+      {
+       "path": "evidence/runtime/build-api-inputs.json",
+       "sha256": "c454680a9e363736fa11b09ae61b18f1b72fdb98daa32d9e057ae0b45dfc3ba3",
+       "trackedByGit": true,
+       "recorded": {
+        "status": "built",
+        "utc": "2026-10-19T22:26:34.9749561Z"
+       }
+      },
+      {
+       "path": "evidence/baseline/doctor-tests.log",
+       "sha256": "ea4854ef21d55f2a8bc2e292089c4217a645063574273a49f17fdc0deaa04610",
+       "trackedByGit": true,
+       "recorded": null
+      }
+     ],
+     "note": "Bannerlord v1.4.8.119303 and War Sails v1.2.8.119303; 25 assemblies (18 game, 6 framework, Harmony) and 6 descriptors pinned by SHA-256; build and deploy refuse other inputs. The final one-shot run recorded the same versions and the package's module, fwg.exe and worldbridge.exe hashes."
+    },
+    {
+     "aspect": "the Modding Kit is identified",
+     "status": "pass",
+     "evidence": [
+      {
+       "path": "evidence/baseline/editor-inspection-19324.json",
+       "sha256": "05973fd375bf832cea8facaddd11d6f8b005c473ac7d6ab6a2eaa43d5a8456c1",
+       "trackedByGit": true,
+       "recorded": null
+      },
+      {
+       "path": "evidence/baseline/editor-prerequisite-gap.json",
+       "sha256": "4efc3b0806d26a62117e978449234453da6a010bfbe735519fa89a700c7b4293",
+       "trackedByGit": true,
+       "recorded": {
+        "resolution.status": "resolved"
+       }
+      }
+     ],
+     "note": "Identified by its Steam depot 4456490 and manifest 1015157637537524692 and one editor session that opened and rendered the War Sails map (2026-10-13; the record is an inspection, so it says ticketAccepted false). No build or player step uses it. Not re-checked since."
+    },
+    {
+     "aspect": "generation is reproducible",
+     "status": "pass",
+     "evidence": [
+      {
+       "path": "evidence/fwg/generation-identity.json",
+       "sha256": "1f361b99849d4c699f7135db3f4d306227839b9f6428df838019fd5ab04c0e68",
+       "trackedByGit": true,
+       "recorded": {
+        "results.c1.passed": true,
+        "results.c3.passed": true,
+        "results.c2.passed": true,
+        "results.c4.passed": true,
+        "results.bindings.passed": true,
+        "results.newRequest.passed": true,
+        "results.nonAscii.passed": true,
+        "results.frozen.status": "accepted",
+        "results.frozen.passed": true,
+        "results.statePaths.passed": true,
+        "passed": true,
+        "utc": "2026-10-14T02:16:46.4945809Z"
+       }
+      },
+      {
+       "path": "evidence/fwg/source-reader.json",
+       "sha256": "4de8a5bf276c449b4fe6d5f35f9660d8eb985f924b3a29294ac0bb46cd40d0eb",
+       "trackedByGit": true,
+       "recorded": {
+        "passed": true,
+        "utc": "2026-10-19T22:22:52.4094984Z"
+       }
+      },
+      {
+       "path": "evidence/world/seed-yield.json",
+       "sha256": "40b35cb0ba55c40c3c662184aad281a93fd732903245c4411312a74feaa4a2dd",
+       "trackedByGit": true,
+       "recorded": null
+      }
+     ],
+     "note": "MMR-24 75/75 identity and retry checks; MMR-23 120/120 source contract checks (re-run 2026-10-19). The shipped worldbridge (2bfdbb9d...) republished all 19 accepted bundles of the 2026-10-19 seed sweep byte for byte (seed-yield.json reproduced), worlds A and B with their content ids f596b58c... and f63c6841... unchanged."
+    },
+    {
+     "aspect": "the producer's pinned runtime matches this installation",
+     "status": "pass",
+     "evidence": [
+      {
+       "path": "evidence/fwg/producer-process-contract.json",
+       "sha256": "dc497106d51c1d7367883c63024265bb648196300f8aad3bf2e0fb93f3285f23",
+       "trackedByGit": true,
+       "recorded": {
+        "passed": true,
+        "results.preflight.passed": true,
+        "utc": "2026-10-19T22:20:56.8276663Z"
+       }
+      },
+      {
+       "path": "evidence/one-shot/ucrt-drift.json",
+       "sha256": "0f701d8253a868a67e08e461d854c96984f3b18573f866e8415dbb820dc7fc54",
+       "trackedByGit": true,
+       "recorded": {
+        "preflight.passed": false
+       }
+      },
+      {
+       "path": "evidence/one-shot/offline-suites.json",
+       "sha256": "c4efbd4223269fab65ff92748f82f5ef6483644242793019498535c13efd3ee0",
+       "trackedByGit": true,
+       "recorded": {
+        "passed": 46,
+        "total": 46,
+        "suites.Test-ApiPins.passed": true,
+        "suites.Test-Activation.passed": true,
+        "suites.Test-GenerationJob.passed": true,
+        "suites.Test-EarlyBinding.passed": true,
+        "suites.Test-SaveBinding.passed": true,
+        "suites.Test-WorldLoader.passed": true,
+        "suites.Test-AutorunCleanup.passed": true,
+        "suites.Test-Heightfield.passed": true,
+        "suites.Test-GeneratedCampaignDataset.passed": true,
+        "suites.Test-Doctor.passed": true,
+        "suites.Test-Deployment.passed": true,
+        "suites.Test-CampaignRegistry.passed": true,
+        "suites.Test-Characters.passed": true,
+        "suites.Test-Factions.passed": true,
+        "suites.Test-Settlements.passed": true,
+        "suites.Test-SpawnPolicy.passed": true,
+        "suites.Test-NavalContent.passed": true,
+        "suites.Test-CompiledWorld.passed": true,
+        "suites.Test-Compatibility.passed": true,
+        "suites.Test-PeriodicCoordinates.passed": true,
+        "suites.Test-WaterClimate.passed": true,
+        "suites.Test-WorldDataBundle.passed": true,
+        "suites.Test-GraphValidation.passed": true,
+        "suites.Test-EncounterResolver.passed": true,
+        "suites.Test-Playability.passed": true,
+        "suites.Test-SettlementPlacement.passed": true,
+        "suites.Test-WorldNavigation.passed": true,
+        "suites.Test-WorldPreview.passed": true,
+        "suites.Test-WorldSetup.passed": true,
+        "suites.Test-WorldSurface.passed": true,
+        "suites.Test-Recovery.passed": true,
+        "suites.Test-GenerationProbe.passed": true,
+        "suites.Test-ProducerProcess.passed": true,
+        "suites.Test-SourceReader.passed": true,
+        "suites.Test-TravelGate.passed": true,
+        "suites.Test-WorldBridgeSurface.passed": true,
+        "suites.Test-PackagePaths.passed": true,
+        "suites.Test-CampaignSoak.passed": true,
+        "suites.Test-LandMissions.passed": true,
+        "suites.Test-NavalMissions.passed": true,
+        "suites.ci unit tests.passed": true,
+        "suites.mods.py check.passed": true,
+        "suites.producer lock.passed": true,
+        "suites.source reader.passed": true,
+        "suites.terrain.bin.passed": true,
+        "suites.navmesh.bin.passed": true,
+        "utc": "2026-10-19T22:25:10.9014302Z"
+       }
+      }
+     ],
+     "note": "A Windows update (KB5127647/KB5127648, 2026-10-13/14) replaced C:\\Windows\\System32\\ucrtbase.dll after the pin; the UCRT pin in worldgen/producer.lock.json was renewed to the installed dedb7611... on 2026-10-19 (fix the failures: the owner's instruction). The producer process contract's preflight passes again (Test-ProducerProcess in the offline suites). The producer lock is not a world input inside the bundle, so no world content id changed."
+    }
+   ],
+   "notExercised": []
+  },
+  {
+   "id": "s2",
+   "text": "Bannerlord's New Campaign flow generates a fresh chosen-seed world locally with progress/cancel/error handling, without a player running an external editor, publishing a module or restarting the game.",
+   "status": "pass",
+   "aspects": [
+    {
+     "aspect": "New Procedural Campaign entry and setup screen",
+     "status": "pass",
+     "evidence": [
+      {
+       "path": "evidence/runtime/world-setup.json",
+       "sha256": "e2aac0bafaf1ccfb6547db749254ca2eb9017821fea839caa28faad8a6d968ac",
+       "trackedByGit": true,
+       "recorded": {
+        "offline.checks": 20,
+        "offline.failures": 0,
+        "budget.status": "provisional",
+        "checks": 19,
+        "passed": true
+       }
+      },
+      {
+       "path": "evidence/runtime/world-setup-tests.json",
+       "sha256": "780023992cee33bd18757647a1352e0c01dea89d266f56d20c4aae91d289d069",
+       "trackedByGit": true,
+       "recorded": {
+        "checks": 29,
+        "failures": 0
+       }
+      }
+     ],
+     "note": "MMR-43 run 13032 19/19; 29 offline checks."
+    },
+    {
+     "aspect": "the generation job: progress, cancel and errors, in the running game",
+     "status": "pass",
+     "evidence": [
+      {
+       "path": "evidence/generation/generation-job.json",
+       "sha256": "d5d1f308fa18bac93e3d0d0f98171196daf4701b94934410f6d803b32afea018",
+       "trackedByGit": true,
+       "recorded": {
+        "offline.checks": 17,
+        "offline.failures": 0,
+        "checks": 17,
+        "passed": true
+       }
+      },
+      {
+       "path": "evidence/generation/job-state-machine-tests.json",
+       "sha256": "e203ff24cf404dcbfb2e2088194324c31e2587d247c3aca90b39c53829953722",
+       "trackedByGit": true,
+       "recorded": {
+        "checks": 19,
+        "failures": 0
+       }
+      },
+      {
+       "path": "evidence/one-shot/one-shot-run.json",
+       "sha256": "3b0b3927da260d26a0bac5060bc3b3ba67a3c115fdbfac054b8cb1706d8a4895",
+       "trackedByGit": true,
+       "recorded": {
+        "status": "pass",
+        "runs.step1 profile.status": "ok",
+        "runs.step1 profile.ok": true,
+        "runs.step1 profile.failures": 0,
+        "runs.step1 profile.result": "evidence/runtime/in-game/first_test_profile-23852.json",
+        "runs.step1 identities.status": "ok",
+        "runs.step1 identities.ok": true,
+        "runs.step1 identities.failures": 0,
+        "runs.step1 identities.result": "evidence/runtime/in-game/new_campaign_flow-35592.json",
+        "runs.step3 prepare.status": "ok",
+        "runs.step3 prepare.ok": true,
+        "runs.step3 prepare.failures": 0,
+        "runs.step3 prepare.result": "evidence/runtime/in-game/land_missions-46848.json",
+        "runs.step3 naval.status": "ok",
+        "runs.step3 naval.ok": true,
+        "runs.step3 naval.failures": 0,
+        "runs.step3 naval.result": "evidence/runtime/in-game/naval_missions-51924.json",
+        "runs.step2 land.status": "ok",
+        "runs.step2 land.ok": true,
+        "runs.step2 land.failures": 0,
+        "runs.step2 land.result": "evidence/runtime/in-game/land_missions-52204.json",
+        "runs.step2 visit.status": "ok",
+        "runs.step2 visit.ok": true,
+        "runs.step2 visit.failures": 0,
+        "runs.step2 visit.result": "evidence/runtime/in-game/campaign_soak-7156.json",
+        "runs.step4-5 create.status": "ok",
+        "runs.step4-5 create.ok": true,
+        "runs.step4-5 create.failures": 0,
+        "runs.step4-5 create.result": "evidence/runtime/in-game/two_world_matrix-54052.json",
+        "runs.step5 cold.status": "ok",
+        "runs.step5 cold.ok": true,
+        "runs.step5 cold.failures": 0,
+        "runs.step5 cold.result": "evidence/runtime/in-game/two_world_matrix-30068.json",
+        "runs.step4 seam.status": "ok",
+        "runs.step4 seam.ok": true,
+        "runs.step4 seam.failures": 0,
+        "runs.step4 seam.result": "evidence/runtime/in-game/seam_presentation-54116.json",
+        "runs.step6 refusals.status": "ok",
+        "runs.step6 refusals.ok": true,
+        "runs.step6 refusals.failures": 0,
+        "runs.step6 refusals.result": "evidence/runtime/in-game/compat_matrix-36200.json",
+        "finishedUtc": "2026-10-19T20:31:49.7366639Z"
+       }
+      }
+     ],
+     "note": "MMR-44 run 21316 17/17: cancel in 4 phases, a killed producer gives generate.crashed, largest frame gap 0.407 s. The final one-shot run cancelled a generation through the setup screen (step 6) and generated seed 43's world (step 1). No external editor, module publishing or restart."
+    },
+    {
+     "aspect": "preview, regeneration and Start Campaign",
+     "status": "pass",
+     "evidence": [
+      {
+       "path": "evidence/ui/new-campaign-flow/new-campaign-flow.json",
+       "sha256": "c20191c97edc76bc8045e1660dda96f62976f80fd654fac43bd734334b3abbc7",
+       "trackedByGit": true,
+       "recorded": {
+        "accepted.result": "evidence/runtime/in-game/new_campaign_flow-50304.json",
+        "accepted.status": "ok",
+        "accepted.failures": 0,
+        "accepted.checks": 16,
+        "accepted.passed": 16,
+        "accepted.total": 16
+       }
+      },
+      {
+       "path": "evidence/ui/new-campaign-flow/world-preview-tests.json",
+       "sha256": "01669a0ef5e614f9405a2a6b54b084b2030bc26cfb8f7c6deebdb08794bfde60",
+       "trackedByGit": true,
+       "recorded": {
+        "checks": 16,
+        "failures": 0
+       }
+      },
+      {
+       "path": "evidence/generation/activation-matrix.json",
+       "sha256": "a5b0a83e9af1e8ed842a25c6918683dc464960d2e7739f756f0acc70916db673",
+       "trackedByGit": true,
+       "recorded": {
+        "offline.checks": 240,
+        "offline.failures": 0,
+        "compiled.checks": 8,
+        "compiled.failures": 0,
+        "commit.run.status": "ok",
+        "commit.gameplay.failures": 0,
+        "checks": 15,
+        "passed": true
+       }
+      },
+      {
+       "path": "evidence/one-shot/one-shot-run.json",
+       "sha256": "3b0b3927da260d26a0bac5060bc3b3ba67a3c115fdbfac054b8cb1706d8a4895",
+       "trackedByGit": true,
+       "recorded": {
+        "status": "pass",
+        "runs.step1 profile.status": "ok",
+        "runs.step1 profile.ok": true,
+        "runs.step1 profile.failures": 0,
+        "runs.step1 profile.result": "evidence/runtime/in-game/first_test_profile-23852.json",
+        "runs.step1 identities.status": "ok",
+        "runs.step1 identities.ok": true,
+        "runs.step1 identities.failures": 0,
+        "runs.step1 identities.result": "evidence/runtime/in-game/new_campaign_flow-35592.json",
+        "runs.step3 prepare.status": "ok",
+        "runs.step3 prepare.ok": true,
+        "runs.step3 prepare.failures": 0,
+        "runs.step3 prepare.result": "evidence/runtime/in-game/land_missions-46848.json",
+        "runs.step3 naval.status": "ok",
+        "runs.step3 naval.ok": true,
+        "runs.step3 naval.failures": 0,
+        "runs.step3 naval.result": "evidence/runtime/in-game/naval_missions-51924.json",
+        "runs.step2 land.status": "ok",
+        "runs.step2 land.ok": true,
+        "runs.step2 land.failures": 0,
+        "runs.step2 land.result": "evidence/runtime/in-game/land_missions-52204.json",
+        "runs.step2 visit.status": "ok",
+        "runs.step2 visit.ok": true,
+        "runs.step2 visit.failures": 0,
+        "runs.step2 visit.result": "evidence/runtime/in-game/campaign_soak-7156.json",
+        "runs.step4-5 create.status": "ok",
+        "runs.step4-5 create.ok": true,
+        "runs.step4-5 create.failures": 0,
+        "runs.step4-5 create.result": "evidence/runtime/in-game/two_world_matrix-54052.json",
+        "runs.step5 cold.status": "ok",
+        "runs.step5 cold.ok": true,
+        "runs.step5 cold.failures": 0,
+        "runs.step5 cold.result": "evidence/runtime/in-game/two_world_matrix-30068.json",
+        "runs.step4 seam.status": "ok",
+        "runs.step4 seam.ok": true,
+        "runs.step4 seam.failures": 0,
+        "runs.step4 seam.result": "evidence/runtime/in-game/seam_presentation-54116.json",
+        "runs.step6 refusals.status": "ok",
+        "runs.step6 refusals.ok": true,
+        "runs.step6 refusals.failures": 0,
+        "runs.step6 refusals.result": "evidence/runtime/in-game/compat_matrix-36200.json",
+        "finishedUtc": "2026-10-19T20:31:49.7366639Z"
+       }
+      }
+     ],
+     "note": "MMR-46 run 50304 16/16; MMR-45 run 43676 15/15. The final one-shot run (step 1, run 23852) generated A from the New Campaign screen in 35.0 s, finished character creation and entered the map after 395.3 s; its preview matched the live campaign (run 35592)."
+    },
+    {
+     "aspect": "an interrupted generation is recovered",
+     "status": "pass",
+     "evidence": [
+      {
+       "path": "evidence/generation/recovery/world-recovery.json",
+       "sha256": "c856f071e4a663ae5b3ac33ca467eb9f963462f1e2a9f0e7bfa23e2eb832a2cb",
+       "trackedByGit": true,
+       "recorded": {
+        "accepted.crash.result": "evidence/runtime/in-game/world_recovery-28280.json",
+        "accepted.crash.status": "running",
+        "accepted.resume.result": "evidence/runtime/in-game/world_recovery-47264.json",
+        "accepted.resume.status": "ok",
+        "accepted.resume.failures": 0,
+        "accepted.checks": 8,
+        "accepted.passed": 8,
+        "accepted.total": 8,
+        "hostProblem.result": "evidence/runtime/in-game/world_setup-41480.json",
+        "hostProblem.status": "ok",
+        "hostProblem.failures": 0,
+        "hostProblem.check.passed": true
+       }
+      },
+      {
+       "path": "evidence/generation/recovery/recovery-tests.json",
+       "sha256": "c162037c89369fc1014dc7ffffddef526b3380ab6f0c8b6d49c6eb4eb233e937",
+       "trackedByGit": true,
+       "recorded": {
+        "checks": 10,
+        "failures": 0
+       }
+      }
+     ],
+     "note": "MMR-47 crash run 28280 and resume run 47264, 8/8."
+    },
+    {
+     "aspect": "the measured first-test profile",
+     "status": "pass",
+     "evidence": [
+      {
+       "path": "worldgen/validation/first-test-measurements.json",
+       "sha256": "6cb798555d8511e82e198894da4bce53b51f092bc6dd2f02b2ba4d4f570e2a50",
+       "trackedByGit": true,
+       "recorded": {
+        "result": "evidence/runtime/in-game/first_test_profile-40412.json",
+        "status": "ok",
+        "passed": 20,
+        "total": 20,
+        "checks": 20
+       }
+      },
+      {
+       "path": "evidence/one-shot/one-shot-run.json",
+       "sha256": "3b0b3927da260d26a0bac5060bc3b3ba67a3c115fdbfac054b8cb1706d8a4895",
+       "trackedByGit": true,
+       "recorded": {
+        "status": "pass",
+        "runs.step1 profile.status": "ok",
+        "runs.step1 profile.ok": true,
+        "runs.step1 profile.failures": 0,
+        "runs.step1 profile.result": "evidence/runtime/in-game/first_test_profile-23852.json",
+        "runs.step1 identities.status": "ok",
+        "runs.step1 identities.ok": true,
+        "runs.step1 identities.failures": 0,
+        "runs.step1 identities.result": "evidence/runtime/in-game/new_campaign_flow-35592.json",
+        "runs.step3 prepare.status": "ok",
+        "runs.step3 prepare.ok": true,
+        "runs.step3 prepare.failures": 0,
+        "runs.step3 prepare.result": "evidence/runtime/in-game/land_missions-46848.json",
+        "runs.step3 naval.status": "ok",
+        "runs.step3 naval.ok": true,
+        "runs.step3 naval.failures": 0,
+        "runs.step3 naval.result": "evidence/runtime/in-game/naval_missions-51924.json",
+        "runs.step2 land.status": "ok",
+        "runs.step2 land.ok": true,
+        "runs.step2 land.failures": 0,
+        "runs.step2 land.result": "evidence/runtime/in-game/land_missions-52204.json",
+        "runs.step2 visit.status": "ok",
+        "runs.step2 visit.ok": true,
+        "runs.step2 visit.failures": 0,
+        "runs.step2 visit.result": "evidence/runtime/in-game/campaign_soak-7156.json",
+        "runs.step4-5 create.status": "ok",
+        "runs.step4-5 create.ok": true,
+        "runs.step4-5 create.failures": 0,
+        "runs.step4-5 create.result": "evidence/runtime/in-game/two_world_matrix-54052.json",
+        "runs.step5 cold.status": "ok",
+        "runs.step5 cold.ok": true,
+        "runs.step5 cold.failures": 0,
+        "runs.step5 cold.result": "evidence/runtime/in-game/two_world_matrix-30068.json",
+        "runs.step4 seam.status": "ok",
+        "runs.step4 seam.ok": true,
+        "runs.step4 seam.failures": 0,
+        "runs.step4 seam.result": "evidence/runtime/in-game/seam_presentation-54116.json",
+        "runs.step6 refusals.status": "ok",
+        "runs.step6 refusals.ok": true,
+        "runs.step6 refusals.failures": 0,
+        "runs.step6 refusals.result": "evidence/runtime/in-game/compat_matrix-36200.json",
+        "finishedUtc": "2026-10-19T20:31:49.7366639Z"
+       }
+      }
+     ],
+     "note": "MMR-56 run 35468 20/20, re-measured by the final one-shot run 23852. The first Start Campaign blocks the engine thread about 6.5 minutes while the navigation caches are built (the game does not respond); the wait text says so."
+    },
+    {
+     "aspect": "the clean package generates and starts a world",
+     "status": "pass",
+     "evidence": [
+      {
+       "path": "evidence/release/clean-install.json",
+       "sha256": "0ddbc143a5b17cf44c0b3db60d4a55857a47c7dbffaa29a4fa9f9b4672cb1897",
+       "trackedByGit": true,
+       "recorded": {
+        "passed": 27,
+        "total": 27,
+        "checks": 27,
+        "readOnly.probe.status": "ok"
+       }
+      },
+      {
+       "path": "evidence/one-shot/one-shot-run.json",
+       "sha256": "3b0b3927da260d26a0bac5060bc3b3ba67a3c115fdbfac054b8cb1706d8a4895",
+       "trackedByGit": true,
+       "recorded": {
+        "status": "pass",
+        "runs.step1 profile.status": "ok",
+        "runs.step1 profile.ok": true,
+        "runs.step1 profile.failures": 0,
+        "runs.step1 profile.result": "evidence/runtime/in-game/first_test_profile-23852.json",
+        "runs.step1 identities.status": "ok",
+        "runs.step1 identities.ok": true,
+        "runs.step1 identities.failures": 0,
+        "runs.step1 identities.result": "evidence/runtime/in-game/new_campaign_flow-35592.json",
+        "runs.step3 prepare.status": "ok",
+        "runs.step3 prepare.ok": true,
+        "runs.step3 prepare.failures": 0,
+        "runs.step3 prepare.result": "evidence/runtime/in-game/land_missions-46848.json",
+        "runs.step3 naval.status": "ok",
+        "runs.step3 naval.ok": true,
+        "runs.step3 naval.failures": 0,
+        "runs.step3 naval.result": "evidence/runtime/in-game/naval_missions-51924.json",
+        "runs.step2 land.status": "ok",
+        "runs.step2 land.ok": true,
+        "runs.step2 land.failures": 0,
+        "runs.step2 land.result": "evidence/runtime/in-game/land_missions-52204.json",
+        "runs.step2 visit.status": "ok",
+        "runs.step2 visit.ok": true,
+        "runs.step2 visit.failures": 0,
+        "runs.step2 visit.result": "evidence/runtime/in-game/campaign_soak-7156.json",
+        "runs.step4-5 create.status": "ok",
+        "runs.step4-5 create.ok": true,
+        "runs.step4-5 create.failures": 0,
+        "runs.step4-5 create.result": "evidence/runtime/in-game/two_world_matrix-54052.json",
+        "runs.step5 cold.status": "ok",
+        "runs.step5 cold.ok": true,
+        "runs.step5 cold.failures": 0,
+        "runs.step5 cold.result": "evidence/runtime/in-game/two_world_matrix-30068.json",
+        "runs.step4 seam.status": "ok",
+        "runs.step4 seam.ok": true,
+        "runs.step4 seam.failures": 0,
+        "runs.step4 seam.result": "evidence/runtime/in-game/seam_presentation-54116.json",
+        "runs.step6 refusals.status": "ok",
+        "runs.step6 refusals.ok": true,
+        "runs.step6 refusals.failures": 0,
+        "runs.step6 refusals.result": "evidence/runtime/in-game/compat_matrix-36200.json",
+        "finishedUtc": "2026-10-19T20:31:49.7366639Z"
+       }
+      }
+     ],
+     "note": "The final package 51abd1cc... installed alone generated and started world A (one-shot step 1) and passed the clean-install sequence (s7)."
+    },
+    {
+     "aspect": "a chosen seed gives a playable world",
+     "status": "pass",
+     "evidence": [
+      {
+       "path": "evidence/world/seed-yield.json",
+       "sha256": "40b35cb0ba55c40c3c662184aad281a93fd732903245c4411312a74feaa4a2dd",
+       "trackedByGit": true,
+       "recorded": null
+      },
+      {
+       "path": "evidence/one-shot/one-shot-run.json",
+       "sha256": "3b0b3927da260d26a0bac5060bc3b3ba67a3c115fdbfac054b8cb1706d8a4895",
+       "trackedByGit": true,
+       "recorded": {
+        "status": "pass",
+        "runs.step1 profile.status": "ok",
+        "runs.step1 profile.ok": true,
+        "runs.step1 profile.failures": 0,
+        "runs.step1 profile.result": "evidence/runtime/in-game/first_test_profile-23852.json",
+        "runs.step1 identities.status": "ok",
+        "runs.step1 identities.ok": true,
+        "runs.step1 identities.failures": 0,
+        "runs.step1 identities.result": "evidence/runtime/in-game/new_campaign_flow-35592.json",
+        "runs.step3 prepare.status": "ok",
+        "runs.step3 prepare.ok": true,
+        "runs.step3 prepare.failures": 0,
+        "runs.step3 prepare.result": "evidence/runtime/in-game/land_missions-46848.json",
+        "runs.step3 naval.status": "ok",
+        "runs.step3 naval.ok": true,
+        "runs.step3 naval.failures": 0,
+        "runs.step3 naval.result": "evidence/runtime/in-game/naval_missions-51924.json",
+        "runs.step2 land.status": "ok",
+        "runs.step2 land.ok": true,
+        "runs.step2 land.failures": 0,
+        "runs.step2 land.result": "evidence/runtime/in-game/land_missions-52204.json",
+        "runs.step2 visit.status": "ok",
+        "runs.step2 visit.ok": true,
+        "runs.step2 visit.failures": 0,
+        "runs.step2 visit.result": "evidence/runtime/in-game/campaign_soak-7156.json",
+        "runs.step4-5 create.status": "ok",
+        "runs.step4-5 create.ok": true,
+        "runs.step4-5 create.failures": 0,
+        "runs.step4-5 create.result": "evidence/runtime/in-game/two_world_matrix-54052.json",
+        "runs.step5 cold.status": "ok",
+        "runs.step5 cold.ok": true,
+        "runs.step5 cold.failures": 0,
+        "runs.step5 cold.result": "evidence/runtime/in-game/two_world_matrix-30068.json",
+        "runs.step4 seam.status": "ok",
+        "runs.step4 seam.ok": true,
+        "runs.step4 seam.failures": 0,
+        "runs.step4 seam.result": "evidence/runtime/in-game/seam_presentation-54116.json",
+        "runs.step6 refusals.status": "ok",
+        "runs.step6 refusals.ok": true,
+        "runs.step6 refusals.failures": 0,
+        "runs.step6 refusals.result": "evidence/runtime/in-game/compat_matrix-36200.json",
+        "finishedUtc": "2026-10-19T20:31:49.7366639Z"
+       }
+      }
+     ],
+     "note": "Owner's judgement asked: chosen seeds now generally give a playable world, not every one. Offline, seeds 42-73 at one quality attempt went from 1 of 32 accepted to 19 of 32 (town repairs, port and village repairs, binding), and all 19 pass every managed activation stage offline: settlements, the runtime navigation build and validator over the stand-in engine, and the naval, spawn, graph, faction, character, registry and water stages (seed-yield.json). A request gets 3 quality attempts with derived seeds. In game, seeds 42 (A) and 73 (B) were played through the final one-shot run, and seed 43 generated its second attempt's world (8cb59e18..., all 792 playability routes passing; refused at runtime navigation on the earlier package e20f2667 until commit 6d34cef). Seeds 56 and 67 were refused in game at settlement placement (settlement.port_far) on that package; a later fix, not in it, turns a port town's gate toward its port, after which the offline sweep runs the placement on all 19 and both seeds generate and start in game (runs 51808, 25336). A runtime refusal still ends the job instead of trying the next derived seed (follow-up)."
+    }
+   ],
+   "notExercised": []
+  },
+  {
+   "id": "s3",
+   "text": "The entire generated globe is playable as a flat map with connected east/west edges. Terrain, player/AI land and naval routes, distances, encounters, camera/picking and saves use one consistent periodic topology; different seeds change geography and traversability.",
+   "status": "pass",
+   "aspects": [
+    {
+     "aspect": "periodic coordinates and distances",
+     "status": "pass",
+     "evidence": [
+      {
+       "path": "evidence/runtime/periodic-coordinates.json",
+       "sha256": "1934d9a0c4da09dba21b12830555d57238af3f383968387b159cb4aceef0aec5",
+       "trackedByGit": true,
+       "recorded": {
+        "accepted.status": "ok",
+        "offline.checks": 82,
+        "offline.failures": 0,
+        "passed": true,
+        "distanceCoverage.failures": 0,
+        "failures": 0,
+        "generatedUtc": "2026-10-16T08:30:08.910780+00:00"
+       }
+      },
+      {
+       "path": "evidence/runtime/periodic-coordinates-tests.json",
+       "sha256": "12aa6261b1f57bf15a30aba3da8397a20d81ab2f4fcc163462394ed92084e101",
+       "trackedByGit": true,
+       "recorded": {
+        "checks": 85,
+        "failures": 0
+       }
+      },
+      {
+       "path": "evidence/fwg/projection-export.json",
+       "sha256": "716112339b7cb99a1ee2bff48e55a8d013a65b1ecc4c2f932e1c3e1fd987c785",
+       "trackedByGit": true,
+       "recorded": {
+        "passed": true,
+        "generatedUtc": "2026-10-14T21:35:07.372414+00:00"
+       }
+      }
+     ],
+     "note": "MMR-64 run 6292 16/16; 85 offline checks on world A (re-run 2026-10-19 with the enlarged spatial table). East-west distances overstate sphere distance by 1/cos(latitude) (docs/periodic-coordinates.md)."
+    },
+    {
+     "aspect": "generated terrain renders and answers heights, rays and picking",
+     "status": "pass",
+     "evidence": [
+      {
+       "path": "evidence/runtime/surface-probe.json",
+       "sha256": "ba7cbfc631d2be3a854e5efc5f4f789a7f6eb781e090b73bd768759eeeb128ee",
+       "trackedByGit": true,
+       "recorded": {
+        "status": "scoped_runtime_evidence_verified",
+        "sequence.status": "ok",
+        "party.status": "passed",
+        "party.passed": true,
+        "party.failures": 0,
+        "independentCoverageReview.status": "review_complete_evidence_supported_root_acceptance_pending",
+        "utc": "2026-10-13T18:21:17.697Z"
+       }
+      },
+      {
+       "path": "evidence/runtime/world-surface.json",
+       "sha256": "77f5763d45bd56b3b76b3b2e64f6c9787569ebf481ca1db1232b9ae3f576bce9",
+       "trackedByGit": true,
+       "recorded": {
+        "checks": 32,
+        "passed": 32,
+        "total": 32
+       }
+      },
+      {
+       "path": "evidence/world/surface-contract.json",
+       "sha256": "90b3179e12b189d580f6e4a2a392916ba1571503b4a230eb733f08126257b010",
+       "trackedByGit": true,
+       "recorded": {
+        "checks": 24,
+        "failures": 0
+       }
+      },
+      {
+       "path": "evidence/fwg/terrain-compile.json",
+       "sha256": "36df10144e400dae2146c9cc201fd0cbbef436f35455b142e04d90aed97567d4",
+       "trackedByGit": true,
+       "recorded": {
+        "visualProbe.status": "ok",
+        "passed": true,
+        "generatedUtc": "2026-10-14T21:34:42.335443+00:00"
+       }
+      }
+     ],
+     "note": "MMR-16 run 32896; MMR-37 32/32. Exact native bin-boundary rounding is unresolved (docs/runtime-backend-decision.md R02)."
+    },
+    {
+     "aspect": "land and naval routes agree with the engine on generated worlds",
+     "status": "pass",
+     "evidence": [
+      {
+       "path": "evidence/world/navigation-routes.json",
+       "sha256": "4e5f2a56c85c9cbd978645f795b950192eb19f0131f81093213154a87fce7bcc",
+       "trackedByGit": true,
+       "recorded": {
+        "checks": 34,
+        "passed": 34,
+        "total": 34
+       }
+      },
+      {
+       "path": "evidence/world/navigation-contract.json",
+       "sha256": "51b4c0155a7ca1440ff278a06ac46238cd543dde2bd8e4a3228f96b50cf6bf33",
+       "trackedByGit": true,
+       "recorded": {
+        "checks": 36,
+        "failures": 0
+       }
+      },
+      {
+       "path": "evidence/runtime/navigation-probe.json",
+       "sha256": "da1556aff6492b34a04180369024b37cdb16f5548bc8161b65d2432d3a2bff5b",
+       "trackedByGit": true,
+       "recorded": {
+        "accepted.status": "ok",
+        "accepted.result": "evidence/runtime/in-game/generated_campaign-2248.json",
+        "utc": "2026-10-13T23:50:34.225103+00:00"
+       }
+      },
+      {
+       "path": "evidence/fwg/travel-graph.json",
+       "sha256": "34662fda9441f56efb37131e4c406015f4086f677550489ea696caf0591b321a",
+       "trackedByGit": true,
+       "recorded": {
+        "gate.passed": true,
+        "passed": true,
+        "generatedUtc": "2026-10-15T05:17:12.993687+00:00"
+       }
+      },
+      {
+       "path": "evidence/world/playability-report.json",
+       "sha256": "473af6ba4a57511040fb8b491baf8858c22a68589069ac46d92da18e47c822f2",
+       "trackedByGit": true,
+       "recorded": {
+        "sources.navigation.status": "ok",
+        "sources.job.status": "ok",
+        "sources.cold.status": "ok",
+        "sources.reuse.status": "ok",
+        "sources.fault.status": "ok",
+        "sources.periodicCold.status": "ok",
+        "sources.periodicReuse.status": "ok",
+        "sources.startsRefused.status": "error",
+        "passed": true,
+        "caches.cold.status": "generated",
+        "caches.reuse.status": "reused",
+        "caches.fault.status": "regenerated",
+        "caches.periodicCold.status": "generated",
+        "caches.periodicReuse.status": "reused",
+        "campaign.cold.failures": 0,
+        "campaign.reuse.failures": 0,
+        "campaign.fault.failures": 0,
+        "campaign.periodicCold.failures": 0,
+        "campaign.periodicReuse.failures": 0,
+        "startsRefused.routes.total": 34,
+        "startsRefused.routes.passed": 22,
+        "startsRefused.routes.failed": 12,
+        "startsRefused.failures": 12
+       }
+      },
+      {
+       "path": "evidence/one-shot/one-shot-run.json",
+       "sha256": "3b0b3927da260d26a0bac5060bc3b3ba67a3c115fdbfac054b8cb1706d8a4895",
+       "trackedByGit": true,
+       "recorded": {
+        "status": "pass",
+        "runs.step1 profile.status": "ok",
+        "runs.step1 profile.ok": true,
+        "runs.step1 profile.failures": 0,
+        "runs.step1 profile.result": "evidence/runtime/in-game/first_test_profile-23852.json",
+        "runs.step1 identities.status": "ok",
+        "runs.step1 identities.ok": true,
+        "runs.step1 identities.failures": 0,
+        "runs.step1 identities.result": "evidence/runtime/in-game/new_campaign_flow-35592.json",
+        "runs.step3 prepare.status": "ok",
+        "runs.step3 prepare.ok": true,
+        "runs.step3 prepare.failures": 0,
+        "runs.step3 prepare.result": "evidence/runtime/in-game/land_missions-46848.json",
+        "runs.step3 naval.status": "ok",
+        "runs.step3 naval.ok": true,
+        "runs.step3 naval.failures": 0,
+        "runs.step3 naval.result": "evidence/runtime/in-game/naval_missions-51924.json",
+        "runs.step2 land.status": "ok",
+        "runs.step2 land.ok": true,
+        "runs.step2 land.failures": 0,
+        "runs.step2 land.result": "evidence/runtime/in-game/land_missions-52204.json",
+        "runs.step2 visit.status": "ok",
+        "runs.step2 visit.ok": true,
+        "runs.step2 visit.failures": 0,
+        "runs.step2 visit.result": "evidence/runtime/in-game/campaign_soak-7156.json",
+        "runs.step4-5 create.status": "ok",
+        "runs.step4-5 create.ok": true,
+        "runs.step4-5 create.failures": 0,
+        "runs.step4-5 create.result": "evidence/runtime/in-game/two_world_matrix-54052.json",
+        "runs.step5 cold.status": "ok",
+        "runs.step5 cold.ok": true,
+        "runs.step5 cold.failures": 0,
+        "runs.step5 cold.result": "evidence/runtime/in-game/two_world_matrix-30068.json",
+        "runs.step4 seam.status": "ok",
+        "runs.step4 seam.ok": true,
+        "runs.step4 seam.failures": 0,
+        "runs.step4 seam.result": "evidence/runtime/in-game/seam_presentation-54116.json",
+        "runs.step6 refusals.status": "ok",
+        "runs.step6 refusals.ok": true,
+        "runs.step6 refusals.failures": 0,
+        "runs.step6 refusals.result": "evidence/runtime/in-game/compat_matrix-36200.json",
+        "finishedUtc": "2026-10-19T20:31:49.7366639Z"
+       }
+      }
+     ],
+     "note": "MMR-38 run 42984: world A 826/826 routes, world B 1118/1118; MMR-41 21/21 with navigation caches cold, reused and faulted. The final one-shot run activated A and B on the shipped bridge (both navigation reports activatable)."
+    },
+    {
+     "aspect": "travel, camera and picking across the seam",
+     "status": "pass",
+     "evidence": [
+      {
+       "path": "evidence/runtime/world-wrap-probe.json",
+       "sha256": "7524ce450c54e8038282ff011f56f721b7b01c482ae52f27bf1961cd5306949e",
+       "trackedByGit": true,
+       "recorded": {
+        "accepted.status": "ok",
+        "passed": true,
+        "seamEncounter.failures": 0,
+        "picking.failures": 0,
+        "seamSave.failures": 0,
+        "generatedUtc": "2026-10-14T17:46:18.071714+00:00"
+       }
+      },
+      {
+       "path": "evidence/world/periodic-movement.json",
+       "sha256": "54a55ae7cb8fdc5a72abf797b5f2eb07ba734bf3e4547422a7e0f72c2ef2530a",
+       "trackedByGit": true,
+       "recorded": {
+        "sources.run.status": "ok",
+        "sources.offline.checks": 85,
+        "sources.offline.failures": 0,
+        "movement.failures": 0,
+        "movement.reinforcement.failures": 0,
+        "movement.pursuit.failures": 0,
+        "movement.army.failures": 0,
+        "movement.fleet.failures": 0,
+        "movement.cancellation.failures": 0,
+        "movement.ports.failures": 0,
+        "movement.circumnavigation.failures": 0,
+        "wrapRegression.passed": true,
+        "wrapRegression.failures": 0
+       }
+      },
+      {
+       "path": "evidence/world/periodic-camera-picking.json",
+       "sha256": "a8c0252b0a17c7cc5060f9b507648471deacc7943c0203188f2c89e3bb00ba66",
+       "trackedByGit": true,
+       "recorded": {
+        "sources.run.status": "ok",
+        "sections.copies.passed": true,
+        "sections.copies.failures": 0,
+        "sections.follow.passed": true,
+        "sections.follow.failures": 0,
+        "sections.pan.passed": true,
+        "sections.pan.failures": 0,
+        "sections.moves.passed": true,
+        "sections.moves.failures": 0,
+        "sections.picking.passed": true,
+        "sections.picking.failures": 0,
+        "sections.tracks.passed": true,
+        "sections.tracks.failures": 0,
+        "sections.alignment.passed": true,
+        "sections.alignment.failures": 0,
+        "sections.menu.passed": true,
+        "sections.menu.failures": 0,
+        "sections.mission.passed": true,
+        "sections.mission.failures": 0,
+        "sections.budget.passed": true,
+        "sections.budget.failures": 0,
+        "presentation.failures": 0,
+        "presentation.copies.failures": 0,
+        "presentation.follow.failures": 0,
+        "presentation.pan.failures": 0,
+        "presentation.moves.failures": 0,
+        "presentation.picking.failures": 0,
+        "presentation.tracks.failures": 0,
+        "presentation.alignment.failures": 0,
+        "presentation.menu.failures": 0,
+        "presentation.mission.failures": 0,
+        "presentation.budget.failures": 0,
+        "wrapRegression.passed": true,
+        "wrapRegression.failures": 0
+       }
+      },
+      {
+       "path": "evidence/persistence/two-world-matrix.json",
+       "sha256": "ecf15d57bf09e9b605166914f120d1c2757e87c74e8d651c2f25aeb1792512b4",
+       "trackedByGit": true,
+       "recorded": {
+        "create.result": "evidence/runtime/in-game/two_world_matrix-54052.json",
+        "create.status": "ok",
+        "create.failures": 0,
+        "create.checks": 38,
+        "create.passed": 38,
+        "create.total": 38,
+        "cold.result": "evidence/runtime/in-game/two_world_matrix-30068.json",
+        "cold.status": "ok",
+        "cold.failures": 0,
+        "cold.checks": 20,
+        "cold.passed": 20,
+        "cold.total": 20
+       }
+      },
+      {
+       "path": "evidence/one-shot/one-shot-run.json",
+       "sha256": "3b0b3927da260d26a0bac5060bc3b3ba67a3c115fdbfac054b8cb1706d8a4895",
+       "trackedByGit": true,
+       "recorded": {
+        "status": "pass",
+        "runs.step1 profile.status": "ok",
+        "runs.step1 profile.ok": true,
+        "runs.step1 profile.failures": 0,
+        "runs.step1 profile.result": "evidence/runtime/in-game/first_test_profile-23852.json",
+        "runs.step1 identities.status": "ok",
+        "runs.step1 identities.ok": true,
+        "runs.step1 identities.failures": 0,
+        "runs.step1 identities.result": "evidence/runtime/in-game/new_campaign_flow-35592.json",
+        "runs.step3 prepare.status": "ok",
+        "runs.step3 prepare.ok": true,
+        "runs.step3 prepare.failures": 0,
+        "runs.step3 prepare.result": "evidence/runtime/in-game/land_missions-46848.json",
+        "runs.step3 naval.status": "ok",
+        "runs.step3 naval.ok": true,
+        "runs.step3 naval.failures": 0,
+        "runs.step3 naval.result": "evidence/runtime/in-game/naval_missions-51924.json",
+        "runs.step2 land.status": "ok",
+        "runs.step2 land.ok": true,
+        "runs.step2 land.failures": 0,
+        "runs.step2 land.result": "evidence/runtime/in-game/land_missions-52204.json",
+        "runs.step2 visit.status": "ok",
+        "runs.step2 visit.ok": true,
+        "runs.step2 visit.failures": 0,
+        "runs.step2 visit.result": "evidence/runtime/in-game/campaign_soak-7156.json",
+        "runs.step4-5 create.status": "ok",
+        "runs.step4-5 create.ok": true,
+        "runs.step4-5 create.failures": 0,
+        "runs.step4-5 create.result": "evidence/runtime/in-game/two_world_matrix-54052.json",
+        "runs.step5 cold.status": "ok",
+        "runs.step5 cold.ok": true,
+        "runs.step5 cold.failures": 0,
+        "runs.step5 cold.result": "evidence/runtime/in-game/two_world_matrix-30068.json",
+        "runs.step4 seam.status": "ok",
+        "runs.step4 seam.ok": true,
+        "runs.step4 seam.failures": 0,
+        "runs.step4 seam.result": "evidence/runtime/in-game/seam_presentation-54116.json",
+        "runs.step6 refusals.status": "ok",
+        "runs.step6 refusals.ok": true,
+        "runs.step6 refusals.failures": 0,
+        "runs.step6 refusals.result": "evidence/runtime/in-game/compat_matrix-36200.json",
+        "finishedUtc": "2026-10-19T20:31:49.7366639Z"
+       }
+      }
+     ],
+     "note": "On world A the final one-shot run (two_world_matrix create 54052) crossed the seam on land, was pursued across it, called a fleet across it and kept it all through save and load. On world B (seam_presentation 54116, MMR-66's sections on a generated world): display copies, camera follow and pan, fast moves, picking (copy rays equal canonical rays), tracks, alignment, a town menu across the seam and the wrap budget, between two towns joined by land across the seam."
+    },
+    {
+     "aspect": "different seeds change geography and traversability",
+     "status": "pass",
+     "evidence": [
+      {
+       "path": "evidence/one-shot/one-shot-run.json",
+       "sha256": "3b0b3927da260d26a0bac5060bc3b3ba67a3c115fdbfac054b8cb1706d8a4895",
+       "trackedByGit": true,
+       "recorded": {
+        "status": "pass",
+        "runs.step1 profile.status": "ok",
+        "runs.step1 profile.ok": true,
+        "runs.step1 profile.failures": 0,
+        "runs.step1 profile.result": "evidence/runtime/in-game/first_test_profile-23852.json",
+        "runs.step1 identities.status": "ok",
+        "runs.step1 identities.ok": true,
+        "runs.step1 identities.failures": 0,
+        "runs.step1 identities.result": "evidence/runtime/in-game/new_campaign_flow-35592.json",
+        "runs.step3 prepare.status": "ok",
+        "runs.step3 prepare.ok": true,
+        "runs.step3 prepare.failures": 0,
+        "runs.step3 prepare.result": "evidence/runtime/in-game/land_missions-46848.json",
+        "runs.step3 naval.status": "ok",
+        "runs.step3 naval.ok": true,
+        "runs.step3 naval.failures": 0,
+        "runs.step3 naval.result": "evidence/runtime/in-game/naval_missions-51924.json",
+        "runs.step2 land.status": "ok",
+        "runs.step2 land.ok": true,
+        "runs.step2 land.failures": 0,
+        "runs.step2 land.result": "evidence/runtime/in-game/land_missions-52204.json",
+        "runs.step2 visit.status": "ok",
+        "runs.step2 visit.ok": true,
+        "runs.step2 visit.failures": 0,
+        "runs.step2 visit.result": "evidence/runtime/in-game/campaign_soak-7156.json",
+        "runs.step4-5 create.status": "ok",
+        "runs.step4-5 create.ok": true,
+        "runs.step4-5 create.failures": 0,
+        "runs.step4-5 create.result": "evidence/runtime/in-game/two_world_matrix-54052.json",
+        "runs.step5 cold.status": "ok",
+        "runs.step5 cold.ok": true,
+        "runs.step5 cold.failures": 0,
+        "runs.step5 cold.result": "evidence/runtime/in-game/two_world_matrix-30068.json",
+        "runs.step4 seam.status": "ok",
+        "runs.step4 seam.ok": true,
+        "runs.step4 seam.failures": 0,
+        "runs.step4 seam.result": "evidence/runtime/in-game/seam_presentation-54116.json",
+        "runs.step6 refusals.status": "ok",
+        "runs.step6 refusals.ok": true,
+        "runs.step6 refusals.failures": 0,
+        "runs.step6 refusals.result": "evidence/runtime/in-game/compat_matrix-36200.json",
+        "finishedUtc": "2026-10-19T20:31:49.7366639Z"
+       }
+      },
+      {
+       "path": "worldgen/validation/first-test-measurements.json",
+       "sha256": "6cb798555d8511e82e198894da4bce53b51f092bc6dd2f02b2ba4d4f570e2a50",
+       "trackedByGit": true,
+       "recorded": {
+        "result": "evidence/runtime/in-game/first_test_profile-40412.json",
+        "status": "ok",
+        "passed": 20,
+        "total": 20,
+        "checks": 20
+       }
+      }
+     ],
+     "note": "Worlds A (seed 42) and B (seed 73) differ in every geography hash (land cells 2389 vs 4192, coastlines differ) and in their engine routes (826 vs 1118), and both are played in the final one-shot run (land missions on B included)."
+    },
+    {
+     "aspect": "encounters and missions at the seam",
+     "status": "pass",
+     "evidence": [
+      {
+       "path": "evidence/gameplay/naval-scenarios.json",
+       "sha256": "23e47b2ba0068f860e13a7871be70e33264e75f5213efe1addff0a57c93e6801",
+       "trackedByGit": true,
+       "recorded": {
+        "result": "evidence/runtime/in-game/naval_missions-51924.json",
+        "status": "ok",
+        "failures": 0,
+        "passed": 117,
+        "total": 117,
+        "cases.shipyard.buy.failures": 0,
+        "cases.route.port.failures": 0,
+        "cases.shipyard.repair.failures": 0,
+        "cases.route.island.failures": 0,
+        "cases.blockade.failures": 0,
+        "cases.dropoff.failures": 0,
+        "cases.pirate.battle.failures": 0,
+        "cases.route.seam.failures": 0,
+        "cases.pirate.seam.failures": 0,
+        "cases.raid.failures": 0,
+        "cases.naval.defeat.failures": 0
+       }
+      },
+      {
+       "path": "evidence/world/mission-scenes-report.json",
+       "sha256": "0a13e953a808f5775c6cc0e90cf5e81fdec9741a01af6f57d1fa48b39ea94ac7",
+       "trackedByGit": true,
+       "recorded": {
+        "sources.fixture.status": "ok",
+        "sources.seam.status": "ok",
+        "passed": true
+       }
+      }
+     ],
+     "note": "The final one-shot naval run 51924: route.seam (sailed across the seam, one rebase, on naval navigation, at sea) and pirate.seam (a naval encounter of the party and a pirate 1.6 apart across the seam, its mission, the retreat). One land mission at the seam ran (MMR-42 run 17596)."
+    },
+    {
+     "aspect": "one consistent topology for the audited consumers; named presentation limits",
+     "status": "pass",
+     "evidence": [
+      {
+       "path": "evidence/world/periodic-consumers.tsv",
+       "sha256": "66808dcae1be2dc416fd77a2af820d5c79f11048da4b4d6ca5bc19651b441382",
+       "trackedByGit": true,
+       "recorded": null
+      },
+      {
+       "path": "evidence/fwg/water-climate-review.md",
+       "sha256": "d526f97d2100bea22295657c6957022beb02e0f88b1d2272481a9562ce083b2c",
+       "trackedByGit": true,
+       "recorded": null
+      },
+      {
+       "path": "evidence/fwg/periodic-presentation-review.md",
+       "sha256": "7e2102f96ba7ee27678acfc13c8d30e0587abc1b4d54ab32b58f2d1272c760b4",
+       "trackedByGit": true,
+       "recorded": null
+      }
+     ],
+     "note": "Owner's judgement asked: the topology is one for every audited consumer, with three named presentation limits left. Every planar campaign measure the audit found (evidence/world/periodic-consumers.tsv: 105 methods, 168 calls) is transpiled periodic, now with the views the player reads as distances (the clan screen's distance sorts, the army overlay, the game-menu party list, the nearby culture's music); the storm tick at the seam (L14) was fixed by MMR-65; strip lake copies cut by the terrain's edge now follow their twin. Left, presentation only: the hero behaviour text measures planar near the cut (its class initializer cannot run when the set is applied); siege machines and missiles are drawn only on the settlement's own side of the cut; a route whose path leaves the terrain cannot be represented (docs/periodic-presentation.md, Limits)."
+    }
+   ],
+   "notExercised": [
+    "mouse dragging across the seam (it pivots on the rebased click position; axis input was injected)",
+    "encyclopedia, clan and kingdom screen map navigation (FastMoveCameraToPosition called directly)",
+    "a siege, a raid, embarking and disembarking at the seam"
+   ]
+  },
+  {
+   "id": "s4",
+   "text": "Generated towns, villages, castles, factions, clans and characters initialize a coherent Sandbox campaign with trading, recruitment, ownership, wars and missions, with no unintended Calradia campaign objects surviving.",
+   "status": "pass",
+   "aspects": [
+    {
+     "aspect": "generated factions, clans, heroes, settlements and economy register and validate",
+     "status": "pass",
+     "evidence": [
+      {
+       "path": "evidence/fwg/factions.json",
+       "sha256": "023687035b656b4d7b6ac93f9413a36a14cf6fcc125031da1562327277506e95",
+       "trackedByGit": true,
+       "recorded": {
+        "banners.total": 132,
+        "checks": 29,
+        "failures": 0
+       }
+      },
+      {
+       "path": "evidence/fwg/heroes.json",
+       "sha256": "004fa70496fbfde66007a04ce0fcb7ebccb62f28d8ee4c700766655c48219cca",
+       "trackedByGit": true,
+       "recorded": {
+        "checks": 19,
+        "failures": 0
+       }
+      },
+      {
+       "path": "evidence/fwg/settlements.json",
+       "sha256": "6a55ea74be6fc5f7cffb964f187f33ed1c3dad0907f4225f745786c574db25e7",
+       "trackedByGit": true,
+       "recorded": {
+        "checks": 22,
+        "failures": 0
+       }
+      },
+      {
+       "path": "evidence/fwg/startup.json",
+       "sha256": "9ad66a1a166a29bec52082bee158440d22b4afd99b1bbf40648367391e75483b",
+       "trackedByGit": true,
+       "recorded": {
+        "checks": 18,
+        "failures": 0
+       }
+      },
+      {
+       "path": "evidence/campaign/graph-validation.json",
+       "sha256": "b94cfb180ff84742b4487b41fb413eb7ffc20586b15c27fc9ab6746d60e365c4",
+       "trackedByGit": true,
+       "recorded": {
+        "checks": 70,
+        "clean.ok": true,
+        "failures": 0,
+        "inGame.checks": 9,
+        "inGame.passed": 9,
+        "inGame.total": 9
+       }
+      },
+      {
+       "path": "evidence/runtime/graph-gate.json",
+       "sha256": "66932f0200237755ba8d9081cf47fc2d74591eda18f5284024bf5486f17dde22",
+       "trackedByGit": true,
+       "recorded": {
+        "graphGate.liveWorld.ok": true,
+        "checks": 9,
+        "passed": 9,
+        "total": 9
+       }
+      },
+      {
+       "path": "evidence/runtime/registry-probe.json",
+       "sha256": "2e86096979e8b665aab95fb200941532afb650f7fcf943b134bf9b8b0fb46b15",
+       "trackedByGit": true,
+       "recorded": {
+        "checks": 16,
+        "passed": 16,
+        "total": 16,
+        "generatedUtc": "2026-10-15T08:30:20Z"
+       }
+      },
+      {
+       "path": "evidence/runtime/character-creation.json",
+       "sha256": "ec60e92202cc7f6fc4c65cb99a28674b6622e430ad29af6be7426f9ea38d0f63",
+       "trackedByGit": true,
+       "recorded": {
+        "checks": 43,
+        "passed": 43,
+        "total": 43
+       }
+      },
+      {
+       "path": "evidence/runtime/settlement-fixtures.json",
+       "sha256": "0a14ae1490a99acdf2ff02f842d08911271721ce51bbaa66fe9aa2c05a32e620",
+       "trackedByGit": true,
+       "recorded": {
+        "checks": 13,
+        "passed": 13,
+        "total": 13
+       }
+      },
+      {
+       "path": "evidence/runtime/startup-audit.json",
+       "sha256": "45f569c4763b88c4d0ef25e815f00d065eb7fb20c5beb209cf0e16ab5d774236",
+       "trackedByGit": true,
+       "recorded": {
+        "checks": 36,
+        "passed": 36,
+        "total": 36
+       }
+      },
+      {
+       "path": "evidence/world/settlement-entities.json",
+       "sha256": "5e9d18c347fd2c110e4ffc017dd633b697ebec9d4f159b71cfb8968be1cad0f0",
+       "trackedByGit": true,
+       "recorded": {
+        "sources.surface.status": "ok",
+        "sources.campaign.status": "ok",
+        "passed": true
+       }
+      },
+      {
+       "path": "evidence/runtime/bootstrap-probe.json",
+       "sha256": "65f15dcaf05aa46829086cea10c43c022a031dd4424a3a471990e256ac92c0d5",
+       "trackedByGit": true,
+       "recorded": {
+        "status": "c1-c3 evidenced for new-game initialization plus two campaign days per world; save/load, UI-driven interactions, settlement visuals and long-run economy unproved",
+        "utc": "2026-10-13T21:20:00Z"
+       }
+      }
+     ],
+     "note": "World A: 358 settlements, 40 kingdoms, 92 clans. The MMR-30/33/34/35/36 in-game probes ran on 4-settlement fixtures; the whole world is covered by MMR-45, MMR-51 and the final one-shot run. One town starts with no gold and earns it within the day; 22 of 40 kingdoms hold a single fief."
+    },
+    {
+     "aspect": "no unintended Calradia campaign objects survive",
+     "status": "pass",
+     "evidence": [
+      {
+       "path": "evidence/campaign/graph-validation.json",
+       "sha256": "b94cfb180ff84742b4487b41fb413eb7ffc20586b15c27fc9ab6746d60e365c4",
+       "trackedByGit": true,
+       "recorded": {
+        "checks": 70,
+        "clean.ok": true,
+        "failures": 0,
+        "inGame.checks": 9,
+        "inGame.passed": 9,
+        "inGame.total": 9
+       }
+      },
+      {
+       "path": "evidence/gameplay/campaign-soak.json",
+       "sha256": "fc4d74aa7dcdaca2c65453adffa6837d73e92422e7fbb64b51246e7db0c4acea",
+       "trackedByGit": true,
+       "recorded": {
+        "result": "evidence/runtime/in-game/campaign_soak-41920.json",
+        "status": "ok",
+        "failures": 0,
+        "passed": 55,
+        "total": 55
+       }
+      }
+     ],
+     "note": "The graph validator refuses official objects, references and coordinates; MMR-51 run 41920 found 0 settlements, clans or kingdoms outside the world."
+    },
+    {
+     "aspect": "trading, recruitment, ownership and wars",
+     "status": "pass",
+     "evidence": [
+      {
+       "path": "evidence/gameplay/campaign-soak.json",
+       "sha256": "fc4d74aa7dcdaca2c65453adffa6837d73e92422e7fbb64b51246e7db0c4acea",
+       "trackedByGit": true,
+       "recorded": {
+        "result": "evidence/runtime/in-game/campaign_soak-41920.json",
+        "status": "ok",
+        "failures": 0,
+        "passed": 55,
+        "total": 55
+       }
+      },
+      {
+       "path": "evidence/gameplay/campaign-soak-tests.txt",
+       "sha256": "23a34e2e2de8ae7a36d09861d9afaeff749bc82a7ddf0d0e3cf0e238e4cc3b77",
+       "trackedByGit": true,
+       "recorded": null
+      },
+      {
+       "path": "evidence/one-shot/one-shot-run.json",
+       "sha256": "3b0b3927da260d26a0bac5060bc3b3ba67a3c115fdbfac054b8cb1706d8a4895",
+       "trackedByGit": true,
+       "recorded": {
+        "status": "pass",
+        "runs.step1 profile.status": "ok",
+        "runs.step1 profile.ok": true,
+        "runs.step1 profile.failures": 0,
+        "runs.step1 profile.result": "evidence/runtime/in-game/first_test_profile-23852.json",
+        "runs.step1 identities.status": "ok",
+        "runs.step1 identities.ok": true,
+        "runs.step1 identities.failures": 0,
+        "runs.step1 identities.result": "evidence/runtime/in-game/new_campaign_flow-35592.json",
+        "runs.step3 prepare.status": "ok",
+        "runs.step3 prepare.ok": true,
+        "runs.step3 prepare.failures": 0,
+        "runs.step3 prepare.result": "evidence/runtime/in-game/land_missions-46848.json",
+        "runs.step3 naval.status": "ok",
+        "runs.step3 naval.ok": true,
+        "runs.step3 naval.failures": 0,
+        "runs.step3 naval.result": "evidence/runtime/in-game/naval_missions-51924.json",
+        "runs.step2 land.status": "ok",
+        "runs.step2 land.ok": true,
+        "runs.step2 land.failures": 0,
+        "runs.step2 land.result": "evidence/runtime/in-game/land_missions-52204.json",
+        "runs.step2 visit.status": "ok",
+        "runs.step2 visit.ok": true,
+        "runs.step2 visit.failures": 0,
+        "runs.step2 visit.result": "evidence/runtime/in-game/campaign_soak-7156.json",
+        "runs.step4-5 create.status": "ok",
+        "runs.step4-5 create.ok": true,
+        "runs.step4-5 create.failures": 0,
+        "runs.step4-5 create.result": "evidence/runtime/in-game/two_world_matrix-54052.json",
+        "runs.step5 cold.status": "ok",
+        "runs.step5 cold.ok": true,
+        "runs.step5 cold.failures": 0,
+        "runs.step5 cold.result": "evidence/runtime/in-game/two_world_matrix-30068.json",
+        "runs.step4 seam.status": "ok",
+        "runs.step4 seam.ok": true,
+        "runs.step4 seam.failures": 0,
+        "runs.step4 seam.result": "evidence/runtime/in-game/seam_presentation-54116.json",
+        "runs.step6 refusals.status": "ok",
+        "runs.step6 refusals.ok": true,
+        "runs.step6 refusals.failures": 0,
+        "runs.step6 refusals.result": "evidence/runtime/in-game/compat_matrix-36200.json",
+        "finishedUtc": "2026-10-19T20:31:49.7366639Z"
+       }
+      }
+     ],
+     "note": "MMR-51 run 41920 55/55, 14 scenarios, 1 day 6 h on world A; the final one-shot run's soak (7156) travelled, traded and recruited in a generated town. Trade and recruitment drive the screens' logic without the screens. Long play is deferred certification."
+    },
+    {
+     "aspect": "land missions and mission transitions",
+     "status": "pass",
+     "evidence": [
+      {
+       "path": "evidence/gameplay/land-missions.json",
+       "sha256": "bf550af2034a44e8aeb99caa28737895659c26098636def427637ab9aad2dcec",
+       "trackedByGit": true,
+       "recorded": {
+        "result": "evidence/runtime/in-game/land_missions-52204.json",
+        "status": "ok",
+        "failures": 0,
+        "passed": 163,
+        "total": 163,
+        "cases.field.open.failures": 0,
+        "cases.field.woodland.failures": 0,
+        "cases.field.rock.failures": 0,
+        "cases.field.cold.failures": 0,
+        "cases.field.desert.failures": 0,
+        "cases.crossing.failures": 0,
+        "cases.retreat.failures": 0,
+        "cases.town.failures": 0,
+        "cases.castle.failures": 0,
+        "cases.village.failures": 0,
+        "cases.siege.failures": 0,
+        "cases.capture.failures": 0,
+        "cases.B.field.wetland.failures": 0,
+        "cases.hideout.failures": 0
+       }
+      },
+      {
+       "path": "evidence/runtime/mission-transition-probe.json",
+       "sha256": "5ad24a4e501cb6d660b76eadbdfd79e505c9cc4b3e791a1bcc38f6d52b725ac1",
+       "trackedByGit": true,
+       "recorded": {
+        "accepted.status": "ok",
+        "passed": true,
+        "generatedUtc": "2026-10-14T07:59:37.612571+00:00"
+       }
+      },
+      {
+       "path": "evidence/world/mission-scenes-report.json",
+       "sha256": "0a13e953a808f5775c6cc0e90cf5e81fdec9741a01af6f57d1fa48b39ea94ac7",
+       "trackedByGit": true,
+       "recorded": {
+        "sources.fixture.status": "ok",
+        "sources.seam.status": "ok",
+        "passed": true
+       }
+      },
+      {
+       "path": "evidence/world/mission-scenes-tests.json",
+       "sha256": "4a6e53f1c4db021cb3436d81886f51faecac2201ebf4e52c5b93474e149fd9e0",
+       "trackedByGit": true,
+       "recorded": {
+        "checks": 35,
+        "failures": 0
+       }
+      }
+     ],
+     "note": "The final one-shot land run 52204: 163/163 checks, 14/14 cases (field battles of every class A has and B's wetland, town, castle, village, siege, capture, hideout, crossing, retreat), each return with the world identity unchanged; MMR-60 11/11; MMR-42 11/11."
+    },
+    {
+     "aspect": "every generated world initializes",
+     "status": "pass",
+     "evidence": [
+      {
+       "path": "evidence/world/seed-yield.json",
+       "sha256": "40b35cb0ba55c40c3c662184aad281a93fd732903245c4411312a74feaa4a2dd",
+       "trackedByGit": true,
+       "recorded": null
+      },
+      {
+       "path": "evidence/one-shot/one-shot-run.json",
+       "sha256": "3b0b3927da260d26a0bac5060bc3b3ba67a3c115fdbfac054b8cb1706d8a4895",
+       "trackedByGit": true,
+       "recorded": {
+        "status": "pass",
+        "runs.step1 profile.status": "ok",
+        "runs.step1 profile.ok": true,
+        "runs.step1 profile.failures": 0,
+        "runs.step1 profile.result": "evidence/runtime/in-game/first_test_profile-23852.json",
+        "runs.step1 identities.status": "ok",
+        "runs.step1 identities.ok": true,
+        "runs.step1 identities.failures": 0,
+        "runs.step1 identities.result": "evidence/runtime/in-game/new_campaign_flow-35592.json",
+        "runs.step3 prepare.status": "ok",
+        "runs.step3 prepare.ok": true,
+        "runs.step3 prepare.failures": 0,
+        "runs.step3 prepare.result": "evidence/runtime/in-game/land_missions-46848.json",
+        "runs.step3 naval.status": "ok",
+        "runs.step3 naval.ok": true,
+        "runs.step3 naval.failures": 0,
+        "runs.step3 naval.result": "evidence/runtime/in-game/naval_missions-51924.json",
+        "runs.step2 land.status": "ok",
+        "runs.step2 land.ok": true,
+        "runs.step2 land.failures": 0,
+        "runs.step2 land.result": "evidence/runtime/in-game/land_missions-52204.json",
+        "runs.step2 visit.status": "ok",
+        "runs.step2 visit.ok": true,
+        "runs.step2 visit.failures": 0,
+        "runs.step2 visit.result": "evidence/runtime/in-game/campaign_soak-7156.json",
+        "runs.step4-5 create.status": "ok",
+        "runs.step4-5 create.ok": true,
+        "runs.step4-5 create.failures": 0,
+        "runs.step4-5 create.result": "evidence/runtime/in-game/two_world_matrix-54052.json",
+        "runs.step5 cold.status": "ok",
+        "runs.step5 cold.ok": true,
+        "runs.step5 cold.failures": 0,
+        "runs.step5 cold.result": "evidence/runtime/in-game/two_world_matrix-30068.json",
+        "runs.step4 seam.status": "ok",
+        "runs.step4 seam.ok": true,
+        "runs.step4 seam.failures": 0,
+        "runs.step4 seam.result": "evidence/runtime/in-game/seam_presentation-54116.json",
+        "runs.step6 refusals.status": "ok",
+        "runs.step6 refusals.ok": true,
+        "runs.step6 refusals.failures": 0,
+        "runs.step6 refusals.result": "evidence/runtime/in-game/compat_matrix-36200.json",
+        "finishedUtc": "2026-10-19T20:31:49.7366639Z"
+       }
+      }
+     ],
+     "note": "Worlds A and B activate and play in the final one-shot run. Offline, every one of the 19 accepted worlds of seeds 42-73 passes the activation's managed stages (seed-yield.json); the sweep found and fixed the refusals of other worlds: harbours on closed basins, unplaceable villages (a crash in three runtime readers), a deck shared by two joins and port pairs the engine cannot route."
+    }
+   ],
+   "notExercised": [
+    "village raids on land, lord's hall fights, port visits",
+    "a field battle fought to the end (all ended by retreat or the probe's kills), the hideout's night stealth mission",
+    "siege preparation beyond 1.5 h; captivity escape played rather than applied"
+   ]
+  },
+  {
+   "id": "s5",
+   "text": "War Sails ports, fleets, embarkation, land/sea routes, navigation types and required distance caches operate on the generated world; naval travel and naval encounters are tested.",
+   "status": "pass",
+   "aspects": [
+    {
+     "aspect": "ports, fleets and naval faction records",
+     "status": "pass",
+     "evidence": [
+      {
+       "path": "evidence/fwg/naval.json",
+       "sha256": "b53b0f624ed6d2036ef5fb526d16c18134d06e067dc1a35c23367ca2046debc0",
+       "trackedByGit": true,
+       "recorded": {
+        "checks": 15,
+        "failures": 0
+       }
+      },
+      {
+       "path": "evidence/runtime/naval-content.json",
+       "sha256": "ae760fbceff2e30b3d407da18bcb02b2de14582f9f758ff065f1b495db733109",
+       "trackedByGit": true,
+       "recorded": {
+        "checks": 11,
+        "passed": 11,
+        "total": 11
+       }
+      }
+     ],
+     "note": "MMR-35: 15 offline checks; in-game run 21180 on the fixture world; the final one-shot run sailed from and docked at generated ports on world A."
+    },
+    {
+     "aspect": "naval navigation types, routes and distance caches",
+     "status": "pass",
+     "evidence": [
+      {
+       "path": "evidence/world/navigation-routes.json",
+       "sha256": "4e5f2a56c85c9cbd978645f795b950192eb19f0131f81093213154a87fce7bcc",
+       "trackedByGit": true,
+       "recorded": {
+        "checks": 34,
+        "passed": 34,
+        "total": 34
+       }
+      },
+      {
+       "path": "evidence/world/playability-report.json",
+       "sha256": "473af6ba4a57511040fb8b491baf8858c22a68589069ac46d92da18e47c822f2",
+       "trackedByGit": true,
+       "recorded": {
+        "sources.navigation.status": "ok",
+        "sources.job.status": "ok",
+        "sources.cold.status": "ok",
+        "sources.reuse.status": "ok",
+        "sources.fault.status": "ok",
+        "sources.periodicCold.status": "ok",
+        "sources.periodicReuse.status": "ok",
+        "sources.startsRefused.status": "error",
+        "passed": true,
+        "caches.cold.status": "generated",
+        "caches.reuse.status": "reused",
+        "caches.fault.status": "regenerated",
+        "caches.periodicCold.status": "generated",
+        "caches.periodicReuse.status": "reused",
+        "campaign.cold.failures": 0,
+        "campaign.reuse.failures": 0,
+        "campaign.fault.failures": 0,
+        "campaign.periodicCold.failures": 0,
+        "campaign.periodicReuse.failures": 0,
+        "startsRefused.routes.total": 34,
+        "startsRefused.routes.passed": 22,
+        "startsRefused.routes.failed": 12,
+        "startsRefused.failures": 12
+       }
+      },
+      {
+       "path": "evidence/one-shot/one-shot-run.json",
+       "sha256": "3b0b3927da260d26a0bac5060bc3b3ba67a3c115fdbfac054b8cb1706d8a4895",
+       "trackedByGit": true,
+       "recorded": {
+        "status": "pass",
+        "runs.step1 profile.status": "ok",
+        "runs.step1 profile.ok": true,
+        "runs.step1 profile.failures": 0,
+        "runs.step1 profile.result": "evidence/runtime/in-game/first_test_profile-23852.json",
+        "runs.step1 identities.status": "ok",
+        "runs.step1 identities.ok": true,
+        "runs.step1 identities.failures": 0,
+        "runs.step1 identities.result": "evidence/runtime/in-game/new_campaign_flow-35592.json",
+        "runs.step3 prepare.status": "ok",
+        "runs.step3 prepare.ok": true,
+        "runs.step3 prepare.failures": 0,
+        "runs.step3 prepare.result": "evidence/runtime/in-game/land_missions-46848.json",
+        "runs.step3 naval.status": "ok",
+        "runs.step3 naval.ok": true,
+        "runs.step3 naval.failures": 0,
+        "runs.step3 naval.result": "evidence/runtime/in-game/naval_missions-51924.json",
+        "runs.step2 land.status": "ok",
+        "runs.step2 land.ok": true,
+        "runs.step2 land.failures": 0,
+        "runs.step2 land.result": "evidence/runtime/in-game/land_missions-52204.json",
+        "runs.step2 visit.status": "ok",
+        "runs.step2 visit.ok": true,
+        "runs.step2 visit.failures": 0,
+        "runs.step2 visit.result": "evidence/runtime/in-game/campaign_soak-7156.json",
+        "runs.step4-5 create.status": "ok",
+        "runs.step4-5 create.ok": true,
+        "runs.step4-5 create.failures": 0,
+        "runs.step4-5 create.result": "evidence/runtime/in-game/two_world_matrix-54052.json",
+        "runs.step5 cold.status": "ok",
+        "runs.step5 cold.ok": true,
+        "runs.step5 cold.failures": 0,
+        "runs.step5 cold.result": "evidence/runtime/in-game/two_world_matrix-30068.json",
+        "runs.step4 seam.status": "ok",
+        "runs.step4 seam.ok": true,
+        "runs.step4 seam.failures": 0,
+        "runs.step4 seam.result": "evidence/runtime/in-game/seam_presentation-54116.json",
+        "runs.step6 refusals.status": "ok",
+        "runs.step6 refusals.ok": true,
+        "runs.step6 refusals.failures": 0,
+        "runs.step6 refusals.result": "evidence/runtime/in-game/compat_matrix-36200.json",
+        "finishedUtc": "2026-10-19T20:31:49.7366639Z"
+       }
+      }
+     ],
+     "note": "Naval routes agree with the engine on worlds A and B. The final one-shot run built A's navigation caches once at its start and every later load of A and B reused them (keys dadc84ff, ebc5475a)."
+    },
+    {
+     "aspect": "water, flow and weather on the generated world",
+     "status": "pass",
+     "evidence": [
+      {
+       "path": "evidence/runtime/environment-rebind-probe.json",
+       "sha256": "f25ac4b9d3675a5aab659d247017a3eddbb602b5c2b2e6594527a7537c7ea918",
+       "trackedByGit": true,
+       "recorded": {
+        "accepted.status": "ok",
+        "passed": true,
+        "generatedUtc": "2026-10-14T18:58:30.866459+00:00"
+       }
+      },
+      {
+       "path": "evidence/world/water-climate.json",
+       "sha256": "4743c6be43914838b481b06a4219785bdffd54b0af82441990919ed5fa5ce90e",
+       "trackedByGit": true,
+       "recorded": {
+        "sources.periodic.status": "ok",
+        "sources.periodic.failures": 0,
+        "sources.naval.status": "ok",
+        "sources.naval.failures": 0,
+        "sources.offline.checks": 34,
+        "sources.offline.failures": 0,
+        "sources.surface.status": "ok",
+        "sources.load.status": "ok",
+        "periodicWorld.dayNight.failures": 0,
+        "periodicWorld.mapSupportWeather.status": "prepared",
+        "navalWorld.dayNight.failures": 0,
+        "afterLoad.status": "ok",
+        "afterLoad.failures": 0
+       }
+      },
+      {
+       "path": "evidence/world/water-climate-tests.json",
+       "sha256": "856652909ff31e79d22d4d824a358cf98eacb7885c8f64cdb37c9c82fba8fad0",
+       "trackedByGit": true,
+       "recorded": {
+        "checks": 34,
+        "failures": 0
+       }
+      }
+     ],
+     "note": "MMR-59 23/23; MMR-39 runs on fixtures. Rivers have no water surface; 15 of 23 lake groups on world A have no plane (too shallow at the sample grid)."
+    },
+    {
+     "aspect": "naval travel, embarkation and encounters",
+     "status": "pass",
+     "evidence": [
+      {
+       "path": "evidence/gameplay/naval-scenarios.json",
+       "sha256": "23e47b2ba0068f860e13a7871be70e33264e75f5213efe1addff0a57c93e6801",
+       "trackedByGit": true,
+       "recorded": {
+        "result": "evidence/runtime/in-game/naval_missions-51924.json",
+        "status": "ok",
+        "failures": 0,
+        "passed": 117,
+        "total": 117,
+        "cases.shipyard.buy.failures": 0,
+        "cases.route.port.failures": 0,
+        "cases.shipyard.repair.failures": 0,
+        "cases.route.island.failures": 0,
+        "cases.blockade.failures": 0,
+        "cases.dropoff.failures": 0,
+        "cases.pirate.battle.failures": 0,
+        "cases.route.seam.failures": 0,
+        "cases.pirate.seam.failures": 0,
+        "cases.raid.failures": 0,
+        "cases.naval.defeat.failures": 0
+       }
+      }
+     ],
+     "note": "The final one-shot naval run 51924: 117/117 checks, 15/15 cases (shipyard purchase and repair, port and island voyages, drop-off and coastal landing, blockade and anchor, a pirate battle, a voyage and a pirate encounter across the seam, a seaborne raid won, defeat with the raft)."
+    },
+    {
+     "aspect": "fleets survive save and load",
+     "status": "pass",
+     "evidence": [
+      {
+       "path": "evidence/persistence/two-world-matrix.json",
+       "sha256": "ecf15d57bf09e9b605166914f120d1c2757e87c74e8d651c2f25aeb1792512b4",
+       "trackedByGit": true,
+       "recorded": {
+        "create.result": "evidence/runtime/in-game/two_world_matrix-54052.json",
+        "create.status": "ok",
+        "create.failures": 0,
+        "create.checks": 38,
+        "create.passed": 38,
+        "create.total": 38,
+        "cold.result": "evidence/runtime/in-game/two_world_matrix-30068.json",
+        "cold.status": "ok",
+        "cold.failures": 0,
+        "cold.checks": 20,
+        "cold.passed": 20,
+        "cold.total": 20
+       }
+      }
+     ],
+     "note": "The final one-shot matrix (create 54052, cold 30068): an embarked fleet and an AI lord's fleet after a naval battle survive save, same-process load and cold load."
+    }
+   ],
+   "notExercised": [
+    "boarding, crew reinforcement, ship damage in battle, a naval battle won by fighting, a blockade battle or an AI blockade",
+    "straits narrower than 8.5; pirate-initiated encounters (the player was ignored); port visits"
+   ]
+  },
+  {
+   "id": "s6",
+   "text": "Two campaigns with different world identities can be saved, alternately loaded after a cold restart, and resumed with correct terrain, objects and navigation; missing or mismatched worlds fail safely before simulation.",
+   "status": "pass",
+   "aspects": [
+    {
+     "aspect": "two campaigns from production-generated worlds, saved and alternately loaded after a cold restart",
+     "status": "pass",
+     "evidence": [
+      {
+       "path": "evidence/persistence/two-world-matrix.json",
+       "sha256": "ecf15d57bf09e9b605166914f120d1c2757e87c74e8d651c2f25aeb1792512b4",
+       "trackedByGit": true,
+       "recorded": {
+        "create.result": "evidence/runtime/in-game/two_world_matrix-54052.json",
+        "create.status": "ok",
+        "create.failures": 0,
+        "create.checks": 38,
+        "create.passed": 38,
+        "create.total": 38,
+        "cold.result": "evidence/runtime/in-game/two_world_matrix-30068.json",
+        "cold.status": "ok",
+        "cold.failures": 0,
+        "cold.checks": 20,
+        "cold.passed": 20,
+        "cold.total": 20
+       }
+      },
+      {
+       "path": "evidence/one-shot/one-shot-run.json",
+       "sha256": "3b0b3927da260d26a0bac5060bc3b3ba67a3c115fdbfac054b8cb1706d8a4895",
+       "trackedByGit": true,
+       "recorded": {
+        "status": "pass",
+        "runs.step1 profile.status": "ok",
+        "runs.step1 profile.ok": true,
+        "runs.step1 profile.failures": 0,
+        "runs.step1 profile.result": "evidence/runtime/in-game/first_test_profile-23852.json",
+        "runs.step1 identities.status": "ok",
+        "runs.step1 identities.ok": true,
+        "runs.step1 identities.failures": 0,
+        "runs.step1 identities.result": "evidence/runtime/in-game/new_campaign_flow-35592.json",
+        "runs.step3 prepare.status": "ok",
+        "runs.step3 prepare.ok": true,
+        "runs.step3 prepare.failures": 0,
+        "runs.step3 prepare.result": "evidence/runtime/in-game/land_missions-46848.json",
+        "runs.step3 naval.status": "ok",
+        "runs.step3 naval.ok": true,
+        "runs.step3 naval.failures": 0,
+        "runs.step3 naval.result": "evidence/runtime/in-game/naval_missions-51924.json",
+        "runs.step2 land.status": "ok",
+        "runs.step2 land.ok": true,
+        "runs.step2 land.failures": 0,
+        "runs.step2 land.result": "evidence/runtime/in-game/land_missions-52204.json",
+        "runs.step2 visit.status": "ok",
+        "runs.step2 visit.ok": true,
+        "runs.step2 visit.failures": 0,
+        "runs.step2 visit.result": "evidence/runtime/in-game/campaign_soak-7156.json",
+        "runs.step4-5 create.status": "ok",
+        "runs.step4-5 create.ok": true,
+        "runs.step4-5 create.failures": 0,
+        "runs.step4-5 create.result": "evidence/runtime/in-game/two_world_matrix-54052.json",
+        "runs.step5 cold.status": "ok",
+        "runs.step5 cold.ok": true,
+        "runs.step5 cold.failures": 0,
+        "runs.step5 cold.result": "evidence/runtime/in-game/two_world_matrix-30068.json",
+        "runs.step4 seam.status": "ok",
+        "runs.step4 seam.ok": true,
+        "runs.step4 seam.failures": 0,
+        "runs.step4 seam.result": "evidence/runtime/in-game/seam_presentation-54116.json",
+        "runs.step6 refusals.status": "ok",
+        "runs.step6 refusals.ok": true,
+        "runs.step6 refusals.failures": 0,
+        "runs.step6 refusals.result": "evidence/runtime/in-game/compat_matrix-36200.json",
+        "finishedUtc": "2026-10-19T20:31:49.7366639Z"
+       }
+      },
+      {
+       "path": "evidence/persistence/save-binding.json",
+       "sha256": "bd30152c0062ac9300c9f7aa718f554677bb53c6c05cd143e73297bc5823e1a0",
+       "trackedByGit": true,
+       "recorded": {
+        "accepted.result": "evidence/runtime/in-game/save_binding-15972.json",
+        "accepted.status": "ok",
+        "accepted.failures": 0,
+        "accepted.checks": 14,
+        "accepted.passed": 14,
+        "accepted.total": 14
+       }
+      },
+      {
+       "path": "evidence/persistence/save-binding-tests.json",
+       "sha256": "6e8c5e07ab92717e90138259e7154d12960224c0fd8bbeedcbb7ea7f5ad5abaa",
+       "trackedByGit": true,
+       "recorded": {
+        "checks": 77,
+        "failures": 0
+       }
+      },
+      {
+       "path": "evidence/persistence/loader-tests.json",
+       "sha256": "e3b29816ae89072583045e634d1066a4f4823957ce04e2b64ce9c00d2149a3ee",
+       "trackedByGit": true,
+       "recorded": {
+        "checks": 42,
+        "failures": 0
+       }
+      }
+     ],
+     "note": "The final one-shot matrix: create 54052 38/38 (A played into mutable land and naval state across the seam and saved; B, seed 73, generated, started, changed and saved; A then B loaded in the same process), cold 30068 20/20 (a new process loads A, its scene swept and re-encoded, then B; each equal to its save). No cross-world callbacks after any load. MMR-19 17/17; MMR-48 14/14."
+    },
+    {
+     "aspect": "missing or mismatched worlds are refused before simulation",
+     "status": "pass",
+     "evidence": [
+      {
+       "path": "evidence/persistence/two-world-matrix.json",
+       "sha256": "ecf15d57bf09e9b605166914f120d1c2757e87c74e8d651c2f25aeb1792512b4",
+       "trackedByGit": true,
+       "recorded": {
+        "create.result": "evidence/runtime/in-game/two_world_matrix-54052.json",
+        "create.status": "ok",
+        "create.failures": 0,
+        "create.checks": 38,
+        "create.passed": 38,
+        "create.total": 38,
+        "cold.result": "evidence/runtime/in-game/two_world_matrix-30068.json",
+        "cold.status": "ok",
+        "cold.failures": 0,
+        "cold.checks": 20,
+        "cold.passed": 20,
+        "cold.total": 20
+       }
+      },
+      {
+       "path": "evidence/persistence/compat-matrix.json",
+       "sha256": "81d9d625d3d5dacf961895c32bcfa5db835ae0e45a45dc220a20ae9aee78a578",
+       "trackedByGit": true,
+       "recorded": {
+        "result": "evidence/runtime/in-game/compat_matrix-36200.json",
+        "status": "ok",
+        "failures": 0,
+        "checks": 13,
+        "passed": 13,
+        "total": 13
+       }
+      },
+      {
+       "path": "evidence/persistence/compatibility-tests.json",
+       "sha256": "5d4086fdc895416aa8e244ade0edd6af50a26857775b2f54808c7353e5909868",
+       "trackedByGit": true,
+       "recorded": {
+        "checks": 56,
+        "failures": 0
+       }
+      }
+     ],
+     "note": "In the final one-shot run: the matrix refused torn, missing-world, other-game-version saves and a Continue into a missing world; the compatibility matrix 36200 13/13 refused incompatible schema and build, missing DLC, a corrupted manifest hash and an isolated damaged copy of the world data; each left the running campaign or the menu as it was, and the bundles were unchanged."
+    },
+    {
+     "aspect": "a campaign is exported and imported with its world, offline",
+     "status": "pass",
+     "evidence": [
+      {
+       "path": "evidence/persistence/save-transfer-real.json",
+       "sha256": "0e3b28d3eabc0df8437af89e4e27265b3d3799ac2bfc3a6bee696f0ee6658cea",
+       "trackedByGit": true,
+       "recorded": null
+      }
+     ],
+     "note": "tools/Transfer-WorldSave.ps1 (a repository tool, not in the package): a real export imported into an empty store on the same PC and checked by tools/Inspect-World.ps1 (the first export format; the current format is tested offline only)."
+    },
+    {
+     "aspect": "the packaged module reloads a save after a reinstall",
+     "status": "pass",
+     "evidence": [
+      {
+       "path": "evidence/release/clean-install.json",
+       "sha256": "0ddbc143a5b17cf44c0b3db60d4a55857a47c7dbffaa29a4fa9f9b4672cb1897",
+       "trackedByGit": true,
+       "recorded": {
+        "passed": 27,
+        "total": 27,
+        "checks": 27,
+        "readOnly.probe.status": "ok"
+       }
+      }
+     ],
+     "note": "The clean-install sequence on the final package: no scene left after the reinstall, the save loaded and its scene was re-encoded."
+    }
+   ],
+   "notExercised": [
+    "a transferred campaign loaded in game",
+    "a failure after a load has started, the deferred re-encode and War Sails absent, in game"
+   ]
+  },
+  {
+   "id": "s7",
+   "text": "A clean local package completes the specified one-shot acceptance scenario and records exact build/request/world/save identities, observed results, timings and limitations. Broad seed certification, long simulation soaks and production performance targets are follow-up. Any observed correctness failure in the required scenario remains failed.",
+   "status": "pass",
+   "aspects": [
+    {
+     "aspect": "the current package passes its audits",
+     "status": "pass",
+     "evidence": [
+      {
+       "path": "evidence/release/package-manifest.json",
+       "sha256": "0464f31611a119d96885baa23e9295dc53e751bd00ea3d42d4ffc0fa675dd6f9",
+       "trackedByGit": true,
+       "recorded": {
+        "utc": "2026-10-19T19:24:03.9419417Z"
+       }
+      }
+     ],
+     "note": "MNBL.ProceduralWorld-v0.0.1.zip 51abd1cc... (assembly bb6c6fd2..., worldbridge 2bfdbb9d..., fwg.exe 564c2629...), 11 files; 0 game files identical, the embedded resources the project lists, the module's own template files. A local test package, not release-certified."
+    },
+    {
+     "aspect": "the current package installed alone, with the development module and store unavailable",
+     "status": "pass",
+     "evidence": [
+      {
+       "path": "evidence/one-shot/one-shot-run.json",
+       "sha256": "3b0b3927da260d26a0bac5060bc3b3ba67a3c115fdbfac054b8cb1706d8a4895",
+       "trackedByGit": true,
+       "recorded": {
+        "status": "pass",
+        "runs.step1 profile.status": "ok",
+        "runs.step1 profile.ok": true,
+        "runs.step1 profile.failures": 0,
+        "runs.step1 profile.result": "evidence/runtime/in-game/first_test_profile-23852.json",
+        "runs.step1 identities.status": "ok",
+        "runs.step1 identities.ok": true,
+        "runs.step1 identities.failures": 0,
+        "runs.step1 identities.result": "evidence/runtime/in-game/new_campaign_flow-35592.json",
+        "runs.step3 prepare.status": "ok",
+        "runs.step3 prepare.ok": true,
+        "runs.step3 prepare.failures": 0,
+        "runs.step3 prepare.result": "evidence/runtime/in-game/land_missions-46848.json",
+        "runs.step3 naval.status": "ok",
+        "runs.step3 naval.ok": true,
+        "runs.step3 naval.failures": 0,
+        "runs.step3 naval.result": "evidence/runtime/in-game/naval_missions-51924.json",
+        "runs.step2 land.status": "ok",
+        "runs.step2 land.ok": true,
+        "runs.step2 land.failures": 0,
+        "runs.step2 land.result": "evidence/runtime/in-game/land_missions-52204.json",
+        "runs.step2 visit.status": "ok",
+        "runs.step2 visit.ok": true,
+        "runs.step2 visit.failures": 0,
+        "runs.step2 visit.result": "evidence/runtime/in-game/campaign_soak-7156.json",
+        "runs.step4-5 create.status": "ok",
+        "runs.step4-5 create.ok": true,
+        "runs.step4-5 create.failures": 0,
+        "runs.step4-5 create.result": "evidence/runtime/in-game/two_world_matrix-54052.json",
+        "runs.step5 cold.status": "ok",
+        "runs.step5 cold.ok": true,
+        "runs.step5 cold.failures": 0,
+        "runs.step5 cold.result": "evidence/runtime/in-game/two_world_matrix-30068.json",
+        "runs.step4 seam.status": "ok",
+        "runs.step4 seam.ok": true,
+        "runs.step4 seam.failures": 0,
+        "runs.step4 seam.result": "evidence/runtime/in-game/seam_presentation-54116.json",
+        "runs.step6 refusals.status": "ok",
+        "runs.step6 refusals.ok": true,
+        "runs.step6 refusals.failures": 0,
+        "runs.step6 refusals.result": "evidence/runtime/in-game/compat_matrix-36200.json",
+        "finishedUtc": "2026-10-19T20:31:49.7366639Z"
+       }
+      }
+     ],
+     "note": "The one-shot sequence: the package extracted alone matches its manifest (11 files, no development receipt), the store started empty, the battle-scale lock held; the official files, the 123 earlier saves and the development module and store were unchanged or put back."
+    },
+    {
+     "aspect": "the current package through the disable, remove, reinstall and read-only sequence",
+     "status": "pass",
+     "evidence": [
+      {
+       "path": "evidence/release/clean-install.json",
+       "sha256": "0ddbc143a5b17cf44c0b3db60d4a55857a47c7dbffaa29a4fa9f9b4672cb1897",
+       "trackedByGit": true,
+       "recorded": {
+        "passed": 27,
+        "total": 27,
+        "checks": 27,
+        "readOnly.probe.status": "ok"
+       }
+      }
+     ],
+     "note": "tools/Test-CleanInstall.ps1 on 51abd1cc... (install, disabled, removed, reinstalled, read-only)."
+    },
+    {
+     "aspect": "the one-shot acceptance scenario on the current package",
+     "status": "pass",
+     "evidence": [
+      {
+       "path": "evidence/one-shot/one-shot-run.json",
+       "sha256": "3b0b3927da260d26a0bac5060bc3b3ba67a3c115fdbfac054b8cb1706d8a4895",
+       "trackedByGit": true,
+       "recorded": {
+        "status": "pass",
+        "runs.step1 profile.status": "ok",
+        "runs.step1 profile.ok": true,
+        "runs.step1 profile.failures": 0,
+        "runs.step1 profile.result": "evidence/runtime/in-game/first_test_profile-23852.json",
+        "runs.step1 identities.status": "ok",
+        "runs.step1 identities.ok": true,
+        "runs.step1 identities.failures": 0,
+        "runs.step1 identities.result": "evidence/runtime/in-game/new_campaign_flow-35592.json",
+        "runs.step3 prepare.status": "ok",
+        "runs.step3 prepare.ok": true,
+        "runs.step3 prepare.failures": 0,
+        "runs.step3 prepare.result": "evidence/runtime/in-game/land_missions-46848.json",
+        "runs.step3 naval.status": "ok",
+        "runs.step3 naval.ok": true,
+        "runs.step3 naval.failures": 0,
+        "runs.step3 naval.result": "evidence/runtime/in-game/naval_missions-51924.json",
+        "runs.step2 land.status": "ok",
+        "runs.step2 land.ok": true,
+        "runs.step2 land.failures": 0,
+        "runs.step2 land.result": "evidence/runtime/in-game/land_missions-52204.json",
+        "runs.step2 visit.status": "ok",
+        "runs.step2 visit.ok": true,
+        "runs.step2 visit.failures": 0,
+        "runs.step2 visit.result": "evidence/runtime/in-game/campaign_soak-7156.json",
+        "runs.step4-5 create.status": "ok",
+        "runs.step4-5 create.ok": true,
+        "runs.step4-5 create.failures": 0,
+        "runs.step4-5 create.result": "evidence/runtime/in-game/two_world_matrix-54052.json",
+        "runs.step5 cold.status": "ok",
+        "runs.step5 cold.ok": true,
+        "runs.step5 cold.failures": 0,
+        "runs.step5 cold.result": "evidence/runtime/in-game/two_world_matrix-30068.json",
+        "runs.step4 seam.status": "ok",
+        "runs.step4 seam.ok": true,
+        "runs.step4 seam.failures": 0,
+        "runs.step4 seam.result": "evidence/runtime/in-game/seam_presentation-54116.json",
+        "runs.step6 refusals.status": "ok",
+        "runs.step6 refusals.ok": true,
+        "runs.step6 refusals.failures": 0,
+        "runs.step6 refusals.result": "evidence/runtime/in-game/compat_matrix-36200.json",
+        "finishedUtc": "2026-10-19T20:31:49.7366639Z"
+       }
+      }
+     ],
+     "note": "tools/Test-OneShot.ps1 on 51abd1cc... (2026-10-19, docs/one-shot-acceptance.md): steps 1-6 and the sequence pass, every aspect. It re-ran the earlier pass on e20f2667 after the seed-43 fixes (commit 6d34cef). The three runs between found and fixed probe failures: returns measured planar across the seam, a native crash when the matrix finished an encounter under its opening map conversation, the soak's volunteers taken during its journey, the seam presentation without a shelter, and a stale path after a teleport. The two runs before e20f2667 found a type-initializer failure from patching CampaignUIHelper that broke character creation, the naval raid probe that needed the main agent to kill, and the AI fleet battle left to chance in the matrix (build/mmr1/one-shot-run-f91a42f4.json)."
+    },
+    {
+     "aspect": "the established offline suites on the integrated sources",
+     "status": "pass",
+     "evidence": [
+      {
+       "path": "evidence/one-shot/offline-suites.json",
+       "sha256": "c4efbd4223269fab65ff92748f82f5ef6483644242793019498535c13efd3ee0",
+       "trackedByGit": true,
+       "recorded": {
+        "passed": 46,
+        "total": 46,
+        "suites.Test-ApiPins.passed": true,
+        "suites.Test-Activation.passed": true,
+        "suites.Test-GenerationJob.passed": true,
+        "suites.Test-EarlyBinding.passed": true,
+        "suites.Test-SaveBinding.passed": true,
+        "suites.Test-WorldLoader.passed": true,
+        "suites.Test-AutorunCleanup.passed": true,
+        "suites.Test-Heightfield.passed": true,
+        "suites.Test-GeneratedCampaignDataset.passed": true,
+        "suites.Test-Doctor.passed": true,
+        "suites.Test-Deployment.passed": true,
+        "suites.Test-CampaignRegistry.passed": true,
+        "suites.Test-Characters.passed": true,
+        "suites.Test-Factions.passed": true,
+        "suites.Test-Settlements.passed": true,
+        "suites.Test-SpawnPolicy.passed": true,
+        "suites.Test-NavalContent.passed": true,
+        "suites.Test-CompiledWorld.passed": true,
+        "suites.Test-Compatibility.passed": true,
+        "suites.Test-PeriodicCoordinates.passed": true,
+        "suites.Test-WaterClimate.passed": true,
+        "suites.Test-WorldDataBundle.passed": true,
+        "suites.Test-GraphValidation.passed": true,
+        "suites.Test-EncounterResolver.passed": true,
+        "suites.Test-Playability.passed": true,
+        "suites.Test-SettlementPlacement.passed": true,
+        "suites.Test-WorldNavigation.passed": true,
+        "suites.Test-WorldPreview.passed": true,
+        "suites.Test-WorldSetup.passed": true,
+        "suites.Test-WorldSurface.passed": true,
+        "suites.Test-Recovery.passed": true,
+        "suites.Test-GenerationProbe.passed": true,
+        "suites.Test-ProducerProcess.passed": true,
+        "suites.Test-SourceReader.passed": true,
+        "suites.Test-TravelGate.passed": true,
+        "suites.Test-WorldBridgeSurface.passed": true,
+        "suites.Test-PackagePaths.passed": true,
+        "suites.Test-CampaignSoak.passed": true,
+        "suites.Test-LandMissions.passed": true,
+        "suites.Test-NavalMissions.passed": true,
+        "suites.ci unit tests.passed": true,
+        "suites.mods.py check.passed": true,
+        "suites.producer lock.passed": true,
+        "suites.source reader.passed": true,
+        "suites.terrain.bin.passed": true,
+        "suites.navmesh.bin.passed": true,
+        "utc": "2026-10-19T22:25:10.9014302Z"
+       }
+      }
+     ],
+     "note": "tools/Test-OfflineSuites.ps1 on the final sources: every csc harness, the bridge and package path suites, the scenario checks and the Python tests. Test-GenerationIdentity not run (it rewrites an embedded build input)."
+    }
+   ],
+   "notExercised": []
+  }
+ ],
+ "deferredCertification": [
+  {
+   "item": "broad seed certification (seed corpus)",
+   "status": "not-run",
+   "partial": [
+    {
+     "path": "evidence/world/seed-yield.json",
+     "sha256": "40b35cb0ba55c40c3c662184aad281a93fd732903245c4411312a74feaa4a2dd",
+     "trackedByGit": true,
+     "recorded": null
+    },
+    {
+     "path": "worldgen/fixtures/acceptance-seeds.json",
+     "sha256": "b177e2907e03796c5937f3795a7bde7d06877da79188b133e86aafacae4ccb10",
+     "trackedByGit": true,
+     "recorded": null
+    }
+   ],
+   "note": "Seeds 42-73 offline at one quality attempt: 19 of 32 accepted, all 19 offline-activatable (stand-in engine). In game: 42 and 73 played, 43 generated and started on the final package, 56 and 67 generated and started after the later gate fix (refused at settlement.port_far on the final package). Size 129 only; the in-game activation of the other accepted seeds is not run."
+  },
+  {
+   "item": "runtime-world sweep",
+   "status": "not-run",
+   "partial": [
+    {
+     "path": "evidence/world/seed-yield.json",
+     "sha256": "40b35cb0ba55c40c3c662184aad281a93fd732903245c4411312a74feaa4a2dd",
+     "trackedByGit": true,
+     "recorded": null
+    }
+   ],
+   "note": "The sweep runs the activation's managed stages and the stand-in navigation offline; no sweep of generated worlds through the game exists."
+  },
+  {
+   "item": "long simulation soaks",
+   "status": "not-run",
+   "partial": [
+    {
+     "path": "evidence/gameplay/campaign-soak.json",
+     "sha256": "fc4d74aa7dcdaca2c65453adffa6837d73e92422e7fbb64b51246e7db0c4acea",
+     "trackedByGit": true,
+     "recorded": {
+      "result": "evidence/runtime/in-game/campaign_soak-41920.json",
+      "status": "ok",
+      "failures": 0,
+      "passed": 55,
+      "total": 55
+     }
+    }
+   ],
+   "note": "The longest play is 1 day 6 h on world A (MMR-51). Long-run economy, raids, sieges and naval attrition over many days are untested."
+  },
+  {
+   "item": "endurance (repeated sessions, memory over time)",
+   "status": "not-run",
+   "partial": [
+    {
+     "path": "worldgen/validation/first-test-measurements.json",
+     "sha256": "6cb798555d8511e82e198894da4bce53b51f092bc6dd2f02b2ba4d4f570e2a50",
+     "trackedByGit": true,
+     "recorded": {
+      "result": "evidence/runtime/in-game/first_test_profile-40412.json",
+      "status": "ok",
+      "passed": 20,
+      "total": 20,
+      "checks": 20
+     }
+    }
+   ],
+   "note": "One working-set measurement per phase in one profile run."
+  },
+  {
+   "item": "all-season play",
+   "status": "not-run",
+   "partial": [
+    {
+     "path": "evidence/world/water-climate.json",
+     "sha256": "4743c6be43914838b481b06a4219785bdffd54b0af82441990919ed5fa5ce90e",
+     "trackedByGit": true,
+     "recorded": {
+      "sources.periodic.status": "ok",
+      "sources.periodic.failures": 0,
+      "sources.naval.status": "ok",
+      "sources.naval.failures": 0,
+      "sources.offline.checks": 34,
+      "sources.offline.failures": 0,
+      "sources.surface.status": "ok",
+      "sources.load.status": "ok",
+      "periodicWorld.dayNight.failures": 0,
+      "periodicWorld.mapSupportWeather.status": "prepared",
+      "navalWorld.dayNight.failures": 0,
+      "afterLoad.status": "ok",
+      "afterLoad.failures": 0
+     }
+    }
+   ],
+   "note": "The weather model was checked against its formula for all four seasons on fixtures; no season-long play."
+  },
+  {
+   "item": "resolution and performance certification",
+   "status": "not-run",
+   "partial": [
+    {
+     "path": "worldgen/validation/first-test-measurements.json",
+     "sha256": "6cb798555d8511e82e198894da4bce53b51f092bc6dd2f02b2ba4d4f570e2a50",
+     "trackedByGit": true,
+     "recorded": {
+      "result": "evidence/runtime/in-game/first_test_profile-40412.json",
+      "status": "ok",
+      "passed": 20,
+      "total": 20,
+      "checks": 20
+     }
+    }
+   ],
+   "note": "One machine (Core Ultra 9, RTX 5080, 32 GB) at a 60 fps cap; narrow screens and UI scales measured, not run; no mission frame rate."
+  },
+  {
+   "item": "production performance targets",
+   "status": "not-run",
+   "partial": [
+    {
+     "path": "worldgen/policies/one-shot-budget.json",
+     "sha256": "23a59ce940b0ef4bacdc43c163ad2c6964c292b4e35982a3f877ea9f6fb33120",
+     "trackedByGit": true,
+     "recorded": {
+      "status": "provisional"
+     }
+    }
+   ],
+   "note": "The budget is provisional and not enforced. The first start of every world, and the first start or load after a module update, blocks the engine thread for about 6.5 minutes."
+  }
+ ],
+ "identities": {
+  "game": "Mount & Blade II: Bannerlord v1.4.8.119303 (Steam build 24573425)",
+  "warSails": "NavalDLC v1.2.8.119303",
+  "moddingKit": "Steam app 1393600 build 24575232; depot 4456490 manifest 1015157637537524692 (development only)",
+  "harmony": "Bannerlord.Harmony v2.4.2 (Steam Workshop 2859188632)",
+  "producer": {
+   "fwg.exe": "564c2629b5b92d49e52cd466a5a1aaa9339380464207ddcae669dd487d2f695e",
+   "fwgcppCommit": "ec5d1c10f5ae4c32fdcef092d23ad7d51e2a30de"
+  },
+  "worldbridge": "2bfdbb9d0e2ae55dc356e9a8873bd70a5cded3b647faed28d261e5abc442f53a (package 51abd1cc, the 2026-10-19 seed sweep)",
+  "package": {
+   "archive": "MNBL.ProceduralWorld-v0.0.1.zip",
+   "sha256": "51abd1cc9b88dc3d2a7e3d0d8f5b15f9301a54d9288fbde23864a5d542789a66",
+   "moduleAssemblySha256": "bb6c6fd2da1a5f47ee71fc0394702a80005b4d537b1ab5db09cd9548349fd03e",
+   "releaseCertified": false,
+   "oneShotTested": true,
+   "cleanInstallTested": true
+  },
+  "worlds": {
+   "A": {
+    "seed": 42,
+    "worldContentId": "f596b58cdcfc18798542fdef5a4d9c9f6d84abddca1425af8d0b87f521191d2d",
+    "campaignId": "mnbl_1609fb72",
+    "scene": "mnbl_world_f596b58cdcfc1879_019bf8ec927e",
+    "playable": true
+   },
+   "B": {
+    "seed": 73,
+    "worldContentId": "f63c6841085725e2c437b7d5d087a52cf4dc7d5d8fe3e2d583d46cba6a775550",
+    "campaignId": "mnbl_214f6557",
+    "scene": "mnbl_world_f63c6841085725e2_c36448e016ee",
+    "playable": true
+   },
+   "fixtures": {
+    "mnbl_00059042": "MMR-19 world w42, seed 364610: the earlier second world of the two-world tests (no longer needed: B is production seed 73)",
+    "mnbl_00063042": "MMR-63 periodic fixture, seed 405570: the seam travel, camera and picking runs before the generated-world seam probe"
+   }
+  }
+ },
+ "buildCurrency": "No single module build ran every piece of evidence: each ticket's in-game runs used the module assembly of its own build (for example MMR-49 4ed3b966..., MMR-51 fcae6eea..., MMR-53 3003e293..., MMR-56 e10a2e69...). The final one-shot scenario (2026-10-19) re-ran the player flow, land and naval play, the seam on A and B, the two-world save matrix and the refusals on one build, the package assembly bb6c6fd2..., the clean-install sequence ran on the same package, and the offline suites on its sources; the remaining in-game evidence is from earlier builds.",
+ "evidenceFiles": {
+  "count": 82,
+  "untracked": []
+ },
+ "designedFailuresInPassingEvidence": [
+  {
+   "path": "evidence/generation/recovery/world-recovery.json",
+   "field": "accepted.crash.status",
+   "why": "the crash run is killed on purpose and stays \"running\""
+  },
+  {
+   "path": "evidence/one-shot/ucrt-drift.json",
+   "field": "preflight.passed",
+   "why": "the record of the drift itself, from before the UCRT pin was renewed; evidence/fwg/producer-process-contract.json is the re-run after the renewal, and it passes"
+  },
+  {
+   "path": "evidence/persistence/initial-save-recovery.json",
+   "field": "sources.publish.status",
+   "why": "process 1 of the recovery pair is left mid-run on purpose; process 2 (run 19888) recovers it, and all 15 checks pass"
+  },
+  {
+   "path": "evidence/world/playability-report.json",
+   "field": "sources.startsRefused.status",
+   "why": "run 9908 is kept to show that surviving installed start points are refused (check installedStartsRefused)"
+  },
+  {
+   "path": "evidence/world/playability-report.json",
+   "field": "startsRefused.failures",
+   "why": "the refused routes of that same deliberate run 9908"
+  }
+ ],
+ "finalScenario": {
+  "status": "pass",
+  "owner": "MMR-1",
+  "run": "evidence/one-shot/one-shot-run.json",
+  "startedUtc": "2026-10-19T19:24:08.4793952Z",
+  "finishedUtc": "2026-10-19T20:31:49.7366639Z",
+  "steps": {
+   "1": "pass",
+   "2": "pass",
+   "3": "pass",
+   "4": "pass",
+   "5": "pass",
+   "6": "pass",
+   "sequence": "pass"
+  },
+  "identities": {
+   "commit": "6d34cef12aed416550732885abec19ff539fe76b",
+   "sourceTreeClean": false,
+   "package": {
+    "sha256": "51abd1cc9b88dc3d2a7e3d0d8f5b15f9301a54d9288fbde23864a5d542789a66",
+    "moduleAssemblySha256": "bb6c6fd2da1a5f47ee71fc0394702a80005b4d537b1ab5db09cd9548349fd03e",
+    "worldbridgeSha256": "2bfdbb9d0e2ae55dc356e9a8873bd70a5cded3b647faed28d261e5abc442f53a",
+    "manifestSource": {
+     "commit": "6d34cef12aed416550732885abec19ff539fe76b",
+     "ownedFilesUncommitted": true
+    }
+   },
+   "producerSha256": "564c2629b5b92d49e52cd466a5a1aaa9339380464207ddcae669dd487d2f695e",
+   "game": "v1.4.8.119303",
+   "navalDlc": "v1.2.8.119303",
+   "worlds": {
+    "A": {
+     "seed": 42,
+     "worldContentId": "f596b58cdcfc18798542fdef5a4d9c9f6d84abddca1425af8d0b87f521191d2d",
+     "save": "mnbl_probe56_A_23852",
+     "binding": {
+      "worldId": "mnbl_1609fb72",
+      "package": "mnbl_1609fb72-423268b6fc6c",
+      "instance": "029fd4b667d04e208207255be5718cfc",
+      "contentId": "f596b58cdcfc18798542fdef5a4d9c9f6d84abddca1425af8d0b87f521191d2d"
+     },
+     "scene": "mnbl_world_f596b58cdcfc1879_019bf8ec927e",
+     "seconds": {
+      "generate": 34.991769,
+      "mapAfterStart": 395.32428170000003,
+      "load": 14.443538199999978
+     }
+    },
+    "B": {
+     "seed": 73,
+     "worldContentId": "f63c6841085725e2c437b7d5d087a52cf4dc7d5d8fe3e2d583d46cba6a775550",
+     "activated": true,
+     "matrixContentId": "f63c6841085725e2c437b7d5d087a52cf4dc7d5d8fe3e2d583d46cba6a775550",
+     "save": "mnbl_probe49_B_54052",
+     "instance": "333463c267d147a89a975c7e934db37c",
+     "seconds": {
+      "generate": 54.70147250000002,
+      "matrixStart": 854.8579004
+     }
+    }
+   },
+   "request": {
+    "jobA": "5987aff676004625807553b53a2084e0",
+    "jobB": "d9ffdfc6f4cb4e6da416f1b8c6ec085c",
+    "recipeVersion": 3,
+    "overrides": {
+     "phase": 16,
+     "size": 129
+    },
+    "qualityAttempts": 3
+   },
+   "campaigns": {
+    "profile": "029fd4b667d04e208207255be5718cfc",
+    "matrix": "18daa6b69520426d82d28bd59bdc7399",
+    "designated": "9a5318d45b5341c3a1f9f21e1630cdab"
+   },
+   "matrixSave": "mnbl_probe49_A_54052",
+   "designatedSave": "mnbl_oneshot_A_designated",
+   "navigationCaches": {
+    "keys": [
+     "dadc84ff",
+     "ebc5475a"
+    ],
+    "builtIn": [
+     "step1 profile",
+     "step2 land",
+     "step4-5 create"
+    ],
+    "aStart": "dadc84ff",
+    "loads": [
+     {
+      "world": "A",
+      "how": "profile same-process",
+      "status": "reused",
+      "key": "dadc84ff"
+     },
+     {
+      "world": "A",
+      "how": "matrix same-process",
+      "status": "reused",
+      "key": "dadc84ff"
+     },
+     {
+      "world": "B",
+      "how": "matrix same-process",
+      "status": "reused",
+      "key": "ebc5475a"
+     },
+     {
+      "world": "A",
+      "how": "matrix cold",
+      "status": "reused",
+      "key": "dadc84ff"
+     },
+     {
+      "world": "B",
+      "how": "matrix cold",
+      "status": "reused",
+      "key": "ebc5475a"
+     },
+     {
+      "world": "B",
+      "how": "seam presentation",
+      "status": "reused",
+      "key": "ebc5475a"
+     }
+    ],
+    "loadSeconds": {
+     "profile same-process": 14.443538199999978,
+     "matrix same-process A": 14.205048000000033,
+     "matrix same-process B": 18.249198699999965,
+     "matrix cold A": 32.7053725,
+     "matrix cold B": 18.5391701
+    }
+   }
+  },
+  "reruns": []
+ }
+}

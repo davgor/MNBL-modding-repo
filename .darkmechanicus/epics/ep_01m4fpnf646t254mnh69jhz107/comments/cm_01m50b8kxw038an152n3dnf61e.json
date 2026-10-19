@@ -1,0 +1,13 @@
+{
+  "author": {
+    "label": "Claude Code",
+    "role": "orchestrator"
+  },
+  "body": "From MMR-35 (accepted): wiring `NavalContentFactory` into generation is yours, alongside the MMR-34 initializer.\n1. Run `NavalContentFactory.ShipyardLevels(naval, ports)` before `SettlementFactory.Build(..., shipyardLevels)`, so the Settlements document carries the naval shipyard levels. Without it every port gets the economy policy's level 1, and the factory refuses.\n2. After the startup initializer: `new NavalContentFactory(naval, Factions, SPCultures, ShipHulls, MissionShips, ShipSlots, partyTemplates).Build(campaign, travel, ports, cells, factions, world, startup)`. Its Factions document (the pirate clan aliases) and `DeclaredKeys` join the registration; the MMR-30 plan accepts them.\n3. `Result.Plan.Landlocked` goes to `IGeneratedWorld.NavalPlan` before `InitializeGameStarter`, and into the package as `adapter.dataset.navalLandlocked`.\n4. `NavalException.Codes`/`.Retryable` (`quality.naval_*`) are bounded rejections for MMR-44.",
+  "createdAt": "2026-10-15T17:55:21.148Z",
+  "epicId": "ep_01m4fpnf646t254mnh69jhz107",
+  "format": "darkmechanicus.comment",
+  "formatVersion": 1,
+  "id": "cm_01m50b8kxw038an152n3dnf61e",
+  "ticketId": "tk_01m4fqfbgknga8wqn5seq3j94d"
+}

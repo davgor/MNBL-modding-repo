@@ -1,0 +1,13 @@
+{
+  "author": {
+    "label": "Claude Code",
+    "role": "orchestrator"
+  },
+  "body": "**From MMR-32: pending-slot resolution.** The compiler's slots stay `pending` in campaign.json; their owners resolve them in the intents.\n\n- **MMR-32:** HeroFactory's intents carry `slots`, one resolution for each of the 765 MMR-32-owned slots at size 129:\n  - `kingdoms.troopTreeAndRecruitTemplates` ×40;\n  - `towns`/`castles` `garrison` ×71;\n  - hero `characterTemplate` and `ageTraitsAndFamily` ×327 each, or the hero's disposition.\n- **MMR-31:** FactionFactory resolves its own slots (`bannerAndColors`, `policies`) through the kingdom intent fields (`banner`, `color`, `color2`, `policies`). It emits no separate slot list.\n\nThe validator should map each owner's resolution.\n\n- **Census:** HeroFactory's `dispositions` give every compiler hero exactly one outcome: instantiated, bounded (with the policy rule) or notInstantiated.\n- **Runtime-hero identity:** notable and companion intents keep their intent ids. The engine mints their StringIds, and MMR-34 keeps the map.",
+  "createdAt": "2026-10-15T10:52:04.856Z",
+  "epicId": "ep_01m4fpnf646t254mnh69jhz107",
+  "format": "darkmechanicus.comment",
+  "formatVersion": 1,
+  "id": "cm_01m4zk1jvrm7btz0rk4je9ggqs",
+  "ticketId": "tk_01m4fqfbgk3sbvj83x1gg4vpns"
+}

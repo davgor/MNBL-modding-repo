@@ -1,0 +1,13 @@
+{
+  "author": {
+    "label": "Claude Code",
+    "role": "orchestrator"
+  },
+  "body": "**Handoff from MMR-43 (setup screen).**\n\n- **The vocabulary exists.** `src/MNBL.ProceduralWorld/Generation/GenerationErrors.cs` defines the eight categories this ticket names: missing tool or DLC, incompatible build, refused recipe, exhausted quality attempts, disk full, bad source, runtime capability failure, interrupted generation.\n  - Each category has a localisable `{=mnbl_err_*}` title and action.\n  - The rule: messages name only what a player can act on; producer codes, executable names, paths and hashes go to `Detail`, which only the diagnostics view shows.\n  - `GenerationErrors.Host` covers War Sails missing or disabled, game and War Sails versions, and generator binaries (IO errors included).\n  - `GenerationErrors.FromGeneration` maps any unknown status to bad source, never to success.\n  - **Adopt and extend this file** rather than defining a second vocabulary. MMR-43 needed it first.\n- **Staging cleanup is partly in place.** The setup releases its own jobs (`InterimGenerationRunner.Release`): one job directory under `SubModule.Store/jobs`, plus its heightfield marker, deleted off the engine thread. Developer generations and older job directories are not touched; general staging cleanup, logs, recovery and correlation ids are yours.",
+  "createdAt": "2026-10-16T01:26:10.186Z",
+  "epicId": "ep_01m4fpnf646t254mnh69jhz107",
+  "format": "darkmechanicus.comment",
+  "formatVersion": 1,
+  "id": "cm_01m515230acy6bt6s9b0mesqdr",
+  "ticketId": "tk_01m4fqfbgkdhbqqf84gy5p5z2b"
+}

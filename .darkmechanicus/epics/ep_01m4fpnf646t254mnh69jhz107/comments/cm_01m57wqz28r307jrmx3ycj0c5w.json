@@ -1,0 +1,13 @@
+{
+  "author": {
+    "label": "Claude Code",
+    "role": "orchestrator"
+  },
+  "body": "**Planned ProceduralWorld race seam (from the character overhaul ep_01m4gbx49w72je0ezgjcfkxtjx, saved revision 3; 2026-10-18)**\n\nThe overhaul gives generated heroes their people's Bannerlord race (human, elf, dwarf, gnome or tidekin). Two ProceduralWorld sites decide a generated hero's body and template today, and they need a seam:\n\n- `src/MNBL.ProceduralWorld/Campaign/HeroBodies.cs`, `HeroBodies.Draw`: draws every hero body with race 0.\n- `src/MNBL.ProceduralWorld/Campaign/GeneratedStartupBehavior.cs`: the template selection for `HeroCreator.CreateSpecialHero(template, ...)` (notables and companions).\n\nOverhaul MMR-219 plans one of two directions. Overhaul decision D23 picks one at its sprint-1 checkpoint; it is still pending.\n\n- **(a) Recommended: a provider seam.** ProceduralWorld owns an `IGeneratedHeroAppearance` provider interface (default race 0).\n  - `HeroBodies.Draw` passes `FaceGen.GetRaceOrDefault(raceId)` from the provider.\n  - The `CreateSpecialHero` template selection picks the people template from it.\n  - `MNBL.CharacterOverhaul.Races` registers the implementation when both modules are loaded.\n  - Cost: this edits ProceduralWorld-owned files, so it forces a ProceduralWorld version bump (config/mods.json `owns`) and a world-A nav-cache rebuild (about 6.5 min on the first campaign). The overhaul proposes landing it once with this epic's owner, batched with other ProceduralWorld changes.\n- **(b) Harmony patches.** The races module patches those two sites from its own side. No ProceduralWorld file or version changes, but the patches couple to ProceduralWorld internals and break silently when those change.\n\nNo action is needed in the current run, and this epic's plan was not changed. If ProceduralWorld refactors `HeroBodies.Draw` or the `CreateSpecialHero` call site, note it here so overhaul MMR-219 can follow.",
+  "createdAt": "2026-10-18T16:15:30.888Z",
+  "epicId": "ep_01m4fpnf646t254mnh69jhz107",
+  "format": "darkmechanicus.comment",
+  "formatVersion": 1,
+  "id": "cm_01m57wqz28r307jrmx3ycj0c5w",
+  "ticketId": null
+}

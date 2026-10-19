@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "status": "passed-isolated-adoption-tests-pending-independent-review",
+  "createdAtUtc": "2026-10-17T17:28:20.638203+00:00",
+  "sources": {
+    "src/MNBL.AgentStorage/AgentDomainStorage.hpp": "722e5d7e0883af22499fb02b068e54e7fddef6eee0185796020ed89d9361f7b6",
+    "src/MNBL.AgentStorage/StableAgentStorage.hpp": "34555749bbfdf9ad318a02aea660f36cfe57ee9183e856df48c216ebf8503458",
+    "tests/AgentStorage/agent_domain_storage_tests.cpp": "f8b6ebbf9c31aab5df46dbf3c0832f275b892ff028e7150b023563415c7895df",
+    "tests/AgentStorage/adopted_agent_storage_tests.cpp": "48d057fb0d5e9432c1eba49fc0b3dff647647db71654da1df9efef5cc541a445",
+    "tools/battle-scale/Test-AdoptedAgentStorage.cmd": "1adb7f79dcc65486eb9e52432a3ada8bf6e98265529258f775ea9163a890b1ce",
+    "tools/battle-scale/verify_adopted_storage.py": "12c175de4c7efef534c7b0e55b33fe5b15e9ff1b7a76ce83db22a29491b9e002"
+  },
+  "binaries": {
+    "build/agent-storage/adopted_agent_storage_tests.exe": "bf9597e5059a9388c17f926de18d3c670f0cf99a912c0daea6b4c5001149bc89",
+    "build/agent-storage/adopted_agent_storage_asan.exe": "92ccadca77a20f48d7d39ac12777f052f7cbacbdd883cf5a19f0e9e453fdae2f"
+  },
+  "command": "tools/battle-scale/Test-AdoptedAgentStorage.cmd",
+  "exitCode": 0,
+  "stdout": "adopted_agent_storage_tests.cpp\nPASS independent domains: primary pools0,2,3,4 and secondary pool1; overlapping indices, 2040 -> 4080 -> 6120, stable five-pool addresses, cross-access rejection, 12 boundary reuses\nPASS atomic shared growth: 15 null allocations, 15 throwing allocations, 45 constructor failures; both old ledgers survive; reverse rollback and retry\nPASS independent old free chains and 66049 indices per domain, beyond signed16 and unsigned16 limits; overflow rejected\nPASS invalid domains, reader barrier, deferred five-pool teardown, closed-domain rejection\nOFFLINE DOMAIN STORAGE ONLY: synthetic callbacks; no engine allocation, native lookup, or secondary companion relationship established\nPASS borrowed original arrays: no relocation or reconstruction; staged growth to6120; explicit allocation, holes, exhaustion, independent highwater; lease-held teardown\nPASS invalid adoption rollback, duplicate/out-of-range occupancy, overlapping/null/overflow arrays, double adoption, closed physical access\nPASS 75 adopted-suffix failure points: original pointers, objects, both ledgers and highwater survive; retry and teardown succeed\nOFFLINE ADOPTION ONLY: synthetic existing records; caller must supply actual engine lifetime and occupancy snapshots\nadopted_agent_storage_tests.cpp\nPASS independent domains: primary pools0,2,3,4 and secondary pool1; overlapping indices, 2040 -> 4080 -> 6120, stable five-pool addresses, cross-access rejection, 12 boundary reuses\nPASS atomic shared growth: 15 null allocations, 15 throwing allocations, 45 constructor failures; both old ledgers survive; reverse rollback and retry\nPASS independent old free chains and 66049 indices per domain, beyond signed16 and unsigned16 limits; overflow rejected\nPASS invalid domains, reader barrier, deferred five-pool teardown, closed-domain rejection\nOFFLINE DOMAIN STORAGE ONLY: synthetic callbacks; no engine allocation, native lookup, or secondary companion relationship established\nPASS borrowed original arrays: no relocation or reconstruction; staged growth to6120; explicit allocation, holes, exhaustion, independent highwater; lease-held teardown\nPASS invalid adoption rollback, duplicate/out-of-range occupancy, overlapping/null/overflow arrays, double adoption, closed physical access\nPASS 75 adopted-suffix failure points: original pointers, objects, both ledgers and highwater survive; retry and teardown succeed\nOFFLINE ADOPTION ONLY: synthetic existing records; caller must supply actual engine lifetime and occupancy snapshots\n",
+  "stderr": "",
+  "checks": [
+    "Original five arrays adopted without element construction, relocation, destruction or release",
+    "Separate primary and secondary occupied-index snapshots, holes and highwater",
+    "2040 borrowed elements followed by actual new blocks at4080 and6120",
+    "Inactive physical record access for native scans; invalid and closed ranges rejected",
+    "Explicit index allocation unlinks one free slot, rejects occupied/out-of-range slots, preserves generations",
+    "75 adopted-suffix callback failures preserve old objects, pointers, both ledgers and highwater; retry succeeds",
+    "Earlier domain test suite runs in both builds, including75 additional fault points and66049 indices/domain",
+    "Borrowed owner retained through last lease, released once; only newly owned records invoke storage destruction"
+  ],
+  "limits": [
+    "Synthetic existing objects; not live Bannerlord Agents or a validated engine allocator adapter",
+    "Caller must supply a real engine lifetime owner and frozen occupancy snapshots; no game barrier implemented",
+    "Free slots rebuilt in ascending order; replacing native allocation metadata and every consumer is still required",
+    "Primary companion linkage reflects reviewed create/delete paths only; arbitrary companion writers remain unproved",
+    "The earlier domain receipt binds pre-adoption header bytes and is historical; this receipt binds current source",
+    "MSVC AddressSanitizer is not a data-race detector; no full-engine concurrency or exception-handler claim"
+  ],
+  "gameLaunched": false,
+  "enginePatchApproved": false,
+  "independentReviewPending": true
+}

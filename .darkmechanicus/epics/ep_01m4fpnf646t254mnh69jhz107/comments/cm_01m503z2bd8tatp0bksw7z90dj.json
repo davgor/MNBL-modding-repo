@@ -1,0 +1,13 @@
+{
+  "author": {
+    "label": "Claude Code",
+    "role": "orchestrator"
+  },
+  "body": "From MMR-34 (accepted):\n- **Pirate clans are yours.** `startup.json` leaves out the naval clans: `northern_pirates` (culture looters) and `southern_pirates`. `PiratesCampaignBehavior` is inventoried as retained with basis `deferred:MMR-35`; with no pirate clan it spawns nothing.\n- **Pirate patrol zones** come from `INavalMapSceneWrapper.GetSpawnPoints(clan tag)` on the map scene. The generated map scene must answer that per pirate clan, or pirates have nowhere to spawn.\n- **Aliases.** If the pirate clans are re-created with their installed ids, add them to `CampaignIdentity.Aliases`, the dataset's `RequiredAliases` and the startup audit's alias list. The registry tests currently prove `northern_pirates` is refused as an unprefixed non-alias.\n- **Bandit rule.** `Clan.IsBanditFaction` excludes naval-capable cultures, so pirates are not keyed into `BanditSpawnCampaignBehavior`'s hideouts-by-culture map.\n- **Embarkation.** MMR-34 checks the start town's gate (Default), port (Naval) and gate-to-port within 2 cells. The engine's `GetPortToGateDistanceForSettlement` reads 54.4 on the fixture world, against a straight-line 4.38. It is not a straight-line distance; your landing metadata should say what it measures.",
+  "createdAt": "2026-10-15T15:47:48.205Z",
+  "epicId": "ep_01m4fpnf646t254mnh69jhz107",
+  "format": "darkmechanicus.comment",
+  "formatVersion": 1,
+  "id": "cm_01m503z2bd8tatp0bksw7z90dj",
+  "ticketId": "tk_01m4fqfbgkdsrnhxytt4xafgwd"
+}

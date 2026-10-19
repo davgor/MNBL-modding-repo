@@ -1,0 +1,201 @@
+{
+  "schemaVersion": 1,
+  "status": "rejected-private-element-probe-v2-package",
+  "statusReason": "On this machine the runner cannot complete a live run: C:\\ProgramData\\Mount and Blade II Bannerlord\\crashes is a dangling junction, so the crash-directory snapshot at Test-ElementProbeInGameV2.ps1:231 throws after the three private files are deployed and before launch. The run would mutate and restore the shared module folder and produce only a failed receipt. Fail-safe, but the package is not usable for its one live launch as built. Everything else (hashes, contract, host, deterministic rebuild, inert tests) checked out; see should-fix findings.",
+  "reviewedProfileSha256": "c37fbe17e5adb0a976a4f0ff8c58e2405e873a3384fc16104af73d8f1beef6f4",
+  "verifiedHashes": {
+    "profileSources": {
+      "src/MNBL.AgentGrowthProbe/managed/ProbeInterop.cs": "1e33587f5cd8e2a7014885ba56d137cd4f773e36afbc433ea321e5dfac9eae5d",
+      "src/MNBL.AgentGrowthProbe/managed/ProbeRequest.cs": "2c1ee19a283cf53309af777f539b2ee2ff43159da54ae97f0b14ff0c8c23dc0a",
+      "src/MNBL.AgentGrowthProbe/managed-v2/SubModule.cs": "61d5c40fe0962729685415b9790b5266492b9c01f16530f834c04712dcd7e638",
+      "Modules/MNBL.AgentGrowthProbe/SubModule.xml": "694ad34c5690853aec036821c53fbb8e524029fcd91254b4d6e003bf0196cb23",
+      "tests/AgentStorage/managed_element_host_tests.cs": "cc87e75db3c98b9d956a3d738b11534e3bfd64d23e7d4b6f78c568d61a745742",
+      "tools/battle-scale/Build-ElementProbeHostV2.ps1": "aff47fd10ed14223572b50e8bc0eca7471fd474ec3dcebee5706d247a1211109",
+      "tools/battle-scale/Test-ElementProbeInGameV2.ps1": "ee2d3715f3f7a13883c799246151babc29a97d6b62b8ebf28061a2e1347b2e57",
+      "tools/battle-scale/Test-NativeExitContract.ps1": "bd8cc8995a6855676945855154a71145c7dbe883441feab7c68de2aceefd10d4",
+      "tools/battle-scale/audit_watchdog_exit_contract_original.py": "742f9cae16633d4b3ea25072a869d38d6af2a8d83825b27f4f7637f3823ae277",
+      "evidence/engine-extension/native-original-watchdog-shutdown-contract.json": "ce986872594d4ae57c00637f5d84009b3a6b75df08fd6f7a5c1a8e942b0dc295",
+      "evidence/engine-extension/native-relocated-binding-independent-review.json": "b027c74bcf573639f833917e23570c81dfbc819c83f0b215fd9e85792bca7962",
+      "build/agent-storage/MNBL.RelocatedNativeElementProbe.dll": "9d1f6a512dd63c833d44a4fd0bf0e7f5ede9750dcb022ef50608144306347d05"
+    },
+    "profileProviders": {
+      "bin/Win64_Shipping_Client/TaleWorlds.Library.dll": "ab4ff23e94a6f4b6f293d0cb4333cae731a0499063fe4a8b6c6a3770de32c4e5",
+      "bin/Win64_Shipping_Client/TaleWorlds.Localization.dll": "d75a5c89c26a09e587fab55c182b2962bb36708b4766a922bdf1f46a28212628",
+      "bin/Win64_Shipping_Client/TaleWorlds.Core.dll": "3e5cece8ca42faf3fdde27632519ed2a6f86d1ec6d1a742867729f00001689bf",
+      "bin/Win64_Shipping_Client/TaleWorlds.ObjectSystem.dll": "d76e1d883a6d9a4efe6f9f3b4d14da41a414c7b587f7280705255dc99abd9977",
+      "bin/Win64_Shipping_Client/TaleWorlds.Engine.dll": "bfd5db82d92f75ef15a5eb9a9f0c9391412566933193122db1684019ed704d68",
+      "bin/Win64_Shipping_Client/TaleWorlds.DotNet.dll": "a002a6f094b01912306814f3979c8a249abcfc05a874dcc3352b26f23dfef080",
+      "bin/Win64_Shipping_Client/TaleWorlds.MountAndBlade.dll": "19387f31557ff840d14f378f6bbdf1d58fcff406ab9ff2294dfbb3e49a50b87e",
+      "bin/Win64_Shipping_Client/TaleWorlds.Native.dll": "2a5e0e0b15513ebb7052d747a621b82c50ee834553eba283b33bbbc33766e12a",
+      "bin/Win64_Shipping_Client/Bannerlord.exe": "5b50b56a2e13e5d7a00fd6c6f940285be50eeac0391e76b90d766dd497ab56be",
+      "bin/Win64_Shipping_Client/Watchdog/Watchdog.exe": "01c871b3742700e1ccf15e89d94a7e019525e4e1917a6b7c31765188b5ff6983"
+    },
+    "packageFiles": {
+      "MNBL.AgentGrowthProbe.dll": "57c5b680beeca06c73847130100c44c7931a6b4f0f603c5b4d90fb1a4ce0de7d",
+      "MNBL.NativeElementProbe.dll": "9d1f6a512dd63c833d44a4fd0bf0e7f5ede9750dcb022ef50608144306347d05",
+      "SubModule.xml": "694ad34c5690853aec036821c53fbb8e524029fcd91254b4d6e003bf0196cb23",
+      "element-probe-profile.json": "c37fbe17e5adb0a976a4f0ff8c58e2405e873a3384fc16104af73d8f1beef6f4"
+    },
+    "reviewerDeterministicRecompile": {
+      "v2HostFromProbeInterop+ProbeRequest+managed-v2/SubModule": "57c5b680beeca06c73847130100c44c7931a6b4f0f603c5b4d90fb1a4ce0de7d",
+      "v1HostFromFrozenSources_controlMatchesV1PackageAndRealV1Runs": "d95bb8aac1e17f099d7c5b740e18195ca7df8238618db1d575fd13b9ee664e78"
+    },
+    "contractInputs": {
+      "tools/battle-scale/audit_watchdog_exit_contract.py (frozen)": "fe027c0acd4e30d685712f371b7c4b089a2930cd60cdf4f6d2177dbf8a65d082",
+      "evidence/engine-extension/native-watchdog-shutdown-contract.json (historical)": "915d39892bbf7ab165290e6f8c37aa192707588769d001dbc3665b2da53d33c5",
+      "evidence/engine-extension/native-watchdog-managed-exit-evidence.json": "7ca9fcf270522d32abbcb93eacb6fed2abc80c9aeaa8df7b616344ca62b5f85c",
+      "tools/battle-scale/managed-audit/Read-WatchdogExitContract.ps1": "59ff0bfb602162569ae449ac08c17a4063213c3bc491f1825728ac567faa20b7",
+      "build/battle-scale/native-run-20261017-065749-08e99ed9/backup-0": "2a5e0e0b15513ebb7052d747a621b82c50ee834553eba283b33bbbc33766e12a"
+    },
+    "frozenV1Unchanged": {
+      "src/MNBL.AgentGrowthProbe/managed/SubModule.cs": "afa6e85b7eeb66c20282414ab6a2ee9374ab74aab194bc86be2e37f0e58bb95d",
+      "tools/battle-scale/Test-ElementProbeInGame.ps1": "d6d7066d2adad723d6d4095ed45985882c972d5269225ce44e955ecd68f04163"
+    },
+    "buildReceipt": {
+      "evidence/engine-extension/managed-element-host-v2-offline-build.json": "415c3059f79b3fe5f0b543708fee988ce175d9e3c3906bfb76e91720c703b919"
+    },
+    "inertTests": {
+      "tests/AgentStorage/managed_host_runner_v2_tests.ps1": "80a107700fb6de58bf9f7b9184541ce71b8d66c502068ba5a065b8b01bc178ed",
+      "evidence/engine-extension/managed-element-runner-v2-offline-tests.json (before reviewer re-run)": "2787dd86dbed5a41c2eb8e23f52ed54b97df2f04b3edb8472051020a41cc85cd",
+      "evidence/engine-extension/managed-element-runner-v2-offline-tests.json (written by reviewer re-run)": "123c2da60f0993141170fb7ad5d6b968236d6f02ca6738851c90028d4e44ae14"
+    }
+  },
+  "checks": [
+    {"check": "Every profile source, provider and package file hash recomputed from disk (22 pins + 3 files + exit contract).", "result": "pass", "detail": "0 mismatches. Installed TaleWorlds.Native.dll 2a5e0e0b... and Watchdog.exe 01c871b3... match the expected stock values."},
+    {"check": "Package files equal their sources.", "result": "pass", "detail": "Byte compare: package MNBL.NativeElementProbe.dll == build/agent-storage/MNBL.RelocatedNativeElementProbe.dll; package SubModule.xml == Modules/MNBL.AgentGrowthProbe/SubModule.xml. Relocated review status accepted-bounded-relocated-native-binding-offline names 9d1f6a51...; all 16 of its source pins match disk."},
+    {"check": "Build receipt consistency.", "result": "pass", "detail": "managed-element-host-v2-offline-build.json sources/providers/outputs equal the profile; profileSha256 c37fbe17...; ManagedElementHostTests.exe hash matches its recorded value."},
+    {"check": "Contract rebuild: imported audit_watchdog_exit_contract_original.py with python -I (spec_from_file_location), called build(), compared in memory.", "result": "pass", "detail": "build() == saved JSON as objects with identical key order; json.dumps(indent=2)+newline with CRLF translation reproduces the saved bytes exactly (sha ce986872...). Saved file untouched (bytes compared before/after)."},
+    {"check": "Contract proof spans and IL checks vs frozen script.", "result": "pass", "detail": "All 13 spans (start/end), 4 method_contains IL line sets, pinvoke checks, string/pointer/import asserts are identical to audit_watchdog_exit_contract.py. The new script also asserts installed TaleWorlds.Native.dll bytes == the hashed backup."},
+    {"check": "Cross-check against historical nativeProofs is real.", "result": "pass-with-note", "detail": "historical nativeProofs == rows over 13 non-empty spans (1553 decoded instructions; each span must decode to its exact byte length), bundleExtraction == manifest, historical nativeSourceSha256/watchdogSha256 asserted. It is a byte-identity check against the previously reviewed decode of the same image, not a new semantic analysis (see limitations)."},
+    {"check": "Host v2 source diff vs frozen v1.", "result": "pass", "detail": "Only changes: comment; a try/catch that reads TaleWorlds.Engine.Utilities.GetReturnCode() after native validation and before Report; schemaVersion 2, hostVersion managed-v2, new status strings, nativeReturnCode field. QuitGame stays in the same finally; GetReturnCode is never called after it. Arming, claim, env clear and interop unchanged."},
+    {"check": "GetReturnCode is read-only.", "result": "pass", "detail": "native-quit-exit-contract.json: Utilities.GetReturnCode -> IUtil.GetReturnCode -> native 529b50 reading DWORD D92CD4; only DoDelayedexit writes it. D92CD4 lies beyond .data raw size (zero-initialised)."},
+    {"check": "Package host DLL compiled from exactly ProbeInterop.cs + ProbeRequest.cs + managed-v2/SubModule.cs.", "result": "pass", "detail": "Reviewer re-ran the build script's exact csc command (deterministic, same refs) into the scratchpad: output sha 57c5b680... equals the package DLL. Control: same command on v1 sources reproduces d95bb8aa..., the v1 host hash in the real v1 runs. Reflection-only metadata: types SubModule (OnApplicationTick, OnBeforeInitialModuleScreenSetAsRoot), ProbeInterop, ProbeRequest(+Owner), ProbeResult, and a 17-member anonymous report type including hostVersion and nativeReturnCode; user strings managed-v2 and passed-awaiting-shutdown-verification present; GetReturnCode and QuitGame member refs present; no SetReturnCode reference."},
+    {"check": "Runner read-only preflight against the real package (no -Execute).", "result": "pass", "detail": "Private probe v2 preflight passed. Existing Bannerlord/Watchdog sessions: 0. Preflight does not examine the crash directory (see blocking finding)."},
+    {"check": "Inert tests re-run in Windows PowerShell 5.1.26100.9711.", "result": "pass", "detail": "PASS 32 actual-runner v2 inert scenarios + real stock-log replay. All 27 failing scenarios were rejected for their intended reasons (identity, cleanup counters, return code, schema, exit 5, missing result, copy failure and package/input change before launch, restore conflict/backup corruption, timeout with exactly one owned kill, no/stale/wrong-path/replaced watchdog, lingering watchdog stopped once, foreign/stale/out-of-order/missing logs, crash marker, crash file, error-log entry, missing cleanup milestone). Real logs for PID 21268 accepted; PID 556 (no watchdog log) rejected. Install module folder unchanged afterwards."},
+    {"check": "Foreign-session checks before every install mutation and launch.", "result": "pass-with-nit", "detail": "FreshWindow (any Bannerlord* or Watchdog process) precedes each deployment copy (213), the launch (232), each restore copy (303) and each removal (307). The directory creation at 208 follows the check at 198 with hashing/backup in between (nit)."},
+    {"check": "Owned-process identity before CloseMainWindow/Kill/Stop-Process.", "result": "pass-with-findings", "detail": "Game: VerifyOwnedIdentity before CloseMainWindow and before Kill, and the Process object from Process.Start holds the handle, so PID reuse is impossible. Watchdog: re-identified by PID + WMI CreationDate + name before Stop-Process, but Stop-Process acts by PID (TOCTOU nit). Unbounded WaitForExit after Kill (should-fix)."},
+    {"check": "Watchdog identity.", "result": "pass", "detail": "Child of the exact owned PID, created no earlier than game start - 2 s (PID-reuse guard), exact path Watchdog/Watchdog.exe, file hash == contract hash, recorded once; liveness re-checks CreationDate. Native DLL references Watchdog\\Watchdog.exe, so the game being the parent is expected."},
+    {"check": "Receipt semantics.", "result": "pass-with-findings", "detail": "passed requires no failure, nativeProbePassed, verifiedShutdownProtocol and restored; verifiedShutdownProtocol requires a verified contract result and no forced cleanup; normalExitVerified additionally requires exit 0; allNativeDestructorsVerified always false. No runner path gives passed or either flag true after a failure, a forced kill/stop or a failed restore. Found: mock receipts with passed status share the live runs directory; launcher overrides are recorded but not enforced."},
+    {"check": "PS 5.1 / StrictMode pitfalls.", "result": "pass", "detail": "Large startTicks parse as Int64 and compare exactly (real v1 runs show runner/host tick agreement). DateTime comparisons are UTC on both sides. Missing result properties throw under StrictMode (still a rejection). SaveJson writes UTF-8 with BOM, which File.ReadAllText in the host strips. ProcessStartInfo.EnvironmentVariables affects only the child; inert tests confirm the parent environment is unchanged."},
+    {"check": "Function:\\Start-ArmedGame seam.", "result": "finding", "detail": "Recorded in launcherSource (the inert-test receipts show the test file), but not enforced. See should-fix."},
+    {"check": "Safe Mode dialog clicker.", "result": "pass-with-nit", "detail": "Only visible top-level #32770 windows titled exactly 'Safe Mode' owned by the owned game PID or recorded watchdog PIDs; only a child Button whose text is exactly 'No'; BM_CLICK. Never Yes. The test fake PIDs are not multiples of 4, so the real EnumWindows calls during tests could not match anything. Watchdog PIDs are not re-verified before use (nit). Not exercised by any test."},
+    {"check": "Crash-dir and error-log checks.", "result": "fail", "detail": "The crash dir is a junction to C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\261550\\3717685432\\cache, which does not exist. Test-Path returns True; Get-ChildItem throws DirectoryNotFoundException (reproduced with the runner's exact line-231 expression under Stop/StrictMode). The error-log check is sound for a clean run (the real rgl_log_errors_21268.txt contains only the header and passes the regex), but a missing or stale error log is accepted silently."}
+  ],
+  "findings": [
+    {
+      "id": "B1",
+      "severity": "blocking",
+      "location": "tools/battle-scale/Test-ElementProbeInGameV2.ps1:231 (also 22, 105-107; preflight 160-175 does not check it)",
+      "summary": "Crash-directory snapshot throws on this machine's dangling crash junction, after deployment and before launch.",
+      "failureScenario": "C:\\ProgramData\\Mount and Blade II Bannerlord\\crashes is a Junction whose target (Steam workshop item 3717685432 'cache') no longer exists. Test-Path is True, so line 231 runs Get-ChildItem, which throws DirectoryNotFoundException under ErrorActionPreference=Stop. A live -Execute deploys all three private files into the shared module folder (197-223), writes the request, then fails at 231; finally restores and writes status failed with gameLaunched false. The live run cannot succeed. Preflight passes, so nothing warns the operator, and no inert test covers a reparse-point or unreadable crash directory. If the target is ever re-created, the check would watch a Steam-managed workshop folder that Steam may change mid-run, causing false failures.",
+      "suggestedFix": "In preflight, before any deployment, resolve the crash path and refuse with a clear message if it is a reparse point or cannot be enumerated (or treat it explicitly as 'crash dir unavailable' and record that, if the operator accepts weaker crash evidence). Add an inert scenario for it. Whether to remove or repair the junction is the user's decision; it may belong to another tool or agent."
+    },
+    {
+      "id": "S1",
+      "severity": "should-fix",
+      "location": "tests/AgentStorage/managed_host_runner_v2_tests.ps1:153 with tools/battle-scale/Test-ElementProbeInGameV2.ps1:182",
+      "summary": "Inert tests write mock 'passed' receipts into the same runs directory a live run uses.",
+      "failureScenario": "The runner always writes to build/element-probe-host-v2/runs/<guid>/runtime-receipt.json. Each suite run adds 4 such receipts; there are now 12 (8 before the reviewer's re-run) with status passed-private-native-probe-and-verified-shutdown, gameLaunched true and verifiedShutdownProtocol true (mock PID 78787, fake profile hash, launcherSource = test script). Any later step that globs the runs directory for a passing receipt, or picks the newest one, can take a mock receipt for the live result. Only profileSha256/launcherSource/pid tell them apart.",
+      "suggestedFix": "Let the test pass a separate run root, or have the runner mark receipts produced with an overridden launcher as inert (a distinct status, never passed). Consumers should require profileSha256 == the reviewed hash and launcherSource == the runner path."
+    },
+    {
+      "id": "S2",
+      "severity": "should-fix",
+      "location": "tools/battle-scale/Test-ElementProbeInGameV2.ps1:151-159, 187, 324",
+      "summary": "The test seam is live in -Execute: a caller-scope Start-ArmedGame (and any shadowing Get-Process, Copy-Item, Get-CimInstance, Stop-Process or Start-Sleep function) is used silently.",
+      "failureScenario": "If -Execute is invoked from a session or parent script that defines Start-ArmedGame (or Get-Process), the runner uses it. That can skip the foreign-session check or launch something other than the pinned Bannerlord.exe, and the receipt can still say passed. launcherSource records the override's file (or null when defined interactively), but nothing compares it with the runner's own path. The profile pins the runner's hash, which does not cover caller-scope definitions.",
+      "suggestedFix": "In -Execute, require (Get-Command Start-ArmedGame).ScriptBlock.File -eq $PSCommandPath and that Get-Process/Copy-Item/Remove-Item/Stop-Process/Get-CimInstance resolve to CmdletInfo. Otherwise force an inert status, or refuse to run."
+    },
+    {
+      "id": "S3",
+      "severity": "should-fix",
+      "location": "tools/battle-scale/Test-ElementProbeInGameV2.ps1:276-278, 283-286",
+      "summary": "WaitForExit() after Kill() has no timeout, and the owned watchdog (attached as a debugger) is handled only after the game has exited.",
+      "failureScenario": "On a hung owned game (timeout path), CloseMainWindow, then Kill, then $owned.WaitForExit() can block forever if termination does not complete while the watchdog debugger is attached. This repo's memory records a hung Bannerlord that Stop-Process did not end but 'taskkill /F /T' did. The runner would then never stop the watchdog, never restore the module files and never release native-test.lock; the shared install keeps the deployed private module. Mechanism unconfirmed for this build; the unbounded wait itself is confirmed in code.",
+      "suggestedFix": "Use a bounded WaitForExit. If the game is still alive, stop the recorded owned watchdog instance (after re-identifying it), then wait again, bounded. Record the result and continue to restore/receipt in every case."
+    },
+    {
+      "id": "N1",
+      "severity": "nit",
+      "location": "tools/battle-scale/Test-ElementProbeInGameV2.ps1:285",
+      "summary": "Owned-watchdog Stop-Process acts by PID after a separate WMI identity check (TOCTOU).",
+      "failureScenario": "If the watchdog exits and its PID is reused between OwnedWatchdogAlive and Stop-Process, a foreign process could be stopped. The window is very small.",
+      "suggestedFix": "Get a Process object once, verify StartTime/path on that object, then Kill() through its handle."
+    },
+    {
+      "id": "N2",
+      "severity": "nit",
+      "location": "tools/battle-scale/Test-ElementProbeInGameV2.ps1:112",
+      "summary": "A missing rgl_log_errors_<pid>.txt is accepted silently, and the error log is not checked for staleness.",
+      "failureScenario": "Every real run creates this file. If it is absent (redirected or virtualized logs) the check is skipped, and errorLog is null on a passing receipt. If a stale same-PID file exists, a clean old header satisfies the check.",
+      "suggestedFix": "Require the file and require LastWriteTimeUtc >= launch, or record errorLogVerified=false and do not pass."
+    },
+    {
+      "id": "N3",
+      "severity": "nit",
+      "location": "tools/battle-scale/Test-ElementProbeInGameV2.ps1:244-245",
+      "summary": "DeclineSafeMode is called for recorded watchdog PIDs without re-checking that the same instance is alive.",
+      "failureScenario": "If an owned watchdog exits while the game lives and its PID is reused by another process showing a 'Safe Mode' #32770 dialog, that dialog would get 'No'. Practically remote.",
+      "suggestedFix": "Filter by OwnedWatchdogAlive first."
+    },
+    {
+      "id": "N4",
+      "severity": "nit",
+      "location": "tools/battle-scale/Test-ElementProbeInGameV2.ps1:227 vs 232",
+      "summary": "The request (10-minute validity in ProbeRequest) is created before the final unbounded FreshWindow wait.",
+      "failureScenario": "If a foreign session starts just before the launch check and runs for more than about 10 minutes, the host finds a stale request, stays inert, and the runner times out and force-kills its own game. That wastes the launch; it is safe. Inherited from v1.",
+      "suggestedFix": "Create or refresh the request after the last FreshWindow."
+    },
+    {
+      "id": "N5",
+      "severity": "nit",
+      "location": "tools/battle-scale/Test-ElementProbeInGameV2.ps1:13, 21-22",
+      "summary": "LogRoot (and the crash path derived from it) is a free parameter, and neither is recorded in the receipt.",
+      "failureScenario": "A non-default LogRoot changes which logs and crash directory the verification uses, and the receipt does not say so.",
+      "suggestedFix": "Record logPath and crashPath in the receipt; in -Execute, require the default or pin it in the profile."
+    },
+    {
+      "id": "N6",
+      "severity": "nit",
+      "location": "tests/AgentStorage/managed_host_runner_v2_tests.ps1:16, 210-216",
+      "summary": "The real-log replay depends on C:\\ProgramData\\...\\logs\\watchdog_log_21268.txt, which is not pinned or retained in the repo.",
+      "failureScenario": "Only the most recent run's watchdog log survives today (runs 556, 2092, 26872, 30368 and 37192 have rgl logs but no watchdog log). Uncertain: the next game start may delete it. If so, the inert suite throws at line 16 after the live run and can no longer be re-run.",
+      "suggestedFix": "Copy the real logs into a hashed repo fixture and replay from there."
+    },
+    {
+      "id": "N7",
+      "severity": "nit",
+      "location": "tools/battle-scale/Test-ElementProbeInGameV2.ps1:208, 291-312",
+      "summary": "Restore removes deployed files but not the directories it created. Directory creation is not immediately preceded by a fresh check.",
+      "failureScenario": "On a clean install, an empty Modules/MNBL.AgentGrowthProbe/bin/Win64_Shipping_Client tree stays behind. It already exists on this machine, so there is no change today.",
+      "suggestedFix": "Record created directories and remove them if empty during restore."
+    },
+    {
+      "id": "N8",
+      "severity": "nit",
+      "location": "tools/battle-scale/Test-ElementProbeInGameV2.ps1:315-321",
+      "summary": "For exit 0, verifiedShutdownProtocol is also true (kind process-exit-zero).",
+      "failureScenario": "A consumer that reads verifiedShutdownProtocol=true as 'the watchdog kp protocol was observed' is wrong for exit-0 runs. shutdownVerification.kind tells them apart. No false pass.",
+      "suggestedFix": "Document this, or add a separate watchdogProtocolVerified flag."
+    }
+  ],
+  "missingTestScenarios": [
+    "Crash directory that is a reparse point, dangling or unreadable (would have caught B1).",
+    "A foreign Watchdog-only process (no Bannerlord*) blocking deploy, launch and restore. The mock only returns 'Bannerlord.Native'.",
+    "An owned game that does not exit after Kill (unbounded WaitForExit, S3).",
+    "A reused watchdog PID with a different CreationDate: it must count as not alive and must not be stopped.",
+    "-Execute with an overridden Start-ArmedGame or a shadowed cmdlet: it must refuse or be marked inert (S2).",
+    "Missing or stale rgl_log_errors file (N2); exit-0 runs with crash or error-log entries.",
+    "Safe Mode dialog handling (acknowledged as untested in the test receipt's limitations)."
+  ],
+  "limitations": [
+    "Static and offline only. No game launch, deployment, process start/stop/attach, or -Execute. The runner was run once with -PreflightOnly (read-only).",
+    "The contract cross-check proves the 13 decoded spans are byte-identical to the frozen historical contract. Their semantic interpretation (kp emitter, watchdog Process.Kill -> TerminateProcess(-1)) is inherited from that prior review, not re-derived here.",
+    "The exit-zero and watchdog-kp paths were exercised only through the inert mocks and the real PID 21268 log replay. The live watchdog parent PID, watchdog exit latency (the runner allows 30 s), first-chance-exception logging by the watchdog during the native probe, and the Safe Mode click were not observed.",
+    "S3's hang mechanism (TerminateProcess on a debugged process) is inferred from this repo's memory notes, not reproduced.",
+    "N6's log-deletion behaviour is inferred from which logs exist, not confirmed.",
+    "The reviewer's inert-test re-run overwrote evidence/engine-extension/managed-element-runner-v2-offline-tests.json (new hash recorded above) and added a fixture suite under build/element-probe-host-v2/inert-runner-tests/ and 29 mock run folders under build/element-probe-host-v2/runs/."
+  ],
+  "gameLaunched": false,
+  "installedFilesChanged": false
+}

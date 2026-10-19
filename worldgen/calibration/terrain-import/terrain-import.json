@@ -1,0 +1,98 @@
+{
+  "schema": "mnbl.terrain-import",
+  "version": 1,
+  "ticket": "MMR-26",
+  "summary": "Engine terrain format as proven by MMR-16, read by the terrain compiler instead of hard-coding it. Every value is an output of the accepted MMR-16 runs and of the encoder they exercised (src/WorldBridge/surface.cpp). No new engine calibration was made for these values.",
+  "terrain": {
+    "nodes": [
+      4,
+      4
+    ],
+    "nodeCells": [
+      32,
+      64
+    ],
+    "gridSides": [
+      129,
+      257
+    ],
+    "square": true,
+    "sharedNodeBorders": true,
+    "nodeSizeRule": "nodeSize = extent / 4, representable at 0.001 world units (XML precision)",
+    "extentRange": [
+      0.004,
+      1000000
+    ],
+    "heightLimit": 1000000,
+    "heightmapLevel": {
+      "32": 5,
+      "64": 6
+    },
+    "origin": [
+      0,
+      0
+    ],
+    "rasterOrientation": "row-major heightfield, row r at y = r * extent / (side - 1), column c at x = c * extent / (side - 1)",
+    "nodeSizeDecimals": 3
+  },
+  "height": {
+    "bits": 16,
+    "byteOrder": "big-endian (PNG network order inside terrain.bin HGHT)",
+    "range": "hmin = floor(min * 1000) / 1000, hmax = ceil(max * 1000) / 1000 over the whole grid (one global range)",
+    "zeroRange": "when hmax <= hmin, hmax = hmin + 1 (every sample quantizes to 0 and reconstructs exactly)",
+    "quantize": "q = round-half-even(clamp((h - hmin) / (hmax - hmin), 0, 1) * 65535)",
+    "reconstruct": "h' = hmin + q * (hmax - hmin) / 65535; |h - h'| <= (hmax - hmin) / 65535 / 2",
+    "engineVertex": "the engine truncates vertex heights toward zero at 0.03 world units (MMR-16 collision model)",
+    "triangleDiagonal": "(x, y) -> (x + 1, y + 1)",
+    "rangeDecimals": 3,
+    "zeroRangeSpan": 1,
+    "engineVertexTruncation": 0.03
+  },
+  "materials": {
+    "slots": 16,
+    "weightBits": 8,
+    "templateLayers": [
+      "grass",
+      "rock_k"
+    ],
+    "base": "slot 0 (grass) is written at full weight everywhere; slot 1 (rock_k) is painted over it by its weight",
+    "physics": "PHYM per node, x-major: stone where the rock weight >= 128, otherwise grass, for all four seasons",
+    "seasons": "winter enables snow physics on grass and disables rock_k (template check in surface.cpp)",
+    "encoderDefaultRock": "without compiled weights the encoder derives rock from slope: round-half-even(clamp((slope - 0.6) / 0.6, 0, 1) * 255)"
+  },
+  "navigation": {
+    "encoderNavmesh": "33 x 33 vertices, 2048 faces, z offset 0.2; slope > 1 -> group 7 else group 1 (surface encoder diagnostic navmesh only; campaign navmesh is MMR-28/38)"
+  },
+  "evidence": [
+    {
+      "file": "evidence/runtime/surface-probe.json",
+      "sha256": "ba7cbfc631d2be3a854e5efc5f4f789a7f6eb781e090b73bd768759eeeb128ee",
+      "fields": "accepted MMR-16 summary: encoded seeds 42/43 rendered, height, ground and ray queries"
+    },
+    {
+      "file": "evidence/runtime/in-game/runtime_surface-32896.json",
+      "sha256": "27975543003fd9ccba77678f5508ca9f03869c7041d9b45686872802cdfba0d0",
+      "fields": "accepted run: 129-vertex surfaces at extents 256, 800 and 640 registered and rendered at runtime"
+    },
+    {
+      "file": "evidence/runtime/surface-collision-calibration.json",
+      "sha256": "f5a3ac2b02737a7588264362d8c9fc241fc84d961189fc1807791227616b8278",
+      "fields": "0.03 truncation, main diagonal, collision model"
+    },
+    {
+      "file": "evidence/runtime/worldbridge-surface-offline.json",
+      "sha256": "9e181656ac0e937142b8f4f8c5439f544b06f17988401803c057c88f741767e6",
+      "fields": "11,956 offline assertions on the encoder's heights, normals, weights, physics and navigation"
+    },
+    {
+      "file": "docs/formats/terrain-bin.md",
+      "sha256": "e0c7045d42884b3b1ab1b6c94db52c5215ec6d18bbb177624b4b19234462d35a",
+      "fields": "node layout, column = +X, row = +Y, shared borders, 16-bit heights"
+    },
+    {
+      "file": "src/WorldBridge/surface.cpp",
+      "fields": "check_template (4x4 nodes, grass then rock_k), make_grid (129 or 257, range, round-half-even), terrain (big-endian heights, slot 0 full, slot 1 weights, PHYM x-major), surface_main (extent rule)"
+    }
+  ],
+  "observedSides": "MMR-16 ran 129-vertex surfaces in the engine. 257 is accepted by the same encoder path (level 6) and was used by the MMR-63 periodic fixture (257 x 257, 1600 extent, run 12348); both are proven."
+}

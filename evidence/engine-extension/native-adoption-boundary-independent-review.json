@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "status": "accepted-phase-mismatch-and-empty-boundary-evidence-no-live-adoption-approval",
+  "sources": {
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\evidence\\engine-extension\\native-companion-occupancy-contract.json": "a44b7c371cd4a5a87f66760bce3c85f364b456611dbc00ca9e20af0f13e8bc37",
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\build\\battle-scale\\native-run-20261017-065749-08e99ed9\\backup-0": "2a5e0e0b15513ebb7052d747a621b82c50ee834553eba283b33bbbc33766e12a",
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\tools\\battle-scale\\audit_native_companion_occupancy.py": "ee43a09345bf696a68af9ff21422be8e98e90c4f8f11d5e50f04356db2a55f5b",
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\src\\MNBL.AgentStorage\\NativePoolSnapshot.hpp": "cf2076735a90908babe1e9ddf6564aa19f188810b44e53f87b764a7529d73248",
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\evidence\\engine-extension\\native-pool-index-chain-replay.json": "79942f24b3183dacfc29505f516288152392ab97284bdd5a09d295776af615ae",
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\evidence\\engine-extension\\native-live-pool-growth-contract.json": "c99ca69958b3ed9d316510e53c1d7c04adf4d4e6aa73275e81382c7ce09f5363",
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\evidence\\engine-extension\\native-empty-adoption-boundary.json": "08f9cd63da22cc2a079048010fe4cf3507c2e362a2dbedd5425f32e730a67393",
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\tools\\battle-scale\\audit_native_empty_adoption_boundary.py": "2d8456469999e48197b2e95c729aa16b18c0422da204a3725f0583d74242b347",
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\evidence\\engine-extension\\native-callback-contracts.json": "03e0be441901f3999148de6d64b19f29426a44179f936d8de97263c6598f8ca1",
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\evidence\\engine-extension\\native-unpublished-element-runtime-contract.json": "036733361062f0aa087b8f7321c0132aceaa85cb0ee244bb27fa984b9a4e5660"
+  },
+  "reviewerSha256": "f43f96a783c4c35fabfc78b98c678c5a353bf14ea656a1141e45cefd20c9ff2b",
+  "originalInstructionRows": 2216,
+  "readOnlyProducerReplays": 2,
+  "nativeHelperCases": 4,
+  "nativeRegistrationResetCases": 5,
+  "nativeRemovalContrasts": 2,
+  "nativeEmptyBoundaryCases": 12,
+  "emptyGateRejections": 40,
+  "findings": [
+    "Current header-based occupied230 snapshot rule cannot be used at arbitrary frozen points; table membership survives initializer resetting payload header.",
+    "Table-only replacement is insufficient because original removal still scans payload headers to compute highwater.",
+    "An empty-only attach contract avoids importing phase-sensitive occupied state, but still requires completed construction, lifetime ownership and exclusion of native writers.",
+    "Constructor-return candidate precedes this wrapper publication; no transitive no-escape proof or hook approval is established.",
+    "CreateAgent common prefix is before both mutations; explicit branch writes header before its helper, so hooking only5cd195 would be late.",
+    "Do not synthesize CreateAgent failure result without fixing registered caller, which derives Agent pointer unconditionally."
+  ],
+  "openFindings": [
+    "Whole constructor/reset no-escape and mutation barrier unresolved.",
+    "No live adoption/lifecycle token or routed wide metadata yet."
+  ],
+  "limitations": [
+    "Replay uses synthetic memory and exact retained slices; full native Mission construction/activation/removal does not execute.",
+    "Negative tests validate necessary metadata checks, not absence of readers/jobs or native object lifetime.",
+    "No frozen source/evidence modified and no game launched."
+  ],
+  "liveAdoptionApproved": false,
+  "enginePatchApproved": false,
+  "gameLaunched": false
+}

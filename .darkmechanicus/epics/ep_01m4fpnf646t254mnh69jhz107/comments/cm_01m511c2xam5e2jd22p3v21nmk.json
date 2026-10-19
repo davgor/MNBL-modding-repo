@@ -1,0 +1,13 @@
+{
+  "author": {
+    "label": "Claude Code",
+    "role": "orchestrator"
+  },
+  "body": "**Decision (MMR-43 scope boundaries)**, recorded by the worker:\n\n1. **c1 lifecycle stage.**\n   - The setup screen and its generation run on the main menu, before any `Game` exists. Nothing is registered; generation produces files only. The `world_setup` probe asserts `Game.Current == null` when the screen opens and after generation.\n   - After Generate, the screen names the generated world's own peoples (the `civilizations.entities` names of its cities' population profiles). It shows no vanilla culture.\n   - Registering the world's cultures ahead of character creation (MMR-32 ordering: `GeneratedGameManager` plus `GeneratedCharacterCreation`) happens at campaign start. MMR-46 owns the one Start Campaign action, after MMR-45's activation transaction.\n   - Wiring a campaign start into MMR-43 would bypass MMR-45's \"only a fully validated matching world enters simulation\", so the result shows \"starting a campaign in a generated world is not available in this build yet\".\n   - **The reviewer and acceptor should judge whether this satisfies c1.** It is a judgment call on the ticket text.\n2. **Interim generation.** `InterimGenerationRunner` (the R01 job, `GenerationProbe.RunDiagnostic`) sits behind `IWorldGenerationRunner`. MMR-44's GenerationCoordinator replaces it, building its GenerationRequest from `WorldChoice`.\n3. **Error categories.** MMR-47's category vocabulary is defined in `Generation/GenerationErrors.cs`, because MMR-43 needs it first. MMR-47 owns recovery, logs, correlation ids and cleanup.\n4. **Waiting times.** They come from `worldgen/policies/one-shot-budget.json` (status provisional): the largest measurement per phase, rounded up to 5 s. The ticket allows runtime measurements to update the labels. The setup path's own measurements (20.1 s and 26.7 s) were added after run 31804 exceeded the 25 s then stated. MMR-56 replaces the values with its end-to-end measurements.\n5. **Input.** Physical keyboard and controller devices are not driven. The probe feeds synthetic `GenericPanelGameKeyCategory` key states through the screen's own mapping. The bindings were read from the v1.4.8 IL: Exit is Escape or the right face button; Confirm is Enter, Numpad Enter or the left face button.",
+  "createdAt": "2026-10-16T00:21:43.466Z",
+  "epicId": "ep_01m4fpnf646t254mnh69jhz107",
+  "format": "darkmechanicus.comment",
+  "formatVersion": 1,
+  "id": "cm_01m511c2xam5e2jd22p3v21nmk",
+  "ticketId": "tk_01m4fqfbgkgj055h5hvwmbzma8"
+}

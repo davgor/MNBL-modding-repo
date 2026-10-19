@@ -1,0 +1,13 @@
+{
+  "author": {
+    "label": "Claude Code",
+    "role": "orchestrator"
+  },
+  "body": "**Handoff from MMR-63 (seam save).**\n- **What MMR-63 tested:** one save with the player 0.0002 from the seam, deserialized in-session with `MBSaveLoad.LoadSaveGameData`. 19/19 parties; 95 saved positions equal the live values (`_position`, `MoveTargetPoint`, `_targetPosition`, `_pathLastPosition`, `EndPositionForNavigationTransition`), with 0 non-canonical. Resume was not tested.\n- **Known hole: canonical after each tick's rebase pass, but not guaranteed at the instant of a save.**\n  - Order: `MapState.OnTick` runs `SaveHandler.SaveTick` (IL_0022) before `OnMapModeTick` (IL_004f), and the rebase listener fires in `Campaign.Tick` before the hourly AI (`MobilePartyHourlyTick`, `TickPartialHourlyAi`). A strip target the AI places during a tick can therefore be saved.\n  - Fix: canonicalize in `OnBeforeSaveEvent`.\n- **Unchecked saved field:** `MobilePartyAi.BehaviorTarget` (a saved `CampaignVec2`) is neither canonicalized nor checked. Add it to both.\n- **Weather and storms:** `MapWeatherCampaignBehavior` saves `_lastUpdatedNodeIndex`, which goes out of range if the weather node dimension shrinks. Storms are saved at absolute positions. (From the MMR-59 research notes.)",
+  "createdAt": "2026-10-14T17:46:51.929Z",
+  "epicId": "ep_01m4fpnf646t254mnh69jhz107",
+  "format": "darkmechanicus.comment",
+  "formatVersion": 1,
+  "id": "cm_01m4xrcbmsw2abm0xya67ktzmz",
+  "ticketId": "tk_01m4fqfbgkz61vc2vqzb3vhggb"
+}

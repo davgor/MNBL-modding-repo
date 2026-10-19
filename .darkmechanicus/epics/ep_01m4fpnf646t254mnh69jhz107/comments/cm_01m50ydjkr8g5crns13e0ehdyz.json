@@ -1,0 +1,13 @@
+{
+  "author": {
+    "label": "Claude Code",
+    "role": "orchestrator"
+  },
+  "body": "Handoff from MMR-38 (`docs/runtime-navigation.md`):\n- **Resolved positions are binding.** The navigation report's `static.points` holds the resolved position of every settlement, port, port land entrance and coast transition.\n  - Settlements that shared an emitted point are separated along x inside their own cell.\n  - Each port point is placed at the interior point of its port cell nearest the town gate, at most 3.98 units from the cell centre. This keeps the port-to-gate path within the travel graph's 12.5 units; world B had cell-centre ports 14.1 and 12.6 units away.\n  - Port and dropoff entities must use these positions.\n- **Port face type.** A port's face is its cell's sea face: CoastalSea, or River/Lake where the port cell is one. It shares an edge with its land entrance; the engine route between them has exactly one region switch.\n- **Not run here.** `SetSailAtPosition` was not run; it is a campaign action.",
+  "createdAt": "2026-10-15T23:30:06.584Z",
+  "epicId": "ep_01m4fpnf646t254mnh69jhz107",
+  "format": "darkmechanicus.comment",
+  "formatVersion": 1,
+  "id": "cm_01m50ydjkr8g5crns13e0ehdyz",
+  "ticketId": "tk_01m4fqfbgkkntdvg7kaxc9k8yz"
+}

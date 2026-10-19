@@ -1,0 +1,13 @@
+{
+  "author": {
+    "label": "Claude Code",
+    "role": "orchestrator"
+  },
+  "body": "**From MMR-32: instantiating the runtime heroes** (docs/heroes.md, installed IL).\n\nHeroFactory emits 909 notable intents and 28 companion intents at size 129. Each carries an installed template, a home settlement, a name and an age. For each one:\n- **Call:** `HeroCreator.CreateSpecialHero(template, homeSettlement, null, null, age)`, then `SetName`. Do not use `CreateNotable`: it draws its own template and age.\n- **Placement:** `NotablesCampaignBehavior.OnHeroCreated` places a notable in its home through `EnterSettlementAction`.\n- **Identity:** the engine mints the StringId (`CharacterObject_<n>`). The stable identity is the intent id, so keep a saved map from intent id to hero.\n- **Vanilla spawning must not also run:** `NotablesCampaignBehavior.SpawnNotablesAtGameStart` and `CompanionsCampaignBehavior.OnNewGameCreated` spawn unconditionally. The first creates the targets, town merchant 2, gang leader 2, artisan 1 and village headman 1, rural notable 2; the second creates `for i < 0.6f*towns` companions. Without replacing them the intents would be doubled.\n- **Ruler relations** (`relations` in the faction and hero intents) are hero relations to apply once the heroes exist.\n- **Culture start points:** character creation is now limited to the world's cultures by `GeneratedCharacterCreation`, so the start points (`CultureObject.StartingPoint`) still need generated positions.",
+  "createdAt": "2026-10-15T10:52:04.812Z",
+  "epicId": "ep_01m4fpnf646t254mnh69jhz107",
+  "format": "darkmechanicus.comment",
+  "formatVersion": 1,
+  "id": "cm_01m4zk1jtb79cfcfcy3wvx6xr2",
+  "ticketId": "tk_01m4fqfbgkprn72erwx8htk4g3"
+}

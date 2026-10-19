@@ -1,0 +1,66 @@
+{
+  "schemaVersion": 1,
+  "status": "accepted-conditional-private-home-preservation-not-hook-approval",
+  "reviewedArtifact": {
+    "path": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\evidence\\engine-extension\\native-live-owner-private-home-v2.json",
+    "sha256": "d74a693d1f699d6f4bf6c240cee7183be40685a529265fa6a02a768596e19cfb"
+  },
+  "verifiedSources": [
+    {
+      "path": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\build\\battle-scale\\native-run-20261017-065749-08e99ed9\\backup-0",
+      "sha256": "2a5e0e0b15513ebb7052d747a621b82c50ee834553eba283b33bbbc33766e12a"
+    },
+    {
+      "path": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\evidence\\engine-extension\\native-live-owner-private-home.json",
+      "sha256": "9f6df1b349af07ebd06d08adfc16e9ee6b0eceb20ee31246f4469f9ccced5c06"
+    },
+    {
+      "path": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\tools\\battle-scale\\audit_live_owner_private_home_v2.py",
+      "sha256": "fea5e6580062974a4345fc77b1cea1823df583b7b97496c2e1da3d3fb6675316"
+    },
+    {
+      "path": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\tools\\battle-scale\\native_instruction_semantics.py",
+      "sha256": "4673a53f680954cb1bcf9b0991341c19c0a5248d619fb5fbf650355e53d360a7"
+    },
+    {
+      "path": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\tools\\battle-scale\\patch_native_copy.py",
+      "sha256": "e61450ea2094b82e153e6c47d3b981fe8faa65f184542efe1b9e19357e842793"
+    }
+  ],
+  "verifiedOriginalByteRows": 1214,
+  "independentReplay": {
+    "steps": 1330,
+    "lifetimeInstructions": 368,
+    "callArgumentSets": 20,
+    "memoryDestinations": 62,
+    "retainedOutputMatches": true
+  },
+  "resolvedFinding": {
+    "historicalReceiptSha256": "9f6df1b349af07ebd06d08adfc16e9ee6b0eceb20ee31246f4469f9ccced5c06",
+    "call": "0x1806f2cfe",
+    "oldFalseClaim": "698570 writes local RSP70..ff",
+    "correction": "RCX is external vector record+0x10; exact leaf writes that 0x90-byte region. RSP70 is a prior copied snapshot later passed read-only to698600.",
+    "checks": [
+      "Independent no-RCX-write interval6f2c4a..6f2cfe.",
+      "Independent reaching RCX external-record+0x10 fixed-point equality.",
+      "All20 pointer-argument contracts and62 direct destinations rechecked, including protected input homes and Mission home.",
+      "Exact recursive original-byte verification across retained instruction rows."
+    ]
+  },
+  "manualCalleeReview": [
+    "711220 only exposes caller output to own scalar stores; nested63e220 receives its own local output.",
+    "63e220 and746070 have scalar output stores; diagnostic calls receive scalar values/static strings.",
+    "6ead40 writes three output floats; nested746070 receives callee-local scalar outputs.",
+    "698570 stores within its exact RCX-relative0x90 record;698600/2692d0 compare supplied snapshots without publishing their pointers.",
+    "6491f0 may resize an external vector;6ec2d0/6ec7d0 decode into external records. This is not a proof that these routines are globally memory-pure."
+  ],
+  "openFindings": [],
+  "limitations": [
+    "Incoming packet, vector header/backing and descriptor must be well formed and cannot alias the new private frame.",
+    "The0xe0 index classification assumes valid native record indices; bounds/overflow/corrupt-packet behavior is not proved.",
+    "Only two exact home reloads and normal-return lifetime are covered. Later RSP30 reuse is excluded, not restored.",
+    "No arbitrary caller, external stack inspection, async memory writes, hook routing, thread lifetime or engine runtime approval."
+  ],
+  "enginePatchApproved": false,
+  "gameLaunched": false
+}

@@ -1,0 +1,97 @@
+<Prefab>
+	<!-- MMR-46: the world preview (WorldPreviewViewModel), used by WorldSetup.xml as <WorldPreview />. The raster is the world's own surface
+	     (WorldPreviewTextureProvider); every settlement and port is a marker at its scene position on the logical frame, told apart by shape and
+	     size, not colour alone; towns carry their (shortened) name; pointing at any marker shows its full name, kind and kingdom below the map.
+	     Only installed Native assets: the BlankWhiteSquare_9 sprite and the popup text brushes. -->
+	<Window>
+		<ListPanel WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" HorizontalAlignment="Center" StackLayout.LayoutMethod="VerticalTopToBottom">
+			<Children>
+
+				<Widget Id="PreviewMap" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="@Width" SuggestedHeight="@Height" HorizontalAlignment="Center">
+					<Children>
+						<!--The map raster; a dark field when the engine refused the texture (the markers still show)-->
+						<Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Sprite="BlankWhiteSquare_9" Color="#1E3448FF" />
+						<TextureWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" TextureProviderName="WorldPreviewTextureProvider" IsVisible="@HasPreview" />
+
+						<!--Kingdom names, in gold (town names are white)-->
+						<Widget DataSource="{Regions}" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent">
+							<ItemTemplate>
+								<TextWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="200" SuggestedHeight="22" PositionXOffset="@PositionX" PositionYOffset="@PositionY" Command.HoverBegin="ExecuteHover" Command.HoverEnd="ExecuteHoverEnd" Brush="Popup.Description.Text" Brush.FontSize="16" Brush.FontColor="#F2D16BFF" Brush.TextHorizontalAlignment="Center" Text="@Name" />
+							</ItemTemplate>
+						</Widget>
+
+						<!--Settlements and ports: villages first, towns last (on top)-->
+						<Widget DataSource="{Markers}" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent">
+							<ItemTemplate>
+								<Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="@MarkerSize" SuggestedHeight="@MarkerSize" PositionXOffset="@PositionX" PositionYOffset="@PositionY" Command.HoverBegin="ExecuteHover" Command.HoverEnd="ExecuteHoverEnd">
+									<Children>
+										<!--The selected place (Previous/Next place): a gold ring around the marker-->
+										<Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="22" SuggestedHeight="22" HorizontalAlignment="Center" VerticalAlignment="Center" Sprite="BlankWhiteSquare_9" Color="#F2D16BFF" IsVisible="@IsSelected" DoNotAcceptEvents="true">
+											<Children>
+												<Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="16" SuggestedHeight="16" HorizontalAlignment="Center" VerticalAlignment="Center" Sprite="BlankWhiteSquare_9" Color="#1A1A1AFF" DoNotAcceptEvents="true" />
+											</Children>
+										</Widget>
+										<!--Town: large light square, dark edge-->
+										<Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Sprite="BlankWhiteSquare_9" Color="#1A1A1AFF" IsVisible="@IsTown" DoNotAcceptEvents="true">
+											<Children>
+												<Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="8" SuggestedHeight="8" HorizontalAlignment="Center" VerticalAlignment="Center" Sprite="BlankWhiteSquare_9" Color="#F2E6C8FF" DoNotAcceptEvents="true" />
+											</Children>
+										</Widget>
+										<!--Castle: light square, dark centre-->
+										<Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Sprite="BlankWhiteSquare_9" Color="#F2E6C8FF" IsVisible="@IsCastle" DoNotAcceptEvents="true">
+											<Children>
+												<Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="4" SuggestedHeight="4" HorizontalAlignment="Center" VerticalAlignment="Center" Sprite="BlankWhiteSquare_9" Color="#1A1A1AFF" DoNotAcceptEvents="true" />
+											</Children>
+										</Widget>
+										<!--Village: small dark dot; a harbour village (fleets land there): a dark dot with a blue edge-->
+										<Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Sprite="BlankWhiteSquare_9" Color="#2B1E12FF" IsVisible="@IsVillage" DoNotAcceptEvents="true" />
+										<Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Sprite="BlankWhiteSquare_9" Color="#2F7FD0FF" IsVisible="@IsHarbourVillage" DoNotAcceptEvents="true">
+											<Children>
+												<Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="3" SuggestedHeight="3" HorizontalAlignment="Center" VerticalAlignment="Center" Sprite="BlankWhiteSquare_9" Color="#2B1E12FF" DoNotAcceptEvents="true" />
+											</Children>
+										</Widget>
+										<!--Port: blue-edged square-->
+										<Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Sprite="BlankWhiteSquare_9" Color="#2F7FD0FF" IsVisible="@IsPort" DoNotAcceptEvents="true">
+											<Children>
+												<Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="5" SuggestedHeight="5" HorizontalAlignment="Center" VerticalAlignment="Center" Sprite="BlankWhiteSquare_9" Color="#FFFFFFFF" DoNotAcceptEvents="true" />
+											</Children>
+										</Widget>
+										<!--Town names beside the marker, on the side with room-->
+										<TextWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="150" SuggestedHeight="20" PositionXOffset="@LabelX" PositionYOffset="@LabelY" DoNotAcceptEvents="true" Brush="Popup.Description.Text" Brush.FontSize="14" Brush.FontColor="#FFFFFFFF" Brush.TextHorizontalAlignment="Left" Text="@Name" IsVisible="@ShowLabelRight" />
+										<TextWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="150" SuggestedHeight="20" PositionXOffset="@LabelX" PositionYOffset="@LabelY" DoNotAcceptEvents="true" Brush="Popup.Description.Text" Brush.FontSize="14" Brush.FontColor="#FFFFFFFF" Brush.TextHorizontalAlignment="Right" Text="@Name" IsVisible="@ShowLabelLeft" />
+									</Children>
+								</Widget>
+							</ItemTemplate>
+						</Widget>
+					</Children>
+				</Widget>
+
+				<!--The place pointed at or selected, in full, between Previous and Next place (the tab keys, the controller's shoulder buttons); then the
+				    counts and the legend; why the raster is missing, if it is. Every kingdom holds a town, so walking the places names every kingdom in
+				    full; pointing at a kingdom's label does too-->
+				<ListPanel Id="PlaceRow" WidthSizePolicy="Fixed" HeightSizePolicy="CoverChildren" SuggestedWidth="@Width" MarginTop="6" StackLayout.LayoutMethod="HorizontalLeftToRight">
+					<Children>
+						<ButtonWidget DoNotPassEventsToChildren="true" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="170" SuggestedHeight="40" VerticalAlignment="Center" Brush="Popup.Cancel.Button" Command.Click="ExecutePreviousPlace" GamepadNavigationIndex="0">
+							<Children>
+								<TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" MarginLeft="34" Brush="Popup.Button.Text" Brush.FontSize="16" Text="@PreviousPlaceText" />
+								<InputKeyVisualWidget DataSource="{PreviousPlaceKey}" DoNotAcceptEvents="true" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="32" SuggestedHeight="32" HorizontalAlignment="Left" VerticalAlignment="Center" PositionXOffset="6" KeyID="@KeyID" IsVisible="@IsVisible" />
+							</Children>
+						</ButtonWidget>
+						<RichTextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" VerticalAlignment="Center" MarginLeft="10" MarginRight="10" Brush="Popup.Description.Text" Brush.FontSize="18" Brush.TextHorizontalAlignment="Center" Text="@HoverText" />
+						<ButtonWidget DoNotPassEventsToChildren="true" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="170" SuggestedHeight="40" VerticalAlignment="Center" Brush="Popup.Cancel.Button" Command.Click="ExecuteNextPlace" GamepadNavigationIndex="1">
+							<Children>
+								<TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" MarginLeft="34" Brush="Popup.Button.Text" Brush.FontSize="16" Text="@NextPlaceText" />
+								<InputKeyVisualWidget DataSource="{NextPlaceKey}" DoNotAcceptEvents="true" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="32" SuggestedHeight="32" HorizontalAlignment="Left" VerticalAlignment="Center" PositionXOffset="6" KeyID="@KeyID" IsVisible="@IsVisible" />
+							</Children>
+						</ButtonWidget>
+					</Children>
+				</ListPanel>
+				<NavigationScopeTargeter ScopeID="WorldPreviewPlaceScope" ScopeParent="..\PlaceRow" ScopeMovements="Horizontal" />
+				<RichTextWidget WidthSizePolicy="Fixed" HeightSizePolicy="CoverChildren" SuggestedWidth="@Width" MarginTop="4" Brush="Popup.Description.Text" Brush.FontSize="18" Text="@CountsText" />
+				<RichTextWidget WidthSizePolicy="Fixed" HeightSizePolicy="CoverChildren" SuggestedWidth="@Width" MarginTop="4" Brush="Popup.Description.Text" Brush.FontSize="16" Text="@LegendText" />
+				<RichTextWidget WidthSizePolicy="Fixed" HeightSizePolicy="CoverChildren" SuggestedWidth="@Width" MarginTop="4" Brush="Popup.Description.Text" Brush.FontSize="16" Brush.FontColor="#FF8A80FF" Text="@TextureErrorText" IsVisible="@HasTextureError" />
+
+			</Children>
+		</ListPanel>
+	</Window>
+</Prefab>

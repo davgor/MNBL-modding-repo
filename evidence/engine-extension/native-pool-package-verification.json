@@ -1,0 +1,79 @@
+{
+  "status": "r10-package-verified-exhaustion-combat-teardown-watchdog-shutdown-passed",
+  "verifiedUtc": "2026-10-17T08:23:42.521325+00:00",
+  "packagePath": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\build\\battle-scale\\native4080-test-r10",
+  "files": {
+    "build-receipt.json": "afd86305580b6364ba2c17baef8bb8b735ffcd199bc8d90db0b204c99e2dd45e",
+    "MNBL.BattleScale.dll": "4d127109535ebb4574fd2c44723b3646080491e6fc1b5ee176fd9716de456f43",
+    "native-copy-receipt.json": "e41c2603fcbe3da23648999ddb32621661613208a3c310f42b56c0c674f0513d",
+    "native-pool-manifest.json": "da402340bb1a6d3d810af0b4fcb33063c0708d46f424269b644ff1b5bca52d95",
+    "native-pool-test-profile.json": "44689bc5d86cc9d0e2bb1f2bfe80399f5a195cc29c41fbb8a01d99216c658ef3",
+    "SubModule.xml": "656298ead147c604cd92a1a40d04dcb051336305b46841f381ebd19f186d3e54",
+    "TaleWorlds.Native.dll": "941f2ca0aa41e594067e2b732edd043e0aee6173e358688663f5ee1ebac5be37",
+    "TEST-HELD.txt": "1cdf2297c91507de1c7d00b33f33fe47f40802ec8c0316e452b20dfd12d62a69"
+  },
+  "sourceSha256": "2a5e0e0b15513ebb7052d747a621b82c50ee834553eba283b33bbbc33766e12a",
+  "patchedSha256": "941f2ca0aa41e594067e2b732edd043e0aee6173e358688663f5ee1ebac5be37",
+  "patchEdits": 1676,
+  "packageMatchesRun": true,
+  "staticChecksPassed": true,
+  "runtimeVerified": true,
+  "runtimeReceipt": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\evidence\\engine-extension\\native-pool-run-r10\\runtime-receipt.json",
+  "runtimeReceiptSha256": "e3517a6817cff768c490a4b934bab31f0ef378272393d6e5e2becabc835ec212",
+  "processExitCode": -1,
+  "shutdownVerification": {
+    "kind": "reviewed-watchdog-kp-command",
+    "ownedWatchdogIds": [
+      30780
+    ],
+    "limitation": "The stock watchdog terminates the process after main shutdown; remaining native releases after the command are not certified.",
+    "logs": [
+      {
+        "sha256": "0f98c786cba9ed4da7f9c5c6cdc1779313a7e611f8aaad6d67d2cea02f17ceb6",
+        "path": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\build\\battle-scale\\native-run-20261017-081811-632d6efb\\watchdog_log_40556.txt"
+      },
+      {
+        "sha256": "7bde738e65fce5e85ce0958585b7fa05247d8d10201dd1dfac649e38b6badccd",
+        "path": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\build\\battle-scale\\native-run-20261017-081811-632d6efb\\rgl_log_40556.txt"
+      }
+    ],
+    "gamePid": 40556,
+    "contractSha256": "a53f635c34844fa460be087c4bd123f36fa57291e14cdb734338cb695aba0f0d",
+    "allNativeDestructorsVerified": false,
+    "exitCode": -1,
+    "verified": true
+  },
+  "restoredFiles": [
+    {
+      "path": "D:\\SteamLibrary\\steamapps\\common\\Mount & Blade II Bannerlord\\bin\\Win64_Shipping_Client\\TaleWorlds.Native.dll",
+      "verified": true,
+      "sha256": "2a5e0e0b15513ebb7052d747a621b82c50ee834553eba283b33bbbc33766e12a"
+    },
+    {
+      "path": "D:\\SteamLibrary\\steamapps\\common\\Mount & Blade II Bannerlord\\Modules\\MNBL.BattleScale\\bin\\Win64_Shipping_Client\\MNBL.BattleScale.dll",
+      "verified": true,
+      "sha256": "a9b44cced6b502f805409b3f037c7903570417ff92127ca728e484f6c70d429f"
+    },
+    {
+      "path": "D:\\SteamLibrary\\steamapps\\common\\Mount & Blade II Bannerlord\\Modules\\MNBL.BattleScale\\SubModule.xml",
+      "verified": true,
+      "sha256": "656298ead147c604cd92a1a40d04dcb051336305b46841f381ebd19f186d3e54"
+    },
+    {
+      "path": "D:\\SteamLibrary\\steamapps\\common\\Mount & Blade II Bannerlord\\Modules\\MNBL.BattleScale\\bin\\Win64_Shipping_Client\\native-pool-test-profile.json",
+      "verified": true,
+      "sha256": null
+    }
+  ],
+  "moduleSourceHashesVerified": 8,
+  "reviewInputHashesVerified": 11,
+  "limitations": [
+    "Isolated infantry probe only; broader engine-extension framework and production safety remain unfinished.",
+    "All 4080 agents passed visual/frustum/entity checks at full capacity; exact on-screen pixel counts and frame times are unverified.",
+    "Secondary native pool remained empty; its allocation/exhaustion path was not exercised.",
+    "Public SpawnAgent overflow remains unsafe and is guarded by the harness; only the private allocator full path was tested.",
+    "Failed-construction injection, cavalry, ranged, siege, long soak and third-party mod compatibility remain unverified.",
+    "Stock watchdog shutdown is build-specifically verified; native releases after its kill request are not certified.",
+    "Supplemental switch proofs reduce 401 canonical open decode bytes by 89 to 312 outside patched groups; arbitrary computed entries remain unproved."
+  ]
+}

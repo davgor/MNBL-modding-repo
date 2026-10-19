@@ -1,0 +1,13 @@
+{
+  "author": {
+    "label": "Claude Code",
+    "role": "orchestrator"
+  },
+  "body": "From MMR-34 (accepted): the startup initializer refuses a world with `GeneratedCampaignInitializer.StartupException`. It carries quality codes from `worldgen/policies/startup.json` (`quality.codes`), and `Retryable` is true only when every code is:\n- retryable: `quality.startup_no_start`, `quality.startup_hideouts`, `quality.startup_retreat`, `quality.startup_unplaceable_spawn`, `quality.startup_map`;\n- not retryable: `quality.startup_catalog`, `quality.startup_plan`, `quality.startup_policy`.\n\nThey are kept in startup.json, not world-quality.json, whose hash is part of the generation identity and the MMR-24 evidence. The generation job should record them with the job result and retry on the retryable ones. Tested offline: spawn-policy check 18.",
+  "createdAt": "2026-10-15T15:47:48.252Z",
+  "epicId": "ep_01m4fpnf646t254mnh69jhz107",
+  "format": "darkmechanicus.comment",
+  "formatVersion": 1,
+  "id": "cm_01m503z2cw9gs0bbmyq9b8759t",
+  "ticketId": "tk_01m4fqfbgk1vwve9rr5fhepm68"
+}

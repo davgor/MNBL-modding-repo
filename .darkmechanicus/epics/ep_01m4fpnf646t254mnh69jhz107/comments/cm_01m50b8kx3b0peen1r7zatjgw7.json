@@ -1,0 +1,13 @@
+{
+  "author": {
+    "label": "Claude Code",
+    "role": "orchestrator"
+  },
+  "body": "From MMR-35 (accepted), for naval play:\n- **Fleet rule.** A clan whose home's land group has no port town on an open basin is landlocked. `GeneratedShipDistributionModel` refuses ships and transfers to its parties; `GeneratedClanShipOwnershipModel` gives it an ideal fleet of 0, so anything it gains, for example by loot, is sold over time. Check this over many days.\n- **Pirates.** They spawn only once MMR-40 places the `PirateSpawnPoint` entities.\n- **Flaky MMR-33 check.** The settlement-fixture check \"grain sells within 3 x its base value\" failed once at 3.3× (run 42236). The same market code gave 1.2-1.9× in runs 39816, 37592 and 6636: it is new-game market variance, not a regression. Widen or re-derive that bound if it recurs.",
+  "createdAt": "2026-10-15T17:55:21.123Z",
+  "epicId": "ep_01m4fpnf646t254mnh69jhz107",
+  "format": "darkmechanicus.comment",
+  "formatVersion": 1,
+  "id": "cm_01m50b8kx3b0peen1r7zatjgw7",
+  "ticketId": "tk_01m4fqfbgmxsqgvdkdhj9sks6j"
+}

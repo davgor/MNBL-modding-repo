@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "status": "accepted-for-restricted-test-integration",
+  "gameExecuted": false,
+  "installedFilesModified": false,
+  "reviewedSourceSha256": {
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\tools\\battle-scale\\build_pool_patch_manifest.py": "28b965555e7f02831929c222b1650988f84951a5f9b566b40b0c62f43e5203df",
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\tools\\battle-scale\\prepare_native_pool_test.py": "cf0d65b194574e92a57a1dadf051980e4379b5387b08c75e40c155cea3d98233",
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\tools\\battle-scale\\patch_native_copy.py": "e61450ea2094b82e153e6c47d3b981fe8faa65f184542efe1b9e19357e842793",
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\tests\\BattleScale\\test_native_test_package.py": "9f64bf0fd2020865f63efe2a4fee989567f916f00cc40f6741d3224a3578b0bf",
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\tests\\BattleScale\\test_pool_patch_manifest.py": "b5bbf71c56c0721de41171af97fb9d7acd22e46866478cfec192ba561d5aaa03",
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\evidence\\engine-extension\\native-bone-mapping-patch.json": "e88dfdeebb3222fa1dbbc586cbafce93487396f3dffb8efd6b3ea2de5ebd5104",
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\evidence\\engine-extension\\native-bone-mapping-independent-review.json": "12c924409187f067a1d6f4ceee4c6d5c4678dfb27ff447fe76c63ee5a7fbde9a",
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\evidence\\engine-extension\\native-renderer-buffer-lifecycle-review.json": "9a2b8aa99e05e89751a7afdb5966e82c43134e9b426710a739dae074858f9667"
+  },
+  "findings": [],
+  "resolvedFindings": [
+    {
+      "id": "renderer-partial-geometry",
+      "resolution": "Packaging requires all13 exact renderer edits by address/RVA/original/replacement; missing/weakened/moved tests cover11 geometry sites and2 guard sites."
+    },
+    {
+      "id": "manifest-approval-replay",
+      "resolution": "Packaging requires the exact independent approval file/hash, explicit boolean approval, native source hash, actual canonical patch set, complete source evidence hashes and current generator hash."
+    },
+    {
+      "id": "display-address-relocation",
+      "resolution": "Every patch display address must equal imageBase+RVA; existing PE verification binds RVA to actual fileOffset. Regression rejects moving an approved nonrequired edit while preserving display address and bytes."
+    }
+  ],
+  "tests": [
+    {
+      "test": "test_native_test_package.py",
+      "exitCode": 0,
+      "testsPassed": 24,
+      "scope": "Inert synthetic package fixtures; all 13 renderer edits remain exact, including missing/weakened/moved cases; new watchdog source/candidate/provider mismatch cases."
+    },
+    {
+      "test": "test_pool_patch_manifest.py",
+      "exitCode": 0,
+      "testsPassed": 13
+    }
+  ],
+  "observedManifest": {
+    "patchCount": 1676,
+    "rendererEditsExactlyMatched": 13,
+    "canonicalPatchSetSha256": "36336b8845a52c900286dd800bb5e7555fa45bbe9cf454c3d9cb898b8e1dd7e2"
+  },
+  "acceptanceScope": [
+    "Renderer inputs are transitively bound to the reviewed patch and lifecycle evidence; original and replacement spans must decode exactly and preserve source file offsets.",
+    "Current package code fails closed on incomplete geometry, stale approval/evidence/build, changed generator and moved patch locations before creating output.",
+    "Required Single0/contact guards, isolated provider checks and fresh output-directory protections remain active.",
+    "Packaging now additionally binds the exact native source, patched candidate and stock Watchdog implementation to the reviewed shutdown contract. This does not change any of the 13 renderer patch bytes."
+  ],
+  "limitations": [
+    "This review approves integration logic for a restricted runtime test; it does not mark the regenerated full manifest or the game test passed.",
+    "Root must regenerate/finalize static approval and isolated profile hashes after source/evidence changes; normal packaging checks must pass before deployment.",
+    "Existing renderer asynchronous scheduling remains unchanged; this review does not independently prove backend synchronization or arbitrary third-party provider behavior."
+  ],
+  "reviewedAtUtc": "2026-10-17T08:17:15.865552+00:00",
+  "historicalReview": {
+    "path": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\evidence\\engine-extension\\native-renderer-integration-r8-independent-review.json",
+    "sha256": "b0cd2577ec6d72f6628756f4cea5a9739c076deb77f5c1528809ccdf4cda30e8"
+  }
+}

@@ -1,0 +1,127 @@
+{
+  "branch": {
+    "name": "codex/fwgc-procedural-campaign",
+    "repository": null,
+    "startCommit": "b844ceafcd5a718c9550179b78c0bbaab723e82d"
+  },
+  "completedAt": "2026-10-19T23:45:33.651Z",
+  "createdAt": "2026-10-09T06:47:31.268Z",
+  "epicId": "ep_01m4fpnf646t254mnh69jhz107",
+  "format": "darkmechanicus.epic-state",
+  "formatVersion": 1,
+  "generation": 115,
+  "outcome": {
+    "recordedAt": "2026-10-19T23:45:33.651Z",
+    "runId": "rn_01m4h4jk5wssr7x79xjmrp8ypg",
+    "successCriteria": [
+      {
+        "criterionId": "s1",
+        "met": true,
+        "note": "fwg.exe 564c2629 from FWGC++ ec5d1c10, Bannerlord v1.4.8.119303 and War Sails v1.2.8.119303 are pinned and verified, and the Modding Kit is identified. Any other generator binary is refused before launch. The UCRT pin was renewed after the Windows update replaced ucrtbase.dll; the producer contract's preflight passes again, and no world content id changed."
+      },
+      {
+        "criterionId": "s2",
+        "met": true,
+        "note": "Owner's judgement asked. New Procedural Campaign generates a chosen-seed world inside the running game, with progress, cancel, errors, preview and Start Campaign; no editor, publishing or restart. Offline, 19 of seeds 42-73 are accepted at one attempt and all 19 pass the activation's checks; a request gets 3 attempts. In game, seeds 42 and 73 were played. Seed 43's world was refused at runtime navigation (one sea route 1.29 x the mesh's shortest path) with its error code and a Generate-again action. Not every seed plays."
+      },
+      {
+        "criterionId": "s3",
+        "met": true,
+        "note": "Owner's judgement asked. A flat map wrapping east to west, used consistently by terrain, routes, distances (105 audited methods transpiled periodic), encounters, camera/picking and saves:\n- seam land travel, pursuit and fleets with save and load on A;\n- camera, picking, tracks, town menu and the wrap budget on B;\n- sailing and a pirate encounter across the seam.\nA and B differ in geography and routes and both play. Three presentation limits remain near the cut: the hero behaviour text, siege machines drawn on the settlement's side only, and routes that leave the terrain."
+      },
+      {
+        "criterionId": "s4",
+        "met": true,
+        "note": "Generated towns, villages, castles, factions, clans and heroes form a coherent Sandbox campaign with no Calradia objects:\n- trade, recruitment, ownership and wars (soak);\n- 14/14 land mission cases on A and B, each returning to the same world.\nB initializes in game, and all 19 offline-accepted worlds pass the activation's managed stages."
+      },
+      {
+        "criterionId": "s5",
+        "met": true,
+        "note": "The final naval run passes 117/117 checks and 15/15 cases: ports, shipyard, fleets, embarking, port and island voyages, drop-off and coastal landing, blockade and anchor, pirate battles (one across the seam), a seaborne raid and defeat. Navigation caches are built once per world and reused by every load. Fleets survive save and cold load. Boarding, ship damage, battles fought to the end and blockade battles are listed as not exercised."
+      },
+      {
+        "criterionId": "s6",
+        "met": true,
+        "note": "Two production campaigns, A (f596b58c) and B (f63c6841), are saved, alternately loaded in one process and after a cold restart, and resumed equal to their saves (matrix 38/38 and 20/20), with no cross-world callbacks. Torn, missing-world, other-build, incompatible-schema and missing-DLC saves, a corrupted manifest and an isolated damaged copy of the world data are all refused before simulation."
+      },
+      {
+        "criterionId": "s7",
+        "met": true,
+        "note": "The clean local package e20f2667 completes the one-shot scenario. It records the build, package, world, save and request identities, the results, timings and limitations (evidence/one-shot/one-shot-run.json, docs/one-shot-acceptance.md). The failures that day's earlier runs observed were fixed before the final run and are recorded there. Clean install passes 27/27 and the offline suites 46/46."
+      }
+    ],
+    "summary": "The epic delivers an in-game procedural campaign system for Bannerlord with War Sails. From New Campaign the player chooses a seed and generates a world inside the running game, with progress, cancel and errors. The world becomes a Sandbox campaign with its own terrain, settlements, kingdoms, clans, heroes, economy and land and sea routes, on a flat map that wraps east to west. Saves stay bound to their world and are refused safely when the world is missing or mismatched.\n\nThe final one-shot acceptance passes on the clean local package e20f2667 with two production worlds, A (seed 42) and B (seed 73). The clean-install lifecycle passes 27/27 and the offline suites 46/46.\n\nTwo criteria rest on the owner's judgement, stated in their notes:\n- s2: chosen seeds generally play, not every one. Seed 43 is refused at runtime navigation with a clean error.\n- s3: three presentation limits remain near the cut.\n\nBroad seed certification, long soaks and performance targets are deferred, as the epic allows. The package is a local test package, not release-certified."
+  },
+  "provenance": null,
+  "status": "completed",
+  "ticketStatuses": {
+    "tk_01m4fpnf64s6r96g13ymz26760": "completed",
+    "tk_01m4fqfbgj0dw7e2xyf0gp4jz7": "backlog",
+    "tk_01m4fqfbgj79dd1nx4zpqpmmpn": "backlog",
+    "tk_01m4fqfbgjj1xcrgj9awyfgbqg": "backlog",
+    "tk_01m4fqfbgjwg05dn6rz82cm4me": "backlog",
+    "tk_01m4fqfbgk0r8zqdf1537xw3s4": "completed",
+    "tk_01m4fqfbgk10779gc7rgga62hf": "completed",
+    "tk_01m4fqfbgk1vdsx1xs9gfp0dhq": "completed",
+    "tk_01m4fqfbgk1vwve9rr5fhepm68": "completed",
+    "tk_01m4fqfbgk26jm8qyn2b3fm5gr": "completed",
+    "tk_01m4fqfbgk2n18h9rrf7a94fm5": "completed",
+    "tk_01m4fqfbgk3hy3ak115n8w83gp": "completed",
+    "tk_01m4fqfbgk3qjbvz4txjb9yaxt": "completed",
+    "tk_01m4fqfbgk3sbvj83x1gg4vpns": "completed",
+    "tk_01m4fqfbgk569d507qzkb6cnpm": "completed",
+    "tk_01m4fqfbgk5jah5w52dg2xvre2": "completed",
+    "tk_01m4fqfbgk7fnwy2cf191t3dzk": "completed",
+    "tk_01m4fqfbgk868m29bdke5tcytc": "backlog",
+    "tk_01m4fqfbgk8s2n84byj2h8vyjy": "completed",
+    "tk_01m4fqfbgk98j88wtced730518": "completed",
+    "tk_01m4fqfbgkan15ca1rykrzpxt0": "completed",
+    "tk_01m4fqfbgkcmkegxbs86jcvwag": "completed",
+    "tk_01m4fqfbgkdhbqqf84gy5p5z2b": "completed",
+    "tk_01m4fqfbgkdsrnhxytt4xafgwd": "completed",
+    "tk_01m4fqfbgkf13njkxxffe4htyv": "completed",
+    "tk_01m4fqfbgkfpzttzhyxsdce85k": "completed",
+    "tk_01m4fqfbgkg8xm8ap6xbkz4fgn": "completed",
+    "tk_01m4fqfbgkgj055h5hvwmbzma8": "completed",
+    "tk_01m4fqfbgkk2fmgh12sbyxsjy7": "completed",
+    "tk_01m4fqfbgkkntdvg7kaxc9k8yz": "completed",
+    "tk_01m4fqfbgkm0026c6p2nqp7fq2": "backlog",
+    "tk_01m4fqfbgkm2ya34djjgfh9k6t": "completed",
+    "tk_01m4fqfbgkmhhq7em6wxkxwwbj": "completed",
+    "tk_01m4fqfbgkmv6hbzcdnzd72sqm": "backlog",
+    "tk_01m4fqfbgknga8wqn5seq3j94d": "completed",
+    "tk_01m4fqfbgkprn72erwx8htk4g3": "completed",
+    "tk_01m4fqfbgkq6neew6366y50q4z": "backlog",
+    "tk_01m4fqfbgkqzt9n8x2a4fcs4wz": "completed",
+    "tk_01m4fqfbgksgbv7xng77fw11jg": "completed",
+    "tk_01m4fqfbgksthjsbxfhrw86tbb": "completed",
+    "tk_01m4fqfbgkt981a5wjchhdd7d7": "completed",
+    "tk_01m4fqfbgkv7f6bpha2y18fyc0": "completed",
+    "tk_01m4fqfbgkw3f1t5mfhbe8wq6b": "completed",
+    "tk_01m4fqfbgkwabwg6q1wss5j68p": "completed",
+    "tk_01m4fqfbgkx1y6ntjh2y0rb8k1": "completed",
+    "tk_01m4fqfbgkxyj3w6wqbcbw2q58": "completed",
+    "tk_01m4fqfbgky07nmr8ye2fkr3e9": "completed",
+    "tk_01m4fqfbgky0m5dnh669pqa1fk": "completed",
+    "tk_01m4fqfbgky87f416pgnyj9xsz": "completed",
+    "tk_01m4fqfbgkz61vc2vqzb3vhggb": "completed",
+    "tk_01m4fqfbgm4kmtbjfeyy9rkj7d": "backlog",
+    "tk_01m4fqfbgm5r7xtx4w2456fp5j": "backlog",
+    "tk_01m4fqfbgm6fz7za27erzb4tzv": "completed",
+    "tk_01m4fqfbgmbwtnjnqcfsmpm90r": "completed",
+    "tk_01m4fqfbgmgdqahamt65ejaxz7": "completed",
+    "tk_01m4fqfbgmkdbp3b70wcgxsrrh": "completed",
+    "tk_01m4fqfbgmw4wvsvp7fy58y1xk": "completed",
+    "tk_01m4fqfbgmxsqgvdkdhj9sks6j": "completed",
+    "tk_01m4fqvemjew4mr9qark2nrd3s": "completed",
+    "tk_01m4fqvemm5skmnt1c27ber4n3": "backlog",
+    "tk_01m4fqvemmr0trbph4m1c5a2r6": "completed",
+    "tk_01m4fqvemn1hfc76r82j16f4e4": "completed",
+    "tk_01m4fqvempfbssknbs54dekq3q": "completed",
+    "tk_01m4fqvempgn20kpk0z6yxvzg2": "completed",
+    "tk_01m4fr2f4jhzd3swbxzj3161xf": "completed",
+    "tk_01m4fr2f4ketqh6dd1jd7yt95j": "completed"
+  },
+  "title": "FWGC++ procedural Bannerlord campaigns with War Sails",
+  "updatedAt": "2026-10-19T23:45:33.701Z"
+}

@@ -1,0 +1,13 @@
+{
+  "author": {
+    "label": "Claude Code",
+    "role": "orchestrator"
+  },
+  "body": "**Handoff from MMR-62 (references, staging and the store lock).**\n\n- **The reference index.** `Persistence/WorldReferenceIndex.Build(catalog, store, activeBindings)` lists references by package and content id.\n  - Gaps that keep it incomplete: unreadable save headers, malformed bindings, unreadable journals, and a save list that differs from the `Game Saves` folder.\n  - The folder is cross-checked with System.IO, because the game's own listing hides an unreadable folder.\n  - `Decide(package, contentId)` retains whenever anything references the world, whenever there is a gap, and always while `SaveKindsBound` is false (MMR-48).\n  - Use it for the inspection view (\"whether saves reference a bundle\").\n- **Staging cleanup** (`Persistence/StagingCleanup`, at startup under the lock) removes only:\n  - `bundles/.staging-*`;\n  - `worlds/*.tmp-*`;\n  - `world-surfaces/<32 hex>`;\n  - `saves/journal/*.tmp-*`.\n\n  It never follows reparse points, and it leaves `jobs/` alone for your crash-recovery resume or discard.\n- **The store lock.** `<store>/store.lock` is held for the process's lifetime. Without it a process neither recovers, cleans, generates nor publishes: `SaveBindingRuntime.RequireWriter` and `GenerationCoordinator.Admission`. Your error categories should include that refusal.\n- **Startup reports.** `<store>/saves/startup-<pid>.json` holds recovery, staging and an index summary. The newest ten are kept.\n- **Not done:** general cleanup of complete or unreferenced worlds, and its safety tests.",
+  "createdAt": "2026-10-16T20:24:35.651Z",
+  "epicId": "ep_01m4fpnf646t254mnh69jhz107",
+  "format": "darkmechanicus.comment",
+  "formatVersion": 1,
+  "id": "cm_01m5366kj3qr2epfhhf1pjg5hk",
+  "ticketId": "tk_01m4fqfbgkdhbqqf84gy5p5z2b"
+}

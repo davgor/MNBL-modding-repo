@@ -1,0 +1,73 @@
+{
+  "schema": "mnbl.projection-calibration",
+  "version": 1,
+  "ticket": "MMR-25",
+  "summary": "Scene axes, origin and raster orientation are fixed by the accepted MMR-16 calibration receipts. The height scale, 0.01 world units per metre, is the convention its generated-seed runs used; the calibration surface itself used scale 1. The horizontal scale is a projection-policy choice (worldgen/policies/projection.json), not a receipt value. The sea datum for terrain and navigation follows the MMR-17 rule. One engine calibration run (PID 4768) was made, for the sea datum only, because no receipt fixed where the engine puts water on a generated map.",
+  "axes": {
+    "x": "+X = source columns = east",
+    "y": "+Y = source rows = south (row 0, the north pole row, at y = 0)",
+    "z": "up",
+    "origin": "(0, 0) at the terrain corner",
+    "handedness": "(east, south, up) reflects the geographic (east, north, up) frame",
+    "evidence": [
+      {
+        "file": "evidence/runtime/surface-collision-calibration.json",
+        "sha256": "f5a3ac2b02737a7588264362d8c9fc241fc84d961189fc1807791227616b8278",
+        "fields": "prospectiveLandmarks.gridCoordinates [[50.25, 64.6], [80.75, 40.2]] with worldScale extent/(side-1); the model's (x,y) -> (x+1,y+1) diagonal"
+      },
+      {
+        "file": "evidence/runtime/in-game/runtime_surface-32896.json",
+        "sha256": "27975543003fd9ccba77678f5508ca9f03869c7041d9b45686872802cdfba0d0",
+        "fields": "accepted MMR-16 run: the asymmetric calibration surface (off-centre peak, diagonal channel, narrow ridge) rendered and queried at its grid coordinates; physical clicks matched the collision reference within 9.54e-7 m (calibration) and 4.46e-5 m (seed 42)"
+      },
+      {
+        "file": "evidence/runtime/surface-probe.json",
+        "sha256": "ba7cbfc631d2be3a854e5efc5f4f789a7f6eb781e090b73bd768759eeeb128ee",
+        "fields": "accepted MMR-16 summary"
+      },
+      {
+        "file": "docs/formats/terrain-bin.md",
+        "sha256": "e0c7045d42884b3b1ab1b6c94db52c5215ec6d18bbb177624b4b19234462d35a",
+        "fields": "column = +X, row = +Y, origin at the terrain corner, verified against scene entities (59 of 387 within 5 cm, against 3 with Y flipped and 1 with X/Y swapped)"
+      }
+    ]
+  },
+  "rasterOrientation": "row-major, row 0 first at y = 0, column 0 at x = 0; the encoder writes the heightfield as given (src/WorldBridge/surface.cpp heightLayout: row-major +Y rows +X columns)",
+  "horizontal": "MMR-16 fixes the encoder raster: vertex (column, row) at (column, row) * extent / (side - 1) world units, square cells. The projection policy chooses W and H = W/2, so a source cell is 6.25 x 3.125 world units at n = 129. MMR-26 must therefore resample the source grid onto the square encoder raster through Projection::inverse; it is not copied cell for cell.",
+  "heightScale": {
+    "worldUnitsPerMetre": 0.01,
+    "evidence": "an adopted convention, not a measured constant: runtime_surface-32896 encoded both generated seeds with --surface-scale 0.01 (the calibration surface used 1; RuntimeSurfaceSequenceProbe.cs line 178); every campaign fixture builder defaults to --scale 0.01; MMR-16 found the engine truncates vertex heights toward zero at 0.03 world units"
+  },
+  "seaDatum": {
+    "rule": "scene z = 0 at effective_config.sea_level; a sample is sea when radial height - sea_level < 0",
+    "receipts": [
+      {
+        "file": "evidence/runtime/navigation-probe.json",
+        "sha256": "da1556aff6492b34a04180369024b37cdb16f5548bc8161b65d2432d3a2bff5b",
+        "fields": "MMR-17: sea faces (CoastalSea 18) where the cell centre is below 0 at sea level 0; player and AI sailed on them"
+      }
+    ],
+    "calibrationRun": {
+      "file": "evidence/runtime/in-game/generated_campaign-4768.json",
+      "sha256": "575205574b08077723f50b1814811bb0c339c445592ea86b5cd5ba24a4d6625a",
+      "module": "6f7e3edc630137950f85e4764fe8a4cd77771ef9bc55264b337f509d6a46d8e3",
+      "world": "mnbl_00059042 (build/research-env59/w42, placement a529b12851ad884d...), 800 x 800, 32768 navmesh faces",
+      "probe": "src/MNBL.ProceduralWorld/Diagnostics/SeaDatumProbe.cs (seaDatumProbe=1): 24 x 24 grid of cell centres, each with its navmesh face group, Scene.GetTerrainHeight, and Scene.GetWaterLevelAtPosition with the water renderer and with water-body entities",
+      "observed": {
+        "sceneWaterLevel": -100,
+        "medit_water_plane": false,
+        "waterLevelAtEverySample": -100,
+        "terrainZ": {
+          "openSea": [-33.03, -0.9],
+          "coastalSea": [-32.66, 6.38],
+          "land": [4.37, 63.75],
+          "noFace": [-0.5, 24.91]
+        },
+        "samplesByFace": {"openSea": 256, "coastalSea": 159, "land": 25, "noFace": 136},
+        "faceQueryNote": "Faces were looked up with GetFaceIndex(new CampaignVec2(p, false)), the sea-flagged position. 136 samples, mostly low land near the coast, returned no face, and the 25 'land' samples are all Mountain faces. The face class only groups the samples; it does not affect the water-level reading, which was -100 for all 576."
+      },
+      "conclusion": "The generated scene's water_level (-100, water_exists false) is the only water level the engine reports, and no water entity exists, so the engine has no water surface at the sea datum. Terrain and navmesh keep z = 0 as sea level, and the sea floor is below it. The water seen in screenshots is not the scene water renderer, and this run does not identify its source. Placing and verifying a sea surface at z = 0 belongs to MMR-39. The official War Sails Main_map uses a global_water entity at z 1.8 plus local water_plane entities."
+    }
+  },
+  "newEngineRuns": "one (PID 4768), for the sea datum only"
+}

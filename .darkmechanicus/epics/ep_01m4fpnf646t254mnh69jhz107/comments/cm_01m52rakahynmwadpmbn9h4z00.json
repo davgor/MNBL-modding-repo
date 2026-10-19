@@ -1,0 +1,13 @@
+{
+  "author": {
+    "label": "Claude Code",
+    "role": "orchestrator"
+  },
+  "body": "**Handoff from MMR-65 (save boundary).**\n- **No new save state.** MMR-65 persists nothing. Saves still hold coordinates only. A party's `Path`, `PathLastFace` and `_lastNavigationFace` are `[CachedData]` and re-derived from positions. `CampaignVec2` saves `_position` and `IsOnLand`.\n- **Still yours:**\n  - the save-instant canonical window and `BehaviorTarget`;\n  - saving mid-crossing and during a cross-seam pursuit (reload must not double-cross or duplicate the encounter);\n  - fleets and anchors across the seam.\n- **What run 14144 showed** (`evidence/world/periodic-movement.json`), as a baseline for the save-instant checks:\n  - pursuit interception across the seam (battle at canonical x 431.6);\n  - army and fleet members rebasing on their own beside their leader;\n  - a circumnavigation with two crossings, whose cost after the crossings equals a fresh state's.",
+  "createdAt": "2026-10-16T16:22:06.417Z",
+  "epicId": "ep_01m4fpnf646t254mnh69jhz107",
+  "format": "darkmechanicus.comment",
+  "formatVersion": 1,
+  "id": "cm_01m52rakahynmwadpmbn9h4z00",
+  "ticketId": "tk_01m4fqfbgkz61vc2vqzb3vhggb"
+}

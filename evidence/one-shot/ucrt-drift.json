@@ -1,0 +1,28 @@
+{
+ "schema": "mnbl.ucrt-drift",
+ "version": 1,
+ "ticket": "MMR-1",
+ "pinned": {
+  "tools.lock.json compiler.ucrtSha256": "5c52e3a303baaac0e0af8bd9b96134993da34bc9d834a31ef37e1d2cdc7fe192",
+  "worldgen/producer.lock.json runtime.ucrtbaseSha256": "5c52e3a303baaac0e0af8bd9b96134993da34bc9d834a31ef37e1d2cdc7fe192"
+ },
+ "system": {
+  "path": "C:/Windows/System32/ucrtbase.dll",
+  "sha256": "dedb7611e1abc1ff3852dcac3d4c93a048d729e25b061973b9969f22698f14ca",
+  "fileVersion": "10.0.26100.9711 (WinBuild.160101.0800)"
+ },
+ "windowsUpdates": [
+  "KB5127647 (installed 2026-10-13)",
+  "KB5127648 (installed 2026-10-14)",
+  "KB5127690 (installed 2026-10-14)"
+ ],
+ "preflight": {
+  "exit": 3,
+  "passed": false,
+  "failedChecks": [
+   "ucrtbase_matches_lock"
+  ]
+ },
+ "consequence": "The producer process contract (tools/Test-ProducerProcess.ps1) fails its preflight check ucrtbase_matches_lock; fwg.exe still matches its pin, and the in-game generation path does not check the UCRT. Re-pinning changes worldgen/producer.lock.json, a world input: an owner decision.",
+ "preflightSource": "evidence/one-shot/producer-process-contract-20261019.json results.preflight"
+}

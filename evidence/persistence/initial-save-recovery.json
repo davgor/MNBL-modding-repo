@@ -1,0 +1,358 @@
+{
+  "schema": "mnbl.evidence.initial-save-recovery",
+  "version": 1,
+  "ticket": "MMR-62",
+  "generated": "2026-10-16T20:21:21+00:00",
+  "sources": {
+    "publish": {
+      "file": "evidence/runtime/in-game/generated_campaign-33696.json",
+      "sha256": "a2cd0fad3135c76ed5723b06138421853ffe2b08de3c0f87d49cda5871270b5b",
+      "processId": 33696,
+      "probe": "generated_campaign",
+      "status": "running",
+      "moduleSha256": "c1ef0e0db35306107b5d73ece5fa6495c7f4a69d43e97833cb177aae4e30b732"
+    },
+    "recover": {
+      "file": "evidence/runtime/in-game/save_recovery-19888.json",
+      "sha256": "395ca371e80cdf884258a8c9e2a5135101609f85890738e3c601f8fb04e9a4f0",
+      "processId": 19888,
+      "probe": "save_recovery",
+      "status": "ok",
+      "moduleSha256": "c1ef0e0db35306107b5d73ece5fa6495c7f4a69d43e97833cb177aae4e30b732"
+    },
+    "history": [
+      {
+        "file": "evidence/runtime/in-game/generated_campaign-27964.json",
+        "sha256": "647aa2bf24644fbe11ca096088b7f434e4f79c3389a562dbafc66b539b6b4baa",
+        "processId": 27964,
+        "probe": "generated_campaign",
+        "status": "running",
+        "moduleSha256": "a27298a264086c5c10acefcdd728c0bee60696157e0f582251ac42e4b651b2d5"
+      },
+      {
+        "file": "evidence/runtime/in-game/save_recovery-3868.json",
+        "sha256": "56daa919f572eac5bee06a4ad59ddc5a05331eb92ec390eea50d75db1f1518a7",
+        "processId": 3868,
+        "probe": "save_recovery",
+        "status": "ok",
+        "moduleSha256": "a27298a264086c5c10acefcdd728c0bee60696157e0f582251ac42e4b651b2d5"
+      }
+    ]
+  },
+  "checks": {
+    "publishedBeforeSuccess": true,
+    "refusalsWriteNothing": true,
+    "ironmanPublishedUnderEngineName": true,
+    "storeLockExclusive": true,
+    "indexFindsInitialSave": true,
+    "processKilledAfterSave": true,
+    "startupPassHeldLock": true,
+    "everyBoundaryRecovered": true,
+    "foreignUnreadableSaveKept": true,
+    "indexFailsClosedWithGap": true,
+    "completeIndexStillRetains": true,
+    "decisionFollowsReferencesWhenAllKindsBound": true,
+    "recoveryIdempotent": true,
+    "stagingRemovedSentinelsKept": true,
+    "noProbeFailures": true
+  },
+  "passed": true,
+  "publish": {
+    "binding": {
+      "worldId": "mnbl_00059042",
+      "package": "mnbl_00059042-9ebd196077ea",
+      "instance": "2b30d67c60454ecb9c18714ac11855b6",
+      "contentId": "none"
+    },
+    "seconds": 0.33963380000000143,
+    "saveName": "mnbl_00059042_start_2b30d67c6045",
+    "states": [
+      "intent",
+      "published"
+    ],
+    "readBack": {
+      "exists": true,
+      "readable": true,
+      "bodyWhole": true,
+      "instance": "2b30d67c60454ecb9c18714ac11855b6",
+      "package": "mnbl_00059042-9ebd196077ea",
+      "contentId": "none"
+    },
+    "uniqueGameId": "wkz750n21Zfx",
+    "refusals": {
+      "unpublishedPackage": {
+        "refused": "InvalidDataException: World package mnbl_00059042-000000000000 is not published or does not verify; the initial save would dangle.",
+        "journalWritten": false
+      },
+      "takenName": {
+        "refused": "IOException: A save named mnbl_00059042_start_2b30d67c6045 exists; an initial save never replaces one.",
+        "journalWritten": false
+      }
+    },
+    "index": {
+      "savesListed": 83,
+      "savesBound": 41,
+      "discoveryComplete": true,
+      "gaps": [],
+      "retain": true,
+      "reason": "referenced by 3: save Ironmanwkz750n21Zfx, save mnbl_00059042_start_2b30d67c6045, active campaign 2b30d67c60454ecb9c18714ac11855b6"
+    },
+    "planted": {
+      "listedUnreadable": [
+        "mnbl_00059042_start_19b6dd8a85dd",
+        "mnbl_probe62_foreign_33696"
+      ],
+      "tornDataHeader": {
+        "readable": true,
+        "bodyWhole": false,
+        "problem": "the game data ends early (a torn write)"
+      }
+    },
+    "crash": "killed after save B was over, before its journal outcome",
+    "ironman": {
+      "saveName": "Ironmanwkz750n21Zfx",
+      "expectedName": "Ironmanwkz750n21Zfx",
+      "states": [
+        "intent",
+        "published"
+      ],
+      "seconds": 0.23007599999999684,
+      "readBack": {
+        "exists": true,
+        "readable": true,
+        "bodyWhole": true,
+        "instance": "aec7e16dcc154143a4fd8d3ed953b349",
+        "package": "mnbl_00059042-9ebd196077ea",
+        "contentId": "none"
+      },
+      "error": null
+    }
+  },
+  "startup": {
+    "lockHeld": true,
+    "recovery": {
+      "resolved": [
+        {
+          "instance": "19b6dd8a85dd411280467467beab94d9",
+          "worldId": "mnbl_00059042",
+          "package": "mnbl_00059042-9ebd196077ea",
+          "contentId": "none",
+          "saveName": "mnbl_00059042_start_19b6dd8a85dd",
+          "state": "removed",
+          "uniqueGameId": null,
+          "note": "deleted: its header cannot be read: a torn or partial write (recovered at startup)",
+          "transitions": 2
+        },
+        {
+          "instance": "77bd745901df4a8483abe46d682153bc",
+          "worldId": "mnbl_00059042",
+          "package": "mnbl_00059042-9ebd196077ea",
+          "contentId": "none",
+          "saveName": "mnbl_00059042_start_77bd745901df",
+          "state": "removed",
+          "uniqueGameId": null,
+          "note": "deleted: its game data is torn: the game data ends early (a torn write) (recovered at startup)",
+          "transitions": 2
+        },
+        {
+          "instance": "94eb9a1840b3428db5257a4596d3ab31",
+          "worldId": "mnbl_00059042",
+          "package": "mnbl_00059042-9ebd196077ea",
+          "contentId": "none",
+          "saveName": "mnbl_00059042_start_94eb9a1840b3",
+          "state": "abandoned",
+          "uniqueGameId": null,
+          "note": "no save named mnbl_00059042_start_94eb9a1840b3 (recovered at startup); the world package is kept",
+          "transitions": 2
+        },
+        {
+          "instance": "f9c8b62b96944ad99f26a487e0f790a7",
+          "worldId": "mnbl_00059042",
+          "package": "mnbl_00059042-9ebd196077ea",
+          "contentId": "none",
+          "saveName": "mnbl_00059042_start_f9c8b62b9694",
+          "state": "published",
+          "uniqueGameId": "wkz750n21Zfx",
+          "note": "read back bound to this instance (recovered at startup)",
+          "transitions": 2
+        }
+      ],
+      "unresolved": [],
+      "unreadableJournals": []
+    },
+    "staging": {
+      "ran": true,
+      "skipped": null,
+      "removed": [
+        "bundles/.staging-probe62-33696",
+        "worlds/mnbl_probe62_33696.tmp-e64baa27cedf4834b45d9211a2f10b54",
+        "world-surfaces/52a87324acd94ec0b0cda2166506315d",
+        "saves/journal/1b0f49d7b6044d52b22cc7b1783f6c69.json.tmp-44b63d82ef5d460dae890c657dc73847"
+      ],
+      "retained": []
+    },
+    "seconds": 0.08099719999999999
+  },
+  "boundaries": [
+    {
+      "boundary": "published",
+      "what": "normal publication (process 1)",
+      "expected": "published",
+      "state": "published",
+      "note": "read back bound to this instance (the engine reported the save)",
+      "saveExists": true,
+      "boundInstance": "2b30d67c60454ecb9c18714ac11855b6",
+      "bodyWhole": true,
+      "passed": true
+    },
+    {
+      "boundary": "ironman",
+      "what": "Ironman publication: the engine saves under IronmanModSaveName (process 1)",
+      "expected": "published",
+      "state": "published",
+      "note": "read back bound to this instance (the engine reported the save)",
+      "saveExists": true,
+      "boundInstance": "aec7e16dcc154143a4fd8d3ed953b349",
+      "bodyWhole": true,
+      "passed": true
+    },
+    {
+      "boundary": "afterSave",
+      "what": "engine save over, process killed before the outcome",
+      "expected": "published",
+      "state": "published",
+      "note": "read back bound to this instance (recovered at startup)",
+      "saveExists": true,
+      "boundInstance": "f9c8b62b96944ad99f26a487e0f790a7",
+      "bodyWhole": true,
+      "passed": true
+    },
+    {
+      "boundary": "beforeSave",
+      "what": "intent written, engine never asked to save",
+      "expected": "abandoned",
+      "state": "abandoned",
+      "note": "no save named mnbl_00059042_start_94eb9a1840b3 (recovered at startup); the world package is kept",
+      "saveExists": false,
+      "boundInstance": null,
+      "bodyWhole": null,
+      "passed": true
+    },
+    {
+      "boundary": "tornHeader",
+      "what": "torn save: header cut short",
+      "expected": "removed",
+      "state": "removed",
+      "note": "deleted: its header cannot be read: a torn or partial write (recovered at startup)",
+      "saveExists": false,
+      "boundInstance": null,
+      "bodyWhole": null,
+      "passed": true
+    },
+    {
+      "boundary": "tornData",
+      "what": "whole header before torn game data",
+      "expected": "removed",
+      "state": "removed",
+      "note": "deleted: its game data is torn: the game data ends early (a torn write) (recovered at startup)",
+      "saveExists": false,
+      "boundInstance": null,
+      "bodyWhole": null,
+      "passed": true
+    }
+  ],
+  "foreign": {
+    "saveExists": true,
+    "readable": false
+  },
+  "index": {
+    "withForeign": {
+      "discoveryComplete": false,
+      "gaps": [
+        "save mnbl_probe62_foreign_33696: its header cannot be read, so the world it names is unknown"
+      ],
+      "world": {
+        "package": "mnbl_00059042-9ebd196077ea",
+        "retain": true,
+        "reason": "referenced by 3: save mnbl_00059042_start_f9c8b62b9694, save Ironmanwkz750n21Zfx, save mnbl_00059042_start_2b30d67c6045",
+        "references": 3
+      },
+      "unreferenced": {
+        "package": "mnbl_probe62_33696-000000000000",
+        "retain": true,
+        "reason": "reference discovery is incomplete (1 gaps: save mnbl_probe62_foreign_33696: its header cannot be read, so the world it names is unknown)",
+        "references": 0
+      }
+    },
+    "complete": {
+      "discoveryComplete": true,
+      "gaps": [],
+      "world": {
+        "package": "mnbl_00059042-9ebd196077ea",
+        "retain": true,
+        "reason": "referenced by 3: save mnbl_00059042_start_f9c8b62b9694, save Ironmanwkz750n21Zfx, save mnbl_00059042_start_2b30d67c6045",
+        "references": 3
+      },
+      "unreferenced": {
+        "package": "mnbl_probe62_33696-000000000000",
+        "retain": true,
+        "reason": "autosaves, Save As and renamed saves are not all journaled yet (MMR-48); a complete world is never deleted in this increment",
+        "references": 0
+      },
+      "unreferencedIfAllSaveKindsBound": {
+        "package": "mnbl_probe62_33696-000000000000",
+        "retain": false,
+        "reason": "no save, pending initial save or active campaign names it, and discovery is complete",
+        "references": 0
+      },
+      "worldIfAllSaveKindsBound": {
+        "package": "mnbl_00059042-9ebd196077ea",
+        "retain": true,
+        "reason": "referenced by 3: save mnbl_00059042_start_f9c8b62b9694, save Ironmanwkz750n21Zfx, save mnbl_00059042_start_2b30d67c6045",
+        "references": 3
+      }
+    }
+  },
+  "recoverAgain": {
+    "resolved": [],
+    "unresolved": [],
+    "unreadableJournals": []
+  },
+  "staging": {
+    "startup": {
+      "ran": true,
+      "skipped": null,
+      "removed": [
+        "bundles/.staging-probe62-33696",
+        "worlds/mnbl_probe62_33696.tmp-e64baa27cedf4834b45d9211a2f10b54",
+        "world-surfaces/52a87324acd94ec0b0cda2166506315d",
+        "saves/journal/1b0f49d7b6044d52b22cc7b1783f6c69.json.tmp-44b63d82ef5d460dae890c657dc73847"
+      ],
+      "retained": []
+    },
+    "plantedLeft": [],
+    "sentinelsKept": [
+      "C:\\Users\\davgo\\AppData\\Local\\MNBL.ProceduralWorld\\bundles\\c3ee96bd7bf0996b785d47afe4b31b7533782505f85f447e6b58e23c1c31de83",
+      "C:\\Users\\davgo\\AppData\\Local\\MNBL.ProceduralWorld\\worlds\\mnbl_probe62_33696-000000000000",
+      "C:\\Users\\davgo\\AppData\\Local\\MNBL.ProceduralWorld\\jobs\\probe62-33696"
+    ]
+  },
+  "cleaned": [
+    "mnbl_00059042_start_2b30d67c6045.sav",
+    "Ironmanwkz750n21Zfx.sav",
+    "mnbl_00059042_start_f9c8b62b9694.sav",
+    "2b30d67c60454ecb9c18714ac11855b6.json",
+    "aec7e16dcc154143a4fd8d3ed953b349.json",
+    "f9c8b62b96944ad99f26a487e0f790a7.json",
+    "94eb9a1840b3428db5257a4596d3ab31.json",
+    "19b6dd8a85dd411280467467beab94d9.json",
+    "77bd745901df4a8483abe46d682153bc.json",
+    "C:\\Users\\davgo\\AppData\\Local\\MNBL.ProceduralWorld\\bundles\\c3ee96bd7bf0996b785d47afe4b31b7533782505f85f447e6b58e23c1c31de83",
+    "C:\\Users\\davgo\\AppData\\Local\\MNBL.ProceduralWorld\\worlds\\mnbl_probe62_33696-000000000000",
+    "C:\\Users\\davgo\\AppData\\Local\\MNBL.ProceduralWorld\\jobs\\probe62-33696"
+  ],
+  "lockExclusive": true,
+  "dismissedDialogs": [
+    "Safe Mode"
+  ]
+}

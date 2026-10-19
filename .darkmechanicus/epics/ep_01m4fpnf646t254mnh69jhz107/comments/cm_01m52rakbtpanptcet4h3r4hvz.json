@@ -1,0 +1,13 @@
+{
+  "author": {
+    "label": "Claude Code",
+    "role": "orchestrator"
+  },
+  "body": "**Handoff from MMR-65 (settlement placement near the seam).**\n- **Gates and ports near the cut work.** On the MMR-63 fixture, ports near the cut were entered from both sides across the seam (run 14144: one rebase per leg, 81.9 travelled each way). Entering moves a party 6.25 from the port to the settlement; that is the engine's snap, not a seam effect.\n- **Siege camp positions.** `BesiegerCamp.GetSiegeCampPartyPosition`, which subtracts another party's position, is now periodic through the gate.\n- **Margin rule.** The periodic measures tell positions from offsets by the pole margin. A world whose `OriginY` is not above 101 units is refused at preflight and load (`PeriodicSpatialQueries.RequireMargin`), so placed geometry must keep that margin.\n- **Canonical spawn points.** `NavigationHelper.FindPointAroundPosition` returns canonical points; a helper's failure (returning its centre) is left as given.",
+  "createdAt": "2026-10-16T16:22:06.458Z",
+  "epicId": "ep_01m4fpnf646t254mnh69jhz107",
+  "format": "darkmechanicus.comment",
+  "formatVersion": 1,
+  "id": "cm_01m52rakbtpanptcet4h3r4hvz",
+  "ticketId": "tk_01m4fqfbgkkntdvg7kaxc9k8yz"
+}

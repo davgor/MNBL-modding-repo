@@ -1,0 +1,222 @@
+<Prefab>
+	<!-- MMR-43: the New Campaign setup screen (WorldSetupViewModel). Widgets, brushes and sprites are the installed Native ones the text query
+	     popup uses; controller focus comes from the navigation scopes below, keyboard and controller confirm/back from the generic panel keys.
+	     MMR-46: a world ready for review shows its preview (WorldPreview.xml) in place of the seed and settings (IsEditing), with Back, New Seed
+	     and Start Campaign. -->
+	<Window>
+		<Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent">
+			<Children>
+
+				<!--Backdrop-->
+				<Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Sprite="BlankWhiteSquare_9" Color="#000000CC" />
+
+				<!--The panel takes its content's height (as the installed text query popup does).-->
+				<DimensionSyncWidget Id="SetupParent" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="980" HorizontalAlignment="Center" VerticalAlignment="Center" DimensionToSync="Vertical" WidgetToCopyHeightFrom="SetupContent">
+					<Children>
+
+						<Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Sprite="StdAssets\Popup\canvas" />
+
+						<ListPanel Id="SetupContent" WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" StackLayout.LayoutMethod="VerticalTopToBottom" MarginBottom="20">
+							<Children>
+
+								<!--Title-->
+								<TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="60" MarginLeft="30" MarginRight="30" MarginTop="10" Brush="Popup.Title.Text" Text="@TitleText" />
+								<Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="23" Sprite="StdAssets\Popup\divider" />
+
+								<!--Profile and fixed coverage text-->
+								<RichTextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" MarginLeft="40" MarginRight="40" MarginTop="10" Brush="Popup.Description.Text" Text="@ProfileText" IsVisible="@IsEditing" />
+								<RichTextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" MarginLeft="40" MarginRight="40" MarginTop="8" Brush="Popup.Description.Text" Text="@CoverageText" IsVisible="@IsEditing" />
+
+								<!--The preview of the world ready for review-->
+								<ListPanel WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" MarginTop="8" StackLayout.LayoutMethod="VerticalTopToBottom" IsVisible="@IsPreviewShown">
+									<Children>
+										<TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="36" MarginLeft="40" MarginRight="40" Brush="Popup.Description.Text" Text="@PreviewTitleText" />
+										<WorldPreview DataSource="{Preview}" />
+									</Children>
+								</ListPanel>
+
+								<!--Host problems (War Sails, versions, generator files), each with its reference and details (MMR-47)-->
+								<ListPanel WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" MarginLeft="40" MarginRight="40" MarginTop="12" StackLayout.LayoutMethod="VerticalTopToBottom" IsVisible="@HasHostProblems">
+									<Children>
+										<ListPanel DataSource="{HostProblemViews}" WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" StackLayout.LayoutMethod="VerticalTopToBottom">
+											<ItemTemplate>
+												<ListPanel WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" MarginBottom="8" StackLayout.LayoutMethod="VerticalTopToBottom">
+													<Children>
+														<RichTextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" Brush="Popup.Description.Text" Brush.FontColor="#FF8A80FF" Text="@TitleText" />
+														<RichTextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" Brush="Popup.Description.Text" Text="@MessageText" />
+														<RichTextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" Brush="Popup.Description.Text" Text="@ActionText" />
+														<ListPanel WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" MarginTop="4" StackLayout.LayoutMethod="HorizontalLeftToRight">
+															<Children>
+																<RichTextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" VerticalAlignment="Center" Brush="Popup.Description.Text" Brush.FontSize="16" Text="@ReferenceText" IsVisible="@HasReference" />
+																<ButtonWidget DoNotPassEventsToChildren="true" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="150" SuggestedHeight="36" VerticalAlignment="Center" Brush="Popup.Cancel.Button" Command.Click="ExecuteToggleDetails">
+																	<Children>
+																		<TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Brush="Popup.Button.Text" Brush.FontSize="16" Text="@DetailsButtonText" />
+																	</Children>
+																</ButtonWidget>
+															</Children>
+														</ListPanel>
+														<RichTextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" MarginTop="4" Brush="Popup.Description.Text" Brush.FontSize="14" Text="@DetailsText" IsVisible="@ShowDetails" />
+													</Children>
+												</ListPanel>
+											</ItemTemplate>
+										</ListPanel>
+									</Children>
+								</ListPanel>
+
+								<!--A world an earlier session left unfinished: continue it or discard it (MMR-47)-->
+								<ListPanel WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" MarginLeft="40" MarginRight="40" MarginTop="12" StackLayout.LayoutMethod="VerticalTopToBottom" IsVisible="@HasUnfinished">
+									<Children>
+										<RichTextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" Brush="Popup.Description.Text" Brush.FontColor="#F2D16BFF" Text="@UnfinishedText" />
+										<ListPanel Id="UnfinishedButtons" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" MarginTop="6" StackLayout.LayoutMethod="HorizontalLeftToRight">
+											<Children>
+												<ButtonWidget DoNotPassEventsToChildren="true" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="200" SuggestedHeight="44" Brush="Popup.Done.Button" Command.Click="ExecuteResume" IsEnabled="@CanResume" GamepadNavigationIndex="0">
+													<Children>
+														<TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Brush="Popup.Button.Text" Brush.FontSize="18" Text="@ResumeText" />
+													</Children>
+												</ButtonWidget>
+												<ButtonWidget DoNotPassEventsToChildren="true" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="200" SuggestedHeight="44" MarginLeft="10" Brush="Popup.Cancel.Button" Command.Click="ExecuteDiscard" IsEnabled="@CanDiscard" GamepadNavigationIndex="1">
+													<Children>
+														<TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Brush="Popup.Button.Text" Brush.FontSize="18" Text="@DiscardText" />
+													</Children>
+												</ButtonWidget>
+											</Children>
+										</ListPanel>
+									</Children>
+								</ListPanel>
+
+								<!--Seed-->
+								<ListPanel Id="SeedRow" WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" MarginLeft="40" MarginRight="40" MarginTop="18" StackLayout.LayoutMethod="HorizontalLeftToRight" IsVisible="@IsEditing">
+									<Children>
+										<TextWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="140" SuggestedHeight="70" VerticalAlignment="Center" Brush="Popup.Description.Text" Text="@SeedLabelText" />
+										<Widget Id="SeedInputParent" DoNotAcceptEvents="true" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="410" SuggestedHeight="70" VerticalAlignment="Center" Sprite="General\CharacterCreation\name_input_area">
+											<Children>
+												<EditableTextWidget Id="SeedInput" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" MarginLeft="10" MarginRight="10" MarginTop="12" MarginBottom="12" Brush="Review.NameInput.Text" RealText="@SeedText" MaxLength="20" IsEnabled="@IsSeedEditable" KeyboardInfoText="@SeedLabelText" GamepadNavigationIndex="0" />
+											</Children>
+										</Widget>
+										<ButtonWidget DoNotPassEventsToChildren="true" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="300" SuggestedHeight="64" MarginLeft="20" VerticalAlignment="Center" Brush="Popup.Done.Button" Command.Click="ExecuteRandomWorld" IsEnabled="@IsSeedEditable" GamepadNavigationIndex="1">
+											<Children>
+												<TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Brush="Popup.Button.Text" Text="@RandomWorldText" />
+													<InputKeyVisualWidget DataSource="{RandomInputKey}" DoNotAcceptEvents="true" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="45" SuggestedHeight="45" HorizontalAlignment="Left" VerticalAlignment="Center" PositionXOffset="12" KeyID="@KeyID" IsVisible="@IsVisible" />
+											</Children>
+										</ButtonWidget>
+									</Children>
+								</ListPanel>
+								<RichTextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" MarginLeft="180" MarginRight="40" MarginTop="4" Brush="Popup.Description.Text" Brush.FontSize="20" Text="@SeedHintText" IsVisible="@IsEditing" />
+								<RichTextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" MarginLeft="180" MarginRight="40" MarginTop="4" Brush="Popup.Description.Text" Brush.FontSize="20" Brush.FontColor="#FF8A80FF" Text="@SeedErrorText" IsVisible="@HasSeedError" />
+
+								<!--Fixed settings, each with why (a list's own IsVisible would bind against its items, so the wrapper hides it)-->
+								<ListPanel WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" StackLayout.LayoutMethod="VerticalTopToBottom" IsVisible="@IsEditing">
+									<Children>
+										<TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="40" MarginLeft="40" MarginRight="40" MarginTop="16" Brush="Popup.Description.Text" Text="@SettingsTitleText" />
+										<ListPanel DataSource="{Settings}" WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" MarginLeft="40" MarginRight="40" StackLayout.LayoutMethod="VerticalTopToBottom">
+											<ItemTemplate>
+												<ListPanel WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" MarginTop="6" StackLayout.LayoutMethod="HorizontalLeftToRight">
+													<Children>
+														<TextWidget WidthSizePolicy="Fixed" HeightSizePolicy="CoverChildren" SuggestedWidth="260" Brush="Popup.Description.Text" Brush.FontSize="20" Text="@NameText" />
+														<TextWidget WidthSizePolicy="Fixed" HeightSizePolicy="CoverChildren" SuggestedWidth="120" Brush="Popup.Description.Text" Brush.FontSize="20" Text="@ValueText" />
+														<RichTextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" Brush="Popup.Description.Text" Brush.FontSize="18" Text="@ReasonText" />
+													</Children>
+												</ListPanel>
+											</ItemTemplate>
+										</ListPanel>
+									</Children>
+								</ListPanel>
+
+								<!--Waiting time from measured data-->
+								<ListPanel WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" StackLayout.LayoutMethod="VerticalTopToBottom" IsVisible="@IsEditing">
+									<Children>
+										<RichTextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" MarginLeft="40" MarginRight="40" MarginTop="14" Brush="Popup.Description.Text" Brush.FontSize="20" Text="@WaitText" IsVisible="@HasWaitText" />
+									</Children>
+								</ListPanel>
+
+								<!--A withdrawn start, a kept world, a missing preview-->
+								<RichTextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" MarginLeft="40" MarginRight="40" MarginTop="10" Brush="Popup.Description.Text" Brush.FontColor="#F2D16BFF" Text="@NoticeText" IsVisible="@HasNotice" />
+
+								<!--Progress, result, error-->
+								<RichTextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" MarginLeft="40" MarginRight="40" MarginTop="14" Brush="Popup.Description.Text" Text="@StatusText" IsVisible="@HasStatus" />
+								<ListPanel WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" MarginLeft="40" MarginRight="40" MarginTop="14" StackLayout.LayoutMethod="VerticalTopToBottom" IsVisible="@HasResult">
+									<Children>
+										<RichTextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" Brush="Popup.Description.Text" Text="@ResultText" IsVisible="@IsEditing" />
+										<RichTextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" MarginTop="4" Brush="Popup.Description.Text" Brush.FontSize="18" Text="@PeoplesText" />
+											<RichTextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" MarginTop="4" Brush="Popup.Description.Text" Brush.FontSize="18" Text="@CreationText" />
+									</Children>
+								</ListPanel>
+								<!--The failure: title, message, action, its reference, and its details on request (MMR-47)-->
+								<ListPanel WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" MarginLeft="40" MarginRight="40" MarginTop="14" StackLayout.LayoutMethod="VerticalTopToBottom" IsVisible="@HasError">
+									<Children>
+										<ListPanel DataSource="{ErrorView}" WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" StackLayout.LayoutMethod="VerticalTopToBottom">
+											<Children>
+												<RichTextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" Brush="Popup.Description.Text" Brush.FontColor="#FF8A80FF" Text="@TitleText" />
+												<RichTextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" Brush="Popup.Description.Text" Text="@MessageText" />
+												<RichTextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" Brush="Popup.Description.Text" Text="@ActionText" />
+												<ListPanel WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" MarginTop="4" StackLayout.LayoutMethod="HorizontalLeftToRight">
+													<Children>
+														<RichTextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" VerticalAlignment="Center" Brush="Popup.Description.Text" Brush.FontSize="16" Text="@ReferenceText" IsVisible="@HasReference" />
+														<ButtonWidget DoNotPassEventsToChildren="true" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="150" SuggestedHeight="36" VerticalAlignment="Center" Brush="Popup.Cancel.Button" Command.Click="ExecuteToggleDetails">
+															<Children>
+																<TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Brush="Popup.Button.Text" Brush.FontSize="16" Text="@DetailsButtonText" />
+															</Children>
+														</ButtonWidget>
+													</Children>
+												</ListPanel>
+												<RichTextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" MarginTop="4" Brush="Popup.Description.Text" Brush.FontSize="14" Text="@DetailsText" IsVisible="@ShowDetails" />
+											</Children>
+										</ListPanel>
+									</Children>
+								</ListPanel>
+
+								<!--Diagnostics view (hashes, paths, job details) only on request-->
+								<RichTextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" MarginLeft="40" MarginRight="40" MarginTop="10" Brush="Popup.Description.Text" Brush.FontSize="14" Text="@DiagnosticsText" IsVisible="@ShowDiagnostics" />
+
+								<!--Buttons-->
+								<NavigationForcedScopeCollectionTargeter CollectionParent="..\." />
+								<NavigationScopeTargeter ScopeID="WorldSetupSeedScope" ScopeParent="..\SeedRow" ScopeMovements="Horizontal" />
+								<NavigationScopeTargeter ScopeID="WorldSetupButtonsScope" ScopeParent="..\SetupButtons" ScopeMovements="Horizontal" />
+								<NavigationScopeTargeter ScopeID="WorldSetupUnfinishedScope" ScopeParent="..\UnfinishedButtons" ScopeMovements="Horizontal" />
+								<ListPanel Id="SetupButtons" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" HorizontalAlignment="Center" MarginTop="24" StackLayout.LayoutMethod="HorizontalLeftToRight">
+									<Children>
+										<ButtonWidget DoNotPassEventsToChildren="true" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="230" SuggestedHeight="64" VerticalAlignment="Center" Brush="Popup.Cancel.Button" Command.Click="ExecuteBack" IsEnabled="@CanGoBack" GamepadNavigationIndex="0">
+											<Children>
+												<TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="32" VerticalAlignment="Center" MarginLeft="47" MarginRight="40" Brush="Popup.Button.Text" Text="@BackText" />
+												<InputKeyVisualWidget DataSource="{CancelInputKey}" DoNotAcceptEvents="true" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="45" SuggestedHeight="45" HorizontalAlignment="Left" VerticalAlignment="Center" PositionXOffset="12" KeyID="@KeyID" IsVisible="@IsVisible" />
+											</Children>
+										</ButtonWidget>
+										<ButtonWidget DoNotPassEventsToChildren="true" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="230" SuggestedHeight="64" MarginLeft="10" VerticalAlignment="Center" Brush="Popup.Cancel.Button" Command.Click="ExecuteToggleDiagnostics" GamepadNavigationIndex="1">
+											<Children>
+												<TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="32" VerticalAlignment="Center" Brush="Popup.Button.Text" Text="@DiagnosticsButtonText" />
+											</Children>
+										</ButtonWidget>
+										<ButtonWidget DoNotPassEventsToChildren="true" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="230" SuggestedHeight="64" MarginLeft="10" VerticalAlignment="Center" Brush="Popup.Done.Button" Command.Click="ExecuteGenerate" IsEnabled="@CanGenerate" IsVisible="@IsEditing" GamepadNavigationIndex="2">
+											<Children>
+												<TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="32" VerticalAlignment="Center" MarginLeft="47" MarginRight="40" Brush="Popup.Button.Text" Text="@GenerateText" />
+												<InputKeyVisualWidget DataSource="{DoneInputKey}" DoNotAcceptEvents="true" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="45" SuggestedHeight="45" HorizontalAlignment="Left" VerticalAlignment="Center" PositionXOffset="12" KeyID="@KeyID" IsVisible="@IsVisible" />
+											</Children>
+										</ButtonWidget>
+										<ButtonWidget DoNotPassEventsToChildren="true" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="230" SuggestedHeight="64" MarginLeft="10" VerticalAlignment="Center" Brush="Popup.Cancel.Button" Command.Click="ExecuteNewSeed" IsVisible="@IsPreviewShown" GamepadNavigationIndex="3">
+											<Children>
+												<TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="32" VerticalAlignment="Center" MarginLeft="47" MarginRight="40" Brush="Popup.Button.Text" Text="@NewSeedText" />
+												<InputKeyVisualWidget DataSource="{RandomInputKey}" DoNotAcceptEvents="true" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="45" SuggestedHeight="45" HorizontalAlignment="Left" VerticalAlignment="Center" PositionXOffset="12" KeyID="@KeyID" IsVisible="@IsVisible" />
+											</Children>
+										</ButtonWidget>
+										<ButtonWidget DoNotPassEventsToChildren="true" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="230" SuggestedHeight="64" MarginLeft="10" VerticalAlignment="Center" Brush="Popup.Done.Button" Command.Click="ExecuteStartCampaign" IsEnabled="@CanStartCampaign" IsVisible="@IsPreviewShown" GamepadNavigationIndex="4">
+											<Children>
+												<TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="32" VerticalAlignment="Center" MarginLeft="47" MarginRight="40" Brush="Popup.Button.Text" Text="@StartCampaignText" />
+												<InputKeyVisualWidget DataSource="{DoneInputKey}" DoNotAcceptEvents="true" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="45" SuggestedHeight="45" HorizontalAlignment="Left" VerticalAlignment="Center" PositionXOffset="12" KeyID="@KeyID" IsVisible="@IsVisible" />
+											</Children>
+										</ButtonWidget>
+									</Children>
+								</ListPanel>
+
+							</Children>
+						</ListPanel>
+
+						<!--Frame Border-->
+						<Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Sprite="frame_9" ExtendLeft="18" ExtendTop="18" ExtendRight="18" ExtendBottom="18" IsEnabled="false" />
+
+					</Children>
+				</DimensionSyncWidget>
+
+			</Children>
+		</Widget>
+	</Window>
+</Prefab>

@@ -1,0 +1,40 @@
+{
+  "schema": "mnbl.terrain-materials",
+  "version": 1,
+  "channels": ["grass", "rock_k"],
+  "biomes": [
+    {"id": 0, "core": "ocean", "rock": 200, "note": "sea floor below the datum: rocky bed"},
+    {"id": 1, "core": "tundra", "rock": 60},
+    {"id": 2, "core": "desert", "rock": 110, "note": "no sand material in the proven template; partial rock stands in"},
+    {"id": 3, "core": "grassland", "rock": 0},
+    {"id": 4, "core": "forest", "rock": 0},
+    {"id": 5, "core": "exposed_rock", "rock": 255},
+    {"id": 6, "core": "snow", "rock": 40, "note": "no snow material in the proven template; winter snow physics comes from the template's grass layer"},
+    {"id": 7, "core": "rainforest", "rock": 0},
+    {"id": 8, "core": "lake", "rock": 120, "note": "lake bed"},
+    {"id": 13, "core": "marsh", "rock": 0},
+    {"id": 15, "core": "boreal_forest", "rock": 20},
+    {"id": 16, "core": "cold_tundra", "rock": 90},
+    {"id": 17, "core": "land_ice", "rock": 140, "note": "no ice material in the proven template"}
+  ],
+  "waterTypes": [
+    {"code": 0, "name": "land", "intent": "land"},
+    {"code": 1, "name": "ocean", "intent": "ocean"},
+    {"code": 2, "name": "lake", "intent": "lake"}
+  ],
+  "river": [
+    {"code": 0, "intent": "none"},
+    {"code": 1, "intent": "river"}
+  ],
+  "landforms": [
+    {"index": 0, "name": "Submerged", "use": "categorical mask only"},
+    {"index": 1, "name": "Plain / hillside", "use": "categorical mask only"},
+    {"index": 2, "name": "Mountain / ridge", "use": "categorical mask only"},
+    {"index": 3, "name": "Valley", "use": "categorical mask only"}
+  ],
+  "intents": {"land": 0, "ocean": 1, "lake": 2, "river": 3},
+  "riverOverridesLand": true,
+  "slopeRock": {"start": 0.6, "full": 1.2},
+  "coastEpsilon": 0.05,
+  "notes": "Material weights for the two layers the proven terrain template provides (MMR-16: grass base at full weight, rock_k painted over it). The rock weight of a sample is max(the biome's rock, the slope rule round-half-even(clamp((slope - start) / (full - start), 0, 1) * 255)), where slope is the output grid's central-difference gradient in world units, as the encoder computes it. Every exported biome id must appear here with the same core name, and every water_type, river and landform code must be listed; anything else fails. coastEpsilon (world units) keeps the compiled coastline coherent with the sea datum: ocean samples are lowered to at most -coastEpsilon and land samples raised to at least +coastEpsilon, which survives 16-bit quantization and the engine's 0.03 truncation toward zero. Lakes are left as compiled. Version 1 ignores layers.biome_variant (magical variants): materials follow the natural biome only."
+}

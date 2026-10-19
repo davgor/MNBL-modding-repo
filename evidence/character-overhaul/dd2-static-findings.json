@@ -1,0 +1,1156 @@
+{
+  "schema": "dd2-static-findings-v1",
+  "recorded_client_date": "2026-10-16",
+  "scope": "Read-only installed DD2/demo manifests, existing enum header, scripts and historical logs. No shared REA session used by this worker.",
+  "sources": [
+    {
+      "path": "D:/SteamLibrary/steamapps/common/Dragons Dogma 2/Enums_Internal.hpp",
+      "bytes": 3924059,
+      "last_write_utc": "2026-10-10T23:56:20.9320901Z",
+      "sha256": "ff61641eca68617e59e777cb8cb0c84010c2dea66cff69b04368500cdcbd083d"
+    },
+    {
+      "path": "D:/SteamLibrary/steamapps/appmanifest_2054970.acf",
+      "bytes": 1446,
+      "last_write_utc": "2026-10-16T03:40:46.9245673Z",
+      "sha256": "1d5c68c7cf7e6e052abecd7142638f4ad4f9b32635305d664d58cb76e0ad33c8"
+    },
+    {
+      "path": "D:/SteamLibrary/steamapps/appmanifest_2674810.acf",
+      "bytes": 1084,
+      "last_write_utc": "2026-10-17T01:50:12.6249144Z",
+      "sha256": "99310bc238ec7391f00fd7da7b8b095dec449282acd782c32326cd257c660033"
+    },
+    {
+      "path": "D:/SteamLibrary/steamapps/common/Dragons Dogma 2/DD2.exe",
+      "bytes": 255663080,
+      "last_write_utc": "2026-10-16T03:38:48.9550242Z",
+      "sha256": "0b3a8e25c67062772598008ac8572141b4cc96274c332272f64a7db2c07979bc"
+    },
+    {
+      "path": "D:/SteamLibrary/steamapps/common/Dragons Dogma 2 Character Creator & Storage/DD2CCS.exe",
+      "bytes": 86395808,
+      "last_write_utc": "2026-10-17T01:48:57.2807428Z",
+      "sha256": "6f6ffb3c360253666e29f86a45d8bf45f1abe8d266f649111f81f45c2a3573e8"
+    },
+    {
+      "path": "D:/SteamLibrary/steamapps/common/Dragons Dogma 2/re2_framework_log.txt",
+      "bytes": 262391,
+      "last_write_utc": "2026-10-15T03:51:46.7296557Z",
+      "sha256": "fcaac7a6b7b4d7a43a44aea7352e32b96809828de173365bb12e6dcf212e4833"
+    },
+    {
+      "path": "D:/SteamLibrary/steamapps/common/Dragons Dogma 2/reframework/plugins/DD2PakBridge.log",
+      "bytes": 14077,
+      "last_write_utc": "2026-10-12T18:36:44.8657294Z",
+      "sha256": "ce78de70254da952a8b1c301bc0ec844a36dd825cf561a492298c54c65f15f60"
+    }
+  ],
+  "observations": [
+    {
+      "id": "DD2-O1",
+      "claim": "Steam manifests identify DD2 build 25920212 and character-creator demo build 24118868.",
+      "anchors": [
+        "appmanifest_2054970.acf:3,6,8,13",
+        "appmanifest_2674810.acf:3,6,8,13"
+      ]
+    },
+    {
+      "id": "DD2-O2",
+      "claim": "Existing Enums_Internal.hpp contains 610 EditEnum members numbered 0 through 609, 71 app::FaceEditID members and 35 app::BodyEditID members.",
+      "anchors": [
+        "Enums_Internal.hpp:17258-17869",
+        "Enums_Internal.hpp:20178-20250",
+        "Enums_Internal.hpp:113985-114021"
+      ],
+      "limit": "Enum members are not a count of independent player-visible human sliders. EditEnum contains presets, toggles, headers and fur/animal-specific items. Face/body keys include adjustment and sub-controls."
+    },
+    {
+      "id": "DD2-O3",
+      "claim": "Body candidate names distinguish upper/lower muscle, upper/lower fat, subcutaneous fat, height, torso length, head width/depth/length, neck length/thickness, chest/waist/pelvis dimensions and arm length.",
+      "anchors": [
+        "Enums_Internal.hpp:17464-17498",
+        "Enums_Internal.hpp:113985-114021"
+      ]
+    },
+    {
+      "id": "DD2-O4",
+      "claim": "EditEnum names include per-eye iris/pupil settings, hair root/tip colors and sheen/gloss, skin color curve/contrast/roughness, tattoo placement/scaling/opacity/thickness/roughness/metallic and repeat layers.",
+      "anchors": [
+        "Enums_Internal.hpp:17345-17394",
+        "Enums_Internal.hpp:17512-17702",
+        "Enums_Internal.hpp:17838-17868"
+      ]
+    },
+    {
+      "id": "DD2-O5",
+      "claim": "Existing header names body/face edit table catalogs, edit-value clamp and influence-map catalogs, FaceJointMaskFlag, body-detail application phases and material-baking phases.",
+      "anchors": [
+        "Enums_Internal.hpp:24198-24204",
+        "Enums_Internal.hpp:130032-130038",
+        "Enums_Internal.hpp:86059-86066",
+        "Enums_Internal.hpp:132716-132723",
+        "Enums_Internal.hpp:22063-22070",
+        "Enums_Internal.hpp:10870-10889",
+        "Enums_Internal.hpp:105168-105179"
+      ],
+      "limit": "Names and enum values only; no catalog payload, class fields, method implementation, bone transform weights or evaluation equations are present in this header."
+    },
+    {
+      "id": "DD2-O6",
+      "claim": "PartsInstantiate names distinguish body/head mesh and skin, muscle, collision shapes, prebakes, hair chains, clothing pieces, tattoo/scar bake and HeadAnim.",
+      "anchors": [
+        "Enums_Internal.hpp:102051-102230"
+      ],
+      "limit": "This is an enum inventory, not a captured call sequence or proof of precise resource dependency order."
+    },
+    {
+      "id": "DD2-O7",
+      "claim": "Installation file enumeration found 182 full-game files and 37 demo files; only matching .hpp/.h/.cs header was Enums_Internal.hpp in full game; no loose .mesh/.mdf2/.user/.pfb resource files (including version suffixes) found in either install.",
+      "anchors": [
+        "recursive Get-ChildItem file enumeration"
+      ],
+      "limit": "Does not inspect PAK contents or prove absence of internal resources. No complete class SDK dump found in these scoped installs."
+    },
+    {
+      "id": "DD2-O8",
+      "claim": "Historical 2026-10-14 REFramework log identifies dd2, commit 0a07faae46a6fc1c51cd1699a0cf99a3f9c2679f and TDB version 83; log ends with error and crash-dump attempt.",
+      "anchors": [
+        "re2_framework_log.txt:2",
+        "re2_framework_log.txt:9",
+        "re2_framework_log.txt:521",
+        "re2_framework_log.txt final 2 lines"
+      ],
+      "limit": "Historical session evidence only; not a fresh compatibility or runtime success test."
+    },
+    {
+      "id": "DD2-O9",
+      "claim": "2026-10-12 DD2PakBridge.log reports DD2.exe size 255573992, while current executable is 255663080 bytes.",
+      "anchors": [
+        "reframework/plugins/DD2PakBridge.log:2",
+        "current file stat"
+      ],
+      "limit": "Existing enum header and historical log provenance are not tied to current executable by build hash. Header may be stale; no exact build attribution claimed."
+    },
+    {
+      "id": "DD2-O10",
+      "claim": "Focused search of current installed Lua autorun scripts found only creature buildPartsFromCh220/buildPartsFromCh230 references for character-edit terms.",
+      "anchors": [
+        "reframework/autorun/_NickCore/EnemySpawner.lua:295,297"
+      ],
+      "limit": "No human creator binding implementation established by installed script search."
+    }
+  ],
+  "enum_blocks": [
+    {
+      "type": "app::guicharaedit::EditEnum",
+      "start_line": 17258,
+      "end_line": 17869,
+      "entry_count": 610,
+      "first": {
+        "line": 17259,
+        "name": "HeadStyle",
+        "value": "0"
+      },
+      "last": {
+        "line": 17868,
+        "name": "RightEyeHeader",
+        "value": "609"
+      }
+    },
+    {
+      "type": "app::FaceEditID",
+      "start_line": 20178,
+      "end_line": 20250,
+      "entry_count": 71,
+      "first": {
+        "line": 20179,
+        "name": "Face_Cheeks_Front",
+        "value": "2188461431"
+      },
+      "last": {
+        "line": 20249,
+        "name": "Face_Nose_Tip__In__1__Out",
+        "value": "945651450"
+      },
+      "entries": [
+        {
+          "line": 20179,
+          "name": "Face_Cheeks_Front",
+          "value": "2188461431"
+        },
+        {
+          "line": 20180,
+          "name": "Face_Cheeks_In__1__Out",
+          "value": "669427638"
+        },
+        {
+          "line": 20181,
+          "name": "Face_Cheeks_Up__1__Down",
+          "value": "1815780215"
+        },
+        {
+          "line": 20182,
+          "name": "Face_Ears_Angle",
+          "value": "1823918496"
+        },
+        {
+          "line": 20183,
+          "name": "Face_Ears_Bend__Front",
+          "value": "1519356681"
+        },
+        {
+          "line": 20184,
+          "name": "Face_Ears_Bend__Front_Bend__A",
+          "value": "3082776786"
+        },
+        {
+          "line": 20185,
+          "name": "Face_Ears_Bend__Front_Bend__B",
+          "value": "4091188551"
+        },
+        {
+          "line": 20186,
+          "name": "Face_Ears_Bend__Front_Bend__C",
+          "value": "2512602705"
+        },
+        {
+          "line": 20187,
+          "name": "Face_Ears_Bend__Side",
+          "value": "657053047"
+        },
+        {
+          "line": 20188,
+          "name": "Face_Ears_Bend__Side_Bend__A",
+          "value": "1622622273"
+        },
+        {
+          "line": 20189,
+          "name": "Face_Ears_Bend__Side_Bend__B",
+          "value": "186632296"
+        },
+        {
+          "line": 20190,
+          "name": "Face_Ears_Bend__Side_Bend__C",
+          "value": "191100231"
+        },
+        {
+          "line": 20191,
+          "name": "Face_Ears_Elf",
+          "value": "1521111606"
+        },
+        {
+          "line": 20192,
+          "name": "Face_Ears_Elf_Length",
+          "value": "2101912853"
+        },
+        {
+          "line": 20193,
+          "name": "Face_Ears_Elf_Sharp",
+          "value": "2097873461"
+        },
+        {
+          "line": 20194,
+          "name": "Face_Ears_Elf_Up__1__Down",
+          "value": "2992141810"
+        },
+        {
+          "line": 20195,
+          "name": "Face_Ears_Flap__Straight",
+          "value": "358814321"
+        },
+        {
+          "line": 20196,
+          "name": "Face_Ears_Lobe",
+          "value": "98681257"
+        },
+        {
+          "line": 20197,
+          "name": "Face_Ears_Open",
+          "value": "2564978917"
+        },
+        {
+          "line": 20198,
+          "name": "Face_Ears_Sharp",
+          "value": "2151982020"
+        },
+        {
+          "line": 20199,
+          "name": "Face_Ears_Size",
+          "value": "1660526720"
+        },
+        {
+          "line": 20200,
+          "name": "Face_Ears_Tilt",
+          "value": "3852219371"
+        },
+        {
+          "line": 20201,
+          "name": "Face_Ears_Twist",
+          "value": "2716411241"
+        },
+        {
+          "line": 20202,
+          "name": "Face_Ears_Twist_Twist__A",
+          "value": "2214584548"
+        },
+        {
+          "line": 20203,
+          "name": "Face_Ears_Twist_Twist__B",
+          "value": "2878920572"
+        },
+        {
+          "line": 20204,
+          "name": "Face_Ears_Twist_Twist__C",
+          "value": "2277846095"
+        },
+        {
+          "line": 20205,
+          "name": "Face_Eyebrows_Angle",
+          "value": "1764455332"
+        },
+        {
+          "line": 20206,
+          "name": "Face_Eyebrows_In__1__Out",
+          "value": "413512150"
+        },
+        {
+          "line": 20207,
+          "name": "Face_Eyebrows_In__1__Out_A",
+          "value": "3378237572"
+        },
+        {
+          "line": 20208,
+          "name": "Face_Eyebrows_In__1__Out_B",
+          "value": "4096771389"
+        },
+        {
+          "line": 20209,
+          "name": "Face_Eyebrows_Narrow__1__Wide",
+          "value": "231405082"
+        },
+        {
+          "line": 20210,
+          "name": "Face_Eyebrows_Straighten",
+          "value": "1264805421"
+        },
+        {
+          "line": 20211,
+          "name": "Face_Eyebrows_Up__1__Down",
+          "value": "2469013205"
+        },
+        {
+          "line": 20212,
+          "name": "Face_Eyes_Angle",
+          "value": "1072516754"
+        },
+        {
+          "line": 20213,
+          "name": "Face_Eyes_Distance",
+          "value": "579849303"
+        },
+        {
+          "line": 20214,
+          "name": "Face_Eyes_In__1__Out",
+          "value": "2965921069"
+        },
+        {
+          "line": 20215,
+          "name": "Face_Eyes_Size",
+          "value": "4261632564"
+        },
+        {
+          "line": 20216,
+          "name": "Face_Eyes_Up__1__Down",
+          "value": "3756815236"
+        },
+        {
+          "line": 20217,
+          "name": "Face_General_Face__Up__1__Down",
+          "value": "3546631858"
+        },
+        {
+          "line": 20218,
+          "name": "Face_General_Slim__1__Fat",
+          "value": "2834081594"
+        },
+        {
+          "line": 20219,
+          "name": "Face_General_Slim__1__Fat_Cheeks",
+          "value": "2301721922"
+        },
+        {
+          "line": 20220,
+          "name": "Face_General_Slim__1__Fat_Neck",
+          "value": "3628498915"
+        },
+        {
+          "line": 20221,
+          "name": "Face_Jaw_Chin__Height",
+          "value": "831368101"
+        },
+        {
+          "line": 20222,
+          "name": "Face_Jaw_Chin__In__1__Out",
+          "value": "1966346382"
+        },
+        {
+          "line": 20223,
+          "name": "Face_Jaw_Chin__Sharp",
+          "value": "3247482459"
+        },
+        {
+          "line": 20224,
+          "name": "Face_Jaw_Chin__Width",
+          "value": "1287495149"
+        },
+        {
+          "line": 20225,
+          "name": "Face_Jaw_Height",
+          "value": "874754440"
+        },
+        {
+          "line": 20226,
+          "name": "Face_Jaw_Round__1__Square",
+          "value": "410541958"
+        },
+        {
+          "line": 20227,
+          "name": "Face_Jaw_Submental__In__1__Out",
+          "value": "1261271190"
+        },
+        {
+          "line": 20228,
+          "name": "Face_Jaw_Width",
+          "value": "3188263889"
+        },
+        {
+          "line": 20229,
+          "name": "Face_Mouth_Angle",
+          "value": "2977069815"
+        },
+        {
+          "line": 20230,
+          "name": "Face_Mouth_Corner__Up1Down",
+          "value": "466880228"
+        },
+        {
+          "line": 20231,
+          "name": "Face_Mouth_Front__1__Back",
+          "value": "1610035873"
+        },
+        {
+          "line": 20232,
+          "name": "Face_Mouth_In__1__Out",
+          "value": "3108986950"
+        },
+        {
+          "line": 20233,
+          "name": "Face_Mouth_Lip__Straight",
+          "value": "349738057"
+        },
+        {
+          "line": 20234,
+          "name": "Face_Mouth_Lip__Thickness",
+          "value": "3796006293"
+        },
+        {
+          "line": 20235,
+          "name": "Face_Mouth_Up__1__Down",
+          "value": "926082906"
+        },
+        {
+          "line": 20236,
+          "name": "Face_Mouth_Whisker__In__1__Out",
+          "value": "4259420635"
+        },
+        {
+          "line": 20237,
+          "name": "Face_Mouth_Width",
+          "value": "906993695"
+        },
+        {
+          "line": 20238,
+          "name": "Face_Nose_Bridge__Bulge",
+          "value": "3217659067"
+        },
+        {
+          "line": 20239,
+          "name": "Face_Nose_Bridge__Bulge_Bulge__A",
+          "value": "2584321789"
+        },
+        {
+          "line": 20240,
+          "name": "Face_Nose_Bridge__Bulge_Bulge__B",
+          "value": "2442394521"
+        },
+        {
+          "line": 20241,
+          "name": "Face_Nose_Bridge__Straight",
+          "value": "2033264164"
+        },
+        {
+          "line": 20242,
+          "name": "Face_Nose_Bridge__Width",
+          "value": "2267661055"
+        },
+        {
+          "line": 20243,
+          "name": "Face_Nose_Length",
+          "value": "513398874"
+        },
+        {
+          "line": 20244,
+          "name": "Face_Nose_Nostril__Size",
+          "value": "2294092385"
+        },
+        {
+          "line": 20245,
+          "name": "Face_Nose_Nostril__Up",
+          "value": "2787842421"
+        },
+        {
+          "line": 20246,
+          "name": "Face_Nose_Nostril__Width",
+          "value": "3529503322"
+        },
+        {
+          "line": 20247,
+          "name": "Face_Nose_Sharp",
+          "value": "1661303381"
+        },
+        {
+          "line": 20248,
+          "name": "Face_Nose_Tip__Angle",
+          "value": "3156291298"
+        },
+        {
+          "line": 20249,
+          "name": "Face_Nose_Tip__In__1__Out",
+          "value": "945651450"
+        }
+      ]
+    },
+    {
+      "type": "app::BodyEditID",
+      "start_line": 113985,
+      "end_line": 114021,
+      "entry_count": 35,
+      "first": {
+        "line": 113986,
+        "name": "Arms__0__Legs_Arms_Length",
+        "value": "932575279"
+      },
+      "last": {
+        "line": 114020,
+        "name": "General_Muscle_Upper",
+        "value": "3572613277"
+      },
+      "entries": [
+        {
+          "line": 113986,
+          "name": "Arms__0__Legs_Arms_Length",
+          "value": "932575279"
+        },
+        {
+          "line": 113987,
+          "name": "Arms__0__Legs_Arms_Shoulder__Size",
+          "value": "2092571651"
+        },
+        {
+          "line": 113988,
+          "name": "Arms__0__Legs_Arms_Thickness",
+          "value": "3288601300"
+        },
+        {
+          "line": 113989,
+          "name": "Arms__0__Legs_Arms_Thickness_Lower",
+          "value": "1061052512"
+        },
+        {
+          "line": 113990,
+          "name": "Arms__0__Legs_Arms_Thickness_Upper",
+          "value": "3702242246"
+        },
+        {
+          "line": 113991,
+          "name": "Arms__0__Legs_Legs_Thickness",
+          "value": "1766348416"
+        },
+        {
+          "line": 113992,
+          "name": "Arms__0__Legs_Legs_Thickness_Lower",
+          "value": "3517878099"
+        },
+        {
+          "line": 113993,
+          "name": "Arms__0__Legs_Legs_Thickness_Upper",
+          "value": "3827629560"
+        },
+        {
+          "line": 113994,
+          "name": "Core_Neck__0__Head_Head__Depth",
+          "value": "4099443574"
+        },
+        {
+          "line": 113995,
+          "name": "Core_Neck__0__Head_Head__Length",
+          "value": "1332362251"
+        },
+        {
+          "line": 113996,
+          "name": "Core_Neck__0__Head_Head__Size",
+          "value": "323033925"
+        },
+        {
+          "line": 113997,
+          "name": "Core_Neck__0__Head_Head__Width",
+          "value": "1137593827"
+        },
+        {
+          "line": 113998,
+          "name": "Core_Neck__0__Head_Neck__Length",
+          "value": "1458806590"
+        },
+        {
+          "line": 113999,
+          "name": "Core_Neck__0__Head_Neck__Thickness",
+          "value": "175188792"
+        },
+        {
+          "line": 114000,
+          "name": "Core_Neck__0__Head_Traps__Size",
+          "value": "4206130288"
+        },
+        {
+          "line": 114001,
+          "name": "Core_Pelvis_Buttock__Size",
+          "value": "1638947135"
+        },
+        {
+          "line": 114002,
+          "name": "Core_Pelvis_Depth",
+          "value": "2157976120"
+        },
+        {
+          "line": 114003,
+          "name": "Core_Pelvis_Width",
+          "value": "4206872559"
+        },
+        {
+          "line": 114004,
+          "name": "Core_Torso_Bust__Distance",
+          "value": "2846328871"
+        },
+        {
+          "line": 114005,
+          "name": "Core_Torso_Bust__Size",
+          "value": "1673052757"
+        },
+        {
+          "line": 114006,
+          "name": "Core_Torso_Bust__Vertical",
+          "value": "4061319525"
+        },
+        {
+          "line": 114007,
+          "name": "Core_Torso_Chest__Depth",
+          "value": "3467158119"
+        },
+        {
+          "line": 114008,
+          "name": "Core_Torso_Chest__Width",
+          "value": "2908557143"
+        },
+        {
+          "line": 114009,
+          "name": "Core_Torso_Waist__Depth",
+          "value": "2640155802"
+        },
+        {
+          "line": 114010,
+          "name": "Core_Torso_Waist__Width",
+          "value": "2127619803"
+        },
+        {
+          "line": 114011,
+          "name": "General_Fat_Lower",
+          "value": "750713856"
+        },
+        {
+          "line": 114012,
+          "name": "General_Fat_Upper",
+          "value": "1757076811"
+        },
+        {
+          "line": 114013,
+          "name": "General_Fat_Upper_Mass",
+          "value": "762781798"
+        },
+        {
+          "line": 114014,
+          "name": "General_Fat_Upper_Subcutaneous",
+          "value": "389874767"
+        },
+        {
+          "line": 114015,
+          "name": "General_Fat_Upper__Adjust",
+          "value": "286753722"
+        },
+        {
+          "line": 114016,
+          "name": "General_Height_Height",
+          "value": "1497737450"
+        },
+        {
+          "line": 114017,
+          "name": "General_Height_Height__Adjust",
+          "value": "2964025353"
+        },
+        {
+          "line": 114018,
+          "name": "General_Height_Torso__Length",
+          "value": "3845860653"
+        },
+        {
+          "line": 114019,
+          "name": "General_Muscle_Lower",
+          "value": "813011489"
+        },
+        {
+          "line": 114020,
+          "name": "General_Muscle_Upper",
+          "value": "3572613277"
+        }
+      ]
+    },
+    {
+      "type": "app::BodyDetailEditor::BakingProcess",
+      "start_line": 10871,
+      "end_line": 10888,
+      "entry_count": 16,
+      "first": {
+        "line": 10872,
+        "name": "None",
+        "value": "0"
+      },
+      "last": {
+        "line": 10887,
+        "name": "Failed",
+        "value": "15"
+      },
+      "entries": [
+        {
+          "line": 10872,
+          "name": "None",
+          "value": "0"
+        },
+        {
+          "line": 10873,
+          "name": "DynamicTextureTableSlotAssign",
+          "value": "1"
+        },
+        {
+          "line": 10874,
+          "name": "ApplyPrepare",
+          "value": "2"
+        },
+        {
+          "line": 10875,
+          "name": "ApplyPrepareWaiting",
+          "value": "3"
+        },
+        {
+          "line": 10876,
+          "name": "ApplyParam",
+          "value": "4"
+        },
+        {
+          "line": 10877,
+          "name": "ApplyParamWaiting",
+          "value": "5"
+        },
+        {
+          "line": 10878,
+          "name": "MaterialBake",
+          "value": "6"
+        },
+        {
+          "line": 10879,
+          "name": "MaterialBakeWaiting",
+          "value": "7"
+        },
+        {
+          "line": 10880,
+          "name": "MaterialBake_BodyBakedResource",
+          "value": "8"
+        },
+        {
+          "line": 10881,
+          "name": "MaterialBake_HeadBakedResource",
+          "value": "9"
+        },
+        {
+          "line": 10882,
+          "name": "MaterialBake_ShareResource",
+          "value": "10"
+        },
+        {
+          "line": 10883,
+          "name": "BakingCheck",
+          "value": "11"
+        },
+        {
+          "line": 10884,
+          "name": "FinishingProcess",
+          "value": "12"
+        },
+        {
+          "line": 10885,
+          "name": "FinishingProcessWaiting",
+          "value": "13"
+        },
+        {
+          "line": 10886,
+          "name": "Completed",
+          "value": "14"
+        },
+        {
+          "line": 10887,
+          "name": "Failed",
+          "value": "15"
+        }
+      ]
+    },
+    {
+      "type": "app::charaedit::EditValueClampCatalog::CheckFlag",
+      "start_line": 86060,
+      "end_line": 86065,
+      "entry_count": 4,
+      "first": {
+        "line": 86061,
+        "name": "None",
+        "value": "0"
+      },
+      "last": {
+        "line": 86064,
+        "name": "All",
+        "value": "3"
+      },
+      "entries": [
+        {
+          "line": 86061,
+          "name": "None",
+          "value": "0"
+        },
+        {
+          "line": 86062,
+          "name": "BodyEdit",
+          "value": "1"
+        },
+        {
+          "line": 86063,
+          "name": "FaceEdit",
+          "value": "2"
+        },
+        {
+          "line": 86064,
+          "name": "All",
+          "value": "3"
+        }
+      ]
+    },
+    {
+      "type": "app::charaedit::EditInfluenceMapCatalog::CheckFlag",
+      "start_line": 132717,
+      "end_line": 132722,
+      "entry_count": 4,
+      "first": {
+        "line": 132718,
+        "name": "None",
+        "value": "0"
+      },
+      "last": {
+        "line": 132721,
+        "name": "All",
+        "value": "3"
+      },
+      "entries": [
+        {
+          "line": 132718,
+          "name": "None",
+          "value": "0"
+        },
+        {
+          "line": 132719,
+          "name": "BodyEdit",
+          "value": "1"
+        },
+        {
+          "line": 132720,
+          "name": "FaceEdit",
+          "value": "2"
+        },
+        {
+          "line": 132721,
+          "name": "All",
+          "value": "3"
+        }
+      ]
+    },
+    {
+      "type": "app::charaedit::ch000::Define::FaceJointMaskFlag",
+      "start_line": 22064,
+      "end_line": 22069,
+      "entry_count": 4,
+      "first": {
+        "line": 22065,
+        "name": "None",
+        "value": "0"
+      },
+      "last": {
+        "line": 22068,
+        "name": "CheekAndNose",
+        "value": "32"
+      },
+      "entries": [
+        {
+          "line": 22065,
+          "name": "None",
+          "value": "0"
+        },
+        {
+          "line": 22066,
+          "name": "Lower",
+          "value": "8"
+        },
+        {
+          "line": 22067,
+          "name": "LeftEye",
+          "value": "16"
+        },
+        {
+          "line": 22068,
+          "name": "CheekAndNose",
+          "value": "32"
+        }
+      ]
+    },
+    {
+      "type": "app::charaedit::ch000::BodyEditTableCatalog::CatalogFlag",
+      "start_line": 24199,
+      "end_line": 24203,
+      "entry_count": 3,
+      "first": {
+        "line": 24200,
+        "name": "None",
+        "value": "0"
+      },
+      "last": {
+        "line": 24202,
+        "name": "Female",
+        "value": "2"
+      },
+      "entries": [
+        {
+          "line": 24200,
+          "name": "None",
+          "value": "0"
+        },
+        {
+          "line": 24201,
+          "name": "Male",
+          "value": "1"
+        },
+        {
+          "line": 24202,
+          "name": "Female",
+          "value": "2"
+        }
+      ]
+    },
+    {
+      "type": "app::charaedit::ch000::FaceEditTableCatalog::CatalogFlag",
+      "start_line": 130033,
+      "end_line": 130037,
+      "entry_count": 3,
+      "first": {
+        "line": 130034,
+        "name": "None",
+        "value": "0"
+      },
+      "last": {
+        "line": 130036,
+        "name": "Beastman",
+        "value": "2"
+      },
+      "entries": [
+        {
+          "line": 130034,
+          "name": "None",
+          "value": "0"
+        },
+        {
+          "line": 130035,
+          "name": "Human",
+          "value": "1"
+        },
+        {
+          "line": 130036,
+          "name": "Beastman",
+          "value": "2"
+        }
+      ]
+    },
+    {
+      "type": "app::BodyDetailEditor::ApplyPhase",
+      "start_line": 105169,
+      "end_line": 105179,
+      "entry_count": 9,
+      "first": {
+        "line": 105170,
+        "name": "Start",
+        "value": "0"
+      },
+      "last": {
+        "line": 105178,
+        "name": "Completed",
+        "value": "8"
+      },
+      "entries": [
+        {
+          "line": 105170,
+          "name": "Start",
+          "value": "0"
+        },
+        {
+          "line": 105171,
+          "name": "Skin",
+          "value": "1"
+        },
+        {
+          "line": 105172,
+          "name": "Hair",
+          "value": "2"
+        },
+        {
+          "line": 105173,
+          "name": "Fur",
+          "value": "3"
+        },
+        {
+          "line": 105174,
+          "name": "Face",
+          "value": "4"
+        },
+        {
+          "line": 105175,
+          "name": "Dirt",
+          "value": "5"
+        },
+        {
+          "line": 105176,
+          "name": "Tattoos",
+          "value": "6"
+        },
+        {
+          "line": 105177,
+          "name": "Scars",
+          "value": "7"
+        },
+        {
+          "line": 105178,
+          "name": "Completed",
+          "value": "8"
+        }
+      ]
+    },
+    {
+      "type": "app::CharacterEditManager::PartsInstantiate",
+      "start_line": 102052,
+      "end_line": 102229,
+      "entry_count": 176,
+      "first": {
+        "line": 102053,
+        "name": "Body",
+        "value": "0"
+      },
+      "last": {
+        "line": 102228,
+        "name": "BodyDirt",
+        "value": "175"
+      }
+    }
+  ],
+  "inferences": [
+    {
+      "id": "DD2-I1",
+      "based_on": [
+        "DD2-O2",
+        "DD2-O3",
+        "DD2-O4",
+        "DD2-O5"
+      ],
+      "claim": "Use these identifiers as a targeted runtime inspection list. Likely reconstruction needs separate facial/body deformation, material/detail layers and catalog/preset choices rather than one interchangeable slider array."
+    },
+    {
+      "id": "DD2-I2",
+      "based_on": [
+        "DD2-O5",
+        "DD2-O6"
+      ],
+      "claim": "Prioritize inspection of app::FaceEditor, app::BodyDetailEditor, app::CharacterEditManager, app::GUICharaEditData, app::charaedit::ch000::BodyEditTableCatalog and FaceEditTableCatalog, plus EditValueClampCatalog and EditInfluenceMapCatalog. Query fields and referenced resources before drawing deformation conclusions."
+    },
+    {
+      "id": "DD2-I3",
+      "based_on": [
+        "DD2-O2",
+        "DD2-O5"
+      ],
+      "claim": "Do not map the 71 face enum keys or 35 body enum keys directly onto Bannerlord channels. Test each visible human option and its dependencies, then author Bannerlord-compatible equivalents against measured output."
+    }
+  ],
+  "unknowns": [
+    "Enum header generator, exact originating executable/build and freshness",
+    "Actual visible human control inventory, ranges/defaults and sex/head preset dependencies",
+    "Mesh morph versus bone/joint transform contribution for each control",
+    "Clamp values, influence map payloads and interpolation equations",
+    "Material shader implementation, texture-baking cost and visual equivalence",
+    "Save schema and character-creator demo/full-game parameter compatibility",
+    "Bannerlord implementation and runtime feasibility: parent-owned investigation"
+  ],
+  "checks_performed": [
+    "Read both Steam manifests and current install directory inventories",
+    "Parsed exact selected enum blocks; retained numeric IDs and source lines",
+    "Searched installed autorun Lua for creator/deformation terms",
+    "Read historical REFramework and DD2PakBridge log excerpts",
+    "Computed SHA-256 for seven scoped evidence inputs; did not hash or extract huge PAKs"
+  ],
+  "prohibited_or_not_performed": [
+    "No game launch or attach",
+    "No installs/config changes/game file mutation",
+    "No asset extraction or copying to Bannerlord",
+    "No live UI or parameter-change measurements",
+    "No implementation or visual-parity claims"
+  ],
+  "recommended_smallest_reference_probe": "After obtaining build-matched runtime metadata, start with one human head and one body option, e.g. Face_Jaw_Chin__Width and Arms__0__Legs_Arms_Length. Capture baseline/min/mid/max plus restore; record actual field value, affected resources/joints/materials and fixed-camera screenshots; repeat across human sex/head presets before designing mapping.",
+  "demo_status": {
+    "app_id": 2674810,
+    "manifest_build": "24118868",
+    "executable": "D:/SteamLibrary/steamapps/common/Dragons Dogma 2 Character Creator & Storage/DD2CCS.exe",
+    "executable_bytes": 86395808,
+    "main_pak_bytes": 6254782087,
+    "file_count": 37,
+    "reframework_dinput8_present": false,
+    "existing_enum_header_found": false,
+    "runtime_tested": false,
+    "note": "Demo is installed, but no existing REFramework loader or SDK/enum header found there. Full game has existing REFramework infrastructure but historical crash evidence; do not silently install it into demo or assume either session works."
+  },
+  "read_only_runtime_capture_plan": [
+    "Use a user-opened human creator screen on one explicitly selected build; record executable hash and REFramework version, and leave gameplay saves untouched.",
+    "In the existing Object Explorer, inspect relevant type definitions and objects; export only relevant field names/types and selected values plus referenced catalog/resource names to a new repository evidence file. Do not call setter/build/apply methods during read-only acquisition.",
+    "Capture current head preset, sex, species, active EditEnum identity, effective parameter values and the associated face/body table, clamp and influence-map entries. Record unavailable fields as unknown.",
+    "Read current mesh/morph references, local joint transforms and material parameter blocks if exposed. This is a baseline only: read-only metadata cannot establish causal visual effects.",
+    "For later behavioral measurements, explicitly distinguish human-operated slider changes or a separately scoped controlled UI experiment from passive capture; compare baseline/min/mid/max/restored values and fixed-camera images, then verify no save/export was performed."
+  ]
+}

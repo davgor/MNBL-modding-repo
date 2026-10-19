@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "status": "accepted-bounded-default-unpublished-lifetime-contract",
+  "sources": {
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\build\\battle-scale\\native-run-20261017-065749-08e99ed9\\backup-0": "2a5e0e0b15513ebb7052d747a621b82c50ee834553eba283b33bbbc33766e12a",
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\tools\\battle-scale\\audit_native_unpublished_element_runtime.py": "f916b1c475701b0feb36ed61d42e28b3e16e55253289280718589be2c050ac06",
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\tools\\battle-scale\\patch_native_copy.py": "e61450ea2094b82e153e6c47d3b981fe8faa65f184542efe1b9e19357e842793",
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\evidence\\engine-extension\\native-live-pool-growth-contract.json": "c99ca69958b3ed9d316510e53c1d7c04adf4d4e6aa73275e81382c7ce09f5363",
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\evidence\\engine-extension\\native-pool-helper-escape-review.json": "2d647f0bda65e2e42eb26d2ff9251c0e47ccfb21e28073d1c8dd0ca8be8c6978",
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\evidence\\engine-extension\\native-live-growth-rea-evidence.json": "8c328f8a97085288e2dbecaef6659b1cbb2d153b5f286d0a9a43bf3f5f13aa40",
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\evidence\\engine-extension\\native-unpublished-element-runtime-contract.json": "036733361062f0aa087b8f7321c0132aceaa85cb0ee244bb27fa984b9a4e5660",
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\tools\\battle-scale\\review_native_unpublished_contract.py": "70edcfeb5dc3877779955b86cd36f8da3426150f5945432b904edc7ae58de6f6"
+  },
+  "originalBodies": 14,
+  "instructionRows": 784,
+  "retainedCases": 24,
+  "additionalCases": 27,
+  "extraInputPatterns": {
+    "poison": [
+      19,
+      127,
+      128
+    ],
+    "sentinel": [
+      "0x0101010101010101",
+      "0xffffffffffffffff",
+      "0x8000000000000000"
+    ]
+  },
+  "extraSummary": {
+    "replayCases": 27,
+    "uniqueExecutedInstructions": 658,
+    "retainedInstructions": 784,
+    "unexpectedCallTargets": 0,
+    "observedEngineAllocationCalls": 0,
+    "observedRegistryOrMissionReads": 0,
+    "observedGlobalWrites": 0,
+    "tlsInstructionsOnDefaultPath": 0
+  },
+  "checks": [
+    "All14 retained bodies,784 decoded instruction rows and read ranges independently match the exact original image.",
+    "Full producer replay matches the saved result without its writer;27 additional poisoned/sentinel paths preserve write/read-initialization/ABI gates.",
+    "Guard dispatch slot and original JMP RAX independently checked against PE load config.",
+    "All retained and extra cases destroy only fully constructed never-activated private objects."
+  ],
+  "limitations": [
+    "atan2f(-0,1) remains an explicit emulation model; no actual CRT or Windows loader execution is claimed.",
+    "Evidence is bounded to default fully completed objects with no activation, external publication or mutations beyond inactive headers.",
+    "No exception injection inside native constructors, live pool publication, game worker barrier or native patch approval.",
+    "Mapped arbitrary vtable addresses are stored by construction; the default path does not invoke their non-null resource methods."
+  ],
+  "gameLaunched": false,
+  "enginePatchApproved": false
+}

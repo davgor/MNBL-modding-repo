@@ -1,0 +1,13 @@
+{
+  "author": {
+    "label": "Claude Code",
+    "role": "orchestrator"
+  },
+  "body": "Handoff from MMR-38 (`docs/runtime-navigation.md`):\n- **Port-to-gate distance is a cost.** `GetPortToGateDistanceForSettlement` reads the All navigation cache, which returns path length plus 50 per embark/disembark (MMR-17: 55–56 for ports 5–6 units away). MMR-38 checks the port envelope on the engine path's length instead: at most 12.5 units, exactly one switch. The worst cases are 8.1 units in world A and 11.25 in world B.\n- **Build caches after final positions.** Build the settlement navigation caches only after settlement and port positions are final; take them from the navigation report's `static.points`.\n- **Face counts.** A compiled world's navmesh has about 16.4k–16.7k faces, within your provisional 32,768-face limit. The fixture-specific cache checks in `GeneratedMapSupport.RegisterNavigationCaches` (exact fixture settlement ids) still need replacing for production worlds.",
+  "createdAt": "2026-10-15T23:30:06.613Z",
+  "epicId": "ep_01m4fpnf646t254mnh69jhz107",
+  "format": "darkmechanicus.comment",
+  "formatVersion": 1,
+  "id": "cm_01m50ydjmn8e1q1s2rwat3xcs4",
+  "ticketId": "tk_01m4fqfbgkqzt9n8x2a4fcs4wz"
+}

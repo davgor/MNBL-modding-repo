@@ -1,0 +1,13 @@
+{
+  "author": {
+    "label": "Claude Code",
+    "role": "orchestrator"
+  },
+  "body": "Handoff from MMR-37 (runtime surface backend):\n- **Current navmesh.** A compiled world constructed by `RuntimeWorldBackend` carries the surface encoder's diagnostic navmesh (33 × 33 vertices, 2,048 faces, groups 1/7 by slope; `src/WorldBridge/surface.cpp navmesh`). It is not a campaign navmesh. Replacing it is yours.\n- **Size and grounding.** The compiled terrain is 257² over 1600 units. A full-grid navmesh there is 131,072 faces, four times MMR-21's 32,768-face navigation-cache limit.\n- **Native face and path queries.** `GetFaceIndex`, `GetPathBetweenAIFaces`, `DoesPathExistBetweenFaces` and `GetFaceVertexZ` stay installed members on `GeneratedMapScene`, guarded only for staleness. Native heights on the compiled terrain equal the collision reference: samples truncated toward zero at 0.03, main diagonal; see `WorldSurface.CollisionHeight`. Use that when grounding navmesh vertices.",
+  "createdAt": "2026-10-15T21:10:03.319Z",
+  "epicId": "ep_01m4fpnf646t254mnh69jhz107",
+  "format": "darkmechanicus.comment",
+  "formatVersion": 1,
+  "id": "cm_01m50pd49q8pam7tv9k7y18x5d",
+  "ticketId": "tk_01m4fqfbgk5jah5w52dg2xvre2"
+}

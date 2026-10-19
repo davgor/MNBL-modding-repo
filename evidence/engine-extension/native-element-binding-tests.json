@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "status": "passed-offline-native-binding-identity-tests",
+  "createdAtUtc": "2026-10-17T18:29:32.900656+00:00",
+  "sources": {
+    "src/MNBL.AgentStorage/VerifiedNativeElementBinding.hpp": "f11e07f184e0ea3f2f8cced7315d504df7f50d35a7fa29366c2f171b1c89cad3",
+    "src/MNBL.AgentStorage/NativeElementFactory.hpp": "50a28d26a76edc95b5e059b4e036c936cddd8679b10719215b7b4201e146420d",
+    "src/MNBL.AgentStorage/AgentDomainStorage.hpp": "c5d9ee96a5109438fdfff03287ee8f8a32130835212afef47f2b2044638b5274",
+    "src/MNBL.AgentStorage/StableAgentStorage.hpp": "34555749bbfdf9ad318a02aea660f36cfe57ee9183e856df48c216ebf8503458",
+    "tools/battle-scale/prepare_native_element_binding.py": "a663a7c9d100a79ebbd2085286eb0ff724b3f942d767fb449bcfd4fb27ead2a3",
+    "tests/AgentStorage/native_element_binding_tests.cpp": "62efe4728e9d4373b2f4017a5bff97b91a28950be89cba36f1c401809607dd82",
+    "tools/battle-scale/Test-NativeElementBinding.cmd": "8b76816004e5c8aee8c660b77838f9b8e45e846ff204ea9cc0e7f561841adacf",
+    "tools/battle-scale/verify_native_element_binding.py": "d9f1e695a86d29f40cbf37a7d36b189e98244db54c3c4b7cc623f346ba38c3f2"
+  },
+  "outputs": {
+    "build/agent-storage/native_element_identity.hpp": "fd4ff3e30933bc25161c397e67e64b5f7728aeedbe22a714ebc2b1020fda98f8",
+    "build/agent-storage/native_element_binding_tests.exe": "13c8700fb47dc38401f174d350bfb54ce05eee124b9b4eef75fc55f3cccd80f6",
+    "build/agent-storage/native_element_binding_asan.exe": "ef2eed4ed86cd6c4dd5704b0121af2454acd8c0110b6f0f6e57de9477008de63",
+    "evidence/engine-extension/native-element-binding-identity.json": "e10f90b5e615a8fea85bc900ffe60dfa8f7f281df0d998f81a8fba9942a46be6"
+  },
+  "exitCode": 0,
+  "stdout": "{\"status\": \"original-native-binding-identity\", \"regions\": 3}\nnative_element_binding_tests.cpp\nPASS native binding: exact original file/mapped image;55 code/header/unwind mutations;4 wrong-module rejections;short buffers;private-memory rejection;nonexecutable MEM_IMAGE rejected;executable MEM_IMAGE accepted;runtime data excluded. No native module loaded or executed.\nnative_element_binding_tests.cpp\nPASS native binding: exact original file/mapped image;55 code/header/unwind mutations;4 wrong-module rejections;short buffers;private-memory rejection;nonexecutable MEM_IMAGE rejected;executable MEM_IMAGE accepted;runtime data excluded. No native module loaded or executed.\n",
+  "stderr": "",
+  "checks": [
+    "Optimized and ASAN builds verify full original file identity and original header/executable/function-table bytes in an offline mapped-layout buffer.",
+    "55 changed region/entry byte cases are rejected; short input and changed-file cases fail.",
+    "Loaded unrelated modules, interior module address and null module are rejected without executing target constructors.",
+    "Loaded-image memory checks reject private allocations and overflow; runtime mutable data is intentionally excluded.",
+    "Every pinned executable byte requires execute/read permission; nonexecutable MEM_IMAGE fixture rejected and executable MEM_IMAGE fixture accepted."
+  ],
+  "limitations": [
+    "No positive binding to a running Bannerlord module and no live Agent constructor/destructor execution.",
+    "Full file identity and loaded header/text/pdata equality do not prove mutable runtime initialization or all relocated read-only data/exception handler metadata.",
+    "Caller must exclude concurrent code/module mutation during binding and retain factory/runtime owner through all storage leases.",
+    "Binding does not synchronize engine jobs, activate agents, install patches or widen native indices."
+  ],
+  "gameLaunched": false,
+  "enginePatchApproved": false
+}

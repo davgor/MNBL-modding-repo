@@ -1,0 +1,360 @@
+﻿{
+    "schema":  "mnbl.producer-process-contract",
+    "version":  1,
+    "utc":  "2026-10-19T22:20:56.8276663Z",
+    "passed":  true,
+    "workDirectory":  "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\build\\research-producer22\\run-c4c7af6d842041d1bf09dcaa593010e3",
+    "ctest":  {
+                  "exit":  0,
+                  "log":  [
+                              "1/9 Test #1: reader_contract ..................   Passed    0.06 sec",
+                              "2/9 Test #2: process_contract .................   Passed    1.92 sec",
+                              "3/9 Test #3: identity_retry ...................   Passed    0.34 sec",
+                              "4/9 Test #4: source_contract ..................   Passed    1.83 sec",
+                              "5/9 Test #5: projection .......................   Passed    0.17 sec",
+                              "6/9 Test #6: terrain ..........................   Passed    0.09 sec",
+                              "7/9 Test #7: campaign .........................   Passed    0.09 sec",
+                              "8/9 Test #8: travel ...........................   Passed    0.10 sec",
+                              "9/9 Test #9: bundle ...........................   Passed    2.26 sec",
+                              "100% tests passed, 0 tests failed out of 9"
+                          ]
+              },
+    "lockCheck":  {
+                      "exit":  0,
+                      "summary":  "PASS: 22/22 producer lock checks"
+                  },
+    "bridge":  {
+                   "path":  "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\build\\worldbridge-contract\\Release\\worldbridge.exe",
+                   "sha256":  "2bfdbb9d0e2ae55dc356e9a8873bd70a5cded3b647faed28d261e5abc442f53a"
+               },
+    "producer":  {
+                     "path":  "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\build\\producer\\apps\\Release\\fwg.exe",
+                     "sha256":  "564c2629b5b92d49e52cd466a5a1aaa9339380464207ddcae669dd487d2f695e"
+                 },
+    "results":  {
+                    "preflight":  {
+                                      "exit":  0,
+                                      "passed":  true,
+                                      "failedChecks":  [
+
+                                                       ]
+                                  },
+                    "success":  {
+                                    "exit":  0,
+                                    "outcome":  "succeeded",
+                                    "published":  true,
+                                    "stagingRemaining":  false,
+                                    "worldSha256":  "e9264b8d1e0ad5b45af40dca3dcdd54128c22c856a7c11d7acdef3043e5f5c69",
+                                    "matchesAcceptedSeed42Root":  true,
+                                    "stray":  0
+                                },
+                    "refusal":  {
+                                    "exit":  3,
+                                    "outcome":  "refused",
+                                    "field":  "size",
+                                    "code":  "INVALID_INPUT",
+                                    "published":  false
+                                },
+                    "crossFieldRefusal":  {
+                                              "exit":  3,
+                                              "outcome":  "refused",
+                                              "code":  "INVALID_INPUT",
+                                              "fieldIsNull":  true,
+                                              "published":  false
+                                          },
+                    "bracePath":  {
+                                      "exit":  3,
+                                      "outcome":  "refused",
+                                      "field":  "size"
+                                  },
+                    "cancelBeforeLaunch":  {
+                                               "exit":  3,
+                                               "outcome":  "cancelled",
+                                               "launched":  false
+                                           },
+                    "cancellation":  {
+                                         "exit":  3,
+                                         "outcome":  "cancelled",
+                                         "producerPid":  51368,
+                                         "producerStillRunning":  false,
+                                         "published":  false,
+                                         "secondsUntilBridgeReturned":  1.83
+                                     },
+                    "timeout":  {
+                                    "exit":  3,
+                                    "outcome":  "timeout",
+                                    "producerStillRunning":  false,
+                                    "published":  false
+                                },
+                    "pinMismatch":  {
+                                        "exit":  3,
+                                        "outcome":  "pin_mismatch",
+                                        "launched":  false
+                                    },
+                    "missingExecutable":  {
+                                              "exit":  3,
+                                              "outcome":  "missing_executable",
+                                              "launched":  false
+                                          },
+                    "reproducibleBridge":  {
+                                               "first":  "2bfdbb9d0e2ae55dc356e9a8873bd70a5cded3b647faed28d261e5abc442f53a",
+                                               "second":  "2bfdbb9d0e2ae55dc356e9a8873bd70a5cded3b647faed28d261e5abc442f53a",
+                                               "identical":  true
+                                           }
+                },
+    "sources":  [
+                    {
+                        "path":  "src/WorldBridge/CMakeLists.txt",
+                        "sha256":  "fae5b0cfa29458e3a872a2c18a35f7356cbb8a026b1575c65b661152c831c510"
+                    },
+                    {
+                        "path":  "src/WorldBridge/commands/inspect_bundle.cpp",
+                        "sha256":  "002ddd65f859aa779b2bbb8c8bc0ab70ac97a2a76868af06349d296f0a0c1b1f"
+                    },
+                    {
+                        "path":  "src/WorldBridge/include/worldbridge/attempt_schedule.hpp",
+                        "sha256":  "7490a23b7168167ae656e3a93458ef9355bea099e9ddab8d47d203106b758cdf"
+                    },
+                    {
+                        "path":  "src/WorldBridge/include/worldbridge/campaign_compiler.hpp",
+                        "sha256":  "2e74ba583c7f956bbde425c19cb225c0c125251de7ab9f6f978cb57eebf7284b"
+                    },
+                    {
+                        "path":  "src/WorldBridge/include/worldbridge/canonical_json.hpp",
+                        "sha256":  "9c77f724e9ab07790235e157c978ad302655b0323bae54ceff32194ea0996432"
+                    },
+                    {
+                        "path":  "src/WorldBridge/include/worldbridge/json.hpp",
+                        "sha256":  "0635ce1bdf23c2c3f60e66bfd94a1db939ca5d3e2bd35e1fdfd9f5cc2c170e5f"
+                    },
+                    {
+                        "path":  "src/WorldBridge/include/worldbridge/json_stream.hpp",
+                        "sha256":  "711ce39750cc908c7d520af09b7916fbc911c1676d2526c0375c21c33cade87e"
+                    },
+                    {
+                        "path":  "src/WorldBridge/include/worldbridge/material_compiler.hpp",
+                        "sha256":  "bfbd03a3ae7cd455d2ba6ff18068fd937fc768de5c602c5840f7dda8699fb9ec"
+                    },
+                    {
+                        "path":  "src/WorldBridge/include/worldbridge/projected_world.hpp",
+                        "sha256":  "d090e1546bd1637b56cfaab03abad6da1478a4f17eb6dbd7d78ca4771f213ba8"
+                    },
+                    {
+                        "path":  "src/WorldBridge/include/worldbridge/projection.hpp",
+                        "sha256":  "5794a66a900ba1b8cd38dbd130cd84137d017edd0eb4958eb3d3313cfbbe43fa"
+                    },
+                    {
+                        "path":  "src/WorldBridge/include/worldbridge/protocol.hpp",
+                        "sha256":  "ce8ac76e5cdb9c7fab9a8b4e0d45bc2c493e2dc1d92ffac503cd57d35d5b0135"
+                    },
+                    {
+                        "path":  "src/WorldBridge/include/worldbridge/source_nodes.hpp",
+                        "sha256":  "61def6b07d31d14c9c65ad80a20b40c8e58134510a2cdffc469c0dc00e945938"
+                    },
+                    {
+                        "path":  "src/WorldBridge/include/worldbridge/source_world.hpp",
+                        "sha256":  "00f89fd3562b670cabef1c2088b8aee1238ab183daa181c983f0bc6a158efa46"
+                    },
+                    {
+                        "path":  "src/WorldBridge/include/worldbridge/stable_ids.hpp",
+                        "sha256":  "2048222a1bb659428df0bc1b1c26880226ad321862fe65cc1c5c4123e412ac0f"
+                    },
+                    {
+                        "path":  "src/WorldBridge/include/worldbridge/terrain_compiler.hpp",
+                        "sha256":  "a9dc73f62fe2d4c772f0568a820889b708bde3f0c2917bac06bc980933d1bf4f"
+                    },
+                    {
+                        "path":  "src/WorldBridge/include/worldbridge/travel_graph.hpp",
+                        "sha256":  "bf2bab9ea16670cc9bc91bf40a083c2f715d50cc01682d934429d5723870f505"
+                    },
+                    {
+                        "path":  "src/WorldBridge/include/worldbridge/world_bundle.hpp",
+                        "sha256":  "e75d56b753622e6db7a3a1e39b741aa95f44df2e28341302a4cfc1eeb5f83546"
+                    },
+                    {
+                        "path":  "src/WorldBridge/include/worldbridge/world_identity.hpp",
+                        "sha256":  "96639038dc57d230c83b48ea9d23d6d77f84038f9545cb5199d31d0cc0c82ad8"
+                    },
+                    {
+                        "path":  "src/WorldBridge/main.cpp",
+                        "sha256":  "4a0d6e9111f1dd4e040542c7e513fc0a91a47182c695fe2d729ec5fc4a8026ea"
+                    },
+                    {
+                        "path":  "src/WorldBridge/src/attempt_schedule.cpp",
+                        "sha256":  "51a56c8ed566a83d692cb642a3ccda36ffe612f7dc412648cb0a90abc8d4cb38"
+                    },
+                    {
+                        "path":  "src/WorldBridge/src/bundle_validator.cpp",
+                        "sha256":  "ca647da49e3848dea830cb3de45d78b25224cb5f8296249337503c46c61a4528"
+                    },
+                    {
+                        "path":  "src/WorldBridge/src/bundle_writer.cpp",
+                        "sha256":  "9989d29ca646e2bf78e160132a594c063a7fd9420df750c3e48b29a7fdf167d7"
+                    },
+                    {
+                        "path":  "src/WorldBridge/src/campaign_compiler.cpp",
+                        "sha256":  "df89d2da80624addd869ba6ac6c9f3956fe6187f112de4a0b81be1945b1472bc"
+                    },
+                    {
+                        "path":  "src/WorldBridge/src/canonical_json.cpp",
+                        "sha256":  "d3f485da5753c04e733bc685e7214299a146b330e9a67b0e49d8e38a4c2a18a3"
+                    },
+                    {
+                        "path":  "src/WorldBridge/src/generation_driver.cpp",
+                        "sha256":  "41daa67654fe080f388a363cd959fe93a98b58f9fab24032b54b1cbb1352b3a0"
+                    },
+                    {
+                        "path":  "src/WorldBridge/src/json_stream.cpp",
+                        "sha256":  "3c93dd0ee2f4675c8e0f9e1d79365a0d13f2a70ba0f83ece1aec37c618bad2a1"
+                    },
+                    {
+                        "path":  "src/WorldBridge/src/material_compiler.cpp",
+                        "sha256":  "88e77c5b08871919d3f0b4055978e7580a1ffab032e40707002d58d1e21dcc54"
+                    },
+                    {
+                        "path":  "src/WorldBridge/src/port_compiler.cpp",
+                        "sha256":  "a74063c3014d3bb2d4241294bf9e4f50f21267f539e19c9be55fe9f04024117a"
+                    },
+                    {
+                        "path":  "src/WorldBridge/src/producer_process.cpp",
+                        "sha256":  "8978e4a0a6a22690da69d6fbc58602a6029aa6e529628d453cd46d6a47eaa337"
+                    },
+                    {
+                        "path":  "src/WorldBridge/src/projected_world.cpp",
+                        "sha256":  "53e0ee6e2db09096ac09cfb0f139581e4201c7950db6dc3dd3cd094bad2fceee"
+                    },
+                    {
+                        "path":  "src/WorldBridge/src/projection.cpp",
+                        "sha256":  "7c4bd2b39f656f240df8ff106bb7374ce2318e37dac5910d87127e17ac80f6ab"
+                    },
+                    {
+                        "path":  "src/WorldBridge/src/source_nodes.cpp",
+                        "sha256":  "d26968f0ef54deccced98e2b0f97c005a26f199066c8543449f9d12fbd24ed6e"
+                    },
+                    {
+                        "path":  "src/WorldBridge/src/source_reader.cpp",
+                        "sha256":  "11a390edf0588a5383a9b86294ce802411e413468592630e6fc3fb776bdcfb61"
+                    },
+                    {
+                        "path":  "src/WorldBridge/src/stable_ids.cpp",
+                        "sha256":  "c39ae1544f90b3b706a9ace98992b39828bdf8205605ad0ef0e716609482c373"
+                    },
+                    {
+                        "path":  "src/WorldBridge/src/terrain_compiler.cpp",
+                        "sha256":  "f6ff45683c399cf9ee4e591736fc51d1ca6beb44925f769bc4e234b51afeb2f4"
+                    },
+                    {
+                        "path":  "src/WorldBridge/src/travel_graph.cpp",
+                        "sha256":  "f804cedb6a0978ab2b640b985a07e0397a2710a10e754536883c283d96668b04"
+                    },
+                    {
+                        "path":  "src/WorldBridge/src/world_identity.cpp",
+                        "sha256":  "dd1bdfdb1c6ec5ede2a384a7d61f39754dcfcb36c666da174b5a9480ef4c8a9d"
+                    },
+                    {
+                        "path":  "src/WorldBridge/surface.cpp",
+                        "sha256":  "cae3f4885e14fd27f08641d2ab92ebbdc218d7c2ed7b4860b0c75a4a0558f94e"
+                    },
+                    {
+                        "path":  "src/WorldBridge/surface.hpp",
+                        "sha256":  "411fb410005cc97e04a6796a24bb41d55a05403781d4502c29144b373b6728c3"
+                    },
+                    {
+                        "path":  "src/WorldBridge/tests/bundle_transaction_tests.cpp",
+                        "sha256":  "4ce467887d8d3c69e155260fa858628161db76565a9c82712f987fbc35e44e98"
+                    },
+                    {
+                        "path":  "src/WorldBridge/tests/campaign_semantics_tests.cpp",
+                        "sha256":  "c467845f93f725d218b55d9d4785b5f7105d259ac452ea1e71b5fe4b584e8f21"
+                    },
+                    {
+                        "path":  "src/WorldBridge/tests/fake_producer.cpp",
+                        "sha256":  "fa22069673c82613c3a562039fdad75eac1984173b659c4f23eccdbfca5ac6b6"
+                    },
+                    {
+                        "path":  "src/WorldBridge/tests/fixtures/source_contract/make_fixture.py",
+                        "sha256":  "c678ff50e2fa58b1bfab605e0c30bd8ef083f9da2d9245f928644ca68714b29c"
+                    },
+                    {
+                        "path":  "src/WorldBridge/tests/fixtures/source_contract/make_memory_attacks.py",
+                        "sha256":  "206d1386d00b24db9567bcc376f8374a1099e9e649cf862f04ad3d3abbf5e48d"
+                    },
+                    {
+                        "path":  "src/WorldBridge/tests/fixtures/source_contract/valid/plans/castle/fortress-0-2.json",
+                        "sha256":  "71c9ab8dd008b34bf05463acd3dbac9a8009dd3749430815c59fb0956bbb1e69"
+                    },
+                    {
+                        "path":  "src/WorldBridge/tests/fixtures/source_contract/valid/plans/city/surface-city-0-12-elf-2.json",
+                        "sha256":  "33c89519039dc9bf700769d3b92f4eb7a773c332078f22397422f60e593b273a"
+                    },
+                    {
+                        "path":  "src/WorldBridge/tests/fixtures/source_contract/valid/plans/city/surface-city-0-17-elf-2.json",
+                        "sha256":  "fa9353ec5bff6ca40e32ac33ef904300645110716b0cfc615879a8481e8e7c08"
+                    },
+                    {
+                        "path":  "src/WorldBridge/tests/fixtures/source_contract/valid/plans/hamlet/coastal-0-0-2.json",
+                        "sha256":  "4f276684921af4cf254d552148fb6c44a94eeceb6da743be41628f042e44b4bf"
+                    },
+                    {
+                        "path":  "src/WorldBridge/tests/fixtures/source_contract/valid/plans/hamlet/coastal-1-0-2.json",
+                        "sha256":  "6093c5f3722c3f0a88827fc7bb8bf4ec76e4b6ce4ef9bd59c913bc8536d8793f"
+                    },
+                    {
+                        "path":  "src/WorldBridge/tests/fixtures/source_contract/valid/plans/hamlet/hamlet-0-2.json",
+                        "sha256":  "358b655bda44c158d091ae844b4f59b28436601a33c95e8a09756fb9dbc80721"
+                    },
+                    {
+                        "path":  "src/WorldBridge/tests/fixtures/source_contract/valid/plans/key_location/keyloc-academy_ruin-13-2.json",
+                        "sha256":  "eb5fdbea0a46327145bccb1adf626f2fdd67a4016ead69aad7478620cc9515ae"
+                    },
+                    {
+                        "path":  "src/WorldBridge/tests/fixtures/source_contract/valid/scene.json",
+                        "sha256":  "7b911880bd3fac34f3eb1d672d08967116739b8f2d0e18785b67738ab5d31ade"
+                    },
+                    {
+                        "path":  "src/WorldBridge/tests/fixtures/source_contract/valid/world.json",
+                        "sha256":  "d32b9b11b518fe94557ef0b8cec0730b9471b22bdb52aebd1a814186dba717c9"
+                    },
+                    {
+                        "path":  "src/WorldBridge/tests/identity_retry_tests.cpp",
+                        "sha256":  "05c7cf811c78f218ac2ea710df87b5e914a655d77f46be0f82afe74fa1f3e321"
+                    },
+                    {
+                        "path":  "src/WorldBridge/tests/process_contract_tests.cpp",
+                        "sha256":  "f61a36d7eb4666c2b199e015e8c0fb722550bd16a8e09b37fcde945fcab46e7d"
+                    },
+                    {
+                        "path":  "src/WorldBridge/tests/projection_tests.cpp",
+                        "sha256":  "d6638c34580c7f38dc63e2200dec0db1cbce1d804f10c69a771d50446a8e3c2b"
+                    },
+                    {
+                        "path":  "src/WorldBridge/tests/source_reader_tests.cpp",
+                        "sha256":  "3c8cc8a78ddc82f51177f15c51d96dd5f950bf09d1913275de8fb1e165d6c15f"
+                    },
+                    {
+                        "path":  "src/WorldBridge/tests/terrain_resampling_tests.cpp",
+                        "sha256":  "3c07e83c523eaa289ed60b17a0d4bad7388b5adf5ba3bd83753fd5af9d220439"
+                    },
+                    {
+                        "path":  "src/WorldBridge/tests/travel_graph_tests.cpp",
+                        "sha256":  "74f34ae1a7a19a784dc8c0a16c7f37a195b99ba1ad6cfb30ae734ff6c1567046"
+                    },
+                    {
+                        "path":  "tests/check_producer_lock.py",
+                        "sha256":  "505d8486f83e876fe33b3ceed2b6248a694edb4512da1cb6e18861e1818132d4"
+                    },
+                    {
+                        "path":  "tools/Test-ProducerProcess.ps1",
+                        "sha256":  "5124f13cccc3cc0b119a67f2ba09df35f6b501d786b1c791104c0be448f4e1cd"
+                    },
+                    {
+                        "path":  "worldgen/contracts/producer-lock.schema.json",
+                        "sha256":  "2cdb172bcc8ae264cfac5375167463353263052ee999774511100ba0d006a297"
+                    },
+                    {
+                        "path":  "worldgen/producer.lock.json",
+                        "sha256":  "a374affb43f1ec0621fc885218a9232bea356ed7bfd82917115096bc44dcb824"
+                    }
+                ],
+    "scope":  "Bridge-side protocol and supervision only. The C# host still launches the producer directly (GenerationProbe); switching it to --produce is host integration work."
+}

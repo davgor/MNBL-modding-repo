@@ -1,0 +1,134 @@
+{
+  "schema": "fantasy-world-generator.capabilities",
+  "capability_version": 1,
+  "implementation": "fwgc++",
+  "supported": {
+    "asset_list_json": [
+      2
+    ],
+    "city_plans_json": [
+      8
+    ],
+    "coordinates": [
+      1
+    ],
+    "counter_candidate_json": [
+      1
+    ],
+    "counter_command_json": [
+      1
+    ],
+    "counter_kernel": [
+      1
+    ],
+    "counter_state_json": [
+      1
+    ],
+    "generation_algorithm": [
+      1
+    ],
+    "hamlet_plans_json": [
+      3
+    ],
+    "height_tile_json": [
+      1
+    ],
+    "hero_guild_planning": [
+      1
+    ],
+    "kernel_numeric": [
+      1
+    ],
+    "native_kernel": [
+      1
+    ],
+    "recipe": [
+      3
+    ],
+    "terrain_taxonomy": [
+      1
+    ],
+    "world_controls": [
+      1
+    ],
+    "world_json": [
+      2
+    ],
+    "world_scene_json": [
+      1
+    ]
+  },
+  "unsupported": [
+    "unreal_editor_import",
+    "unreal_cooked_runtime",
+    "save_migration"
+  ],
+  "coordinates": {
+    "version": 1,
+    "length_unit": "metres",
+    "angle_unit": "degrees",
+    "height_datum": "radial elevation above reference sphere, not sea level",
+    "globe": {
+      "origin": "sphere centre",
+      "axes": [
+        "latitude 0 longitude 0",
+        "north pole",
+        "latitude 0 longitude 90"
+      ],
+      "handedness": "right-handed Cartesian cross product: X cross Y = Z",
+      "latitude_degrees": [
+        -90,
+        90
+      ],
+      "longitude_degrees": [
+        -180,
+        180
+      ],
+      "seam": "+180 aliases -180 for positions",
+      "poles": "unit positions are exact [0, +/-1, 0]; tangent orientation retains anchor longitude"
+    },
+    "tangent": {
+      "axes": [
+        "east",
+        "up",
+        "north"
+      ],
+      "handedness": "east cross up = north",
+      "origin": "(radius_m + origin_height_m) times anchor direction"
+    },
+    "city": {
+      "projection": "gnomonic: normalize(up + (east*x_m + north*z_m)/radius_m)",
+      "height": "absolute radial elevation; schematic viewer draws this vertically",
+      "rotation": "degrees; positive width rotation runs from east toward north"
+    },
+    "patch": {
+      "projection": "exponential map: up*cos(distance/radius_m) + tangent*sin(distance/radius_m)",
+      "mesh": "Cartesian surface displacement projected onto the anchor east/up/north frame",
+      "rows": "south to north; columns west to east"
+    },
+    "tile": {
+      "level_range": [
+        1,
+        24
+      ],
+      "global_cells": "[2^(level+1), 2^level]",
+      "rows": "north to south; columns west to east",
+      "samples": "inclusive boundary indices; tile requests themselves cannot cross a seam or pole"
+    },
+    "unreal_boundary": {
+      "centimetres_per_metre": 100,
+      "axis_mapping": "Unreal X is source east, Y is source north, Z is source radial up; left-handed Z-up, so copied triangle winding reverses. Implemented by the native core and the FantasyWorldGenerator plugin, not by this producer.",
+      "scale_unit_vectors": false,
+      "origin": "caller-chosen tangent anchor (latitude, longitude, origin height); lengths scale by 100 once at that boundary"
+    }
+  },
+  "kernel": {
+    "numeric_version": 1,
+    "counter_rule_version": 1,
+    "time_unit": "integer milliseconds",
+    "max_events_per_command": 64,
+    "max_effects_per_evaluation": 64,
+    "max_retained_receipts": 256,
+    "storage": "host-owned atomic commit; pending snapshots are checkpoints"
+  }
+}

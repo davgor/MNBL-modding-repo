@@ -1,0 +1,226 @@
+{
+ "schema": "mnbl.evidence.naval-audit",
+ "version": 1,
+ "ticket": "MMR-35",
+ "run": "evidence/runtime/in-game/generated_campaign-21180.json",
+ "pid": 21180,
+ "moduleSha256": "1c3b7d65d74c50af3633f8558e29580bb14fc54d3d90c34d94fb99fdf413e49a",
+ "policySha256": "f8af37983c763ca0381121e70de6b6a8ee787c958450bf9fbb01af317eb50a3d",
+ "navalAudit": {
+  "hulls": {
+   "checked": 38,
+   "missionShipType": "TaleWorlds.Core.MissionShipObject",
+   "prefabs": 21,
+   "prefabsLoadedOnTheMap": 0,
+   "siegeEngines": 13,
+   "siegeEnginesMissing": [],
+   "problems": []
+  },
+  "shipyards": {
+   "mnbl_00059042_town_1": {
+    "culture": "empire",
+    "shipyardLevel": 1,
+    "canCreate": {
+     "empire_heavy_ship": false,
+     "empire_medium_ship": false,
+     "central_light_ship": true,
+     "eastern_trade_ship": true,
+     "western_light_ship": true,
+     "eastern_heavy_ship": false,
+     "empire_trade_ship": false
+    }
+   },
+   "mnbl_00059042_town_2": {
+    "culture": "empire",
+    "shipyardLevel": 3,
+    "canCreate": {
+     "empire_heavy_ship": true,
+     "empire_medium_ship": true,
+     "central_light_ship": true,
+     "eastern_trade_ship": true,
+     "western_light_ship": true,
+     "eastern_heavy_ship": true,
+     "empire_trade_ship": true
+    }
+   }
+  },
+  "fleets": {
+   "townShips": 18,
+   "partyShips": 18,
+   "byClan": {
+    "mnbl_00059042_clan_1": 4,
+    "none": 14
+   },
+   "hulls": {
+    "western_light_ship": 15,
+    "central_light_ship": 4,
+    "eastern_trade_ship": 11,
+    "empire_medium_ship": 4,
+    "empire_trade_ship": 2
+   },
+   "problems": [],
+   "landlocked": [
+    "mnbl_00059042_clan_2"
+   ]
+  },
+  "fleetRule": {
+   "effectiveModel": "MNBL.ProceduralWorld.CampaignRegistry.GeneratedClanShipOwnershipModel",
+   "installedModel": "NavalDLC.GameComponents.NavalDLCClanShipOwnershipModel",
+   "effectiveDistributionModel": "MNBL.ProceduralWorld.CampaignRegistry.GeneratedShipDistributionModel",
+   "installedDistributionModel": "NavalDLC.GameComponents.NavalDLCShipDistributionModel",
+   "distributionAnswers": {
+    "mnbl_00059042_ruler_1_party_1": "take True (installed True), send True (installed True)",
+    "mnbl_00059042_ruler_2_party_1": "landlocked: take False (installed True), send False (installed True)",
+    "player_party": "take True (installed True), send False (installed False)"
+   },
+   "values": {
+    "mnbl_00059042_clan_1": "6 (installed 6)",
+    "mnbl_00059042_clan_2": "0 (installed 6)",
+    "player_faction": "6 (installed 6)"
+   },
+   "probeClan": "mnbl_00059042_clan_1",
+   "whileLandlocked": 0,
+   "afterwards": 6
+  },
+  "sanctionedPath": {
+   "hull": "eastern_heavy_ship",
+   "seller": "mnbl_00059042_town_2",
+   "party": "mnbl_00059042_ruler_1_party_1",
+   "ship": "Invincible Triumph",
+   "producedAtTown": true,
+   "ownedByParty": true,
+   "inPartyList": true,
+   "leftTown": true,
+   "partyShips": "4 -> 5",
+   "navalNavigation": true,
+   "inCampaignParties": true,
+   "anchorValid": true,
+   "visualMarkedDirty": true,
+   "playerShip": "Black Ferret",
+   "playerOwns": true,
+   "playerVisualMarkedDirty": true
+  },
+  "pirates": {
+   "northern_pirates": {
+    "isPirateClan": true,
+    "home": "mnbl_00059042_hideout_1",
+    "homeIsHideout": true,
+    "template": "northern_pirates_template",
+    "templateShipStacks": 2,
+    "patrolZones": 0,
+    "parties": 0
+   },
+   "southern_pirates": {
+    "isPirateClan": true,
+    "home": "mnbl_00059042_hideout_1",
+    "homeIsHideout": true,
+    "template": "southern_pirates_template",
+    "templateShipStacks": 2,
+    "patrolZones": 0,
+    "parties": 0
+   }
+  }
+ },
+ "afterGameplay": {
+  "fleets": {
+   "townShips": 20,
+   "partyShips": 20,
+   "byClan": {
+    "player_faction": 1,
+    "mnbl_00059042_clan_1": 5,
+    "none": 14
+   },
+   "hulls": {
+    "central_light_ship": 7,
+    "western_light_ship": 13,
+    "eastern_trade_ship": 13,
+    "empire_medium_ship": 3,
+    "empire_trade_ship": 1,
+    "eastern_heavy_ship": 3
+   },
+   "problems": [],
+   "landlocked": [
+    "mnbl_00059042_clan_2"
+   ]
+  },
+  "pirateParties": 0,
+  "buyerVisualDirty": false,
+  "buyerShips": 1
+ },
+ "load": {
+  "run": "evidence/runtime/in-game/generated_save_load-10724.json",
+  "pid": 10724,
+  "worlds": [
+   {
+    "restored": true,
+    "model": true,
+    "effective": true,
+    "landlockedAtSave": [
+     "mnbl_00059042_clan_2"
+    ],
+    "landlockedLoaded": [
+     "mnbl_00059042_clan_2"
+    ],
+    "landlockedShips": 0,
+    "pirateClans": 2
+   },
+   {
+    "restored": false,
+    "model": false,
+    "effective": false,
+    "landlockedAtSave": null,
+    "landlockedLoaded": null,
+    "landlockedShips": 0,
+    "pirateClans": 0
+   }
+  ]
+ },
+ "checks": [
+  {
+   "ok": true,
+   "label": "the run finished ok with two worlds (ok, 2)"
+  },
+  {
+   "ok": true,
+   "label": "world 0: all 38 creation-culture hulls are registered ShipHulls of the policy's type, whose TaleWorlds.Core.MissionShipObject records name the policy's 21 prefabs (verified with their deck navmeshes in the installed files; 0 loaded on the campaign map); all 13 upgrade-piece siege engines are registered"
+  },
+  {
+   "ok": true,
+   "label": "world 0: each port town has a shipyard and the engine's CanTownCreateShipFromHull matches the policy tiers for every hull of its culture (town_1 level 1 builds 3 of 7; town_2 level 3 builds 7 of 7)"
+  },
+  {
+   "ok": true,
+   "label": "world 0: after the new game the installed production and trade hold 18 ships at settlements and 18 in parties (59042_clan_1 4, none 14), each where its owner says; the landlocked mnbl_00059042_clan_2 holds none"
+  },
+  {
+   "ok": true,
+   "label": "world 0: after the gameplay window the installed production and trade hold 20 ships at settlements and 20 in parties (59042_clan_1 5, none 14, ayer_faction 1), each where its owner says; the landlocked mnbl_00059042_clan_2 holds none"
+  },
+  {
+   "ok": true,
+   "label": "world 0: War Sails reads the generated ClanShipOwnershipModel and ShipDistributionModel over its own: ideal fleets 2_clan_1 6 (installed 6), 2_clan_2 0 (installed 6), _faction 6 (installed 6); 42_ruler_1_party_1 take True (installed True), send True (installed True); 42_ruler_2_party_1 landlocked: take False (installed True), send False (installed True); player_party take True (installed True), send False (installed False)"
+  },
+  {
+   "ok": true,
+   "label": "world 0: a eastern_heavy_ship the installed CreateShip built at town_2 and mnbl_00059042_ruler_1_party_1 bought (ApplyByTrade) is owned and listed by that party alone (ships 4 -> 5), with naval navigation, a valid anchor and its naval visual marked for refresh; a second (Black Ferret) moved to the player party (ApplyByTransferring) had its visual refreshed by the visual layer by the end of the window"
+  },
+  {
+   "ok": true,
+   "label": "world 0: the pirate clan aliases are pirate clans to PiratesCampaignBehavior, homed at a hideout, with ship templates (northern_pirates home hideout_1, 2 stacks, southern_pirates home hideout_1, 2 stacks); patrol zones on the generated scene: northern_pirates 0, southern_pirates 0 (PirateSpawnPoint entities are MMR-40's)"
+  },
+  {
+   "ok": true,
+   "label": "world 0: no validation failure (0)"
+  },
+  {
+   "ok": true,
+   "label": "world 1: no validation failure (0)"
+  },
+  {
+   "ok": true,
+   "label": "world 0 loads with its fleet rule effective, the same landlocked clans (mnbl_00059042_clan_2) holding no ship, and its 2 pirate clans; world 1 (no naval content) loads without the models; the only snapshot differences are 8 path-state values of moving AI parties (MMR-62)"
+  }
+ ],
+ "passed": 11,
+ "total": 11
+}

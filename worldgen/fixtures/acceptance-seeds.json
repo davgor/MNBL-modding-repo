@@ -1,0 +1,19 @@
+{
+ "schema": "mnbl.acceptance-seeds",
+ "version": 1,
+ "ticket": "MMR-56",
+ "build": "The build of worldgen/validation/first-test-measurements.json (its build block: module assembly, worldbridge, producer and lock hashes, game and War Sails versions).",
+ "profile": "F03 diagnostic profile: worldgen/profiles/one-shot.json (recipe 3, size 129, phase 16, 3 quality attempts per request).",
+ "rule": "World A is the profile's default seed. World B is the seed after A that MMR-37's search found to publish (73), re-generated on this build through the New Campaign setup screen; it must differ from A in geography and traversability (first-test-measurements.json: geography and routes). A seed is rejected when its generation exhausts the quality attempts. Same-request determinism is MMR-24's (evidence/fwg/generation-identity.json) and is not re-run here.",
+ "chosen": [
+  {"role": "A", "seed": 42, "worldContentId": "f596b58cdcfc18798542fdef5a4d9c9f6d84abddca1425af8d0b87f521191d2d", "reason": "The profile's default seed. It generates in one quality attempt, starts a campaign through Start Campaign, plays, saves and loads (first_test_profile)."},
+  {"role": "B", "seed": 73, "worldContentId": "f63c6841085725e2c437b7d5d087a52cf4dc7d5d8fe3e2d583d46cba6a775550", "reason": "The seed after 42 that MMR-37's search found to publish (seeds 43-73, one bundle attempt each, on an earlier build). On this build it generated through the setup screen in one quality attempt, with different geography and engine routes from A. It is not shown to be the first such seed on this build: F03 gives each request 3 quality attempts with derived seeds, so seeds 44-72 might generate now; they were not re-tried. It is reviewed only: its activation is refused by the village binding (towns with 6-8 villages, towns and castles with none; evidence/fwg/world-loading-review.md, TwoWorldMatrixProbe's seed list), so it is not a playable second world."},
+  {"role": "playable second world", "seed": 364610, "worldContentId": null, "reason": "Gameplay tests that need a second playable world use the MMR-19 fixture world w42 (seed 364610: build/research-env59/w42/placement.json, started through DiagnosticSandboxBootstrap.StartGenerated). It is not produced by the F03 pipeline, so it is not B for the same-build comparison."}
+ ],
+ "rejected": [
+  {"seed": 43, "on": "this build (first_test_profile)", "reason": "The profile's secondSeed. Generation through the setup screen exhausted its 3 quality attempts (generate.exhausted): quality.unreachable_town, quality.unplaceable_town, quality.repair_bound_exceeded."},
+  {"seeds": "44-72", "on": "MMR-37's search (evidence/world/second-bundle-search.jsonl, an earlier build, one bundle attempt per seed)", "reason": "Each rejected by the compiler's quality gate (bundle exit 3): unplaceable or unreachable towns, or the repair bound exceeded. Not re-tried on this build, where each request gets 3 quality attempts with derived seeds, so the rejection may not carry over."},
+  {"seed": 73, "on": "activation (MMR-49)", "reason": "Rejected as a playable world only: generation passes, activation refuses it at the village binding."}
+ ],
+ "cause": "The static travel gate rejects a whole world when a single town is unplaceable or unreachable, then retries a derived seed; most seeds fail that way (docs/research/map-epic-2-findings.md section 11). Repairing towns instead of rejecting worlds is map epic 2's MMR-251."
+}

@@ -1,0 +1,183 @@
+{
+ "schema": "mnbl.one-shot-budget",
+ "version": 1,
+ "status": "provisional",
+ "rule": "The waiting times the New Campaign setup screen states (MMR-43): generating the world as its largest measurement rounded up to roundToSeconds, and the first start of its campaign (startCampaign) in whole minutes rounded up. The screen never promises a time it has no measurement for; a run that takes longer adds its measurement. MMR-56 measured both end to end on the F03 profile (worldgen/validation/first-test-measurements.json): generation varies with the world (seed 42 35.6 s, seed 73 56.6 s), and a world's first campaign start after a module build builds its navigation caches (about 390 s of 410 s).",
+ "roundToSeconds": 5,
+ "phases": {
+  "generateWorld": {
+   "seconds": [
+    28.6,
+    27.2,
+    28.3,
+    29.4,
+    30.4,
+    35.6,
+    56.6,
+    32.7,
+    55.7
+   ],
+   "source": "MMR-44's generation job to review (request, source with quality attempts, bundle, verification, scene, runtime navigation), seed 42 at size 129, on this machine: from the job's start, 28.6 s, 27.2 s and 29.4 s (evidence/runtime/in-game/generation_job-30220.json, -27272.json, -29872.json, jobs[0].seconds); from the setup screen's Confirm to its result, 28.3 s and 30.4 s (world_setup-41228.json, world_setup-26012.json, keys.generationSeconds). Runs 27284 (32.0 s) and 28788 (33.6 s) used an interim build that gave the engine thread back after every navigation route and are not this pipeline. The R01 job's 11.2-15.4 s is no longer what the setup runs.",
+   "mmr56": "first_test_profile runs 17872, 35468 add their generations from Confirm to review (A cold, the profile's next seed when it generates, and B)."
+  },
+  "startCampaign": {
+   "seconds": [
+    410.5,
+    398.9
+   ],
+   "source": "MMR-56 first_test_profile runs 17872, 35468: the first start of world A after a module build (its navigation caches built), the activation's steps from Start Campaign to the committed campaign summed, less the time character creation was on screen (the player's), on the machine of worldgen/validation/first-test-measurements.json. Run 17872's 410.5 s did not yet separate that time (about 2.4 s of the probe's character creation), so it is slightly high."
+  }
+ },
+ "testedSettings": {
+  "profile": "worldgen/profiles/one-shot.json: recipe 3, size 129, phase 16, 3 quality attempts",
+  "seeds": {
+   "A": 42,
+   "B": 73,
+   "rejected": [
+    43
+   ]
+  },
+  "machine": "Intel Core Ultra 9 275HX (24 logical processors), 32 GB, NVIDIA GeForce RTX 5080 Laptop GPU, Windows 11 Home 10.0.26200 (the game process reports the compatibility version NT 6.2.9200); the game's settings files as recorded in first-test-measurements.json (machine)",
+  "build": "first-test-measurements.json (build: module assembly, worldbridge, producer and lock hashes; game v1.4.8.119303, War Sails v1.2.8.119303)",
+  "path": "the New Campaign setup screen's Confirm, Start Campaign with character creation, the map, a manual save and its load (first_test_profile)"
+ },
+ "provisionalLimits": {
+  "rule": "Implementer-chosen provisional limits, about 1.5 times the largest measurement, rounded up. They are recorded, not enforced, and are not a performance guarantee. A measurement above one is recorded and re-measured, it is not a failure by itself; a crash, an unresponsive required operation or a failed correctness check still fails.",
+  "values": {
+   "generateWorldSeconds": {
+    "limit": 90,
+    "measured": [
+     28.6,
+     27.2,
+     28.3,
+     29.4,
+     30.4,
+     35.6,
+     56.6,
+     32.7,
+     55.7
+    ]
+   },
+   "firstCampaignStartSeconds": {
+    "limit": 630,
+    "measured": [
+     410.5,
+     398.9
+    ],
+    "note": "the navigation caches built"
+   },
+   "loadSeconds": {
+    "limit": 25,
+    "measured": [
+     16.1,
+     14.5
+    ],
+    "note": "the navigation caches reused"
+   },
+   "generationLongestFrameSeconds": {
+    "limit": 0.5,
+    "measured": [
+     0.17,
+     0.33,
+     0.19,
+     0.2
+    ],
+    "note": "MMR-43's rule while the job runs off the engine thread"
+   },
+   "gameWorkingSetMB": {
+    "limit": 8192,
+    "measured": [
+     5209.2,
+     5139.1
+    ]
+   },
+   "gamePrivateMB": {
+    "limit": 11776,
+    "measured": [
+     7543.0,
+     7473.5
+    ]
+   },
+   "producerPeakMB": {
+    "limit": 448,
+    "measured": [
+     246.6,
+     269.5
+    ],
+    "note": "fwg.exe's job object, from worldbridge's run record"
+   },
+   "worldbridgePeakMB": {
+    "limit": 512,
+    "measured": [
+     255.2,
+     322.4,
+     255.1,
+     322.2
+    ],
+    "note": "worldbridge --bundle"
+   },
+   "storePerWorldMB": {
+    "limit": 300,
+    "measured": [
+     137.0,
+     184.7
+    ],
+    "note": "the published bundle; its activation package, navigation caches and saves add a few MB"
+   },
+   "generationTemporaryMB": {
+    "limit": 300,
+    "measured": [
+     136.0,
+     183.7
+    ],
+    "note": "the job directory at its largest while generating, released after review"
+   },
+   "freeDiskBeforeGenerationMB": {
+    "limit": 768,
+    "note": "the per-world store and temporary limits together"
+   }
+  }
+ },
+ "mmr56Measurements": {
+  "runs": [
+   "17872",
+   "35468"
+  ],
+  "generationLongestFrameSeconds": [
+   0.17,
+   0.33,
+   0.19,
+   0.2
+  ],
+  "worldbridgePeakMB": [
+   255.2,
+   322.4,
+   255.1,
+   322.2
+  ],
+  "loadSeconds": [
+   16.1,
+   14.5
+  ],
+  "gameWorkingSetMB": [
+   5209.2,
+   5139.1
+  ],
+  "gamePrivateMB": [
+   7543.0,
+   7473.5
+  ],
+  "bundleMB": [
+   137.0,
+   184.7
+  ],
+  "peakJobDirectoryMB": [
+   136.0,
+   183.7
+  ],
+  "producerPeakMB": [
+   246.6,
+   269.5
+  ]
+ }
+}

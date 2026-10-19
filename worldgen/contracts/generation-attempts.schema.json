@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "mnbl.generation-attempts/1",
+  "title": "MNBL generation attempt state",
+  "description": "Persisted after every transition by worldbridge::schedule (canonical JSON, atomically replaced). Seeds follow mnbl.retry-seed/1: attempt 0 uses masterSeed; attempt k >= 1 uses, for counter c = 0, 1, ..., the first four bytes (big-endian uint32) of SHA-256('mnbl.retry-seed/1' 0x00 BE32(masterSeed) BE32(k) BE32(c)), keeping the first value no earlier attempt used (derivationCounter = c). Only failures whose every reason code is in the world-quality policy's retryableQualityCodes are retried; input, mechanical, parser and engine failures end the generation. A cancelled attempt resumes with its own seed; accepted, exhausted and failed states are final and never regenerated. Exhaustion keeps every reason and never substitutes Calradia. One process drives a state at a time (exclusive <state>.lock); each write is flushed and renamed over the state with write-through. A loaded state must re-derive every seed, keep every attempt before the last as a rejection, and agree with the request it is resumed for (requestId, configurationId, campaignInstanceId, masterSeed, maxAttempts). Attempt work lives in <work>/<first 16 hex of requestId>/attempt-<index>-run-<run>, created exclusively: an existing directory is a work collision, never adopted.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "version", "canonicalJson", "requestId", "configurationId", "campaignInstanceId", "masterSeed", "maxAttempts", "seedDerivation", "status", "attempts", "chosen"],
+  "properties": {
+    "schema": { "const": "mnbl.generation-attempts" },
+    "version": { "const": 1 },
+    "canonicalJson": { "const": "mnbl.canonical-json/1", "description": "The state file is the RFC 8785 canonical form plus a final newline." },
+    "requestId": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "configurationId": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "campaignInstanceId": { "type": "string" },
+    "masterSeed": { "type": "integer", "minimum": 0, "maximum": 4294967295 },
+    "maxAttempts": { "type": "integer", "minimum": 1, "maximum": 16 },
+    "seedDerivation": { "const": "mnbl.retry-seed/1" },
+    "status": { "enum": ["in_progress", "cancelled", "accepted", "exhausted", "failed"] },
+    "attempts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["index", "seed", "derivationCounter", "runs", "recipeSha256", "sourceInputId", "state", "failure", "producerOutcome", "reasons", "worldContentId", "history"],
+        "properties": {
+          "index": { "type": "integer", "minimum": 0 },
+          "seed": { "type": "integer", "minimum": 0, "maximum": 4294967295 },
+          "derivationCounter": { "type": "integer", "minimum": 0 },
+          "runs": { "type": "integer", "minimum": 0, "description": "Times this attempt was started (a cancelled attempt resumes as another run with the same seed)." },
+          "recipeSha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+          "sourceInputId": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+          "state": { "enum": ["pending", "running", "cancelled", "rejected", "failed", "accepted"] },
+          "failure": { "enum": ["none", "quality", "input", "mechanical", "parser", "engine", "cancelled", "undeclared_quality"] },
+          "producerOutcome": { "type": "string" },
+          "reasons": { "type": "array", "items": { "type": "object", "additionalProperties": false, "required": ["code", "message"], "properties": { "code": { "type": "string" }, "message": { "type": "string" } } } },
+          "worldContentId": { "type": "string" },
+          "history": {
+            "type": "array",
+            "description": "Earlier runs of this attempt, oldest first: the record a run had when it was interrupted (state 'running' after a hard kill or work collision, 'cancelled' after cancellation).",
+            "items": { "type": "object", "additionalProperties": false, "required": ["run", "state", "failure", "producerOutcome", "reasons"],
+                       "properties": { "run": { "type": "integer", "minimum": 1 }, "state": { "enum": ["pending", "running", "cancelled", "rejected", "failed", "accepted"] },
+                                       "failure": { "enum": ["none", "quality", "input", "mechanical", "parser", "engine", "cancelled", "undeclared_quality"] },
+                                       "producerOutcome": { "type": "string" },
+                                       "reasons": { "type": "array", "items": { "type": "object", "additionalProperties": false, "required": ["code", "message"], "properties": { "code": { "type": "string" }, "message": { "type": "string" } } } } } }
+          }
+        }
+      }
+    },
+    "chosen": {
+      "oneOf": [
+        { "type": "null" },
+        { "type": "object", "additionalProperties": false, "required": ["attempt", "seed", "sourceInputId", "worldContentId"],
+          "properties": { "attempt": { "type": "integer" }, "seed": { "type": "integer" }, "sourceInputId": { "type": "string" }, "worldContentId": { "type": "string" } } }
+      ]
+    }
+  }
+}

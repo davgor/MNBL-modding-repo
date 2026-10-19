@@ -1,0 +1,22 @@
+{
+    "schema":  "mnbl.producer-seed-width",
+    "version":  1,
+    "producerSha256":  "564c2629b5b92d49e52cd466a5a1aaa9339380464207ddcae669dd487d2f695e",
+    "maxSeed":  4294967295,
+    "verified":  true,
+    "probes":  [
+                   {
+                       "seed":  "4294967296",
+                       "outcome":  "refused",
+                       "failureCode":  "INVALID_INPUT",
+                       "failureField":  "seed"
+                   },
+                   {
+                       "seed":  "4294967295",
+                       "outcome":  "succeeded",
+                       "failureCode":  null,
+                       "failureField":  null
+                   }
+               ],
+    "note":  "Written by tools/Test-GenerationIdentity.ps1: the pinned producer refuses seed 4294967296 (field seed) and accepts 4294967295. worldbridge --generate refuses (seed_width_unverified) unless producerSha256 equals the locked producer and maxSeed equals the request contract."
+}

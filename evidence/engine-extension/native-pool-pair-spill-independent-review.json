@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "status": "accepted-exact-pair-Mission-argument-eight",
+  "reviewedArtifact": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\evidence\\engine-extension\\native-pool-pair-spill-review.json",
+  "reviewedArtifactSha256": "0d1cf9d7111b3a675f00b44b6bd885905f6daa0f3ebaeb7aa4a6bde6162aebdd",
+  "targetSha256": "2a5e0e0b15513ebb7052d747a621b82c50ee834553eba283b33bbbc33766e12a",
+  "originalInstructionEntriesMatched": 291,
+  "approvedSite": "0x18068f345",
+  "findings": [],
+  "review": [
+    "Exact framecallee68eea0 receivesMissionRDX; preservesitRDI after68eee3 throughboth calls. Two outgoingRSP38 writes areargument8. Completecallee savesRDI atRSP300 andrestores68f276 beforecall/return paths.",
+    "CalleePUSHRBX+SUB2f0 transforms incomingentryRSP40 into steadyRSP338. No interveningcall or address escape occurs before68f33a.",
+    "Both local2c8 copies have five128-byte iterations and72-byte tail, coveringRSP20..2e7. Other destinations are typed companionpool records andsavedRDI300; no overlapwith338..33f.",
+    "All291 retained originalinstructions match. Originalcallerretention wasextendedthrough68efb8 beforethisreceipt."
+  ],
+  "limitations": [
+    "Exact68f345 only, conditional on retainedMission/companionpool sourcecontracts. No wholepatch/runtime certification."
+  ],
+  "gameExecuted": false
+}

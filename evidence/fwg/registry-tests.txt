@@ -1,0 +1,58 @@
+﻿ok    a world in the proven order registers phase by phase, closes, and every village is trade-bound to its town
+ok    the proven two-pass forward references (Hero.faction, Kingdom/Faction.initial_home_settlement) become ready in the same registration
+ok    a village bound to a castle registers and closes without a trade bound (the engine trade-binds only to towns), while town villages stay trade-bound
+ok    a village before its bound town (silently not trade-bound in the engine, which closure also detects) is refused before any document loads
+ok    a village bound to its own settlement or to another village is refused
+ok    a hero without its NPCCharacter (Hero.Deserialize throws) is refused before any document loads
+ok    a forward reference outside the two-pass pattern is an early reference
+ok    documents out of the proven phase order are refused, naming the early references they cause
+ok    a reference to a world object nothing registers is refused
+ok    the same object twice is a duplicate identity
+ok    one id used by two world types is a duplicate identity
+ok    a generated id already registered collides
+ok    a generated id without the world prefix is refused
+ok    an id of another world is refused
+ok    an id longer than the documented limit is refused
+ok    a declared generated culture without the world prefix is refused
+ok    a declared generated character with an uppercase id is refused
+ok    a declared generated culture reusing an official id is refused, not merged
+ok    a declared generated object missing from the documents is refused
+ok    a reference to another world's object is refused even when it is registered
+ok    a dependency on an official world object is refused
+ok    the unprefixed player aliases (main_hero, player_faction) are allowed, replacing the official player definition
+ok    the startup's unprefixed aliases register too: a land bandit clan (looters) homed at a generated hideout, and the retirement retreat, whose CustomSettlementComponent is typed RetirementSettlementComponent by its component_name
+ok    an unprefixed generated id that is not an alias (corsair_band) is refused
+ok    the census is identical whatever the registration order of the shared templates
+ok    the census is identical also when closure reports problems (sorted)
+ok    the census counts this world's and official objects per type, reports closure and lists not yet published
+ok    campaign-created objects are counted as derived from this world or runtime-created, not official
+ok    an installed record first loaded by the registration counts as official, not runtime-created
+ok    an object derived from another world (its prefix embedded in the id) is another world's object
+ok    after initialization, closure follows the moved types to the campaign lists; settlements stay held
+ok    a generated clan missing from the published Clans list fails closure
+ok    a listed generated clan that is not ready fails settled closure
+ok    the published Settlements list and the object manager must agree on this world's settlements, both ways
+ok    a campaign list holding another world's object fails closure
+ok    a village that lost its trade-bound link fails registration closure (settled closure leaves trade bounds to the campaign)
+ok    a reference left presumed fails closure inside Register, before the caller can publish default lists
+ok    B in a fresh object manager closes with the same official template ids as A
+ok    an object of A in B's object manager fails B's closure, and an A-derived party in B's lists is counted as A's
+ok    in a reused object manager, removing A unregisters only A's objects; templates and the pre-existing main_hero stay; B registers with nothing of A
+ok    after initialization, removal reports the world objects it cannot unregister
+ok    the registry types hold no mutable static state
+ok    a registry registers one world once; a second campaign needs its own registry
+ok    two campaigns of one world register the same immutable ids; the instance id is recorded in the census and refused inside an id
+ok    a replay before BeforeLoad re-registers the saved objects is refused
+ok    a replay after UnregisterNonReadyObjects is refused
+ok    the replay timing is checked on the engine state, not only on the caller's stage
+ok    a replay at the contracted time re-merges the five permanent documents against the saved clans in the lists and closes once the load finished
+ok    before the load finishes, settled closure reports the saved clans not ready (replay closure only requires them listed)
+ok    a replayed settlement whose owner clan is not in the save is refused before loading
+ok    a replay that misses a saved object fails closure instead of letting the engine drop it
+ok    identity rules: compiler and seed ids are world-qualified; aliases are exempt; uppercase is refused; derived ids carry their world
+ok    the module save-id base 7910000 is clear of all 153 scanned SaveableTypeDefiner bases (73 installed, highest 5080000; 80 from Workshop modules)
+ok    the real world's compiler records (1306 objects) plan in the proven order with compiler ids, no early reference and no duplicate
+ok    every village of the real world is planned after its bound town
+ok    a repeated compiler record is a duplicate identity
+ok    a record whose town is missing has an unresolved world reference
+57/57 checks passed

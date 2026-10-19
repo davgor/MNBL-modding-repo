@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "status": "passed-isolated-native-inline-write-integration",
+  "createdAtUtc": "2026-10-17T18:10:19.145285+00:00",
+  "sources": {
+    "src/MNBL.AgentStorage/AgentDomainStorage.hpp": "c5d9ee96a5109438fdfff03287ee8f8a32130835212afef47f2b2044638b5274",
+    "src/MNBL.AgentStorage/StableAgentStorage.hpp": "34555749bbfdf9ad318a02aea660f36cfe57ee9183e856df48c216ebf8503458",
+    "tools/battle-scale/prepare_segmented_write_harness.py": "a47b5c69f8304de4c581993d1e3c1cac1596bda0a70b2f89668837670572a581",
+    "tests/AgentStorage/native_write_harness.cpp": "abbcd32675b17e51d26f31df845dcc6c00d2a5aa18be355b9802e5ff8139bcf8",
+    "tools/battle-scale/Test-NativeWriteHarness.cmd": "e251bcb9725ada29340615a5c4398cbac8fd2af66f44e2dd3b6f02563f74a716",
+    "tools/battle-scale/verify_native_write_harness.py": "2dc0433e02ad3eb83441abead51d476e1d1bdca32ecefd287b18a349d401550d",
+    "evidence/engine-extension/native-segmented-agent-consumers.json": "4c85a68076c071143afb3dce3d8071b89ce5164ba1904683a3f49a015f52223c",
+    "evidence/engine-extension/native-live-agent-access-review.json": "b5a0beaa3d4274c01e584975f74107ad0021e3d2197847bc67860d52d6c4bfef"
+  },
+  "outputs": {
+    "build/agent-storage/native_write_harness.exe": "ef96f4b35832ac6b8e3d236274b471828f883ab269c395b65c327058d1053682",
+    "build/agent-storage/write_machine_code.hpp": "5e2781fc13dfa58720a64c099daab039ffe15fc1c58e7d267eee8c9b2ebbb9c7",
+    "evidence/engine-extension/native-segmented-write-replay.json": "72a62b1e6c3658d92086ec0acaad9f144a6064b7832603d02f476e81acdb05ed"
+  },
+  "exitCode": 0,
+  "stdout": "{\"cases\": 20, \"stubBytes\": 386, \"sha256\": \"72a62b1e6c3658d92086ec0acaad9f144a6064b7832603d02f476e81acdb05ed\"}\nnative_write_harness.cpp\nPASS real x64 inline write + adopted segmented backend: 12240 writes;2040->4080->6120->8160;stable original pointers\nPASS 50 instruction-boundary Windows unwinds;invalid/failing helper;independent domains;reuse;lease-held write blocks growth/close;teardown\nISOLATED HARNESS ONLY: no live Bannerlord callback, engine objects, installation or whole-engine barrier\n",
+  "stderr": "",
+  "checks": [
+    "20 machine-code replays preserve all GPR/XMM values required by this exact site despite deliberate volatile helper clobbering.",
+    "Fixed0x108-byte frame with registered nonvolatile MOV saves; Windows unwinding matches caller stack/return/nonvolatiles at50 instruction boundaries.",
+    "Actual generated x64 stub calls C++ domain storage helper for12240 writes across2040,4080,6120 capacities.",
+    "Borrowed original payloads stay put; real suffix allocation reaches8160 without moving earlier objects.",
+    "Negative/out-of-range/foreign/closed requests and injected helper exception produce no write; primary deletion is not masked by secondary occupancy.",
+    "Current-index reuse resolves new generation. A held helper read lease preventsclose and delays growth until the write finishes.",
+    "Borrowed owner disposed once and all owned synthetic elements/allocations cleaned up."
+  ],
+  "limitations": [
+    "No game process, real Bannerlord Agent construction, native worker barrier or installed patch.",
+    "Only one exact field-write sequence is routed; all other native address/iteration/metadata consumers remain separate work.",
+    "Registered network owner context is bounded; alternate incoming/interior branches and multicast/multiplayer/replay protocols are not approved.",
+    "The helper uses occupied primary-domain lookup; original callback liveness assumptions still require an engine-path contract.",
+    "A storage read lease protects lifetime and blocks metadata mutation, but does not serialize simultaneous writes to the same Agent byte; engine write ownership remains unproved.",
+    "No arbitrary-flag preservation claim: following original ADDRSP overwrites arithmetic flags before POP/RET.",
+    "These Windows runtime unwind checks are boundary checks, not execution of arbitrary native exception handlers."
+  ],
+  "gameLaunched": false,
+  "enginePatchApproved": false
+}

@@ -1,0 +1,13 @@
+{
+  "author": {
+    "label": "Claude Code",
+    "role": "orchestrator"
+  },
+  "body": "**MMR-33 finding for full-world registration**\n\n`tests/Campaign/SettlementTests.cs` plans the whole generated world through `RegistrationPlan.FromDocuments`, in NewGameOrder: the factions, the heroes and all 286 settlements.\n- Settlements, factions and references: no problem.\n\n**Hero family references: 150 problems.** Spouse 88, father 28 and mother 34 references point forward to a hero later in the Heroes document. That is outside MMR-30's `TwoPass` list (Hero.faction, Kingdom/Faction.initial_home_settlement).\n- The installed Heroes.xml has 127 such forward references (spouse 97, father 13, mother 17). The engine resolves them through presumed objects, so this is likely safe.\n- It is unproven through our registry. MMR-45 should prove it in game and then extend `TwoPass` with `Hero.spouse>Hero`, `Hero.father>Hero` and `Hero.mother>Hero`, or reorder the MMR-32 heroes (spouse pairs always need one forward reference).\n\n**`FromCompilerRecords` is stale.** It still plans the compiler's castle owners (16 differ from the castellan-clan owners) and village bounds (44 differ after the MMR-33 binding passes). Register from the factory documents.",
+  "createdAt": "2026-10-15T13:01:56.646Z",
+  "epicId": "ep_01m4fpnf646t254mnh69jhz107",
+  "format": "darkmechanicus.comment",
+  "formatVersion": 1,
+  "id": "cm_01m4ztfc16jk8rqndaxc0h08j7",
+  "ticketId": "tk_01m4fqfbgknga8wqn5seq3j94d"
+}

@@ -1,0 +1,364 @@
+{
+  "schemaVersion": 1,
+  "status": "accepted-exact-singleton-recursion-normal-return-register-proof",
+  "source": {
+    "path": "build\\battle-scale\\native-run-20261017-065749-08e99ed9\\backup-0",
+    "sha256": "2a5e0e0b15513ebb7052d747a621b82c50ee834553eba283b33bbbc33766e12a"
+  },
+  "reviewedSourceSha256": {
+    "tools\\battle-scale\\audit_recursive_register_preservation.py": "fb120664b49a8f5bc5a27c5b6df9ca9e9d9069eefa19dd89dd7627a54ef2ca08"
+  },
+  "entry": "0x1806089d0",
+  "endExclusive": "0x180608a59",
+  "bodyBytes": "4883ec38488b8180080000488bd10f29742420660f6eb1840500000f5bf64885c0741af30f1088d00800000f28c1f30f59c60f28f0f30f59f1f30f59f1f30f1089e8030000f30f5889c003000048638158050000f30f58f185c078204869c8600c0000488b82b80a00004805502d00004803c8e888fffffff30f58f00f28c60f287424204883c438c3",
+  "bodySha256": "678dc77c76aa3b6d7b580feefd097adb70b840961d64a4e39f55fb457f6e5188",
+  "runtimeFunction": {
+    "beginRva": "0x6089d0",
+    "endRva": "0x608a59",
+    "unwindRva": "0xca04b8",
+    "unwindBytes": "011303001368020004620000",
+    "version": 1,
+    "flags": 0,
+    "handlerOrChainedEntry": false
+  },
+  "proof": {
+    "preservedRegisters": [
+      "r10",
+      "r11",
+      "r8",
+      "r9",
+      "xmm2",
+      "xmm3",
+      "xmm4",
+      "xmm5"
+    ],
+    "writtenRegisters": [
+      "rax",
+      "rcx",
+      "rdx",
+      "rflags",
+      "rsp",
+      "xmm0",
+      "xmm1",
+      "xmm6"
+    ],
+    "recursiveCalls": [
+      "0x180608a43"
+    ],
+    "returns": [
+      "0x180608a58"
+    ],
+    "controlFlow": {
+      "0x1806089d0": [
+        "0x1806089d4"
+      ],
+      "0x1806089d4": [
+        "0x1806089db"
+      ],
+      "0x1806089db": [
+        "0x1806089de"
+      ],
+      "0x1806089de": [
+        "0x1806089e3"
+      ],
+      "0x1806089e3": [
+        "0x1806089eb"
+      ],
+      "0x1806089eb": [
+        "0x1806089ee"
+      ],
+      "0x1806089ee": [
+        "0x1806089f1"
+      ],
+      "0x1806089f1": [
+        "0x1806089f3",
+        "0x180608a0d"
+      ],
+      "0x1806089f3": [
+        "0x1806089fb"
+      ],
+      "0x1806089fb": [
+        "0x1806089fe"
+      ],
+      "0x1806089fe": [
+        "0x180608a02"
+      ],
+      "0x180608a02": [
+        "0x180608a05"
+      ],
+      "0x180608a05": [
+        "0x180608a09"
+      ],
+      "0x180608a09": [
+        "0x180608a0d"
+      ],
+      "0x180608a0d": [
+        "0x180608a15"
+      ],
+      "0x180608a15": [
+        "0x180608a1d"
+      ],
+      "0x180608a1d": [
+        "0x180608a24"
+      ],
+      "0x180608a24": [
+        "0x180608a28"
+      ],
+      "0x180608a28": [
+        "0x180608a2a"
+      ],
+      "0x180608a2a": [
+        "0x180608a2c",
+        "0x180608a4c"
+      ],
+      "0x180608a2c": [
+        "0x180608a33"
+      ],
+      "0x180608a33": [
+        "0x180608a3a"
+      ],
+      "0x180608a3a": [
+        "0x180608a40"
+      ],
+      "0x180608a40": [
+        "0x180608a43"
+      ],
+      "0x180608a43": [
+        "0x180608a48"
+      ],
+      "0x180608a48": [
+        "0x180608a4c"
+      ],
+      "0x180608a4c": [
+        "0x180608a4f"
+      ],
+      "0x180608a4f": [
+        "0x180608a54"
+      ],
+      "0x180608a54": [
+        "0x180608a58"
+      ],
+      "0x180608a58": []
+    },
+    "instructions": [
+      {
+        "address": "0x1806089d0",
+        "bytes": "4883ec38",
+        "mnemonic": "sub",
+        "operands": "rsp, 0x38"
+      },
+      {
+        "address": "0x1806089d4",
+        "bytes": "488b8180080000",
+        "mnemonic": "mov",
+        "operands": "rax, qword ptr [rcx + 0x880]"
+      },
+      {
+        "address": "0x1806089db",
+        "bytes": "488bd1",
+        "mnemonic": "mov",
+        "operands": "rdx, rcx"
+      },
+      {
+        "address": "0x1806089de",
+        "bytes": "0f29742420",
+        "mnemonic": "movaps",
+        "operands": "xmmword ptr [rsp + 0x20], xmm6"
+      },
+      {
+        "address": "0x1806089e3",
+        "bytes": "660f6eb184050000",
+        "mnemonic": "movd",
+        "operands": "xmm6, dword ptr [rcx + 0x584]"
+      },
+      {
+        "address": "0x1806089eb",
+        "bytes": "0f5bf6",
+        "mnemonic": "cvtdq2ps",
+        "operands": "xmm6, xmm6"
+      },
+      {
+        "address": "0x1806089ee",
+        "bytes": "4885c0",
+        "mnemonic": "test",
+        "operands": "rax, rax"
+      },
+      {
+        "address": "0x1806089f1",
+        "bytes": "741a",
+        "mnemonic": "je",
+        "operands": "0x180608a0d"
+      },
+      {
+        "address": "0x1806089f3",
+        "bytes": "f30f1088d0080000",
+        "mnemonic": "movss",
+        "operands": "xmm1, dword ptr [rax + 0x8d0]"
+      },
+      {
+        "address": "0x1806089fb",
+        "bytes": "0f28c1",
+        "mnemonic": "movaps",
+        "operands": "xmm0, xmm1"
+      },
+      {
+        "address": "0x1806089fe",
+        "bytes": "f30f59c6",
+        "mnemonic": "mulss",
+        "operands": "xmm0, xmm6"
+      },
+      {
+        "address": "0x180608a02",
+        "bytes": "0f28f0",
+        "mnemonic": "movaps",
+        "operands": "xmm6, xmm0"
+      },
+      {
+        "address": "0x180608a05",
+        "bytes": "f30f59f1",
+        "mnemonic": "mulss",
+        "operands": "xmm6, xmm1"
+      },
+      {
+        "address": "0x180608a09",
+        "bytes": "f30f59f1",
+        "mnemonic": "mulss",
+        "operands": "xmm6, xmm1"
+      },
+      {
+        "address": "0x180608a0d",
+        "bytes": "f30f1089e8030000",
+        "mnemonic": "movss",
+        "operands": "xmm1, dword ptr [rcx + 0x3e8]"
+      },
+      {
+        "address": "0x180608a15",
+        "bytes": "f30f5889c0030000",
+        "mnemonic": "addss",
+        "operands": "xmm1, dword ptr [rcx + 0x3c0]"
+      },
+      {
+        "address": "0x180608a1d",
+        "bytes": "48638158050000",
+        "mnemonic": "movsxd",
+        "operands": "rax, dword ptr [rcx + 0x558]"
+      },
+      {
+        "address": "0x180608a24",
+        "bytes": "f30f58f1",
+        "mnemonic": "addss",
+        "operands": "xmm6, xmm1"
+      },
+      {
+        "address": "0x180608a28",
+        "bytes": "85c0",
+        "mnemonic": "test",
+        "operands": "eax, eax"
+      },
+      {
+        "address": "0x180608a2a",
+        "bytes": "7820",
+        "mnemonic": "js",
+        "operands": "0x180608a4c"
+      },
+      {
+        "address": "0x180608a2c",
+        "bytes": "4869c8600c0000",
+        "mnemonic": "imul",
+        "operands": "rcx, rax, 0xc60"
+      },
+      {
+        "address": "0x180608a33",
+        "bytes": "488b82b80a0000",
+        "mnemonic": "mov",
+        "operands": "rax, qword ptr [rdx + 0xab8]"
+      },
+      {
+        "address": "0x180608a3a",
+        "bytes": "4805502d0000",
+        "mnemonic": "add",
+        "operands": "rax, 0x2d50"
+      },
+      {
+        "address": "0x180608a40",
+        "bytes": "4803c8",
+        "mnemonic": "add",
+        "operands": "rcx, rax"
+      },
+      {
+        "address": "0x180608a43",
+        "bytes": "e888ffffff",
+        "mnemonic": "call",
+        "operands": "0x1806089d0"
+      },
+      {
+        "address": "0x180608a48",
+        "bytes": "f30f58f0",
+        "mnemonic": "addss",
+        "operands": "xmm6, xmm0"
+      },
+      {
+        "address": "0x180608a4c",
+        "bytes": "0f28c6",
+        "mnemonic": "movaps",
+        "operands": "xmm0, xmm6"
+      },
+      {
+        "address": "0x180608a4f",
+        "bytes": "0f28742420",
+        "mnemonic": "movaps",
+        "operands": "xmm6, xmmword ptr [rsp + 0x20]"
+      },
+      {
+        "address": "0x180608a54",
+        "bytes": "4883c438",
+        "mnemonic": "add",
+        "operands": "rsp, 0x38"
+      },
+      {
+        "address": "0x180608a58",
+        "bytes": "c3",
+        "mnemonic": "ret",
+        "operands": ""
+      }
+    ]
+  },
+  "tests": [
+    {
+      "name": "missing-ret",
+      "rejected": true,
+      "reason": "Unclosed fallthrough"
+    },
+    {
+      "name": "foreign-recursion-target",
+      "rejected": true,
+      "reason": "Call outside singleton recursive component"
+    },
+    {
+      "name": "external-conditional",
+      "rejected": true,
+      "reason": "Branch outside exact decoded body"
+    },
+    {
+      "name": "handler-flags",
+      "rejected": true,
+      "reason": "Unverified unwind body, flags or exception handler"
+    },
+    {
+      "name": "unsupported-state-restore",
+      "rejected": true,
+      "reason": "Instruction outside exact bounded semantic set"
+    },
+    {
+      "name": "direct-r9-write",
+      "removedFromPreserved": "r9"
+    }
+  ],
+  "reasoning": "Complete decoded normal CFG has one recursive call to its own exact entry and no other call, tail transfer, handler or indirect edge. The named registers are never written locally. Induction on finite returning recursion depth proves each invocation returns them unchanged. No fixed recursion limit or assumption about child arguments is needed for this register-only property.",
+  "limitations": [
+    "Does not prove termination, recursion depth safety, valid Agent owner or pointer lifetime.",
+    "Abnormal non-returning exception paths are outside the fact restored at the next instruction after CALL.",
+    "No caller memory or spill fact is preserved; no hooks, deployment or native engine execution.",
+    "Generic recursive-call rejection remains unchanged. Integration must gate exact body, runtime metadata and whole binary identity."
+  ]
+}

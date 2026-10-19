@@ -1,0 +1,59 @@
+ok    binding: a header's mnbl.world.* keys give the world id, the package <id>-<manifest12>, the campaign instance and the content id
+ok    binding: a header without mnbl.world.id has no binding (a vanilla save)
+ok    binding: an MMR-19 header (no instance, an absolute package path) still names its package by id and manifest hash; the path is not used
+ok    binding: a malformed manifest hash, instance, content id or world id is refused (InvalidDataException)
+ok    binding: a new binding contributes instance and contentId to the header; a legacy one cannot be written
+ok    begin: an unpublished package, a taken save name, a binding without instance and an invalid name are refused and write no journal
+ok    begin: a process without the store lock may not publish (no journal)
+ok    begin: one initial save journal per campaign instance
+ok    begin: the reserved name is <worldId>_start_<instance12>
+ok    boundary before the intent is durable: a torn temporary journal is no journal: the engine was never asked to save and recovery finds nothing (staging cleanup removes temporaries)
+ok    boundary after the intent, before the engine save: no save under the reserved name: abandoned, nothing deleted (the package stays)
+ok    boundary engine reported failure, no file: Complete after a failed engine save with no file: abandoned, never published
+ok    boundary torn header: a save under the reserved name whose header cannot be read is this publication's torn write: deleted through the game, removed
+ok    boundary whole header, torn game data: a header bound to this instance before torn game data is not published: deleted, removed
+ok    boundary engine reported success, torn game data: Complete trusts the read-back, not the engine's report: torn data is removed, not published
+ok    boundary unbound header: a readable save under the reserved name with no world binding (an ambiguous save the vanilla loader would take) is deleted, removed
+ok    boundary malformed binding: a save under the reserved name with a malformed binding is deleted, removed
+ok    boundary after the engine save, before the outcome: a whole save bound to this instance and world: recovery flushes it to the disk, publishes it and records the game's UniqueGameId
+ok    boundary normal publication: Begin, the engine save, Complete: intent -> published; Complete and Recover afterwards change nothing
+ok    boundary during the outcome's write: a crash before the outcome's rename leaves the intent authoritative (a complete temporary journal is ignored): recovery resolves it
+ok    boundary another instance's save under the name: a save under the reserved name bound to another instance is kept (a bound save is never deleted): conflict
+ok    boundary another world's save under the name: the same instance bound to another world's package is not this publication: kept, conflict
+ok    boundary save list unreadable: when the save list cannot be read the intent stays unresolved: nothing deleted, reported
+ok    boundary deletion does not take: a torn save that cannot be deleted leaves the intent unresolved (retried at the next start)
+ok    boundary flush fails: a whole bound save that cannot be flushed to the disk is not published: unresolved
+ok    boundary integrity not checked: a bound save whose game data could not be checked is neither published nor deleted: unresolved
+ok    boundary corrupt journal: a journal that cannot be read is reported and is a gap in the reference index
+ok    boundary journal history without a note: a parseable journal with an incomplete history row is unreadable: reported, recovery goes on, nothing deleted
+ok    boundary journal save name escapes: a journal naming a save outside the save folder is unreadable and never acted on
+ok    boundary journal renamed: a journal whose instance is not its file name is unreadable (never resolved against the wrong save)
+ok    index: bound saves (one legacy), a pending initial save and the active campaign are references; a vanilla save is listed and names nothing
+ok    index: a package named by a save, a legacy save, a pending initial save or the active campaign is retained
+ok    index: a package whose data bundle (content id) a save names is retained through the content id
+ok    index: complete discovery still retains an unreferenced complete world in this increment (save kinds not all journaled: MMR-48)
+ok    index: once every save kind is bound, an unreferenced package may go and a referenced one stays
+ok    index: an unreadable save is a gap, and with a gap nothing is deletable (it might name any world)
+ok    index: a malformed binding is a gap
+ok    index: a save list that cannot be read is a gap; pending initial saves still count
+ok    staging: test junctions created (mklink /J)
+ok    staging: without the store lock nothing is removed
+ok    staging: bundle staging, surface staging and journal temporaries are removed; staging a live job owns is kept
+ok    staging: a published bundle, a world package, a job record, journals, other store data and a surface folder not named like encoder staging are kept
+ok    staging: a junction inside a staging directory is removed as a link; its target is untouched
+ok    staging: a candidate that is itself a reparse point is kept and reported
+ok    staging: the next run removes staging no longer live
+ok    staging: a staging parent that is a reparse point is not scanned; its target's folders are untouched
+ok    durable file: written and replaced whole, no temporary left; temporaries are recognised
+ok    store lock: one holder at a time in a process; released on dispose
+ok    store lock: held by another process it cannot be taken; when that process is killed the system releases it
+ok    save folder: the *.sav names; a folder that does not exist (no save yet) is empty
+ok    save folder: a folder that cannot be enumerated throws (the game's own listing would return nothing)
+ok    save folder: the game's list must name the saves on disk, no more and no fewer
+ok    save check: a whole save (header, deflated game data walked to its end) passes
+ok    save check: game data cut short behind a whole header is torn
+ok    save check: a header cut short is torn
+ok    save check: data after the game data's end is refused
+ok    save check: game data that does not inflate is refused
+ok    save check: a file it cannot read (held without sharing) is unchecked, never torn
+58/58 checks passed

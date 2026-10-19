@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 1,
+  "status": "accepted-build-specific-watchdog-exit-integration",
+  "reviewedAtUtc": "2026-10-17T10:11:12.8228543Z",
+  "gameExecuted": false,
+  "installedFilesModified": false,
+  "findings": [],
+  "reviewedSourceSha256": {
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\tools\\battle-scale\\Test-NativeExitContract.ps1": "bd8cc8995a6855676945855154a71145c7dbe883441feab7c68de2aceefd10d4",
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\tools\\Test-NativePoolInGame.ps1": "099353cda180234298d440155a4947b8e101533ff6a34f41ffc31c25f0b8e041",
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\tools\\battle-scale\\prepare_native_pool_test.py": "70ca5b27dcabf8d00866be0a62c6396be9f06e0d9278c8731204a044e80911d6",
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\tests\\BattleScale\\Test-NativeExitContract.ps1": "2185e18540f6bdf172be727c46bc30e8ef4673e9acbeff826d115ae93b1d74e0",
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\tests\\BattleScale\\Test-NativeRunnerFailures.ps1": "2ef3ff7ec8a0c3c469ba46445b8407f10e62bc43180cc42a9d330caf1b9dd90b",
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\tests\\BattleScale\\test_native_test_package.py": "7a85380b131200e791c1bdb3515e4e5ba686142f9db12bcb83ab9c5af66b769d",
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\evidence\\engine-extension\\native-watchdog-shutdown-contract.json": "a53f635c34844fa460be087c4bd123f36fa57291e14cdb734338cb695aba0f0d",
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\evidence\\engine-extension\\native-watchdog-managed-exit-evidence.json": "7ca9fcf270522d32abbcb93eacb6fed2abc80c9aeaa8df7b616344ca62b5f85c",
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\tools\\battle-scale\\audit_watchdog_exit_contract.py": "fe027c0acd4e30d685712f371b7c4b089a2930cd60cdf4f6d2177dbf8a65d082",
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\tools\\battle-scale\\managed-audit\\Read-WatchdogExitContract.ps1": "59ff0bfb602162569ae449ac08c17a4063213c3bc491f1825728ac567faa20b7",
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\build\\battle-scale\\native4080-watchdog-static-input.json": "b042fd2c175385cf130dd1f70329a7001e4364454db1f5233686fb20f5bd1fe8",
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\src\\MNBL.BattleScale\\SubModule.cs": "541f816ad5db22f3723ecbe980a779204f24f79e25d0749e8e5e9ee172e17743",
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\src\\MNBL.BattleScale\\NativePoolProbeMission.cs": "cbc908148a83dafcc4c65a564a9514edd73f5fa91121a814fdcdad5a05913b4f",
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\src\\MNBL.BattleScale\\Core\\NativeProbeWorkload.cs": "41ffcc1abcd7b39ec5cb12ffa326dda77561b6a7c14312d27029dae18240f010",
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\tests\\BattleScale\\NativeWorkloadTests.cs": "6c72f9d27289318c6a7819b23ec7dcb9a53c269c83af714ceabd380896a0c664",
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\evidence\\engine-extension\\native-workload-independent-review.json": "db639b5b41f71da1adf85ff9f418130ed2846ed06e74bb23cf9b7b250f37adf7"
+  },
+  "verifiedContracts": [
+    "The packager requires native original SHA, reconstructed candidate SHA, stock Watchdog path/hash and reviewed contract status before producing a profile.",
+    "The runner binds probe success to its unique run GUID, completed exhaustion/teardown status and native return code zero. A stale PID result is rejected.",
+    "Exit -1 additionally requires a same-parent observed Watchdog at the expected path, the build-bound contract and fresh per-game-PID logs with ordered #TW#-kp, parsed -kp and process-exit debugger markers. Exception/dump markers reject acceptance.",
+    "Required ordered game cleanup markers corroborate main cleanup before the stock command; the recorded protocol does not claim all native destruction or the cleanup function returned.",
+    "The emitted profile pins the shutdown contract hash and Watchdog file hash. Existing renderer geometry, guard, canonical approval and fresh-directory checks remain active.",
+    "Failure handling restores backed-up files; inert actual-runner fixtures cover interrupted copy, cleanup failure, foreign request, stale result and waiting for another game.",
+    "Managed admission deployments are bound to schema3, original/candidate/module/patcher-source hashes and receipt hash. The runner rechecks the managed original after waiting and includes its file in the same intent-before-copy, readback, backup and restoration transaction as the native copy.",
+    "Admission result acceptance additionally requires public SpawnAgent overflow verification and exact workload/duration/recycle match. The bound module only emits completed status after its full sustained/reuse/resource/teardown gates.",
+    "Actual runner inert fixtures independently cover a partial managed overwrite and successful managed deployment/restoration; the five prior foreign-request/native-copy/cleanup/stale-result/session-wait cases remain passing.",
+    "The stock watchdog classifier, reviewed native shutdown chain and all 13 renderer edits are unchanged. Existing hashes were checked; only reviewed changed integration files were refreshed."
+  ],
+  "tests": [
+    {
+      "command": "python tests/BattleScale/test_native_test_package.py",
+      "exitCode": 0,
+      "passed": 28
+    },
+    {
+      "command": "python tests/BattleScale/test_pool_patch_manifest.py",
+      "exitCode": 0,
+      "passed": 13
+    },
+    {
+      "command": "tests/BattleScale/Test-NativeExitContract.ps1",
+      "exitCode": 0,
+      "passed": 17
+    },
+    {
+      "command": "tests/BattleScale/Test-NativeRunnerFailures.ps1",
+      "exitCode": 0,
+      "passed": 7,
+      "receipt": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\build\\battle-scale\\runner-failure-tests-96703efb5339490fa010f42b9f95165a\\review.json"
+    }
+  ],
+  "limitations": [
+    "This is source integration acceptance, not a new runtime pass or deployment authorization. Root must regenerate and validate exact package/profile/static approval dependencies before any authorized test.",
+    "The -1 interpretation is exclusive to this reviewed stock Watchdog command protocol, after the completed probe teardown and required log milestones. It is not a general nonzero-exit whitelist.",
+    "The stock Watchdog terminates during the native shutdown worker after main cleanup; releases following the command and outer cleanup return are not certified.",
+    "Observed child identity and log provenance are operational checks for the controlled isolated test; this review does not establish adversarial operating-system integrity or arbitrary mod safety.",
+    "Schema3 integration acceptance is not proof of managed IL rewriter correctness, cavalry/ranged runtime safety, or sustained performance. Those require the separate patcher review and root-owned live trials."
+  ],
+  "reviewer": "/root/workload_review",
+  "preManagedAdmissionReview": {
+    "path": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\evidence\\engine-extension\\native-pool-run-r10\\reviews\\native-watchdog-exit-integration-review.json",
+    "sha256": "b4b766811662adfaa86c95d8762e4dc1b707dce022e4a7a7ad783e2da5d65c30"
+  },
+  "modernPowerShellCompatibilityReview": {
+    "change": "Managed patch subprocess uses pwsh instead of Windows PowerShell5; explanatory comment only.",
+    "previousSourceSha256": "a7f452957a7ddcb7e0893b1c9d8aced3fd65b9764ed74a1f96135a983c730836",
+    "currentSourceSha256": "70ca5b27dcabf8d00866be0a62c6396be9f06e0d9278c8731204a044e80911d6",
+    "boundedDiffVerified": "Reversing only the executable token and added comment reconstructs exactly the previous reviewed source SHA256.",
+    "runtimePath": "C:\\Users\\davgo\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe",
+    "runtimeVersion": "7.6.5.0",
+    "tests": "28 inert package tests independently rerun and passed; this bounded re-review does not execute the managed rewriter or game."
+  }
+}

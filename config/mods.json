@@ -1,0 +1,83 @@
+{
+  "schema": "mnbl.mod-registry",
+  "version": 1,
+  "notes": "Every Modules/<id>/ and src/<dir>/ must belong to a mod here; tools/ci/mods.py check fails otherwise. A release mod ships when its SubModule.xml Version has no <id>/<version> tag yet. 'owns' lists what ships (sources, module folder, build inputs; not tests): changing any of it, or a file the 'project' csproj embeds, needs a Version bump.",
+  "mods": [
+    {
+      "id": "MNBL.BattleScale",
+      "release": true,
+      "build": "tools/ci/Build-BattleScale.ps1",
+      "owns": [
+        "Modules/MNBL.BattleScale/",
+        "src/MNBL.BattleScale/",
+        "tools/ci/Build-BattleScale.ps1"
+      ]
+    },
+    {
+      "id": "MNBL.ProceduralWorld",
+      "release": true,
+      "build": "tools/ci/Build-ProceduralWorld.ps1",
+      "project": "src/MNBL.ProceduralWorld/MNBL.ProceduralWorld.csproj",
+      "owns": [
+        "Modules/MNBL.ProceduralWorld/",
+        "src/MNBL.ProceduralWorld/",
+        "src/WorldBridge/",
+        "config/runtime-api-lock.json",
+        "tools.lock.json",
+        "tools/ci/Build-ProceduralWorld.ps1"
+      ],
+      "package": {
+        "files": [
+          "SubModule.xml",
+          "GUI/Prefabs/*.xml",
+          "bin/Win64_Shipping_Client/MNBL.ProceduralWorld.dll",
+          "bin/Win64_Shipping_Client/worldbridge.exe",
+          "bin/Win64_Shipping_Client/worldbridge.sha256",
+          "bin/Win64_Shipping_Client/fwg.exe",
+          "bin/Win64_Shipping_Client/fwg.sha256",
+          "SurfaceTemplate/terrain.bin",
+          "SurfaceTemplate/navmesh.bin",
+          "SurfaceTemplate/template-recipe.json"
+        ],
+        "provenance": {
+          "SubModule.xml": "Modules/MNBL.ProceduralWorld/SubModule.xml (repository file)",
+          "GUI/Prefabs/*.xml": "Modules/MNBL.ProceduralWorld/GUI/Prefabs (repository files)",
+          "bin/Win64_Shipping_Client/MNBL.ProceduralWorld.dll": "built from src/MNBL.ProceduralWorld; it embeds the worldgen policies, profiles, contracts, calibration and culture templates it reads (src/MNBL.ProceduralWorld/MNBL.ProceduralWorld.csproj EmbeddedResource)",
+          "bin/Win64_Shipping_Client/worldbridge.exe": "built from src/WorldBridge",
+          "bin/Win64_Shipping_Client/fwg.exe": "the FWGC++ world producer pinned by tools.lock.json (producer.sourceCommit, producer.sha256)",
+          "bin/Win64_Shipping_Client/*.sha256": "pins written at staging; the module refuses a producer or bridge whose hash differs",
+          "SurfaceTemplate/*.bin": "this module's own surface template binaries (tools/scenebin/build_slot.py's writers; copied by tools/scenebin/make_surface_template.py)",
+          "SurfaceTemplate/template-recipe.json": "tools/scenebin/make_surface_template.py: this module's values and the SHA-256 of every template file; scene.xscene and atmosphere.xml are derived from the player's installed SandBoxCore battle_terrain_001 at run time (World/SurfaceTemplateSource.cs), never shipped"
+        },
+        "licenses": {
+          "module": "No license file: the module, WorldBridge and their sources are the repository owner's, all rights reserved; this archive is for local installation by its testers.",
+          "producer": "fwg.exe is built from the owner's FWGC++ repository (no license file), same terms.",
+          "dependencies": "Harmony (Bannerlord.Harmony, Steam Workshop 2859188632; MIT) and the game with War Sails (TaleWorlds, proprietary) are required and installed separately; neither is redistributed."
+        },
+        "notRedistributed": [
+          "Bannerlord, its official modules and War Sails (assemblies, assets, scenes)",
+          "Harmony (0Harmony.dll)",
+          "development caches, research outputs and user worlds (the per-user store under %LOCALAPPDATA%\\MNBL.ProceduralWorld)",
+          "generated scenes (SceneObj/), made at run time in the installed module folder",
+          "the surface template's scene.xscene and atmosphere.xml (derived from the installed SandBoxCore battle_terrain_001 on the player's machine) and its empty flora.bin (written there)"
+        ],
+        "runtimeRequirements": [
+          "Microsoft Visual C++ 2015-2022 Redistributable (x64): worldbridge.exe and fwg.exe import MSVCP140.dll, VCRUNTIME140.dll and VCRUNTIME140_1.dll, which the game does not ship (tools/Package.ps1 records the imports)."
+        ],
+        "contentNotes": [
+          "The module assembly embeds worldgen/templates/cultures/*.json, which carry about 1,051 name and lore strings with their localisation ids copied from the game's culture definitions (spcultures.xml), 7 of them culture lore paragraphs. They are not game files, but they are copied official text; whether to resolve them from the player's installation instead is an open decision (MMR-57)."
+        ]
+      }
+    },
+    {
+      "id": "MNBL.AgentGrowthProbe",
+      "release": false,
+      "reason": "In-game engine probe used by local tests; not a player-facing mod.",
+      "owns": [
+        "Modules/MNBL.AgentGrowthProbe/",
+        "src/MNBL.AgentGrowthProbe/",
+        "src/MNBL.AgentStorage/"
+      ]
+    }
+  ]
+}

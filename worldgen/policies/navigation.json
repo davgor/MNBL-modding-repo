@@ -1,0 +1,46 @@
+{
+ "schema": "mnbl.navigation",
+ "version": 1,
+ "rule": "MMR-38: RuntimeNavigationBuilder realizes a compiled world's travel cells (MMR-28 cells.bin and travel-graph.json) as the scene's navmesh.bin, and NavigationValidator refuses activation when a required point cannot be snapped or a required route is not realized (statically, then by the engine). Face groups are the installed TaleWorlds.Core.TerrainType values named by the bundle's playability policy (cells.faceGroups), resolved by name, never by number.",
+ "mesh": {
+  "faces": "one quad per physical cell between the pole lines, over every physical column (the periodic strips repeat the opposite side); no faces beyond the pole lines",
+  "zOffset": 0.2,
+  "seaDatum": 0.0,
+  "deckClearance": 1.0,
+  "deckInsetFraction": 0.25
+ },
+ "domains": {
+  "rule": "Land cells are the land domain (navigation region 1, Default-valid); sea, lake and river cells are the sea domain (region 0, Naval-valid); mountain cells are impassable (invalid for All). Water class (open sea, coastal sea, lake, river), terrain cost (plain, mountain) and passage (open, impassable, bridge deck, under bridge) are recorded per cell, separately from the domain."
+ },
+ "rivers": {
+  "rule": "A river or lake cell is passable by land only as a bridge: a joining crossing of the travel graph (at most bridges.maxCells cells, playability policy). There is no fording and a road never implies passability."
+ },
+ "bridges": {
+  "rule": "Each joining crossing becomes a deck of bridge faces (land domain) from bank to bank over under-bridge faces (sea domain) that keep the water's own connections. A deck cell connects its entry and exit sides through inset points (deckInsetFraction of the side from each corner); the bank cells beside it are split so they share exactly the deck's edge. A crossing must be edge-connected and enter and leave each cell through two different sides; a cell crossed in two different ways is refused."
+ },
+ "coasts": {
+  "rule": "Land and sea faces share every coast edge (embark and disembark need shared edges; MMR-17). A port is the travel graph's port cell (its sea face: CoastalSea, or River or Lake when the port cell is one) beside its land entrance; under a bridge there is no coast edge toward the banks."
+ },
+ "snapping": {
+  "radiusFraction": 0.5,
+  "interiorFraction": 0.05,
+  "separationFraction": 0.2,
+  "rule": "A required point (settlement, port, port entrance, coast transition) stays where it is when its cell is in its intended domain and component (the travel graph's land component or basin); otherwise it moves to the nearest interior point of a cell of that domain and component within radiusFraction cells, or activation is refused naming the point's source id. Settlements that share one emitted point are separated along x by separationFraction cells, inside their own cell, or refused.",
+  "ports": "A port point is placed at the interior point (interiorFraction) of its port cell nearest its town's gate, never outside that cell: the travel graph bounds the port and gate cells (maxPortGateCells), not the points, and the engine's port-to-gate distance is checked against travel-graph engine.maxPortGateUnits."
+ },
+ "routes": {
+  "landRadius": 0.3,
+  "extraCostMultiplier": 2.0,
+  "sampleStep": 0.25,
+  "maxStaticFactor": 1.25,
+  "maxStaticFactorAll": 1.41421356,
+  "staticSlackFraction": 0.5,
+  "distanceSlack": 0.05,
+  "portGateUnitsFrom": "travel-graph engine.maxPortGateUnits",
+  "rule": "The MMR-17 route function, restated: Scene.GetPathBetweenAIFaces and GetPathDistanceBetweenAIFaces with the installed navigation model's invalid terrain types as excluded faces (the AI party capabilities Default, Naval and All), its region switch costs, radius landRadius on land and the embark threshold at sea, each periodic image of the target (the shortest found path is the route's). Every found path is sampled every sampleStep units (land and sea region faces; a sample whose lookup fails is in its domain when a point 0.05 units away is, so a boundary tie is not a shortcut) and must stay in its domain; its length is at least the straight distance less distanceSlack and at most maxStaticFactor times the mesh's own shortest path (MeshNavigationEngine) plus staticSlackFraction cells, or maxStaticFactorAll for an All route (land and sea with region switches): the engine's own route over the square sea faces can run longer than the shortest corridor, up to a staircase's sqrt 2 at 45 degrees (2026-10-19: seed 43's world, one All route across the seam 1.29 x, its faces and switches right); region switches are counted exactly as (engine cost - path length) / region switch cost; a bridge route must cross its deck (or under-bridge) face."
+ },
+ "barrier": {
+  "minDetourExtraCells": 4,
+  "maxDetourFactor": 3
+ }
+}

@@ -1,0 +1,66 @@
+{
+  "schema": "fantasy-world-generator.world-controls",
+  "version": 1,
+  "recipe_version": 3,
+  "groups": [
+    "Air",
+    "Beast nests",
+    "Blood",
+    "Climate",
+    "Coasts",
+    "Cold",
+    "Communities",
+    "Drainage",
+    "Earth",
+    "Eldritch",
+    "Fire",
+    "Geography",
+    "Infernal",
+    "Moon",
+    "Nomads",
+    "Ocean islands",
+    "Radiant",
+    "Regions",
+    "Rot",
+    "Sky",
+    "Terrain",
+    "Transport",
+    "Umbral",
+    "Void",
+    "Water",
+    "Weave",
+    "World"
+  ],
+  "total": 209,
+  "returned": 2,
+  "controls": {
+    "phase": {
+      "default": 16,
+      "description": "How far through the sixteen generation stages to run. A lower phase stops early and omits every block a later stage would have written.",
+      "group": "World",
+      "max": 16,
+      "min": 1,
+      "producers": [
+        "reference",
+        "native"
+      ],
+      "status": "open",
+      "type": "integer",
+      "units": "stage"
+    },
+    "size": {
+      "default": 129,
+      "description": "Sampling grid along one edge of the sphere. This is a content control as much as a detail control: settlement count tracks cells rather than land area, so raising it yields a fuller world rather than the same world sampled finer.",
+      "group": "World",
+      "max": 1025,
+      "min": 3,
+      "producers": [
+        "reference",
+        "native"
+      ],
+      "status": "open",
+      "type": "integer",
+      "units": "cells"
+    }
+  }
+}

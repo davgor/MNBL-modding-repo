@@ -1,0 +1,22 @@
+ok    state machine v2: Idle -> ValidatingRequest -> GeneratingSource -> Compiling -> ValidatingData -> BuildingScene -> RegisteringCampaign -> ValidatingRuntime -> ReadyForReview -> Committing -> Playing; only the next phase, Cancelled before commit (each phase up to ReadyForReview), Failed from any running phase; Committing never cancels; a withdrawn commit returns to ReadyForReview (and nothing else goes back); final states stay final; each phase timed
+ok    phase groups: source (request, generation), compilation (bundle, verification), engine (scene, registration, runtime validation), review, commit
+ok    the progress sink takes only the followed job's events and only newer ones: another job's are stale, a repeated or older sequence is out of order
+ok    engine work runs only on the engine thread (a pump from another thread runs nothing and is counted), within the per-tick budget (1 of 6 five-millisecond items in one 8 ms pump)
+ok    a queued item can be withdrawn unrun; an item whose job ticket is no longer live (a later job began) is dropped unrun; a full queue refuses work
+ok    the probes' hold keeps job items queued while teardown items run, and releases them when lifted
+ok    a job runs every phase in order to review: a start event per phase, the stages' progress (attempt 1 of 3), sequence 0..9 without gaps, engine work on the engine thread, timings and events written to the job, its resources still held for review
+ok    every progress event validates against progress-event.schema.json
+ok    a second job is refused while one awaits review; cancelling at review releases every resource in reverse order of acquisition; releasing the job deletes its directory
+ok    cancelled during GeneratingSource (Source group): Cancelled, exactly its own resources released in reverse order (release GeneratingSource, release ValidatingRequest), its ticket ended, the next job runs
+ok    cancelled during Compiling (Compilation group): Cancelled, exactly its own resources released in reverse order (release Compiling, release GeneratingSource, release ValidatingRequest), its ticket ended, the next job runs
+ok    cancelled during BuildingScene (Engine group): Cancelled, exactly its own resources released in reverse order (release BuildingScene, release ValidatingData, release Compiling, release GeneratingSource, release ValidatingRequest), its ticket ended, the next job runs
+ok    engine-side cancellation: queued engine work is withdrawn unrun; running engine work finishes and what it made is torn down on the engine thread before the job stops
+ok    stale callbacks: engine work a cancelled job posts after a later job began is dropped unrun, and its late progress event is dropped by the later job's consumer
+ok    a failing stage fails the job in its category (a stage's own error, or the classified exception: disk full), releasing what it held; the final event carries the structured error
+ok    commit: from review only, never cancelled; Playing keeps what the commit took over and releases the remaining staging; a failed commit recovers before the job fails
+ok    commit withdrawn: the job returns to review keeping all 7 owned resources (none released), the event says commit_withdrawn, and the same world commits on the next try
+ok    coordinator admission (MMR-62): refused with the admission's message, no job and no job directory
+ok    one job at a time: a new job is refused as busy while the previous job's release runs and starts once AwaitIdle returns; releasing twice is one release; a release during a commit waits for Playing before deleting the job
+19/19 checks passed
+ok    worldbridge --new-request --seed-source: --seed 7 alone is explicit, --seed-source random records random, explicit stays explicit; --seed-source with --random, or any other value, is refused (explicitDefault exit 0 explicit; random exit 0 random; explicit exit 0 explicit; randomWithRandom exit 2 ; unknown exit 2 )
+ok    every job input the production stages write is embedded from the repository file at the path the job writes it to, keeping the layout policies resolve their calibration receipts in (14: producer.lock.json, producer-seed-width.json, source-compatibility.json, product-policy.json, world-quality.json, projection.json, terrain-materials.json, campaign-content.json, culture-presentations.json, playability.json, terrain-import.json, axis-sea-datum-calibration.json, naval-transitions.json, runtime-api-lock.json)

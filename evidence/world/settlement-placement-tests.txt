@@ -1,0 +1,53 @@
+ok    the placement policy was measured on the installed campaign map the entity contract reads (1fb8bb08210a); a policy from another campaign map is refused
+ok    contract: the installed helper scripts (Town Scene Manager, CampaignMapSiegePrefabEntityCache) are found once each and copied verbatim, with the siege cache's 10 prefab variables; the icon meshes are installed references
+ok    contract: a campaign map without the helper scripts is refused; the policy's wall meshes (mi_emp_wall_3s, mi_emp_wall_2s_collapsed) are installed references, an unknown mesh is refused
+ok    policy version 2: two wall sections and four wall engines per wall level, circle and camp-area scales; a version 1 policy is refused
+ok    A: the navigation plan is activatable (the precondition the scene build already has)
+ok    A: every compiled settlement is a site (45 towns, 26 castles, 215 villages; 30 port towns); the harbour villages are the campaign's harbour flag (80), each with the harbour cell of a port candidate naming it, as SettlementFactory gives them ports
+ok    A: the layout has no refusal
+ok    A: every site is resolved
+ok    A: the layout and its report are deterministic (bc3004a4b2b8)
+ok    A: independently re-checked: centres are navigation points on land and canonical in the terrain; 710 gate-frame markers on passable land of their component within their installed reach and the slope limit, 1278 wall sections and wall engines on land of their component within their reach (239 adjusted; 10 least-steep where nothing met the limit, each reported); every marker clear of every other settlement's centre and markers (0 cross pairs); ports, arc ends and all 300 blockade ships (the installed GetBlockadeArc replayed in single precision, within 0 of the resolver's) on their basin (0 ports without a fitting arc get none, reported), ports within the gate limit; drop-offs on their basin; no two settlements at one place
+ok    A: every resolved position carries its provenance (centre, gate, port, blockade arc, drop-off, every marker: rule, before and after)
+ok    A: the report gives each position canonically and where the scene builds it (beside its settlement), each marker's unadjusted position, the walls; a least-steep gate says so in its rule
+ok    A: the scene entities meet the structural contract (scene levels; one root per settlement named its id with its kind's tag and Town Entity Manager, circle, selection, banner placeholders with one volume_box each, village icons per level, gate, every marker, wall section and wall engine by name with its tag, offset and levels, each wall with a solid and a broken child, port and blockade arc with BlockadePositionScript on port towns with an arc, drop-offs on harbour villages; unique names; borders; the baked helper only)
+ok    A: the entity XML is deterministic (the encoding's identity hashes it)
+ok    A: 289 root entities: 2 borders, the Town Scene Manager helper and one per settlement (6297 entities in all); no siege prefab cache (its script throws in a read without a campaign, run 25412; GeneratedMapScene.Load adds it to the campaign map)
+ok    A: a scene carrying a baked siege prefab cache fails the contract
+ok    A: with the engine's level rules exactly one village icon shows in each state (level 1-3, civilian or looted); each wall level shows its two wall sections in civilian and siege and caches two sections and four wall engines; circles and camp areas at the installed scales; every marker faces the gate (yaw = gate angle - pi/2)
+ok    A: a scene whose port children are mistagged fails the contract
+ok    A: a scene whose walls lack their solid child fails the contract
+ok    A: a scene that does not declare the campaign map's levels fails the contract
+ok    A: a scene missing a settlement's entity fails the contract
+ok    B: the navigation plan is activatable (the precondition the scene build already has)
+ok    B: every compiled settlement is a site (66 towns, 39 castles, 305 villages; 25 port towns); the harbour villages are the campaign's harbour flag (105), each with the harbour cell of a port candidate naming it, as SettlementFactory gives them ports
+ok    B: the layout has no refusal
+ok    B: every site is resolved
+ok    B: the layout and its report are deterministic (6b84dc4417e9)
+ok    B: independently re-checked: centres are navigation points on land and canonical in the terrain; 1050 gate-frame markers on passable land of their component within their installed reach and the slope limit, 1890 wall sections and wall engines on land of their component within their reach (331 adjusted; 35 least-steep where nothing met the limit, each reported); every marker clear of every other settlement's centre and markers (0 cross pairs); ports, arc ends and all 250 blockade ships (the installed GetBlockadeArc replayed in single precision, within 0 of the resolver's) on their basin (0 ports without a fitting arc get none, reported), ports within the gate limit; drop-offs on their basin; no two settlements at one place
+ok    B: every resolved position carries its provenance (centre, gate, port, blockade arc, drop-off, every marker: rule, before and after)
+ok    B: the report gives each position canonically and where the scene builds it (beside its settlement), each marker's unadjusted position, the walls; a least-steep gate says so in its rule
+ok    B: the scene entities meet the structural contract (scene levels; one root per settlement named its id with its kind's tag and Town Entity Manager, circle, selection, banner placeholders with one volume_box each, village icons per level, gate, every marker, wall section and wall engine by name with its tag, offset and levels, each wall with a solid and a broken child, port and blockade arc with BlockadePositionScript on port towns with an arc, drop-offs on harbour villages; unique names; borders; the baked helper only)
+ok    B: the entity XML is deterministic (the encoding's identity hashes it)
+ok    B: 413 root entities: 2 borders, the Town Scene Manager helper and one per settlement (9123 entities in all); no siege prefab cache (its script throws in a read without a campaign, run 25412; GeneratedMapScene.Load adds it to the campaign map)
+ok    B: a scene carrying a baked siege prefab cache fails the contract
+ok    B: with the engine's level rules exactly one village icon shows in each state (level 1-3, civilian or looted); each wall level shows its two wall sections in civilian and siege and caches two sections and four wall engines; circles and camp areas at the installed scales; every marker faces the gate (yaw = gate angle - pi/2)
+ok    B: a scene whose port children are mistagged fails the contract
+ok    B: a scene whose walls lack their solid child fails the contract
+ok    B: a scene that does not declare the campaign map's levels fails the contract
+ok    B: a scene missing a settlement's entity fails the contract
+ok    the scene declares the installed campaign map's levels (base 1, level_1-3 2/4/8, civilian 16, siege 32, looted 64): missing ones are added once, a conflicting mask is refused, a scene without levels gets them
+ok    refusal: a settlement centre off land (mnbl_1609fb72_t_02135fe588's point moved onto its port)
+ok    refusal: a port on land
+ok    refusal: no room for a gate (the land around a town turned to mountain)
+ok    a port where no blockade arc keeps every ship on water (only its own water left) keeps its port but gets no arc and no BlockadePositionScript, reported (never ships on land)
+ok    an arc whose two ends are on water but whose ships are not is rejected (every ship is checked, not only the ends): another arc with every ship on water is chosen (turn 2, mirrored, kept 1)
+ok    refusal: a drop-off on land (a harbour village's harbour cell set to its own land cell)
+ok    refusal: a harbour village (the campaign's flag) without a harbour cell
+ok    refusal: two settlements at one place (a hideout given the town's centre)
+ok    the refusal names its first problem (RuntimeWorldBackend.Prepare throws it before encoding; GenerationRuntime classifies it as a runtime capability failure)
+ok    a given hideout site resolves on land and gets the installed hideout root (wm_hideout, sphere collider, Town Entity Manager) and its icon
+ok    the run-time hierarchy for a settlement the scene lacks is its record's: the root at its centre, the gate at the record's gate, every siege marker, wall section and wall engine at its installed offset in that gate's frame, the record's port, no blockade arc
+ok    the settlement records take the layout's positions (centre, a fortification's gate, a port town's port, a harbour village's drop-off as its port); an unplaced settlement stays staged and is reported
+ok    a record that differs from the placement the scene was built from is found (a castle's gate moved half a unit), as is a record with no placement (MMR-45 refuses such a world)
+52/52 checks passed

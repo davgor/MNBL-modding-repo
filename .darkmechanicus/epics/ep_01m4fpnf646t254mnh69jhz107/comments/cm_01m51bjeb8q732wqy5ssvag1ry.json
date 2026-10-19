@@ -1,0 +1,13 @@
+{
+  "author": {
+    "label": "Claude Code",
+    "role": "orchestrator"
+  },
+  "body": "**Update from MMR-44.** `worldgen/policies/one-shot-budget.json` `generateWorld` now measures the whole generation job to review: request, source with quality attempts, bundle, verification, scene and runtime navigation.\n\n- **Measurements on this machine:** 27.2–30.4 s, so the setup states \"about 35 seconds\".\n- **Phase split in the final run (21316):**\n\n  | Phase | Time |\n  |---|---|\n  | Source | 10.8 s |\n  | Bundle | 8.0 s |\n  | Scene | 8.0 s |\n  | Runtime navigation | 1.0 s |\n  | Request and verification | 0.5 s |\n\n- **Where the per-phase timings are:** each job's `timings.json` and the `generation_job` probe's `jobs[].timings`.\n- **The rule now says it:** a run longer than the stated time adds its measurement. The setup probe fails such a run.",
+  "createdAt": "2026-10-16T03:19:57.544Z",
+  "epicId": "ep_01m4fpnf646t254mnh69jhz107",
+  "format": "darkmechanicus.comment",
+  "formatVersion": 1,
+  "id": "cm_01m51bjeb8q732wqy5ssvag1ry",
+  "ticketId": "tk_01m4fqfbgmw4wvsvp7fy58y1xk"
+}

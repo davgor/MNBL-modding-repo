@@ -1,0 +1,13 @@
+{
+  "author": {
+    "label": "Claude Code",
+    "role": "orchestrator"
+  },
+  "body": "**Handoff from MMR-41: navigation cache cost** (`docs/playability.md`, `evidence/world/playability-report.json`)\n\nNavigation caches are now built once per world and keyed input set, published, and read back on later loads. Measure both sides at the first-test profile:\n- **First load** (generation, per type Default/Naval/All, and publication): fixtures took 5.0 / 8.0 / 55.0 s at 32,768 faces with 4 settlements, and 28.1 / 129.8 / 407.9 s on periodic fixture-c (131,072 faces). Real settlement counts (hundreds; every entrance pair is stored) are unmeasured.\n- **Reload** (deserialize and register): 21 ms on the fixtures and 95 ms on fixture-c.\n- **Published size** on disk per world: fixture-c is about 6.7 MB. Real scale is unmeasured.\n- The caches live under `<store>/navigation-caches/<key sha>`. The record of a load is in `mapSupport.generatedNavigationCaches.navigationCache` (status generated, reused or regenerated; per-type milliseconds).\n\nThe wait-time text (MMR-43) should distinguish a world's first campaign start, which pays the build, from later loads, which read the published caches.",
+  "createdAt": "2026-10-17T01:45:00.217Z",
+  "epicId": "ep_01m4fpnf646t254mnh69jhz107",
+  "format": "darkmechanicus.comment",
+  "formatVersion": 1,
+  "id": "cm_01m53rh9hs8wfs1vhf01ctwfx4",
+  "ticketId": "tk_01m4fqfbgmw4wvsvp7fy58y1xk"
+}

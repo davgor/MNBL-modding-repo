@@ -1,0 +1,188 @@
+{
+  "schema": "mnbl.evidence.world-bundle",
+  "version": 1,
+  "ticket": "MMR-29",
+  "generatedUtc": "2026-10-15T06:24:28Z",
+  "bundle": {
+    "directory": "build/research-bundle29/bundles/f596b58cdcfc18798542fdef5a4d9c9f6d84abddca1425af8d0b87f521191d2d",
+    "worldContentId": "f596b58cdcfc18798542fdef5a4d9c9f6d84abddca1425af8d0b87f521191d2d",
+    "manifestSha256": "4b81fb9e52664c2393ae6c77ccb4a3b9c1bfd54fa1e78c97a0a1f6a63d60f951",
+    "totals": {
+      "bytes": 143659383,
+      "files": 889
+    },
+    "roots": {
+      "source": {
+        "files": 868,
+        "bytes": 141680220
+      },
+      "compiled": {
+        "files": 12,
+        "bytes": 1941485
+      },
+      "policies": {
+        "files": 9,
+        "bytes": 37678
+      }
+    },
+    "compiler": {
+      "binarySha256": "d61cecadc2c2ac8a9a772bea4e8f40225ea626ab8829f3a45533bd80cbe36ae5",
+      "bridgeVersion": "0.1.0",
+      "stages": [
+        "MMR-25 projection",
+        "MMR-26 terrain",
+        "MMR-27 campaign",
+        "MMR-28 travel"
+      ]
+    },
+    "engine": {
+      "gameVersion": "v1.4.8.119303",
+      "navalVersion": "v1.2.8.119303"
+    },
+    "requiredCapabilities": [
+      "R02",
+      "R03",
+      "R04",
+      "R05",
+      "R08",
+      "R09",
+      "R10"
+    ]
+  },
+  "publish": {
+    "first": {
+      "existed": false,
+      "compileSeconds": 6.7557215,
+      "wallSeconds": 9.417113
+    },
+    "again": {
+      "existed": true,
+      "compileSeconds": 2.596374,
+      "wallSeconds": 5.7025375
+    }
+  },
+  "managed": {
+    "receipt": "build/research-bundle29/managed-3e806f26da2247d2b7785abe82414ac2/receipt.json",
+    "checks": "41/41 checks passed",
+    "worldContentId": "f596b58cdcfc18798542fdef5a4d9c9f6d84abddca1425af8d0b87f521191d2d"
+  },
+  "checks": [
+    {
+      "name": "manifest validates against bundle-manifest.schema.json",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "DATA_READY names the manifest hash and the WorldContentId",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "the directory is named by the WorldContentId",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "the Python verifier (the rules of worldbridge validate and the C# host) accepts it on a v1.4.8.119303 / v1.2.8.119303 host",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "inventory is sorted by UTF-8 bytes and unique",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "every inventory file exists with its size and SHA-256, and nothing else is in the bundle",
+      "ok": true,
+      "detail": "extra [] wrong []"
+    },
+    {
+      "name": "totals match the inventory",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "the WorldContentId recomputes from the inventory",
+      "ok": true,
+      "detail": "f596b58cdcfc18798542fdef5a4d9c9f6d84abddca1425af8d0b87f521191d2d"
+    },
+    {
+      "name": "the manifest holds no absolute paths or timestamps",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "only source/, compiled/ and policies/ hold content",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "every bundle path is at most 120 bytes",
+      "ok": true,
+      "detail": "79"
+    },
+    {
+      "name": "compiled/ equals the MMR-26 terrain, MMR-27 id map and MMR-28 travel outputs compiled separately",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "source/ is the producer split byte for byte",
+      "ok": true,
+      "detail": "868 split files, 868 source files"
+    },
+    {
+      "name": "policies/ are the repository policy files and the manifest names their hashes",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "compiled/compatibility.json (inside the WorldContentId) names the runtime lock's versions and the manifest's capabilities",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "engine versions are the runtime lock's",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "a bundle is sealed only for an ok travel graph, and the validation report says so",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "the producer lock hash is the repository lock's",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "the first publish created the bundle and a republish reused it unchanged",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "publication diagnostics (timings, absolute inputs) are written outside the bundle",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "worldbridge --inspect-bundle reports it valid with the same identity",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "the activation receipt schema accepts a complete U03 receipt and refuses a missing C07, another writer or a failed W03",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "the C# host verifier accepted the bundle and refused every tampering (tools/Test-WorldDataBundle.ps1)",
+      "ok": true,
+      "detail": ""
+    }
+  ],
+  "passed": 23,
+  "total": 23
+}

@@ -1,0 +1,13 @@
+{
+  "author": {
+    "label": "Claude Code",
+    "role": "orchestrator"
+  },
+  "body": "**Handoff from MMR-66 (sieges at the periodic seam).**\n\n- **Siege machines on display copies.** Siege machines, siege missiles and banners exist only on the settlement's own entity, not on its display copy.\n  - A siege of a settlement beside the cut, seen from the copy's side of the camera, shows walls and level meshes (visibility is mirrored after `RefreshSiegePreparations`) but not the engines.\n  - Engine clicks (`FrameAndVisualOfEngines`) work on the settlement's side only.\n  - If MMR-42 needs engines on both sides, it must mirror them onto the copy (`PeriodicMapPresentation.DisplayCopy`) or draw them through the display rule.\n- **Camera averages.** Siege camp frames stay canonical (MMR-65). The camera averages of a settlement with its besieger (`GetMapCameraInput`) and the camp lerp (`GetCameraTargetForParty`) take each term beside the settlement. Not fixture-tested.\n- **Not run in game:** a siege at the cut (MMR-65 limits).",
+  "createdAt": "2026-10-16T19:26:39.343Z",
+  "epicId": "ep_01m4fpnf646t254mnh69jhz107",
+  "format": "darkmechanicus.comment",
+  "formatVersion": 1,
+  "id": "cm_01m532wgqfvb16a7vtssmfth7v",
+  "ticketId": "tk_01m4fqfbgky87f416pgnyj9xsz"
+}

@@ -1,0 +1,688 @@
+{
+  "schemaVersion": 1,
+  "status": "retained-complete-rea-responses",
+  "requests": [
+    38,
+    39,
+    40,
+    41,
+    42,
+    43,
+    44
+  ],
+  "records": [
+    {
+      "responsePath": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\build\\battle-scale\\native-growth-queue\\038.response.json",
+      "responseSha256": "708bbada13c7dab122f3ec30263c74ae21b1bde7125b7c2f6926fcaf4eb0a696",
+      "evidence": {
+        "evidence_id": "ev_e0b82175769f808df547932d7e0c1adf75e0dde510dca8db023a811adae9e8ae",
+        "subject": {
+          "name": "backup-0",
+          "digest": {
+            "sha256": "2a5e0e0b15513ebb7052d747a621b82c50ee834553eba283b33bbbc33766e12a"
+          },
+          "local_path": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\build\\battle-scale\\native-run-20261017-065749-08e99ed9\\backup-0",
+          "format": "pe",
+          "architecture": "x86_64"
+        },
+        "provider": {
+          "id": "ghidra",
+          "name": "Ghidra",
+          "version": "12.1.4"
+        },
+        "analysis_profile": {
+          "provider": {
+            "id": "ghidra",
+            "name": "Ghidra",
+            "version": "12.1.4"
+          },
+          "parameters": {
+            "target_kind": "executable",
+            "target_format": "pe",
+            "executable_role": "shared-library",
+            "managed": false,
+            "native_aot_metadata": {
+              "contract_revision": "rtr-9.1-x64-pe-read-only-v3",
+              "source_bytes": 134217728,
+              "work_units": 67108864,
+              "working_memory_bytes": 67108864,
+              "report_bytes": 4194304
+            },
+            "architecture": "x86_64",
+            "available_architectures": [
+              "x86_64"
+            ],
+            "import_mode": "ephemeral-source-immutable",
+            "pdb_observations": "program-info-v1",
+            "annotation_policy": "atomic-function-entry-metadata-v1",
+            "load_image_observations": "source-mappings-entry-context-v2",
+            "function_body_evidence": "complete-inclusive-ranges-v1",
+            "function_references": "complete-body-and-entry-reference-manager-v2",
+            "call_relationship_coverage": "function-body-call-coverage-v5",
+            "function_dossier_coverage": "observed-facets-and-call-relationships-v1",
+            "string_inventory_evidence": "defined-data-coverage-v1",
+            "location_resolution": "explicit-address-exact-entry-symbol-first-v3",
+            "procedure_file_offset_resolution": "address-first-unique-target-source-mapping-v2",
+            "instruction_flow_evidence": "decoded-return-pcode-v1",
+            "instruction_references": "exact-address-incoming-v1",
+            "function_boundary_observations": "ghidra-function-boundary-limitations-v3",
+            "no_return_repair": "disabled-windows-p0",
+            "process_launch": "official-headless-script-v1",
+            "jump_table_evidence": "typed-case-default-blocks-v1",
+            "decompiler_jump_loads": true,
+            "loader": "auto-from-header",
+            "language_id": "auto-from-header",
+            "compiler_spec_id": "auto-default",
+            "analyzer_preset": "ghidra-default"
+          },
+          "digest": "dcc676845881c04a2d22833fb35d26569462e033daee5e99a95edac5aa61ac05"
+        },
+        "predicate_type": "rea.analysis",
+        "operation": "procedure_pseudo_code",
+        "parameters": {
+          "procedure": "0x1805ce3f0"
+        },
+        "raw_result": {
+          "value": "\r\nundefined8 *\r\nFUN_1805ce3f0(undefined8 *param_1,undefined8 param_2,undefined8 param_3,undefined8 param_4)\r\n\r\n{\r\n  longlong *plVar1;\r\n  undefined8 uVar2;\r\n  undefined4 *puVar3;\r\n  uint uVar4;\r\n  uint uVar5;\r\n  longlong lVar6;\r\n  undefined8 *puVar7;\r\n  longlong lVar8;\r\n  \r\n  *param_1 = ftlObject::vftable;\r\n  *param_1 = rglReference_counted_object::vftable;\r\n  uVar5 = 0;\r\n  *(undefined4 *)(param_1 + 1) = 0;\r\n  param_1[2] = Game_scene_controller::vftable;\r\n  param_1[3] = 0;\r\n  FUN_1805b5d40(param_1 + 4,param_2,param_3,param_4,0xfffffffffffffffe);\r\n  param_1[0x5a8] = 0;\r\n  *param_1 = Mission::vftable;\r\n  param_1[2] = Mission::vftable;\r\n  FUN_1805d8220(param_1 + 0x5aa);\r\n  FUN_1805d8220(param_1 + 0xc5b4a);\r\n  puVar7 = param_1 + 0x18b0ea;\r\n  lVar6 = 0x7f8;\r\n  do {\r\n    FUN_1805e58e0(puVar7);\r\n    puVar7 = puVar7 + 0x46;\r\n    lVar6 = lVar6 + -1;\r\n  } while (lVar6 != 0);\r\n  puVar3 = (undefined4 *)((longlong)param_1 + 0xc5876c);\r\n  lVar6 = 0x7f8;\r\n  do {\r\n    *puVar3 = 0xffffffff;\r\n    puVar3 = puVar3 + 0x8c;\r\n    lVar6 = lVar6 + -1;\r\n  } while (lVar6 != 0);\r\n  puVar7 = param_1 + 0x1adeba;\r\n  for (lVar6 = 0x7f8; lVar6 != 0; lVar6 = lVar6 + -1) {\r\n    *(undefined2 *)puVar7 = 0xffff;\r\n    puVar7 = (undefined8 *)((longlong)puVar7 + 2);\r\n  }\r\n  param_1[0x1ae0b8] = 0;\r\n  FUN_1805d8740(param_1 + 0x1ae0b9);\r\n  FUN_1805d8740(param_1 + 0x1da7f0);\r\n  param_1[0x20771f] = 0;\r\n  param_1[0x207720] = 0;\r\n  param_1[0x207721] = 0;\r\n  *(undefined4 *)(param_1 + 0x207722) = 3;\r\n  *(undefined1 *)((longlong)param_1 + 0x103b91c) = 1;\r\n  *(undefined4 *)(param_1 + 0x207723) = 0;\r\n  param_1[0x207f1c] = 0;\r\n  param_1[0x207f1d] = 0;\r\n  param_1[0x207f1e] = 0;\r\n  *(undefined4 *)(param_1 + 0x207f1f) = 3;\r\n  *(undefined1 *)((longlong)param_1 + 0x103f904) = 1;\r\n  *(undefined4 *)(param_1 + 0x207f20) = 0;\r\n  param_1[0x208719] = 0;\r\n  param_1[0x20871a] = 0;\r\n  param_1[0x20871b] = 0;\r\n  *(undefined4 *)(param_1 + 0x20871c) = 3;\r\n  *(undefined1 *)((longlong)param_1 + 0x10438ec) = 1;\r\n  *(undefined4 *)(param_1 + 0x20871d) = 0;\r\n  param_1[0x20871f] = 0;\r\n  _Mtx_init_in_situ(param_1 + 0x208720,2);\r\n  _Mtx_init_in_situ(param_1 + 0x20872a,0x102);\r\n  LOCK();\r\n  *(undefined4 *)(param_1 + 0x208734) = 0;\r\n  UNLOCK();\r\n  uVar4 = uVar5;\r\n  do {\r\n    param_1[(longlong)(int)uVar4 + 0x208735] = 0;\r\n    LOCK();\r\n    *(undefined1 *)((longlong)param_1 + (longlong)(int)uVar4 + 0x1043da0) = 1;\r\n    UNLOCK();\r\n    uVar4 = uVar4 + 1;\r\n  } while (uVar4 < 0x7f);\r\n  LOCK();\r\n  *(undefined4 *)(param_1 + 0x2087c4) = 0;\r\n  UNLOCK();\r\n  uVar4 = uVar5;\r\n  do {\r\n    param_1[(longlong)(int)uVar4 + 0x2087c5] = 0;\r\n    LOCK();\r\n    *(undefined1 *)((longlong)param_1 + (longlong)(int)uVar4 + 0x1044220) = 1;\r\n    UNLOCK();\r\n    uVar4 = uVar4 + 1;\r\n  } while (uVar4 < 0x7f);\r\n  LOCK();\r\n  *(undefined4 *)(param_1 + 0x208854) = 0;\r\n  UNLOCK();\r\n  do {\r\n    param_1[(longlong)(int)uVar5 + 0x208855] = 0;\r\n    LOCK();\r\n    *(undefined1 *)((longlong)param_1 + (longlong)(int)uVar5 + 0x10446a0) = 1;\r\n    UNLOCK();\r\n    uVar5 = uVar5 + 1;\r\n  } while (uVar5 < 0x7f);\r\n  param_1[0x2088e5] = 0;\r\n  param_1[0x2088e6] = 0;\r\n  param_1[0x2088e7] = 0;\r\n  *(undefined4 *)(param_1 + 0x2088e8) = 3;\r\n  param_1[0x2088ea] = 0;\r\n  param_1[0x2088eb] = 0;\r\n  param_1[0x2088ec] = 0;\r\n  *(undefined4 *)(param_1 + 0x2088ed) = 3;\r\n  param_1[0x2088ee] = 0;\r\n  param_1[0x2088ef] = 0;\r\n  param_1[0x2088f0] = 0;\r\n  *(undefined4 *)(param_1 + 0x2088f1) = 3;\r\n  param_1[0x2088e9] = 0;\r\n  *(undefined4 *)(param_1 + 0x2088f2) = 0;\r\n  param_1[0x2088f3] = 0;\r\n  param_1[0x2088f4] = 0;\r\n  param_1[0x2088f5] = 0;\r\n  *(undefined4 *)(param_1 + 0x2088f6) = 3;\r\n  param_1[0x2088f8] = 0;\r\n  param_1[0x2088f9] = 0;\r\n  param_1[0x2088fa] = 0;\r\n  *(undefined4 *)(param_1 + 0x2088fb) = 3;\r\n  param_1[0x2088fd] = 0;\r\n  param_1[0x2088fe] = 0;\r\n  param_1[0x2088ff] = 0;\r\n  *(undefined4 *)(param_1 + 0x208900) = 3;\r\n  param_1[0x208901] = 0;\r\n  param_1[0x208902] = 0;\r\n  param_1[0x208903] = 0;\r\n  *(undefined4 *)(param_1 + 0x208904) = 3;\r\n  *(undefined4 *)(param_1 + 0x208907) = 1;\r\n  param_1[0x208906] = DAT_180da29b8;\r\n  param_1[0x20890c] = rglString_base::vftable;\r\n  param_1[0x20890d] = 0;\r\n  *(undefined4 *)(param_1 + 0x20890e) = 0;\r\n  param_1[0x20890c] = rglVarString::vftable;\r\n  param_1[0x20890f] = 0;\r\n  param_1[0x20890d] = 0;\r\n  *(undefined4 *)(param_1 + 0x20890e) = 0;\r\n  *(undefined8 *)((longlong)param_1 + 0x1044884) = 0;\r\n  param_1[0x208913] = 0;\r\n  *(undefined4 *)(param_1 + 0x208914) = 0;\r\n  FUN_180698980(param_1 + 0x208913,8);\r\n  *(undefined4 *)(param_1 + 0x208912) = 0;\r\n  *(undefined4 *)(param_1 + 0x208916) = 1;\r\n  uVar2 = DAT_180da29b8;\r\n  param_1[0x208915] = DAT_180da29b8;\r\n  *(undefined4 *)(param_1 + 0x208918) = 1;\r\n  param_1[0x208917] = uVar2;\r\n  *(undefined4 *)(param_1 + 0x20891a) = 1;\r\n  param_1[0x208919] = uVar2;\r\n  FUN_1805e5380((longlong)param_1 + 0x10448dc);\r\n  param_1[0x2089ca] = 0;\r\n  param_1[0x2089cb] = 0;\r\n  param_1[0x2089cc] = 0;\r\n  *(undefined4 *)(param_1 + 0x2089cd) = 3;\r\n  param_1[0x2089cf] = 0;\r\n  param_1[0x2089d0] = 0;\r\n  param_1[0x2089d1] = 0;\r\n  *(undefined4 *)(param_1 + 0x2089d2) = 3;\r\n  param_1[0x2089d3] = 0;\r\n  param_1[0x2089d4] = 0;\r\n  param_1[0x2089d5] = 0;\r\n  *(undefined4 *)(param_1 + 0x2089d6) = 3;\r\n  param_1[0x2089ce] = 0;\r\n  *(undefined4 *)(param_1 + 0x2089d7) = 0;\r\n  FUN_1805e5270(param_1 + 0x2089d9);\r\n  puVar7 = param_1 + 0x208c6d;\r\n  lVar6 = 0x400;\r\n  lVar8 = 0x400;\r\n  do {\r\n    FUN_1805e58e0(puVar7);\r\n    puVar7 = puVar7 + 0x46;\r\n    lVar8 = lVar8 + -1;\r\n  } while (lVar8 != 0);\r\n  param_1[0x21a46d] = 0;\r\n  puVar7 = param_1 + 0x21a46e;\r\n  do {\r\n    FUN_1805d8860(puVar7);\r\n    puVar7 = puVar7 + 0x59;\r\n    lVar6 = lVar6 + -1;\r\n  } while (lVar6 != 0);\r\n  param_1[0x23086e] = 0;\r\n  param_1[0x23086f] = 0;\r\n  param_1[0x230870] = 0;\r\n  *(undefined4 *)(param_1 + 0x230879) = 0x3f800000;\r\n  *(undefined8 *)((longlong)param_1 + 0x11843cc) = 0x40000000;\r\n  *(undefined4 *)((longlong)param_1 + 0x11843d4) = 3;\r\n  param_1[0x230877] = 1;\r\n  param_1[0x230876] = &DAT_180cef000;\r\n  param_1[0x230878] = 0;\r\n  *(undefined4 *)(param_1 + 0x23087a) = 0;\r\n  FUN_1805cec60(param_1 + 0x23087c);\r\n  param_1[0x23093c] = 0;\r\n  param_1[0x23093d] = 0;\r\n  param_1[0x23093e] = 0;\r\n  *(undefined4 *)(param_1 + 0x23093f) = 3;\r\n  param_1[0x230940] = 0;\r\n  param_1[0x230941] = 0;\r\n  param_1[0x230942] = 0;\r\n  *(undefined4 *)(param_1 + 0x230943) = 3;\r\n  *(undefined4 *)(param_1 + 0x230946) = 0;\r\n  param_1[0x230953] = rglString_base::vftable;\r\n  param_1[0x230954] = 0;\r\n  *(undefined4 *)(param_1 + 0x230955) = 0;\r\n  param_1[0x230953] = rglVarString::vftable;\r\n  param_1[0x230956] = 0;\r\n  param_1[0x230954] = 0;\r\n  *(undefined4 *)(param_1 + 0x230955) = 0;\r\n  param_1[0x230957] = rglString_base::vftable;\r\n  param_1[0x230958] = 0;\r\n  *(undefined4 *)(param_1 + 0x230959) = 0;\r\n  param_1[0x230957] = rglVarString::vftable;\r\n  param_1[0x23095a] = 0;\r\n  param_1[0x230958] = 0;\r\n  *(undefined4 *)(param_1 + 0x230959) = 0;\r\n  param_1[0x23095b] = 0;\r\n  param_1[0x23095c] = 0;\r\n  *(undefined4 *)(param_1 + 0x230966) = 0;\r\n  param_1[0x208905] = 0;\r\n  plVar1 = (longlong *)param_1[3];\r\n  param_1[3] = 0;\r\n  if (plVar1 != (longlong *)0x0) {\r\n    (**(code **)(*plVar1 + 0x38))();\r\n  }\r\n  param_1[0x208c6b] = 0;\r\n  param_1[0x208c6c] = 0;\r\n  *(undefined1 *)((longlong)param_1 + 0x1184a34) = 1;\r\n  *(undefined4 *)((longlong)param_1 + 0x1184a3c) = 0x3f800000;\r\n  *(undefined4 *)(param_1 + 0x230948) = 0x3f800000;\r\n  *(undefined4 *)((longlong)param_1 + 0x1184a44) = 0x3f800000;\r\n  *(undefined4 *)(param_1 + 0x230949) = 0x3f800000;\r\n  *(undefined4 *)(param_1 + 0x20890b) = 0xffffffff;\r\n  *(undefined1 *)((longlong)param_1 + 0x1044844) = 0;\r\n  *(undefined2 *)((longlong)param_1 + 0x1184b3c) = 0;\r\n  *(undefined1 *)((longlong)param_1 + 0x1184b3e) = 0;\r\n  *(undefined1 *)((longlong)param_1 + 0x10447e1) = 1;\r\n  *(undefined4 *)(param_1 + 0x20891b) = 0;\r\n  param_1[0x230944] = 0;\r\n  param_1[0x230945] = 0;\r\n  *(undefined8 *)((longlong)param_1 + 0x1184a54) = 0x3f800000;\r\n  *(undefined8 *)((longlong)param_1 + 0x1184a5c) = 0;\r\n  *(undefined8 *)((longlong)param_1 + 0x1184a64) = 0x3f80000000000000;\r\n  *(undefined8 *)((longlong)param_1 + 0x1184a6c) = 0;\r\n  *(undefined4 *)((longlong)param_1 + 0x1184a74) = 0;\r\n  *(undefined4 *)(param_1 + 0x23094f) = 0;\r\n  *(undefined4 *)((longlong)param_1 + 0x1184a7c) = 0x3f800000;\r\n  *(undefined4 *)(param_1 + 0x230950) = 0;\r\n  *(undefined4 *)((longlong)param_1 + 0x1184a84) = 0;\r\n  *(undefined4 *)(param_1 + 0x230951) = 0;\r\n  *(undefined4 *)((longlong)param_1 + 0x1184a8c) = 0;\r\n  *(undefined4 *)(param_1 + 0x230952) = 0x3f800000;\r\n  param_1[0x230871] = 0;\r\n  *(undefined4 *)((longlong)param_1 + 0x1184a4c) = 0;\r\n  *(undefined4 *)(param_1 + 0x230967) = 0x3c888889;\r\n  FUN_1805cf3c0(param_1);\r\n  return param_1;\r\n}\r\n\r\n",
+          "limitations": []
+        },
+        "normalized_result": "\r\nundefined8 *\r\nFUN_1805ce3f0(undefined8 *param_1,undefined8 param_2,undefined8 param_3,undefined8 param_4)\r\n\r\n{\r\n  longlong *plVar1;\r\n  undefined8 uVar2;\r\n  undefined4 *puVar3;\r\n  uint uVar4;\r\n  uint uVar5;\r\n  longlong lVar6;\r\n  undefined8 *puVar7;\r\n  longlong lVar8;\r\n  \r\n  *param_1 = ftlObject::vftable;\r\n  *param_1 = rglReference_counted_object::vftable;\r\n  uVar5 = 0;\r\n  *(undefined4 *)(param_1 + 1) = 0;\r\n  param_1[2] = Game_scene_controller::vftable;\r\n  param_1[3] = 0;\r\n  FUN_1805b5d40(param_1 + 4,param_2,param_3,param_4,0xfffffffffffffffe);\r\n  param_1[0x5a8] = 0;\r\n  *param_1 = Mission::vftable;\r\n  param_1[2] = Mission::vftable;\r\n  FUN_1805d8220(param_1 + 0x5aa);\r\n  FUN_1805d8220(param_1 + 0xc5b4a);\r\n  puVar7 = param_1 + 0x18b0ea;\r\n  lVar6 = 0x7f8;\r\n  do {\r\n    FUN_1805e58e0(puVar7);\r\n    puVar7 = puVar7 + 0x46;\r\n    lVar6 = lVar6 + -1;\r\n  } while (lVar6 != 0);\r\n  puVar3 = (undefined4 *)((longlong)param_1 + 0xc5876c);\r\n  lVar6 = 0x7f8;\r\n  do {\r\n    *puVar3 = 0xffffffff;\r\n    puVar3 = puVar3 + 0x8c;\r\n    lVar6 = lVar6 + -1;\r\n  } while (lVar6 != 0);\r\n  puVar7 = param_1 + 0x1adeba;\r\n  for (lVar6 = 0x7f8; lVar6 != 0; lVar6 = lVar6 + -1) {\r\n    *(undefined2 *)puVar7 = 0xffff;\r\n    puVar7 = (undefined8 *)((longlong)puVar7 + 2);\r\n  }\r\n  param_1[0x1ae0b8] = 0;\r\n  FUN_1805d8740(param_1 + 0x1ae0b9);\r\n  FUN_1805d8740(param_1 + 0x1da7f0);\r\n  param_1[0x20771f] = 0;\r\n  param_1[0x207720] = 0;\r\n  param_1[0x207721] = 0;\r\n  *(undefined4 *)(param_1 + 0x207722) = 3;\r\n  *(undefined1 *)((longlong)param_1 + 0x103b91c) = 1;\r\n  *(undefined4 *)(param_1 + 0x207723) = 0;\r\n  param_1[0x207f1c] = 0;\r\n  param_1[0x207f1d] = 0;\r\n  param_1[0x207f1e] = 0;\r\n  *(undefined4 *)(param_1 + 0x207f1f) = 3;\r\n  *(undefined1 *)((longlong)param_1 + 0x103f904) = 1;\r\n  *(undefined4 *)(param_1 + 0x207f20) = 0;\r\n  param_1[0x208719] = 0;\r\n  param_1[0x20871a] = 0;\r\n  param_1[0x20871b] = 0;\r\n  *(undefined4 *)(param_1 + 0x20871c) = 3;\r\n  *(undefined1 *)((longlong)param_1 + 0x10438ec) = 1;\r\n  *(undefined4 *)(param_1 + 0x20871d) = 0;\r\n  param_1[0x20871f] = 0;\r\n  _Mtx_init_in_situ(param_1 + 0x208720,2);\r\n  _Mtx_init_in_situ(param_1 + 0x20872a,0x102);\r\n  LOCK();\r\n  *(undefined4 *)(param_1 + 0x208734) = 0;\r\n  UNLOCK();\r\n  uVar4 = uVar5;\r\n  do {\r\n    param_1[(longlong)(int)uVar4 + 0x208735] = 0;\r\n    LOCK();\r\n    *(undefined1 *)((longlong)param_1 + (longlong)(int)uVar4 + 0x1043da0) = 1;\r\n    UNLOCK();\r\n    uVar4 = uVar4 + 1;\r\n  } while (uVar4 < 0x7f);\r\n  LOCK();\r\n  *(undefined4 *)(param_1 + 0x2087c4) = 0;\r\n  UNLOCK();\r\n  uVar4 = uVar5;\r\n  do {\r\n    param_1[(longlong)(int)uVar4 + 0x2087c5] = 0;\r\n    LOCK();\r\n    *(undefined1 *)((longlong)param_1 + (longlong)(int)uVar4 + 0x1044220) = 1;\r\n    UNLOCK();\r\n    uVar4 = uVar4 + 1;\r\n  } while (uVar4 < 0x7f);\r\n  LOCK();\r\n  *(undefined4 *)(param_1 + 0x208854) = 0;\r\n  UNLOCK();\r\n  do {\r\n    param_1[(longlong)(int)uVar5 + 0x208855] = 0;\r\n    LOCK();\r\n    *(undefined1 *)((longlong)param_1 + (longlong)(int)uVar5 + 0x10446a0) = 1;\r\n    UNLOCK();\r\n    uVar5 = uVar5 + 1;\r\n  } while (uVar5 < 0x7f);\r\n  param_1[0x2088e5] = 0;\r\n  param_1[0x2088e6] = 0;\r\n  param_1[0x2088e7] = 0;\r\n  *(undefined4 *)(param_1 + 0x2088e8) = 3;\r\n  param_1[0x2088ea] = 0;\r\n  param_1[0x2088eb] = 0;\r\n  param_1[0x2088ec] = 0;\r\n  *(undefined4 *)(param_1 + 0x2088ed) = 3;\r\n  param_1[0x2088ee] = 0;\r\n  param_1[0x2088ef] = 0;\r\n  param_1[0x2088f0] = 0;\r\n  *(undefined4 *)(param_1 + 0x2088f1) = 3;\r\n  param_1[0x2088e9] = 0;\r\n  *(undefined4 *)(param_1 + 0x2088f2) = 0;\r\n  param_1[0x2088f3] = 0;\r\n  param_1[0x2088f4] = 0;\r\n  param_1[0x2088f5] = 0;\r\n  *(undefined4 *)(param_1 + 0x2088f6) = 3;\r\n  param_1[0x2088f8] = 0;\r\n  param_1[0x2088f9] = 0;\r\n  param_1[0x2088fa] = 0;\r\n  *(undefined4 *)(param_1 + 0x2088fb) = 3;\r\n  param_1[0x2088fd] = 0;\r\n  param_1[0x2088fe] = 0;\r\n  param_1[0x2088ff] = 0;\r\n  *(undefined4 *)(param_1 + 0x208900) = 3;\r\n  param_1[0x208901] = 0;\r\n  param_1[0x208902] = 0;\r\n  param_1[0x208903] = 0;\r\n  *(undefined4 *)(param_1 + 0x208904) = 3;\r\n  *(undefined4 *)(param_1 + 0x208907) = 1;\r\n  param_1[0x208906] = DAT_180da29b8;\r\n  param_1[0x20890c] = rglString_base::vftable;\r\n  param_1[0x20890d] = 0;\r\n  *(undefined4 *)(param_1 + 0x20890e) = 0;\r\n  param_1[0x20890c] = rglVarString::vftable;\r\n  param_1[0x20890f] = 0;\r\n  param_1[0x20890d] = 0;\r\n  *(undefined4 *)(param_1 + 0x20890e) = 0;\r\n  *(undefined8 *)((longlong)param_1 + 0x1044884) = 0;\r\n  param_1[0x208913] = 0;\r\n  *(undefined4 *)(param_1 + 0x208914) = 0;\r\n  FUN_180698980(param_1 + 0x208913,8);\r\n  *(undefined4 *)(param_1 + 0x208912) = 0;\r\n  *(undefined4 *)(param_1 + 0x208916) = 1;\r\n  uVar2 = DAT_180da29b8;\r\n  param_1[0x208915] = DAT_180da29b8;\r\n  *(undefined4 *)(param_1 + 0x208918) = 1;\r\n  param_1[0x208917] = uVar2;\r\n  *(undefined4 *)(param_1 + 0x20891a) = 1;\r\n  param_1[0x208919] = uVar2;\r\n  FUN_1805e5380((longlong)param_1 + 0x10448dc);\r\n  param_1[0x2089ca] = 0;\r\n  param_1[0x2089cb] = 0;\r\n  param_1[0x2089cc] = 0;\r\n  *(undefined4 *)(param_1 + 0x2089cd) = 3;\r\n  param_1[0x2089cf] = 0;\r\n  param_1[0x2089d0] = 0;\r\n  param_1[0x2089d1] = 0;\r\n  *(undefined4 *)(param_1 + 0x2089d2) = 3;\r\n  param_1[0x2089d3] = 0;\r\n  param_1[0x2089d4] = 0;\r\n  param_1[0x2089d5] = 0;\r\n  *(undefined4 *)(param_1 + 0x2089d6) = 3;\r\n  param_1[0x2089ce] = 0;\r\n  *(undefined4 *)(param_1 + 0x2089d7) = 0;\r\n  FUN_1805e5270(param_1 + 0x2089d9);\r\n  puVar7 = param_1 + 0x208c6d;\r\n  lVar6 = 0x400;\r\n  lVar8 = 0x400;\r\n  do {\r\n    FUN_1805e58e0(puVar7);\r\n    puVar7 = puVar7 + 0x46;\r\n    lVar8 = lVar8 + -1;\r\n  } while (lVar8 != 0);\r\n  param_1[0x21a46d] = 0;\r\n  puVar7 = param_1 + 0x21a46e;\r\n  do {\r\n    FUN_1805d8860(puVar7);\r\n    puVar7 = puVar7 + 0x59;\r\n    lVar6 = lVar6 + -1;\r\n  } while (lVar6 != 0);\r\n  param_1[0x23086e] = 0;\r\n  param_1[0x23086f] = 0;\r\n  param_1[0x230870] = 0;\r\n  *(undefined4 *)(param_1 + 0x230879) = 0x3f800000;\r\n  *(undefined8 *)((longlong)param_1 + 0x11843cc) = 0x40000000;\r\n  *(undefined4 *)((longlong)param_1 + 0x11843d4) = 3;\r\n  param_1[0x230877] = 1;\r\n  param_1[0x230876] = &DAT_180cef000;\r\n  param_1[0x230878] = 0;\r\n  *(undefined4 *)(param_1 + 0x23087a) = 0;\r\n  FUN_1805cec60(param_1 + 0x23087c);\r\n  param_1[0x23093c] = 0;\r\n  param_1[0x23093d] = 0;\r\n  param_1[0x23093e] = 0;\r\n  *(undefined4 *)(param_1 + 0x23093f) = 3;\r\n  param_1[0x230940] = 0;\r\n  param_1[0x230941] = 0;\r\n  param_1[0x230942] = 0;\r\n  *(undefined4 *)(param_1 + 0x230943) = 3;\r\n  *(undefined4 *)(param_1 + 0x230946) = 0;\r\n  param_1[0x230953] = rglString_base::vftable;\r\n  param_1[0x230954] = 0;\r\n  *(undefined4 *)(param_1 + 0x230955) = 0;\r\n  param_1[0x230953] = rglVarString::vftable;\r\n  param_1[0x230956] = 0;\r\n  param_1[0x230954] = 0;\r\n  *(undefined4 *)(param_1 + 0x230955) = 0;\r\n  param_1[0x230957] = rglString_base::vftable;\r\n  param_1[0x230958] = 0;\r\n  *(undefined4 *)(param_1 + 0x230959) = 0;\r\n  param_1[0x230957] = rglVarString::vftable;\r\n  param_1[0x23095a] = 0;\r\n  param_1[0x230958] = 0;\r\n  *(undefined4 *)(param_1 + 0x230959) = 0;\r\n  param_1[0x23095b] = 0;\r\n  param_1[0x23095c] = 0;\r\n  *(undefined4 *)(param_1 + 0x230966) = 0;\r\n  param_1[0x208905] = 0;\r\n  plVar1 = (longlong *)param_1[3];\r\n  param_1[3] = 0;\r\n  if (plVar1 != (longlong *)0x0) {\r\n    (**(code **)(*plVar1 + 0x38))();\r\n  }\r\n  param_1[0x208c6b] = 0;\r\n  param_1[0x208c6c] = 0;\r\n  *(undefined1 *)((longlong)param_1 + 0x1184a34) = 1;\r\n  *(undefined4 *)((longlong)param_1 + 0x1184a3c) = 0x3f800000;\r\n  *(undefined4 *)(param_1 + 0x230948) = 0x3f800000;\r\n  *(undefined4 *)((longlong)param_1 + 0x1184a44) = 0x3f800000;\r\n  *(undefined4 *)(param_1 + 0x230949) = 0x3f800000;\r\n  *(undefined4 *)(param_1 + 0x20890b) = 0xffffffff;\r\n  *(undefined1 *)((longlong)param_1 + 0x1044844) = 0;\r\n  *(undefined2 *)((longlong)param_1 + 0x1184b3c) = 0;\r\n  *(undefined1 *)((longlong)param_1 + 0x1184b3e) = 0;\r\n  *(undefined1 *)((longlong)param_1 + 0x10447e1) = 1;\r\n  *(undefined4 *)(param_1 + 0x20891b) = 0;\r\n  param_1[0x230944] = 0;\r\n  param_1[0x230945] = 0;\r\n  *(undefined8 *)((longlong)param_1 + 0x1184a54) = 0x3f800000;\r\n  *(undefined8 *)((longlong)param_1 + 0x1184a5c) = 0;\r\n  *(undefined8 *)((longlong)param_1 + 0x1184a64) = 0x3f80000000000000;\r\n  *(undefined8 *)((longlong)param_1 + 0x1184a6c) = 0;\r\n  *(undefined4 *)((longlong)param_1 + 0x1184a74) = 0;\r\n  *(undefined4 *)(param_1 + 0x23094f) = 0;\r\n  *(undefined4 *)((longlong)param_1 + 0x1184a7c) = 0x3f800000;\r\n  *(undefined4 *)(param_1 + 0x230950) = 0;\r\n  *(undefined4 *)((longlong)param_1 + 0x1184a84) = 0;\r\n  *(undefined4 *)(param_1 + 0x230951) = 0;\r\n  *(undefined4 *)((longlong)param_1 + 0x1184a8c) = 0;\r\n  *(undefined4 *)(param_1 + 0x230952) = 0x3f800000;\r\n  param_1[0x230871] = 0;\r\n  *(undefined4 *)((longlong)param_1 + 0x1184a4c) = 0;\r\n  *(undefined4 *)(param_1 + 0x230967) = 0x3c888889;\r\n  FUN_1805cf3c0(param_1);\r\n  return param_1;\r\n}\r\n\r\n",
+        "confidence": "observed",
+        "authority": "shipped-artifact",
+        "environment": null,
+        "limitations": [
+          "The session serves operations only after Ghidra reports default auto-analysis complete; incomplete analysis does not expose partial results.",
+          "The imported Program and temporary project are ephemeral and deleted on close. Annotation operations edit session database metadata; original executable bytes are never written.",
+          "Cancelling an active Ghidra request terminates its ephemeral database and discards session annotations. The selected target remains open; the next provider query imports the original artifact again.",
+          "Default-space addresses use lowercase 0x-prefixed hexadecimal; other address spaces use <percent-encoded-space>:0x<hex>.",
+          "Pseudocode is Ghidra decompiler output, not original source and not text-equivalent to Hopper output.",
+          "External functions and functions without an analyzable body return null; other decompiler failures remain explicit.",
+          "Windows Ghidra P0 accepts native x86 and x86-64 PE applications and DLLs, and explicitly selected raw 6502 images; managed, hostile, sensitive, and mutable-path targets are unsupported.",
+          "The Windows bridge uses authenticated IPv4 loopback because Node path-based IPC does not expose Java AF_UNIX sockets; the endpoint file contains no bearer token.",
+          "Windows sessions require the matching packaged Windows x64 native addon, local NTFS targets and runtimes, and Windows 10 or later. Native handles enforce path admission, private DACLs, and Job Object ownership automatically.",
+          "The target references PDB TaleWorlds.Native.pdb (GUID 2029ba6e-176d-498a-903c-b56d1af1370c, age (hex) 1, signature unknown, version RSDS); Ghidra reports load state unknown. Original names and types may be missing; an empty name search does not prove a procedure is absent. Use list_procedures and address-based analysis to inspect recovered functions. REA does not admit a caller-selected PDB companion."
+        ],
+        "relationship_coverage": null,
+        "locations": [],
+        "evidence_links": []
+      }
+    },
+    {
+      "responsePath": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\build\\battle-scale\\native-growth-queue\\039.response.json",
+      "responseSha256": "56f3ff11318e9db811165964a407924768cf32e2eac61d2e951816bf76f54e46",
+      "evidence": {
+        "evidence_id": "ev_af814ae656f48c15fecf9496c78df251a1e7652706a9edb73ab73428b36bc06d",
+        "subject": {
+          "name": "backup-0",
+          "digest": {
+            "sha256": "2a5e0e0b15513ebb7052d747a621b82c50ee834553eba283b33bbbc33766e12a"
+          },
+          "local_path": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\build\\battle-scale\\native-run-20261017-065749-08e99ed9\\backup-0",
+          "format": "pe",
+          "architecture": "x86_64"
+        },
+        "provider": {
+          "id": "ghidra",
+          "name": "Ghidra",
+          "version": "12.1.4"
+        },
+        "analysis_profile": {
+          "provider": {
+            "id": "ghidra",
+            "name": "Ghidra",
+            "version": "12.1.4"
+          },
+          "parameters": {
+            "target_kind": "executable",
+            "target_format": "pe",
+            "executable_role": "shared-library",
+            "managed": false,
+            "native_aot_metadata": {
+              "contract_revision": "rtr-9.1-x64-pe-read-only-v3",
+              "source_bytes": 134217728,
+              "work_units": 67108864,
+              "working_memory_bytes": 67108864,
+              "report_bytes": 4194304
+            },
+            "architecture": "x86_64",
+            "available_architectures": [
+              "x86_64"
+            ],
+            "import_mode": "ephemeral-source-immutable",
+            "pdb_observations": "program-info-v1",
+            "annotation_policy": "atomic-function-entry-metadata-v1",
+            "load_image_observations": "source-mappings-entry-context-v2",
+            "function_body_evidence": "complete-inclusive-ranges-v1",
+            "function_references": "complete-body-and-entry-reference-manager-v2",
+            "call_relationship_coverage": "function-body-call-coverage-v5",
+            "function_dossier_coverage": "observed-facets-and-call-relationships-v1",
+            "string_inventory_evidence": "defined-data-coverage-v1",
+            "location_resolution": "explicit-address-exact-entry-symbol-first-v3",
+            "procedure_file_offset_resolution": "address-first-unique-target-source-mapping-v2",
+            "instruction_flow_evidence": "decoded-return-pcode-v1",
+            "instruction_references": "exact-address-incoming-v1",
+            "function_boundary_observations": "ghidra-function-boundary-limitations-v3",
+            "no_return_repair": "disabled-windows-p0",
+            "process_launch": "official-headless-script-v1",
+            "jump_table_evidence": "typed-case-default-blocks-v1",
+            "decompiler_jump_loads": true,
+            "loader": "auto-from-header",
+            "language_id": "auto-from-header",
+            "compiler_spec_id": "auto-default",
+            "analyzer_preset": "ghidra-default"
+          },
+          "digest": "dcc676845881c04a2d22833fb35d26569462e033daee5e99a95edac5aa61ac05"
+        },
+        "predicate_type": "rea.analysis",
+        "operation": "procedure_pseudo_code",
+        "parameters": {
+          "procedure": "0x1805b5d40"
+        },
+        "raw_result": {
+          "value": "\r\n/* WARNING: Function: __security_check_cookie replaced with injection: security_check_cookie */\r\n\r\nundefined8 * FUN_1805b5d40(undefined8 *param_1)\r\n\r\n{\r\n  undefined8 uVar1;\r\n  longlong *plVar2;\r\n  longlong lVar3;\r\n  undefined8 *puVar4;\r\n  ulonglong uVar5;\r\n  uint uVar6;\r\n  undefined1 auStackY_138 [32];\r\n  longlong *local_100;\r\n  undefined8 *local_f8;\r\n  undefined8 *local_f0;\r\n  longlong *local_e8;\r\n  longlong *local_e0;\r\n  undefined8 local_d8;\r\n  undefined8 *local_d0;\r\n  undefined **local_c8;\r\n  char *local_c0;\r\n  undefined4 local_b8;\r\n  char local_b0 [136];\r\n  ulonglong local_28;\r\n  \r\n  local_d8 = 0xfffffffffffffffe;\r\n  local_28 = DAT_180cff388 ^ (ulonglong)auStackY_138;\r\n  *param_1 = rglRender_system::vftable;\r\n  uVar6 = 0;\r\n  param_1[1] = 0;\r\n  param_1[2] = 0;\r\n  param_1[3] = 0;\r\n  *(undefined4 *)(param_1 + 4) = 3;\r\n  *param_1 = Agent_renderer::vftable;\r\n  local_100 = param_1 + 0xd;\r\n  *local_100 = 0;\r\n  param_1[0xe] = 0;\r\n  param_1[0xf] = 0;\r\n  *(undefined4 *)(param_1 + 0x10) = 3;\r\n  local_d0 = param_1;\r\n  _eh_vector_constructor_iterator_(param_1 + 0x16,0x58,8,FUN_1805b82b0,FUN_180579cc0);\r\n  param_1[0x70] = 0;\r\n  param_1[0x71] = 0;\r\n  param_1[0x72] = 0;\r\n  *(undefined4 *)(param_1 + 0x73) = 3;\r\n  param_1[0x74] = 0;\r\n  param_1[0x75] = 0;\r\n  param_1[0x76] = 0;\r\n  *(undefined4 *)(param_1 + 0x77) = 3;\r\n  *(undefined4 *)(param_1 + 0x78) = 0x3ff;\r\n  *(undefined4 *)((longlong)param_1 + 0x3c4) = 0x400;\r\n  param_1[0x6e] = 0;\r\n  *(undefined4 *)(param_1 + 0x6f) = 0;\r\n  param_1[0x7b] = 0;\r\n  param_1[0x7c] = 0;\r\n  param_1[0x7d] = 0;\r\n  *(undefined4 *)(param_1 + 0x7e) = 3;\r\n  param_1[0x7f] = 0;\r\n  param_1[0x80] = 0;\r\n  param_1[0x81] = 0;\r\n  *(undefined4 *)(param_1 + 0x82) = 3;\r\n  *(undefined4 *)(param_1 + 0x83) = 0x3ff;\r\n  *(undefined4 *)((longlong)param_1 + 0x41c) = 0x400;\r\n  param_1[0x79] = 0;\r\n  *(undefined4 *)(param_1 + 0x7a) = 0;\r\n  param_1[0x84] = 0;\r\n  param_1[0x85] = 0;\r\n  param_1[0x86] = 0;\r\n  *(undefined4 *)(param_1 + 0x87) = 3;\r\n  param_1[0x88] = 0;\r\n  param_1[0x89] = 0;\r\n  param_1[0x8d] = 0;\r\n  param_1[0x8e] = 0;\r\n  param_1[0x8f] = 0;\r\n  *(undefined4 *)(param_1 + 0x90) = 3;\r\n  param_1[0x91] = 0;\r\n  param_1[0x92] = 0;\r\n  param_1[0x93] = 0;\r\n  *(undefined4 *)(param_1 + 0x94) = 3;\r\n  *(undefined4 *)(param_1 + 0x95) = 0x3ff;\r\n  *(undefined4 *)((longlong)param_1 + 0x4ac) = 0x400;\r\n  param_1[0x8b] = 0;\r\n  *(undefined4 *)(param_1 + 0x8c) = 0;\r\n  param_1[0x98] = 0;\r\n  param_1[0x99] = 0;\r\n  param_1[0x9a] = 0;\r\n  *(undefined4 *)(param_1 + 0x9b) = 3;\r\n  param_1[0x9c] = 0;\r\n  param_1[0x9d] = 0;\r\n  param_1[0x9e] = 0;\r\n  *(undefined4 *)(param_1 + 0x9f) = 3;\r\n  *(undefined4 *)(param_1 + 0xa0) = 0x3ff;\r\n  *(undefined4 *)((longlong)param_1 + 0x504) = 0x400;\r\n  param_1[0x96] = 0;\r\n  *(undefined4 *)(param_1 + 0x97) = 0;\r\n  param_1[0xa3] = 0;\r\n  param_1[0xa4] = 0;\r\n  param_1[0xa5] = 0;\r\n  *(undefined4 *)(param_1 + 0xa6) = 3;\r\n  param_1[0xa7] = 0;\r\n  param_1[0xa8] = 0;\r\n  param_1[0xa9] = 0;\r\n  *(undefined4 *)(param_1 + 0xaa) = 3;\r\n  *(undefined4 *)(param_1 + 0xab) = 0x3ff;\r\n  *(undefined4 *)((longlong)param_1 + 0x55c) = 0x400;\r\n  param_1[0xa1] = 0;\r\n  *(undefined4 *)(param_1 + 0xa2) = 0;\r\n  param_1[0xae] = 0;\r\n  param_1[0xaf] = 0;\r\n  param_1[0xb0] = 0;\r\n  *(undefined4 *)(param_1 + 0xb1) = 3;\r\n  param_1[0xb2] = 0;\r\n  param_1[0xb3] = 0;\r\n  param_1[0xb4] = 0;\r\n  *(undefined4 *)(param_1 + 0xb5) = 3;\r\n  *(undefined4 *)(param_1 + 0xb6) = 0x3ff;\r\n  *(undefined4 *)((longlong)param_1 + 0x5b4) = 0x400;\r\n  param_1[0xac] = 0;\r\n  *(undefined4 *)(param_1 + 0xad) = 0;\r\n  param_1[0xb9] = 0;\r\n  param_1[0xba] = 0;\r\n  param_1[0xbb] = 0;\r\n  *(undefined4 *)(param_1 + 0xbc) = 3;\r\n  param_1[0xbd] = 0;\r\n  param_1[0xbe] = 0;\r\n  param_1[0xbf] = 0;\r\n  *(undefined4 *)(param_1 + 0xc0) = 3;\r\n  *(undefined4 *)(param_1 + 0xc1) = 0x3ff;\r\n  *(undefined4 *)((longlong)param_1 + 0x60c) = 0x400;\r\n  param_1[0xb7] = 0;\r\n  *(undefined4 *)(param_1 + 0xb8) = 0;\r\n  param_1[0xc4] = 0;\r\n  param_1[0xc5] = 0;\r\n  param_1[0xc6] = 0;\r\n  *(undefined4 *)(param_1 + 199) = 3;\r\n  param_1[200] = 0;\r\n  param_1[0xc9] = 0;\r\n  param_1[0xca] = 0;\r\n  *(undefined4 *)(param_1 + 0xcb) = 3;\r\n  *(undefined4 *)(param_1 + 0xcc) = 0x3ff;\r\n  *(undefined4 *)((longlong)param_1 + 0x664) = 0x400;\r\n  param_1[0xc2] = 0;\r\n  *(undefined4 *)(param_1 + 0xc3) = 0;\r\n  local_100 = param_1 + 0xcd;\r\n  param_1[0xcf] = 0;\r\n  param_1[0xd0] = 0;\r\n  param_1[0xd1] = 0;\r\n  *(undefined4 *)(param_1 + 0xd2) = 3;\r\n  param_1[0xd3] = 0;\r\n  param_1[0xd4] = 0;\r\n  param_1[0xd5] = 0;\r\n  *(undefined4 *)(param_1 + 0xd6) = 3;\r\n  *(undefined4 *)(param_1 + 0xd7) = 0x3ff;\r\n  *(undefined4 *)((longlong)param_1 + 0x6bc) = 0x400;\r\n  *local_100 = 0;\r\n  *(undefined4 *)(param_1 + 0xce) = 0;\r\n  LOCK();\r\n  *(undefined4 *)(param_1 + 0xd8) = 0;\r\n  UNLOCK();\r\n  do {\r\n    param_1[(longlong)(int)uVar6 + 0xd9] = 0;\r\n    LOCK();\r\n    *(undefined1 *)((longlong)param_1 + (longlong)(int)uVar6 + 0x26c8) = 1;\r\n    UNLOCK();\r\n    uVar6 = uVar6 + 1;\r\n  } while (uVar6 < 0x400);\r\n  local_f0 = param_1 + 0x559;\r\n  param_1[0x55b] = 0;\r\n  param_1[0x55c] = 0;\r\n  param_1[0x55d] = 0;\r\n  *(undefined4 *)(param_1 + 0x55e) = 3;\r\n  param_1[0x55f] = 0;\r\n  param_1[0x560] = 0;\r\n  param_1[0x561] = 0;\r\n  *(undefined4 *)(param_1 + 0x562) = 3;\r\n  *(undefined4 *)(param_1 + 0x563) = 0x3ff;\r\n  *(undefined4 *)((longlong)param_1 + 0x2b1c) = 0x400;\r\n  *local_f0 = 0;\r\n  *(undefined4 *)(param_1 + 0x55a) = 0;\r\n  *(undefined4 *)(param_1 + 0x568) = 0x3f800000;\r\n  *(undefined8 *)((longlong)param_1 + 0x2b44) = 0x40000000;\r\n  *(undefined4 *)((longlong)param_1 + 0x2b4c) = 3;\r\n  param_1[0x566] = 1;\r\n  param_1[0x565] = &DAT_180cef000;\r\n  param_1[0x567] = 0;\r\n  *(undefined4 *)(param_1 + 0x569) = 0;\r\n  puVar4 = param_1 + 0x56b;\r\n  param_1[0x56e] = 0;\r\n  *(undefined4 *)(param_1 + 0x570) = 3;\r\n  *puVar4 = puVar4;\r\n  param_1[0x56c] = puVar4;\r\n  param_1[0x56d] = 0;\r\n  *(undefined1 *)(param_1 + 0x56e) = 0;\r\n  param_1[0x56f] = 0;\r\n  puVar4 = param_1 + 0x571;\r\n  param_1[0x574] = 0;\r\n  *(undefined4 *)(param_1 + 0x576) = 3;\r\n  *puVar4 = puVar4;\r\n  param_1[0x572] = puVar4;\r\n  param_1[0x573] = 0;\r\n  *(undefined1 *)(param_1 + 0x574) = 0;\r\n  param_1[0x575] = 0;\r\n  puVar4 = param_1 + 0x577;\r\n  param_1[0x57a] = 0;\r\n  *(undefined4 *)(param_1 + 0x57c) = 3;\r\n  *puVar4 = puVar4;\r\n  param_1[0x578] = puVar4;\r\n  param_1[0x579] = 0;\r\n  *(undefined1 *)(param_1 + 0x57a) = 0;\r\n  param_1[0x57b] = 0;\r\n  local_f8 = param_1 + 0x57d;\r\n  _Mtx_init_in_situ(local_f8,2);\r\n  param_1[0x589] = 0;\r\n  param_1[0x58a] = 0;\r\n  param_1[0x58b] = 0;\r\n  *(undefined4 *)(param_1 + 0x58c) = 3;\r\n  param_1[0x58d] = 0;\r\n  param_1[0x58e] = 0;\r\n  param_1[0x58f] = 0;\r\n  *(undefined4 *)(param_1 + 0x590) = 3;\r\n  *(undefined4 *)(param_1 + 0x591) = 0x3ff;\r\n  *(undefined4 *)((longlong)param_1 + 0x2c8c) = 0x400;\r\n  param_1[0x587] = 0;\r\n  *(undefined4 *)(param_1 + 0x588) = 0;\r\n  *(undefined4 *)(param_1 + 0x596) = 0x3f800000;\r\n  *(undefined8 *)((longlong)param_1 + 0x2cb4) = 0x40000000;\r\n  *(undefined4 *)((longlong)param_1 + 0x2cbc) = 3;\r\n  param_1[0x594] = 1;\r\n  param_1[0x593] = &DAT_180cef000;\r\n  param_1[0x595] = 0;\r\n  *(undefined4 *)(param_1 + 0x597) = 0;\r\n  local_f8 = param_1 + 0x598;\r\n  param_1[0x59a] = 0;\r\n  param_1[0x59b] = 0;\r\n  param_1[0x59c] = 0;\r\n  *(undefined4 *)(param_1 + 0x59d) = 3;\r\n  local_f0 = param_1 + 0x59e;\r\n  *local_f0 = 0;\r\n  param_1[0x59f] = 0;\r\n  param_1[0x5a0] = 0;\r\n  *(undefined4 *)(param_1 + 0x5a1) = 3;\r\n  *(undefined4 *)(param_1 + 0x5a2) = 0x3ff;\r\n  *(undefined4 *)((longlong)param_1 + 0x2d14) = 0x400;\r\n  *local_f8 = 0;\r\n  *(undefined4 *)(param_1 + 0x599) = 0;\r\n  *(undefined4 *)((longlong)param_1 + 0x2d1c) = 0;\r\n  puVar4 = (undefined8 *)FUN_18009f840(local_f8,&local_e0,\"human_lod_4\");\r\n  uVar1 = *puVar4;\r\n  *puVar4 = 0;\r\n  local_e8 = (longlong *)param_1[0x88];\r\n  param_1[0x88] = uVar1;\r\n  if (local_e8 != (longlong *)0x0) {\r\n    (**(code **)(*local_e8 + 0x38))();\r\n  }\r\n  if (local_e0 != (longlong *)0x0) {\r\n    (**(code **)(*local_e0 + 0x38))();\r\n  }\r\n  puVar4 = (undefined8 *)FUN_18007e7d0(param_1[0x88],&local_100);\r\n  uVar1 = *puVar4;\r\n  *puVar4 = 0;\r\n  plVar2 = (longlong *)param_1[0x89];\r\n  param_1[0x89] = uVar1;\r\n  if (plVar2 != (longlong *)0x0) {\r\n    (**(code **)(*plVar2 + 0x38))();\r\n  }\r\n  if (local_100 != (longlong *)0x0) {\r\n    (**(code **)(*local_100 + 0x38))();\r\n  }\r\n  lVar3 = *(longlong *)(param_1[0x89] + 0x1b8);\r\n  local_c8 = rglConstString<128>::vftable;\r\n  local_c0 = local_b0;\r\n  local_b0[0] = '\\0';\r\n  local_b8 = 0x25;\r\n  strcpy_s(local_b0,0x80,\"use_double_colormap_with_mask_texture\");\r\n  uVar5 = FUN_18027fb60(*(undefined8 *)(lVar3 + 0x1e8),&local_c8,1);\r\n  *(ulonglong *)(lVar3 + 0x140) = *(ulonglong *)(lVar3 + 0x140) | uVar5;\r\n  FUN_18026c990(lVar3);\r\n  *(undefined2 *)(lVar3 + 0x3c9) = 0xffff;\r\n  local_c8 = rglString_base::vftable;\r\n  *(undefined1 *)((longlong)param_1 + 0xac) = 0;\r\n  *(undefined2 *)(param_1 + 0x56a) = 0x100;\r\n  FUN_1805b64e0(param_1);\r\n  return param_1;\r\n}\r\n\r\n",
+          "limitations": []
+        },
+        "normalized_result": "\r\n/* WARNING: Function: __security_check_cookie replaced with injection: security_check_cookie */\r\n\r\nundefined8 * FUN_1805b5d40(undefined8 *param_1)\r\n\r\n{\r\n  undefined8 uVar1;\r\n  longlong *plVar2;\r\n  longlong lVar3;\r\n  undefined8 *puVar4;\r\n  ulonglong uVar5;\r\n  uint uVar6;\r\n  undefined1 auStackY_138 [32];\r\n  longlong *local_100;\r\n  undefined8 *local_f8;\r\n  undefined8 *local_f0;\r\n  longlong *local_e8;\r\n  longlong *local_e0;\r\n  undefined8 local_d8;\r\n  undefined8 *local_d0;\r\n  undefined **local_c8;\r\n  char *local_c0;\r\n  undefined4 local_b8;\r\n  char local_b0 [136];\r\n  ulonglong local_28;\r\n  \r\n  local_d8 = 0xfffffffffffffffe;\r\n  local_28 = DAT_180cff388 ^ (ulonglong)auStackY_138;\r\n  *param_1 = rglRender_system::vftable;\r\n  uVar6 = 0;\r\n  param_1[1] = 0;\r\n  param_1[2] = 0;\r\n  param_1[3] = 0;\r\n  *(undefined4 *)(param_1 + 4) = 3;\r\n  *param_1 = Agent_renderer::vftable;\r\n  local_100 = param_1 + 0xd;\r\n  *local_100 = 0;\r\n  param_1[0xe] = 0;\r\n  param_1[0xf] = 0;\r\n  *(undefined4 *)(param_1 + 0x10) = 3;\r\n  local_d0 = param_1;\r\n  _eh_vector_constructor_iterator_(param_1 + 0x16,0x58,8,FUN_1805b82b0,FUN_180579cc0);\r\n  param_1[0x70] = 0;\r\n  param_1[0x71] = 0;\r\n  param_1[0x72] = 0;\r\n  *(undefined4 *)(param_1 + 0x73) = 3;\r\n  param_1[0x74] = 0;\r\n  param_1[0x75] = 0;\r\n  param_1[0x76] = 0;\r\n  *(undefined4 *)(param_1 + 0x77) = 3;\r\n  *(undefined4 *)(param_1 + 0x78) = 0x3ff;\r\n  *(undefined4 *)((longlong)param_1 + 0x3c4) = 0x400;\r\n  param_1[0x6e] = 0;\r\n  *(undefined4 *)(param_1 + 0x6f) = 0;\r\n  param_1[0x7b] = 0;\r\n  param_1[0x7c] = 0;\r\n  param_1[0x7d] = 0;\r\n  *(undefined4 *)(param_1 + 0x7e) = 3;\r\n  param_1[0x7f] = 0;\r\n  param_1[0x80] = 0;\r\n  param_1[0x81] = 0;\r\n  *(undefined4 *)(param_1 + 0x82) = 3;\r\n  *(undefined4 *)(param_1 + 0x83) = 0x3ff;\r\n  *(undefined4 *)((longlong)param_1 + 0x41c) = 0x400;\r\n  param_1[0x79] = 0;\r\n  *(undefined4 *)(param_1 + 0x7a) = 0;\r\n  param_1[0x84] = 0;\r\n  param_1[0x85] = 0;\r\n  param_1[0x86] = 0;\r\n  *(undefined4 *)(param_1 + 0x87) = 3;\r\n  param_1[0x88] = 0;\r\n  param_1[0x89] = 0;\r\n  param_1[0x8d] = 0;\r\n  param_1[0x8e] = 0;\r\n  param_1[0x8f] = 0;\r\n  *(undefined4 *)(param_1 + 0x90) = 3;\r\n  param_1[0x91] = 0;\r\n  param_1[0x92] = 0;\r\n  param_1[0x93] = 0;\r\n  *(undefined4 *)(param_1 + 0x94) = 3;\r\n  *(undefined4 *)(param_1 + 0x95) = 0x3ff;\r\n  *(undefined4 *)((longlong)param_1 + 0x4ac) = 0x400;\r\n  param_1[0x8b] = 0;\r\n  *(undefined4 *)(param_1 + 0x8c) = 0;\r\n  param_1[0x98] = 0;\r\n  param_1[0x99] = 0;\r\n  param_1[0x9a] = 0;\r\n  *(undefined4 *)(param_1 + 0x9b) = 3;\r\n  param_1[0x9c] = 0;\r\n  param_1[0x9d] = 0;\r\n  param_1[0x9e] = 0;\r\n  *(undefined4 *)(param_1 + 0x9f) = 3;\r\n  *(undefined4 *)(param_1 + 0xa0) = 0x3ff;\r\n  *(undefined4 *)((longlong)param_1 + 0x504) = 0x400;\r\n  param_1[0x96] = 0;\r\n  *(undefined4 *)(param_1 + 0x97) = 0;\r\n  param_1[0xa3] = 0;\r\n  param_1[0xa4] = 0;\r\n  param_1[0xa5] = 0;\r\n  *(undefined4 *)(param_1 + 0xa6) = 3;\r\n  param_1[0xa7] = 0;\r\n  param_1[0xa8] = 0;\r\n  param_1[0xa9] = 0;\r\n  *(undefined4 *)(param_1 + 0xaa) = 3;\r\n  *(undefined4 *)(param_1 + 0xab) = 0x3ff;\r\n  *(undefined4 *)((longlong)param_1 + 0x55c) = 0x400;\r\n  param_1[0xa1] = 0;\r\n  *(undefined4 *)(param_1 + 0xa2) = 0;\r\n  param_1[0xae] = 0;\r\n  param_1[0xaf] = 0;\r\n  param_1[0xb0] = 0;\r\n  *(undefined4 *)(param_1 + 0xb1) = 3;\r\n  param_1[0xb2] = 0;\r\n  param_1[0xb3] = 0;\r\n  param_1[0xb4] = 0;\r\n  *(undefined4 *)(param_1 + 0xb5) = 3;\r\n  *(undefined4 *)(param_1 + 0xb6) = 0x3ff;\r\n  *(undefined4 *)((longlong)param_1 + 0x5b4) = 0x400;\r\n  param_1[0xac] = 0;\r\n  *(undefined4 *)(param_1 + 0xad) = 0;\r\n  param_1[0xb9] = 0;\r\n  param_1[0xba] = 0;\r\n  param_1[0xbb] = 0;\r\n  *(undefined4 *)(param_1 + 0xbc) = 3;\r\n  param_1[0xbd] = 0;\r\n  param_1[0xbe] = 0;\r\n  param_1[0xbf] = 0;\r\n  *(undefined4 *)(param_1 + 0xc0) = 3;\r\n  *(undefined4 *)(param_1 + 0xc1) = 0x3ff;\r\n  *(undefined4 *)((longlong)param_1 + 0x60c) = 0x400;\r\n  param_1[0xb7] = 0;\r\n  *(undefined4 *)(param_1 + 0xb8) = 0;\r\n  param_1[0xc4] = 0;\r\n  param_1[0xc5] = 0;\r\n  param_1[0xc6] = 0;\r\n  *(undefined4 *)(param_1 + 199) = 3;\r\n  param_1[200] = 0;\r\n  param_1[0xc9] = 0;\r\n  param_1[0xca] = 0;\r\n  *(undefined4 *)(param_1 + 0xcb) = 3;\r\n  *(undefined4 *)(param_1 + 0xcc) = 0x3ff;\r\n  *(undefined4 *)((longlong)param_1 + 0x664) = 0x400;\r\n  param_1[0xc2] = 0;\r\n  *(undefined4 *)(param_1 + 0xc3) = 0;\r\n  local_100 = param_1 + 0xcd;\r\n  param_1[0xcf] = 0;\r\n  param_1[0xd0] = 0;\r\n  param_1[0xd1] = 0;\r\n  *(undefined4 *)(param_1 + 0xd2) = 3;\r\n  param_1[0xd3] = 0;\r\n  param_1[0xd4] = 0;\r\n  param_1[0xd5] = 0;\r\n  *(undefined4 *)(param_1 + 0xd6) = 3;\r\n  *(undefined4 *)(param_1 + 0xd7) = 0x3ff;\r\n  *(undefined4 *)((longlong)param_1 + 0x6bc) = 0x400;\r\n  *local_100 = 0;\r\n  *(undefined4 *)(param_1 + 0xce) = 0;\r\n  LOCK();\r\n  *(undefined4 *)(param_1 + 0xd8) = 0;\r\n  UNLOCK();\r\n  do {\r\n    param_1[(longlong)(int)uVar6 + 0xd9] = 0;\r\n    LOCK();\r\n    *(undefined1 *)((longlong)param_1 + (longlong)(int)uVar6 + 0x26c8) = 1;\r\n    UNLOCK();\r\n    uVar6 = uVar6 + 1;\r\n  } while (uVar6 < 0x400);\r\n  local_f0 = param_1 + 0x559;\r\n  param_1[0x55b] = 0;\r\n  param_1[0x55c] = 0;\r\n  param_1[0x55d] = 0;\r\n  *(undefined4 *)(param_1 + 0x55e) = 3;\r\n  param_1[0x55f] = 0;\r\n  param_1[0x560] = 0;\r\n  param_1[0x561] = 0;\r\n  *(undefined4 *)(param_1 + 0x562) = 3;\r\n  *(undefined4 *)(param_1 + 0x563) = 0x3ff;\r\n  *(undefined4 *)((longlong)param_1 + 0x2b1c) = 0x400;\r\n  *local_f0 = 0;\r\n  *(undefined4 *)(param_1 + 0x55a) = 0;\r\n  *(undefined4 *)(param_1 + 0x568) = 0x3f800000;\r\n  *(undefined8 *)((longlong)param_1 + 0x2b44) = 0x40000000;\r\n  *(undefined4 *)((longlong)param_1 + 0x2b4c) = 3;\r\n  param_1[0x566] = 1;\r\n  param_1[0x565] = &DAT_180cef000;\r\n  param_1[0x567] = 0;\r\n  *(undefined4 *)(param_1 + 0x569) = 0;\r\n  puVar4 = param_1 + 0x56b;\r\n  param_1[0x56e] = 0;\r\n  *(undefined4 *)(param_1 + 0x570) = 3;\r\n  *puVar4 = puVar4;\r\n  param_1[0x56c] = puVar4;\r\n  param_1[0x56d] = 0;\r\n  *(undefined1 *)(param_1 + 0x56e) = 0;\r\n  param_1[0x56f] = 0;\r\n  puVar4 = param_1 + 0x571;\r\n  param_1[0x574] = 0;\r\n  *(undefined4 *)(param_1 + 0x576) = 3;\r\n  *puVar4 = puVar4;\r\n  param_1[0x572] = puVar4;\r\n  param_1[0x573] = 0;\r\n  *(undefined1 *)(param_1 + 0x574) = 0;\r\n  param_1[0x575] = 0;\r\n  puVar4 = param_1 + 0x577;\r\n  param_1[0x57a] = 0;\r\n  *(undefined4 *)(param_1 + 0x57c) = 3;\r\n  *puVar4 = puVar4;\r\n  param_1[0x578] = puVar4;\r\n  param_1[0x579] = 0;\r\n  *(undefined1 *)(param_1 + 0x57a) = 0;\r\n  param_1[0x57b] = 0;\r\n  local_f8 = param_1 + 0x57d;\r\n  _Mtx_init_in_situ(local_f8,2);\r\n  param_1[0x589] = 0;\r\n  param_1[0x58a] = 0;\r\n  param_1[0x58b] = 0;\r\n  *(undefined4 *)(param_1 + 0x58c) = 3;\r\n  param_1[0x58d] = 0;\r\n  param_1[0x58e] = 0;\r\n  param_1[0x58f] = 0;\r\n  *(undefined4 *)(param_1 + 0x590) = 3;\r\n  *(undefined4 *)(param_1 + 0x591) = 0x3ff;\r\n  *(undefined4 *)((longlong)param_1 + 0x2c8c) = 0x400;\r\n  param_1[0x587] = 0;\r\n  *(undefined4 *)(param_1 + 0x588) = 0;\r\n  *(undefined4 *)(param_1 + 0x596) = 0x3f800000;\r\n  *(undefined8 *)((longlong)param_1 + 0x2cb4) = 0x40000000;\r\n  *(undefined4 *)((longlong)param_1 + 0x2cbc) = 3;\r\n  param_1[0x594] = 1;\r\n  param_1[0x593] = &DAT_180cef000;\r\n  param_1[0x595] = 0;\r\n  *(undefined4 *)(param_1 + 0x597) = 0;\r\n  local_f8 = param_1 + 0x598;\r\n  param_1[0x59a] = 0;\r\n  param_1[0x59b] = 0;\r\n  param_1[0x59c] = 0;\r\n  *(undefined4 *)(param_1 + 0x59d) = 3;\r\n  local_f0 = param_1 + 0x59e;\r\n  *local_f0 = 0;\r\n  param_1[0x59f] = 0;\r\n  param_1[0x5a0] = 0;\r\n  *(undefined4 *)(param_1 + 0x5a1) = 3;\r\n  *(undefined4 *)(param_1 + 0x5a2) = 0x3ff;\r\n  *(undefined4 *)((longlong)param_1 + 0x2d14) = 0x400;\r\n  *local_f8 = 0;\r\n  *(undefined4 *)(param_1 + 0x599) = 0;\r\n  *(undefined4 *)((longlong)param_1 + 0x2d1c) = 0;\r\n  puVar4 = (undefined8 *)FUN_18009f840(local_f8,&local_e0,\"human_lod_4\");\r\n  uVar1 = *puVar4;\r\n  *puVar4 = 0;\r\n  local_e8 = (longlong *)param_1[0x88];\r\n  param_1[0x88] = uVar1;\r\n  if (local_e8 != (longlong *)0x0) {\r\n    (**(code **)(*local_e8 + 0x38))();\r\n  }\r\n  if (local_e0 != (longlong *)0x0) {\r\n    (**(code **)(*local_e0 + 0x38))();\r\n  }\r\n  puVar4 = (undefined8 *)FUN_18007e7d0(param_1[0x88],&local_100);\r\n  uVar1 = *puVar4;\r\n  *puVar4 = 0;\r\n  plVar2 = (longlong *)param_1[0x89];\r\n  param_1[0x89] = uVar1;\r\n  if (plVar2 != (longlong *)0x0) {\r\n    (**(code **)(*plVar2 + 0x38))();\r\n  }\r\n  if (local_100 != (longlong *)0x0) {\r\n    (**(code **)(*local_100 + 0x38))();\r\n  }\r\n  lVar3 = *(longlong *)(param_1[0x89] + 0x1b8);\r\n  local_c8 = rglConstString<128>::vftable;\r\n  local_c0 = local_b0;\r\n  local_b0[0] = '\\0';\r\n  local_b8 = 0x25;\r\n  strcpy_s(local_b0,0x80,\"use_double_colormap_with_mask_texture\");\r\n  uVar5 = FUN_18027fb60(*(undefined8 *)(lVar3 + 0x1e8),&local_c8,1);\r\n  *(ulonglong *)(lVar3 + 0x140) = *(ulonglong *)(lVar3 + 0x140) | uVar5;\r\n  FUN_18026c990(lVar3);\r\n  *(undefined2 *)(lVar3 + 0x3c9) = 0xffff;\r\n  local_c8 = rglString_base::vftable;\r\n  *(undefined1 *)((longlong)param_1 + 0xac) = 0;\r\n  *(undefined2 *)(param_1 + 0x56a) = 0x100;\r\n  FUN_1805b64e0(param_1);\r\n  return param_1;\r\n}\r\n\r\n",
+        "confidence": "observed",
+        "authority": "shipped-artifact",
+        "environment": null,
+        "limitations": [
+          "The session serves operations only after Ghidra reports default auto-analysis complete; incomplete analysis does not expose partial results.",
+          "The imported Program and temporary project are ephemeral and deleted on close. Annotation operations edit session database metadata; original executable bytes are never written.",
+          "Cancelling an active Ghidra request terminates its ephemeral database and discards session annotations. The selected target remains open; the next provider query imports the original artifact again.",
+          "Default-space addresses use lowercase 0x-prefixed hexadecimal; other address spaces use <percent-encoded-space>:0x<hex>.",
+          "Pseudocode is Ghidra decompiler output, not original source and not text-equivalent to Hopper output.",
+          "External functions and functions without an analyzable body return null; other decompiler failures remain explicit.",
+          "Windows Ghidra P0 accepts native x86 and x86-64 PE applications and DLLs, and explicitly selected raw 6502 images; managed, hostile, sensitive, and mutable-path targets are unsupported.",
+          "The Windows bridge uses authenticated IPv4 loopback because Node path-based IPC does not expose Java AF_UNIX sockets; the endpoint file contains no bearer token.",
+          "Windows sessions require the matching packaged Windows x64 native addon, local NTFS targets and runtimes, and Windows 10 or later. Native handles enforce path admission, private DACLs, and Job Object ownership automatically.",
+          "The target references PDB TaleWorlds.Native.pdb (GUID 2029ba6e-176d-498a-903c-b56d1af1370c, age (hex) 1, signature unknown, version RSDS); Ghidra reports load state unknown. Original names and types may be missing; an empty name search does not prove a procedure is absent. Use list_procedures and address-based analysis to inspect recovered functions. REA does not admit a caller-selected PDB companion."
+        ],
+        "relationship_coverage": null,
+        "locations": [],
+        "evidence_links": []
+      }
+    },
+    {
+      "responsePath": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\build\\battle-scale\\native-growth-queue\\040.response.json",
+      "responseSha256": "7ba3286718cfe73707a4a9473dc60ef74becb18fabf49131d885ef81699cb147",
+      "evidence": {
+        "evidence_id": "ev_383d02098124b7ddd9e044160957c6add7d33e69ec00957dc1855e2a7af4c707",
+        "subject": {
+          "name": "backup-0",
+          "digest": {
+            "sha256": "2a5e0e0b15513ebb7052d747a621b82c50ee834553eba283b33bbbc33766e12a"
+          },
+          "local_path": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\build\\battle-scale\\native-run-20261017-065749-08e99ed9\\backup-0",
+          "format": "pe",
+          "architecture": "x86_64"
+        },
+        "provider": {
+          "id": "ghidra",
+          "name": "Ghidra",
+          "version": "12.1.4"
+        },
+        "analysis_profile": {
+          "provider": {
+            "id": "ghidra",
+            "name": "Ghidra",
+            "version": "12.1.4"
+          },
+          "parameters": {
+            "target_kind": "executable",
+            "target_format": "pe",
+            "executable_role": "shared-library",
+            "managed": false,
+            "native_aot_metadata": {
+              "contract_revision": "rtr-9.1-x64-pe-read-only-v3",
+              "source_bytes": 134217728,
+              "work_units": 67108864,
+              "working_memory_bytes": 67108864,
+              "report_bytes": 4194304
+            },
+            "architecture": "x86_64",
+            "available_architectures": [
+              "x86_64"
+            ],
+            "import_mode": "ephemeral-source-immutable",
+            "pdb_observations": "program-info-v1",
+            "annotation_policy": "atomic-function-entry-metadata-v1",
+            "load_image_observations": "source-mappings-entry-context-v2",
+            "function_body_evidence": "complete-inclusive-ranges-v1",
+            "function_references": "complete-body-and-entry-reference-manager-v2",
+            "call_relationship_coverage": "function-body-call-coverage-v5",
+            "function_dossier_coverage": "observed-facets-and-call-relationships-v1",
+            "string_inventory_evidence": "defined-data-coverage-v1",
+            "location_resolution": "explicit-address-exact-entry-symbol-first-v3",
+            "procedure_file_offset_resolution": "address-first-unique-target-source-mapping-v2",
+            "instruction_flow_evidence": "decoded-return-pcode-v1",
+            "instruction_references": "exact-address-incoming-v1",
+            "function_boundary_observations": "ghidra-function-boundary-limitations-v3",
+            "no_return_repair": "disabled-windows-p0",
+            "process_launch": "official-headless-script-v1",
+            "jump_table_evidence": "typed-case-default-blocks-v1",
+            "decompiler_jump_loads": true,
+            "loader": "auto-from-header",
+            "language_id": "auto-from-header",
+            "compiler_spec_id": "auto-default",
+            "analyzer_preset": "ghidra-default"
+          },
+          "digest": "dcc676845881c04a2d22833fb35d26569462e033daee5e99a95edac5aa61ac05"
+        },
+        "predicate_type": "rea.analysis",
+        "operation": "procedure_pseudo_code",
+        "parameters": {
+          "procedure": "0x1805ccb90"
+        },
+        "raw_result": {
+          "value": "\r\nvoid FUN_1805ccb90(longlong param_1,char param_2)\r\n\r\n{\r\n  short sVar1;\r\n  uint uVar2;\r\n  int iVar3;\r\n  short *psVar4;\r\n  int *piVar5;\r\n  ulonglong uVar6;\r\n  longlong lVar7;\r\n  ulonglong uVar8;\r\n  longlong lVar9;\r\n  ulonglong uVar10;\r\n  \r\n  uVar8 = 0;\r\n  if (param_2 == '\\0') {\r\n    uVar2 = *(uint *)(param_1 + 0x62da44);\r\n    if (0 < (int)uVar2) {\r\n      piVar5 = (int *)(param_1 + 0x2d60);\r\n      uVar6 = uVar8;\r\n      uVar10 = uVar8;\r\n      do {\r\n        if (-1 < *piVar5) goto LAB_1805ccbe9;\r\n        uVar10 = (ulonglong)((int)uVar10 + 1);\r\n        uVar6 = uVar6 + 1;\r\n        piVar5 = piVar5 + 0x318;\r\n      } while ((longlong)uVar6 < (longlong)(int)uVar2);\r\n    }\r\n    uVar10 = (ulonglong)uVar2;\r\nLAB_1805ccbe9:\r\n    if ((int)uVar10 < *(int *)(param_1 + 0x62da44)) {\r\n      do {\r\n        lVar9 = (longlong)(int)uVar10;\r\n        lVar7 = param_1 + 0x2d50 + lVar9 * 0xc60;\r\n        if ((*(int *)(lVar7 + 0x560) - 3U < 2) && (*(char *)(lVar7 + 0xc50) == '\\0')) {\r\n          FUN_1805fe9f0(lVar7,param_1 + 0x10438f8,0xffffffff);\r\n        }\r\n        sVar1 = *(short *)(param_1 + 0x62ca50 + lVar9 * 2);\r\n        psVar4 = (short *)(param_1 + 0x62ca50 + lVar9 * 2);\r\n        if (sVar1 == -1) {\r\n          for (; (lVar9 < *(int *)(param_1 + 0x62da44) && (*psVar4 == -1)); psVar4 = psVar4 + 1) {\r\n            uVar10 = (ulonglong)((int)uVar10 + 1);\r\n            lVar9 = lVar9 + 1;\r\n          }\r\n        }\r\n        else {\r\n          uVar10 = (ulonglong)(uint)(int)sVar1;\r\n        }\r\n      } while ((int)uVar10 < *(int *)(param_1 + 0x62da44));\r\n    }\r\n  }\r\n  uVar2 = *(uint *)(param_1 + 0x62da44);\r\n  if (0 < (int)uVar2) {\r\n    piVar5 = (int *)(param_1 + 0x2d60);\r\n    uVar10 = uVar8;\r\n    do {\r\n      if (-1 < *piVar5) goto LAB_1805ccca8;\r\n      uVar10 = (ulonglong)((int)uVar10 + 1);\r\n      uVar8 = uVar8 + 1;\r\n      piVar5 = piVar5 + 0x318;\r\n    } while ((longlong)uVar8 < (longlong)(int)uVar2);\r\n  }\r\n  uVar10 = (ulonglong)uVar2;\r\nLAB_1805ccca8:\r\n  if ((int)uVar10 < *(int *)(param_1 + 0x62da44)) {\r\n    do {\r\n      lVar9 = (longlong)(int)uVar10;\r\n      FUN_1805fe5b0(param_1 + 0x2d50 + lVar9 * 0xc60,param_2,param_1 + 0x10438f8);\r\n      sVar1 = *(short *)(param_1 + 0x62ca50 + lVar9 * 2);\r\n      psVar4 = (short *)(param_1 + 0x62ca50 + lVar9 * 2);\r\n      if (sVar1 == -1) {\r\n        for (; (lVar9 < *(int *)(param_1 + 0x62da44) && (*psVar4 == -1)); psVar4 = psVar4 + 1) {\r\n          uVar10 = (ulonglong)((int)uVar10 + 1);\r\n          lVar9 = lVar9 + 1;\r\n        }\r\n      }\r\n      else {\r\n        uVar10 = (ulonglong)(uint)(int)sVar1;\r\n      }\r\n    } while ((int)uVar10 < *(int *)(param_1 + 0x62da44));\r\n  }\r\n  iVar3 = (int)((*(longlong *)(param_1 + 0x1044e58) - *(longlong *)(param_1 + 0x1044e50)) / 0x38);\r\n  while (iVar3 = iVar3 + -1, -1 < iVar3) {\r\n    FUN_1805d37b0(param_1,iVar3,0);\r\n  }\r\n  if ((*(longlong *)(param_1 + 0x18) != 0) &&\r\n     (*(longlong *)(*(longlong *)(*(longlong *)(param_1 + 0x18) + 0x688) + 0x2d30) != 0)) {\r\n    FUN_18065a0d0();\r\n  }\r\n  *(undefined1 *)(param_1 + 0x10438f0) = 1;\r\n  return;\r\n}\r\n\r\n",
+          "limitations": []
+        },
+        "normalized_result": "\r\nvoid FUN_1805ccb90(longlong param_1,char param_2)\r\n\r\n{\r\n  short sVar1;\r\n  uint uVar2;\r\n  int iVar3;\r\n  short *psVar4;\r\n  int *piVar5;\r\n  ulonglong uVar6;\r\n  longlong lVar7;\r\n  ulonglong uVar8;\r\n  longlong lVar9;\r\n  ulonglong uVar10;\r\n  \r\n  uVar8 = 0;\r\n  if (param_2 == '\\0') {\r\n    uVar2 = *(uint *)(param_1 + 0x62da44);\r\n    if (0 < (int)uVar2) {\r\n      piVar5 = (int *)(param_1 + 0x2d60);\r\n      uVar6 = uVar8;\r\n      uVar10 = uVar8;\r\n      do {\r\n        if (-1 < *piVar5) goto LAB_1805ccbe9;\r\n        uVar10 = (ulonglong)((int)uVar10 + 1);\r\n        uVar6 = uVar6 + 1;\r\n        piVar5 = piVar5 + 0x318;\r\n      } while ((longlong)uVar6 < (longlong)(int)uVar2);\r\n    }\r\n    uVar10 = (ulonglong)uVar2;\r\nLAB_1805ccbe9:\r\n    if ((int)uVar10 < *(int *)(param_1 + 0x62da44)) {\r\n      do {\r\n        lVar9 = (longlong)(int)uVar10;\r\n        lVar7 = param_1 + 0x2d50 + lVar9 * 0xc60;\r\n        if ((*(int *)(lVar7 + 0x560) - 3U < 2) && (*(char *)(lVar7 + 0xc50) == '\\0')) {\r\n          FUN_1805fe9f0(lVar7,param_1 + 0x10438f8,0xffffffff);\r\n        }\r\n        sVar1 = *(short *)(param_1 + 0x62ca50 + lVar9 * 2);\r\n        psVar4 = (short *)(param_1 + 0x62ca50 + lVar9 * 2);\r\n        if (sVar1 == -1) {\r\n          for (; (lVar9 < *(int *)(param_1 + 0x62da44) && (*psVar4 == -1)); psVar4 = psVar4 + 1) {\r\n            uVar10 = (ulonglong)((int)uVar10 + 1);\r\n            lVar9 = lVar9 + 1;\r\n          }\r\n        }\r\n        else {\r\n          uVar10 = (ulonglong)(uint)(int)sVar1;\r\n        }\r\n      } while ((int)uVar10 < *(int *)(param_1 + 0x62da44));\r\n    }\r\n  }\r\n  uVar2 = *(uint *)(param_1 + 0x62da44);\r\n  if (0 < (int)uVar2) {\r\n    piVar5 = (int *)(param_1 + 0x2d60);\r\n    uVar10 = uVar8;\r\n    do {\r\n      if (-1 < *piVar5) goto LAB_1805ccca8;\r\n      uVar10 = (ulonglong)((int)uVar10 + 1);\r\n      uVar8 = uVar8 + 1;\r\n      piVar5 = piVar5 + 0x318;\r\n    } while ((longlong)uVar8 < (longlong)(int)uVar2);\r\n  }\r\n  uVar10 = (ulonglong)uVar2;\r\nLAB_1805ccca8:\r\n  if ((int)uVar10 < *(int *)(param_1 + 0x62da44)) {\r\n    do {\r\n      lVar9 = (longlong)(int)uVar10;\r\n      FUN_1805fe5b0(param_1 + 0x2d50 + lVar9 * 0xc60,param_2,param_1 + 0x10438f8);\r\n      sVar1 = *(short *)(param_1 + 0x62ca50 + lVar9 * 2);\r\n      psVar4 = (short *)(param_1 + 0x62ca50 + lVar9 * 2);\r\n      if (sVar1 == -1) {\r\n        for (; (lVar9 < *(int *)(param_1 + 0x62da44) && (*psVar4 == -1)); psVar4 = psVar4 + 1) {\r\n          uVar10 = (ulonglong)((int)uVar10 + 1);\r\n          lVar9 = lVar9 + 1;\r\n        }\r\n      }\r\n      else {\r\n        uVar10 = (ulonglong)(uint)(int)sVar1;\r\n      }\r\n    } while ((int)uVar10 < *(int *)(param_1 + 0x62da44));\r\n  }\r\n  iVar3 = (int)((*(longlong *)(param_1 + 0x1044e58) - *(longlong *)(param_1 + 0x1044e50)) / 0x38);\r\n  while (iVar3 = iVar3 + -1, -1 < iVar3) {\r\n    FUN_1805d37b0(param_1,iVar3,0);\r\n  }\r\n  if ((*(longlong *)(param_1 + 0x18) != 0) &&\r\n     (*(longlong *)(*(longlong *)(*(longlong *)(param_1 + 0x18) + 0x688) + 0x2d30) != 0)) {\r\n    FUN_18065a0d0();\r\n  }\r\n  *(undefined1 *)(param_1 + 0x10438f0) = 1;\r\n  return;\r\n}\r\n\r\n",
+        "confidence": "observed",
+        "authority": "shipped-artifact",
+        "environment": null,
+        "limitations": [
+          "The session serves operations only after Ghidra reports default auto-analysis complete; incomplete analysis does not expose partial results.",
+          "The imported Program and temporary project are ephemeral and deleted on close. Annotation operations edit session database metadata; original executable bytes are never written.",
+          "Cancelling an active Ghidra request terminates its ephemeral database and discards session annotations. The selected target remains open; the next provider query imports the original artifact again.",
+          "Default-space addresses use lowercase 0x-prefixed hexadecimal; other address spaces use <percent-encoded-space>:0x<hex>.",
+          "Pseudocode is Ghidra decompiler output, not original source and not text-equivalent to Hopper output.",
+          "External functions and functions without an analyzable body return null; other decompiler failures remain explicit.",
+          "Windows Ghidra P0 accepts native x86 and x86-64 PE applications and DLLs, and explicitly selected raw 6502 images; managed, hostile, sensitive, and mutable-path targets are unsupported.",
+          "The Windows bridge uses authenticated IPv4 loopback because Node path-based IPC does not expose Java AF_UNIX sockets; the endpoint file contains no bearer token.",
+          "Windows sessions require the matching packaged Windows x64 native addon, local NTFS targets and runtimes, and Windows 10 or later. Native handles enforce path admission, private DACLs, and Job Object ownership automatically.",
+          "The target references PDB TaleWorlds.Native.pdb (GUID 2029ba6e-176d-498a-903c-b56d1af1370c, age (hex) 1, signature unknown, version RSDS); Ghidra reports load state unknown. Original names and types may be missing; an empty name search does not prove a procedure is absent. Use list_procedures and address-based analysis to inspect recovered functions. REA does not admit a caller-selected PDB companion."
+        ],
+        "relationship_coverage": null,
+        "locations": [],
+        "evidence_links": []
+      }
+    },
+    {
+      "responsePath": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\build\\battle-scale\\native-growth-queue\\041.response.json",
+      "responseSha256": "2c1ef91f7e5c90e60ba1f1ab657b548cd942eae77548c4d4a808675f5a3e1c94",
+      "evidence": {
+        "evidence_id": "ev_02a4f6cb37f88c46fd83fc5a5d1bea1f3ebd7e01eddcc15123d29c68ebed2740",
+        "subject": {
+          "name": "backup-0",
+          "digest": {
+            "sha256": "2a5e0e0b15513ebb7052d747a621b82c50ee834553eba283b33bbbc33766e12a"
+          },
+          "local_path": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\build\\battle-scale\\native-run-20261017-065749-08e99ed9\\backup-0",
+          "format": "pe",
+          "architecture": "x86_64"
+        },
+        "provider": {
+          "id": "ghidra",
+          "name": "Ghidra",
+          "version": "12.1.4"
+        },
+        "analysis_profile": {
+          "provider": {
+            "id": "ghidra",
+            "name": "Ghidra",
+            "version": "12.1.4"
+          },
+          "parameters": {
+            "target_kind": "executable",
+            "target_format": "pe",
+            "executable_role": "shared-library",
+            "managed": false,
+            "native_aot_metadata": {
+              "contract_revision": "rtr-9.1-x64-pe-read-only-v3",
+              "source_bytes": 134217728,
+              "work_units": 67108864,
+              "working_memory_bytes": 67108864,
+              "report_bytes": 4194304
+            },
+            "architecture": "x86_64",
+            "available_architectures": [
+              "x86_64"
+            ],
+            "import_mode": "ephemeral-source-immutable",
+            "pdb_observations": "program-info-v1",
+            "annotation_policy": "atomic-function-entry-metadata-v1",
+            "load_image_observations": "source-mappings-entry-context-v2",
+            "function_body_evidence": "complete-inclusive-ranges-v1",
+            "function_references": "complete-body-and-entry-reference-manager-v2",
+            "call_relationship_coverage": "function-body-call-coverage-v5",
+            "function_dossier_coverage": "observed-facets-and-call-relationships-v1",
+            "string_inventory_evidence": "defined-data-coverage-v1",
+            "location_resolution": "explicit-address-exact-entry-symbol-first-v3",
+            "procedure_file_offset_resolution": "address-first-unique-target-source-mapping-v2",
+            "instruction_flow_evidence": "decoded-return-pcode-v1",
+            "instruction_references": "exact-address-incoming-v1",
+            "function_boundary_observations": "ghidra-function-boundary-limitations-v3",
+            "no_return_repair": "disabled-windows-p0",
+            "process_launch": "official-headless-script-v1",
+            "jump_table_evidence": "typed-case-default-blocks-v1",
+            "decompiler_jump_loads": true,
+            "loader": "auto-from-header",
+            "language_id": "auto-from-header",
+            "compiler_spec_id": "auto-default",
+            "analyzer_preset": "ghidra-default"
+          },
+          "digest": "dcc676845881c04a2d22833fb35d26569462e033daee5e99a95edac5aa61ac05"
+        },
+        "predicate_type": "rea.analysis",
+        "operation": "procedure_pseudo_code",
+        "parameters": {
+          "procedure": "0x1805d78f0"
+        },
+        "raw_result": {
+          "value": "\r\nvoid FUN_1805d78f0(undefined4 *param_1)\r\n\r\n{\r\n  longlong lVar1;\r\n  uint *_Dst;\r\n  void *pvVar2;\r\n  uint *puVar3;\r\n  uint *_Src;\r\n  uint uVar4;\r\n  uint *puVar5;\r\n  \r\n  FUN_18008a420(param_1 + 2,0);\r\n  puVar5 = (uint *)0x0;\r\n  if (0 < (int)param_1[1]) {\r\n    do {\r\n      uVar4 = (uint)puVar5;\r\n      *(undefined4 *)\r\n       (*(longlong *)(*(longlong *)(param_1 + 10) + ((ulonglong)puVar5 >> 4) * 8) + 8 +\r\n       (ulonglong)(uVar4 & 0xf) * 0x40) = 0;\r\n      puVar5 = *(uint **)(param_1 + 4);\r\n      if (puVar5 < *(uint **)(param_1 + 6)) {\r\n        *(uint **)(param_1 + 4) = puVar5 + 1;\r\n        *puVar5 = uVar4;\r\n      }\r\n      else {\r\n        _Src = *(uint **)(param_1 + 2);\r\n        lVar1 = (longlong)puVar5 - (longlong)_Src >> 2;\r\n        if (lVar1 == 0) {\r\n          lVar1 = 1;\r\nLAB_1805d798b:\r\n          _Dst = (uint *)FUN_180729b40(DAT_180da29a8,lVar1 * 4,*(undefined1 *)(param_1 + 8));\r\n          _Src = *(uint **)(param_1 + 2);\r\n          puVar5 = *(uint **)(param_1 + 4);\r\n        }\r\n        else {\r\n          lVar1 = lVar1 * 2;\r\n          _Dst = (uint *)0x0;\r\n          if (lVar1 != 0) goto LAB_1805d798b;\r\n        }\r\n        puVar3 = _Dst;\r\n        if (_Src != puVar5) {\r\n          pvVar2 = memmove(_Dst,_Src,(longlong)puVar5 - (longlong)_Src);\r\n          puVar3 = (uint *)((longlong)pvVar2 + ((longlong)puVar5 - (longlong)_Src >> 2) * 4);\r\n        }\r\n        *puVar3 = uVar4;\r\n        if (*(longlong *)(param_1 + 2) != 0) {\r\n          FUN_18074e270();\r\n        }\r\n        *(uint **)(param_1 + 2) = _Dst;\r\n        *(uint **)(param_1 + 6) = _Dst + lVar1;\r\n        *(uint **)(param_1 + 4) = puVar3 + 1;\r\n      }\r\n      puVar5 = (uint *)(ulonglong)(uVar4 + 1);\r\n    } while ((int)(uVar4 + 1) < (int)param_1[1]);\r\n  }\r\n  *param_1 = 0;\r\n  param_1[0x12] = 0;\r\n  return;\r\n}\r\n\r\n",
+          "limitations": []
+        },
+        "normalized_result": "\r\nvoid FUN_1805d78f0(undefined4 *param_1)\r\n\r\n{\r\n  longlong lVar1;\r\n  uint *_Dst;\r\n  void *pvVar2;\r\n  uint *puVar3;\r\n  uint *_Src;\r\n  uint uVar4;\r\n  uint *puVar5;\r\n  \r\n  FUN_18008a420(param_1 + 2,0);\r\n  puVar5 = (uint *)0x0;\r\n  if (0 < (int)param_1[1]) {\r\n    do {\r\n      uVar4 = (uint)puVar5;\r\n      *(undefined4 *)\r\n       (*(longlong *)(*(longlong *)(param_1 + 10) + ((ulonglong)puVar5 >> 4) * 8) + 8 +\r\n       (ulonglong)(uVar4 & 0xf) * 0x40) = 0;\r\n      puVar5 = *(uint **)(param_1 + 4);\r\n      if (puVar5 < *(uint **)(param_1 + 6)) {\r\n        *(uint **)(param_1 + 4) = puVar5 + 1;\r\n        *puVar5 = uVar4;\r\n      }\r\n      else {\r\n        _Src = *(uint **)(param_1 + 2);\r\n        lVar1 = (longlong)puVar5 - (longlong)_Src >> 2;\r\n        if (lVar1 == 0) {\r\n          lVar1 = 1;\r\nLAB_1805d798b:\r\n          _Dst = (uint *)FUN_180729b40(DAT_180da29a8,lVar1 * 4,*(undefined1 *)(param_1 + 8));\r\n          _Src = *(uint **)(param_1 + 2);\r\n          puVar5 = *(uint **)(param_1 + 4);\r\n        }\r\n        else {\r\n          lVar1 = lVar1 * 2;\r\n          _Dst = (uint *)0x0;\r\n          if (lVar1 != 0) goto LAB_1805d798b;\r\n        }\r\n        puVar3 = _Dst;\r\n        if (_Src != puVar5) {\r\n          pvVar2 = memmove(_Dst,_Src,(longlong)puVar5 - (longlong)_Src);\r\n          puVar3 = (uint *)((longlong)pvVar2 + ((longlong)puVar5 - (longlong)_Src >> 2) * 4);\r\n        }\r\n        *puVar3 = uVar4;\r\n        if (*(longlong *)(param_1 + 2) != 0) {\r\n          FUN_18074e270();\r\n        }\r\n        *(uint **)(param_1 + 2) = _Dst;\r\n        *(uint **)(param_1 + 6) = _Dst + lVar1;\r\n        *(uint **)(param_1 + 4) = puVar3 + 1;\r\n      }\r\n      puVar5 = (uint *)(ulonglong)(uVar4 + 1);\r\n    } while ((int)(uVar4 + 1) < (int)param_1[1]);\r\n  }\r\n  *param_1 = 0;\r\n  param_1[0x12] = 0;\r\n  return;\r\n}\r\n\r\n",
+        "confidence": "observed",
+        "authority": "shipped-artifact",
+        "environment": null,
+        "limitations": [
+          "The session serves operations only after Ghidra reports default auto-analysis complete; incomplete analysis does not expose partial results.",
+          "The imported Program and temporary project are ephemeral and deleted on close. Annotation operations edit session database metadata; original executable bytes are never written.",
+          "Cancelling an active Ghidra request terminates its ephemeral database and discards session annotations. The selected target remains open; the next provider query imports the original artifact again.",
+          "Default-space addresses use lowercase 0x-prefixed hexadecimal; other address spaces use <percent-encoded-space>:0x<hex>.",
+          "Pseudocode is Ghidra decompiler output, not original source and not text-equivalent to Hopper output.",
+          "External functions and functions without an analyzable body return null; other decompiler failures remain explicit.",
+          "Windows Ghidra P0 accepts native x86 and x86-64 PE applications and DLLs, and explicitly selected raw 6502 images; managed, hostile, sensitive, and mutable-path targets are unsupported.",
+          "The Windows bridge uses authenticated IPv4 loopback because Node path-based IPC does not expose Java AF_UNIX sockets; the endpoint file contains no bearer token.",
+          "Windows sessions require the matching packaged Windows x64 native addon, local NTFS targets and runtimes, and Windows 10 or later. Native handles enforce path admission, private DACLs, and Job Object ownership automatically.",
+          "The target references PDB TaleWorlds.Native.pdb (GUID 2029ba6e-176d-498a-903c-b56d1af1370c, age (hex) 1, signature unknown, version RSDS); Ghidra reports load state unknown. Original names and types may be missing; an empty name search does not prove a procedure is absent. Use list_procedures and address-based analysis to inspect recovered functions. REA does not admit a caller-selected PDB companion."
+        ],
+        "relationship_coverage": null,
+        "locations": [],
+        "evidence_links": []
+      }
+    },
+    {
+      "responsePath": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\build\\battle-scale\\native-growth-queue\\042.response.json",
+      "responseSha256": "d120216e01b347b0d985ca0beb33b4c2223f21ce23de208ab2d0d97f1666ed06",
+      "evidence": {
+        "evidence_id": "ev_8b70cae88bf3c11ada3aebb28823c62957d9338c5d288e6f924318150b7d4320",
+        "subject": {
+          "name": "backup-0",
+          "digest": {
+            "sha256": "2a5e0e0b15513ebb7052d747a621b82c50ee834553eba283b33bbbc33766e12a"
+          },
+          "local_path": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\build\\battle-scale\\native-run-20261017-065749-08e99ed9\\backup-0",
+          "format": "pe",
+          "architecture": "x86_64"
+        },
+        "provider": {
+          "id": "ghidra",
+          "name": "Ghidra",
+          "version": "12.1.4"
+        },
+        "analysis_profile": {
+          "provider": {
+            "id": "ghidra",
+            "name": "Ghidra",
+            "version": "12.1.4"
+          },
+          "parameters": {
+            "target_kind": "executable",
+            "target_format": "pe",
+            "executable_role": "shared-library",
+            "managed": false,
+            "native_aot_metadata": {
+              "contract_revision": "rtr-9.1-x64-pe-read-only-v3",
+              "source_bytes": 134217728,
+              "work_units": 67108864,
+              "working_memory_bytes": 67108864,
+              "report_bytes": 4194304
+            },
+            "architecture": "x86_64",
+            "available_architectures": [
+              "x86_64"
+            ],
+            "import_mode": "ephemeral-source-immutable",
+            "pdb_observations": "program-info-v1",
+            "annotation_policy": "atomic-function-entry-metadata-v1",
+            "load_image_observations": "source-mappings-entry-context-v2",
+            "function_body_evidence": "complete-inclusive-ranges-v1",
+            "function_references": "complete-body-and-entry-reference-manager-v2",
+            "call_relationship_coverage": "function-body-call-coverage-v5",
+            "function_dossier_coverage": "observed-facets-and-call-relationships-v1",
+            "string_inventory_evidence": "defined-data-coverage-v1",
+            "location_resolution": "explicit-address-exact-entry-symbol-first-v3",
+            "procedure_file_offset_resolution": "address-first-unique-target-source-mapping-v2",
+            "instruction_flow_evidence": "decoded-return-pcode-v1",
+            "instruction_references": "exact-address-incoming-v1",
+            "function_boundary_observations": "ghidra-function-boundary-limitations-v3",
+            "no_return_repair": "disabled-windows-p0",
+            "process_launch": "official-headless-script-v1",
+            "jump_table_evidence": "typed-case-default-blocks-v1",
+            "decompiler_jump_loads": true,
+            "loader": "auto-from-header",
+            "language_id": "auto-from-header",
+            "compiler_spec_id": "auto-default",
+            "analyzer_preset": "ghidra-default"
+          },
+          "digest": "dcc676845881c04a2d22833fb35d26569462e033daee5e99a95edac5aa61ac05"
+        },
+        "predicate_type": "rea.analysis",
+        "operation": "procedure_pseudo_code",
+        "parameters": {
+          "procedure": "0x18009f840"
+        },
+        "raw_result": {
+          "value": "\r\n/* WARNING: Function: __security_check_cookie replaced with injection: security_check_cookie */\r\n\r\nundefined8 FUN_18009f840(undefined8 param_1,undefined8 param_2,char *param_3)\r\n\r\n{\r\n  undefined8 uVar1;\r\n  longlong lVar2;\r\n  undefined1 auStack_d8 [32];\r\n  undefined8 local_b8;\r\n  undefined4 local_a8;\r\n  undefined8 local_a0;\r\n  undefined8 local_98;\r\n  undefined **local_88;\r\n  char *local_80;\r\n  undefined4 local_78;\r\n  char local_70 [72];\r\n  ulonglong local_28;\r\n  \r\n  uVar1 = DAT_180d96db8;\r\n  local_a0 = 0xfffffffffffffffe;\r\n  local_28 = DAT_180cff388 ^ (ulonglong)auStack_d8;\r\n  local_a8 = 0;\r\n  local_88 = rglConstString<64>::vftable;\r\n  local_80 = local_70;\r\n  local_78 = 0;\r\n  local_70[0] = '\\0';\r\n  local_98 = param_2;\r\n  if (param_3 != (char *)0x0) {\r\n    lVar2 = -1;\r\n    do {\r\n      lVar2 = lVar2 + 1;\r\n    } while (param_3[lVar2] != '\\0');\r\n    local_78 = (undefined4)lVar2;\r\n    strcpy_s(local_70,0x40,param_3);\r\n  }\r\n  local_b8 = 0;\r\n  FUN_1800befd0(uVar1,param_2,&local_88,0);\r\n  return param_2;\r\n}\r\n\r\n",
+          "limitations": []
+        },
+        "normalized_result": "\r\n/* WARNING: Function: __security_check_cookie replaced with injection: security_check_cookie */\r\n\r\nundefined8 FUN_18009f840(undefined8 param_1,undefined8 param_2,char *param_3)\r\n\r\n{\r\n  undefined8 uVar1;\r\n  longlong lVar2;\r\n  undefined1 auStack_d8 [32];\r\n  undefined8 local_b8;\r\n  undefined4 local_a8;\r\n  undefined8 local_a0;\r\n  undefined8 local_98;\r\n  undefined **local_88;\r\n  char *local_80;\r\n  undefined4 local_78;\r\n  char local_70 [72];\r\n  ulonglong local_28;\r\n  \r\n  uVar1 = DAT_180d96db8;\r\n  local_a0 = 0xfffffffffffffffe;\r\n  local_28 = DAT_180cff388 ^ (ulonglong)auStack_d8;\r\n  local_a8 = 0;\r\n  local_88 = rglConstString<64>::vftable;\r\n  local_80 = local_70;\r\n  local_78 = 0;\r\n  local_70[0] = '\\0';\r\n  local_98 = param_2;\r\n  if (param_3 != (char *)0x0) {\r\n    lVar2 = -1;\r\n    do {\r\n      lVar2 = lVar2 + 1;\r\n    } while (param_3[lVar2] != '\\0');\r\n    local_78 = (undefined4)lVar2;\r\n    strcpy_s(local_70,0x40,param_3);\r\n  }\r\n  local_b8 = 0;\r\n  FUN_1800befd0(uVar1,param_2,&local_88,0);\r\n  return param_2;\r\n}\r\n\r\n",
+        "confidence": "observed",
+        "authority": "shipped-artifact",
+        "environment": null,
+        "limitations": [
+          "The session serves operations only after Ghidra reports default auto-analysis complete; incomplete analysis does not expose partial results.",
+          "The imported Program and temporary project are ephemeral and deleted on close. Annotation operations edit session database metadata; original executable bytes are never written.",
+          "Cancelling an active Ghidra request terminates its ephemeral database and discards session annotations. The selected target remains open; the next provider query imports the original artifact again.",
+          "Default-space addresses use lowercase 0x-prefixed hexadecimal; other address spaces use <percent-encoded-space>:0x<hex>.",
+          "Pseudocode is Ghidra decompiler output, not original source and not text-equivalent to Hopper output.",
+          "External functions and functions without an analyzable body return null; other decompiler failures remain explicit.",
+          "Windows Ghidra P0 accepts native x86 and x86-64 PE applications and DLLs, and explicitly selected raw 6502 images; managed, hostile, sensitive, and mutable-path targets are unsupported.",
+          "The Windows bridge uses authenticated IPv4 loopback because Node path-based IPC does not expose Java AF_UNIX sockets; the endpoint file contains no bearer token.",
+          "Windows sessions require the matching packaged Windows x64 native addon, local NTFS targets and runtimes, and Windows 10 or later. Native handles enforce path admission, private DACLs, and Job Object ownership automatically.",
+          "The target references PDB TaleWorlds.Native.pdb (GUID 2029ba6e-176d-498a-903c-b56d1af1370c, age (hex) 1, signature unknown, version RSDS); Ghidra reports load state unknown. Original names and types may be missing; an empty name search does not prove a procedure is absent. Use list_procedures and address-based analysis to inspect recovered functions. REA does not admit a caller-selected PDB companion."
+        ],
+        "relationship_coverage": null,
+        "locations": [],
+        "evidence_links": []
+      }
+    },
+    {
+      "responsePath": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\build\\battle-scale\\native-growth-queue\\043.response.json",
+      "responseSha256": "0f9fc109d61b90b6c77223162fbdbc7bde3c601e5058a1b8ca360f7fd182db22",
+      "evidence": {
+        "evidence_id": "ev_a264d1287ebc39dfbf9e8a169c8998dd485a047582d65d8216e005f84a23aaa9",
+        "subject": {
+          "name": "backup-0",
+          "digest": {
+            "sha256": "2a5e0e0b15513ebb7052d747a621b82c50ee834553eba283b33bbbc33766e12a"
+          },
+          "local_path": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\build\\battle-scale\\native-run-20261017-065749-08e99ed9\\backup-0",
+          "format": "pe",
+          "architecture": "x86_64"
+        },
+        "provider": {
+          "id": "ghidra",
+          "name": "Ghidra",
+          "version": "12.1.4"
+        },
+        "analysis_profile": {
+          "provider": {
+            "id": "ghidra",
+            "name": "Ghidra",
+            "version": "12.1.4"
+          },
+          "parameters": {
+            "target_kind": "executable",
+            "target_format": "pe",
+            "executable_role": "shared-library",
+            "managed": false,
+            "native_aot_metadata": {
+              "contract_revision": "rtr-9.1-x64-pe-read-only-v3",
+              "source_bytes": 134217728,
+              "work_units": 67108864,
+              "working_memory_bytes": 67108864,
+              "report_bytes": 4194304
+            },
+            "architecture": "x86_64",
+            "available_architectures": [
+              "x86_64"
+            ],
+            "import_mode": "ephemeral-source-immutable",
+            "pdb_observations": "program-info-v1",
+            "annotation_policy": "atomic-function-entry-metadata-v1",
+            "load_image_observations": "source-mappings-entry-context-v2",
+            "function_body_evidence": "complete-inclusive-ranges-v1",
+            "function_references": "complete-body-and-entry-reference-manager-v2",
+            "call_relationship_coverage": "function-body-call-coverage-v5",
+            "function_dossier_coverage": "observed-facets-and-call-relationships-v1",
+            "string_inventory_evidence": "defined-data-coverage-v1",
+            "location_resolution": "explicit-address-exact-entry-symbol-first-v3",
+            "procedure_file_offset_resolution": "address-first-unique-target-source-mapping-v2",
+            "instruction_flow_evidence": "decoded-return-pcode-v1",
+            "instruction_references": "exact-address-incoming-v1",
+            "function_boundary_observations": "ghidra-function-boundary-limitations-v3",
+            "no_return_repair": "disabled-windows-p0",
+            "process_launch": "official-headless-script-v1",
+            "jump_table_evidence": "typed-case-default-blocks-v1",
+            "decompiler_jump_loads": true,
+            "loader": "auto-from-header",
+            "language_id": "auto-from-header",
+            "compiler_spec_id": "auto-default",
+            "analyzer_preset": "ghidra-default"
+          },
+          "digest": "dcc676845881c04a2d22833fb35d26569462e033daee5e99a95edac5aa61ac05"
+        },
+        "predicate_type": "rea.analysis",
+        "operation": "procedure_pseudo_code",
+        "parameters": {
+          "procedure": "0x1805b64e0"
+        },
+        "raw_result": {
+          "value": "\r\nvoid FUN_1805b64e0(longlong param_1)\r\n\r\n{\r\n  longlong lVar1;\r\n  int iVar2;\r\n  int iVar3;\r\n  float fVar4;\r\n  float fVar5;\r\n  float fVar6;\r\n  float fVar7;\r\n  \r\n  lVar1 = DAT_180d96da8;\r\n  iVar2 = *(int *)(DAT_180d96da8 + 0xe70) + -1;\r\n  iVar3 = 0;\r\n  if ((-1 < iVar2) && (iVar3 = iVar2, 3 < iVar2)) {\r\n    iVar3 = 3;\r\n  }\r\n  fVar7 = (float)iVar3;\r\n  fVar6 = fVar7 * 3.35 + 4.9500003;\r\n  fVar4 = fVar7 * 0.99999994 + 4.5;\r\n  fVar5 = fVar6 + fVar4;\r\n  *(float *)(param_1 + 0x88) = fVar6 * fVar6;\r\n  fVar4 = fVar5 + fVar4;\r\n  *(float *)(param_1 + 0x8c) = fVar5 * fVar5;\r\n  fVar6 = (fVar7 + 1.0) * 4.5;\r\n  fVar5 = fVar6 + fVar4;\r\n  *(float *)(param_1 + 0x90) = fVar4 * fVar4;\r\n  fVar6 = fVar6 + fVar5;\r\n  *(float *)(param_1 + 0x94) = fVar5 * fVar5;\r\n  fVar4 = (fVar7 + 1.0) * 12.5 + fVar6;\r\n  *(float *)(param_1 + 0x98) = fVar6 * fVar6;\r\n  fVar5 = (fVar7 + 1.0) * 15.0 + fVar4;\r\n  *(float *)(param_1 + 0x9c) = fVar4 * fVar4;\r\n  *(float *)(param_1 + 0xa0) = fVar5 * fVar5;\r\n  *(undefined4 *)(param_1 + 0xa4) = 0x7f7fffff;\r\n  *(uint *)(param_1 + 0xa8) = (uint)(*(int *)(lVar1 + 0xe70) == 0);\r\n  return;\r\n}\r\n\r\n",
+          "limitations": []
+        },
+        "normalized_result": "\r\nvoid FUN_1805b64e0(longlong param_1)\r\n\r\n{\r\n  longlong lVar1;\r\n  int iVar2;\r\n  int iVar3;\r\n  float fVar4;\r\n  float fVar5;\r\n  float fVar6;\r\n  float fVar7;\r\n  \r\n  lVar1 = DAT_180d96da8;\r\n  iVar2 = *(int *)(DAT_180d96da8 + 0xe70) + -1;\r\n  iVar3 = 0;\r\n  if ((-1 < iVar2) && (iVar3 = iVar2, 3 < iVar2)) {\r\n    iVar3 = 3;\r\n  }\r\n  fVar7 = (float)iVar3;\r\n  fVar6 = fVar7 * 3.35 + 4.9500003;\r\n  fVar4 = fVar7 * 0.99999994 + 4.5;\r\n  fVar5 = fVar6 + fVar4;\r\n  *(float *)(param_1 + 0x88) = fVar6 * fVar6;\r\n  fVar4 = fVar5 + fVar4;\r\n  *(float *)(param_1 + 0x8c) = fVar5 * fVar5;\r\n  fVar6 = (fVar7 + 1.0) * 4.5;\r\n  fVar5 = fVar6 + fVar4;\r\n  *(float *)(param_1 + 0x90) = fVar4 * fVar4;\r\n  fVar6 = fVar6 + fVar5;\r\n  *(float *)(param_1 + 0x94) = fVar5 * fVar5;\r\n  fVar4 = (fVar7 + 1.0) * 12.5 + fVar6;\r\n  *(float *)(param_1 + 0x98) = fVar6 * fVar6;\r\n  fVar5 = (fVar7 + 1.0) * 15.0 + fVar4;\r\n  *(float *)(param_1 + 0x9c) = fVar4 * fVar4;\r\n  *(float *)(param_1 + 0xa0) = fVar5 * fVar5;\r\n  *(undefined4 *)(param_1 + 0xa4) = 0x7f7fffff;\r\n  *(uint *)(param_1 + 0xa8) = (uint)(*(int *)(lVar1 + 0xe70) == 0);\r\n  return;\r\n}\r\n\r\n",
+        "confidence": "observed",
+        "authority": "shipped-artifact",
+        "environment": null,
+        "limitations": [
+          "The session serves operations only after Ghidra reports default auto-analysis complete; incomplete analysis does not expose partial results.",
+          "The imported Program and temporary project are ephemeral and deleted on close. Annotation operations edit session database metadata; original executable bytes are never written.",
+          "Cancelling an active Ghidra request terminates its ephemeral database and discards session annotations. The selected target remains open; the next provider query imports the original artifact again.",
+          "Default-space addresses use lowercase 0x-prefixed hexadecimal; other address spaces use <percent-encoded-space>:0x<hex>.",
+          "Pseudocode is Ghidra decompiler output, not original source and not text-equivalent to Hopper output.",
+          "External functions and functions without an analyzable body return null; other decompiler failures remain explicit.",
+          "Windows Ghidra P0 accepts native x86 and x86-64 PE applications and DLLs, and explicitly selected raw 6502 images; managed, hostile, sensitive, and mutable-path targets are unsupported.",
+          "The Windows bridge uses authenticated IPv4 loopback because Node path-based IPC does not expose Java AF_UNIX sockets; the endpoint file contains no bearer token.",
+          "Windows sessions require the matching packaged Windows x64 native addon, local NTFS targets and runtimes, and Windows 10 or later. Native handles enforce path admission, private DACLs, and Job Object ownership automatically.",
+          "The target references PDB TaleWorlds.Native.pdb (GUID 2029ba6e-176d-498a-903c-b56d1af1370c, age (hex) 1, signature unknown, version RSDS); Ghidra reports load state unknown. Original names and types may be missing; an empty name search does not prove a procedure is absent. Use list_procedures and address-based analysis to inspect recovered functions. REA does not admit a caller-selected PDB companion."
+        ],
+        "relationship_coverage": null,
+        "locations": [],
+        "evidence_links": []
+      }
+    },
+    {
+      "responsePath": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\build\\battle-scale\\native-growth-queue\\044.response.json",
+      "responseSha256": "6ca0fdcbfd53bbb080a36606460565e7dccda2f540f8a518af94d45797e1b216",
+      "evidence": {
+        "evidence_id": "ev_dfa08a9e911e75be92553d14d589195a63b81e0678098d136c1c9881b81e004e",
+        "subject": {
+          "name": "backup-0",
+          "digest": {
+            "sha256": "2a5e0e0b15513ebb7052d747a621b82c50ee834553eba283b33bbbc33766e12a"
+          },
+          "local_path": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\build\\battle-scale\\native-run-20261017-065749-08e99ed9\\backup-0",
+          "format": "pe",
+          "architecture": "x86_64"
+        },
+        "provider": {
+          "id": "ghidra",
+          "name": "Ghidra",
+          "version": "12.1.4"
+        },
+        "analysis_profile": {
+          "provider": {
+            "id": "ghidra",
+            "name": "Ghidra",
+            "version": "12.1.4"
+          },
+          "parameters": {
+            "target_kind": "executable",
+            "target_format": "pe",
+            "executable_role": "shared-library",
+            "managed": false,
+            "native_aot_metadata": {
+              "contract_revision": "rtr-9.1-x64-pe-read-only-v3",
+              "source_bytes": 134217728,
+              "work_units": 67108864,
+              "working_memory_bytes": 67108864,
+              "report_bytes": 4194304
+            },
+            "architecture": "x86_64",
+            "available_architectures": [
+              "x86_64"
+            ],
+            "import_mode": "ephemeral-source-immutable",
+            "pdb_observations": "program-info-v1",
+            "annotation_policy": "atomic-function-entry-metadata-v1",
+            "load_image_observations": "source-mappings-entry-context-v2",
+            "function_body_evidence": "complete-inclusive-ranges-v1",
+            "function_references": "complete-body-and-entry-reference-manager-v2",
+            "call_relationship_coverage": "function-body-call-coverage-v5",
+            "function_dossier_coverage": "observed-facets-and-call-relationships-v1",
+            "string_inventory_evidence": "defined-data-coverage-v1",
+            "location_resolution": "explicit-address-exact-entry-symbol-first-v3",
+            "procedure_file_offset_resolution": "address-first-unique-target-source-mapping-v2",
+            "instruction_flow_evidence": "decoded-return-pcode-v1",
+            "instruction_references": "exact-address-incoming-v1",
+            "function_boundary_observations": "ghidra-function-boundary-limitations-v3",
+            "no_return_repair": "disabled-windows-p0",
+            "process_launch": "official-headless-script-v1",
+            "jump_table_evidence": "typed-case-default-blocks-v1",
+            "decompiler_jump_loads": true,
+            "loader": "auto-from-header",
+            "language_id": "auto-from-header",
+            "compiler_spec_id": "auto-default",
+            "analyzer_preset": "ghidra-default"
+          },
+          "digest": "dcc676845881c04a2d22833fb35d26569462e033daee5e99a95edac5aa61ac05"
+        },
+        "predicate_type": "rea.analysis",
+        "operation": "procedure_pseudo_code",
+        "parameters": {
+          "procedure": "0x1805cec60"
+        },
+        "raw_result": {
+          "value": "\r\nundefined8 *\r\nFUN_1805cec60(undefined8 *param_1,undefined8 param_2,undefined8 param_3,undefined8 param_4)\r\n\r\n{\r\n  ulonglong uVar1;\r\n  ulonglong uVar2;\r\n  ulonglong uVar3;\r\n  ulonglong uVar4;\r\n  undefined8 *puVar5;\r\n  undefined8 *puVar6;\r\n  longlong lVar7;\r\n  longlong lVar8;\r\n  undefined8 uVar9;\r\n  \r\n  uVar9 = 0xfffffffffffffffe;\r\n  uVar2 = 0;\r\n  *param_1 = 0;\r\n  *(undefined4 *)(param_1 + 1) = 0;\r\n  param_1[2] = 0;\r\n  param_1[5] = 0;\r\n  puVar6 = param_1 + 0xb;\r\n  lVar7 = 0x20;\r\n  lVar8 = 0x20;\r\n  puVar5 = puVar6;\r\n  do {\r\n    FUN_18005e2f0(puVar5);\r\n    puVar5 = puVar5 + 2;\r\n    lVar8 = lVar8 + -1;\r\n  } while (lVar8 != 0);\r\n  *(undefined8 *)((longlong)param_1 + 0x25c) = 0;\r\n  *(undefined4 *)(param_1 + 0x4b) = 0;\r\n  param_1[7] = 0;\r\n  param_1[8] = 0x20;\r\n  param_1[9] = puVar6;\r\n  lVar8 = 0x20;\r\n  do {\r\n    *(undefined4 *)puVar6 = 0;\r\n    puVar6 = puVar6 + 2;\r\n    lVar8 = lVar8 + -1;\r\n  } while (lVar8 != 0);\r\n  param_1[10] = 0;\r\n  param_1[6] = param_1 + 8;\r\n  param_1[4] = 0x15;\r\n  lVar8 = FUN_1805dbcb0();\r\n  param_1[3] = lVar8;\r\n  if (lVar8 == 0) {\r\n    param_1[4] = 0;\r\n    uVar1 = uVar2;\r\n  }\r\n  else {\r\n    uVar1 = param_1[4];\r\n  }\r\n  uVar4 = uVar2;\r\n  uVar3 = uVar2;\r\n  if (uVar1 != 0) {\r\n    do {\r\n      *(undefined1 *)(param_1[3] + 0x2041 + uVar4) = 0;\r\n      uVar3 = uVar3 + 1;\r\n      uVar4 = uVar4 + 0x2048;\r\n    } while (uVar3 < (ulonglong)param_1[4]);\r\n  }\r\n  _Cnd_init_in_situ();\r\n  _Mtx_init_in_situ(param_1 + 0x56,2,param_3,param_4,uVar9);\r\n  param_1[0x60] = 0;\r\n  *(undefined4 *)(param_1 + 0x61) = 0;\r\n  param_1[0x62] = 0;\r\n  param_1[0x65] = 0;\r\n  puVar6 = param_1 + 0x6b;\r\n  lVar8 = 0x20;\r\n  puVar5 = puVar6;\r\n  do {\r\n    FUN_18005e2f0(puVar5);\r\n    puVar5 = puVar5 + 2;\r\n    lVar8 = lVar8 + -1;\r\n  } while (lVar8 != 0);\r\n  *(undefined8 *)((longlong)param_1 + 0x55c) = 0;\r\n  *(undefined4 *)(param_1 + 0xab) = 0;\r\n  param_1[0x67] = 0;\r\n  param_1[0x68] = 0x20;\r\n  param_1[0x69] = puVar6;\r\n  do {\r\n    *(undefined4 *)puVar6 = 0;\r\n    puVar6 = puVar6 + 2;\r\n    lVar7 = lVar7 + -1;\r\n  } while (lVar7 != 0);\r\n  param_1[0x6a] = 0;\r\n  param_1[0x66] = param_1 + 0x68;\r\n  param_1[100] = 0x15;\r\n  lVar7 = FUN_18005e330();\r\n  param_1[99] = lVar7;\r\n  if (lVar7 == 0) {\r\n    param_1[100] = 0;\r\n    uVar1 = uVar2;\r\n  }\r\n  else {\r\n    uVar1 = param_1[100];\r\n  }\r\n  uVar4 = uVar2;\r\n  if (uVar1 != 0) {\r\n    do {\r\n      *(undefined1 *)(uVar2 + 0x141 + param_1[99]) = 0;\r\n      uVar4 = uVar4 + 1;\r\n      uVar2 = uVar2 + 0x148;\r\n    } while (uVar4 < (ulonglong)param_1[100]);\r\n  }\r\n  _Cnd_init_in_situ();\r\n  _Mtx_init_in_situ(param_1 + 0xb6,2);\r\n  return param_1;\r\n}\r\n\r\n",
+          "limitations": []
+        },
+        "normalized_result": "\r\nundefined8 *\r\nFUN_1805cec60(undefined8 *param_1,undefined8 param_2,undefined8 param_3,undefined8 param_4)\r\n\r\n{\r\n  ulonglong uVar1;\r\n  ulonglong uVar2;\r\n  ulonglong uVar3;\r\n  ulonglong uVar4;\r\n  undefined8 *puVar5;\r\n  undefined8 *puVar6;\r\n  longlong lVar7;\r\n  longlong lVar8;\r\n  undefined8 uVar9;\r\n  \r\n  uVar9 = 0xfffffffffffffffe;\r\n  uVar2 = 0;\r\n  *param_1 = 0;\r\n  *(undefined4 *)(param_1 + 1) = 0;\r\n  param_1[2] = 0;\r\n  param_1[5] = 0;\r\n  puVar6 = param_1 + 0xb;\r\n  lVar7 = 0x20;\r\n  lVar8 = 0x20;\r\n  puVar5 = puVar6;\r\n  do {\r\n    FUN_18005e2f0(puVar5);\r\n    puVar5 = puVar5 + 2;\r\n    lVar8 = lVar8 + -1;\r\n  } while (lVar8 != 0);\r\n  *(undefined8 *)((longlong)param_1 + 0x25c) = 0;\r\n  *(undefined4 *)(param_1 + 0x4b) = 0;\r\n  param_1[7] = 0;\r\n  param_1[8] = 0x20;\r\n  param_1[9] = puVar6;\r\n  lVar8 = 0x20;\r\n  do {\r\n    *(undefined4 *)puVar6 = 0;\r\n    puVar6 = puVar6 + 2;\r\n    lVar8 = lVar8 + -1;\r\n  } while (lVar8 != 0);\r\n  param_1[10] = 0;\r\n  param_1[6] = param_1 + 8;\r\n  param_1[4] = 0x15;\r\n  lVar8 = FUN_1805dbcb0();\r\n  param_1[3] = lVar8;\r\n  if (lVar8 == 0) {\r\n    param_1[4] = 0;\r\n    uVar1 = uVar2;\r\n  }\r\n  else {\r\n    uVar1 = param_1[4];\r\n  }\r\n  uVar4 = uVar2;\r\n  uVar3 = uVar2;\r\n  if (uVar1 != 0) {\r\n    do {\r\n      *(undefined1 *)(param_1[3] + 0x2041 + uVar4) = 0;\r\n      uVar3 = uVar3 + 1;\r\n      uVar4 = uVar4 + 0x2048;\r\n    } while (uVar3 < (ulonglong)param_1[4]);\r\n  }\r\n  _Cnd_init_in_situ();\r\n  _Mtx_init_in_situ(param_1 + 0x56,2,param_3,param_4,uVar9);\r\n  param_1[0x60] = 0;\r\n  *(undefined4 *)(param_1 + 0x61) = 0;\r\n  param_1[0x62] = 0;\r\n  param_1[0x65] = 0;\r\n  puVar6 = param_1 + 0x6b;\r\n  lVar8 = 0x20;\r\n  puVar5 = puVar6;\r\n  do {\r\n    FUN_18005e2f0(puVar5);\r\n    puVar5 = puVar5 + 2;\r\n    lVar8 = lVar8 + -1;\r\n  } while (lVar8 != 0);\r\n  *(undefined8 *)((longlong)param_1 + 0x55c) = 0;\r\n  *(undefined4 *)(param_1 + 0xab) = 0;\r\n  param_1[0x67] = 0;\r\n  param_1[0x68] = 0x20;\r\n  param_1[0x69] = puVar6;\r\n  do {\r\n    *(undefined4 *)puVar6 = 0;\r\n    puVar6 = puVar6 + 2;\r\n    lVar7 = lVar7 + -1;\r\n  } while (lVar7 != 0);\r\n  param_1[0x6a] = 0;\r\n  param_1[0x66] = param_1 + 0x68;\r\n  param_1[100] = 0x15;\r\n  lVar7 = FUN_18005e330();\r\n  param_1[99] = lVar7;\r\n  if (lVar7 == 0) {\r\n    param_1[100] = 0;\r\n    uVar1 = uVar2;\r\n  }\r\n  else {\r\n    uVar1 = param_1[100];\r\n  }\r\n  uVar4 = uVar2;\r\n  if (uVar1 != 0) {\r\n    do {\r\n      *(undefined1 *)(uVar2 + 0x141 + param_1[99]) = 0;\r\n      uVar4 = uVar4 + 1;\r\n      uVar2 = uVar2 + 0x148;\r\n    } while (uVar4 < (ulonglong)param_1[100]);\r\n  }\r\n  _Cnd_init_in_situ();\r\n  _Mtx_init_in_situ(param_1 + 0xb6,2);\r\n  return param_1;\r\n}\r\n\r\n",
+        "confidence": "observed",
+        "authority": "shipped-artifact",
+        "environment": null,
+        "limitations": [
+          "The session serves operations only after Ghidra reports default auto-analysis complete; incomplete analysis does not expose partial results.",
+          "The imported Program and temporary project are ephemeral and deleted on close. Annotation operations edit session database metadata; original executable bytes are never written.",
+          "Cancelling an active Ghidra request terminates its ephemeral database and discards session annotations. The selected target remains open; the next provider query imports the original artifact again.",
+          "Default-space addresses use lowercase 0x-prefixed hexadecimal; other address spaces use <percent-encoded-space>:0x<hex>.",
+          "Pseudocode is Ghidra decompiler output, not original source and not text-equivalent to Hopper output.",
+          "External functions and functions without an analyzable body return null; other decompiler failures remain explicit.",
+          "Windows Ghidra P0 accepts native x86 and x86-64 PE applications and DLLs, and explicitly selected raw 6502 images; managed, hostile, sensitive, and mutable-path targets are unsupported.",
+          "The Windows bridge uses authenticated IPv4 loopback because Node path-based IPC does not expose Java AF_UNIX sockets; the endpoint file contains no bearer token.",
+          "Windows sessions require the matching packaged Windows x64 native addon, local NTFS targets and runtimes, and Windows 10 or later. Native handles enforce path admission, private DACLs, and Job Object ownership automatically.",
+          "The target references PDB TaleWorlds.Native.pdb (GUID 2029ba6e-176d-498a-903c-b56d1af1370c, age (hex) 1, signature unknown, version RSDS); Ghidra reports load state unknown. Original names and types may be missing; an empty name search does not prove a procedure is absent. Use list_procedures and address-based analysis to inspect recovered functions. REA does not admit a caller-selected PDB companion."
+        ],
+        "relationship_coverage": null,
+        "locations": [],
+        "evidence_links": []
+      }
+    }
+  ],
+  "gameLaunched": false
+}

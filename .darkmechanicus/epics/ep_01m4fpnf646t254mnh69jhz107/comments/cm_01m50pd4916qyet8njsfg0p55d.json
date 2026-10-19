@@ -1,0 +1,13 @@
+{
+  "author": {
+    "label": "Claude Code",
+    "role": "orchestrator"
+  },
+  "body": "Handoff from MMR-37 (runtime surface backend):\n- **Re-installing on cold load.** A world's scene name is content-addressed: `mnbl_world_<content id 16>_<12 hex over encoder, template, extent>`. On a cold load, re-run `RuntimeWorldBackend.Prepare` + `Install` from the save's bundle; it reuses the installed folder when identical or reinstalls it under the same name.\n  - An install in a new process removes other content-addressed folders the process has not used.\n  - The engine's startup scene index keeps names of folders removed later, so `Construct`/`Resolve` require the folder to exist; install before constructing.\n- **Native release.** It is recorded as called (`Scene.ClearAll`, renderer destruct, layer clear, camera release; ledgers in `evidence/runtime/world-surface.json`) but not measured. Measuring native reclamation on a world switch, and cold-load restore, are yours.\n- **Generations.** Campaign map generations begin in `GeneratedMapScene.Load` and end in `Destroy`. A load in the same process requires the previous map destroyed first; `WorldGenerations.Begin` enforces this.",
+  "createdAt": "2026-10-15T21:10:03.297Z",
+  "epicId": "ep_01m4fpnf646t254mnh69jhz107",
+  "format": "darkmechanicus.comment",
+  "formatVersion": 1,
+  "id": "cm_01m50pd4916qyet8njsfg0p55d",
+  "ticketId": "tk_01m4fqfbgkz61vc2vqzb3vhggb"
+}

@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "mnbl.source-identity/1",
+  "title": "MNBL source identity",
+  "description": "Identity of one FWGC++ split world that the campaign compiler carries forward. Written by worldbridge::source::write_identity (worldbridge --read-source --identity FILE) and validated strictly by read_identity. The 64-bit layout seed is a canonical decimal string: as a JSON number it would lose precision above 2^53.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "version", "sourceSchema", "schemaVersion", "completedStage", "generatorVersion", "gridSide", "layoutSeed", "crustSeed", "detailSeed"],
+  "properties": {
+    "schema": { "const": "mnbl.source-identity" },
+    "version": { "const": 1 },
+    "sourceSchema": { "const": "fwg.world" },
+    "schemaVersion": { "type": "integer", "minimum": 0, "maximum": 1000000 },
+    "completedStage": { "type": "integer", "minimum": 0, "maximum": 1000000 },
+    "generatorVersion": { "type": "string", "description": "Descriptive only; not a build fingerprint." },
+    "gridSide": { "type": "integer", "minimum": 0, "maximum": 65537 },
+    "layoutSeed": { "type": "string", "pattern": "^(0|[1-9][0-9]{0,19})$", "description": "Unsigned 64-bit decimal, at most 18446744073709551615 (checked by read_identity)." },
+    "crustSeed": { "type": "integer" },
+    "detailSeed": { "type": "integer" }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "author": {
+    "label": "Claude Code",
+    "role": "orchestrator"
+  },
+  "body": "**MMR-18 progress (Claude, attempt 2): generated campaign boots, two worlds isolated. Not complete: c1 still unmet.**\n\nFixes since Astra's checkpoint:\n1. Live defaults now gather all ten kinds (`SiegeEngineType`, `SkeletonScale` added). The IL shows both load before `RegisterSubModuleObjects`, and every kind must contribute at least one ready object.\n2. Census crash: `CampaignObjectManager.Settlements` stays null until `InitializeOnNewGame`, and `Rows(null)` threw an unhandled `InvalidOperationException` inside `OnCampaignStart` (PID 8152). Lists are now captured per-list as available/unavailable. Generated engine callbacks now trace exceptions before rethrowing.\n3. `BodyGeneratorView..ctor` dereferences `facgen_template_test_char_0..9` without a null check (PID 33184). A Cecil scan of installed IL found 142 hard-coded character IDs. 33 reusable, non-hero ones are now explicit dataset roots (`Options.EngineCharacterIds`). `fighter_sturgia` is excluded because the stock record has a dangling roster. Official heroes are excluded. Evidence: `build/research-bootstrap18/engine-character-literals.json`.\n4. The catalog receipt paths resolved only inside the Codex MSIX package cache, so the catalog was copied to the real AppData path. All 24 hashes match.\n\nRuntime: PID 19700 (one world) and PID 31308 (seed 42 → normal EndGame → seed 43) both finished `status=ok` with zero validation failures, no save changes, and normal exit. Summary: `evidence/runtime/bootstrap-probe.json`. Offline harness: 60 managed checks, real-catalog preflight, and both descriptors pass.\n\nCriteria: c2 met, c3 met (with caveats in the summary). **c1 is unmet:** only paused MapState has been reached. Time advancement, recruitment, and trade have not been exercised. Town meshes don't render (nameplates only). Save reconstruction is still NotSupported.",
+  "createdAt": "2026-10-13T20:11:17.390Z",
+  "epicId": "ep_01m4fpnf646t254mnh69jhz107",
+  "format": "darkmechanicus.comment",
+  "formatVersion": 1,
+  "id": "cm_01m4ve830d5f9xsr1mmsfard4s",
+  "ticketId": "tk_01m4fqfbgkan15ca1rykrzpxt0"
+}

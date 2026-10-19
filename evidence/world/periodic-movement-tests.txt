@@ -1,0 +1,86 @@
+ok    xmin is canonical and maps to itself exactly
+ok    xmax is not canonical and maps to xmin (the range is [xmin, xmax))
+ok    values just inside either end are returned exactly
+ok    the double just below xmin canonicalizes to a canonical value (xmin or just below xmax), never xmax
+ok    single precision: the float just below xmin (399.999969) stays canonical; the MMR-63 computation returned xmax
+ok    multiple wraps east and west land on the same canonical x
+ok    negative coordinates canonicalize
+ok    wrap index and display offset name the copy a physical x lies in
+ok    non-finite coordinates are refused
+ok    layouts without width/2 strips, a width or origin that is not whole key quanta, rows outside the terrain, or non-finite values are refused
+ok    an exact half-width difference resolves east (+W/2) in both directions; a whole width is 0
+ok    the short way across the seam, signed
+ok    width 1000: (998,200) and (2,200) are 4 apart, not 996
+ok    the nearest placement of (2,200) from (998,200) is 4 east, the +W copy
+ok    a half-width target gives the same placement order whichever copy is passed (east first)
+ok    near half-width ties (200000 double pairs within 2^-30 of the tie) the first placement's displacement is exactly DeltaX
+ok    x = 800 has three copies inside the closed terrain [0, 1600]
+ok    near the seam a location has its canonical copy and one strip copy
+ok    the images of any copy are those of the canonical location
+ok    from every canonical start (4096 pairs) the first placement is the short way (DeltaX, no move) and every displacement shorter than a width is placed inside the terrain
+ok    the long ways around: west 750 from the start itself, east 850 from the start's west copy (its target copy 1950 lies outside the terrain)
+ok    a start in the strip (x = 1600) whose nearest target copy (1700) lies outside the terrain is moved a width west (800 -> 900)
+ok    the pole lines and the padding beyond them are poles; the rows between are not
+ok    every x on a pole line is one location (pole alias): the north key is N everywhere, the south S
+ok    source uids collapse on the pole rows and name r<row>c<column> between
+ok    one row off the pole, different x are different locations
+ok    source columns wrap: the seam's last column rounds onto column 0
+ok    physical -> logical -> physical round-trips 2000 canonical points; every copy has the same logical location
+ok    logical x wraps into canonical physical x; y adds the pole margin
+ok    both identities are stable for a layout and change with each layout field (width, height, origins, extent, source columns, central meridian)
+ok    the frame text (the save identity) names the coordinate version, tie rule and layout but not the distance model; the policy text adds the metric and distance version
+ok    display copies of a location computed in double share one location key and one source uid
+ok    an interval across the seam splits into [790, 800] and [0, 10]
+ok    a negative interval start wraps before splitting
+ok    an interval inside the range, a whole width, or one ending on the seam is one piece
+ok    a reversed or longer-than-width interval is refused
+ok    a step east across the seam ends at x = 800 and continues from x = 0 at the interpolated y
+ok    a step west across the seam ends at x = 0 and continues from x = 800
+ok    a half-width step goes east (the tie rule) and stays one piece
+ok    the other half-width step also goes east, across the seam
+ok    a step ending exactly on the seam is one piece
+ok    a step starting on the seam and going west is one piece starting at x = 800 (no zero-length piece)
+ok    cache keys are directed and carry the policy version and identity
+ok    display copies give the same cache key
+ok    the capability and the regions are part of the key
+ok    a different policy identity gives different keys
+ok    a capability containing the separator is refused
+ok    a periodic save made under this coordinate frame is accepted
+ok    the save key is the frame identity, not the full policy identity
+ok    a periodic save made under another policy is refused
+ok    a periodic save without a policy (MMR-63 era) is refused
+ok    a header and world that disagree on periodicity are refused
+ok    a non-periodic save (with or without the MMR-64 keys) is accepted for a non-periodic world
+ok    worldgen/policies/periodic-coordinates.json names the code's versions, tie rule and metric
+ok    the recorded distortion factors are 1/cos(latitude)
+ok    bundle f596b58cdcfc: the coordinates come from its projection (W 800, H 400, strip 400, pole margin 600, terrain 1600, 128 source columns)
+ok    the bundle's recorded canonical physical x range is [xmin, xmax)
+ok    the bundle's policy identity is the production layout's
+ok    the SourceUid of every settlement's source point is the source node its uid names (292/292)
+ok    an MMR-63 placement's periodic block gives pole rows 400..1200 and 128 source columns; a placement without one is not periodic
+ok    only an x-periodic placement is accepted
+ok    strips W: ShortestOverImages over the planar engine equals the periodic oracle on every pair of the mixed grid (land, sea, all; 22568 pairs, 22510 reachable, 5429 won by a strip copy, 0 from a moved start, 40428 pruned), never below the wrapped lower bound
+ok    strips W/2 (production ratio): ShortestOverImages over the planar engine equals the periodic oracle on every pair of the mixed grid (land, sea, all; 22568 pairs, 22510 reachable, 5429 won by a strip copy, 0 from a moved start, 34804 pruned), never below the wrapped lower bound
+ok    production ratio, walls LLLLL#LLLLLLLLLL/LLLLL#LLLLLLLLLL: every pair agrees with the oracle (900/900, 40 long ways from a moved start)
+ok    production ratio, walls LL#LLLLLLLLLLLLL/LLLLLLLLLLLL#LLL/LL#LLLLLLLLLLLLL: every pair agrees with the oracle (2025/2025, 0 long ways from a moved start)
+ok    production ratio: (0,0) -> (6,0) past a wall is the long way west, cost 10
+ok    the same placement and cost whichever copy of the target is passed (1 step across the seam)
+ok    source and target coincide: cost 0 at the canonical copy
+ok    a path tie between the west and east copies resolves east
+ok    a blocked seam corridor: 2 apart through the seam, the path goes the long way (14) (strips W)
+ok    two walls: 2 apart through the seam and unreachable (proximity is not reachability) (strips W)
+ok    a blocked seam corridor: 2 apart through the seam, the path goes the long way (14) (strips W/2)
+ok    two walls: 2 apart through the seam and unreachable (proximity is not reachability) (strips W/2)
+ok    a land gate and a sea port 1 apart across the seam: unreachable for land-only and sea-only capabilities (strips W)
+ok    with both capabilities the cost is directed: gate -> port pays the land-to-sea switch (6), port -> gate the sea-to-land one (2), each through the seam (strips W)
+ok    a land gate and a sea port 1 apart across the seam: unreachable for land-only and sea-only capabilities (strips W/2)
+ok    with both capabilities the cost is directed: gate -> port pays the land-to-sea switch (6), port -> gate the sea-to-land one (2), each through the seam (strips W/2)
+ok    the coverage manifest lists every member of the pinned MapDistanceModel (19) and nothing else
+ok    DefaultMapDistanceModel declares every manifest method itself
+ok    NavalDLCMapDistanceModel declares every manifest method itself
+ok    every planar distance call in Helpers.DistanceHelper and Helpers.SettlementHelper of the pinned assembly is in HelperCoverage (3 methods)
+ok    every manifest entry has a treatment and a reason; region switch costs and transition costs are marked directed
+ok    every spatial consumer of the table resolves in the pinned assemblies with exactly its counted calls (98 methods, 161 replaced calls)
+ok    every recompiled caller (27) calls a table method or another recompiled caller
+ok    the consumer audit scanned exactly the installed campaign assemblies (7, SHA-256 equal)
+85/85 checks passed

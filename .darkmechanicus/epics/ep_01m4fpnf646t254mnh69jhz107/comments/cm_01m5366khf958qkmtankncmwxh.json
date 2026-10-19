@@ -1,0 +1,13 @@
+{
+  "author": {
+    "label": "Claude Code",
+    "role": "orchestrator"
+  },
+  "body": "**Handoff from MMR-62 (the shared journal).**\n\n- **What the journal is.** `Persistence/EarlyWorldBindingStore` journals only the initial save. It works in three steps:\n  - a durable intent (`DurableFile`: write through, flush, same-volume rename);\n  - the engine save;\n  - a read-back, which must show this instance's binding, a whole file (`SaveFileCheck`) and a flush before the journal says published.\n- **Recovery** at the next start resolves an intent:\n  - no save: abandoned;\n  - torn, unbound or malformed: deleted, because the name was reserved;\n  - whole and bound: published;\n  - bound to another instance or world: conflict, kept.\n\n  Any error leaves the intent unresolved. The initial-save boundary matrix is tested (`tests/Persistence/EarlyBindingTests.cs`, 58/58).\n- **What MMR-48 needs to do.**\n  - Bind manual saves, autosaves, Save As and renamed saves through the same journal. The reserved name and its deletion rule assume the store chose the name. For player-named saves, decide what may be deleted: probably never delete, only resolve.\n  - Then set `WorldReferenceIndex.SaveKindsBound` (now false, so `Decide` always retains).\n- **What every save already carries.** The header binding: `instance` and `contentId` (R05 hook, every save mode).\n- **Save type ids.** The binding needs none, and the id base is reserved by MMR-30.",
+  "createdAt": "2026-10-16T20:24:35.631Z",
+  "epicId": "ep_01m4fpnf646t254mnh69jhz107",
+  "format": "darkmechanicus.comment",
+  "formatVersion": 1,
+  "id": "cm_01m5366khf958qkmtankncmwxh",
+  "ticketId": "tk_01m4fqfbgky0m5dnh669pqa1fk"
+}

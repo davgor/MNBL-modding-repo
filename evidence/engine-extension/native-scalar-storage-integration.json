@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "status": "passed-isolated-native-scalar-storage-integration",
+  "createdAtUtc": "2026-10-17T18:30:35.087621+00:00",
+  "sources": {
+    "src/MNBL.AgentStorage/AgentDomainStorage.hpp": "c5d9ee96a5109438fdfff03287ee8f8a32130835212afef47f2b2044638b5274",
+    "src/MNBL.AgentStorage/StableAgentStorage.hpp": "34555749bbfdf9ad318a02aea660f36cfe57ee9183e856df48c216ebf8503458",
+    "tools/battle-scale/prepare_segmented_scalar_harness.py": "ac005278fd77d19c385c5d703c3b99a0abeecb1c344ee5ec1cb1eb8a1f675d00",
+    "tests/AgentStorage/native_scalar_harness.cpp": "6ba29910c3b737fc54ebfa53103c6a069d7459e4556cbb15082c6a13a558c798",
+    "tools/battle-scale/Test-NativeScalarHarness.cmd": "4a0b8f303475707fac44555de1ebe1cef5ea3524af9a27e4791aaff2fc5132e3",
+    "tools/battle-scale/verify_native_scalar_harness.py": "32688107bb4765034b9d415ea5ed055d7ff744704f4d8dc934423c4c1dee3f2a",
+    "evidence/engine-extension/native-simple-agent-operation-routes.json": "fb5e74eff6c0086c97bfc75da29db2768fce1047ac15aacdb0557933116f2516"
+  },
+  "preservedAcceptedInputs": {
+    "tools/battle-scale/prepare_segmented_write_harness.py": "a47b5c69f8304de4c581993d1e3c1cac1596bda0a70b2f89668837670572a581",
+    "tests/AgentStorage/native_write_harness.cpp": "abbcd32675b17e51d26f31df845dcc6c00d2a5aa18be355b9802e5ff8139bcf8",
+    "tools/battle-scale/Test-NativeWriteHarness.cmd": "e251bcb9725ada29340615a5c4398cbac8fd2af66f44e2dd3b6f02563f74a716",
+    "tools/battle-scale/verify_native_write_harness.py": "2dc0433e02ad3eb83441abead51d476e1d1bdca32ecefd287b18a349d401550d",
+    "build/agent-storage/write_machine_code.hpp": "5e2781fc13dfa58720a64c099daab039ffe15fc1c58e7d267eee8c9b2ebbb9c7",
+    "evidence/engine-extension/native-write-storage-integration.json": "d68c5df9246f6b4aa8ada900dd5f58f638061688e7a66a3216268a7b291c55ae",
+    "evidence/engine-extension/native-segmented-write-independent-review.json": "d1381314f5aa9fb6cbad5e4b0021c6a641ddfc3cbdfd06ea86ad609e8111aa9a"
+  },
+  "outputs": {
+    "build/agent-storage/scalar_machine_code.hpp": "6b8566845f64dcbf2d16b25331b5d0d6e653fcc0e2cf4fad20c7ea3aacc328f8",
+    "build/agent-storage/native_scalar_harness.exe": "50a40d80fbcc9759fc99228c3a8102c489a4b843f5698f432b0438e20e3d444e",
+    "build/agent-storage/native_scalar_harness_asan.exe": "71f87e3a6d8e1bc20dcae6266fb2d0e9a7a8c7aa63869a53622fb4c516072d0f",
+    "evidence/engine-extension/native-segmented-scalar-replay.json": "0acfadb3a4715f49c0ca17590e1cc2d8f37abb03577f21571074910def49cf84"
+  },
+  "exitCode": 0,
+  "stdout": "{\"sites\": 7, \"passedCases\": 112, \"sha256\": \"0acfadb3a4715f49c0ca17590e1cc2d8f37abb03577f21571074910def49cf84\"}\nnative_scalar_harness.cpp\nPASS seven real x64 scalar adapters: 85680 operations;2040->4080->6120->8160->10200;stable borrowed/owned payloads\nPASS 670 instruction-boundary Windows unwinds;91 exact UD2 error-path unwinds;index reuse;independent domains;read/write lease blocks growth/close;teardown\nISOLATED HARNESS ONLY: explicit fixture traps, no production failure policy, live game, real Agent constructors or whole-engine barrier\nnative_scalar_harness.cpp\nPASS seven real x64 scalar adapters: 85680 operations;2040->4080->6120->8160->10200;stable borrowed/owned payloads\nPASS 670 instruction-boundary Windows unwinds;91 exact UD2 error-path unwinds;index reuse;independent domains;read/write lease blocks growth/close;teardown\nISOLATED HARNESS ONLY: explicit fixture traps, no production failure policy, live game, real Agent constructors or whole-engine barrier\n",
+  "stderr": "",
+  "checks": {
+    "sites": 7,
+    "unicornCases": 112,
+    "originalMachineInstructionComparisons": 70,
+    "explicitUnicornFailureTraps": 42,
+    "nativeBuilds": [
+      "MSVC optimized",
+      "MSVC AddressSanitizer"
+    ],
+    "scalarOperationsPerBuild": 85680,
+    "instructionBoundaryUnwindsPerBuild": 670,
+    "actualExplicitErrorUnwindsPerBuild": 91,
+    "storageCapacities": [
+      2040,
+      4080,
+      6120,
+      8160,
+      10200
+    ],
+    "coverage": [
+      "All15 GPR outputs and XMM0..15 match original operations despite deliberate volatile helper clobbers in Unicorn.",
+      "Original 64-bit index is captured even when the DWORD result overwrites RAX; load destinations zero-extend.",
+      "Fixed0x108-byte frames, exact helper alignment, real nonvolatile MOV unwind saves, registered wrapper/stub lookup.",
+      "Poisoned unsaved slots/current nonvolatiles check partial prolog and body unwind states at every decoded boundary.",
+      "Invalid owner/index/inactive/closed requests, injected failure status, and caught C++ exceptions lead to exact UD2, never successful zero/ignored operation.",
+      "Actual exception propagation unwinds both generated frames before the narrowly matching fixture handler.",
+      "Borrowed original addresses survive four suffix-growth publications; independent secondary occupancy cannot satisfy primary requests; deleted index gets new generation.",
+      "Held read and write helper leases block close and growth until the operation completes; synthetic storage teardown balances callbacks/allocations."
+    ]
+  },
+  "limitations": [
+    "Isolated standard-CALL wrappers only: no native game entry redirection, prologue integration, incoming/indirect entry closure, engine worker safe point or installed patch.",
+    "Synthetic payloads and callback initialization are not real Bannerlord Agent constructors/destructors.",
+    "UD2 plus narrow fixture SEH interception is a test error contract, not an approved production error policy.",
+    "Arithmetic flags are dead under accepted site continuation proofs; arbitrary condition-code preservation is not claimed.",
+    "Read leases protect lifetime, not same-location concurrent write serialization or pointee lifetime. Helpers return scalar values only.",
+    "Windows boundary unwinding and generated trap propagation are exercised; arbitrary native engine handlers and asynchronous engine exceptions are not certified."
+  ],
+  "gameLaunched": false,
+  "enginePatchApproved": false
+}

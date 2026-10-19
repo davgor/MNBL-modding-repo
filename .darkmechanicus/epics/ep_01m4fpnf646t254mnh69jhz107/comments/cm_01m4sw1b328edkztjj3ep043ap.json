@@ -1,0 +1,13 @@
+{
+  "author": {
+    "label": "Claude Code",
+    "role": "orchestrator"
+  },
+  "body": "2026-10-13 rendering + paused Sandbox milestone verified (not full epic acceptance).\n\nNative generated seed-42 terrain rendered via installed engine scene lifecycle in PID24860. First Sandbox bootstrap PID25644 reached MapState / NavalDLC.View.Map.NavalMapScreen using module-owned mnbl_campaign_42. Final PID23152 confirms the same scene and heights, loading_finished, paused time, and an unobstructed engine screenshot after dismissing the Naval introduction. All three runs completed without a crash; old procedural-mesh crash probes were not rerun.\n\nEvidence: evidence/runtime/in-game/native-render-24860.{json,log,png}; sandbox_boot-25644.*; sandbox_boot-23152.{json,log,png}; sandbox_boot-23152-observation.json. Final module SHA256 3991b6ff2ee200bbde4104b1dcf40e40dea2ff344195ec3a5b771205ae838180. Source build/deployed/runtime hashes agree. Existing saves unchanged; no new saves; game exited. See evidence/runtime/render-and-sandbox-verification.json. Build and offline fixture validation passed; independent source review found no blocking defects. Root independently verified latest screenshot/runtime after review's first-boot evidence.\n\nMain menu now exposes native terrain preview and paused Sandbox terrain test; shared startup path verified via autorun, menu click not separately exercised. README and runtime capability docs updated.\n\nLimits: diagnostic fixture retains official campaign IDs, settlement XY, navigation topology/regions, weather/battle grids and distance caches. Generated terrain and grounded entities/nav vertices are real; generated campaign content/nav gameplay, wrapping, movement, mission transitions and world-bound save/load are NOT accepted. Extracted official scaffold remains local ignored build output. No ticket or epic completion is claimed beyond this requested rendering/boot milestone.",
+  "createdAt": "2026-10-13T05:33:47.490Z",
+  "epicId": "ep_01m4fpnf646t254mnh69jhz107",
+  "format": "darkmechanicus.comment",
+  "formatVersion": 1,
+  "id": "cm_01m4sw1b328edkztjj3ep043ap",
+  "ticketId": null
+}

@@ -1,0 +1,89 @@
+ok    the id map is deterministic
+ok    ids are unique, [a-z0-9_], at most 26 characters
+ok    the world prefix follows the source identity and the world.json hash: another seed or another world.json moves it
+ok    every record id is in the id map with its kind and source uid (26 entries)
+ok    ids depend on kind and uid only (plus the world prefix), never on names
+ok    ownership, capital, binding and membership joins are closed
+ok    realm A: kingdom ruled by its sovereign, presented as empire; the hero keeps its race and presentation
+ok    nullable sovereign: realm C gets a synthesized regent of its parent race
+ok    lords join their realm's ruling clan; the regent leads it
+ok    a realm-less domain holder becomes a clanless Wanderer
+ok    a keeper and a heresiarch with no surviving home city or realm become Wanderers
+ok    a council notable attaches to its home town
+ok    a harbourmaster is a Merchant of its home town (the installed game has no ShipWright heroes)
+ok    a reeve is the Headman of the hamlet it is present at
+ok    a reeve without a hamlet presence falls back to its home town, with provenance
+ok    legends are recorded, not instantiated
+ok    town A: capital, owned by the ruling clan, three villages, a port, its core's culture
+ok    a repeated source name is disambiguated with the ordinal
+ok    nameless hamlets get synthesized, unique village names in UID order
+ok    harbour variants: 'harbor + fishing', 'harbor' and 'landing' are harbours; 'fishing' keeps its sea node without a port
+ok    each town's port collects its harbour villages only
+ok    a garrisoned fortress is owned through its garrison city
+ok    an ungarrisoned fortress is owned by the realm of its culture
+ok    every record carries typed slots with an owner ticket; troop trees and recruit templates are pending for MMR-32
+ok    producer counts recorded: 3 sites as placed, 3 hamlets (2 land) at the busiest core, within hamlets_per_core 3
+ok    every minimum holds; the player aliases are deferred to the registry (MMR-30)
+ok    settlement counts preserved: nothing added or dropped
+ok    nameless cities of one realm become 'Aster Town' and 'Aster Town 2', marked synthesized
+ok    the culture policy covers exactly the generator's 12 civilizations (content_civilizations.cpp kEntityIds)
+ok    excluding the only harbour village drops the port, keeps closure and records the exclusion
+ok    excluding a village moves its Headman to the village's town
+ok    excluding a castle keeps closure and is recorded
+ok    excluding a town -> preserved_settlement
+ok    excluding an unknown id -> broken_join
+ok    excluding without a reason -> missing_field
+ok    XML attribute escaping, control characters (tab included) dropped
+ok    localized form neutralizes TextObject braces and drops control characters
+ok    the XML-ready localized name escapes the localized form
+ok    unknown hamlet role -> unmapped_category
+ok    unknown hero role -> unmapped_category
+ok    unknown hero status -> unmapped_category
+ok    unknown settlement kind -> unmapped_category
+ok    city civilization without a presentation -> unmapped_category
+ok    hero civilization without a presentation -> unmapped_category
+ok    city held by no realm -> faction_distribution
+ok    city held by two realms -> faction_distribution
+ok    capital outside the realm -> broken_join
+ok    realm culture unknown -> broken_join
+ok    city culture unknown -> broken_join
+ok    city culture of another civilization -> broken_join
+ok    hamlet culture unknown -> broken_join
+ok    fortress culture unknown -> broken_join
+ok    duplicate culture id -> duplicate_id
+ok    notable whose home names an unknown city -> broken_join
+ok    hero whose home is not a city -> broken_join
+ok    village notable present at an unknown hamlet -> broken_join
+ok    sovereign of another realm -> sovereign_mismatch
+ok    sovereign who is a legend -> sovereign_mismatch
+ok    castellan without a realm -> broken_join
+ok    a notable with no home, presence, realm or withoutRealm rule -> broken_join
+ok    hamlet with an unknown core -> broken_join
+ok    harbour role without a sea node -> broken_join
+ok    ungarrisoned fortress matching no realm -> broken_join
+ok    ungarrisoned fortress without a culture -> broken_join
+ok    placed cities differ from the sites -> producer_mismatch
+ok    more sites than the producer target -> producer_mismatch
+ok    more fortresses than the producer limit -> producer_mismatch
+ok    more land hamlets at a core than hamlets_per_core -> producer_mismatch
+ok    a world without the founding report -> missing_field
+ok    a world without hamlets_per_core -> missing_field
+ok    a player-adopted hamlet -> unsupported_row
+ok    a player-adopted fortress -> unsupported_row
+ok    duplicate city uid -> duplicate_id
+ok    a world without realms -> missing_field
+ok    a world prefix without a world.json hash -> wrong_type
+ok    id collision is refused, never renamed (17 uids over 16 one-digit hashes) -> id_collision
+ok    the same (kind, uid) twice -> duplicate_id
+ok    a world below a recorded minimum -> invalid_world
+ok    policy content_unknown_member -> unknown_field
+ok    policy content_bad_affiliation -> unmapped_category
+ok    policy content_occupation_without_rule -> unmapped_category
+ok    policy content_settlement_kind_unknown -> unmapped_category
+ok    policy content_settlement_kind_missing -> unmapped_category
+ok    policy content_unknown_rule -> unmapped_category
+ok    policy content_ordinal_without_n -> invalid_template
+ok    policy content_unknown_placeholder -> invalid_template
+ok    policy culture_unofficial -> unmapped_category
+ok    policy culture_duplicate -> duplicate_id
+88/88 checks passed

@@ -1,0 +1,13 @@
+{
+  "author": {
+    "label": "Claude Code",
+    "role": "orchestrator"
+  },
+  "body": "**Decision (MMR-44 scope)**, recorded by the worker; the independent review accepted each item.\n\n- **(a) RegisteringCampaign** is a phase that reports `registration_at_campaign_start` and does nothing. R07's new-game order (`docs/runtime-backend-decision.md`) puts campaign registration inside the new game's `RegisterSubModuleObjects`, which only exists at commit (MMR-45).\n- **(b) Committing/Playing** are implemented as coordinator transitions with an `ICommitStage` that MMR-45 supplies. They are tested offline with scripted commit stages: Playing; a failed commit recovers before Failed; never cancelled; a release during a commit waits for Playing.\n- **(c) ReadyForReview** is where jobs stop in this build; the setup shows the result there. MMR-46 adds the preview and Start Campaign.\n- **(d) In game**, the pipeline now runs worldbridge `--new-request`, `--generate` and `--bundle` (the MMR-22/24/29 components, previously used only by offline tools) as owned children of the game through `GenerationProbe.RunBridge`. The R01 direct-fwg diagnostic stays, gated.\n- **(e) worldbridge `--new-request --seed-source explicit|random`** (only with `--seed`) records a Random World seed the setup drew itself. It is provenance only: ConfigurationId excludes seedSource.\n- **MMR-37/38 components changed in place:**\n  - `RuntimeWorldBackend.Install` is split into `InstallFiles` (worker), `Register` (engine) and `Sweep` (worker); `Install` itself is unchanged for its callers.\n  - `NavigationValidator.Run` now drains `Steps`, so its report is unchanged. The `world_navigation` regression (run 12720) passes 33/33, and the offline navigation tests pass 36/36.",
+  "createdAt": "2026-10-16T03:19:57.420Z",
+  "epicId": "ep_01m4fpnf646t254mnh69jhz107",
+  "format": "darkmechanicus.comment",
+  "formatVersion": 1,
+  "id": "cm_01m51bje7c7bpy0wd4w6ycrw11",
+  "ticketId": "tk_01m4fqfbgk1vwve9rr5fhepm68"
+}

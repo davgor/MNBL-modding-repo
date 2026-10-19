@@ -1,0 +1,13 @@
+{
+  "author": {
+    "label": "Claude Code",
+    "role": "orchestrator"
+  },
+  "body": "**MMR-40 handoff (settlement entities; `docs/settlement-entities.md`).**\n\n1. **Records.** Build the production settlement records with `SettlementFactory.ApplyResolvedPositions(intents, layout.Positions)` from the world's layout (`PreparedSurface.Settlements`, or the persisted `<store>/world-settlements/<scene>.json`). Refuse activation when `SettlementFactory.CheckResolvedPositions` lists anything (a record whose centre, gate or port differs from the scene's placement by more than 1e-3, or a record with no placement). Both are tested offline only (`evidence/world/settlement-placement-tests.json`); nothing in production calls them yet.\n2. **Missing baked entities.** On a world's scene every town, castle and village is baked. `GeneratedMapScene.MissingBakedEntities` lists any of them that `AddNewEntityToMapScene` had to build at run time; activation should fail when it is non-empty after the visuals start.\n3. **Hideouts.** Production hideouts (MMR-34, from the campaign build) are not layout sites: they get a run-time hierarchy from their record (`SettlementEntityFactory.Unresolved`). Giving them to the resolver as sites with a centre, so they are baked and checked, is yours.\n4. **Siege prefab cache.** `GeneratedMapScene.Load` adds `CampaignMapSiegePrefabEntityCache` to a campaign map without one (verified in generated_campaign 17864; `MapScreen.OnInitialize` dereferences it unguarded). Activation must keep loading the campaign map through `GeneratedMapScene`.\n5. **Refused layouts** are persisted as `world-settlements/refused-<content id>.json`; `RuntimeWorldBackend.Sweep` removes them and the reports of swept scenes.\n6. **Coordinates.** Entities stand at `ToPhysical(logical)` (canonical); the records must use the same physical positions (`docs/periodic-coordinates.md`, MMR-40/45 note).",
+  "createdAt": "2026-10-16T23:00:58.326Z",
+  "epicId": "ep_01m4fpnf646t254mnh69jhz107",
+  "format": "darkmechanicus.comment",
+  "formatVersion": 1,
+  "id": "cm_01m53f4yapkcwpc4gdbjhp5b6m",
+  "ticketId": "tk_01m4fqfbgknga8wqn5seq3j94d"
+}

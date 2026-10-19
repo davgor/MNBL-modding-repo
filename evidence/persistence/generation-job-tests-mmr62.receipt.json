@@ -1,0 +1,98 @@
+{
+    "scope":  "The pure job state machine, progress, scheduler and coordinator over scripted stages on a stand-in engine thread; the bridge CLI rule; embedded inputs. No game process (the in-game evidence is the generation_job probe).",
+    "schema":  "mnbl.generation-job-offline.v1",
+    "sourceInputs":  [
+                         {
+                             "sha256":  "e0596898fc04decc1e95b6f39aea7a10444b1dc8264d4febacc5ffab6bb318e3",
+                             "path":  "src/MNBL.ProceduralWorld/Generation/JobStateMachine.cs"
+                         },
+                         {
+                             "sha256":  "9e1eda95ab17842ebb9cf56b70f8402325bbbe41e1685f7c6511b76753954d14",
+                             "path":  "src/MNBL.ProceduralWorld/Generation/ProgressEvents.cs"
+                         },
+                         {
+                             "sha256":  "09471109b653efa330215bcd57523809120b46dfd6f16d63d0adf33cd16bb467",
+                             "path":  "src/MNBL.ProceduralWorld/Generation/EngineWorkScheduler.cs"
+                         },
+                         {
+                             "sha256":  "4eea5f7f739e70f84788bf2e89fdaac163bc71403c2cf0a39210e1270d725087",
+                             "path":  "src/MNBL.ProceduralWorld/Generation/GenerationCoordinator.cs"
+                         },
+                         {
+                             "sha256":  "73eaab4df3d5410af6270ae2bd207434286b22750b0bbd11c7b51e3e3e3849bb",
+                             "path":  "src/MNBL.ProceduralWorld/Generation/GenerationErrors.cs"
+                         },
+                         {
+                             "sha256":  "a4c7381997945efeefa86e7f1e7f84d65f04d4ab2237facbc5189f0abc1c4f05",
+                             "path":  "src/MNBL.ProceduralWorld/UI/WorldSetupModel.cs"
+                         },
+                         {
+                             "sha256":  "e5dfe0418cccfa73bbdf3b8cd94484de6dfe472342f98a3beb9d8a9d7aa20d22",
+                             "path":  "tests/Generation/JobStateMachineTests.cs"
+                         },
+                         {
+                             "sha256":  "96758ec4e69028cdaa4b03c6a46cc132923abb72768ecddb886e36647cabb7c5",
+                             "path":  "worldgen/contracts/progress-event.schema.json"
+                         },
+                         {
+                             "sha256":  "d7b6cc00983a224ad3671fb6a2bacc1fb8269b9b029879db38c84d6b214d9ea2",
+                             "path":  "src/MNBL.ProceduralWorld/Generation/GenerationStages.cs"
+                         },
+                         {
+                             "sha256":  "0866fc801f0931ebbfcd554854fce3b184bf9565681e5295365a0cf36888aab4",
+                             "path":  "src/MNBL.ProceduralWorld/MNBL.ProceduralWorld.csproj"
+                         },
+                         {
+                             "sha256":  "12ec0d25c88f257f2f4fb79ad99cf6174febde6df90ac54a76b45d6695bc37a3",
+                             "path":  "tools/Test-GenerationJob.ps1"
+                         }
+                     ],
+    "cli":  {
+                "explicitDefault":  {
+                                        "exit":  0,
+                                        "seedSource":  "explicit"
+                                    },
+                "random":  {
+                               "exit":  0,
+                               "seedSource":  "random"
+                           },
+                "explicit":  {
+                                 "exit":  0,
+                                 "seedSource":  "explicit"
+                             },
+                "randomWithRandom":  {
+                                         "exit":  2,
+                                         "seedSource":  null
+                                     },
+                "unknown":  {
+                                "exit":  2,
+                                "seedSource":  null
+                            }
+            },
+    "bridge":  {
+                   "sha256":  "776c160626d029e6c9b911472db1a1e7d7992c5f51188259b81fd864e654fe34",
+                   "path":  "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\build\\worldbridge\\Release\\worldbridge.exe"
+               },
+    "referenceInputs":  [
+                            {
+                                "sha256":  "1eb7ab99447ceed5ec717c97b94c4aec5da1edeef9fe4989c287355e03a8f58f",
+                                "path":  "C:\\Program Files (x86)\\Reference Assemblies\\Microsoft\\Framework\\.NETFramework\\v4.8.1\\mscorlib.dll"
+                            },
+                            {
+                                "sha256":  "3fba2c9ab7f1538d09d3a025730da545f3dc24af0b6b74ea5f92cc7768edd5d5",
+                                "path":  "C:\\Program Files (x86)\\Reference Assemblies\\Microsoft\\Framework\\.NETFramework\\v4.8.1\\System.dll"
+                            },
+                            {
+                                "sha256":  "0c5a6f6527a4ebda1d105809c48c0577b316d75d5fd04177a5a0e54f1e4cff59",
+                                "path":  "C:\\Program Files (x86)\\Reference Assemblies\\Microsoft\\Framework\\.NETFramework\\v4.8.1\\System.Core.dll"
+                            },
+                            {
+                                "sha256":  "fdb6fa2aea90683c2e2c3cc0ea2ccbf0b9d7e6d4c98b4e354cfe9aa6c55e39a1",
+                                "path":  "C:\\Program Files (x86)\\Reference Assemblies\\Microsoft\\Framework\\.NETFramework\\v4.8.1\\System.Web.Extensions.dll"
+                            }
+                        ],
+    "executable":  {
+                       "sha256":  "f17d1f4fbc854d8d11c745eff37fd871eae96125598e607934092b2b3b3a44c2",
+                       "path":  "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\build\\research-job44\\test-35d79248e0104f2697e58136f63580d0\\JobStateMachineTests.exe"
+                   }
+}

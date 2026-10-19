@@ -1,0 +1,13 @@
+{
+  "author": {
+    "label": "Claude Code",
+    "role": "orchestrator"
+  },
+  "body": "**MMR-33 handoff: harbour villages and town ports**\n\n**Village ports.** `SettlementFactory` (docs/settlements.md, Positions) gives each of the 80 MMR-27 harbour villages a staged `port_posX`/`port_posY`.\n- The port is the centre of the village's MMR-28 harbour cell (`ports.json` candidate `harbourCell`, a navigable sea cell).\n- All are within the installed village port-centre maximum of 13.09 plus one cell.\n- These villages use coastal village prototypes (installed villages with a port).\n- Fishing types (fisherman, whaler, walrus_hunter) are only drawn for villages with a port. That gives all 69 fishing-type villages the `HasPort` that NavalDLC `FishingPartyCampaignBehavior.CanHaveFishingParties` needs.\n- The intents carry `harbour`, `harbourCell` and `port`, with `positionStatus: pendingEngineValidation`.\n\n**What MMR-35 still owns:**\n- village landing metadata;\n- the sea-approach and land-gate domains;\n- naval templates (fishing party templates per culture).\n\n**Town ports.** Port towns already carry the `chosen.seaPoint` and a shipyard. The template creates a port location for every town; only port towns keep the prototype's port scene override.",
+  "createdAt": "2026-10-15T13:01:56.598Z",
+  "epicId": "ep_01m4fpnf646t254mnh69jhz107",
+  "format": "darkmechanicus.comment",
+  "formatVersion": 1,
+  "id": "cm_01m4ztfbzpfm8pzgvabrnj4hqs",
+  "ticketId": "tk_01m4fqfbgkdsrnhxytt4xafgwd"
+}

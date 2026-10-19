@@ -1,0 +1,105 @@
+ok    n=5: 2 + 3*4 = 14 nodes, south pole 13
+ok    every node decodes to a sample that encodes back to it
+ok    every sample of a pole row is that pole's single node
+ok    pole nodes decode to column 0
+ok    column n-1 duplicates column 0 (duplicate seam)
+ok    duplicate samples flagged; canonical samples not
+ok    row-major interior numbering
+ok    generator parity: size-33 site node 243 is sample (18, 8); 994 nodes
+ok    record (node, x, z) agreement
+ok    pole_of
+ok    a pole is adjacent to its whole ring and nothing else
+ok    adjacency wraps across the seam, diagonals included
+ok    non-neighbours, the two poles and a node with itself are not adjacent
+ok    sample column 5 on n=5 -> out_of_coverage
+ok    sample column -1 (no wrapping) -> out_of_coverage
+ok    sample row 5 -> out_of_coverage
+ok    node -1 -> invalid_node
+ok    node 14 -> invalid_node
+ok    side 2 -> out_of_range
+ok    W = 800, H = W/2
+ok    (0, 0) -> centre (400, 200)
+ok    antimeridian: -180 and +180 are the same point, x = 0
+ok    points either side of the antimeridian sit at either edge
+ok    nearest-image distance across the antimeridian is the short way
+ok    inverse(forward(lat, lon)) = (lat, lon) over the whole globe
+ok    forward(inverse(x, y)) = (x, y)
+ok    inverse wraps x
+ok    y = 0 and y = H are the poles
+ok    pole lines
+ok    forward at the north pole -> singular_point
+ok    forward at the south pole -> singular_point
+ok    latitude 90.5 -> out_of_coverage
+ok    longitude 180.5 -> out_of_coverage
+ok    NaN latitude -> nonfinite_number
+ok    infinite x -> nonfinite_number
+ok    y below the north pole line -> out_of_coverage
+ok    y beyond the south pole line -> out_of_coverage
+ok    east-west factor at a pole -> singular_point
+ok    east-west factor 1/cos(latitude)
+ok    true scale on the equator and meridians: 0.004 units per metre for a 200 km globe
+ok    canonical_x
+ok    wrap_delta picks the nearest image
+ok    periodic layout: physical = logical + (strip W/2, pole margin 3W/4); the physical domain is square, 1600 x 1600
+ok    central meridian 90: the seam moves to -90
+ok    round trip with a shifted central meridian
+ok    the central meridian is part of the identity
+ok    grid samples equal forward(latitude, longitude) of the sample
+ok    duplicate seam column n-1 lands exactly on column 0
+ok    column n-1 is bit-identical to column 0 for non-zero central meridians too
+ok    pole rows are the pole lines
+ok    node position = its canonical sample
+ok    position of the north pole node -> singular_point
+ok    position of the south pole node -> singular_point
+ok    z = (height - sea level) * 0.01
+ok    below the datum only
+ok    non-finite height -> nonfinite_number
+ok    zero radius -> out_of_range
+ok    eastward road across the seam: two pieces, one seam link
+ok    it ends on x = W and continues from x = 0 at the same y; no map-wide step
+ok    westward across the seam
+ok    a path ending on the seam column ends on x = W (the same point as x = 0)
+ok    a diagonal path through the seam column continues from x = 0
+ok    a path starting on the seam heading west starts on x = W, with no zero-length piece
+ok    touching the seam column and turning back is one piece, no seam link
+ok    zigzag along the seam column without crossing is one piece
+ok    crossing the seam twice gives three pieces and no map-wide step
+ok    a seam between columns: the crossing point is interpolated on both edges
+ok    a path through the north pole is split with a pole link
+ok    it meets the pole line at its own longitudes
+ok    a path ending at the south pole ends on the south pole line
+ok    a path starting at a pole starts on the pole line
+ok    an inland path is one piece
+ok    non-adjacent step -> non_adjacent_step
+ok    pole to pole -> non_adjacent_step
+ok    one-node path -> invalid_record
+ok    policy: periodic-equirectangular, W 800, H/W 1/2, 0.01 units per metre, strips W/2
+ok    policy pins the calibration receipt by SHA-256
+ok    policy hash is stable
+ok    policy unknown_member -> unknown_field
+ok    policy wrong_projection -> unsupported_version
+ok    policy version_2 -> unsupported_version
+ok    policy narrow_strip -> out_of_range
+ok    policy zero_height -> out_of_range
+ok    policy string_width -> wrong_type
+ok    policy bad_hash -> invalid_hash
+ok    policy calibration_extra -> unknown_field
+ok    policy notes_array -> wrong_type
+ok    policy with its calibration receipt missing -> missing_file
+ok    policy with an altered calibration receipt -> calibration_mismatch
+ok    a copied policy with its pinned receipt loads with the same hash
+ok    Projection with an in-memory strip below W/2 -> out_of_range
+ok    an edited policy is re-hashed, not stamped with the file's hash
+ok    same inputs, same identity
+ok    radius and grid side change the identity
+ok    identity = SHA-256 of the canonical document
+ok    the document names the policy hash
+ok    export of a world without effective_config.sea_level -> missing_field
+ok    terrain.bin carries the projection identity
+ok    terrain.json and objects.json carry the same identity
+ok    every terrain sample's z and below-datum flag come from the projection
+ok    the source water class is carried unchanged after the below-datum bytes
+ok    every settlement, hamlet, port, castle and key-location position is the projection of its node
+ok    export counts
+ok    export of the reader fixture's synthetic node numbering -> node_mismatch
+104/104 checks passed

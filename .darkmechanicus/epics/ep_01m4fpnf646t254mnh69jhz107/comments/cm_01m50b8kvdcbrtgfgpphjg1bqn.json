@@ -1,0 +1,13 @@
+{
+  "author": {
+    "label": "Claude Code",
+    "role": "orchestrator"
+  },
+  "body": "From MMR-35 (accepted; docs/naval-content.md): `NavalContentFactory` emits map-entity intents that MMR-40 must place. War Sails reads each of them from the scene.\n- **Port marker** (`main_map_city_port`) at each port town's port.\n- **Blockade arc**:\n  - a `BlockadePositionScript` on the town entity with the installed median parameters (10 ships, 4 arcs, 1.555 apart, angle 1.931, `dromon_ship_nested`, scale 0.045);\n  - `Blockade_Arc_Start`/`Blockade_Arc_End` children at the facility's `ArcStart`/`ArcEnd`. These are placed in the port's seaward frame on the basin's water: all 30 at size 129, with 11 turned or mirrored. Once ports and coasts are snapped, re-fit them to the navmesh.\n  - Without the script there are simply no blockade ships.\n- **Village drop-off** (`main_map_village_dropoff`) under each harbour village entity, at its port. `NavalMapSceneWrapper.InitializeDropOffLocations` sets the village port from it. Naval raids also need `landing_00N`/`jumping_00N` entities in the village scene.\n- **Pirate spawn points** (`PirateSpawnPoint` script with `ClanStringId` and `Radius`) at each spawn position: 29 positions and 53 zones at size 129, with an outer zone and usually a stacked inner zone. `INavalMapSceneWrapper.GetSpawnPoints(clan id)` reads them. Until the generated scene answers it, pirates spawn nothing (0 patrol zones in runs 21180/37592).\n- Ports and gates are still the staged MMR-28 points.",
+  "createdAt": "2026-10-15T17:55:21.069Z",
+  "epicId": "ep_01m4fpnf646t254mnh69jhz107",
+  "format": "darkmechanicus.comment",
+  "formatVersion": 1,
+  "id": "cm_01m50b8kvdcbrtgfgpphjg1bqn",
+  "ticketId": "tk_01m4fqfbgkkntdvg7kaxc9k8yz"
+}

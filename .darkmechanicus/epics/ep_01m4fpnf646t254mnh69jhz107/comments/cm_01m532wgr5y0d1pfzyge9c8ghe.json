@@ -1,0 +1,13 @@
+{
+  "author": {
+    "label": "Claude Code",
+    "role": "orchestrator"
+  },
+  "body": "**Handoff from MMR-66 (display-copy memory).**\n\n- **The scene holds every settlement entity twice.** A periodic world gets one display copy per settlement, so the copy cost scales with the settlement count.\n- **Fixture budget** (run 33944, `evidence/world/periodic-camera-picking.json` `budget`):\n  - 4 copies, 50 registered entities in `MapScreen.VisualsOfEntities`, 370 scene root entities;\n  - 20 camera wraps and two party crossings left all of them unchanged;\n  - managed memory +83 KB; private bytes −122 MB (noise).\n- **No memory limit exists yet.** MMR-21 recorded no visible-copy memory limit, so MMR-66 judged only non-growth.\n- **What MMR-56 should measure on a full-size world:** copy entity count, `VisualsOfEntities` size and the private-bytes delta from the copies (`PeriodicMapPresentation.Copies`). It should also set the limit.\n- **Per-frame cost** comes from the display-rule postfixes on every visible party visual and nameplate, plus `RefreshImages` on camera wraps or moves over 50 units. It has not been profiled.",
+  "createdAt": "2026-10-16T19:26:39.365Z",
+  "epicId": "ep_01m4fpnf646t254mnh69jhz107",
+  "format": "darkmechanicus.comment",
+  "formatVersion": 1,
+  "id": "cm_01m532wgr5y0d1pfzyge9c8ghe",
+  "ticketId": "tk_01m4fqfbgmw4wvsvp7fy58y1xk"
+}

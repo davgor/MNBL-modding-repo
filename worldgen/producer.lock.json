@@ -1,0 +1,65 @@
+{
+  "schema": "mnbl.producer-lock",
+  "version": 1,
+  "producer": {
+    "implementation": "fwgc++",
+    "sourceRepository": "https://github.com/davgor/FWGC-.git",
+    "localSource": "C:/Users/davgo/Documents/GitHub/FWGC++",
+    "sourceCommit": "ec5d1c10f5ae4c32fdcef092d23ad7d51e2a30de",
+    "sourceCommitDate": "2026-09-29T13:37:05-05:00",
+    "sourceDirty": false,
+    "binary": "build/producer/apps/Release/fwg.exe",
+    "sha256": "564c2629b5b92d49e52cd466a5a1aaa9339380464207ddcae669dd487d2f695e",
+    "generatorSchema": "fwg.world",
+    "schemaVersion": 2,
+    "splitVersion": 1,
+    "capabilitiesSha256": "80d7cb96bfdabae53bf9cbc9fbadc9f0e2d071192083d548bcb6e6aa69437ce1",
+    "helpSha256": "cfde144a043d1dd213ea6061776d7357e9b6dd28a4187c9c3c30ea53e9d01b96",
+    "commands": {
+      "generate": ["generate", "--request", "{request}", "--split", "{split}", "--quiet"],
+      "capabilities": ["capabilities", "--output", "{output}"],
+      "help": ["--help"]
+    },
+    "exitContract": {
+      "0": "success; split world written",
+      "2": "refusal: fantasy-world-generator.failure schema_version 2 on stdout"
+    }
+  },
+  "toolchain": {
+    "compiler": "MSVC",
+    "compilerVersion": "19.44.35228.0",
+    "toolset": "14.44.35207",
+    "configuration": "Release",
+    "architecture": "x64",
+    "windowsSdk": "10.0.26100.0",
+    "cmake": "3.31.6-msvc6",
+    "cmakeCommand": "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/bin/cmake.exe",
+    "generator": "Visual Studio 17 2022",
+    "floatingPoint": "precise",
+    "buildScript": "tools/Build-Fwg.ps1"
+  },
+  "runtime": {
+    "ucrtbaseSha256": "dedb7611e1abc1ff3852dcac3d4c93a048d729e25b061973b9969f22698f14ca",
+    "requiredDlls": [
+      "MSVCP140.dll", "VCRUNTIME140.dll", "VCRUNTIME140_1.dll",
+      "api-ms-win-crt-runtime-l1-1-0.dll", "api-ms-win-crt-heap-l1-1-0.dll", "api-ms-win-crt-convert-l1-1-0.dll",
+      "api-ms-win-crt-stdio-l1-1-0.dll", "api-ms-win-crt-filesystem-l1-1-0.dll", "api-ms-win-crt-string-l1-1-0.dll",
+      "api-ms-win-crt-math-l1-1-0.dll", "api-ms-win-crt-environment-l1-1-0.dll", "api-ms-win-crt-locale-l1-1-0.dll",
+      "KERNEL32.dll"
+    ]
+  },
+  "contentProvenance": {
+    "dependencyManifest": "dependencies.json at sourceCommit",
+    "dependencyManifestSha256": "21848202724820af3c436005929e695850ae56c350bc4394723946df412daa03",
+    "note": "FWGC++ fetches external content only through dependencies.cmake with hash-checked, licence-recorded entries in dependencies.json; no FWGC++ source is modified by this repository."
+  },
+  "acceptedEvidence": {
+    "ticket": "MMR-10 (F02) rebuild and registration; MMR-15 (R01) process boundary",
+    "toolsLock": "tools.lock.json",
+    "buildLog": {"path": "evidence/fwg/build.log", "sha256": "76b3921b9f362be5898a3feb00d579454b811bd79c739c000392934908ed600c"},
+    "ctestLog": {"path": "evidence/fwg/ctest.log", "sha256": "8950f902ff14a5afb52951006f8b683cd053ec07c011a9fea0a876b7dbc0d881"},
+    "capabilities": "evidence/fwg/capabilities.json",
+    "help": "evidence/fwg/help.txt",
+    "verification": {"path": "evidence/fwg/producer-verification.json", "sha256": "c723a6d2158962f6b55cfc9e81ebd8f627238c8ea330cbf8f563368c81528af2"}
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "author": {
+    "label": "Claude Code",
+    "role": "orchestrator"
+  },
+  "body": "MMR-57 working note (16:26 UTC). The confirming clean-install sequence's first rerun passed install, disable, remove and reload. Its read-only phase was invalid: icacls adds SYNCHRONIZE to every deny entry, even one of listed rights (`(DENY)(W,D,DC)` came out as `DeleteSubdirectoriesAndFiles, Write, Delete, Synchronize`), and a denied SYNCHRONIZE fails every open. The game stopped right after the module's descriptor was listed, before the probe ran. The same cause explains the first sequence's read-only stall. Fixed in `tools/Test-CleanInstall.ps1`:\n- the denial is set through .NET `FileSystemAccessRule` (no SYNCHRONIZE; reproduced on a scratch folder: reads and listing work, while create, modify, mkdir and delete are refused);\n- the read-only probe runs only when the access check proves that;\n- a missing probe result is recorded instead of aborting the sequence.\n\nThe whole sequence is rerunning.",
+  "createdAt": "2026-10-18T16:26:02.941Z",
+  "epicId": "ep_01m4fpnf646t254mnh69jhz107",
+  "format": "darkmechanicus.comment",
+  "formatVersion": 1,
+  "id": "cm_01m57xb89x145m48bw4ek45gwa",
+  "ticketId": "tk_01m4fqfbgmgdqahamt65ejaxz7"
+}

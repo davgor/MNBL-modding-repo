@@ -1,0 +1,13 @@
+{
+  "author": {
+    "label": "Claude Code",
+    "role": "orchestrator"
+  },
+  "body": "**Handoff from MMR-43 (setup screen).**\n\n- **Replace the interim runner.** `InterimGenerationRunner` (`src/MNBL.ProceduralWorld/UI/WorldSetupScreen.cs`) runs the R01 job behind `IWorldGenerationRunner`. GenerationCoordinator replaces it: `Run(WorldChoice, onStage, onJobCreated, token)` returns the source split, `Classify(error, jobRoot)` returns a `GenerationError`, and `Release(jobRoot)` frees the job's files when the setup no longer shows them.\n- **Build the request from `WorldChoice.RequestFields()`** (`UI/WorldSetupModel.cs`). It supplies `campaignInstanceId`, `masterSeed`, `seedSource` (explicit or random), `recipeVersion`, `overrides`, `maxAttempts` and `producerLockSha256`. The lock is sha256(`worldgen/producer.lock.json`), which is not the one-shot profile's `producerLockSha256` field: that field is the tools lock. `tests/UI/WorldSetupTests.cs` checks all of these against `generation-request.schema.json`. **Add `schema`, `version` and `policies`**; the schema's required fields not supplied are exactly those three.\n- **Stages.** The screen maps the R01 stage names to player text (`StageText.Describe`). Emit new stage names, or extend that mapping. An unknown stage keeps the last text.\n- **Errors.** Use the `GenerationErrorCategory` vocabulary (`Generation/GenerationErrors.cs`, MMR-47's names). Keep codes, executable names, paths and hashes in `Detail`.\n- **Keep it off the engine thread.** The world summary reads world.json on the worker; an engine-thread parse froze the game 6–11 s (MMR-43 review B1). The `world_setup` probe fails a run whose largest frame gap during generation is 0.5 s or more.\n- **Quality attempts.** The interim job makes no retries. The profile's attempt count (3) is in the request fields only.",
+  "createdAt": "2026-10-16T01:26:10.114Z",
+  "epicId": "ep_01m4fpnf646t254mnh69jhz107",
+  "format": "darkmechanicus.comment",
+  "formatVersion": 1,
+  "id": "cm_01m51522y2tpcw4effr5j87gk5",
+  "ticketId": "tk_01m4fqfbgk1vwve9rr5fhepm68"
+}

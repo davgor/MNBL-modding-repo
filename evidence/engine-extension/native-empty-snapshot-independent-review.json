@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "status": "accepted-necessary-empty-stock-metadata-gate",
+  "reviewedSources": {
+    "src/MNBL.AgentStorage/EmptyNativePoolSnapshot.hpp": "2611addbeaad6b5fe1cb8b6d2a34b81bb9d858be6e205366f3ae5c48804a9c76",
+    "src/MNBL.AgentStorage/NativePoolSnapshot.hpp": "cf2076735a90908babe1e9ddf6564aa19f188810b44e53f87b764a7529d73248",
+    "src/MNBL.AgentStorage/StableAgentStorage.hpp": "34555749bbfdf9ad318a02aea660f36cfe57ee9183e856df48c216ebf8503458",
+    "tests/AgentStorage/empty_native_snapshot_tests.cpp": "3fc62e0806d695b9c8db3c2c6e81c600ecb2255b547cb35ce47d37c943a85d34",
+    "tools/battle-scale/Test-EmptyNativeSnapshot.cmd": "e7b3c64178924e79d1cac05b42d561ad7270125589e569d3fa84da77ec6d9afa",
+    "tools/battle-scale/review_empty_native_snapshot.py": "af6977c4f195f34a08166bf3d758790fa24e9f8c2261dfe32fe38504c396a5be",
+    "build/agent-storage/empty_native_snapshot_tests.exe": "4b92f58a9d20a38ae3bd62cac091de8deb03662a464ef3307c288fc639427596",
+    "build/agent-storage/empty_native_snapshot_asan.exe": "5838befc98fcdb9f9ebf743b77fd0a9390fc452db34547442b6386a7fdf6928f"
+  },
+  "generatedArtifacts": {
+    "build/agent-storage/empty_native_snapshot_independent.cpp": "0b53af83d4b58dc43ccb2a4794c42957a441f6ac0591c2392a68b572a52eade9",
+    "build/agent-storage/Test-EmptySnapshotIndependent.cmd": "840161bcc47d7772f3060545db64757a63fa746baddb7a5bd2694fcf788140ab",
+    "build/agent-storage/empty_native_snapshot_independent_optimized.exe": "0a99dc3ded918ead98b99b7546da4a7169b505cc9ceeb1a26b2d6a62ec8b0d64",
+    "build/agent-storage/empty_native_snapshot_independent_asan.exe": "acc8b021966a5a0b9fbf4bd50b841eaa22c6b666f7e4b27217c7c959a7dd1a74"
+  },
+  "findings": [],
+  "originalExecutablesReplayed": [
+    "build/agent-storage/empty_native_snapshot_tests.exe",
+    "build/agent-storage/empty_native_snapshot_asan.exe"
+  ],
+  "originalChecksPerBuild": 137,
+  "independentExecution": {
+    "returnCode": 0,
+    "stdout": "PASS empty stock snapshot: 137 checks;poisoned payloads;all-five dimensions/counters/headers/links;phase-mismatch rejection\nPASS empty stock snapshot: 137 checks;poisoned payloads;all-five dimensions/counters/headers/links;phase-mismatch rejection\nempty_native_snapshot_independent.cpp\nPASS independent empty snapshot 20452 checks;20400 all-index mutations;unaligned spans;strict dimensions;metadata-only scope\nempty_native_snapshot_independent.cpp\nPASS independent empty snapshot 20452 checks;20400 all-index mutations;unaligned spans;strict dimensions;metadata-only scope\n",
+    "stderr": "",
+    "checksPerBuild": 20452
+  },
+  "observations": [
+    "Exact 2040-record dimensions and 4080-byte links are required in each of five pools.",
+    "Every one of 10200 headers and 10200 links was independently mutated and rejected with correct pool/index diagnostics.",
+    "Negative/positive extreme counters, zero/oversized views and unaligned views behaved as specified.",
+    "Strict -1 comparison rejects all other negative header/link values; memcpy avoids alignment undefined behavior.",
+    "Other payload fields remain deliberately unvalidated. Passing metadata does not establish object inactivity, absence of resources or publication safety."
+  ],
+  "limitations": [
+    "Caller must supply readable immutable spans, completed constructor state, correct native byte layout, object lifetime and a mutation exclusion barrier through adoption.",
+    "This is stock2040 only; expanded pools and occupied imports are intentionally unsupported.",
+    "The old occupied validator remains unchanged and receives no approval from this review.",
+    "No live Mission snapshot, native thread synchronization, no-escape proof or engine hook was exercised."
+  ],
+  "gameLaunched": false,
+  "enginePatchApproved": false
+}

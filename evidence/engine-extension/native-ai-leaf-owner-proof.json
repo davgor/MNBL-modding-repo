@@ -1,0 +1,385 @@
+{
+  "schemaVersion": 1,
+  "status": "bounded-specific-caller-owner-proof-not-global-hook-approval",
+  "binarySha256": "2a5e0e0b15513ebb7052d747a621b82c50ee834553eba283b33bbbc33766e12a",
+  "reviewedSourceSha256": {
+    "tools/battle-scale/prove_mission_aliases.py": "db09289f102d053fb905c7cc8ac590e3bcf7b4fcfff6018c1d413a8de4d1ba2a",
+    "tools/battle-scale/extend_live_agent_owner_proofs.py": "42c11d76e4609c7b481e4f933bb22524b0b5fae7431164b19e2eedaf9ddfe9e9",
+    "tools/battle-scale/bounded_native_register_effects.py": "97f95c176ec1fa806afbfcf86696121f2d752d4905ea593edc2253b3f3938cc6",
+    "tools/battle-scale/install_live_growth_flow_contracts.py": "48d380523478fffd481a440c0e1f7e703acd250e71cb057f2a6ba731620a34db",
+    "tools/battle-scale/prove_native_ai_leaf_owner.py": "8397aed93855762b39adfee170cd435534faa93e3b92a202e46458870e36cc26",
+    "evidence/engine-extension/native-live-agent-owner-extension.json": "7b03fc003fc6cb662476a9fc9241c09fd3dd1a9f41d5b654fd82d3923b28bd1d"
+  },
+  "entry": "0x1807114c0",
+  "endExclusive": "0x1807114f2",
+  "bodyBytes": "83b9f8140000097526486381a417000085c0781b4869d0600c0000488b81d814000083bc02b0320000017503b001c332c0c3",
+  "boundaryProof": "Exact direct-call target7114c0 after12INT3; complete forward-branch leaf decode to7114f2 withtwoRET and no pdata overlap. Never starts atpadding7114b4.",
+  "entryContract": {
+    "kind": "specific-established-direct-call-context",
+    "entryPointerKind": "agent-ai",
+    "entryRegisters": {
+      "rcx": "agent-ai"
+    },
+    "entryBiases": {
+      "rcx": 0
+    },
+    "sourceProcedure": "0x180712560",
+    "callInstruction": {
+      "address": "0x18071272e",
+      "bytes": "e88dedffff",
+      "mnemonic": "call",
+      "operands": "0x1807114c0"
+    },
+    "argumentProvenance": {
+      "rcx": [
+        {
+          "address": "0x1807125e9",
+          "bytes": "488bf1",
+          "mnemonic": "mov",
+          "operands": "rsi, rcx"
+        },
+        {
+          "address": "0x18071272a",
+          "bytes": "488b4e08",
+          "mnemonic": "mov",
+          "operands": "rcx, qword ptr [rsi + 8]"
+        }
+      ]
+    },
+    "callerContract": {
+      "kind": "exact-direct-call-register-owner",
+      "entryPointerKind": "agent-ai",
+      "entryRegisters": {
+        "r8": "agent-ai",
+        "rcx": "agent-ai"
+      },
+      "sourceProcedure": "0x1806b85e0",
+      "entryBiases": {
+        "r8": 8672,
+        "rcx": 4984
+      },
+      "callInstruction": {
+        "address": "0x1806b9290",
+        "bytes": "e8cb920500",
+        "mnemonic": "call",
+        "operands": "0x180712560"
+      },
+      "argumentProvenance": {
+        "r8": [
+          {
+            "address": "0x1806b8607",
+            "bytes": "4c8bf9",
+            "mnemonic": "mov",
+            "operands": "r15, rcx"
+          },
+          {
+            "address": "0x1806b927f",
+            "bytes": "4d8d87e0210000",
+            "mnemonic": "lea",
+            "operands": "r8, [r15 + 0x21e0]"
+          }
+        ],
+        "rcx": [
+          {
+            "address": "0x1806b8607",
+            "bytes": "4c8bf9",
+            "mnemonic": "mov",
+            "operands": "r15, rcx"
+          },
+          {
+            "address": "0x1806b9286",
+            "bytes": "498d8f78130000",
+            "mnemonic": "lea",
+            "operands": "rcx, [r15 + 0x1378]"
+          }
+        ]
+      },
+      "evidenceIds": [
+        "ev_7f98cb55e222805658367887babec2c45c888d73803b4be5deee49aa165d5ef6",
+        "ev_0903bb131caac6ae01cd6e9d1206055064bfa4ace2b11da20b3d9070aac17a5b",
+        "ev_85627aff0962d117a450369764fe7c952c58810aa7916dac526543304d5772b7",
+        "ev_d5f8505d1a38e3835ce6f81881040adf46fec5f1d050ea9b474a58cbc428bd1c",
+        "ev_4cf07ee188d1db8a5da960a2827cdf71929ac7410ee167140656458101ded433"
+      ]
+    },
+    "scope": "Conditional on this established caller receiver contract. No universal ABI inferred from offsets."
+  },
+  "callerAnalysis": {
+    "procedure": "0x180712560",
+    "status": "converged",
+    "entryContract": {
+      "kind": "exact-direct-call-register-owner",
+      "entryPointerKind": "agent-ai",
+      "entryRegisters": {
+        "r8": "agent-ai",
+        "rcx": "agent-ai"
+      },
+      "sourceProcedure": "0x1806b85e0",
+      "entryBiases": {
+        "r8": 8672,
+        "rcx": 4984
+      },
+      "callInstruction": {
+        "address": "0x1806b9290",
+        "bytes": "e8cb920500",
+        "mnemonic": "call",
+        "operands": "0x180712560"
+      },
+      "argumentProvenance": {
+        "r8": [
+          {
+            "address": "0x1806b8607",
+            "bytes": "4c8bf9",
+            "mnemonic": "mov",
+            "operands": "r15, rcx"
+          },
+          {
+            "address": "0x1806b927f",
+            "bytes": "4d8d87e0210000",
+            "mnemonic": "lea",
+            "operands": "r8, [r15 + 0x21e0]"
+          }
+        ],
+        "rcx": [
+          {
+            "address": "0x1806b8607",
+            "bytes": "4c8bf9",
+            "mnemonic": "mov",
+            "operands": "r15, rcx"
+          },
+          {
+            "address": "0x1806b9286",
+            "bytes": "498d8f78130000",
+            "mnemonic": "lea",
+            "operands": "rcx, [r15 + 0x1378]"
+          }
+        ]
+      },
+      "evidenceIds": [
+        "ev_7f98cb55e222805658367887babec2c45c888d73803b4be5deee49aa165d5ef6",
+        "ev_0903bb131caac6ae01cd6e9d1206055064bfa4ace2b11da20b3d9070aac17a5b",
+        "ev_85627aff0962d117a450369764fe7c952c58810aa7916dac526543304d5772b7",
+        "ev_d5f8505d1a38e3835ce6f81881040adf46fec5f1d050ea9b474a58cbc428bd1c",
+        "ev_4cf07ee188d1db8a5da960a2827cdf71929ac7410ee167140656458101ded433"
+      ]
+    },
+    "decodedInstructions": 1916,
+    "reachableInstructions": 1916,
+    "worklistSteps": 4241,
+    "indirectJumpsOverapproximatedToAllDecodedInstructions": []
+  },
+  "leafAnalysis": {
+    "procedure": "0x1807114c0",
+    "status": "converged",
+    "entryContract": {
+      "kind": "specific-established-direct-call-context",
+      "entryPointerKind": "agent-ai",
+      "entryRegisters": {
+        "rcx": "agent-ai"
+      },
+      "entryBiases": {
+        "rcx": 0
+      },
+      "sourceProcedure": "0x180712560",
+      "callInstruction": {
+        "address": "0x18071272e",
+        "bytes": "e88dedffff",
+        "mnemonic": "call",
+        "operands": "0x1807114c0"
+      },
+      "argumentProvenance": {
+        "rcx": [
+          {
+            "address": "0x1807125e9",
+            "bytes": "488bf1",
+            "mnemonic": "mov",
+            "operands": "rsi, rcx"
+          },
+          {
+            "address": "0x18071272a",
+            "bytes": "488b4e08",
+            "mnemonic": "mov",
+            "operands": "rcx, qword ptr [rsi + 8]"
+          }
+        ]
+      },
+      "callerContract": {
+        "kind": "exact-direct-call-register-owner",
+        "entryPointerKind": "agent-ai",
+        "entryRegisters": {
+          "r8": "agent-ai",
+          "rcx": "agent-ai"
+        },
+        "sourceProcedure": "0x1806b85e0",
+        "entryBiases": {
+          "r8": 8672,
+          "rcx": 4984
+        },
+        "callInstruction": {
+          "address": "0x1806b9290",
+          "bytes": "e8cb920500",
+          "mnemonic": "call",
+          "operands": "0x180712560"
+        },
+        "argumentProvenance": {
+          "r8": [
+            {
+              "address": "0x1806b8607",
+              "bytes": "4c8bf9",
+              "mnemonic": "mov",
+              "operands": "r15, rcx"
+            },
+            {
+              "address": "0x1806b927f",
+              "bytes": "4d8d87e0210000",
+              "mnemonic": "lea",
+              "operands": "r8, [r15 + 0x21e0]"
+            }
+          ],
+          "rcx": [
+            {
+              "address": "0x1806b8607",
+              "bytes": "4c8bf9",
+              "mnemonic": "mov",
+              "operands": "r15, rcx"
+            },
+            {
+              "address": "0x1806b9286",
+              "bytes": "498d8f78130000",
+              "mnemonic": "lea",
+              "operands": "rcx, [r15 + 0x1378]"
+            }
+          ]
+        },
+        "evidenceIds": [
+          "ev_7f98cb55e222805658367887babec2c45c888d73803b4be5deee49aa165d5ef6",
+          "ev_0903bb131caac6ae01cd6e9d1206055064bfa4ace2b11da20b3d9070aac17a5b",
+          "ev_85627aff0962d117a450369764fe7c952c58810aa7916dac526543304d5772b7",
+          "ev_d5f8505d1a38e3835ce6f81881040adf46fec5f1d050ea9b474a58cbc428bd1c",
+          "ev_4cf07ee188d1db8a5da960a2827cdf71929ac7410ee167140656458101ded433"
+        ]
+      },
+      "scope": "Conditional on this established caller receiver contract. No universal ABI inferred from offsets."
+    },
+    "decodedInstructions": 13,
+    "reachableInstructions": 13,
+    "worklistSteps": 13,
+    "indirectJumpsOverapproximatedToAllDecodedInstructions": []
+  },
+  "instructions": [
+    {
+      "address": "0x1807114c0",
+      "bytes": "83b9f814000009",
+      "mnemonic": "cmp",
+      "operands": "dword ptr [rcx + 0x14f8], 9"
+    },
+    {
+      "address": "0x1807114c7",
+      "bytes": "7526",
+      "mnemonic": "jne",
+      "operands": "0x1807114ef"
+    },
+    {
+      "address": "0x1807114c9",
+      "bytes": "486381a4170000",
+      "mnemonic": "movsxd",
+      "operands": "rax, dword ptr [rcx + 0x17a4]"
+    },
+    {
+      "address": "0x1807114d0",
+      "bytes": "85c0",
+      "mnemonic": "test",
+      "operands": "eax, eax"
+    },
+    {
+      "address": "0x1807114d2",
+      "bytes": "781b",
+      "mnemonic": "js",
+      "operands": "0x1807114ef"
+    },
+    {
+      "address": "0x1807114d4",
+      "bytes": "4869d0600c0000",
+      "mnemonic": "imul",
+      "operands": "rdx, rax, 0xc60"
+    },
+    {
+      "address": "0x1807114db",
+      "bytes": "488b81d8140000",
+      "mnemonic": "mov",
+      "operands": "rax, qword ptr [rcx + 0x14d8]"
+    },
+    {
+      "address": "0x1807114e2",
+      "bytes": "83bc02b032000001",
+      "mnemonic": "cmp",
+      "operands": "dword ptr [rdx + rax + 0x32b0], 1"
+    },
+    {
+      "address": "0x1807114ea",
+      "bytes": "7503",
+      "mnemonic": "jne",
+      "operands": "0x1807114ef"
+    },
+    {
+      "address": "0x1807114ec",
+      "bytes": "b001",
+      "mnemonic": "mov",
+      "operands": "al, 1"
+    },
+    {
+      "address": "0x1807114ee",
+      "bytes": "c3",
+      "mnemonic": "ret",
+      "operands": ""
+    },
+    {
+      "address": "0x1807114ef",
+      "bytes": "32c0",
+      "mnemonic": "xor",
+      "operands": "al, al"
+    },
+    {
+      "address": "0x1807114f1",
+      "bytes": "c3",
+      "mnemonic": "ret",
+      "operands": ""
+    }
+  ],
+  "ownerUse": {
+    "multiply": {
+      "address": "0x1807114d4",
+      "bytes": "4869d0600c0000",
+      "mnemonic": "imul",
+      "operands": "rdx, rax, 0xc60"
+    },
+    "use": {
+      "address": "0x1807114e2",
+      "bytes": "83bc02b032000001",
+      "mnemonic": "cmp",
+      "operands": "dword ptr [rdx + rax + 0x32b0], 1"
+    },
+    "effectiveOwner": "agent",
+    "fieldOffset": 1376,
+    "definitions": [
+      {
+        "address": "0x1807114d4",
+        "bytes": "4869d0600c0000",
+        "mnemonic": "imul",
+        "operands": "rdx, rax, 0xc60"
+      },
+      {
+        "address": "0x1807114db",
+        "bytes": "488b81d8140000",
+        "mnemonic": "mov",
+        "operands": "rax, qword ptr [rcx + 0x14d8]"
+      }
+    ]
+  },
+  "nextIntegration": "After independent review, add exactentry7114c0 as boundedeligible procedure and retainedleaf boundary so ordinary direct-call contract propagation can discover it. Do not directly seedAI without caller evidence.",
+  "limitations": [
+    "One established caller context is proven; all possible caller/interior-entry enumeration is not claimed.",
+    "No global eligibility range widened and canonical119candidate analysis unchanged.",
+    "Native index bounds, all result uses and safe substitution are separate proofs; no hook or engine execution."
+  ]
+}

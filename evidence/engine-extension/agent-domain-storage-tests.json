@@ -1,0 +1,106 @@
+{
+  "schemaVersion": 1,
+  "status": "passed-offline-domain-storage-tests-pending-root-independent-review",
+  "createdAtUtc": "2026-10-17 17:12:28 UTC",
+  "sourceAndBuildSha256": {
+    "src/MNBL.AgentStorage/AgentDomainStorage.hpp": "afde0f4c8b1ad7967f1bfc2d2dd8ff203ec02f8239414652db88433c2413f17c",
+    "src/MNBL.AgentStorage/StableAgentStorage.hpp": "34555749bbfdf9ad318a02aea660f36cfe57ee9183e856df48c216ebf8503458",
+    "tests/AgentStorage/agent_domain_storage_tests.cpp": "f8b6ebbf9c31aab5df46dbf3c0832f275b892ff028e7150b023563415c7895df",
+    "tools/battle-scale/Test-AgentDomainStorage.cmd": "90ac93cc030d353e46091152c7c9b3ffe43d2cea60b28f605858aed8c11d1fd5",
+    "build/agent-storage/test-agent-domain-asan.cmd": "b76d7ae93651bd0ac8365ca48ccdae8659d9b12225fb8eb9195f96ca353fbd13",
+    "build/agent-storage/agent_domain_storage_tests.exe": "8953a6d2d13f88453b9373118515605abe3b618b17b3b5738e6d9d72cbce9e08",
+    "build/agent-storage/agent_domain_storage_asan.exe": "7b3f5a244482e42de4e21159040fc93fe8558d93c281fa811b21eff13ca25dcb"
+  },
+  "implementation": {
+    "class": "mnbl::storage::AgentDomainStorage",
+    "header": "src/MNBL.AgentStorage/AgentDomainStorage.hpp",
+    "primary": {
+      "physicalPools": [
+        0,
+        2,
+        3,
+        4
+      ],
+      "ledger": "primary occupancy, generation, free head and live count"
+    },
+    "secondary": {
+      "physicalPools": [
+        1
+      ],
+      "ledger": "independent secondary occupancy, generation, free head and live count"
+    },
+    "handleFields": [
+      "domain",
+      "uint64 index",
+      "uint64 generation"
+    ],
+    "sharedPublication": "All five physical payloads and both new metadata ledgers become accessible together under the write lock only after all allocations and constructors succeed.",
+    "rollback": "Completed new records and blocks destroyed in reverse construction order; both old domain free chains, generation values, live counts and published capacity retained.",
+    "pointerLifetime": "Stable payload addresses across directory movement and growth; read lease owns State lifetime and blocks mutation. Entire pointer access must remain within lease or external engine job barrier.",
+    "generationSaturation": "Per-domain release retires a slot at maximum generation; never wraps.",
+    "historicalInputs": "Accepted StableAgentStorage.hpp, native harness, preparer, replay source and proof/review artifacts independently hash-checked unchanged against native-storage-lookup-integration-review.json."
+  },
+  "runs": [
+    {
+      "command": "tools/battle-scale/Test-AgentDomainStorage.cmd",
+      "compiler": "MSVC x64 C++20 /EHsc /W4 /WX /MD /O2",
+      "exitCode": 0,
+      "stdout": "agent_domain_storage_tests.cpp\nPASS independent domains: primary pools0,2,3,4 and secondary pool1; overlapping indices, 2040 -> 4080 -> 6120, stable five-pool addresses, cross-access rejection, 12 boundary reuses\nPASS atomic shared growth: 15 null allocations, 15 throwing allocations, 45 constructor failures; both old ledgers survive; reverse rollback and retry\nPASS independent old free chains and 66049 indices per domain, beyond signed16 and unsigned16 limits; overflow rejected\nPASS invalid domains, reader barrier, deferred five-pool teardown, closed-domain rejection\nOFFLINE DOMAIN STORAGE ONLY: synthetic callbacks; no engine allocation, native lookup, or secondary companion relationship established\n",
+      "stderr": ""
+    },
+    {
+      "command": "build/agent-storage/test-agent-domain-asan.cmd",
+      "compiler": "MSVC x64 C++20 /EHsc /W4 /WX /MD /Zi /fsanitize=address /Od",
+      "exitCode": 0,
+      "stdout": "agent_domain_storage_tests.cpp\nPASS independent domains: primary pools0,2,3,4 and secondary pool1; overlapping indices, 2040 -> 4080 -> 6120, stable five-pool addresses, cross-access rejection, 12 boundary reuses\nPASS atomic shared growth: 15 null allocations, 15 throwing allocations, 45 constructor failures; both old ledgers survive; reverse rollback and retry\nPASS independent old free chains and 66049 indices per domain, beyond signed16 and unsigned16 limits; overflow rejected\nPASS invalid domains, reader barrier, deferred five-pool teardown, closed-domain rejection\nOFFLINE DOMAIN STORAGE ONLY: synthetic callbacks; no engine allocation, native lookup, or secondary companion relationship established\n",
+      "stderr": "",
+      "sanitizerDiagnosticsObserved": false
+    }
+  ],
+  "checks": {
+    "simultaneousIndexZeroBothDomains": true,
+    "primaryExhaustionLeavesSecondaryAvailable": true,
+    "releaseAndReuseLeavesOppositeDomainValid": true,
+    "physicalPoolCrossDomainAccessRejected": true,
+    "stableFivePoolAddressesAcrossCapacityStages": [
+      2040,
+      4080,
+      6120
+    ],
+    "independentBoundaryReuseCases": 12,
+    "callbackFaultPoints": {
+      "nullPayloadAllocations": 15,
+      "throwingPayloadAllocations": 15,
+      "throwingRecordConstructors": 45,
+      "total": 75
+    },
+    "failedGrowthRetainsBothLedgersAndAddresses": true,
+    "reverseRollbackAndSuccessfulRetry": true,
+    "unequalOldFreeChainsPreservedOnGrowth": true,
+    "wideAllocatedSlotsPerDomain": 66049,
+    "bothSigned16AndUnsigned16ThresholdsCrossed": true,
+    "capacityArithmeticOverflowRejected": true,
+    "invalidDomainAndPoolRejected": true,
+    "readerPreventsClose": true,
+    "growthWaitsForLease": true,
+    "bothDomainsRemainAccessibleAfterOwnerDestructionUntilFinalLease": true,
+    "closedDomainAcquireReleaseCurrentAndGrowthChecked": true,
+    "exactlyOnceDestructionPerPhysicalRecord": true
+  },
+  "limitations": [
+    "Storage mechanics and synthetic Object callbacks only; no engine allocator, native hook, game process, installed files or secondary companion semantics are implemented or exercised.",
+    "Primary and secondary may independently allocate identical indices and generations. Handles are storage-instance-local; manually changing domain or other handle fields is not a supported operation or an authorization mechanism.",
+    "current(domain,index) intentionally resolves the current occupant and cannot reject stale index-only native IDs after reuse.",
+    "All physical pools share a growth capacity in this prototype; domain-specific native count/highwater and publication adapters remain engine integration work.",
+    "No engine constructor/destructor, worker barrier, live growth, rollback of engine side effects, or migration of original inline allocations is supplied.",
+    "Wide tests reach66049 per domain, proving no16-bit narrowing. They do not allocate beyond signed32 or exercise full uint64 generation rollover.",
+    "Callback payload allocation and construction failures are exhaustively injected for three additional test blocks; standard-library metadata/directory allocation failures are source-reviewed RAII, not fault-injected.",
+    "The blocked-growth timing test includes a30ms scheduling wait and cannot alone prove worker lock contention; source locking and an independent failed try_close under a held lease corroborate it.",
+    "Allocator callbacks must provide required alignment and remain alive through final read lease; callbacks are nonreentrant. Acquire/release modify ledger state, not object reconstruction.",
+    "Root independent review is required before accepting this new implementation. This receipt is implementation evidence, not independent approval."
+  ],
+  "gameLaunched": false,
+  "installedFilesAccessed": false,
+  "enginePatchApproved": false,
+  "independentReviewPending": true
+}

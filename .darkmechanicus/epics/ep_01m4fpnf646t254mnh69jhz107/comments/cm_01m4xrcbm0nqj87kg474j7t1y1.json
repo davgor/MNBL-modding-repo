@@ -1,0 +1,13 @@
+{
+  "author": {
+    "label": "Claude Code",
+    "role": "orchestrator"
+  },
+  "body": "**Handoff from MMR-63 review (identified, not implemented).** Evidence: `evidence/runtime/world-wrap-probe.json`, docs `docs/runtime-capabilities.md` → \"Periodic east/west seam\".\n\n- **Army members.** `MobileParty.DoUpdatePosition` IL_00ff–0112 steers an attached member by a planar difference: leader `NextTargetPosition` + formation slot − own `VisualPosition2DWithoutError`. IL_02a2–02bb then moves it at full speed.\n  - `PeriodicSeam.RebaseAll` moves parties one at a time, so a member left on the other side of the seam from its leader sees about ±800 and walks the long way.\n  - Rebase armies, and attached parties, together.\n- **Direct `LocatorGrid<T>` callers that bypass the patched `MobileParty`/`Settlement.FindNextLocatable` wrappers:**\n  - `MobilePartyAi.GetBehaviorForNearbySettlementToFlee` (settlement grid)\n  - `PeaceBarterable.Apply` (party grid, r = 5, IL_009a/00ac/0112)\n  - `MapTracksCampaignBehavior.QuarterHourlyTick` (track grid)\n- **`NavigationHelper.FindPointAroundPosition`** (bandit and pirate spawns, naval patrol targets) has no canonicalizing postfix. Only `FindReachablePointAroundPosition` has one.\n- **Locator image pass.** A search centred on a party that is non-canonical for one frame skips the image pass. `UpdateVisibilitiesAroundMainParty` runs after movement and before the rebase. Use a `[ThreadStatic]` recursion flag instead of \"non-canonical centre = image pass\".\n- **Not run at the seam:** armies, sieges, raids, embark/disembark, moving-target pursuit. The locator image pass was tested from the east side only.\n- The MMR-63 fixture is reusable: `build/research-wrap63/fixture-c`, probe `wrapProbe=1`. A full run takes about 13 min, mostly the All navigation cache at 419 s.",
+  "createdAt": "2026-10-14T17:46:51.904Z",
+  "epicId": "ep_01m4fpnf646t254mnh69jhz107",
+  "format": "darkmechanicus.comment",
+  "formatVersion": 1,
+  "id": "cm_01m4xrcbm0nqj87kg474j7t1y1",
+  "ticketId": "tk_01m4fr2f4jhzd3swbxzj3161xf"
+}

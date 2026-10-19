@@ -1,0 +1,361 @@
+{
+  "schemaVersion": 1,
+  "status": "static-lifetime-audit-with-explicit-open-bounds",
+  "targetSha256": "2a5e0e0b15513ebb7052d747a621b82c50ee834553eba283b33bbbc33766e12a",
+  "targetCapacity": 4080,
+  "gameExecuted": false,
+  "scope": "Three127-page Mission scratch containers; two independent fixed2040-pointer frame allocations; distinguish later255-page specializations. No native edits.",
+  "pageContainers": [
+    {
+      "id": "agent-work",
+      "counterOffset": "0x10439a0",
+      "tableOffset": "0x10439a8",
+      "flagsOffset": "0x1043da0",
+      "currentPageCount": 127,
+      "recordsPerPage": 16,
+      "recordBytes": 16,
+      "allocationBytesPerPage": "0x100",
+      "currentRecordCapacityByGeometry": 2032,
+      "proposedPageCount": 255,
+      "proposedRecordCapacity": 4080,
+      "currentContainerBytes": "0x480",
+      "proposedContainerBytes": "0x900",
+      "proposedTableOffsetWithinContainer": "0x8",
+      "proposedFlagsOffsetWithinContainer": "0x800",
+      "producer": "0x1805c5f60",
+      "consumer": "0x1805c6180",
+      "evidenceIds": [
+        "ev_90ad9a7baaa3b0f2b80f3df4f7faf4fd00d4e014b70c5a6efcac40c6ec88ffa5",
+        "ev_49d5b83f071b2e92b3d2f0726174063ac62c4b4ac21f18b94f56ab377532dd27",
+        "ev_85627aff0962d117a450369764fe7c952c58810aa7916dac526543304d5772b7",
+        "ev_224b7fa522efa5c9f63bba5130c46ea0d241bacae86ec8c684c5b1977597de24"
+      ]
+    },
+    {
+      "id": "secondary-work",
+      "counterOffset": "0x1043e20",
+      "tableOffset": "0x1043e28",
+      "flagsOffset": "0x1044220",
+      "currentPageCount": 127,
+      "recordsPerPage": 16,
+      "recordBytes": 80,
+      "allocationBytesPerPage": "0x500",
+      "currentRecordCapacityByGeometry": 2032,
+      "proposedPageCount": 255,
+      "proposedRecordCapacity": 4080,
+      "currentContainerBytes": "0x480",
+      "proposedContainerBytes": "0x900",
+      "proposedTableOffsetWithinContainer": "0x8",
+      "proposedFlagsOffsetWithinContainer": "0x800",
+      "producer": "0x1805c6180",
+      "consumer": "0x1805c37d0 plus job callback",
+      "evidenceIds": [
+        "ev_90ad9a7baaa3b0f2b80f3df4f7faf4fd00d4e014b70c5a6efcac40c6ec88ffa5",
+        "ev_a55cdb246d4a648d74d7ba3a809a68d79054abf530c5bc255111b4a5f466145b",
+        "ev_85627aff0962d117a450369764fe7c952c58810aa7916dac526543304d5772b7",
+        "ev_224b7fa522efa5c9f63bba5130c46ea0d241bacae86ec8c684c5b1977597de24"
+      ]
+    },
+    {
+      "id": "agent-pointer-work",
+      "counterOffset": "0x10442a0",
+      "tableOffset": "0x10442a8",
+      "flagsOffset": "0x10446a0",
+      "currentPageCount": 127,
+      "recordsPerPage": 16,
+      "recordBytes": 8,
+      "allocationBytesPerPage": "0x80",
+      "currentRecordCapacityByGeometry": 2032,
+      "proposedPageCount": 255,
+      "proposedRecordCapacity": 4080,
+      "currentContainerBytes": "0x480",
+      "proposedContainerBytes": "0x900",
+      "proposedTableOffsetWithinContainer": "0x8",
+      "proposedFlagsOffsetWithinContainer": "0x800",
+      "producer": "0x18060b390",
+      "consumer": "0x1805e0420",
+      "evidenceIds": [
+        "ev_90ad9a7baaa3b0f2b80f3df4f7faf4fd00d4e014b70c5a6efcac40c6ec88ffa5",
+        "ev_83bc9035f801e653b29519b7d3c31df142330b868f45c93a6c250298f3d81c2e",
+        "ev_85627aff0962d117a450369764fe7c952c58810aa7916dac526543304d5772b7",
+        "ev_224b7fa522efa5c9f63bba5130c46ea0d241bacae86ec8c684c5b1977597de24"
+      ]
+    }
+  ],
+  "lifecycle": [
+    {
+      "stage": "constructor",
+      "procedure": "0x1805ce3f0",
+      "evidenceId": "ev_90ad9a7baaa3b0f2b80f3df4f7faf4fd00d4e014b70c5a6efcac40c6ec88ffa5",
+      "details": "Counter=0; each of127 table pointers=0; each corresponding flag=1. Three loops. No page allocated until producer appends."
+    },
+    {
+      "stage": "producer",
+      "details": "Atomic fetch/increment gives unique index. page=index>>4; allocate if pointer null; compare-exchange publishes winner; losing allocation freed. No page-range check visible in103/104/188. Each producer body contributes at most one item per invocation."
+    },
+    {
+      "stage": "frame-reset",
+      "procedure": "0x1805c37d0",
+      "evidenceId": "ev_85627aff0962d117a450369764fe7c952c58810aa7916dac526543304d5772b7",
+      "details": "First counter reset before its producer jobs; second existing entries release owned first pointer then counter reset before dependent producer jobs; third consumed by5e0420 and counter reset after processing. Table pages themselves remain allocated for reuse."
+    },
+    {
+      "stage": "destructor",
+      "procedure": "0x1805d7d30",
+      "evidenceId": "ev_224b7fa522efa5c9f63bba5130c46ea0d241bacae86ec8c684c5b1977597de24",
+      "details": "Iterates127 page pointers, frees each nonnull page, clears pointer. Does not inspect flags. After expansion loop must run255 times."
+    },
+    {
+      "stage": "destructor-callers",
+      "evidenceId": "ev_946499aa6858a1894ef933f68fe89a9a92f73896a2d4a4416164fdac42a04f4f",
+      "directCallers": [
+        "0x1805cef70",
+        "0x180a23480",
+        "0x180a234a0",
+        "0x180a234c0",
+        "0x180a23ad0",
+        "0x180a23af0",
+        "0x180a23b10"
+      ],
+      "details": "Observed direct callers are Mission destructor and six cleanup thunks; indirect callers are not proven absent."
+    }
+  ],
+  "sameWidthCompareCandidates": [
+    {
+      "address": "0x1805ce609",
+      "fileOffset": 6085129,
+      "original": "83fa7f",
+      "replacement": "80faff",
+      "register": "EDX/DL",
+      "reason": "Compare unsigned low byte against255; full32-bit counter starts0, increases1, exits at255 before byte wrap. Same instruction size; avoids imm8 sign extension to-1.",
+      "standaloneSafe": false
+    },
+    {
+      "address": "0x1805ce639",
+      "fileOffset": 6085177,
+      "original": "83fa7f",
+      "replacement": "80faff",
+      "register": "EDX/DL",
+      "reason": "Compare unsigned low byte against255; full32-bit counter starts0, increases1, exits at255 before byte wrap. Same instruction size; avoids imm8 sign extension to-1.",
+      "standaloneSafe": false
+    },
+    {
+      "address": "0x1805ce669",
+      "fileOffset": 6085225,
+      "original": "83fa7f",
+      "replacement": "80faff",
+      "register": "EDX/DL",
+      "reason": "Compare unsigned low byte against255; full32-bit counter starts0, increases1, exits at255 before byte wrap. Same instruction size; avoids imm8 sign extension to-1.",
+      "standaloneSafe": false
+    },
+    {
+      "address": "0x1805d7d6b",
+      "fileOffset": 6123883,
+      "original": "83fb7f",
+      "replacement": "80fbff",
+      "register": "EBX/BL",
+      "reason": "Compare unsigned low byte against255; full32-bit counter starts0, increases1, exits at255 before byte wrap. Same instruction size; avoids imm8 sign extension to-1.",
+      "standaloneSafe": false
+    }
+  ],
+  "layoutRequirements": [
+    "Expand each127-page container from0x480 to0x900, preserving all surrounding alignment.",
+    "Shift second/third container bases by accumulated growth; flags additionally move+0x400 within each enlarged container.",
+    "Shift all downstream Mission fields by another0xd80 total, in addition to five pool growth.",
+    "Patch constructor page loops and common destructor loop, all three bases in Mission destructor, and six cleanup thunk ADD operands.",
+    "Do not change page index shift4, per-page allocations0x100/0x500/0x80, or per-record strides."
+  ],
+  "heapFrameBuffers": [
+    {
+      "allocationProcedure": "0x1805c37d0",
+      "local": "local_718",
+      "sourceAllocationBytes": "0x3fc0",
+      "requiredAllocationBytes": "0x7f80",
+      "recordBytes": 8,
+      "counter": "local_710",
+      "producer": "0x180615140",
+      "dispatcherWorker": "0x1805dfb40",
+      "evidenceIds": [
+        "ev_85627aff0962d117a450369764fe7c952c58810aa7916dac526543304d5772b7",
+        "ev_c5398455ecb7e7b7542edcc71fdab8925a2998388cfa82e6521081d28cb29eb4",
+        "ev_fd2b5adee5919bbbabd2754cd00cbc7154710513913aa8bf5301b8e80923fb19"
+      ],
+      "proof": "Producer has one conditional atomic append of Agent pointer per invocation, no local capacity guard; worker calls once per input agent. Consumer scans count then frees buffer."
+    },
+    {
+      "allocationProcedure": "0x1805c37d0",
+      "local": "local_748",
+      "sourceAllocationBytes": "0x3fc0",
+      "requiredAllocationBytes": "0x7f80",
+      "recordBytes": 8,
+      "counter": "local_740",
+      "producer": "0x18060b390",
+      "dispatcherWorkers": [
+        "0x1805e0e60",
+        "0x1805e0c70"
+      ],
+      "evidenceIds": [
+        "ev_85627aff0962d117a450369764fe7c952c58810aa7916dac526543304d5772b7",
+        "ev_582e2971cd9863cf981440f38608b4877c2b670c340a0fcd7605f9a67cb4df1e",
+        "ev_508dde5fa735f819fe2d0f81a35351f073213caf1e9ca4274aa758ad73acf368",
+        "ev_83bc9035f801e653b29519b7d3c31df142330b868f45c93a6c250298f3d81c2e",
+        "ev_94112341f4d8588800cc1ff14676f23fc7262135459206467ca9a48040975202"
+      ],
+      "proof": "Producer has one conditional atomic append per invocation; workers each select one of the complementary flags&1 lists created by5d51f0. Consumer scans count then frees buffer."
+    }
+  ],
+  "otherFixedContainers": [
+    {
+      "counterOffset": "0x1045150",
+      "tableOffset": "0x1045158",
+      "flagsOffset": "0x1045950",
+      "pageCount": 255,
+      "recordsPerPage": 64,
+      "status": "confirmed-distinct-specialization-with-scheduling-contract-open",
+      "ctor": "0x1805e5270",
+      "dtor": "0x1805e5210",
+      "reset": "0x1805cf3c0",
+      "evidenceIds": [
+        "ev_b024f39af7bf488f802b8931bace7e47d5d43dda38d20a1545418465ba9feb01",
+        "ev_06f121dd889bcc2041c11b954561560f11d9121fd9f15661f67baaeb10f1b60d",
+        "ev_2d353c514aebd371fefda69e41c8d9bd0cc3f95f1595ff6851be55cb2dfb3fc2",
+        "ev_4e0c46c49919beb3261a576805fdb62261a2275eaa0fb6879ddd106e572dc617",
+        "ev_3ee6f1e4cb565e14bc1879b3c4b7f15d9bcbd2a5a8fd518e3cbb4aabe07c28c4",
+        "ev_d0fd0d34597c87b9776e13fe89377d0e73d712e5085c4f2e452839e7bc56972d"
+      ],
+      "note": "Producer68dd10 conditionally appends one36-byte record per invocation; page=index>>6 and allocation0x900. No explicit count guard in this producer. It tests input-record byte+0x60 bit0x10 before append and sets that bit at function end, preventing repeat append for serial repeat calls on the same record. Consumer68eea0 resets count; shared destructor frees255 pointers. Storage remains16320 records; not a4080-agent-sized table.",
+      "recordBytes": 36,
+      "currentRecordCapacityByGeometry": 16320,
+      "consumer": "0x18068eea0",
+      "producer": "0x18068dd10",
+      "allocationBytesPerPage": "0x900",
+      "appendGuardExclusive": null,
+      "cardinalityContract": "Input layout (100-byte record, short agent ids at0x34/36, flags at0x60) matches the second255-page queue. This supports a derived-output queue bounded by unique input records when scheduling processes each record without concurrent duplicates. Complete caller/work scheduling proof remains open; do not assert a global population bound."
+    },
+    {
+      "counterOffset": "0x1045a50",
+      "tableOffset": "0x1045a58",
+      "flagsOffset": "0x1046250",
+      "pageCount": 255,
+      "recordsPerPage": 64,
+      "recordBytes": 100,
+      "allocationBytesPerPage": "0x1900",
+      "recordCapacity": 16320,
+      "appendGuardExclusive": 16256,
+      "status": "confirmed-distinct-specialization",
+      "ctor": "0x1805e5270",
+      "dtor": "0x1805e5210",
+      "reset": "0x1805cf3c0",
+      "evidenceIds": [
+        "ev_b024f39af7bf488f802b8931bace7e47d5d43dda38d20a1545418465ba9feb01",
+        "ev_06f121dd889bcc2041c11b954561560f11d9121fd9f15661f67baaeb10f1b60d",
+        "ev_2d353c514aebd371fefda69e41c8d9bd0cc3f95f1595ff6851be55cb2dfb3fc2",
+        "ev_368ba78e4923094dab404e27c5abe8148e7593a6c0bea2b0cf3eedd052e9d2f3",
+        "ev_b532fcb8dcca2c323652e1c147093e5d044d892728709c05bf0db071ab0ff0ce",
+        "ev_d3a1b53978f3485cd1025aa646090619f4dec55f324718dd90b06c6dce8eb73f",
+        "ev_3ee6f1e4cb565e14bc1879b3c4b7f15d9bcbd2a5a8fd518e3cbb4aabe07c28c4"
+      ],
+      "note": "Guard count<0x3f80 occurs before atomic increment; spare64 slots may accommodate racing producers, purpose is inference. Per-agent multi-contact work can exceed agent count; no need to set capacity to4080.",
+      "additionalProducer": "0x18067f200",
+      "additionalProof": "67f200 rejects count>0x3f7f before atomic increment, allocates0x1900 pages and writes100-byte records indexed by64/page.68cf30 consumes records then atomically resets count.5e5210 frees255page pointers."
+    }
+  ],
+  "doNotChange": [
+    {
+      "item": "Inline2040-pointer vectors",
+      "evidenceId": "ev_94112341f4d8588800cc1ff14676f23fc7262135459206467ca9a48040975202",
+      "reason": "Have explicit dynamic spill; unchanged2040/2041 capacity comparisons and0xff0 growth size are correct for unchanged inline buffer."
+    },
+    {
+      "item": "local_10d8[4080] collision buffer in6763c0",
+      "evidenceIds": [
+        "ev_368ba78e4923094dab404e27c5abe8148e7593a6c0bea2b0cf3eedd052e9d2f3",
+        "ev_1d67ce98375ca49c7c7a7581066ba0fd868566c02763777e57daf562ecbb0217"
+      ],
+      "reason": "255 records of16bytes, not2040 shorts. Producer434980 checks count+6<0xff; keep size and bound unchanged."
+    },
+    {
+      "item": "FUN5d99b0",
+      "evidenceId": "ev_312838f087d769f5a0c059f39492f876e1eb7dd8752074a0b92ecbe00496a2d2",
+      "reason": "Dynamic0xc00-record vector destructor, not127-page storage."
+    }
+  ],
+  "openQuestions": [
+    "All callers of60b390/615140 and job-dispatch completion/barrier semantics have not been exhaustively proven. At-most-agentcount is supported for observed normal frame workers, not all possible reentrant or exceptional paths.",
+    "Original127*16=2032 capacity is below2040 slot maximum. Reserved slots or subset predicates may explain this; not established. Expansion255*16=4080 covers one item for every target agent but must verify complete workload cardinality.",
+    "First later255-page container appends at most once per input record under serial re-entry, but complete caller/work scheduling proof is open; second queue admits16256 records before atomic reservations, so concurrency margin must be established.",
+    "Collision virtual output buffers of1024 pointer-sized entries in6763c0/6d21d0 require provider contract audit; no local bound proven by these callers.",
+    "Shared-helper indirect callers are not ruled out; table helper mutation requires complete xref/module-boundary audit.",
+    "Static byte patches do not prove runtime safety; no game test was launched."
+  ],
+  "keyEvidenceExcerpts": [
+    {
+      "evidenceId": "ev_90ad9a7baaa3b0f2b80f3df4f7faf4fd00d4e014b70c5a6efcac40c6ec88ffa5",
+      "lineStart": 69,
+      "lineEnd": 100,
+      "text": "  LOCK();\n  *(undefined4 *)(param_1 + 0x208734) = 0;\n  UNLOCK();\n  uVar4 = uVar5;\n  do {\n    param_1[(longlong)(int)uVar4 + 0x208735] = 0;\n    LOCK();\n    *(undefined1 *)((longlong)param_1 + (longlong)(int)uVar4 + 0x1043da0) = 1;\n    UNLOCK();\n    uVar4 = uVar4 + 1;\n  } while (uVar4 < 0x7f);\n  LOCK();\n  *(undefined4 *)(param_1 + 0x2087c4) = 0;\n  UNLOCK();\n  uVar4 = uVar5;\n  do {\n    param_1[(longlong)(int)uVar4 + 0x2087c5] = 0;\n    LOCK();\n    *(undefined1 *)((longlong)param_1 + (longlong)(int)uVar4 + 0x1044220) = 1;\n    UNLOCK();\n    uVar4 = uVar4 + 1;\n  } while (uVar4 < 0x7f);\n  LOCK();\n  *(undefined4 *)(param_1 + 0x208854) = 0;\n  UNLOCK();\n  do {\n    param_1[(longlong)(int)uVar5 + 0x208855] = 0;\n    LOCK();\n    *(undefined1 *)((longlong)param_1 + (longlong)(int)uVar5 + 0x10446a0) = 1;\n    UNLOCK();\n    uVar5 = uVar5 + 1;\n  } while (uVar5 < 0x7f);"
+    },
+    {
+      "evidenceId": "ev_49d5b83f071b2e92b3d2f0726174063ac62c4b4ac21f18b94f56ab377532dd27",
+      "lineStart": 49,
+      "lineEnd": 78,
+      "text": "        if (iVar9 != 0) {\n          lVar3 = *param_1;\n          puVar8 = (uint *)(lVar3 + 0x10439a0);\n          LOCK();\n          uVar4 = *puVar8;\n          *puVar8 = *puVar8 + 1;\n          UNLOCK();\n          uVar5 = uVar4 >> 4;\n          if (*(longlong *)(lVar3 + 0x10439a8 + (ulonglong)uVar5 * 8) == 0) {\n            lVar6 = FUN_180729b40(DAT_180da29a8,0x100,8);\n            plVar2 = (longlong *)(lVar3 + 0x10439a8 + (ulonglong)uVar5 * 8);\n            LOCK();\n            bVar12 = *plVar2 == 0;\n            if (bVar12) {\n              *plVar2 = lVar6;\n            }\n            UNLOCK();\n            if ((!bVar12) && (lVar6 != 0)) {\n              FUN_18074e270();\n            }\n          }\n          local_58 = (undefined4)lVar7;\n          uStack_54 = (undefined4)((ulonglong)lVar7 >> 0x20);\n          puVar1 = (undefined4 *)\n                   (*(longlong *)(lVar3 + 0x10439a8 + (ulonglong)uVar5 * 8) +\n                   (ulonglong)(uVar4 + uVar5 * -0x10) * 0x10);\n          *puVar1 = local_58;\n          puVar1[1] = uStack_54;\n          puVar1[2] = iVar9;\n          puVar1[3] = uStack_4c;"
+    },
+    {
+      "evidenceId": "ev_a55cdb246d4a648d74d7ba3a809a68d79054abf530c5bc255111b4a5f466145b",
+      "lineStart": 45,
+      "lineEnd": 70,
+      "text": "      FUN_1805ec6b0(*puVar6,*(undefined4 *)(puVar6 + 1),&local_78,param_4,uVar9);\n      lVar3 = lStack_70 - local_78 >> 0x3f;\n      if ((lStack_70 - local_78) / 0xcd0 + lVar3 != lVar3) {\n        lVar3 = *param_1;\n        puVar7 = (uint *)(lVar3 + 0x1043e20);\n        LOCK();\n        uVar2 = *puVar7;\n        *puVar7 = *puVar7 + 1;\n        UNLOCK();\n        uVar4 = uVar2 >> 4;\n        if (*(longlong *)(lVar3 + 0x1043e28 + (ulonglong)uVar4 * 8) == 0) {\n          lVar5 = FUN_180729b40(DAT_180da29a8,0x500,8);\n          plVar1 = (longlong *)(lVar3 + 0x1043e28 + (ulonglong)uVar4 * 8);\n          LOCK();\n          bVar8 = *plVar1 == 0;\n          if (bVar8) {\n            *plVar1 = lVar5;\n          }\n          UNLOCK();\n          if ((!bVar8) && (lVar5 != 0)) {\n            FUN_18074e270();\n          }\n        }\n        FUN_1805dc410((ulonglong)(uVar2 + uVar4 * -0x10) * 0x50 +\n                      *(longlong *)(lVar3 + 0x1043e28 + (ulonglong)uVar4 * 8),&local_78);\n      }"
+    },
+    {
+      "evidenceId": "ev_83bc9035f801e653b29519b7d3c31df142330b868f45c93a6c250298f3d81c2e",
+      "lineStart": 70,
+      "lineEnd": 97,
+      "text": "  if ((*(longlong *)(lVar14 + 0x278) != 0) ||\n     ((lVar22 = 0, lVar21 != 0 &&\n      (((*(longlong *)(lVar21 + 0x278) != 0 &&\n        ((*(byte *)(*(longlong *)(lVar21 + 0x278) + 0x18) & 0x10) != 0)) || (lVar15 != 0)))))) {\n    lVar15 = *(longlong *)(param_1 + 0xab8);\n    puVar26 = (uint *)(lVar15 + 0x10442a0);\n    LOCK();\n    uVar24 = *puVar26;\n    *puVar26 = *puVar26 + 1;\n    UNLOCK();\n    uVar20 = uVar24 >> 4;\n    if (*(longlong *)(lVar15 + 0x10442a8 + (ulonglong)uVar20 * 8) == 0) {\n      lVar22 = FUN_180729b40(DAT_180da29a8,0x80,8);\n      plVar1 = (longlong *)(lVar15 + 0x10442a8 + (ulonglong)uVar20 * 8);\n      LOCK();\n      bVar29 = *plVar1 == 0;\n      if (bVar29) {\n        *plVar1 = lVar22;\n      }\n      UNLOCK();\n      if ((!bVar29) && (lVar22 != 0)) {\n        FUN_18074e270();\n      }\n    }\n    *(longlong *)\n     (*(longlong *)(lVar15 + 0x10442a8 + (ulonglong)uVar20 * 8) +\n     (ulonglong)(uVar24 + uVar20 * -0x10) * 8) = param_1;\n    param_4 = local_198;"
+    },
+    {
+      "evidenceId": "ev_83bc9035f801e653b29519b7d3c31df142330b868f45c93a6c250298f3d81c2e",
+      "lineStart": 204,
+      "lineEnd": 216,
+      "text": "  lVar14 = *(longlong *)(param_1 + 0x20);\n  if (0.0 < *(float *)(lVar14 + 0xd8)) {\n    if (param_4 == (longlong *)0x0) {\n      FUN_1806048f0(param_1,lVar14 + 0xb0,*(undefined8 *)(lVar14 + 200));\n    }\n    else {\n      LOCK();\n      plVar1 = param_4 + 1;\n      lVar14 = *plVar1;\n      *(int *)plVar1 = (int)*plVar1 + 1;\n      UNLOCK();\n      *(longlong *)(*param_4 + (longlong)(int)lVar14 * 8) = param_1;\n    }"
+    },
+    {
+      "evidenceId": "ev_fd2b5adee5919bbbabd2754cd00cbc7154710513913aa8bf5301b8e80923fb19",
+      "lineStart": 18,
+      "lineEnd": 32,
+      "text": "    if ((*(int *)(param_1 + 0x560) == 1) &&\n       ((*(uint *)(*(longlong *)(param_1 + 0x20) + 8) >> 0xe & 1) != 0)) {\n      if (param_4 == (longlong *)0x0) {\n        if (*(int *)(param_1 + 0x55c) < 0) {\n          FUN_180607f30(param_1);\n        }\n      }\n      else {\n        LOCK();\n        plVar1 = param_4 + 1;\n        lVar2 = *plVar1;\n        *(int *)plVar1 = (int)*plVar1 + 1;\n        UNLOCK();\n        *(longlong *)(*param_4 + (longlong)(int)lVar2 * 8) = param_1;\n      }"
+    },
+    {
+      "evidenceId": "ev_368ba78e4923094dab404e27c5abe8148e7593a6c0bea2b0cf3eedd052e9d2f3",
+      "lineStart": 883,
+      "lineEnd": 918,
+      "text": "          if (((((uint)param_4[9] & 0x800) == 0) || ((*(byte *)(local_6d98 + 0x40) & 3) != 1)) ||\n             ((*(uint *)(lVar19 + 0x18) & 0x800) == 0)) {\n            local_6da8 = '\\x01';\n            iVar28 = iVar28 + 1;\n            if (*(int *)(local_6da0 + 0x1045a50) < 0x3f80) {\n              local_6b88 = puVar29[-2];\n              uStack_6b80 = puVar29[-1];\n              local_6b78 = *puVar29;\n              uStack_6b70 = puVar29[1];\n              local_6b58 = *(undefined4 *)((longlong)puVar29 + -0x1c);\n              uStack_6b54 = SUB42(param_4[7],0);\n              uStack_6b52 = 0xffff;\n              LOCK();\n              puVar1 = (uint *)(local_6da0 + 0x1045a50);\n              uVar20 = *puVar1;\n              *puVar1 = *puVar1 + 1;\n              UNLOCK();\n              uVar15 = uVar20 >> 6;\n              local_6b68 = local_6b78;\n              uStack_6b60 = uStack_6b70;\n              if (*(longlong *)(local_6da0 + 0x1045a58 + (ulonglong)uVar15 * 8) == 0) {\n                lVar19 = FUN_180729b40(DAT_180da29a8,0x1900,8);\n                plVar32 = (longlong *)(local_6da0 + 0x1045a58 + (ulonglong)uVar15 * 8);\n                LOCK();\n                bVar33 = *plVar32 == 0;\n                if (bVar33) {\n                  *plVar32 = lVar19;\n                }\n                UNLOCK();\n                if ((!bVar33) && (lVar19 != 0)) {\n                  FUN_18074e270();\n                }\n              }\n              lVar19 = *(longlong *)(local_6da0 + 0x1045a58 + (ulonglong)uVar15 * 8);\n              lVar18 = (ulonglong)(uVar20 + uVar15 * -0x40) * 100;\n              *(undefined8 *)(lVar19 + lVar18) = local_6b88;"
+    },
+    {
+      "evidenceId": "ev_d0fd0d34597c87b9776e13fe89377d0e73d712e5085c4f2e452839e7bc56972d",
+      "lineStart": 478,
+      "lineEnd": 517,
+      "text": "    FUN_18067dbc0(lVar23,&local_3f0,uVar35,cVar24);\n    if (((*(byte *)(param_2 + 0xc) & 0x10) == 0) &&\n       ((*(char *)(param_1 + 0x1489) == '\\0' || (lVar16 != 0)))) {\n      uVar8 = param_2[4];\n      uVar9 = param_2[5];\n      local_3b0 = *(undefined4 *)((longlong)param_2 + 0x34);\n      uVar10 = *param_2;\n      uVar11 = param_2[1];\n      LOCK();\n      puVar1 = (uint *)(param_1 + 0x288);\n      uVar5 = *puVar1;\n      *puVar1 = *puVar1 + 1;\n      UNLOCK();\n      uVar14 = uVar5 >> 6;\n      if (*(longlong *)(param_1 + 0x290 + (ulonglong)uVar14 * 8) == 0) {\n        lVar16 = FUN_180729b40(DAT_180da29a8,0x900,8);\n        plVar3 = (longlong *)(param_1 + 0x290 + (ulonglong)uVar14 * 8);\n        LOCK();\n        bVar27 = *plVar3 == 0;\n        if (bVar27) {\n          *plVar3 = lVar16;\n        }\n        UNLOCK();\n        if ((!bVar27) && (lVar16 != 0)) {\n          FUN_18074e270();\n        }\n      }\n      lVar16 = *(longlong *)(param_1 + 0x290 + (ulonglong)uVar14 * 8);\n      uVar20 = (ulonglong)(uVar5 + uVar14 * -0x40);\n      puVar2 = (undefined8 *)(lVar16 + uVar20 * 0x24);\n      *puVar2 = uVar8;\n      puVar2[1] = uVar9;\n      puVar2 = (undefined8 *)(lVar16 + 0x10 + uVar20 * 0x24);\n      *puVar2 = uVar10;\n      puVar2[1] = uVar11;\n      *(undefined4 *)(lVar16 + 0x20 + uVar20 * 0x24) = local_3b0;\n    }\n  }\n  *(byte *)(param_2 + 0xc) = *(byte *)(param_2 + 0xc) | 0x10;\n  return 1;"
+    }
+  ],
+  "collisionProviderFollowup": {
+    "status": "provider-contract-unresolved-not-proven-overflow",
+    "pointerPath": "Mission+0x18 -> Scene+0x2be0 -> object+0x598 -> vtable+0x190",
+    "callerBuffers": [
+      {
+        "procedure": "0x1806763c0",
+        "pointerSlots": 1024
+      },
+      {
+        "procedure": "0x1806d21d0",
+        "pointerSlots": 1024
+      }
+    ],
+    "additionalEvidenceIds": [
+      "ev_5c8df7604c57768087649ddd8d99d2bdb5a97d75ed46a0edf52c1069db20d792",
+      "ev_1be855b7a20d2179dcb8419475797971c939aeb4f6f8ef6dcca6c843ac5b3c62"
+    ],
+    "finding": "Scene constructor1ba9f0 contains no direct Scene+2be0 assignment. Follow-up1e0d40 initializes navigation entities, not this provider. Full .pdata linear instruction scan found no direct MOV store to Scene+2be0; this does not exclude initialization through biased pointers, memcpy, another module, or unrecognized code. Concrete provider target and1024 output bound remain unproven.",
+    "requiredResolution": "Identify concrete query implementation or documented/validated provider output contract before treating dense-scene query safety as established. Do not enlarge stack buffers by guessing."
+  }
+}

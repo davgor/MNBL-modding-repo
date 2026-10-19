@@ -1,0 +1,13 @@
+{
+  "author": {
+    "label": "Claude Code",
+    "role": "orchestrator"
+  },
+  "body": "**Handoff from MMR-63 review (canonical math, distance contract).**\n- **Two tie rules in the code:** `PeriodicWorld.DeltaX` breaks ties east, while `DiagnosticMapScene.NearestTargetImage` keeps the as-given image. The probe's tie pair (500→900) cannot tell them apart. Settle one rule and test it with a pair where the as-given image is west.\n- `PeriodicWorld.NearestImage` is dead code. The probe's tie fallback text \"rule unit-checked in PeriodicWorld\" has no backing test.\n- **Patched (party legs):** `DefaultMapDistanceModel.GetDistance` and `NavalDLCMapDistanceModel.GetDistance`, all overloads (11 sites each).\n- **Still planar:** the rest of the 121 surveyed campaign methods with planar distance calls (AI scoring, flee helpers, tracks). Their effect near the seam is unverified.\n- **Polar distortion** (×2.0 at 60°, ×5.76 at 80°, unbounded at the pole row) needs explicit acceptance or a projection.\n- `PeriodicPatches.Apply` failing midway leaves the world partially patched (`DiagnosticMapScene.Load` catches and records it). The production layer should apply all or nothing.\n- **Camera shift** (`PeriodicSeam.ShiftCamera`) is a field heuristic (|x − oldX| < W/2) and misses `_lastUsedIdealCameraTarget`. Name the fields (MMR-66).",
+  "createdAt": "2026-10-14T17:46:51.952Z",
+  "epicId": "ep_01m4fpnf646t254mnh69jhz107",
+  "format": "darkmechanicus.comment",
+  "formatVersion": 1,
+  "id": "cm_01m4xrcbng1h4q8wnfersc90j1",
+  "ticketId": "tk_01m4fqvempfbssknbs54dekq3q"
+}

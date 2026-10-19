@@ -1,0 +1,13 @@
+{
+  "author": {
+    "label": "Claude Code",
+    "role": "orchestrator"
+  },
+  "body": "From MMR-34 (accepted): `GeneratedCampaignInitializer` (src/MNBL.ProceduralWorld/Campaign) builds the startup and is verified offline on the size-129 world (`tools/Test-SpawnPolicy.ps1`, 18/18). The startup covers starts for all creation cultures, hideouts, the land bandit clans as aliases, the retirement retreat, spawn anchors and the runtime plan. **It is not called by world generation yet.** Wiring it in is yours.\n- Its `Documents` (Settlements: hideouts and retreat; Factions: bandit clans; SPCultures: all 7 creation cultures' start points) and `DeclaredKeys` join the world's registration. The MMR-30 plan accepts them (check 15).\n- `Plan` goes to `GeneratedStartupBehavior` through `IGeneratedWorld.StartupPlan`, with `SuppliesStartup = true`. The package must record `adapter.dataset.suppliesStartup` (and `fixturePrefabs` if any entity comes from a prefab), so a load restores both. Run 35880 crashed on load without the prefabs.\n- `StartupException.Codes` / `.Retryable` are the bounded quality rejection (`startup.json quality.codes`); see the MMR-44 comment.\n- In game, the fixture world shares only the record builders and rules (`BanditClanRecord`, `RetreatRecord`, `StartCultureRecord`, `BanditHome`, `NearestTownCulture`). The initializer's own placement of hideouts, retreat and starts has never been registered in game.",
+  "createdAt": "2026-10-15T15:47:48.229Z",
+  "epicId": "ep_01m4fpnf646t254mnh69jhz107",
+  "format": "darkmechanicus.comment",
+  "formatVersion": 1,
+  "id": "cm_01m503z2c5e3j6d65trtmcxej5",
+  "ticketId": "tk_01m4fqfbgknga8wqn5seq3j94d"
+}

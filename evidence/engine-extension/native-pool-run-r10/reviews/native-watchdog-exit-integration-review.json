@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "status": "accepted-build-specific-watchdog-exit-integration",
+  "reviewedAtUtc": "2026-10-17T08:17:15.865552+00:00",
+  "gameExecuted": false,
+  "installedFilesModified": false,
+  "findings": [],
+  "reviewedSourceSha256": {
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\tools\\battle-scale\\Test-NativeExitContract.ps1": "bd8cc8995a6855676945855154a71145c7dbe883441feab7c68de2aceefd10d4",
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\tools\\Test-NativePoolInGame.ps1": "91cfd0d26e9398abd8054875d97c51a660d0d669b288fd9b514f075185ec30a8",
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\tools\\battle-scale\\prepare_native_pool_test.py": "cf0d65b194574e92a57a1dadf051980e4379b5387b08c75e40c155cea3d98233",
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\tests\\BattleScale\\Test-NativeExitContract.ps1": "2185e18540f6bdf172be727c46bc30e8ef4673e9acbeff826d115ae93b1d74e0",
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\tests\\BattleScale\\Test-NativeRunnerFailures.ps1": "8bd85e5d1d0250e8999c989cce32a1dca7b9659bb4b980a50dbd9ac835c92a21",
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\tests\\BattleScale\\test_native_test_package.py": "9f64bf0fd2020865f63efe2a4fee989567f916f00cc40f6741d3224a3578b0bf",
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\evidence\\engine-extension\\native-watchdog-shutdown-contract.json": "a53f635c34844fa460be087c4bd123f36fa57291e14cdb734338cb695aba0f0d",
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\evidence\\engine-extension\\native-watchdog-managed-exit-evidence.json": "7ca9fcf270522d32abbcb93eacb6fed2abc80c9aeaa8df7b616344ca62b5f85c",
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\tools\\battle-scale\\audit_watchdog_exit_contract.py": "fe027c0acd4e30d685712f371b7c4b089a2930cd60cdf4f6d2177dbf8a65d082",
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\tools\\battle-scale\\managed-audit\\Read-WatchdogExitContract.ps1": "59ff0bfb602162569ae449ac08c17a4063213c3bc491f1825728ac567faa20b7",
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\build\\battle-scale\\native4080-watchdog-static-input.json": "b042fd2c175385cf130dd1f70329a7001e4364454db1f5233686fb20f5bd1fe8"
+  },
+  "verifiedContracts": [
+    "The packager requires native original SHA, reconstructed candidate SHA, stock Watchdog path/hash and reviewed contract status before producing a profile.",
+    "The runner binds probe success to its unique run GUID, completed exhaustion/teardown status and native return code zero. A stale PID result is rejected.",
+    "Exit -1 additionally requires a same-parent observed Watchdog at the expected path, the build-bound contract and fresh per-game-PID logs with ordered #TW#-kp, parsed -kp and process-exit debugger markers. Exception/dump markers reject acceptance.",
+    "Required ordered game cleanup markers corroborate main cleanup before the stock command; the recorded protocol does not claim all native destruction or the cleanup function returned.",
+    "The emitted profile pins the shutdown contract hash and Watchdog file hash. Existing renderer geometry, guard, canonical approval and fresh-directory checks remain active.",
+    "Failure handling restores backed-up files; inert actual-runner fixtures cover interrupted copy, cleanup failure, foreign request, stale result and waiting for another game."
+  ],
+  "tests": [
+    {
+      "command": "python tests/BattleScale/test_native_test_package.py",
+      "passed": 24,
+      "exitCode": 0
+    },
+    {
+      "command": "python tests/BattleScale/test_pool_patch_manifest.py",
+      "passed": 13,
+      "exitCode": 0
+    },
+    {
+      "command": "tests/BattleScale/Test-NativeExitContract.ps1",
+      "passed": 17,
+      "exitCode": 0
+    },
+    {
+      "command": "tests/BattleScale/Test-NativeRunnerFailures.ps1",
+      "passed": 5,
+      "exitCode": 0,
+      "receipt": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\build\\battle-scale\\runner-failure-tests-6a744dea2e5a4bb88aa2451f90672302\\review.json"
+    }
+  ],
+  "limitations": [
+    "This is source integration acceptance, not a new runtime pass or deployment authorization. Root must regenerate and validate exact package/profile/static approval dependencies before any authorized test.",
+    "The -1 interpretation is exclusive to this reviewed stock Watchdog command protocol, after the completed probe teardown and required log milestones. It is not a general nonzero-exit whitelist.",
+    "The stock Watchdog terminates during the native shutdown worker after main cleanup; releases following the command and outer cleanup return are not certified.",
+    "Observed child identity and log provenance are operational checks for the controlled isolated test; this review does not establish adversarial operating-system integrity or arbitrary mod safety."
+  ]
+}

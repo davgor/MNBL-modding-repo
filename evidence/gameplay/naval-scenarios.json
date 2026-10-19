@@ -1,0 +1,2752 @@
+{
+  "schema": "mnbl.evidence.naval-scenarios",
+  "version": 1,
+  "ticket": "MMR-53",
+  "pid": "51924",
+  "result": "evidence/runtime/in-game/naval_missions-51924.json",
+  "status": "ok",
+  "error": null,
+  "scenarioFile": {
+    "run": {
+      "schema": "mnbl.naval-scenarios.v1",
+      "sha256": "94de81a47a7facdc9419a7c36c35bf85ef1a8f9cbc7554bc6af180190c037d8c"
+    },
+    "current": "36de1fd71e150fe664889ec48218f48465dcb795b4a61c1056a137489c57f5ad"
+  },
+  "failures": [],
+  "passed": 117,
+  "total": 117,
+  "scenarios": [
+    {
+      "id": "shipyard",
+      "source": "player",
+      "what": "A ship bought at a port town as the port screen's Done buys it (War Sails' PortScreenTradeModeHandler for the town and the player: its buy button enabled, OnBuyShip, then OnConfirmChanges, which pays ShipCostModel's trade value and docks the new fleet at the town), then a ship damaged (Ship.OnShipDamaged, recorded setup) and repaired through the port menu's repair (RepairShipAction for each damaged docked ship, at the model's repair cost).",
+      "passed": true,
+      "checks": [
+        {
+          "check": "the case ran to its end without error ()",
+          "passed": true
+        },
+        {
+          "check": "the port screen's buy button enabled for the ship ({'relevant': True, 'enabled': True, 'goldCost': 12000, 'tooltip': ''})",
+          "passed": true
+        },
+        {
+          "check": "bought through the port screen's trade handler (confirm True): Azure Ghost (western_light_ship) for 12000",
+          "passed": true
+        },
+        {
+          "check": "the bought fleet docked at the town (the screen's anchor fix-up)",
+          "passed": true
+        },
+        {
+          "check": "the party returned on valid navigation (None)",
+          "passed": true
+        },
+        {
+          "check": "back at the town's gate, where the leave path puts the party within the return bound: 0.000 of 0.635",
+          "passed": true
+        },
+        {
+          "check": "the case ran to its end without error ()",
+          "passed": true
+        },
+        {
+          "check": "started where the previous step left the party (placed [0] from it, bound 0.635)",
+          "passed": true
+        },
+        {
+          "check": "the port menu's repair restored the ship (10800 of 10800) for the model's cost 800 (paid 800)",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "route.port",
+      "source": "player",
+      "what": "Embarkation and a port-to-port voyage: the town's port, the port menu's set sail (at sea at the port), the voyage to another port town of the main land group as a map click orders it (NavigationHelper.GetInteractionDataForMainParty: naval navigation, the port targeted), campaign time running until the party arrives (sampled hourly, every sample on naval navigation), the destination's port menu (on land in the town, the fleet docked), its town center and the leave path (on land at the gate). The voyage starts where the previous step's leave path put the party.",
+      "passed": true,
+      "checks": [
+        {
+          "check": "the case ran to its end without error ()",
+          "passed": true
+        },
+        {
+          "check": "started where the previous step left the party (placed [0] from it, bound 0.635)",
+          "passed": true
+        },
+        {
+          "check": "the port menu's set sail put the party at sea at the port (0 from it, navigation None)",
+          "passed": true
+        },
+        {
+          "check": "the map click ordered a mainland voyage to the port (Naval, targeting the port True)",
+          "passed": true
+        },
+        {
+          "check": "the voyage arrived: 22.3 h, 43.8 sailed, 0 hourly samples off naval navigation, narrowest water 8.5 wide",
+          "passed": true
+        },
+        {
+          "check": "arrived in mnbl_1609fb72_t_e7ed06396a from the sea: on land, the fleet docked (port menu, then the town)",
+          "passed": true
+        },
+        {
+          "check": "the party returned on valid navigation (None)",
+          "passed": true
+        },
+        {
+          "check": "back at the town's gate, where the leave path puts the party within the return bound: 0.000 of 0.635",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "route.island",
+      "source": "player",
+      "what": "The same voyage from the mainland to an island's port town (a land group other than the main one, in the same basin).",
+      "passed": true,
+      "checks": [
+        {
+          "check": "the case ran to its end without error ()",
+          "passed": true
+        },
+        {
+          "check": "started where the previous step left the party (placed [0] from it, bound 0.635)",
+          "passed": true
+        },
+        {
+          "check": "the port menu's set sail put the party at sea at the port (0 from it, navigation None)",
+          "passed": true
+        },
+        {
+          "check": "the map click ordered a island voyage to the port (Naval, targeting the port True)",
+          "passed": true
+        },
+        {
+          "check": "the voyage arrived: 32.2 h, 77.7 sailed, 0 hourly samples off naval navigation, narrowest water 8.5 wide",
+          "passed": true
+        },
+        {
+          "check": "arrived in mnbl_1609fb72_t_7efe6a0c96 from the sea: on land, the fleet docked (port menu, then the town)",
+          "passed": true
+        },
+        {
+          "check": "the party returned on valid navigation (None)",
+          "passed": true
+        },
+        {
+          "check": "back at the town's gate, where the leave path puts the party within the return bound: 0.000 of 0.635",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "dropoff",
+      "source": "player",
+      "what": "A village drop-off: from the island's port town aboard to a harbour village's port (the village menu with the party still at sea), the menu's disembark (on land at the village's gate, the fleet at its port), then back aboard at the anchor as a click on it orders it (MobileParty.SetMoveGoToInteractablePoint; the anchor's interaction sets sail at it). Then a coastal landing as a click on land orders it (MapState.ProcessTravel: the sea-to-land transition, on land navigation, the anchor left at the coast) and back aboard at that anchor.",
+      "passed": true,
+      "checks": [
+        {
+          "check": "the case ran to its end without error ()",
+          "passed": true
+        },
+        {
+          "check": "started where the previous step left the party (placed [0] from it, bound 0.635)",
+          "passed": true
+        },
+        {
+          "check": "the port menu's set sail put the party at sea at the port (0 from it, navigation None)",
+          "passed": true
+        },
+        {
+          "check": "the map click ordered a harbour village voyage to the port (Naval, targeting the port True)",
+          "passed": true
+        },
+        {
+          "check": "the voyage arrived: 8.4 h, 12.8 sailed, 0 hourly samples off naval navigation, narrowest water 8.5 wide",
+          "passed": true
+        },
+        {
+          "check": "in the harbour village mnbl_1609fb72_v_f924958cd5 from the sea, still at sea",
+          "passed": true
+        },
+        {
+          "check": "the village menu's disembark: on land at the gate, the fleet at the village's port (0 from it)",
+          "passed": true
+        },
+        {
+          "check": "back aboard at the village's anchor (0 from it, navigation None)",
+          "passed": true
+        },
+        {
+          "check": "back at the village's gate, where the disembark puts the party within the return bound: 0.000 of 0.635",
+          "passed": true
+        },
+        {
+          "check": "a click on land from the sea (All navigation, 6.40 away) brought the party ashore through the sea-to-land transition (2.0198026946745813 h) on land navigation (None)",
+          "passed": true
+        },
+        {
+          "check": "the landing left the anchor at the coast (1 from where the party came ashore, not at the village)",
+          "passed": true
+        },
+        {
+          "check": "back aboard at the coastal anchor (0 from it, navigation None)",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "targets",
+      "source": "harness",
+      "what": "Targeted regression seeds: world A (seed 42) with the voyages' settlements, the raid's village and the blockade's town pinned in this file, and every voyage's narrowest water (the water's width across 8 axes, away from both ends of the voyage) recorded, so a regression replays the same straits and coastal towns.",
+      "passed": true,
+      "checks": [
+        {
+          "check": "the run sailed the pinned regression targets ({'start': 'mnbl_1609fb72_t_30a1119e46', 'mainland': 'mnbl_1609fb72_t_e7ed06396a', 'island': 'mnbl_1609fb72_t_7efe6a0c96', 'village': 'mnbl_1609fb72_v_f924958cd5', 'raidVillage': 'mnbl_1609fb72_v_1b54c2686d', 'blockadeTown': 'mnbl_1609fb72_t_db2d888bf1'})",
+          "passed": true
+        },
+        {
+          "check": "the narrowest water of every voyage recorded away from both ends (width [('route.port', 8.5), ('route.island', 8.5), ('dropoff', 8.5), ('raid', 9)])",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "ai",
+      "source": "natural",
+      "what": "AI sea travel while the cases run: AI parties take to the sea and land (War Sails' OnMobilePartyNavigationStateChangedEvent), each checked an hour later on its domain's navigation, and parties arrive from the sea at port towns (a landing and the town's entry in the same tick), island port towns among them.",
+      "passed": true,
+      "checks": [
+        {
+          "check": "AI parties took to the sea ({'bandit': 13, 'caravan': 4, 'lord': 139, 'villager': 64}) and landed ({'lord': 107}) while the cases ran",
+          "passed": true
+        },
+        {
+          "check": "every AI party checked an hour after its transition was on its domain's navigation (0 problems of 264 checked: [])",
+          "passed": true
+        },
+        {
+          "check": "AI parties arrived from the sea at port towns, landing and entering in the same tick: 67 ({'lord': 67})",
+          "passed": true
+        },
+        {
+          "check": "AI parties arrived from the sea at island port towns: 53, at 16 of 21 island port towns",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "pirates",
+      "source": "natural",
+      "what": "Pirates against C06 and W03: MMR-35's pirate spawn points served by MMR-39's naval scene wrapper, per pirate clan as many as the plan gives it and each on naval navigation; War Sails' patrol zones exactly the served points (as many zones as served points, each one of them; the scene's own spawn points, the installed Calradia coordinates' source, are 0 by construction on the generated scene); the pirate parties of the pirate clans at sea, on naval navigation, each assigned a served zone.",
+      "passed": true,
+      "checks": [
+        {
+          "check": "the wrapper serves the world's pirate spawn points (C06 through W03): 53 of 53 planned, frame error None",
+          "passed": true
+        },
+        {
+          "check": "each pirate clan is served the plan's points for it (['northern_pirates 33', 'southern_pirates 20']; mismatched []) and the plan has none for other clans (53 of 53)",
+          "passed": true
+        },
+        {
+          "check": "every served point is on naval navigation (0 off)",
+          "passed": true
+        },
+        {
+          "check": "the patrol zones are exactly the served points: 53 zones, 53 served, 53 zones on a served point; the inner scene's own points 0 (0 by construction)",
+          "passed": true
+        },
+        {
+          "check": "pirate parties of 2 clans patrol: 44, all at sea (0 not), on naval navigation (0 off), each assigned a served zone (44; 0 unassigned)",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "pirate.battle",
+      "source": "player",
+      "what": "A pirate encounter ending in a retreat: the party at sea and a pirate party beside it (recorded setup, the pirate sent back to patrol its zone after), the campaign's encounter with its at-sea meeting marked done (the meeting is a conversation mission), the encounter menu's attack: a naval map event of exactly the two parties, the naval battle mission on the patch's naval scene, every spawn checked, then left (OnEndMissionResult, a retreat) and the encounter left; the party back at sea within the naval return bound, on naval navigation.",
+      "passed": true,
+      "checks": [
+        {
+          "check": "the case ran to its end without error ()",
+          "passed": true
+        },
+        {
+          "check": "the pirate party southern_pirates_16 (3 ships) met at sea in a naval map event of exactly the two parties (['southern_pirates_16', 'player_party'])",
+          "passed": true
+        },
+        {
+          "check": "the naval mission opened the patch's naval scene battle_terrain_coastal_021 (battle_terrain_coastal_021)",
+          "passed": true
+        },
+        {
+          "check": "the naval battle mission ran (3.04 s of mission time), then the retreat",
+          "passed": true
+        },
+        {
+          "check": "back at sea within the naval return bound (1.709209680557251)",
+          "passed": true
+        },
+        {
+          "check": "on naval navigation (None)",
+          "passed": true
+        },
+        {
+          "check": "the fleet after returning: 1 ships before, 1 after (hit points [10800] -> [10800])",
+          "passed": true
+        },
+        {
+          "check": "the pirate sent back where it was found, patrolling its zone (patrol)",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "route.seam",
+      "source": "player",
+      "what": "The party at sea sails across the periodic seam: from a sea point 4 inside the east edge of the canonical range to one 4 inside the west edge, on the sea row nearest the party navigable at 1, 4 and 8 inside both edges, as a map click on the sea orders it (SetMoveGoToPoint, naval navigation); campaign time runs until it arrives. It must cross the seam (a rebase), take the short way (at most twice the straight periodic distance plus 5), stay on naval navigation and canonical at every hourly sample, and end at sea.",
+      "passed": true,
+      "checks": [
+        {
+          "check": "the case ran to its end without error ()",
+          "passed": true
+        },
+        {
+          "check": "sailed across the seam: arrived True, 1 rebase(s), 7.5 travelled for 8.0 straight (periodic), 0 hourly samples off naval navigation, 0 outside the canonical range, at sea at the end True",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "pirate.seam",
+      "source": "player",
+      "what": "A naval encounter at the seam: the party just inside the west edge, a pirate party with ships just inside the east edge (1.5 apart across the seam); the encounter, the naval mission and the retreat as in pirate.battle, back at sea on naval navigation, the pirate sent back to its zone.",
+      "passed": true,
+      "checks": [
+        {
+          "check": "the case ran to its end without error ()",
+          "passed": true
+        },
+        {
+          "check": "the party and the pirate southern_pirates_16 beside each other across the seam (1.58881235 apart periodically, 798.469543 planar)",
+          "passed": true
+        },
+        {
+          "check": "met in a naval map event of exactly the two parties (['southern_pirates_16', 'player_party'])",
+          "passed": true
+        },
+        {
+          "check": "the naval mission opened the patch's naval scene battle_terrain_opensea_northern (battle_terrain_opensea_northern)",
+          "passed": true
+        },
+        {
+          "check": "the naval battle mission ran (3.01 s of mission time), then the retreat",
+          "passed": true
+        },
+        {
+          "check": "back at sea within the naval return bound (1.6806257963180542)",
+          "passed": true
+        },
+        {
+          "check": "on naval navigation (None)",
+          "passed": true
+        },
+        {
+          "check": "the pirate sent back where it was found, patrolling its zone (patrol)",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "naval.defeat",
+      "source": "player",
+      "what": "A naval defeat leading to capture: the party, cut to a crew that all goes aboard, loses a naval battle with another pirate party on the patch's naval scene (every agent of its side falls), the player taken prisoner (the defeat menu answered if it shows), the escape forced (EndCaptivityAction.ApplyByEscape), at sea War Sails' raft menus (the raft, its wait and its end menu), campaign time running until the raft washes ashore; the party on land, out of raft state, on land navigation.",
+      "passed": true,
+      "checks": [
+        {
+          "check": "the case ran to its end without error ()",
+          "passed": true
+        },
+        {
+          "check": "another pirate party than the retreat's (southern_pirates_297, not southern_pirates_16)",
+          "passed": true
+        },
+        {
+          "check": "the naval mission opened the patch's naval scene battle_terrain_coastal_caspian_sea_02 (battle_terrain_coastal_caspian_sea_02)",
+          "passed": true
+        },
+        {
+          "check": "defeated in the naval mission (8 fell)",
+          "passed": true
+        },
+        {
+          "check": "taken prisoner by southern_pirates_297 (at sea True), the fleet after the defeat: 0 ships",
+          "passed": true
+        },
+        {
+          "check": "the forced escape freed the party at sea ({'prisoner': False, 'atSea': True, 'raft': False, 'ships': 0, 'menu': 'player_raft_state_after_prisoner'})",
+          "passed": true
+        },
+        {
+          "check": "War Sails' raft carried the party (raft state seen True; menus ['player_raft_state_after_prisoner', 'player_raft_state_wait', 'player_raft_state_end', 'the map'], its wait and its end among them)",
+          "passed": true
+        },
+        {
+          "check": "the raft washed ashore: on land, out of raft state, ships 0 of 0",
+          "passed": true
+        },
+        {
+          "check": "on land navigation (None)",
+          "passed": true
+        },
+        {
+          "check": "the pirate sent back where it was found, patrolling its zone (patrol)",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "raid",
+      "source": "player",
+      "what": "A seaborne village raid, distinct from a naval field battle: a harbour village of another kingdom (war declared for it, peace made after, recorded), the voyage to it, its menu at sea, the hostile action's raid, the encounter's attack with the naval troop selection answered with the troops and ships it offers, the naval raid mission on the village's center scene in its naval_raid level with its landing setup and War Sails' landing run (the player's agents ashore), the defenders killed by the probe, the raid's wait menu until the village is looted, its end menu with the ended map events recorded; the party still at sea by the village's port, its return checked at sea within the naval bound.",
+      "passed": true,
+      "checks": [
+        {
+          "check": "the case ran to its end without error ()",
+          "passed": true
+        },
+        {
+          "check": "the map click ordered a raid voyage to the port (Naval, targeting the port True)",
+          "passed": true
+        },
+        {
+          "check": "the voyage arrived: 40.5 h, 117.8 sailed, 0 hourly samples off naval navigation, narrowest water 9 wide",
+          "passed": true
+        },
+        {
+          "check": "at sea in the village mnbl_1609fb72_v_1b54c2686d, its hostile action's raid",
+          "passed": true
+        },
+        {
+          "check": "the naval troop selection answered: 32 of 40 troops, ships ['western_light_ship']",
+          "passed": true
+        },
+        {
+          "check": "the naval raid opened the village's center scene aserai_village_j_raid (aserai_village_j_raid) in its naval_raid level, with its landing setup ({'landing': 10, 'jumping': 3, 'playerSpawnFrame': 1})",
+          "passed": true
+        },
+        {
+          "check": "the landing ran as War Sails' raid controller runs it: 4 landing paths read, landing completed True after 87.3 s, 18 of the player's agents ashore (1 on a deck, 0 untracked)",
+          "passed": true
+        },
+        {
+          "check": "the raid won (53 defenders killed by the probe) and the village looted (Looted)",
+          "passed": true
+        },
+        {
+          "check": "the raid's end menu village_raid_ended_leaded_by_someone_else answered, with the map events that ended at the village recorded ([('Raid', True, True, False), ('Raid', True, True, False)])",
+          "passed": true
+        },
+        {
+          "check": "still at sea after the raid",
+          "passed": true
+        },
+        {
+          "check": "the raid's return checked at sea with the naval bound (1.885)",
+          "passed": true
+        },
+        {
+          "check": "the party returned on valid navigation (None)",
+          "passed": true
+        },
+        {
+          "check": "back at the village's port, the raid's sea side within the return bound: 0.000 of 1.885",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "blockade",
+      "source": "player",
+      "what": "A coastal blockade, distinct from a naval field battle: a port town of another kingdom besieged from land by the party owning its fleet (a siege cannot start from the sea), War Sails' SiegeEvent activating the blockade, the player's anchor disabled, the town's blockade arcs (BlockadePositionScript on MMR-40's arc entities) on naval navigation for the fleet and for the script's full arcs, then the siege lifted through the menu (the blockade deactivated, the anchor enabled) and the party moved back to where the case found it.",
+      "passed": true,
+      "checks": [
+        {
+          "check": "the case ran to its end without error ()",
+          "passed": true
+        },
+        {
+          "check": "the party moved to the besieged town (recorded: 39.739994 away)",
+          "passed": true
+        },
+        {
+          "check": "the land siege of the port town mnbl_1609fb72_t_db2d888bf1 by a party with ships activated a blockade (1 activation events, blockading ['player_party'])",
+          "passed": true
+        },
+        {
+          "check": "the player's anchor disabled while blockading",
+          "passed": true
+        },
+        {
+          "check": "the town's blockade arcs on water: 0 of the fleet's 1 points and 0 of the full arcs' 10 off naval navigation",
+          "passed": true
+        },
+        {
+          "check": "the siege lifted through the menu: the blockade deactivated (1), the anchor enabled",
+          "passed": true
+        },
+        {
+          "check": "on land navigation after (None)",
+          "passed": true
+        },
+        {
+          "check": "the party moved back to where the case found it (0 away, navigation None)",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "assets",
+      "source": "natural",
+      "what": "No missing asset and valid spawns: no engine log line during a case names a generated object or an opened scene as missing and every other missing line is a stock kind (stockMissingPatterns); no engine assert; in every mission every active human agent stands on the navigation mesh or a scene object (a ship's deck, a seat) inside the boundaries.",
+      "passed": true,
+      "checks": [
+        {
+          "check": "blockade: no missing asset in the log (0 of the world, 0 of an unknown kind), no engine assert (0, canary True)",
+          "passed": true
+        },
+        {
+          "check": "dropoff: no missing asset in the log (0 of the world, 0 of an unknown kind), no engine assert (0, canary True)",
+          "passed": true
+        },
+        {
+          "check": "naval.defeat: no missing asset in the log (0 of the world, 0 of an unknown kind), no engine assert (0, canary True)",
+          "passed": true
+        },
+        {
+          "check": "naval.defeat mission: every agent spawned on the navigation mesh or a scene object inside the boundaries (73 agents, 0 on objects {}, 0 with nothing under, 0 outside)",
+          "passed": true
+        },
+        {
+          "check": "pirate.battle: no missing asset in the log (0 of the world, 0 of an unknown kind), no engine assert (0, canary True)",
+          "passed": true
+        },
+        {
+          "check": "pirate.battle mission: every agent spawned on the navigation mesh or a scene object inside the boundaries (80 agents, 0 on objects {}, 0 with nothing under, 0 outside)",
+          "passed": true
+        },
+        {
+          "check": "pirate.seam: no missing asset in the log (0 of the world, 0 of an unknown kind), no engine assert (0, canary True)",
+          "passed": true
+        },
+        {
+          "check": "pirate.seam mission: every agent spawned on the navigation mesh or a scene object inside the boundaries (80 agents, 0 on objects {}, 0 with nothing under, 0 outside)",
+          "passed": true
+        },
+        {
+          "check": "raid: no missing asset in the log (0 of the world, 0 of an unknown kind), no engine assert (0, canary True)",
+          "passed": true
+        },
+        {
+          "check": "raid mission: every agent spawned on the navigation mesh or a scene object inside the boundaries (85 agents, 0 on objects {}, 0 with nothing under, 0 outside)",
+          "passed": true
+        },
+        {
+          "check": "route.island: no missing asset in the log (0 of the world, 0 of an unknown kind), no engine assert (0, canary True)",
+          "passed": true
+        },
+        {
+          "check": "route.port: no missing asset in the log (0 of the world, 0 of an unknown kind), no engine assert (0, canary True)",
+          "passed": true
+        },
+        {
+          "check": "route.seam: no missing asset in the log (0 of the world, 0 of an unknown kind), no engine assert (0, canary True)",
+          "passed": true
+        },
+        {
+          "check": "shipyard.buy: no missing asset in the log (0 of the world, 0 of an unknown kind), no engine assert (0, canary True)",
+          "passed": true
+        },
+        {
+          "check": "shipyard.repair: no missing asset in the log (0 of the world, 0 of an unknown kind), no engine assert (0, canary True)",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "baselines",
+      "source": "harness",
+      "what": "No game and every tracked static at its baseline at the start and at the end; the run's rules are the scenario file's.",
+      "passed": true,
+      "checks": [
+        {
+          "check": "the run's rules are the scenario file's",
+          "passed": true
+        },
+        {
+          "check": "start: no game, every tracked static at its baseline",
+          "passed": true
+        },
+        {
+          "check": "end: no game, every tracked static at its baseline",
+          "passed": true
+        },
+        {
+          "check": "the start baseline recorded",
+          "passed": true
+        },
+        {
+          "check": "the end baseline recorded",
+          "passed": true
+        }
+      ]
+    }
+  ],
+  "load": {
+    "save": "mnbl_oneshot_A_designated",
+    "loaded": true,
+    "seconds": 16.6018056,
+    "worldId": "mnbl_1609fb72"
+  },
+  "voyage": {
+    "start": {
+      "id": "mnbl_1609fb72_t_30a1119e46",
+      "name": "Graflin (Age 2)",
+      "port": [
+        473.4375,
+        780.9375
+      ],
+      "gate": [
+        475.6647,
+        784.6012
+      ]
+    },
+    "mainland": {
+      "id": "mnbl_1609fb72_t_e7ed06396a",
+      "name": "Korpor (Age 2)",
+      "port": [
+        448.4375,
+        812.1875
+      ],
+      "gate": [
+        450.1105,
+        813.6383
+      ]
+    },
+    "island": {
+      "id": "mnbl_1609fb72_t_7efe6a0c96",
+      "name": "Frosrin",
+      "port": [
+        482.8125,
+        874.6875
+      ],
+      "gate": [
+        482.8125,
+        879.1598
+      ]
+    },
+    "village": {
+      "id": "mnbl_1609fb72_v_f924958cd5",
+      "name": "Frosrin Harbour",
+      "port": [
+        494.375,
+        878.125
+      ],
+      "gate": [
+        485.9375,
+        878.125
+      ]
+    },
+    "basin": 0,
+    "mainGroup": 0,
+    "pinned": true,
+    "islandPortTowns": [
+      "mnbl_1609fb72_t_02135fe588",
+      "mnbl_1609fb72_t_18dce31a8b",
+      "mnbl_1609fb72_t_33e9f6405e",
+      "mnbl_1609fb72_t_3591ac6a33",
+      "mnbl_1609fb72_t_38c906c775",
+      "mnbl_1609fb72_t_3dd40e786f",
+      "mnbl_1609fb72_t_4a4ee84369",
+      "mnbl_1609fb72_t_5372f23728",
+      "mnbl_1609fb72_t_652a339695",
+      "mnbl_1609fb72_t_7efe6a0c96",
+      "mnbl_1609fb72_t_96d91dc9a3",
+      "mnbl_1609fb72_t_a9bb2f10b0",
+      "mnbl_1609fb72_t_bb5436b93b",
+      "mnbl_1609fb72_t_bbe5821524",
+      "mnbl_1609fb72_t_c1093bcad9",
+      "mnbl_1609fb72_t_d92f348adf",
+      "mnbl_1609fb72_t_da31273eb4",
+      "mnbl_1609fb72_t_de424cc7cd",
+      "mnbl_1609fb72_t_e60ca08fa1",
+      "mnbl_1609fb72_t_ecf4b31651",
+      "mnbl_1609fb72_t_eebd8fd293"
+    ]
+  },
+  "pirates": {
+    "wrapper": true,
+    "planPoints": 53,
+    "frameError": null,
+    "clans": [
+      {
+        "clan": "northern_pirates",
+        "planned": 33,
+        "served": 33,
+        "servedOffNaval": 0,
+        "fromScene": 0,
+        "zones": 33,
+        "zonesFromServed": 33,
+        "parties": 27,
+        "withShips": 27,
+        "notAtSea": 0,
+        "offNavigation": 0,
+        "unassigned": 0,
+        "beyondZoneRadius": 0,
+        "inServedZone": 27
+      },
+      {
+        "clan": "southern_pirates",
+        "planned": 20,
+        "served": 20,
+        "servedOffNaval": 0,
+        "fromScene": 0,
+        "zones": 20,
+        "zonesFromServed": 20,
+        "parties": 17,
+        "withShips": 17,
+        "notAtSea": 0,
+        "offNavigation": 0,
+        "unassigned": 0,
+        "beyondZoneRadius": 1,
+        "inServedZone": 17
+      }
+    ],
+    "plannedForPirateClans": 53,
+    "served": 53,
+    "servedOffNaval": 0,
+    "zones": 53,
+    "zonesFromServed": 53,
+    "fromScene": 0,
+    "parties": 44,
+    "unassigned": 0,
+    "beyondZoneRadius": 1,
+    "offNavigation": 0,
+    "notAtSea": 0,
+    "pirateClans": 2,
+    "inServedZone": 44
+  },
+  "traffic": {
+    "embarked": {
+      "bandit": 13,
+      "caravan": 4,
+      "lord": 139,
+      "villager": 64
+    },
+    "disembarked": {
+      "lord": 107
+    },
+    "problems": [],
+    "arrivalsByKind": {
+      "lord": 67
+    },
+    "atSeaAtStart": 149,
+    "checked": 264,
+    "problemCount": 0,
+    "portArrivals": 67,
+    "islandArrivals": 53,
+    "islandPortTowns": 21,
+    "islandsReached": [
+      "mnbl_1609fb72_t_02135fe588",
+      "mnbl_1609fb72_t_33e9f6405e",
+      "mnbl_1609fb72_t_3591ac6a33",
+      "mnbl_1609fb72_t_3dd40e786f",
+      "mnbl_1609fb72_t_4a4ee84369",
+      "mnbl_1609fb72_t_652a339695",
+      "mnbl_1609fb72_t_7efe6a0c96",
+      "mnbl_1609fb72_t_96d91dc9a3",
+      "mnbl_1609fb72_t_a9bb2f10b0",
+      "mnbl_1609fb72_t_bb5436b93b",
+      "mnbl_1609fb72_t_c1093bcad9",
+      "mnbl_1609fb72_t_d92f348adf",
+      "mnbl_1609fb72_t_da31273eb4",
+      "mnbl_1609fb72_t_de424cc7cd",
+      "mnbl_1609fb72_t_e60ca08fa1",
+      "mnbl_1609fb72_t_eebd8fd293"
+    ],
+    "portEntriesOverLand": 1327,
+    "atSeaAtEnd": 231
+  },
+  "menus": {
+    "town": [
+      {
+        "id": "talk_to_garrison_commander_town",
+        "holds": false,
+        "enabled": false,
+        "text": "Talk to the garrison commander",
+        "tooltip": null
+      },
+      {
+        "id": "port",
+        "holds": true,
+        "enabled": true,
+        "text": "Go to the port",
+        "tooltip": null
+      },
+      {
+        "id": "manage_alley",
+        "holds": false,
+        "enabled": false,
+        "text": "Go to alley",
+        "tooltip": null
+      },
+      {
+        "id": "town_keep",
+        "holds": true,
+        "enabled": true,
+        "text": "Go to the keep",
+        "tooltip": null
+      },
+      {
+        "id": "town_arena",
+        "holds": true,
+        "enabled": true,
+        "text": "Go to the arena",
+        "tooltip": null
+      },
+      {
+        "id": "town_backstreet",
+        "holds": true,
+        "enabled": true,
+        "text": "Go to the tavern district",
+        "tooltip": null
+      },
+      {
+        "id": "manage_production",
+        "holds": false,
+        "enabled": false,
+        "text": "Manage town",
+        "tooltip": null
+      },
+      {
+        "id": "manage_warehouse",
+        "holds": false,
+        "enabled": false,
+        "text": "Enter the warehouse",
+        "tooltip": null
+      },
+      {
+        "id": "manage_production_cheat",
+        "holds": false,
+        "enabled": false,
+        "text": "Manage town (Cheat)",
+        "tooltip": null
+      },
+      {
+        "id": "talk_to_steward_for_revenue_town",
+        "holds": false,
+        "enabled": false,
+        "text": "Hand over the revenue",
+        "tooltip": null
+      },
+      {
+        "id": "recruit_volunteers",
+        "holds": true,
+        "enabled": true,
+        "text": "Recruit troops",
+        "tooltip": null
+      },
+      {
+        "id": "trade",
+        "holds": true,
+        "enabled": true,
+        "text": "Trade",
+        "tooltip": null
+      },
+      {
+        "id": "town_smithy",
+        "holds": true,
+        "enabled": true,
+        "text": "Enter smithy",
+        "tooltip": null
+      },
+      {
+        "id": "town_streets",
+        "holds": true,
+        "enabled": true,
+        "text": "Take a walk around the town center",
+        "tooltip": null
+      },
+      {
+        "id": "town_wait",
+        "holds": true,
+        "enabled": true,
+        "text": "Wait here for some time",
+        "tooltip": null
+      },
+      {
+        "id": "town_return_to_army",
+        "holds": false,
+        "enabled": false,
+        "text": "Return to Army",
+        "tooltip": null
+      },
+      {
+        "id": "town_leave",
+        "holds": true,
+        "enabled": true,
+        "text": "Leave",
+        "tooltip": null
+      }
+    ],
+    "port_menu": [
+      {
+        "id": "leave_option",
+        "holds": true,
+        "enabled": true,
+        "text": "Go to the town center",
+        "tooltip": null
+      },
+      {
+        "id": "leave_option_isleave",
+        "holds": false,
+        "enabled": false,
+        "text": "Go to the town center",
+        "tooltip": null
+      },
+      {
+        "id": "call_fleet",
+        "holds": false,
+        "enabled": false,
+        "text": "Call fleet",
+        "tooltip": null
+      },
+      {
+        "id": "inspect_fleet",
+        "holds": false,
+        "enabled": false,
+        "text": "Browse shipyard",
+        "tooltip": null
+      },
+      {
+        "id": "manage_fleet",
+        "holds": true,
+        "enabled": true,
+        "text": "Manage fleet",
+        "tooltip": null
+      },
+      {
+        "id": "repair_ships",
+        "holds": true,
+        "enabled": false,
+        "text": "Repair ships (0<img src=\"General\\Icons\\Coin@2x\" extend=\"6\">)",
+        "tooltip": "None of your ships are damaged."
+      },
+      {
+        "id": "trade",
+        "holds": true,
+        "enabled": true,
+        "text": "Trade",
+        "tooltip": null
+      },
+      {
+        "id": "enter_port",
+        "holds": true,
+        "enabled": true,
+        "text": "Take a walk around the port",
+        "tooltip": null
+      },
+      {
+        "id": "port_wait",
+        "holds": true,
+        "enabled": true,
+        "text": "Wait here for some time",
+        "tooltip": null
+      },
+      {
+        "id": "sail_option",
+        "holds": true,
+        "enabled": true,
+        "text": "Set sail",
+        "tooltip": null
+      }
+    ],
+    "town_outside": [
+      {
+        "id": "approach_gates",
+        "holds": true,
+        "enabled": true,
+        "text": "Approach the gates and hail the guard.",
+        "tooltip": null
+      },
+      {
+        "id": "town_disguise_yourself",
+        "holds": true,
+        "enabled": true,
+        "text": "Disguise yourself and sneak through the gate.",
+        "tooltip": null
+      },
+      {
+        "id": "town_besiege",
+        "holds": true,
+        "enabled": true,
+        "text": "Besiege the town.",
+        "tooltip": null
+      },
+      {
+        "id": "town_enter_cheat",
+        "holds": false,
+        "enabled": false,
+        "text": "Enter town (Cheat).",
+        "tooltip": null
+      },
+      {
+        "id": "town_outside_leave",
+        "holds": true,
+        "enabled": true,
+        "text": "Leave...",
+        "tooltip": null
+      }
+    ],
+    "menu_siege_strategies": [
+      {
+        "id": "menu_siege_strategies_lead_assault",
+        "holds": true,
+        "enabled": false,
+        "text": "Lead an assault",
+        "tooltip": "You need to wait for the siege equipment to be prepared."
+      },
+      {
+        "id": "menu_siege_strategies_order_troops",
+        "holds": true,
+        "enabled": false,
+        "text": "Send troops",
+        "tooltip": "You need to wait for the siege equipment to be prepared."
+      },
+      {
+        "id": "menu_siege_strategies_request_parley",
+        "holds": false,
+        "enabled": false,
+        "text": "Request a parley",
+        "tooltip": null
+      },
+      {
+        "id": "menu_siege_strategies_leave",
+        "holds": true,
+        "enabled": true,
+        "text": "Leave",
+        "tooltip": null
+      },
+      {
+        "id": "menu_siege_strategies_leave_army",
+        "holds": false,
+        "enabled": false,
+        "text": "Leave Army",
+        "tooltip": null
+      },
+      {
+        "id": "menu_siege_strategies_break_out_from_gate",
+        "holds": false,
+        "enabled": false,
+        "text": "Break out from gate",
+        "tooltip": null
+      },
+      {
+        "id": "menu_siege_strategies_break_out_from_port",
+        "holds": false,
+        "enabled": false,
+        "text": "Break out from port",
+        "tooltip": null
+      },
+      {
+        "id": "menu_siege_strategies_sally_out_from_gate",
+        "holds": false,
+        "enabled": false,
+        "text": "",
+        "tooltip": null
+      },
+      {
+        "id": "menu_siege_strategies_sally_out_from_port",
+        "holds": false,
+        "enabled": false,
+        "text": "",
+        "tooltip": null
+      },
+      {
+        "id": "menu_siege_strategies_ambush",
+        "holds": false,
+        "enabled": false,
+        "text": "Ambush",
+        "tooltip": null
+      }
+    ],
+    "menu_siege_strategies_break_siege": [
+      {
+        "id": "menu_siege_strategies_break_siege_return",
+        "holds": true,
+        "enabled": true,
+        "text": "Return to siege",
+        "tooltip": null
+      },
+      {
+        "id": "menu_siege_strategies_break_siege_go_on",
+        "holds": true,
+        "enabled": true,
+        "text": "Go on.",
+        "tooltip": null
+      }
+    ],
+    "village": [
+      {
+        "id": "revenue_farming_quest_collect_tax_menu_button",
+        "holds": false,
+        "enabled": false,
+        "text": "Collect revenue",
+        "tooltip": null
+      },
+      {
+        "id": "hostile_action",
+        "holds": true,
+        "enabled": true,
+        "text": "Take a hostile action",
+        "tooltip": null
+      },
+      {
+        "id": "recruit_volunteers",
+        "holds": true,
+        "enabled": true,
+        "text": "Recruit troops",
+        "tooltip": null
+      },
+      {
+        "id": "trade",
+        "holds": true,
+        "enabled": true,
+        "text": "Buy products",
+        "tooltip": null
+      },
+      {
+        "id": "village_center",
+        "holds": true,
+        "enabled": true,
+        "text": "Take a walk through the lands",
+        "tooltip": null
+      },
+      {
+        "id": "village_wait",
+        "holds": true,
+        "enabled": false,
+        "text": "Wait here for some time",
+        "tooltip": "You cannot wait in the village while you are at sea."
+      },
+      {
+        "id": "village_return_to_army",
+        "holds": false,
+        "enabled": false,
+        "text": "Return to Army",
+        "tooltip": null
+      },
+      {
+        "id": "disembark",
+        "holds": true,
+        "enabled": true,
+        "text": "Disembark",
+        "tooltip": null
+      },
+      {
+        "id": "leave_set_sail",
+        "holds": false,
+        "enabled": false,
+        "text": "Set Sail",
+        "tooltip": null
+      },
+      {
+        "id": "leave_at_sea",
+        "holds": true,
+        "enabled": true,
+        "text": "Leave",
+        "tooltip": null
+      },
+      {
+        "id": "leave",
+        "holds": false,
+        "enabled": false,
+        "text": "Leave",
+        "tooltip": null
+      }
+    ],
+    "encounter": [
+      {
+        "id": "continue_preparations",
+        "holds": false,
+        "enabled": false,
+        "text": "Continue siege preparations.",
+        "tooltip": null
+      },
+      {
+        "id": "village_raid_action",
+        "holds": false,
+        "enabled": false,
+        "text": "Plunder the village, then raze it.",
+        "tooltip": null
+      },
+      {
+        "id": "village_force_volunteer_action",
+        "holds": false,
+        "enabled": false,
+        "text": "Force notables to give you recruits.",
+        "tooltip": null
+      },
+      {
+        "id": "village_force_supplies_action",
+        "holds": false,
+        "enabled": false,
+        "text": "Force people to give you supplies.",
+        "tooltip": null
+      },
+      {
+        "id": "attack",
+        "holds": true,
+        "enabled": true,
+        "text": "Attack!",
+        "tooltip": null
+      },
+      {
+        "id": "capture_the_enemy",
+        "holds": false,
+        "enabled": false,
+        "text": "Capture the enemy.",
+        "tooltip": null
+      },
+      {
+        "id": "str_order_attack",
+        "holds": true,
+        "enabled": true,
+        "text": "Send ships.",
+        "tooltip": "Sea Battle\n\n• Light ships gain major bonus.\n• Heavy ships suffer major penalty.\n"
+      },
+      {
+        "id": "leave_soldiers_behind",
+        "holds": false,
+        "enabled": false,
+        "text": "Try to get away.",
+        "tooltip": null
+      },
+      {
+        "id": "surrender",
+        "holds": false,
+        "enabled": false,
+        "text": "Surrender.",
+        "tooltip": null
+      },
+      {
+        "id": "leave",
+        "holds": true,
+        "enabled": true,
+        "text": "Leave...",
+        "tooltip": null
+      },
+      {
+        "id": "abandon_army",
+        "holds": false,
+        "enabled": false,
+        "text": "Abandon army.",
+        "tooltip": null
+      },
+      {
+        "id": "go_back_to_settlement",
+        "holds": false,
+        "enabled": false,
+        "text": "Return to .",
+        "tooltip": null
+      }
+    ],
+    "village_hostile_action": [
+      {
+        "id": "raid_village",
+        "holds": true,
+        "enabled": true,
+        "text": "Raid the village",
+        "tooltip": null
+      },
+      {
+        "id": "force_peasants_to_give_volunteers",
+        "holds": true,
+        "enabled": true,
+        "text": "Force notables to give you recruits",
+        "tooltip": null
+      },
+      {
+        "id": "force_peasants_to_give_supplies",
+        "holds": true,
+        "enabled": true,
+        "text": "Force peasants to give you goods",
+        "tooltip": null
+      },
+      {
+        "id": "forget_it",
+        "holds": true,
+        "enabled": true,
+        "text": "Forget it",
+        "tooltip": null
+      }
+    ],
+    "raiding_village": [
+      {
+        "id": "raiding_village_end",
+        "holds": true,
+        "enabled": true,
+        "text": "End Raiding",
+        "tooltip": null
+      },
+      {
+        "id": "leave_army",
+        "holds": false,
+        "enabled": false,
+        "text": "Leave Army",
+        "tooltip": null
+      },
+      {
+        "id": "abandon_army",
+        "holds": false,
+        "enabled": false,
+        "text": "Abandon Army",
+        "tooltip": null
+      }
+    ],
+    "village_raid_ended_leaded_by_someone_else": [
+      {
+        "id": "continue",
+        "holds": true,
+        "enabled": true,
+        "text": "Continue",
+        "tooltip": null
+      }
+    ],
+    "player_raft_state_after_prisoner": [
+      {
+        "id": "continue",
+        "holds": true,
+        "enabled": true,
+        "text": "Continue",
+        "tooltip": null
+      }
+    ],
+    "player_raft_state_wait": [],
+    "player_raft_state_end": [
+      {
+        "id": "continue",
+        "holds": true,
+        "enabled": true,
+        "text": "Continue",
+        "tooltip": null
+      }
+    ]
+  },
+  "cases": {
+    "shipyard.buy": {
+      "caseName": "shipyard.buy",
+      "failures": [],
+      "setup": {
+        "crewAdded": 39,
+        "grainAdded": 200,
+        "goldAdded": 13000,
+        "anchorValidBefore": false,
+        "canBuy": {
+          "relevant": true,
+          "enabled": true,
+          "goldCost": 12000,
+          "tooltip": ""
+        },
+        "canConfirm": true,
+        "confirmHint": null
+      },
+      "relocations": [
+        {
+          "to": "mnbl_1609fb72_t_30a1119e46",
+          "from": [
+            1042.97913,
+            699.3487
+          ],
+          "distance": 573.6843
+        }
+      ],
+      "entered": true,
+      "ship": {
+        "name": "Azure Ghost",
+        "hull": "western_light_ship",
+        "price": 12000,
+        "hitPoints": 10800,
+        "maxHitPoints": 10800
+      },
+      "bought": {
+        "owner": true,
+        "inParty": true,
+        "goldPaid": 12000,
+        "townGoldGained": 0,
+        "anchorDocked": true,
+        "naval": true
+      },
+      "afterNavigation": null,
+      "returnExpected": {
+        "position": [
+          475.6647,
+          784.6012
+        ],
+        "reason": "the town's gate, where the leave path puts the party"
+      },
+      "returnDisplacement": 0,
+      "returnBound": 0.635,
+      "seconds": 5.523968199999999,
+      "asserts": [],
+      "assertCount": 0,
+      "assertCanarySeen": true,
+      "log": {
+        "path": "rgl_log_<pid>.txt",
+        "read": true,
+        "missingLines": 0,
+        "kinds": {},
+        "worldMissing": [],
+        "worldMissingCount": 0,
+        "otherMissing": [],
+        "otherMissingCount": 0
+      }
+    },
+    "route.port": {
+      "caseName": "route.port",
+      "failures": [],
+      "from": "mnbl_1609fb72_t_30a1119e46",
+      "to": "mnbl_1609fb72_t_e7ed06396a",
+      "kind": "port",
+      "relocations": [
+        {
+          "to": "mnbl_1609fb72_t_30a1119e46",
+          "from": [
+            475.6647,
+            784.6012
+          ],
+          "distance": 0
+        }
+      ],
+      "entered": true,
+      "sailed": {
+        "atSea": true,
+        "settlement": null,
+        "fromPort": 0,
+        "anchorValid": false,
+        "navigation": null,
+        "menu": "the map"
+      },
+      "order": {
+        "canNavigate": true,
+        "navigation": "Naval",
+        "targetingPort": true
+      },
+      "voyage": {
+        "hours": 22.266916527412832,
+        "distance": 43.804678201675415,
+        "offNavigationSamples": 0,
+        "landSeaChanges": 0,
+        "arrived": true,
+        "minWidth": 8.5,
+        "narrowest": [
+          469.5222,
+          780.781067
+        ]
+      },
+      "arrival": {
+        "settlement": "mnbl_1609fb72_t_e7ed06396a",
+        "atSea": false,
+        "anchorDocked": true,
+        "menus": [
+          "town",
+          "port_menu",
+          "port_menu"
+        ]
+      },
+      "afterNavigation": null,
+      "returnExpected": {
+        "position": [
+          450.1105,
+          813.6383
+        ],
+        "reason": "the town's gate, where the leave path puts the party"
+      },
+      "returnDisplacement": 0,
+      "returnBound": 0.635,
+      "seconds": 19.2812849,
+      "asserts": [],
+      "assertCount": 0,
+      "assertCanarySeen": true,
+      "log": {
+        "path": "rgl_log_<pid>.txt",
+        "read": true,
+        "missingLines": 0,
+        "kinds": {},
+        "worldMissing": [],
+        "worldMissingCount": 0,
+        "otherMissing": [],
+        "otherMissingCount": 0
+      }
+    },
+    "shipyard.repair": {
+      "caseName": "shipyard.repair",
+      "failures": [],
+      "setup": {
+        "damage": 4320,
+        "dealt": 0,
+        "hitPointsDamaged": 6480,
+        "maxHitPoints": 10800,
+        "repairCost": 800
+      },
+      "relocations": [
+        {
+          "to": "mnbl_1609fb72_t_e7ed06396a",
+          "from": [
+            450.1105,
+            813.6383
+          ],
+          "distance": 0
+        }
+      ],
+      "entered": true,
+      "repaired": {
+        "hitPoints": 10800,
+        "goldPaid": 800,
+        "menu": "port_menu"
+      },
+      "afterNavigation": null,
+      "returnExpected": {
+        "position": [
+          450.1105,
+          813.6383
+        ],
+        "reason": "the town's gate, where the leave path puts the party"
+      },
+      "returnDisplacement": 0,
+      "returnBound": 0.635,
+      "seconds": 1.134742799999998,
+      "asserts": [],
+      "assertCount": 0,
+      "assertCanarySeen": true,
+      "log": {
+        "path": "rgl_log_<pid>.txt",
+        "read": true,
+        "missingLines": 0,
+        "kinds": {},
+        "worldMissing": [],
+        "worldMissingCount": 0,
+        "otherMissing": [],
+        "otherMissingCount": 0
+      }
+    },
+    "route.island": {
+      "caseName": "route.island",
+      "failures": [],
+      "from": "mnbl_1609fb72_t_e7ed06396a",
+      "to": "mnbl_1609fb72_t_7efe6a0c96",
+      "kind": "island",
+      "relocations": [
+        {
+          "to": "mnbl_1609fb72_t_e7ed06396a",
+          "from": [
+            450.1105,
+            813.6383
+          ],
+          "distance": 0
+        }
+      ],
+      "entered": true,
+      "sailed": {
+        "atSea": true,
+        "settlement": null,
+        "fromPort": 0,
+        "anchorValid": false,
+        "navigation": null,
+        "menu": "the map"
+      },
+      "order": {
+        "canNavigate": true,
+        "navigation": "Naval",
+        "targetingPort": true
+      },
+      "voyage": {
+        "hours": 32.199486361350864,
+        "distance": 77.7332991361618,
+        "offNavigationSamples": 0,
+        "landSeaChanges": 0,
+        "arrived": true,
+        "minWidth": 8.5,
+        "narrowest": [
+          443.980133,
+          812.0091
+        ]
+      },
+      "arrival": {
+        "settlement": "mnbl_1609fb72_t_7efe6a0c96",
+        "atSea": false,
+        "anchorDocked": true,
+        "menus": [
+          "town",
+          "port_menu",
+          "port_menu"
+        ]
+      },
+      "afterNavigation": null,
+      "returnExpected": {
+        "position": [
+          482.8125,
+          879.1598
+        ],
+        "reason": "the town's gate, where the leave path puts the party"
+      },
+      "returnDisplacement": 0,
+      "returnBound": 0.635,
+      "seconds": 27.821785499999997,
+      "asserts": [],
+      "assertCount": 0,
+      "assertCanarySeen": true,
+      "log": {
+        "path": "rgl_log_<pid>.txt",
+        "read": true,
+        "missingLines": 0,
+        "kinds": {},
+        "worldMissing": [],
+        "worldMissingCount": 0,
+        "otherMissing": [],
+        "otherMissingCount": 0
+      }
+    },
+    "blockade": {
+      "caseName": "blockade",
+      "failures": [],
+      "setup": {
+        "warDeclared": "mnbl_1609fb72_k_3f9b573679",
+        "relocatedFrom": {
+          "position": [
+            482.8125,
+            879.1598
+          ],
+          "distance": 39.739994
+        },
+        "outsideMenu": "town_outside",
+        "peaceMade": true,
+        "movedBack": {
+          "distance": 0,
+          "navigation": null
+        }
+      },
+      "settlement": "mnbl_1609fb72_t_db2d888bf1",
+      "blockade": {
+        "siege": true,
+        "active": true,
+        "activatedEvents": 1,
+        "anchorDisabled": true,
+        "blockadingParties": [
+          "player_party"
+        ],
+        "ships": 1,
+        "arcs": {
+          "script": true,
+          "points": 1,
+          "offNaval": 0,
+          "offSamples": [],
+          "center": [
+            475.9768,
+            839.771
+          ],
+          "fullPoints": 10,
+          "fullOffNaval": 0,
+          "fromPort": 1.54649091
+        }
+      },
+      "lifted": {
+        "siege": false,
+        "deactivatedEvents": 1,
+        "anchorDisabled": false
+      },
+      "afterNavigation": null,
+      "seconds": 2.2272879999999873,
+      "asserts": [],
+      "assertCount": 0,
+      "assertCanarySeen": true,
+      "log": {
+        "path": "rgl_log_<pid>.txt",
+        "read": true,
+        "missingLines": 0,
+        "kinds": {},
+        "worldMissing": [],
+        "worldMissingCount": 0,
+        "otherMissing": [],
+        "otherMissingCount": 0
+      }
+    },
+    "dropoff": {
+      "caseName": "dropoff",
+      "failures": [],
+      "from": "mnbl_1609fb72_t_7efe6a0c96",
+      "to": "mnbl_1609fb72_v_f924958cd5",
+      "relocations": [
+        {
+          "to": "mnbl_1609fb72_t_7efe6a0c96",
+          "from": [
+            482.8125,
+            879.1598
+          ],
+          "distance": 0
+        }
+      ],
+      "entered": true,
+      "sailed": {
+        "atSea": true,
+        "settlement": null,
+        "fromPort": 0,
+        "anchorValid": false,
+        "navigation": null,
+        "menu": "the map"
+      },
+      "order": {
+        "canNavigate": true,
+        "navigation": "Naval",
+        "targetingPort": true
+      },
+      "voyage": {
+        "hours": 8.379803944379091,
+        "distance": 12.828356146812439,
+        "offNavigationSamples": 0,
+        "landSeaChanges": 0,
+        "arrived": true,
+        "minWidth": 8.5,
+        "narrowest": [
+          486.1543,
+          874.5537
+        ]
+      },
+      "arrival": {
+        "settlement": "mnbl_1609fb72_v_f924958cd5",
+        "atSea": true
+      },
+      "disembarked": {
+        "atSea": false,
+        "fromGate": 0,
+        "anchorAtVillage": true,
+        "anchorFromPort": 0,
+        "navigation": null
+      },
+      "returnExpected": {
+        "position": [
+          485.9375,
+          878.125
+        ],
+        "reason": "the village's gate, where the disembark puts the party"
+      },
+      "returnDisplacement": 0,
+      "returnBound": 0.635,
+      "reembarked": {
+        "atSea": true,
+        "fromAnchor": 0,
+        "anchorValid": false,
+        "navigation": null
+      },
+      "coastalLanding": {
+        "point": [
+          487.9883,
+          877.7982
+        ],
+        "canNavigate": true,
+        "navigation": "All",
+        "fromSea": 6.395043,
+        "landed": {
+          "atSea": false,
+          "sawTransition": true,
+          "transitionHours": 2.0198026946745813,
+          "landedAfterHours": 2.1000055000185966,
+          "hours": 5.240223138593137,
+          "ashore": [
+            493.25,
+            878.092834
+          ],
+          "fromPoint": 0.0268073771,
+          "navigation": null,
+          "anchorValid": true,
+          "anchorAtVillage": false,
+          "anchorFromAshore": 1,
+          "anchorNavigation": null,
+          "lastDisembarkFromAshore": 0
+        },
+        "reboarded": {
+          "atSea": true,
+          "fromAnchor": 0,
+          "anchorValid": false,
+          "navigation": null
+        }
+      },
+      "seconds": 15.757832100000002,
+      "asserts": [],
+      "assertCount": 0,
+      "assertCanarySeen": true,
+      "log": {
+        "path": "rgl_log_<pid>.txt",
+        "read": true,
+        "missingLines": 0,
+        "kinds": {},
+        "worldMissing": [],
+        "worldMissingCount": 0,
+        "otherMissing": [],
+        "otherMissingCount": 0
+      }
+    },
+    "pirate.battle": {
+      "caseName": "pirate.battle",
+      "failures": [],
+      "setup": {
+        "crewAdded": 0,
+        "excluded": null,
+        "pirate": "southern_pirates_16",
+        "clan": "southern_pirates",
+        "pirateShips": 3,
+        "pirateTroops": 48,
+        "pirateFrom": [
+          522.6416,
+          881.167053
+        ],
+        "pirateMoved": 27.5941849,
+        "pirateRestored": "patrol"
+      },
+      "fleetBefore": {
+        "ships": [
+          {
+            "hull": "western_light_ship",
+            "hitPoints": 10800,
+            "maxHitPoints": 10800
+          }
+        ],
+        "troops": 40,
+        "healthy": 40,
+        "anchorValid": false
+      },
+      "mapEvent": {
+        "naval": true,
+        "involved": [
+          "southern_pirates_16",
+          "player_party"
+        ]
+      },
+      "fight": {},
+      "mission": {
+        "scene": "battle_terrain_coastal_021",
+        "sceneNameProperty": "battle_terrain_coastal_021",
+        "module": "$BASE/Modules/NavalDLC/",
+        "terrainType": "CoastalSea",
+        "hasEnemyTeam": true,
+        "screen": "NavalDLC.View.NavalMissionScreen",
+        "initializerRecordSource": "TaleWorlds.MountAndBlade.Mission.<InitializerRecord>k__BackingField",
+        "initializerRecord": {
+          "TerrainType": 18,
+          "DamageToFriendsMultiplier": 0.5,
+          "DamageFromPlayerToFriendsMultiplier": 0.5,
+          "NeedsRandomTerrain": false,
+          "RandomTerrainSeed": 5212,
+          "SceneName": "battle_terrain_coastal_021",
+          "SceneLevels": "",
+          "PlayingInCampaignMode": true,
+          "EnableSceneRecording": false,
+          "SceneUpgradeLevel": 0,
+          "SceneHasMapPatch": true,
+          "PatchCoordinates": [
+            0.466666669,
+            0.733333349
+          ],
+          "PatchEncounterDir": [
+            -0.811693847,
+            0.58408314
+          ],
+          "DoNotUseLoadingScreen": false,
+          "DisableDynamicPointlightShadows": false,
+          "DisableCorpseFadeOut": false,
+          "DecalAtlasGroup": 2,
+          "AtmosphereOnCampaign": "AtmosphereInfo"
+        },
+        "terrainSamples": [
+          {
+            "at": [
+              4611.48535,
+              4709.089
+            ],
+            "terrainHeight": -21.18
+          },
+          {
+            "at": [
+              4631.48535,
+              4709.089
+            ],
+            "terrainHeight": -21.18
+          },
+          {
+            "at": [
+              4591.48535,
+              4709.089
+            ],
+            "terrainHeight": -21.18
+          },
+          {
+            "at": [
+              4611.48535,
+              4729.089
+            ],
+            "terrainHeight": -21.18
+          },
+          {
+            "at": [
+              4611.48535,
+              4689.089
+            ],
+            "terrainHeight": -21.18
+          }
+        ],
+        "mainAgentPosition": [
+          4611.48535,
+          4709.089,
+          22.4076576
+        ],
+        "combat": true,
+        "loadSeconds": 2.8906034000000034,
+        "spawns": {
+          "agents": 80,
+          "onNavmesh": 80,
+          "heightAdjusted": 0,
+          "offNavmesh": 0,
+          "offNavmeshUsingObject": 0,
+          "usedObjects": {},
+          "boundaries": 1,
+          "outsideBoundaries": 0,
+          "mainOnNavmesh": true,
+          "samples": []
+        },
+        "missionTimeAdvanced": 3.0384299904108047,
+        "screenshot": true,
+        "endedItself": false,
+        "missionResult": null,
+        "teardownSeconds": 0.5222768000000002
+      },
+      "gear": {
+        "agents": 80,
+        "playerPartyAgents": 32,
+        "incomplete": 0,
+        "byCulture": {
+          "empire": 32,
+          "southern_pirates": 48
+        },
+        "problems": []
+      },
+      "menusAfterBattle": [
+        "encounter",
+        "the map"
+      ],
+      "fleetAfter": {
+        "ships": [
+          {
+            "hull": "western_light_ship",
+            "hitPoints": 10800,
+            "maxHitPoints": 10800
+          }
+        ],
+        "troops": 40,
+        "healthy": 40,
+        "anchorValid": false
+      },
+      "returnDisplacement": 1.709209680557251,
+      "returnDisplacementPlanar": 1.7092097368150048,
+      "returnBound": 1.885,
+      "sceneMatchesPatch": true,
+      "mismatchGuard": {
+        "index": 110,
+        "naval": true,
+        "terrainAtParty": "CoastalSea",
+        "opened": "battle_terrain_coastal_021",
+        "expected": "battle_terrain_coastal_021",
+        "candidates": [
+          "battle_terrain_coastal_021"
+        ],
+        "rule": "a single scene lists the index",
+        "deterministic": true,
+        "agrees": true,
+        "problem": null,
+        "position": [
+          494.25,
+          878.092834
+        ],
+        "patchCoordinates": [
+          0.466666669,
+          0.733333349
+        ],
+        "campaignHours": 2185927.9453745554
+      },
+      "afterNavigation": null,
+      "seconds": 9.464160399999997,
+      "asserts": [],
+      "assertCount": 0,
+      "assertCanarySeen": true,
+      "log": {
+        "path": "rgl_log_<pid>.txt",
+        "read": true,
+        "missingLines": 6,
+        "kinds": {
+          "Missing shader from sack: pbr_terrain": 2,
+          "Missing shader from sack: pbr_terrain_gbuffer": 2,
+          "Missing shader from sack: pbr_terrain_pointlight": 1,
+          "Missing shader from sack: pbr_terrain_shadowmap": 1
+        },
+        "worldMissing": [],
+        "worldMissingCount": 0,
+        "otherMissing": [],
+        "otherMissingCount": 0
+      }
+    },
+    "route.seam": {
+      "caseName": "route.seam",
+      "failures": [],
+      "setup": {
+        "row": 879.0009,
+        "movedFrom": [
+          495.698029,
+          879.0009
+        ],
+        "from": [
+          1195.99414,
+          878.9932
+        ],
+        "to": [
+          404.036377,
+          879.292542
+        ]
+      },
+      "voyage": {
+        "arrived": true,
+        "hours": 2.179968527983874,
+        "travelledPeriodic": 7.5249176,
+        "straightPeriodic": 8.047805,
+        "rebases": 1,
+        "rebaseShifts": [
+          -800
+        ],
+        "atSea": true,
+        "offNavigationSamples": 0,
+        "nonCanonicalSamples": 0
+      },
+      "seconds": 5.210773500000002,
+      "asserts": [],
+      "assertCount": 0,
+      "assertCanarySeen": true,
+      "log": {
+        "path": "rgl_log_<pid>.txt",
+        "read": true,
+        "missingLines": 0,
+        "kinds": {},
+        "worldMissing": [],
+        "worldMissingCount": 0,
+        "otherMissing": [],
+        "otherMissingCount": 0
+      }
+    },
+    "pirate.seam": {
+      "caseName": "pirate.seam",
+      "failures": [],
+      "setup": {
+        "crewAdded": 0,
+        "excluded": null,
+        "pirate": "southern_pirates_16",
+        "clan": "southern_pirates",
+        "pirateShips": 3,
+        "pirateTroops": 48,
+        "pirateFrom": [
+          523.235657,
+          880.3425
+        ],
+        "acrossSeam": {
+          "party": [
+            400.707458,
+            879.3039
+          ],
+          "pirate": [
+            1199.17688,
+            878.8777
+          ],
+          "periodic": 1.58881235,
+          "planar": 798.469543
+        },
+        "pirateMoved": 675.9428,
+        "pirateRestored": "patrol"
+      },
+      "fleetBefore": {
+        "ships": [
+          {
+            "hull": "western_light_ship",
+            "hitPoints": 10800,
+            "maxHitPoints": 10800
+          }
+        ],
+        "troops": 40,
+        "healthy": 40,
+        "anchorValid": false
+      },
+      "mapEvent": {
+        "naval": true,
+        "involved": [
+          "southern_pirates_16",
+          "player_party"
+        ]
+      },
+      "fight": {},
+      "mission": {
+        "scene": "battle_terrain_opensea_northern",
+        "sceneNameProperty": "battle_terrain_opensea_northern",
+        "module": "$BASE/Modules/NavalDLC/",
+        "terrainType": "OpenSea",
+        "hasEnemyTeam": true,
+        "screen": "NavalDLC.View.NavalMissionScreen",
+        "initializerRecordSource": "TaleWorlds.MountAndBlade.Mission.<InitializerRecord>k__BackingField",
+        "initializerRecord": {
+          "TerrainType": 19,
+          "DamageToFriendsMultiplier": 0.5,
+          "DamageFromPlayerToFriendsMultiplier": 0.5,
+          "NeedsRandomTerrain": false,
+          "RandomTerrainSeed": 1767,
+          "SceneName": "battle_terrain_opensea_northern",
+          "SceneLevels": "",
+          "PlayingInCampaignMode": true,
+          "EnableSceneRecording": false,
+          "SceneUpgradeLevel": 0,
+          "SceneHasMapPatch": true,
+          "PatchCoordinates": [
+            0,
+            0.733333349
+          ],
+          "PatchEncounterDir": [
+            0.9633476,
+            0.268256038
+          ],
+          "DoNotUseLoadingScreen": false,
+          "DisableDynamicPointlightShadows": false,
+          "DisableCorpseFadeOut": false,
+          "DecalAtlasGroup": 2,
+          "AtmosphereOnCampaign": "AtmosphereInfo"
+        },
+        "terrainSamples": [
+          {
+            "at": [
+              5815.19629,
+              5005.172
+            ],
+            "terrainHeight": -29.97
+          },
+          {
+            "at": [
+              5835.19629,
+              5005.172
+            ],
+            "terrainHeight": -29.97
+          },
+          {
+            "at": [
+              5795.19629,
+              5005.172
+            ],
+            "terrainHeight": -29.97
+          },
+          {
+            "at": [
+              5815.19629,
+              5025.172
+            ],
+            "terrainHeight": -29.97
+          },
+          {
+            "at": [
+              5815.19629,
+              4985.172
+            ],
+            "terrainHeight": -29.97
+          }
+        ],
+        "mainAgentPosition": [
+          5815.19629,
+          5005.172,
+          1.12754834
+        ],
+        "combat": true,
+        "loadSeconds": 1.7949014000000005,
+        "spawns": {
+          "agents": 80,
+          "onNavmesh": 80,
+          "heightAdjusted": 0,
+          "offNavmesh": 0,
+          "offNavmeshUsingObject": 0,
+          "usedObjects": {},
+          "boundaries": 1,
+          "outsideBoundaries": 0,
+          "mainOnNavmesh": true,
+          "samples": []
+        },
+        "missionTimeAdvanced": 3.0100500136613846,
+        "screenshot": true,
+        "endedItself": false,
+        "missionResult": null,
+        "teardownSeconds": 0.4005987000000033
+      },
+      "gear": {
+        "agents": 80,
+        "playerPartyAgents": 32,
+        "incomplete": 0,
+        "byCulture": {
+          "empire": 32,
+          "southern_pirates": 48
+        },
+        "problems": []
+      },
+      "menusAfterBattle": [
+        "encounter",
+        "the map"
+      ],
+      "fleetAfter": {
+        "ships": [
+          {
+            "hull": "western_light_ship",
+            "hitPoints": 10800,
+            "maxHitPoints": 10800
+          }
+        ],
+        "troops": 40,
+        "healthy": 40,
+        "anchorValid": false
+      },
+      "returnDisplacement": 1.6806257963180542,
+      "returnDisplacementPlanar": 1.6806258308632733,
+      "returnBound": 1.885,
+      "sceneMatchesPatch": true,
+      "mismatchGuard": {
+        "index": 136,
+        "naval": true,
+        "terrainAtParty": "OpenSea",
+        "opened": "battle_terrain_opensea_northern",
+        "expected": "battle_terrain_opensea_northern",
+        "candidates": [
+          "battle_terrain_opensea_northern",
+          "battle_terrain_coastal_07"
+        ],
+        "rule": "the one naval scene of the terrain under the party",
+        "deterministic": true,
+        "agrees": true,
+        "problem": null,
+        "position": [
+          400.707458,
+          879.3039
+        ],
+        "patchCoordinates": [
+          0,
+          0.733333349
+        ],
+        "campaignHours": 2185930.1253430834
+      },
+      "afterNavigation": null,
+      "seconds": 7.844577900000004,
+      "asserts": [],
+      "assertCount": 0,
+      "assertCanarySeen": true,
+      "log": {
+        "path": "rgl_log_<pid>.txt",
+        "read": true,
+        "missingLines": 6,
+        "kinds": {
+          "Missing shader from sack: pbr_terrain": 2,
+          "Missing shader from sack: pbr_terrain_gbuffer": 2,
+          "Missing shader from sack: pbr_terrain_pointlight": 1,
+          "Missing shader from sack: pbr_terrain_shadowmap": 1
+        },
+        "worldMissing": [],
+        "worldMissingCount": 0,
+        "otherMissing": [],
+        "otherMissingCount": 0
+      }
+    },
+    "raid": {
+      "caseName": "raid",
+      "failures": [],
+      "setup": {
+        "warDeclared": "mnbl_1609fb72_k_de9f25ee81",
+        "crewAdded": 0,
+        "shallowShips": 1,
+        "navalTroopSelection": {
+          "offered": 40,
+          "selected": 32,
+          "minTroops": 15,
+          "eligibleShips": 1,
+          "ships": [
+            "western_light_ship"
+          ],
+          "minShips": 1,
+          "maxShips": 3
+        },
+        "peaceMade": true
+      },
+      "village": "mnbl_1609fb72_v_1b54c2686d",
+      "expectedScene": "aserai_village_j_raid",
+      "mapEventsEnded": [
+        {
+          "type": "Raid",
+          "isRaid": true,
+          "playerMapEvent": true,
+          "naval": false,
+          "attackerLeader": "player_party",
+          "attackerLeaderIsMain": true,
+          "defenderLeaderIsVillage": true,
+          "villageRaided": false,
+          "villageState": "BeingRaided",
+          "diplomaticallyFinished": false,
+          "endedByRetreat": false,
+          "winner": "Attacker"
+        },
+        {
+          "type": "Raid",
+          "isRaid": true,
+          "playerMapEvent": true,
+          "naval": false,
+          "attackerLeader": "player_party",
+          "attackerLeaderIsMain": true,
+          "defenderLeaderIsVillage": true,
+          "villageRaided": false,
+          "villageState": "BeingRaided",
+          "diplomaticallyFinished": false,
+          "endedByRetreat": false,
+          "winner": "Attacker"
+        }
+      ],
+      "order": {
+        "canNavigate": true,
+        "navigation": "Naval",
+        "targetingPort": true
+      },
+      "voyage": {
+        "hours": 40.539362916722894,
+        "distance": 117.75050830841064,
+        "offNavigationSamples": 0,
+        "landSeaChanges": 0,
+        "arrived": true,
+        "minWidth": 9,
+        "narrowest": [
+          500.357758,
+          844.3868
+        ]
+      },
+      "arrival": {
+        "atSea": true,
+        "settlement": "mnbl_1609fb72_v_1b54c2686d"
+      },
+      "fight": {
+        "landing": {
+          "controller": true,
+          "paths": 4,
+          "pathFrames": [
+            8,
+            8,
+            8,
+            8
+          ],
+          "jumpingFrames": 4,
+          "startedAfter": 51.1668602,
+          "started": true,
+          "completed": true,
+          "seconds": 87.32760389999999,
+          "playerAgentsAshore": 18,
+          "playerAgentsAboard": 1,
+          "playerAgentsUntracked": 0
+        },
+        "sceneTags": {
+          "landing": 10,
+          "jumping": 3,
+          "playerSpawnFrame": 1
+        },
+        "sceneLevels": "naval_raid",
+        "mainAgentAfterLanding": "active",
+        "killed": 53,
+        "seconds": 1.0399127999999962,
+        "victory": true
+      },
+      "mission": {
+        "scene": "aserai_village_j_raid",
+        "sceneNameProperty": "aserai_village_j_raid",
+        "module": "$BASE/Modules/SandBox/",
+        "terrainType": "River",
+        "hasEnemyTeam": true,
+        "screen": "NavalDLC.View.NavalMissionScreen",
+        "initializerRecordSource": "TaleWorlds.MountAndBlade.Mission.<InitializerRecord>k__BackingField",
+        "initializerRecord": {
+          "TerrainType": 11,
+          "DamageToFriendsMultiplier": 0.5,
+          "DamageFromPlayerToFriendsMultiplier": 0.5,
+          "NeedsRandomTerrain": false,
+          "RandomTerrainSeed": 0,
+          "SceneName": "aserai_village_j_raid",
+          "SceneLevels": "naval_raid",
+          "PlayingInCampaignMode": true,
+          "EnableSceneRecording": false,
+          "SceneUpgradeLevel": 0,
+          "SceneHasMapPatch": false,
+          "PatchCoordinates": [
+            0,
+            0
+          ],
+          "PatchEncounterDir": [
+            0,
+            0
+          ],
+          "DoNotUseLoadingScreen": false,
+          "DisableDynamicPointlightShadows": false,
+          "DisableCorpseFadeOut": false,
+          "DecalAtlasGroup": 2,
+          "AtmosphereOnCampaign": "AtmosphereInfo"
+        },
+        "terrainSamples": [
+          {
+            "at": [
+              247.052979,
+              642.445435
+            ],
+            "terrainHeight": -32.39595
+          },
+          {
+            "at": [
+              267.052979,
+              642.445435
+            ],
+            "terrainHeight": -28.3463936
+          },
+          {
+            "at": [
+              227.052979,
+              642.445435
+            ],
+            "terrainHeight": -32.4696159
+          },
+          {
+            "at": [
+              247.052979,
+              662.445435
+            ],
+            "terrainHeight": -35.93428
+          },
+          {
+            "at": [
+              247.052979,
+              622.445435
+            ],
+            "terrainHeight": -30.5114021
+          }
+        ],
+        "mainAgentPosition": [
+          247.052979,
+          642.445435,
+          21.6951427
+        ],
+        "combat": true,
+        "loadSeconds": 2.3540993999999955,
+        "spawns": {
+          "agents": 85,
+          "onNavmesh": 85,
+          "heightAdjusted": 0,
+          "offNavmesh": 0,
+          "offNavmeshUsingObject": 0,
+          "usedObjects": {},
+          "boundaries": 1,
+          "outsideBoundaries": 0,
+          "mainOnNavmesh": true,
+          "samples": []
+        },
+        "screenshot": true,
+        "endedItself": true,
+        "missionResult": {
+          "victory": true,
+          "defeated": false,
+          "enemyRetreated": false
+        },
+        "teardownSeconds": 0.5902737000000116
+      },
+      "gear": {
+        "agents": 72,
+        "playerPartyAgents": 19,
+        "incomplete": 0,
+        "byCulture": {
+          "aserai": 53,
+          "empire": 19
+        },
+        "problems": []
+      },
+      "menusAfterRaid": [
+        "PartyState",
+        "InventoryState",
+        "raiding_village",
+        "village_raid_ended_leaded_by_someone_else",
+        "the map"
+      ],
+      "screensClosed": [
+        "PartyState",
+        "InventoryState"
+      ],
+      "raidEndMenu": "village_raid_ended_leaded_by_someone_else",
+      "villageState": "Looted",
+      "afterNavigation": null,
+      "atSeaAfter": true,
+      "returnExpected": {
+        "position": [
+          506.875,
+          838.125
+        ],
+        "reason": "the village's port, the raid's sea side"
+      },
+      "returnDisplacement": 0,
+      "returnBound": 1.885,
+      "seconds": 201.75978519999995,
+      "asserts": [],
+      "assertCount": 0,
+      "assertCanarySeen": true,
+      "log": {
+        "path": "rgl_log_<pid>.txt",
+        "read": true,
+        "missingLines": 6,
+        "kinds": {
+          "Missing shader from sack: pbr_terrain": 2,
+          "Missing shader from sack: pbr_terrain_gbuffer": 2,
+          "Missing shader from sack: pbr_terrain_pointlight": 1,
+          "Missing shader from sack: pbr_terrain_shadowmap": 1
+        },
+        "worldMissing": [],
+        "worldMissingCount": 0,
+        "otherMissing": [],
+        "otherMissingCount": 0
+      }
+    },
+    "naval.defeat": {
+      "caseName": "naval.defeat",
+      "failures": [],
+      "setup": {
+        "crewAdded": 14,
+        "playerTroops": 9,
+        "excluded": "southern_pirates_16",
+        "pirate": "southern_pirates_297",
+        "clan": "southern_pirates",
+        "pirateShips": 3,
+        "pirateTroops": 65,
+        "pirateFrom": [
+          536.0128,
+          846.282532
+        ],
+        "pirateMoved": 31.5569344,
+        "pirateRestored": "patrol"
+      },
+      "fleetBefore": {
+        "ships": [
+          {
+            "hull": "western_light_ship",
+            "hitPoints": 10750.875,
+            "maxHitPoints": 10800
+          }
+        ],
+        "troops": 9,
+        "healthy": 8,
+        "anchorValid": false
+      },
+      "mapEvent": {
+        "naval": true,
+        "involved": [
+          "southern_pirates_297",
+          "player_party"
+        ]
+      },
+      "fight": {
+        "fallen": 8,
+        "seconds": 9.866115499999978,
+        "defeated": true
+      },
+      "mission": {
+        "scene": "battle_terrain_coastal_caspian_sea_02",
+        "sceneNameProperty": "battle_terrain_coastal_caspian_sea_02",
+        "module": "$BASE/Modules/NavalDLC/",
+        "terrainType": "CoastalSea",
+        "hasEnemyTeam": true,
+        "screen": "NavalDLC.View.NavalMissionScreen",
+        "initializerRecordSource": "TaleWorlds.MountAndBlade.Mission.<InitializerRecord>k__BackingField",
+        "initializerRecord": {
+          "TerrainType": 18,
+          "DamageToFriendsMultiplier": 0.5,
+          "DamageFromPlayerToFriendsMultiplier": 0.5,
+          "NeedsRandomTerrain": false,
+          "RandomTerrainSeed": 984,
+          "SceneName": "battle_terrain_coastal_caspian_sea_02",
+          "SceneLevels": "",
+          "PlayingInCampaignMode": true,
+          "EnableSceneRecording": false,
+          "SceneUpgradeLevel": 0,
+          "SceneHasMapPatch": true,
+          "PatchCoordinates": [
+            0.6666667,
+            0.06666667
+          ],
+          "PatchEncounterDir": [
+            0.952845931,
+            0.3034547
+          ],
+          "DoNotUseLoadingScreen": false,
+          "DisableDynamicPointlightShadows": false,
+          "DisableCorpseFadeOut": false,
+          "DecalAtlasGroup": 2,
+          "AtmosphereOnCampaign": "AtmosphereInfo"
+        },
+        "terrainSamples": [
+          {
+            "at": [
+              5173.883,
+              2424.81616
+            ],
+            "terrainHeight": 0
+          },
+          {
+            "at": [
+              5193.883,
+              2424.81616
+            ],
+            "terrainHeight": 0
+          },
+          {
+            "at": [
+              5153.883,
+              2424.81616
+            ],
+            "terrainHeight": 0
+          },
+          {
+            "at": [
+              5173.883,
+              2444.81616
+            ],
+            "terrainHeight": 0
+          },
+          {
+            "at": [
+              5173.883,
+              2404.81616
+            ],
+            "terrainHeight": 0
+          }
+        ],
+        "mainAgentPosition": [
+          5173.883,
+          2424.81616,
+          44.30585
+        ],
+        "combat": true,
+        "loadSeconds": 2.666847799999971,
+        "spawns": {
+          "agents": 73,
+          "onNavmesh": 73,
+          "heightAdjusted": 0,
+          "offNavmesh": 0,
+          "offNavmeshUsingObject": 0,
+          "usedObjects": {},
+          "boundaries": 1,
+          "outsideBoundaries": 0,
+          "mainOnNavmesh": true,
+          "samples": []
+        },
+        "screenshot": true,
+        "endedItself": true,
+        "missionResult": {
+          "victory": false,
+          "defeated": true,
+          "enemyRetreated": false
+        },
+        "teardownSeconds": 0.44389269999999215
+      },
+      "gear": {
+        "agents": 73,
+        "playerPartyAgents": 8,
+        "incomplete": 0,
+        "byCulture": {
+          "empire": 8,
+          "southern_pirates": 65
+        },
+        "problems": []
+      },
+      "expectedScene": "battle_terrain_coastal_caspian_sea_02",
+      "sceneDeterministic": true,
+      "sceneMatchesPatch": true,
+      "menusAfterDefeat": [],
+      "captured": true,
+      "fleetAfterDefeat": {
+        "ships": [],
+        "troops": 0,
+        "healthy": 0,
+        "anchorValid": false
+      },
+      "captor": "southern_pirates_297",
+      "captorAtSea": true,
+      "shipsAfterDefeat": 0,
+      "releasedAt": [
+        510.866974,
+        837.840149
+      ],
+      "afterEscape": {
+        "prisoner": false,
+        "atSea": true,
+        "raft": false,
+        "ships": 0,
+        "menu": "player_raft_state_after_prisoner"
+      },
+      "raftMenus": [
+        "player_raft_state_after_prisoner",
+        "player_raft_state_wait",
+        "player_raft_state_end",
+        "the map"
+      ],
+      "raft": {
+        "sawRaft": true,
+        "raftAtEnd": false,
+        "atSea": false,
+        "ships": 0,
+        "shipsBefore": 0,
+        "anchorValid": false,
+        "ashoreFrom": 0.852828741
+      },
+      "escaped": true,
+      "afterNavigation": null,
+      "seconds": 14.739173900000026,
+      "asserts": [],
+      "assertCount": 0,
+      "assertCanarySeen": true,
+      "log": {
+        "path": "rgl_log_<pid>.txt",
+        "read": true,
+        "missingLines": 6,
+        "kinds": {
+          "Missing shader from sack: pbr_terrain": 2,
+          "Missing shader from sack: pbr_terrain_gbuffer": 2,
+          "Missing shader from sack: pbr_terrain_pointlight": 1,
+          "Missing shader from sack: pbr_terrain_shadowmap": 1
+        },
+        "worldMissing": [],
+        "worldMissingCount": 0,
+        "otherMissing": [],
+        "otherMissingCount": 0
+      }
+    }
+  },
+  "captures": [
+    "navalDefeatMissionScreenshot",
+    "pirateBattleMissionScreenshot",
+    "pirateSeamMissionScreenshot",
+    "raidMissionScreenshot"
+  ]
+}

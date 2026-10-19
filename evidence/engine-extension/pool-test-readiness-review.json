@@ -1,0 +1,101 @@
+{
+  "schemaVersion": 1,
+  "status": "review-complete-three-findings-resolved-whole-native-patch-still-blocked",
+  "gameExecuted": false,
+  "gameFilesModified": false,
+  "scope": "Independent static review of native Single0 gate, isolated4080 probe, and offline package preparation. Does not certify whole native patch.",
+  "reviewedSources": {
+    "tools/battle-scale/audit_single_mode_guard.py": "7071e6a347ac15fb31341d173aa26cf71553ddbf1bf36a2474f30309cbb8d7a8",
+    "evidence/engine-extension/native-single-mode-guard.json": "6072092113149d37517a4b670cfef6f91e228cd663310d513d7285a32f70d839",
+    "tests/BattleScale/test_single_mode_guard.py": "41ede18fb431a6f0acee0f4599ca56a2ff1673bfb5d00f3ffe0261db6a1fb162",
+    "tools/battle-scale/prepare_native_pool_test.py": "6b7bc416defae3c74ab596bcd4234ece7fac78c930bd5c866a2e136044aa99d3",
+    "src/MNBL.BattleScale/NativePoolProbeMission.cs": "72e354b52a61602422d405b49044cb0e70ed33006db0b9261535598375d96f7b",
+    "src/MNBL.BattleScale/SubModule.cs": "372eb2cf51ea7d0fd115d65f660aa163bf0c575435c4eee45fabe7d165724539",
+    "tests/BattleScale/test_native_test_package.py": "392f80f353a00026119c0ac3cfaf0362bd3547cbd6c3ea126c08f3519ba31c84"
+  },
+  "findings": [
+    {
+      "id": "P1-fresh-package-impossible",
+      "priority": 1,
+      "status": "resolved-rechecked",
+      "path": "tools/battle-scale/prepare_native_pool_test.py",
+      "problem": "safe_output(output/native.dll) requires output to exist before explicit fresh-directory rejection; every destination fails.",
+      "reproduction": "Temporary fresh directory path: safe_output rejected output parent directory must already exist. No native copy created.",
+      "fix": "Validate new directory itself before mkdir; then normal contained-file checks in run(apply).",
+      "resolution": "New directory itself validated before mkdir; all7 synthetic package tests pass, including successful held package and path/refusal cases."
+    },
+    {
+      "id": "P2-probe-profile-binding",
+      "priority": 2,
+      "status": "resolved-rechecked",
+      "path": "src/MNBL.BattleScale/NativePoolProbeMission.cs",
+      "problem": "Profile stores probeModuleSha256 but ValidateProfile never checks it. Native hash can match while stale or different probe assembly runs.",
+      "fix": "Hash own assembly location and compare profile before native field reads.",
+      "resolution": "ValidateProfile hashes own assembly and matches probeModuleSha256 before native reads."
+    },
+    {
+      "id": "P2-review-input-overwrite",
+      "priority": 2,
+      "status": "resolved-rechecked",
+      "path": "tools/battle-scale/audit_single_mode_guard.py",
+      "problem": "Read REA bundle_path omitted from safe_review_output protected inputs; --output can overwrite that same bundle.",
+      "reproduction": "Helper admitted bundle path as output with original protection list; no write performed.",
+      "fix": "Protect bundle_path as well.",
+      "resolution": "bundle_path added to protected input set; direct read-only admission check now rejects the input."
+    }
+  ],
+  "additionalPreflight": {
+    "recording": "MissionState.OpenNew IL004f calls protected static Boolean IsRecordingActive; IL0056 selectsSingle0, IL0059 selectsRecord5, IL005a setter. Reject public static MissionState.RecordMission before opening mission under Single0. Native failfast already enforces rejection, but managed preflight avoids avoidable crash.",
+    "metadata": "Read with Mono.Cecil; no game assembly execution. MissionState.IsRecordingActive is Family Static HideBySig; RecordMission field Public Static Boolean.",
+    "resolution": "Root rejects public RecordMission in ValidateProfile, called before StartNewGame, after load before OpenNew, and AfterStart."
+  },
+  "acceptedStaticChecks": [
+    "Guard actual decoded bytes TEST ECX,ECX; JE setter+6; INT29; original RET preserve leaf ABI. All32argumentbits tested; negative and unknownnonzero failfast.",
+    "Initializer zero register remains unchanged tostore; loader-zeroed global initialvalue0. Exact native source hash and callback mapping verified by guard audit.",
+    "Probe keeps stable pre-delete indices, observes64 deletioncallbacks before respawn, and verifies index reuse/peak4080/highest4079.",
+    "Combat requires casualty and30missionseconds; terminal checkpoint explicitly awaits teardown and never labels runtime passed.",
+    "Rendering diagnostics use actual AgentVisual entities and active-camera tests; report explicitly leaves visible-soldier count unverified.",
+    "Taskpool readback enforces actual3..16 count and configured16, independent of hardware concurrency, under exact native profile.",
+    "Package implementation has no launcher/installer and blocked manifests cannot apply."
+  ],
+  "tests": [
+    {
+      "command": "python -m unittest discover -s tests/BattleScale -p test_single_mode_guard.py -v",
+      "result": "4 passed"
+    },
+    {
+      "check": "742 byte-bearing evidence instructions and39REAresponse hashes in runtime safety artifact revalidated",
+      "result": "passed"
+    },
+    {
+      "command": "python -m unittest discover -s tests/BattleScale -p test_native_test_package.py -v",
+      "result": "7 passed; synthetic PE and module only"
+    }
+  ],
+  "limitations": [
+    "Separate high-offset semantic defect7096fb discovered by root means prior generator review is superseded; per-operand recheck in progress. This report approves only corrected test tooling, not applying the native patch.",
+    "No real valid package can be prepared until manifest static coverage is complete.",
+    "No game launch, render verification, native failfast execution, mission teardown or normalprocess-exit test performed.",
+    "Native module identity checks disk contents at loaded path; arbitrary thirdparty runtime patching excluded from isolated profile."
+  ],
+  "isolatedProviderAndContactGuardReview": {
+    "status": "accepted-static-profile-and-offline-preparation-guards-runtime-unverified",
+    "reviewedSources": {
+      "tools/battle-scale/prepare_native_pool_test.py": "0df59169a2905ca5d4b35fd6a7d06cf6aefcfe7e367b093cccd3cc317a20d0a0",
+      "src/MNBL.BattleScale/NativePoolProbeMission.cs": "9a8cfc3469c682019bbc89b9f7ad042a3bee707db708ae520013dd7ea18aedf2",
+      "src/MNBL.BattleScale/SubModule.cs": "372eb2cf51ea7d0fd115d65f660aa163bf0c575435c4eee45fabe7d165724539",
+      "tests/BattleScale/test_native_test_package.py": "4a97f3517bc77bbf7bcc2e85d2844c7240cff83c465cfe024d6997bc2e9bc776"
+    },
+    "tests": "Independently ran16 synthetic package tests successfully; none executes game code.",
+    "findings": [],
+    "review": [
+      "Schema2 profile binds exact shipping and selected officialmodule provideridentities plus bundledMono infrastructure. Runtime validates actual loadednative/managed provider paths against locked hashed files and requires exactlyfour approvedmoduleIDs. Unknownproviders fail closed.",
+      "Bounded Windows infrastructure directories are explicitly trusted; arbitrary nativeinmemory mutation is notattested andremainsoutsideprofile. Skeletal assets arenot hashbound, but approved nativebuilder/cache guards enforcecontact64 bound before unsafeuse.",
+      "Native packaging requires literal boolean semanticcoverage/staticreadiness andexact Single0+bothcontactguards withRVA andbyteidentity. Stale module/source/evidence, installedgame destinations, andexistingoutputdirectory are rejected.",
+      "No installer, launcher, probe.once creation or game execution added. Finalgamecheckpoint stillawaitsteardown anddoesnotclaimvisiblecountverified."
+    ],
+    "limitations": [
+      "Runtime provider enumeration compatibility andfail-fast behavior remainunexecuted becausegame launchisheld. Thisreviewdoesnotassertfullnativepatch readiness."
+    ]
+  }
+}

@@ -1,0 +1,729 @@
+{
+  "schemaVersion": 1,
+  "status": "negative-fixtures-pass-pending-full-artifact-review",
+  "sourceSha256": {
+    "tools/battle-scale/native_offset_use_flow.py": "8f47af97f5dd2a6caa84feb1df12cfadf21d5fdfd4bd27d2d3088a189165e059",
+    "tools/battle-scale/audit_segmented_agent_consumers.py": "e9e83d6f1b0fc9e927fea3c13921dca6feca1259a93aae06ebd351668059b0fe",
+    "tests/BattleScale/test_native_offset_use_flow.py": "b80351858362a2f9e193af76bd094f4244be3e7949a51269f24c9d1da6d514d2",
+    "tools/battle-scale/native_instruction_semantics.py": "4673a53f680954cb1bcf9b0991341c19c0a5248d619fb5fbf650355e53d360a7",
+    "build/battle-scale/review_native_offset_flow.py": "5dee89408ae1969a5a6c534b64031b4e638bedfe42a691b34fa17671540c5698"
+  },
+  "initialReviewedFlowSourceSha256": "0bedfda767514ac9d99ee5c25c9d5e57b36f182238f6ef002feebbd9c8adf725",
+  "cases": [
+    {
+      "name": "partial-setcc-upper-bits",
+      "bytes": "4869c0600c0000 0f95c0 488b10 c3",
+      "prunedExternalCFG": false,
+      "expectedTrackedKindsOrExplicitGap": [
+        "memory-read-address"
+      ],
+      "passed": true,
+      "events": [
+        {
+          "address": "0x1007",
+          "kind": "flags-derived-value",
+          "detail": "setne"
+        },
+        {
+          "address": "0x1007",
+          "kind": "flags-use",
+          "detail": "zf"
+        },
+        {
+          "address": "0x1007",
+          "kind": "partial-register-write",
+          "detail": "rax"
+        },
+        {
+          "address": "0x1007",
+          "kind": "unsupported-overwrite-gap",
+          "detail": "rax"
+        },
+        {
+          "address": "0x1007",
+          "kind": "unsupported-value-use",
+          "detail": "setne"
+        },
+        {
+          "address": "0x100a",
+          "kind": "memory-read-address",
+          "detail": "rax"
+        },
+        {
+          "address": "0x100d",
+          "kind": "return-escape",
+          "detail": "rax"
+        }
+      ],
+      "historicalInitialEventKinds": [],
+      "hookApproved": false
+    },
+    {
+      "name": "stack-read-modify-write",
+      "bytes": "4869c0600c0000 4889442440 b800000000 488344244001 488b4c2440 e800000000 c3",
+      "prunedExternalCFG": false,
+      "expectedTrackedKindsOrExplicitGap": [
+        "call-escape",
+        "stack-reload"
+      ],
+      "passed": true,
+      "events": [
+        {
+          "address": "0x1007",
+          "kind": "stack-spill",
+          "detail": "64"
+        },
+        {
+          "address": "0x1011",
+          "kind": "arithmetic-use",
+          "detail": "add"
+        },
+        {
+          "address": "0x1011",
+          "kind": "partial-stack-write-gap",
+          "detail": "64"
+        },
+        {
+          "address": "0x1011",
+          "kind": "stack-reload",
+          "detail": "64"
+        },
+        {
+          "address": "0x1011",
+          "kind": "stack-rmw",
+          "detail": "64"
+        },
+        {
+          "address": "0x1017",
+          "kind": "copy",
+          "detail": "rcx"
+        },
+        {
+          "address": "0x1017",
+          "kind": "stack-reload",
+          "detail": "64"
+        },
+        {
+          "address": "0x101c",
+          "kind": "call-escape",
+          "detail": "rcx"
+        },
+        {
+          "address": "0x101c",
+          "kind": "callee-result-survival-gap",
+          "detail": "ABI permits clobbering but does not prove any original value was overwritten"
+        },
+        {
+          "address": "0x101c",
+          "kind": "callee-stack-alias-gap",
+          "detail": "saved offset may escape or be overwritten by callee"
+        },
+        {
+          "address": "0x1021",
+          "kind": "return-stack-alias-gap",
+          "detail": "implicit return-address read not proven independent of saved values"
+        }
+      ],
+      "historicalInitialEventKinds": [
+        "stack-spill"
+      ],
+      "hookApproved": false
+    },
+    {
+      "name": "volatile-may-survive-call",
+      "bytes": "4c69d0600c0000 e800000000 4c89d0 c3",
+      "prunedExternalCFG": false,
+      "expectedTrackedKindsOrExplicitGap": [
+        "return-escape"
+      ],
+      "passed": true,
+      "events": [
+        {
+          "address": "0x1007",
+          "kind": "callee-result-survival-gap",
+          "detail": "ABI permits clobbering but does not prove any original value was overwritten"
+        },
+        {
+          "address": "0x100c",
+          "kind": "copy",
+          "detail": "rax"
+        },
+        {
+          "address": "0x100f",
+          "kind": "return-escape",
+          "detail": "rax"
+        }
+      ],
+      "historicalInitialEventKinds": [],
+      "hookApproved": false
+    },
+    {
+      "name": "xmm0-return",
+      "bytes": "4869c0600c0000 66480f6ec0 b800000000 c3",
+      "prunedExternalCFG": false,
+      "expectedTrackedKindsOrExplicitGap": [
+        "return-escape"
+      ],
+      "passed": true,
+      "events": [
+        {
+          "address": "0x1007",
+          "kind": "copy",
+          "detail": "xmm0"
+        },
+        {
+          "address": "0x1011",
+          "kind": "return-escape",
+          "detail": "xmm0"
+        }
+      ],
+      "historicalInitialEventKinds": [
+        "copy"
+      ],
+      "hookApproved": false
+    },
+    {
+      "name": "unknown-read-may-alias-spill",
+      "bytes": "4869c0600c0000 4889442440 b800000000 488b02 c3",
+      "prunedExternalCFG": false,
+      "expectedTrackedKindsOrExplicitGap": [
+        "return-escape"
+      ],
+      "passed": true,
+      "events": [
+        {
+          "address": "0x1007",
+          "kind": "stack-spill",
+          "detail": "64"
+        },
+        {
+          "address": "0x1011",
+          "kind": "copy",
+          "detail": "rax"
+        },
+        {
+          "address": "0x1011",
+          "kind": "unknown-load-alias-gap",
+          "detail": "load may retrieve a saved offset"
+        },
+        {
+          "address": "0x1014",
+          "kind": "return-escape",
+          "detail": "rax"
+        },
+        {
+          "address": "0x1014",
+          "kind": "return-stack-alias-gap",
+          "detail": "implicit return-address read not proven independent of saved values"
+        }
+      ],
+      "historicalInitialEventKinds": [
+        "stack-spill"
+      ],
+      "hookApproved": false
+    },
+    {
+      "name": "comparison-flag-to-data",
+      "bytes": "4869c0600c0000 4883f800 0f94c1 b800000000 0fb6c1 c3",
+      "prunedExternalCFG": false,
+      "expectedTrackedKindsOrExplicitGap": [
+        "return-escape"
+      ],
+      "passed": true,
+      "events": [
+        {
+          "address": "0x1007",
+          "kind": "scalar-comparison",
+          "detail": "rax"
+        },
+        {
+          "address": "0x100b",
+          "kind": "flags-derived-value",
+          "detail": "sete"
+        },
+        {
+          "address": "0x100b",
+          "kind": "flags-use",
+          "detail": "zf"
+        },
+        {
+          "address": "0x100b",
+          "kind": "unsupported-value-use",
+          "detail": "sete"
+        },
+        {
+          "address": "0x1013",
+          "kind": "unsupported-value-use",
+          "detail": "movzx"
+        },
+        {
+          "address": "0x1016",
+          "kind": "return-escape",
+          "detail": "rax"
+        }
+      ],
+      "historicalInitialEventKinds": [
+        "scalar-comparison"
+      ],
+      "hookApproved": false
+    },
+    {
+      "name": "memory-arithmetic-store",
+      "bytes": "4869c0600c0000 480103 b800000000 c3",
+      "prunedExternalCFG": false,
+      "expectedTrackedKindsOrExplicitGap": [
+        "persistent-store-escape"
+      ],
+      "passed": true,
+      "events": [
+        {
+          "address": "0x1007",
+          "kind": "arithmetic-use",
+          "detail": "add"
+        },
+        {
+          "address": "0x1007",
+          "kind": "persistent-store-escape",
+          "detail": "arithmetic or unsupported tainted memory store"
+        }
+      ],
+      "historicalInitialEventKinds": [
+        "arithmetic-use"
+      ],
+      "hookApproved": false
+    },
+    {
+      "name": "decoder-pruned-external-tail",
+      "bytes": "4869c0600c0000 e9f40f0000",
+      "prunedExternalCFG": true,
+      "expectedTrackedKindsOrExplicitGap": [
+        "external-control-flow"
+      ],
+      "passed": true,
+      "events": [
+        {
+          "address": "0x1007",
+          "kind": "external-control-flow",
+          "detail": "decoded branch target absent from local CFG"
+        }
+      ],
+      "historicalInitialEventKinds": [],
+      "hookApproved": false
+    },
+    {
+      "name": "decoder-pruned-conditional-exit",
+      "bytes": "4869c0600c0000 0f84f30f0000 b800000000 c3",
+      "prunedExternalCFG": true,
+      "expectedTrackedKindsOrExplicitGap": [
+        "external-control-flow"
+      ],
+      "passed": true,
+      "events": [
+        {
+          "address": "0x1007",
+          "kind": "external-control-flow",
+          "detail": "decoded branch target absent from local CFG"
+        },
+        {
+          "address": "0x1007",
+          "kind": "flags-use",
+          "detail": "zf"
+        },
+        {
+          "address": "0x1007",
+          "kind": "unsupported-value-use",
+          "detail": "je"
+        }
+      ],
+      "historicalInitialEventKinds": [],
+      "hookApproved": false
+    },
+    {
+      "name": "decoder-pruned-fallthrough",
+      "bytes": "4869c0600c0000 90",
+      "prunedExternalCFG": true,
+      "expectedTrackedKindsOrExplicitGap": [
+        "missing-fallthrough-gap"
+      ],
+      "passed": true,
+      "events": [
+        {
+          "address": "0x1007",
+          "kind": "missing-fallthrough-gap",
+          "detail": "live result may continue outside local CFG"
+        }
+      ],
+      "historicalInitialEventKinds": [],
+      "hookApproved": false
+    },
+    {
+      "name": "stack-comparison-flag-to-data",
+      "bytes": "4869c0600c0000 4889442440 b800000000 48837c244005 0f92c1 0fb6c1 c3",
+      "prunedExternalCFG": false,
+      "expectedTrackedKindsOrExplicitGap": [
+        "return-escape"
+      ],
+      "passed": true,
+      "events": [
+        {
+          "address": "0x1007",
+          "kind": "stack-spill",
+          "detail": "64"
+        },
+        {
+          "address": "0x1011",
+          "kind": "scalar-comparison",
+          "detail": ""
+        },
+        {
+          "address": "0x1011",
+          "kind": "stack-reload",
+          "detail": "64"
+        },
+        {
+          "address": "0x1017",
+          "kind": "flags-derived-value",
+          "detail": "setb"
+        },
+        {
+          "address": "0x1017",
+          "kind": "flags-use",
+          "detail": "cf"
+        },
+        {
+          "address": "0x1017",
+          "kind": "unsupported-value-use",
+          "detail": "setb"
+        },
+        {
+          "address": "0x101a",
+          "kind": "unsupported-value-use",
+          "detail": "movzx"
+        },
+        {
+          "address": "0x101d",
+          "kind": "return-escape",
+          "detail": "rax"
+        },
+        {
+          "address": "0x101d",
+          "kind": "return-stack-alias-gap",
+          "detail": "implicit return-address read not proven independent of saved values"
+        }
+      ],
+      "historicalInitialEventKinds": null,
+      "hookApproved": false
+    },
+    {
+      "name": "carry-derived-new-flags",
+      "bytes": "4869c0600c0000 b800000000 83d200 0f92c1 0fb6c1 c3",
+      "prunedExternalCFG": false,
+      "expectedTrackedKindsOrExplicitGap": [
+        "return-escape"
+      ],
+      "passed": true,
+      "events": [
+        {
+          "address": "0x100c",
+          "kind": "arithmetic-use",
+          "detail": "adc"
+        },
+        {
+          "address": "0x100c",
+          "kind": "flags-derived-value",
+          "detail": "adc"
+        },
+        {
+          "address": "0x100c",
+          "kind": "flags-use",
+          "detail": "cf"
+        },
+        {
+          "address": "0x100f",
+          "kind": "flags-derived-value",
+          "detail": "setb"
+        },
+        {
+          "address": "0x100f",
+          "kind": "flags-use",
+          "detail": "cf"
+        },
+        {
+          "address": "0x100f",
+          "kind": "unsupported-value-use",
+          "detail": "setb"
+        },
+        {
+          "address": "0x1012",
+          "kind": "unsupported-value-use",
+          "detail": "movzx"
+        },
+        {
+          "address": "0x1015",
+          "kind": "return-escape",
+          "detail": "rax"
+        }
+      ],
+      "historicalInitialEventKinds": null,
+      "hookApproved": false
+    },
+    {
+      "name": "implicit-pop-stack-load",
+      "bytes": "4869c0600c0000 48890424 b800000000 58 c3",
+      "prunedExternalCFG": false,
+      "expectedTrackedKindsOrExplicitGap": [
+        "return-escape"
+      ],
+      "passed": true,
+      "events": [
+        {
+          "address": "0x1007",
+          "kind": "stack-spill",
+          "detail": "0"
+        },
+        {
+          "address": "0x1010",
+          "kind": "implicit-stack-read-gap",
+          "detail": "pop"
+        },
+        {
+          "address": "0x1010",
+          "kind": "unsupported-value-use",
+          "detail": "pop"
+        },
+        {
+          "address": "0x1011",
+          "kind": "return-escape",
+          "detail": "rax"
+        },
+        {
+          "address": "0x1011",
+          "kind": "return-stack-alias-gap",
+          "detail": "implicit return-address read not proven independent of saved values"
+        }
+      ],
+      "historicalInitialEventKinds": null,
+      "hookApproved": false
+    },
+    {
+      "name": "implicit-popfq-stack-load",
+      "bytes": "4869c0600c0000 48890424 b800000000 9d 0f92c1 0fb6c1 c3",
+      "prunedExternalCFG": false,
+      "expectedTrackedKindsOrExplicitGap": [
+        "return-escape"
+      ],
+      "passed": true,
+      "events": [
+        {
+          "address": "0x1007",
+          "kind": "stack-spill",
+          "detail": "0"
+        },
+        {
+          "address": "0x1010",
+          "kind": "implicit-stack-read-gap",
+          "detail": "popfq"
+        },
+        {
+          "address": "0x1010",
+          "kind": "unsupported-value-use",
+          "detail": "popfq"
+        },
+        {
+          "address": "0x1011",
+          "kind": "flags-derived-value",
+          "detail": "setb"
+        },
+        {
+          "address": "0x1011",
+          "kind": "flags-use",
+          "detail": "cf"
+        },
+        {
+          "address": "0x1011",
+          "kind": "unsupported-value-use",
+          "detail": "setb"
+        },
+        {
+          "address": "0x1014",
+          "kind": "unsupported-value-use",
+          "detail": "movzx"
+        },
+        {
+          "address": "0x1017",
+          "kind": "return-escape",
+          "detail": "rax"
+        },
+        {
+          "address": "0x1017",
+          "kind": "return-stack-alias-gap",
+          "detail": "implicit return-address read not proven independent of saved values"
+        }
+      ],
+      "historicalInitialEventKinds": null,
+      "hookApproved": false
+    },
+    {
+      "name": "false-cmov-retains-destination",
+      "bytes": "4869c0600c0000 31c9 480f45c2 488b10 c3",
+      "prunedExternalCFG": false,
+      "expectedTrackedKindsOrExplicitGap": [
+        "memory-read-address"
+      ],
+      "passed": true,
+      "events": [
+        {
+          "address": "0x1009",
+          "kind": "unsupported-overwrite-gap",
+          "detail": "rax"
+        },
+        {
+          "address": "0x100d",
+          "kind": "memory-read-address",
+          "detail": "rax"
+        },
+        {
+          "address": "0x1010",
+          "kind": "return-escape",
+          "detail": "rax"
+        }
+      ],
+      "historicalInitialEventKinds": null,
+      "hookApproved": false
+    },
+    {
+      "name": "scalar-simd-preserves-upper-half",
+      "bytes": "4869c0600c0000 4889442448 b800000000 0f10442440 f2480f2ac1 c3",
+      "prunedExternalCFG": false,
+      "expectedTrackedKindsOrExplicitGap": [
+        "return-escape"
+      ],
+      "passed": true,
+      "events": [
+        {
+          "address": "0x1007",
+          "kind": "stack-spill",
+          "detail": "72"
+        },
+        {
+          "address": "0x1011",
+          "kind": "copy",
+          "detail": "xmm0"
+        },
+        {
+          "address": "0x1011",
+          "kind": "stack-reload",
+          "detail": "64"
+        },
+        {
+          "address": "0x1016",
+          "kind": "unsupported-overwrite-gap",
+          "detail": "xmm0"
+        },
+        {
+          "address": "0x101b",
+          "kind": "return-escape",
+          "detail": "xmm0"
+        },
+        {
+          "address": "0x101b",
+          "kind": "return-stack-alias-gap",
+          "detail": "implicit return-address read not proven independent of saved values"
+        }
+      ],
+      "historicalInitialEventKinds": null,
+      "hookApproved": false
+    },
+    {
+      "name": "unmodeled-vector-does-not-crash",
+      "bytes": "4869c0600c0000 c5fc28c1 c3",
+      "prunedExternalCFG": false,
+      "expectedTrackedKindsOrExplicitGap": [
+        "return-escape"
+      ],
+      "passed": true,
+      "events": [
+        {
+          "address": "0x1007",
+          "kind": "unsupported-vector-width-gap",
+          "detail": "YMM/ZMM aliases tracked XMM; full lane semantics not certified"
+        },
+        {
+          "address": "0x100b",
+          "kind": "return-escape",
+          "detail": "rax"
+        }
+      ],
+      "historicalInitialEventKinds": null,
+      "hookApproved": false
+    },
+    {
+      "name": "vector-alias-keeps-gap",
+      "bytes": "4869c0600c0000 66480f6ec0 b800000000 c5fd6fc8 66480f7ec8 c3",
+      "prunedExternalCFG": false,
+      "expectedTrackedKindsOrExplicitGap": [
+        "return-escape"
+      ],
+      "passed": true,
+      "events": [
+        {
+          "address": "0x1007",
+          "kind": "copy",
+          "detail": "xmm0"
+        },
+        {
+          "address": "0x1011",
+          "kind": "unsupported-value-use",
+          "detail": "vmovdqa"
+        },
+        {
+          "address": "0x1011",
+          "kind": "unsupported-vector-width-gap",
+          "detail": "YMM/ZMM aliases tracked XMM; full lane semantics not certified"
+        },
+        {
+          "address": "0x1015",
+          "kind": "copy",
+          "detail": "rax"
+        },
+        {
+          "address": "0x101a",
+          "kind": "return-escape",
+          "detail": "rax"
+        },
+        {
+          "address": "0x101a",
+          "kind": "return-escape",
+          "detail": "xmm0"
+        }
+      ],
+      "historicalInitialEventKinds": null,
+      "hookApproved": false
+    },
+    {
+      "name": "reviewed-indirect-tail-with-tainted-argument",
+      "bytes": "4869c8600c0000 ff22",
+      "prunedExternalCFG": true,
+      "expectedTrackedKindsOrExplicitGap": [
+        "external-control-flow"
+      ],
+      "passed": true,
+      "events": [
+        {
+          "address": "0x1007",
+          "kind": "call-escape",
+          "detail": "rcx"
+        },
+        {
+          "address": "0x1007",
+          "kind": "external-tail-gap",
+          "detail": "live result exits through unmodeled indirect branch, even if target is untainted"
+        }
+      ],
+      "historicalInitialEventKinds": [],
+      "hookApproved": false
+    }
+  ],
+  "enginePatchApproved": false,
+  "scope": "Inert decoded x64 instruction fixtures. Each possible result use must survive local flow or stop at an explicit gap. Passing does not establish whole-program completeness."
+}

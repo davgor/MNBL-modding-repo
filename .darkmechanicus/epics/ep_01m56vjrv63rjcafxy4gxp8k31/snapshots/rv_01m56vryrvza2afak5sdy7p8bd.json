@@ -1,0 +1,1361 @@
+{
+  "baseRevisionId": null,
+  "bundle": {
+    "edges": [
+      {
+        "from": "tk_01m56vpv1jgwmytc7nf354b15c",
+        "to": "tk_01m56vpv1q79mk3k16ghhff93z"
+      },
+      {
+        "from": "tk_01m56vpv1q79mk3k16ghhff93z",
+        "to": "tk_01m56vpv1qyna6b7wn2fcyzf07"
+      },
+      {
+        "from": "tk_01m56vpv1qyna6b7wn2fcyzf07",
+        "to": "tk_01m56vpv1q5sg15729903evh8m"
+      },
+      {
+        "from": "tk_01m56vpv1q5sg15729903evh8m",
+        "to": "tk_01m56vpv1qbgk5c44w33rnfjb7"
+      },
+      {
+        "from": "tk_01m56vpv1jgwmytc7nf354b15c",
+        "to": "tk_01m56vpv1q7n03tjs3khew1feb"
+      },
+      {
+        "from": "tk_01m56vpv1qnhmkyhgve4t8q18y",
+        "to": "tk_01m56vpv1q7n03tjs3khew1feb"
+      },
+      {
+        "from": "tk_01m56vpv1q7n03tjs3khew1feb",
+        "to": "tk_01m56vpv1q7r5fc301vg0sbegc"
+      },
+      {
+        "from": "tk_01m56vpv1qnhmkyhgve4t8q18y",
+        "to": "tk_01m56vpv1q7r5fc301vg0sbegc"
+      },
+      {
+        "from": "tk_01m56vpv1q5sg15729903evh8m",
+        "to": "tk_01m56vpv1qcwdsc9bzjq42cg04"
+      },
+      {
+        "from": "tk_01m56vpv1qnhmkyhgve4t8q18y",
+        "to": "tk_01m56vpv1qcwdsc9bzjq42cg04"
+      },
+      {
+        "from": "tk_01m56vpv1qyna6b7wn2fcyzf07",
+        "to": "tk_01m56vpv1qr70hfhdcq91ykrg8"
+      },
+      {
+        "from": "tk_01m56vpv1jgwmytc7nf354b15c",
+        "to": "tk_01m56vpv1qr70hfhdcq91ykrg8"
+      },
+      {
+        "from": "tk_01m56vpv1jgwmytc7nf354b15c",
+        "to": "tk_01m56vpv1qnqa7ksv6nk9y69yw"
+      },
+      {
+        "from": "tk_01m56vpv1qnhmkyhgve4t8q18y",
+        "to": "tk_01m56vpv1qnqa7ksv6nk9y69yw"
+      },
+      {
+        "from": "tk_01m56vpv1qbgk5c44w33rnfjb7",
+        "to": "tk_01m56vpv1q208cm2vd1z3mpny5"
+      },
+      {
+        "from": "tk_01m56vpv1q7n03tjs3khew1feb",
+        "to": "tk_01m56vpv1q208cm2vd1z3mpny5"
+      },
+      {
+        "from": "tk_01m56vpv1qnqa7ksv6nk9y69yw",
+        "to": "tk_01m56vpv1q208cm2vd1z3mpny5"
+      },
+      {
+        "from": "tk_01m56vpv1q2zb58yqevxaf00nc",
+        "to": "tk_01m56vpv1qqpmyfgh4kasb6fzz"
+      },
+      {
+        "from": "tk_01m56vpv1q208cm2vd1z3mpny5",
+        "to": "tk_01m56vpv1qqpmyfgh4kasb6fzz"
+      },
+      {
+        "from": "tk_01m56vpv1q7r5fc301vg0sbegc",
+        "to": "tk_01m56vpv1qttqkdjjgt8fd3gh2"
+      },
+      {
+        "from": "tk_01m56vpv1qcwdsc9bzjq42cg04",
+        "to": "tk_01m56vpv1qttqkdjjgt8fd3gh2"
+      },
+      {
+        "from": "tk_01m56vpv1qr70hfhdcq91ykrg8",
+        "to": "tk_01m56vpv1qttqkdjjgt8fd3gh2"
+      },
+      {
+        "from": "tk_01m56vpv1qqpmyfgh4kasb6fzz",
+        "to": "tk_01m56vpv1qttqkdjjgt8fd3gh2"
+      },
+      {
+        "from": "tk_01m56vpv1q7r5fc301vg0sbegc",
+        "to": "tk_01m56vpv1q208cm2vd1z3mpny5"
+      }
+    ],
+    "epic": {
+      "intent": "## Outcome\nThe generated campaign map follows FWGC++ and can change during play:\n- **Biomes.** Terrain looks and behaves like its FWGC++ biome: desert is desert, snow is snow.\n- **Magic ground.** Magic-mutated ground is visible, with vanilla-quality textures derived from vanilla and directed by the FWGC++ concept art.\n- **Live mutation.** A capital that becomes a magic node changes the surrounding landscape mid-campaign, as computed by FWGC++. Its look and terrain type change, and the change persists in the save.\n- **Cities.** Every city FWGC++ generates becomes a town; the world is repaired, never rejected.\n- **Villages.** Every town has exactly 3 villages and every castle 2.\n- **Roads.** Roads, including feeder roads to castles and villages, are drawn and speed travel.\n- **Settlement looks.** Towns and castles get diverse, culture-correct looks from scaled-down vanilla layouts.\n- **Ruins.** FWGC++ ruins are marked on the map.\n\nResearch and evidence: `docs/research/map-epic-2-findings.md` (sections are cited in tickets). It was done with REA on the shipped assemblies, plus source reading of MNBL and FWGC++, with an adversarial verifier per topic.\n\n## Owner decisions (2026-10-18)\n1. **Clean break.** Pre-epic generated worlds and saves stop loading. One code path everywhere, no legacy readers.\n2. **FWGC++ computes mutations.** A planned FWGC++ slice: a `shift_leylines` verb, an `fwg apply` command and a baseline fix.\n3. **One early in-game probe**, then the final live test. Nothing else launches the game.\n4. **Magic textures are derived from vanilla textures**, with the concept art as direction.\n5. **Scaled-down vanilla town and castle layouts** (about 0.5, trimmed to fit), with culture pieces as fallback.\n6. **Roads.** A speed bonus and feeder roads to castles and villages. No new bridges beyond the existing decks.\n7. **Mutation v1 changes look and terrain type.** It is triggered by an API and debug commands; there is no magic system yet.\n8. **Ruins** get a marker per FWGC++ ruin with its name. No gameplay.\n9. **\"No cities dropped\"** means the world FWGC++ generates keeps every city. Repair towns instead of rejecting worlds.\n\n**Defaults** (findings §14):\n- `cold_tundra` gets a Steppe face plus seasonal snow. The Snow face and permanent white go only to `land_ice` and 12-month snow cells.\n- Northern-phase seasons everywhere.\n- Snow −0.15 and Swamp −0.2 speed terms, with one balance pass.\n- Hidden schools reuse a visible school's look.\n- FWGC++ zones are frozen after generation.\n- Map trees and flora are out of scope.\n\n## Working rules\n- **One sprint. Lean checks:** a ticket is done when it compiles, the existing suites pass (WorldBridge ctest, the managed runner, FWGC++ tests) and new logic has a few targeted assertions.\n  - Offline runs are allowed and encouraged: generation, the compile and travel gates on seeds, seam checks, texture gates.\n  - No per-ticket independent reviews. One review pass happens before the live test.\n- **Game launches:** only the early probe ticket and the acceptance node. Acceptance batching: run everything, fix everything in one batch, one confirming run.\n- **Shared install (battle-scale session):**\n  - CLAIM/OK/RELEASE before any deploy, launch or editor use;\n  - check processes first and never touch a process you didn't start;\n  - auto-dismiss Safe Mode and crash dialogs;\n  - provision grain when campaign time runs;\n  - record the `TaleWorlds.Native.dll` and `TaleWorlds.MountAndBlade.dll` hashes. Never restore or re-pin engine binaries.\n- **FWGC++ repo** (`C:/Users/davgo/Documents/GitHub/FWGC++`). Generator code is Claude's lane; follow its `AGENTS.md`:\n  - write the plan note first;\n  - G3: a logged verb;\n  - G6: the generator commit before the MNBL consumer;\n  - an `api.txt` change goes in its own rule commit;\n  - commit with `FWGC_AGENT=claude` through the commit gate; never `--no-verify`;\n  - stage files by name; push only when asked.\n- **One build, one scene rename.**\n  - Every identity-changing piece (policies, encoder, face types, settlement builder, climate) lands before the live test.\n  - The three format bumps share one `requiredCapabilities` id.\n  - Re-pin policies once, in dependency order.\n- **`travel_graph.cpp` has one owner, serial:** town repair → village quota → feeder roads → face types and road flags.",
+      "ownerRole": "procedural-world",
+      "successCriteria": [
+        {
+          "id": "s1",
+          "text": "On a generated world, desert, grassland/steppe, forest, marsh, exposed rock, tundra and land ice each render with their own terrain layers from the shared biome table. Land ice stays white all year. Screenshots per biome are recorded."
+        },
+        {
+          "id": "s2",
+          "text": "Navmesh land faces carry the biome's TerrainType from the shared table. Party speed (including the Snow, Swamp and road terms), battle scenes and terrain perks follow it in game."
+        },
+        {
+          "id": "s3",
+          "text": "Seasonal snow follows FWGC++'s snow season. Advancing to winter whitens the regions FWGC++ snows on, and the gameplay Snowy fraction matches the snow-season length."
+        },
+        {
+          "id": "s4",
+          "text": "All 8 visible magic schools have vanilla-derived ground texture sets that pass the review gates. The world's generated magic variants are visible on the map."
+        },
+        {
+          "id": "s5",
+          "text": "A debug-cast fire event at a capital runs FWGC++ `fwg apply` in the background and changes nearby ground. Look, terrain type and battle scene all change. The mutation survives save and Continue, no generator process runs during the load, and navigation caches are reused."
+        },
+        {
+          "id": "s6",
+          "text": "Every FWGC++ city becomes a town (same uid set at every stage, and the in-game Town count matches). No world is rejected for an unplaceable or unreachable town. A 20-seed offline sweep records accept and attempt-0 rates."
+        },
+        {
+          "id": "s7",
+          "text": "Every town has exactly 3 bound villages and every castle 2. All ports survive and no fortification has 0 villages."
+        },
+        {
+          "id": "s8",
+          "text": "FWGC++ routes plus feeder roads connect every town, castle and village to the network within its land group. They are drawn on the map with bridges at the existing decks and give a road speed bonus."
+        },
+        {
+          "id": "s9",
+          "text": "Towns and castles use culture-correct looks from scaled vanilla layouts. Nearest neighbours avoid the same look where the pool allows, and the siege contract still holds."
+        },
+        {
+          "id": "s10",
+          "text": "Each FWGC++ ruin has a map marker with its name, and a ruins encyclopedia page lists them."
+        },
+        {
+          "id": "s11",
+          "text": "The single live test ran on the shared install under the CLAIM/RELEASE rules, with the native DLL hashes recorded. The clean break is documented in docs/save-compatibility.md."
+        }
+      ],
+      "title": "Map epic 2: biome terrain, magic mutation, roads, settlements"
+    },
+    "formatVersion": 1,
+    "policies": {
+      "leaseSeconds": 1800,
+      "maxConcurrency": null,
+      "onTicketFailure": "continue_independent",
+      "retryLimit": 3
+    },
+    "rationale": "## Shape\nOne sprint, 15 work tickets plus the acceptance node (MMR-247), as the owner asked. Testing is lean, with one exception the owner approved: a short early in-game probe (MMR-249). It settles the native unknowns that the terrain, snow, decal, texture and overlay work rests on, so a wrong assumption isn't found only at the end.\n\n## Order\n- **MMR-248 first.** It freezes one shared biome table and every new policy key, so faces, layers, battle classes, colour grade and the mutation remap agree. It also re-pins once.\n- **The travel compiler has one owner, run in series:** MMR-251 town repair → MMR-252 village quota → MMR-253 feeder roads → MMR-254 face types. Face types must classify the final classes.\n- **Terrain and climate** follow the probe: MMR-255, then MMR-256.\n- **The FWGC++ slice (MMR-250)** runs in parallel in its own repo under its gates. It lands before the MNBL consumer (MMR-261), per G6.\n- **Textures (MMR-259)** feed the magic overlay (MMR-260), which feeds the runtime mutation (MMR-261).\n- **One review pass (MMR-262)**, then one integrated live test (MMR-247).\n\n## Highest risks\n- Native behaviour of more than 2 layers, decals and dynamic snow. The probe covers it.\n- Texture quality: the prototype showed identity must come from macro shift and placement.\n- Settlement density: generated towns are about 4.5× closer than vanilla, hence scaled and culled layouts.\n- FWGC++ lifting its age-boundary rule.\n- Seed 42 passing the village quota only through the tightest tier.\n\nThe clean break removes all legacy-path work.",
+    "relations": [],
+    "sprints": [
+      {
+        "checkpoint": {
+          "mode": "human"
+        },
+        "concurrencyCap": null,
+        "entryCriteria": [],
+        "exitCriteria": [
+          {
+            "id": "x1",
+            "text": "The acceptance live test passed after at most one fix batch and one confirming run. Its results are in evidence/map-epic-2/acceptance.json and docs/research/map-epic-2-findings.md."
+          }
+        ],
+        "goal": "The generated map follows FWGC++. Biome terrain looks and behaves right, magic ground is visible and mutates live, every city survives, villages are 3 per town and 2 per castle, roads are drawn, settlement looks vary and ruins are marked. Everything is proven in one live test.",
+        "id": "sp_01m56vjrv7dksjs3b73h4cz5j0",
+        "ordinal": 1,
+        "ticketIds": [
+          "tk_01m56vpv1jgwmytc7nf354b15c",
+          "tk_01m56vpv1qnhmkyhgve4t8q18y",
+          "tk_01m56vpv1q2zb58yqevxaf00nc",
+          "tk_01m56vpv1q79mk3k16ghhff93z",
+          "tk_01m56vpv1qyna6b7wn2fcyzf07",
+          "tk_01m56vpv1q5sg15729903evh8m",
+          "tk_01m56vpv1qbgk5c44w33rnfjb7",
+          "tk_01m56vpv1q7n03tjs3khew1feb",
+          "tk_01m56vpv1q7r5fc301vg0sbegc",
+          "tk_01m56vpv1qcwdsc9bzjq42cg04",
+          "tk_01m56vpv1qr70hfhdcq91ykrg8",
+          "tk_01m56vpv1qnqa7ksv6nk9y69yw",
+          "tk_01m56vpv1q208cm2vd1z3mpny5",
+          "tk_01m56vpv1qqpmyfgh4kasb6fzz",
+          "tk_01m56vpv1qttqkdjjgt8fd3gh2",
+          "tk_01m56vjrv7779wvh14w6a2vxqc"
+        ]
+      }
+    ],
+    "tickets": [
+      {
+        "acceptanceCriteria": [
+          {
+            "covers": "tk_01m56vpv1jgwmytc7nf354b15c",
+            "id": "c1",
+            "text": "MMR-248's shared table governs faces, layers, battle classes and the mutation remap in the build that ran."
+          },
+          {
+            "covers": "tk_01m56vpv1qnhmkyhgve4t8q18y",
+            "id": "c2",
+            "text": "MMR-249's probe decisions (delivery mode, decal technique, compositing, scale) are the ones the build used."
+          },
+          {
+            "covers": "tk_01m56vpv1q2zb58yqevxaf00nc",
+            "id": "c3",
+            "text": "FWGC++ `fwg apply` from the re-pinned producer computed the live mutation."
+          },
+          {
+            "covers": "tk_01m56vpv1q79mk3k16ghhff93z",
+            "id": "c4",
+            "text": "Both worlds kept every FWGC++ city: the in-game Town count equals sites, with the same uids."
+          },
+          {
+            "covers": "tk_01m56vpv1qyna6b7wn2fcyzf07",
+            "id": "c5",
+            "text": "Both worlds show exactly 3 villages per town and 2 per castle in game, with ports intact."
+          },
+          {
+            "covers": "tk_01m56vpv1q5sg15729903evh8m",
+            "id": "c6",
+            "text": "Every settlement is reached by a drawn road (routes and feeders)."
+          },
+          {
+            "covers": "tk_01m56vpv1qbgk5c44w33rnfjb7",
+            "id": "c7",
+            "text": "Face types follow biomes in game, and the speed tooltip shows the Snow, Swamp, Forest, Desert and road terms."
+          },
+          {
+            "covers": "tk_01m56vpv1q7n03tjs3khew1feb",
+            "id": "c8",
+            "text": "Each biome renders with its layers (screenshots), and land ice stays white."
+          },
+          {
+            "covers": "tk_01m56vpv1q7r5fc301vg0sbegc",
+            "id": "c9",
+            "text": "Winter whitens FWGC++ snow regions, and the Snowy gameplay state follows season length."
+          },
+          {
+            "covers": "tk_01m56vpv1qcwdsc9bzjq42cg04",
+            "id": "c10",
+            "text": "Road decals, bridges at decks and ruin markers render, and the ruins page lists every ruin."
+          },
+          {
+            "covers": "tk_01m56vpv1qr70hfhdcq91ykrg8",
+            "id": "c11",
+            "text": "Towns and castles show culture-correct scaled vanilla layouts with intact siege visuals."
+          },
+          {
+            "covers": "tk_01m56vpv1qnqa7ksv6nk9y69yw",
+            "id": "c12",
+            "text": "The magic ground textures render from the published packs, and the owner has reviewed them."
+          },
+          {
+            "covers": "tk_01m56vpv1q208cm2vd1z3mpny5",
+            "id": "c13",
+            "text": "Generated magic variants are visible, and the overlay drives terrain type and battle scenes."
+          },
+          {
+            "covers": "tk_01m56vpv1qqpmyfgh4kasb6fzz",
+            "id": "c14",
+            "text": "The fire cast mutates nearby ground live and persists through save and Continue, with no generator process at load and nav caches reused."
+          },
+          {
+            "covers": "tk_01m56vpv1qttqkdjjgt8fd3gh2",
+            "id": "c15",
+            "text": "The review pass findings were fixed or deferred with a reason before the first live run."
+          },
+          {
+            "id": "c16",
+            "text": "The run followed CLAIM/RELEASE, recorded the native DLL hashes and left the install as found. evidence/map-epic-2/acceptance.json records each step as pass, fail, blocked or not-run."
+          }
+        ],
+        "body": "This is the epic's only live game test, apart from MMR-249's probe.\n\n1. **Prepare.** CLAIM with the battle-scale session, process check, one build (one scene rename), record the native DLL hashes.\n2. **World 1: seed 42**, generated from the actual New Campaign screen. Time the nav-cache build. Then check:\n   - biome looks: screenshots of desert, steppe, forest, marsh, rock, tundra and land ice;\n   - face types: the speed tooltip on each, Snow and Forest field battles, a map conversation;\n   - a seam crossing where the biome differs;\n   - roads, feeder roads, bridges and ruin markers, plus the ruins encyclopedia page;\n   - culture looks for towns and castles, including siege state;\n   - 3/2 villages and ports;\n   - generated magic ground;\n   - advance to winter: seasonal snow, with land ice white all year;\n   - debug-cast fire at Nerdun: the background apply, the zone appears, face types and a battle inside the zone change;\n   - save, then Continue: no generator process at load, nav caches reused, the mutation persists.\n3. **World 2:** a seed the repaired gate accepted at attempt 0. Its in-game Town count must equal FWGC++ sites.\n4. **Fix and confirm.** Fix everything found in one batch, then one confirming run. A third run only for a genuinely new blocker.\n5. **Hand off** to the owner, who reviews the magic textures and settlement looks against the concept art. Write `evidence/map-epic-2/acceptance.json`, and update findings §13 with the native answers.",
+        "capability": {
+          "constraints": {
+            "dataLocation": "local",
+            "environments": [
+              "windows"
+            ],
+            "maxCostUsd": null,
+            "maxDurationMinutes": null
+          },
+          "context": {
+            "estimatedInputTokens": null,
+            "requiredArtifacts": []
+          },
+          "modalities": [
+            "text",
+            "images"
+          ],
+          "preferences": {
+            "autonomy": null,
+            "cost": null,
+            "latency": null,
+            "modelOverride": null,
+            "quality": null
+          },
+          "reasoning": {
+            "effort": "high",
+            "level": "multi_step",
+            "rationale": "One integrated live run with a single fix batch."
+          },
+          "skills": [],
+          "tools": [
+            "repo_read",
+            "repo_write",
+            "shell",
+            "test_execution"
+          ],
+          "workType": "testing"
+        },
+        "expectedArtifacts": [
+          "evidence/map-epic-2/acceptance.json"
+        ],
+        "id": "tk_01m56vjrv7779wvh14w6a2vxqc",
+        "key": "MMR-247",
+        "kind": "acceptance",
+        "optional": false,
+        "priority": "critical",
+        "references": [],
+        "size": "large",
+        "tags": [
+          "map-epic-2",
+          "acceptance"
+        ],
+        "title": "Run the final live test"
+      },
+      {
+        "acceptanceCriteria": [
+          {
+            "id": "a1",
+            "text": "docs/biome-presentation.md holds the shared biome table, the 15-slot layer set with verified texture names, the permanent-white rule and the school→TerrainType mutation remap."
+          },
+          {
+            "id": "a2",
+            "text": "All new policy keys exist, both the WorldBridge and managed parsers accept them, the re-pin chain is consistent, and WorldBridge ctest plus the managed test runner pass."
+          },
+          {
+            "id": "a3",
+            "text": "One capability id covers the three format bumps, and the clean break is documented in docs/save-compatibility.md."
+          }
+        ],
+        "body": "One table drives face type, terrain layers, battle class, colour grade and the mutation remap, so they agree (findings §3, §4, §7, §12). This is desk and parser work, with no game.\n\n**Write `docs/biome-presentation.md`.** Per reachable biome (desert, grassland, forest, exposed_rock, rainforest, marsh, boreal_forest, cold_tundra, land_ice; water excluded) record:\n- the TerrainType;\n- the layer mix;\n- the battle scene class;\n- the colour grade;\n- the snow treatment.\n\nAlso record:\n- **Layers.** The 15-slot layer set with exact, corrected vanilla texture names (§4).\n- **Permanent white.** `land_ice` plus 12-month snow cells; the same mask drives the Snow face.\n- **Mutation remap.** School → land-valid TerrainType, only within {Plain, Desert, Snow, Forest, Steppe, Swamp, Dune}.\n- **Thresholds.** Magic thresholds are read from `world.json` `magic.mutation_threshold` / `dominance_margin`.\n\n**Add every new policy key once:**\n- `playability.json`: `cells.landFaceGroups`, `villages` (quota, tiers scaled by town spacing S), road keys;\n- new `roads.json`: feeder rules, decal families, speed terms;\n- `terrain-materials.json` v2: layer table and rules, keeping `biomes`/`landforms` for `WorldReconstruction.cs:70-85`;\n- `economy.json` `townVillages` 3.\n\nMake every strict parser accept them: `travel_graph.cpp` `only()` lists, `material_compiler`, the travel-graph / terrain-metadata / campaign v2 schemas.\n\n**One `requiredCapabilities` id** covers cells v2, weights v2 and campaign v2 (`bundle_writer.cpp:351-355`, plus the host lists in `WorldSetupScreen.cs` and the probes).\n\n**Re-pin once, in order:**\n1. `navmesh-bin.md`;\n2. calibration `faceGroupTableSha256`;\n3. `playability.json:6`;\n4. `naval-content` `water.playabilitySha256` / `startup` `economySha256`;\n5. test literals.\n\n**Clean break.** Document in `docs/save-compatibility.md` that pre-epic worlds and saves are refused; no legacy paths.",
+        "capability": {
+          "constraints": {
+            "dataLocation": "local",
+            "environments": [
+              "windows"
+            ],
+            "maxCostUsd": null,
+            "maxDurationMinutes": null
+          },
+          "context": {
+            "estimatedInputTokens": null,
+            "requiredArtifacts": []
+          },
+          "modalities": [
+            "text"
+          ],
+          "preferences": {
+            "autonomy": null,
+            "cost": null,
+            "latency": null,
+            "modelOverride": null,
+            "quality": null
+          },
+          "reasoning": {
+            "effort": "high",
+            "level": "deep",
+            "rationale": "Every other ticket builds on this table and these policies."
+          },
+          "skills": [],
+          "tools": [
+            "repo_read",
+            "repo_write",
+            "shell",
+            "test_execution"
+          ],
+          "workType": "architecture"
+        },
+        "expectedArtifacts": [
+          "docs/biome-presentation.md",
+          "worldgen/policies/roads.json"
+        ],
+        "id": "tk_01m56vpv1jgwmytc7nf354b15c",
+        "key": "MMR-248",
+        "optional": false,
+        "priority": "critical",
+        "references": [
+          {
+            "hash": null,
+            "kind": "doc",
+            "label": "Research findings",
+            "location": "docs/research/map-epic-2-findings.md",
+            "remoteOnly": false
+          }
+        ],
+        "size": "medium",
+        "tags": [
+          "map-epic-2",
+          "design",
+          "policy"
+        ],
+        "title": "Freeze the shared biome table and the new policies"
+      },
+      {
+        "acceptanceCriteria": [
+          {
+            "id": "a1",
+            "text": "Each of findings §13 items 1–5 has a recorded answer, with screenshots and frame times, in evidence/probe/map-epic-2-probe.json and in §13."
+          },
+          {
+            "id": "a2",
+            "text": "The magic-ground delivery choice (A overlay or B baked layers) and the decal technique are recorded with their evidence."
+          },
+          {
+            "id": "a3",
+            "text": "CLAIM/RELEASE was followed, the native DLL hashes are recorded, and the install was left as found."
+          }
+        ],
+        "body": "This is the only game launch before acceptance (owner decision 3).\n- Use a fixture slot built with `tools/scenebin` (up to 16 slots), with vanilla textures. No campaign and no nav cache.\n- Settle findings §13 items 1–5 and write the answers into §13.\n\n**Measure:**\n1. **Layers.** 6 weighted layers with stripe and ramp weights:\n   - the compositing model (alpha-over vs height-blend);\n   - per-season masks;\n   - frame and load time;\n   - terrain shader compile.\n2. **Scale.** What a layer `scale` means as tile size in map units, and px per map unit at camera distance 38.\n3. **Decals** on generated terrain:\n   - an entity-less path decal over relief;\n   - a `Material.CreateCopy`+`SetTexture` decal, judged by a pixel diff, not entity frames;\n   - the mesh-decal fallback (`deferred_decal_worldmap`);\n   - 200, 1,000 and 3,000 decals with frame time;\n   - removal and re-creation.\n4. **Dynamic snow:**\n   - `use_dynamic_weather_effects`;\n   - `SetDynamicSnowTexture` with an asymmetric NW-quadrant pattern (channel, orientation);\n   - a runtime `MapColorGradeManager` / `SetTerrainDynamicParams`;\n   - summer vs winter response;\n   - whether the template's winter grass whitens the whole map.\n5. **Tints.** Tier-0 tints (albedo factor mode 1 vs 2) and the full-colour `_d` biome textures at map scale.\n\n**Decide and record:**\n- magic ground delivery: (A) one runtime decal overlay for all magic ground, or (B) baked school layers plus decals for mutations;\n- the decal technique to use.\n\n**Shared-install rules:** CLAIM/OK/RELEASE, process check, auto-dismiss dialogs, record the native DLL hashes, leave the install as found.",
+        "capability": {
+          "constraints": {
+            "dataLocation": "local",
+            "environments": [
+              "windows"
+            ],
+            "maxCostUsd": null,
+            "maxDurationMinutes": null
+          },
+          "context": {
+            "estimatedInputTokens": null,
+            "requiredArtifacts": []
+          },
+          "modalities": [
+            "text",
+            "images"
+          ],
+          "preferences": {
+            "autonomy": null,
+            "cost": null,
+            "latency": null,
+            "modelOverride": null,
+            "quality": null
+          },
+          "reasoning": {
+            "effort": "high",
+            "level": "deep",
+            "rationale": "Settles the native unknowns that MMR-255, MMR-256, MMR-257, MMR-259 and MMR-260 rest on."
+          },
+          "skills": [],
+          "tools": [
+            "repo_read",
+            "repo_write",
+            "shell",
+            "test_execution"
+          ],
+          "workType": "investigation"
+        },
+        "expectedArtifacts": [
+          "evidence/probe/map-epic-2-probe.json"
+        ],
+        "id": "tk_01m56vpv1qnhmkyhgve4t8q18y",
+        "key": "MMR-249",
+        "optional": false,
+        "priority": "critical",
+        "references": [],
+        "size": "medium",
+        "tags": [
+          "map-epic-2",
+          "probe",
+          "native"
+        ],
+        "title": "Run the one early in-game probe"
+      },
+      {
+        "acceptanceCriteria": [
+          {
+            "id": "a1",
+            "text": "`shift_leylines` and `fwg apply` exist with passing FWGC++ tests, and landed through the commit gate in the required commit order (rule commit, generator commit)."
+          },
+          {
+            "id": "a2",
+            "text": "A zero-edit apply on seed 42 size 129 produces an empty delta."
+          },
+          {
+            "id": "a3",
+            "text": "A fire key point at Nerdun yields a delta confined to its reach, and the call time and peak memory are recorded."
+          }
+        ],
+        "body": "A planned FWGC++ slice (owner decision 2), in the FWGC++ repo (Claude's lane). Findings §7.\n\n**Follow `FWGC++/AGENTS.md`:**\n- plan note first;\n- G3: a logged verb that takes `const World&`, returns a new world and appends to `history.operations`;\n- G6: the generator commit before the MNBL consumer;\n- the `api.txt` change in its own rule commit;\n- `FWGC_AGENT=claude`, through the commit gate, never `--no-verify`;\n- stage by name, push only when asked.\n\n**Work:**\n1. **Lift the rule** \"the ground moves only at an age boundary\" (`world_time.cpp:526-527`) for this verb only, and document why.\n2. **`shift_leylines(const World&, LeyShiftRequest)`.**\n   - Applies the existing `LeylineEdit` kinds, then runs `evaluate_networks` → `add_biome_variants` → lunar_sensitivity.\n   - Zones stay frozen. No `refresh_astrology` or `add_terrain_labels`, and no re-founding of settlements or roads.\n   - Dedupes systems and warnings.\n   - Refuses hidden schools, unmanifested schools and magic-off worlds.\n3. **`fwg apply --request R --operations OPS --delta D`.** Regenerates the world, replays OPS through the public verbs, and writes the operation envelope plus only the changed cells (`biome_variant`, `dominant_magic`, `magic_hazard` and potency). No split.\n4. **Baseline fix.** Evaluate the field after the nomad edits (`complete_stage.cpp:320-331`) and the villain wells (`ages.cpp:432-438`), so that a zero-edit apply changes nothing.\n5. **Stale 24-city wording:** `settlements_stage.hpp:33`, `config-controls.json:325`, `config.hpp:116`.\n\n**Tests:**\n- a zero-edit apply gives an empty delta;\n- a fire key point at world A's capital Nerdun changes only cells within reach;\n- determinism;\n- hidden-school refusal;\n- call time and peak memory at size 129.",
+        "capability": {
+          "constraints": {
+            "dataLocation": "local",
+            "environments": [
+              "windows"
+            ],
+            "maxCostUsd": null,
+            "maxDurationMinutes": null
+          },
+          "context": {
+            "estimatedInputTokens": null,
+            "requiredArtifacts": []
+          },
+          "modalities": [
+            "text"
+          ],
+          "preferences": {
+            "autonomy": null,
+            "cost": null,
+            "latency": null,
+            "modelOverride": null,
+            "quality": null
+          },
+          "reasoning": {
+            "effort": "high",
+            "level": "deep",
+            "rationale": "Changes a core FWGC++ invariant under strict repository gates."
+          },
+          "skills": [],
+          "tools": [
+            "repo_read",
+            "repo_write",
+            "shell",
+            "test_execution"
+          ],
+          "workType": "implementation"
+        },
+        "expectedArtifacts": [],
+        "id": "tk_01m56vpv1q2zb58yqevxaf00nc",
+        "key": "MMR-250",
+        "optional": false,
+        "priority": "critical",
+        "references": [
+          {
+            "hash": null,
+            "kind": "file",
+            "label": "FWGC++ rules",
+            "location": "C:/Users/davgo/Documents/GitHub/FWGC++/AGENTS.md",
+            "remoteOnly": false
+          }
+        ],
+        "size": "large",
+        "tags": [
+          "map-epic-2",
+          "fwgc",
+          "mutation"
+        ],
+        "title": "FWGC++: shift_leylines verb, fwg apply and a fresh baseline"
+      },
+      {
+        "acceptanceCriteria": [
+          {
+            "id": "a1",
+            "text": "In the 20-seed sweep no world is rejected for unplaceable_town or unreachable_town, and every repair is recorded per town."
+          },
+          {
+            "id": "a2",
+            "text": "The preservation assertion holds for every accepted world. The sweep's accept and attempt-0 rates are recorded in evidence/fwg/city-preservation.json."
+          }
+        ],
+        "body": "Findings §11.\n\n**The problem.** One unplaceable or unreachable town rejects the whole world (`travel_graph.cpp:670-682`, `:695-715`) and a derived seed replaces it.\n- 30 of 31 seeds were rejected.\n- At that rate a random seed loses every city about 90% of the time.\n\n**Work:**\n- **Bounded town repairs** in the travel compiler:\n  - a towns-only larger snap radius;\n  - carve a land cell under the town;\n  - join an unreachable town's group with a pass or deck, or give an island town a forced port.\n\n  Towns stay unexcludable (`campaign_compiler.cpp:578`). Record each repair per town uid.\n- **Keep the requested seed** when the cause was repairable. Record every attempt's city count in the generation record.\n- **Preservation assertion** in the generation driver and the bundle validator: sites = `placed_cities` = compiled towns = travel towns = id-map towns, with the same uid set.\n- **Fix MNBL stale wording:** `campaign-content.json` notes and `campaign-semantics.md:124`.\n\n**Offline check:** run generation and the quality gate on seeds 42–61 at size 129. Record accept rate, attempt-0 rate and town counts in `evidence/fwg/city-preservation.json`.",
+        "capability": {
+          "constraints": {
+            "dataLocation": "local",
+            "environments": [
+              "windows"
+            ],
+            "maxCostUsd": null,
+            "maxDurationMinutes": null
+          },
+          "context": {
+            "estimatedInputTokens": null,
+            "requiredArtifacts": []
+          },
+          "modalities": [
+            "text"
+          ],
+          "preferences": {
+            "autonomy": null,
+            "cost": null,
+            "latency": null,
+            "modelOverride": null,
+            "quality": null
+          },
+          "reasoning": {
+            "effort": "high",
+            "level": "multi_step",
+            "rationale": ""
+          },
+          "skills": [],
+          "tools": [
+            "repo_read",
+            "repo_write",
+            "shell",
+            "test_execution"
+          ],
+          "workType": "implementation"
+        },
+        "expectedArtifacts": [
+          "evidence/fwg/city-preservation.json"
+        ],
+        "id": "tk_01m56vpv1q79mk3k16ghhff93z",
+        "key": "MMR-251",
+        "optional": false,
+        "priority": "critical",
+        "references": [],
+        "size": "medium",
+        "tags": [
+          "map-epic-2",
+          "worldbridge",
+          "cities"
+        ],
+        "title": "Repair towns instead of rejecting worlds"
+      },
+      {
+        "acceptanceCriteria": [
+          {
+            "id": "a1",
+            "text": "On seeds 42 and 73 (size 129) every town has exactly 3 and every castle exactly 2 bound villages. All ports are kept and no fortification has 0 villages."
+          },
+          {
+            "id": "a2",
+            "text": "Determinism and pass-2 stability tests pass, and campaign.json v2 records origin, sourceTown and the villageQuota block."
+          },
+          {
+            "id": "a3",
+            "text": "VillageBinding passes v2 through, and SettlementFactory validates exactly 3/2."
+          }
+        ],
+        "body": "Findings §9. Add a WorldBridge pass `village_quota.cpp` inside `travel::run`, after placement. `compile()` stays faithful to the source.\n\n**Steps:**\n1. **Pin ports.** Each port town's chosen harbour village stays with its town.\n2. **Keep 3 per town.** Preference order:\n   - the pinned village;\n   - at most one more harbour village;\n   - land villages that diversify production;\n   - then the nearest.\n3. **Castles** take their 2 nearest villages from their garrison town.\n4. **Reassign surplus** to short fortifications, own kingdom first.\n5. **Drop the rest** with a `quota:` exclusion that doesn't count toward the travel cap. Notables move as today.\n6. **Synthesize** missing villages on Land cells of the fortification's land component:\n   - clearance tiers **scaled by town spacing S**;\n   - uid `mnbl-quota-village:<fort uid>:<n>`, a unique name, `cultureUid`, a role.\n7. **Second analysis pass** with the pass-1 repaired classes frozen. Assert stable ports and no new exclusions.\n8. **Fallbacks.** Never reject a world for the quota:\n   - islet towns use the tightest tier;\n   - a castle that still can't be filled is excluded with a recorded reason (last resort).\n\n**Also change:**\n- `campaign.json` v2: `bound` (town or castle), `sourceTown`, `origin`, tier and a `villageQuota` block.\n- `closure_problems` and `exclude()` accept castle-bound villages.\n- `VillageBinding` passes v2 through.\n- `SettlementFactory.Validate` requires exactly 3/2.\n- Graph validation rules and the preview follow.\n\n**Never** produce a fortification with 0 villages: vanilla `SnareTheWealthy` and `incident_the_quiet_life` crash on it.",
+        "capability": {
+          "constraints": {
+            "dataLocation": "local",
+            "environments": [
+              "windows"
+            ],
+            "maxCostUsd": null,
+            "maxDurationMinutes": null
+          },
+          "context": {
+            "estimatedInputTokens": null,
+            "requiredArtifacts": []
+          },
+          "modalities": [
+            "text"
+          ],
+          "preferences": {
+            "autonomy": null,
+            "cost": null,
+            "latency": null,
+            "modelOverride": null,
+            "quality": null
+          },
+          "reasoning": {
+            "effort": "high",
+            "level": "deep",
+            "rationale": "Two analysis passes, synthesis with clearance tiers, and closure rules."
+          },
+          "skills": [],
+          "tools": [
+            "repo_read",
+            "repo_write",
+            "shell",
+            "test_execution"
+          ],
+          "workType": "implementation"
+        },
+        "expectedArtifacts": [],
+        "id": "tk_01m56vpv1qyna6b7wn2fcyzf07",
+        "key": "MMR-252",
+        "optional": false,
+        "priority": "high",
+        "references": [],
+        "size": "large",
+        "tags": [
+          "map-epic-2",
+          "worldbridge",
+          "villages"
+        ],
+        "title": "Exactly 3 villages per town and 2 per castle"
+      },
+      {
+        "acceptanceCriteria": [
+          {
+            "id": "a1",
+            "text": "On seeds 42 and 73 every town, castle and village connects to the road network within its land group, recorded in travel-graph.json."
+          },
+          {
+            "id": "a2",
+            "text": "Road cells are deterministic and seam/pole safe in WorldBridge tests."
+          }
+        ],
+        "body": "Findings §8. FWGC++ roads are a minimum spanning forest between cities only, and 7 of world A's 45 cities have no road.\n\n**Work:**\n- **Use the exact route lattice** the compiler already rasterizes:\n  - split routes at poles (world B route 58);\n  - skip `sameGroup=false` sea legs;\n  - treat road passes as road land.\n- **Generate feeder roads** along land travel cells (cheapest path; passes allowed):\n  - from every final castle and village (after the MMR-252 quota) to its bound settlement;\n  - from road-less cities to the nearest road or town in their land group.\n\n  Feeder roads never create a new water crossing; no new decks.\n- **Emit** `roads[]` with cell paths and kind (route or feeder) into `travel-graph.json` (schema update), plus a per-cell road flag for `cells.bin` v2, whose format MMR-254 writes.",
+        "capability": {
+          "constraints": {
+            "dataLocation": "local",
+            "environments": [
+              "windows"
+            ],
+            "maxCostUsd": null,
+            "maxDurationMinutes": null
+          },
+          "context": {
+            "estimatedInputTokens": null,
+            "requiredArtifacts": []
+          },
+          "modalities": [
+            "text"
+          ],
+          "preferences": {
+            "autonomy": null,
+            "cost": null,
+            "latency": null,
+            "modelOverride": null,
+            "quality": null
+          },
+          "reasoning": {
+            "effort": "medium",
+            "level": "multi_step",
+            "rationale": ""
+          },
+          "skills": [],
+          "tools": [
+            "repo_read",
+            "repo_write",
+            "shell",
+            "test_execution"
+          ],
+          "workType": "implementation"
+        },
+        "expectedArtifacts": [],
+        "id": "tk_01m56vpv1q5sg15729903evh8m",
+        "key": "MMR-253",
+        "optional": false,
+        "priority": "high",
+        "references": [],
+        "size": "medium",
+        "tags": [
+          "map-epic-2",
+          "worldbridge",
+          "roads"
+        ],
+        "title": "Feeder roads and road cells in the travel compiler"
+      },
+      {
+        "acceptanceCriteria": [
+          {
+            "id": "a1",
+            "text": "Navmesh faces on seeds 42 and 73 follow the shared table (per-type histograms recorded), and the validator passes offline."
+          },
+          {
+            "id": "a2",
+            "text": "The speed model chain is Road → Naval → Default with the policy factors, covered by unit assertions."
+          },
+          {
+            "id": "a3",
+            "text": "A test asserts that no navigation-cache key input depends on anything mutable."
+          }
+        ],
+        "body": "Findings §3, run on the final classes after MMR-251, MMR-252 and MMR-253.\n\n**Travel compiler:**\n- the biome plane in the grid;\n- per-land-cell corner majority with water excluded and a main-diagonal tie-break, using MMR-248's table;\n- `cells.bin` v2 (`MNBLTC02`) with a land-type plane and a road bit (MMR-253's flags);\n- per-type counts;\n- host-check expectations as \"any type of the touching cells\".\n\n**Managed:**\n- `TravelCells` v2;\n- the per-cell type in `RuntimeNavigationBuilder` (`:542`);\n- `NavigationValidator`: a per-type domain loop and multi-type gate/settlement/pass/footprint expectations;\n- `GeneratedMapScene.ImageFace`: a same-region fallback at the seam.\n\n**One `GeneratedPartySpeedModel`** via `AddModel<PartySpeedModel>`, chained over NavalDLC (no Harmony):\n- Snow −0.15, Swamp −0.2;\n- road +0.2 on road cells when not at sea;\n- cancel the −0.3 ford factor on road decks;\n- all factors from policy.\n\n**Update** the probes and tests that assume all-Plain land or constant land speed: periodic movement, baseline speed, StartupAuditProbe, NavigationContractTests.",
+        "capability": {
+          "constraints": {
+            "dataLocation": "local",
+            "environments": [
+              "windows"
+            ],
+            "maxCostUsd": null,
+            "maxDurationMinutes": null
+          },
+          "context": {
+            "estimatedInputTokens": null,
+            "requiredArtifacts": []
+          },
+          "modalities": [
+            "text"
+          ],
+          "preferences": {
+            "autonomy": null,
+            "cost": null,
+            "latency": null,
+            "modelOverride": null,
+            "quality": null
+          },
+          "reasoning": {
+            "effort": "high",
+            "level": "multi_step",
+            "rationale": ""
+          },
+          "skills": [],
+          "tools": [
+            "repo_read",
+            "repo_write",
+            "shell",
+            "test_execution"
+          ],
+          "workType": "implementation"
+        },
+        "expectedArtifacts": [],
+        "id": "tk_01m56vpv1qbgk5c44w33rnfjb7",
+        "key": "MMR-254",
+        "optional": false,
+        "priority": "critical",
+        "references": [],
+        "size": "medium",
+        "tags": [
+          "map-epic-2",
+          "navigation",
+          "gameplay"
+        ],
+        "title": "Biome face types, road flags and one speed model"
+      },
+      {
+        "acceptanceCriteria": [
+          {
+            "id": "a1",
+            "text": "Seeds 42 and 73 compile with N layers. Per-layer coverage matches the shared table, and the seam check passes on every plane."
+          },
+          {
+            "id": "a2",
+            "text": "The template is generated from tracked source and has no flora on weighted layers."
+          },
+          {
+            "id": "a3",
+            "text": "WorldBridge ctest, the surface tests and the managed runner pass."
+          }
+        ],
+        "body": "Findings §4, using MMR-249's measured compositing, scale and season answers.\n\n**Template:**\n- A tracked surface-template generator replaces the gitignored `build/slots` copy.\n- MMR-248's 15-slot layer set: exact names, scales and tints.\n- No flora on weighted layers.\n- `use_dynamic_weather_effects=\"true\"`.\n- No road layer.\n- School layers only if MMR-249 chose B.\n\n**Compiler (`material_compiler` / `terrain_compiler` v2):**\n- target fractions from biome (kernel-smoothed), moisture, slope, height, temperature, `ice_cap`, landform and `rocky_coast`;\n- the permanent-white mask;\n- canonical periodic columns;\n- alpha conversion calibrated per MMR-249.\n\n**Encoder:** `MNBLWT02` plus the `surface.cpp` encoder, ported from `tools/scenebin/terrain_bin.py`:\n- WGHT per present plane;\n- per-season masks;\n- levels;\n- PHYM as the dominant visible layer.\n\nAlso: Python encoder parity, the `WorldSurface` N-plane reader, and the tools (`summarize_terrain`, seam checks, bundle summaries).",
+        "capability": {
+          "constraints": {
+            "dataLocation": "local",
+            "environments": [
+              "windows"
+            ],
+            "maxCostUsd": null,
+            "maxDurationMinutes": null
+          },
+          "context": {
+            "estimatedInputTokens": null,
+            "requiredArtifacts": []
+          },
+          "modalities": [
+            "text"
+          ],
+          "preferences": {
+            "autonomy": null,
+            "cost": null,
+            "latency": null,
+            "modelOverride": null,
+            "quality": null
+          },
+          "reasoning": {
+            "effort": "high",
+            "level": "deep",
+            "rationale": "Encoder, compiler and template change together, and must keep the C++/Python parity."
+          },
+          "skills": [],
+          "tools": [
+            "repo_read",
+            "repo_write",
+            "shell",
+            "test_execution"
+          ],
+          "workType": "implementation"
+        },
+        "expectedArtifacts": [],
+        "id": "tk_01m56vpv1q7n03tjs3khew1feb",
+        "key": "MMR-255",
+        "optional": false,
+        "priority": "critical",
+        "references": [],
+        "size": "large",
+        "tags": [
+          "map-epic-2",
+          "terrain",
+          "encoder"
+        ],
+        "title": "Compile biome terrain layers"
+      },
+      {
+        "acceptanceCriteria": [
+          {
+            "id": "a1",
+            "text": "The node-level Snowy fraction follows FWGC++'s snow-season length on seed 42 (offline assertion)."
+          },
+          {
+            "id": "a2",
+            "text": "Map load binds the snow texture and drives the season threshold; a log row records both."
+          },
+          {
+            "id": "a3",
+            "text": "docs/water-climate.md and docs/runtime-capabilities.md are updated."
+          }
+        ],
+        "body": "Findings §5, using MMR-249's binding answers and MMR-255's template.\n\n**Gameplay byte:**\n- The snow byte comes from snow-season length through the inverse installed formula (196 = 12 months … 30 = peak only); `ice_cap` → 255.\n- Test at node level under the real `PeriodicWorldCoordinates` layout.\n\n**Visuals:**\n- An RGBA visual snow raster (R snow, G rain).\n- Bind it with `Texture.CreateFromByteArray` + `Scene.SetDynamicSnowTexture` at map load, on the thread MMR-249 proved; release it on teardown.\n- Never call the vanilla binder or `GetPixelData`.\n\n**Colour grade:**\n- Add a runtime `MapColorGradeManager` (or our own per-tick `SetTerrainDynamicParams`).\n- Split the grade grid's grassland by moisture and mode-filter it.\n- Update `WorldSurfaceProbe`.\n\n**Identity and docs:** one climate identity bump (clean break). Fix the \"no safe creation path\" docs.",
+        "capability": {
+          "constraints": {
+            "dataLocation": "local",
+            "environments": [
+              "windows"
+            ],
+            "maxCostUsd": null,
+            "maxDurationMinutes": null
+          },
+          "context": {
+            "estimatedInputTokens": null,
+            "requiredArtifacts": []
+          },
+          "modalities": [
+            "text"
+          ],
+          "preferences": {
+            "autonomy": null,
+            "cost": null,
+            "latency": null,
+            "modelOverride": null,
+            "quality": null
+          },
+          "reasoning": {
+            "effort": "medium",
+            "level": "multi_step",
+            "rationale": ""
+          },
+          "skills": [],
+          "tools": [
+            "repo_read",
+            "repo_write",
+            "shell",
+            "test_execution"
+          ],
+          "workType": "implementation"
+        },
+        "expectedArtifacts": [],
+        "id": "tk_01m56vpv1q7r5fc301vg0sbegc",
+        "key": "MMR-256",
+        "optional": false,
+        "priority": "high",
+        "references": [],
+        "size": "medium",
+        "tags": [
+          "map-epic-2",
+          "climate",
+          "snow"
+        ],
+        "title": "Snow seasons, dynamic snow and a runtime colour grade"
+      },
+      {
+        "acceptanceCriteria": [
+          {
+            "id": "a1",
+            "text": "Road decals, bridges and ruin markers are built from bundle data and removed on teardown. Counts are asserted offline from the builders."
+          },
+          {
+            "id": "a2",
+            "text": "The ruins encyclopedia page lists every FWGC++ ruin of the world, with name, civilization and cause."
+          }
+        ],
+        "body": "Findings §8 and §11, using MMR-249's decal technique.\n\n**Roads:**\n- Decals along smoothed MMR-253 road paths, in per-culture families (empire, khuzait, battania), clipped at gates.\n- Nearest-image refresh at the seam.\n- Lifetime tracking and removal on world release.\n\n**Bridges:**\n- Prefabs (`map_bridge_b/c/d/e`) at the existing decks, read from the kept `navigation.json` `build.bridges` (installed-scene loads skip `Prepare`).\n- z from bank ground; a yaw rule that covers L-shaped decks (skip or rotate); a measured scale.\n\n**Ruins:**\n- Read FWGC++ `ruins[]`: name, civilization, cause, age, node.\n- Place one marker entity per ruin (vanilla ruin pieces), with its name on hover.\n- Add a custom encyclopedia page listing every ruin. No gameplay.",
+        "capability": {
+          "constraints": {
+            "dataLocation": "local",
+            "environments": [
+              "windows"
+            ],
+            "maxCostUsd": null,
+            "maxDurationMinutes": null
+          },
+          "context": {
+            "estimatedInputTokens": null,
+            "requiredArtifacts": []
+          },
+          "modalities": [
+            "text"
+          ],
+          "preferences": {
+            "autonomy": null,
+            "cost": null,
+            "latency": null,
+            "modelOverride": null,
+            "quality": null
+          },
+          "reasoning": {
+            "effort": "medium",
+            "level": "multi_step",
+            "rationale": ""
+          },
+          "skills": [],
+          "tools": [
+            "repo_read",
+            "repo_write",
+            "shell",
+            "test_execution"
+          ],
+          "workType": "implementation"
+        },
+        "expectedArtifacts": [],
+        "id": "tk_01m56vpv1qcwdsc9bzjq42cg04",
+        "key": "MMR-257",
+        "optional": false,
+        "priority": "high",
+        "references": [],
+        "size": "medium",
+        "tags": [
+          "map-epic-2",
+          "roads",
+          "ruins"
+        ],
+        "title": "Draw roads, bridges and ruin markers"
+      },
+      {
+        "acceptanceCriteria": [
+          {
+            "id": "a1",
+            "text": "On seeds 42 and 73 every town and castle gets a culture-correct look. Nearest neighbours avoid the same look where the pool allows, with a report."
+          },
+          {
+            "id": "a2",
+            "text": "The baked scene passes the relaxed contract checks offline, with no nested prefab references and no solid colliders."
+          },
+          {
+            "id": "a3",
+            "text": "Entity count and scene size per world are recorded."
+          }
+        ],
+        "body": "Findings §10 (owner decision 5).\n\n**Phase 0, culture pieces.** An explicit table:\n- keeps `mi_<cul>_keep_1..3` per wall level;\n- walls, using `mi_emp_wall_*_collapsed` where a culture has no collapsed mesh;\n- `village_<cul>_1..3` and production pieces by village type;\n- piers for harbour villages.\n\n**Look catalog** from the player's installed NavalDLC Main_map:\n- a metadata policy, `settlement-looks.json`;\n- a normalizer that:\n  - inlines nested prefab instances;\n  - strips editor data and SceneLeveler;\n  - makes about 1,010 colliders raycast-only;\n  - drops source ports, arcs and drop-offs.\n\nFreeze the selected look XML into the world package, so no TaleWorlds XML ships and rebuilds survive game patches.\n\n**Selector**, deterministic per world:\n- inputs: culture, kind, port, size tier;\n- a neighbour-repeat penalty and a usage balance;\n- fit to clearance at about 0.5 scale with culling;\n- variants: port-stripped Nord, port-grafted Battania and Khuzait, castle-as-small-town;\n- Phase 0 when nothing fits.\n\n**Fit:**\n- yaw to the generated port or gate;\n- re-snap children to the terrain;\n- layout markers;\n- re-add our port, arcs and drop-offs, with drop-offs as direct children named by the village id.\n\n**Contract:**\n- relax to at most one solid/broken child per wall;\n- banner parents must have level bits;\n- keep exactly 2 walls per level;\n- `SettlementEntityChecks` stays within its time slice.\n\nBump `SettlementEntityFactory.Version` (clean break).",
+        "capability": {
+          "constraints": {
+            "dataLocation": "local",
+            "environments": [
+              "windows"
+            ],
+            "maxCostUsd": null,
+            "maxDurationMinutes": null
+          },
+          "context": {
+            "estimatedInputTokens": null,
+            "requiredArtifacts": []
+          },
+          "modalities": [
+            "text"
+          ],
+          "preferences": {
+            "autonomy": null,
+            "cost": null,
+            "latency": null,
+            "modelOverride": null,
+            "quality": null
+          },
+          "reasoning": {
+            "effort": "high",
+            "level": "deep",
+            "rationale": "Scene XML normalization, fitting and the siege contract."
+          },
+          "skills": [],
+          "tools": [
+            "repo_read",
+            "repo_write",
+            "shell",
+            "test_execution"
+          ],
+          "workType": "implementation"
+        },
+        "expectedArtifacts": [],
+        "id": "tk_01m56vpv1qr70hfhdcq91ykrg8",
+        "key": "MMR-258",
+        "optional": false,
+        "priority": "high",
+        "references": [],
+        "size": "large",
+        "tags": [
+          "map-epic-2",
+          "settlements",
+          "visuals"
+        ],
+        "title": "Diverse settlement looks from scaled vanilla layouts"
+      },
+      {
+        "acceptanceCriteria": [
+          {
+            "id": "a1",
+            "text": "Eight school texture sets plus decal atlases pass the gates, recorded in evidence/art/magic-textures.json."
+          },
+          {
+            "id": "a2",
+            "text": "The published packs load by name (header check) and are referenced by the overlay or the template."
+          }
+        ],
+        "body": "Findings §6 (owner decision 4: derived from vanilla). Uses MMR-249's tile scale and delivery choice.\n\n**Inputs and spec:**\n- Fix the `.tpac` extractor: raw chunks, and the large packs for snow, ice and stone_desert.\n- Settle the spec contradictions: `_h` vs `ground_slope_scale`, parents per core, gloss caps, minimum accent size.\n\n**Production:**\n- A derivation tool with recipes for the 8 visible schools; hidden schools reuse visible looks.\n- Material language from the FWGC++ concept art and briefs; weave is matched against the approved concept art.\n- Macro identity at map zoom, not patterns inside the tile.\n- A decal stamp atlas per school with baked falloff.\n- Prototype starting point: scratch `wf5/magicground2.py`.\n\n**Gates:**\n- macro ΔE ≥ 10 vs the parent and the neighbouring biome layers;\n- vanilla stat envelopes;\n- seams;\n- a BCn round-trip.\n\n**Publish:**\n- Import into `Modules/MNBL.ProceduralWorld/AssetSources` with the vanilla flags.\n- Publish through the Modding Kit: try the console `publish` command first, otherwise one owner-performed editor step under CLAIM/RELEASE.\n- Verify the published headers.\n- Packs are release inputs (LFS); update `config/mods.json`.\n- Reference vanilla `_n`/`_s` by name where unchanged.",
+        "capability": {
+          "constraints": {
+            "dataLocation": "local",
+            "environments": [
+              "windows"
+            ],
+            "maxCostUsd": null,
+            "maxDurationMinutes": null
+          },
+          "context": {
+            "estimatedInputTokens": null,
+            "requiredArtifacts": []
+          },
+          "modalities": [
+            "text",
+            "images"
+          ],
+          "preferences": {
+            "autonomy": null,
+            "cost": null,
+            "latency": null,
+            "modelOverride": null,
+            "quality": null
+          },
+          "reasoning": {
+            "effort": "high",
+            "level": "deep",
+            "rationale": "Art derivation with quality gates, plus an editor publish step."
+          },
+          "skills": [],
+          "tools": [
+            "repo_read",
+            "repo_write",
+            "shell",
+            "test_execution"
+          ],
+          "workType": "implementation"
+        },
+        "expectedArtifacts": [
+          "evidence/art/magic-textures.json"
+        ],
+        "id": "tk_01m56vpv1qnqa7ksv6nk9y69yw",
+        "key": "MMR-259",
+        "optional": false,
+        "priority": "high",
+        "references": [
+          {
+            "hash": null,
+            "kind": "file",
+            "label": "FWGC++ concept art map",
+            "location": "C:/Users/davgo/Documents/GitHub/FWGC++/concept art/README.md",
+            "remoteOnly": false
+          }
+        ],
+        "size": "large",
+        "tags": [
+          "map-epic-2",
+          "art",
+          "textures"
+        ],
+        "title": "Magic-mutation ground textures"
+      },
+      {
+        "acceptanceCriteria": [
+          {
+            "id": "a1",
+            "text": "Seed 42's generated magic variants are drawn (decal or layer count recorded) and agree with the shared table."
+          },
+          {
+            "id": "a2",
+            "text": "Unit tests show face overrides only within the land-valid set, and battle-index patches covering every strip image."
+          },
+          {
+            "id": "a3",
+            "text": "The navigation-cache key is unaffected by the overlay (assertion)."
+          }
+        ],
+        "body": "Findings §7, consumer side.\n\n**`WorldSurfaceOverlay`:**\n- base `biome_variant` read from the source `world.json` (optional magic layers, so magic-off worlds still load) plus mutation cells;\n- physical → source mapping that covers the seam and pole rows;\n- an immutable snapshot, swapped atomically.\n\n**Visuals**, per MMR-249's choice:\n- (A) decals for all magic ground with MMR-259's textures, scaled by potency; or\n- (B) MMR-255's baked school layers for generated variants plus same-texture decals for mutations.\n\nIn both cases:\n- node effects (particle and point light) as separate root entities, not inside baked settlements;\n- colour-grade cells (MMR-256's manager);\n- every periodic image;\n- teardown.\n\n**Gameplay:**\n- `GeneratedMapScene` redeclares `GetFaceTerrainType`, `GetTerrainTypeAtPosition` and `GetEnvironmentTerrainTypes(Count)` over a per-face override.\n- Build the override before `MobileParty.PreAfterLoad` / `ComputePathAfterLoad`.\n- Remap only within the land-valid set, per MMR-248's table; never change passability.\n- Patch the battle index map in every strip image.\n- No allocation on the hot path.",
+        "capability": {
+          "constraints": {
+            "dataLocation": "local",
+            "environments": [
+              "windows"
+            ],
+            "maxCostUsd": null,
+            "maxDurationMinutes": null
+          },
+          "context": {
+            "estimatedInputTokens": null,
+            "requiredArtifacts": []
+          },
+          "modalities": [
+            "text"
+          ],
+          "preferences": {
+            "autonomy": null,
+            "cost": null,
+            "latency": null,
+            "modelOverride": null,
+            "quality": null
+          },
+          "reasoning": {
+            "effort": "high",
+            "level": "deep",
+            "rationale": "Hot-path overlay with load ordering, seam images and visuals."
+          },
+          "skills": [],
+          "tools": [
+            "repo_read",
+            "repo_write",
+            "shell",
+            "test_execution"
+          ],
+          "workType": "implementation"
+        },
+        "expectedArtifacts": [],
+        "id": "tk_01m56vpv1q208cm2vd1z3mpny5",
+        "key": "MMR-260",
+        "optional": false,
+        "priority": "critical",
+        "references": [],
+        "size": "large",
+        "tags": [
+          "map-epic-2",
+          "magic",
+          "overlay"
+        ],
+        "title": "Magic ground overlay and live terrain-type overlay"
+      },
+      {
+        "acceptanceCriteria": [
+          {
+            "id": "a1",
+            "text": "Offline: a recorded `fwg apply` delta for a fire cast at Nerdun applies to the overlay and round-trips through SyncData byte-identically."
+          },
+          {
+            "id": "a2",
+            "text": "A test shows no generator process can start during a load."
+          },
+          {
+            "id": "a3",
+            "text": "A test shows a producer change refuses new casts while stored mutations still load."
+          }
+        ],
+        "body": "Findings §7, MNBL side (owner decisions 2 and 7). This is the MNBL consumer commit, after MMR-250 lands in FWGC++ (G6).\n\n**Inputs:**\n- Store the accepted `request.json` in each bundle.\n- Re-pin `fwg.exe` with `apply`: `producer.lock.json`, capabilities and help hashes.\n\n**Trigger:**\n- `WorldMutations.Report(MagicEvent{school, settlement, strength})` plus console commands (cast, list).\n- A daily batch keeps per-(site, school) residue. When a threshold is crossed it emits a `LeylineEdit` at the capital: the FWGC++ capital the kingdom still holds, else the ruler clan's home.\n\n**Compute:**\n- Run `fwg apply` on a background thread during play, **never during a load** (the process audit).\n- Apply results on the engine thread at a safe point; cancel on world release.\n\n**Persist:**\n- One string `SyncData` key with canonical JSON: producer sha, edits, changed cells, digest, pending queue.\n- Load replays the stored cells only.\n- On a digest mismatch, keep the log, disable the overlay and block casts.\n- Ledger entries, an `mnbl.campaign.*` header key, saveIds v2.\n- After a producer change, new casts are refused and stored mutations still load.\n\nFeed results to MMR-260's overlay. No decay in v1.",
+        "capability": {
+          "constraints": {
+            "dataLocation": "local",
+            "environments": [
+              "windows"
+            ],
+            "maxCostUsd": null,
+            "maxDurationMinutes": null
+          },
+          "context": {
+            "estimatedInputTokens": null,
+            "requiredArtifacts": []
+          },
+          "modalities": [
+            "text"
+          ],
+          "preferences": {
+            "autonomy": null,
+            "cost": null,
+            "latency": null,
+            "modelOverride": null,
+            "quality": null
+          },
+          "reasoning": {
+            "effort": "high",
+            "level": "deep",
+            "rationale": "Background process, engine-thread handoff and save persistence."
+          },
+          "skills": [],
+          "tools": [
+            "repo_read",
+            "repo_write",
+            "shell",
+            "test_execution"
+          ],
+          "workType": "implementation"
+        },
+        "expectedArtifacts": [],
+        "id": "tk_01m56vpv1qqpmyfgh4kasb6fzz",
+        "key": "MMR-261",
+        "optional": false,
+        "priority": "critical",
+        "references": [],
+        "size": "large",
+        "tags": [
+          "map-epic-2",
+          "magic",
+          "mutation"
+        ],
+        "title": "Runtime landscape mutation"
+      },
+      {
+        "acceptanceCriteria": [
+          {
+            "id": "a1",
+            "text": "Every finding of the single review pass is fixed or explicitly deferred with a reason in the ticket result."
+          }
+        ],
+        "body": "The epic's single review: one pass over the whole MNBL and FWGC++ diff. Look only for what would waste the live run or harm the shared install:\n- engine calls off the engine thread, and data races on the terrain-type hot path;\n- load ordering (overlay before AfterLoad readers; no process at load);\n- identity and re-pin consistency (one capability id; policy pins);\n- seam images (faces, decals, bridges, battle index, snow raster);\n- teardown leaks (decals, entities, textures);\n- the 0-village and drop-off crash paths;\n- shared-install restore.\n\nFix findings directly. Report only a short findings list.",
+        "capability": {
+          "constraints": {
+            "dataLocation": "local",
+            "environments": [
+              "windows"
+            ],
+            "maxCostUsd": null,
+            "maxDurationMinutes": null
+          },
+          "context": {
+            "estimatedInputTokens": null,
+            "requiredArtifacts": []
+          },
+          "modalities": [
+            "text"
+          ],
+          "preferences": {
+            "autonomy": null,
+            "cost": null,
+            "latency": null,
+            "modelOverride": null,
+            "quality": null
+          },
+          "reasoning": {
+            "effort": "medium",
+            "level": "multi_step",
+            "rationale": ""
+          },
+          "skills": [],
+          "tools": [
+            "repo_read",
+            "repo_write",
+            "shell",
+            "test_execution"
+          ],
+          "workType": "review"
+        },
+        "expectedArtifacts": [],
+        "id": "tk_01m56vpv1qttqkdjjgt8fd3gh2",
+        "key": "MMR-262",
+        "optional": false,
+        "priority": "high",
+        "references": [],
+        "size": "small",
+        "tags": [
+          "map-epic-2",
+          "review"
+        ],
+        "title": "One review pass before the live run"
+      }
+    ]
+  },
+  "contentHash": "sha256:23474d7d25d083dea8371bfdaadca76618a4b70d15d715e8bfee2c0b26c35435",
+  "createdAt": "2026-10-18T06:39:20.350Z",
+  "epicId": "ep_01m56vjrv63rjcafxy4gxp8k31",
+  "format": "darkmechanicus.plan-snapshot",
+  "formatVersion": 1,
+  "number": 1,
+  "revisionId": "rv_01m56vryrvza2afak5sdy7p8bd",
+  "savedAt": "2026-10-18T06:39:20.350Z"
+}

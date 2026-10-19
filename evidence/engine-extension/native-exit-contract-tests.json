@@ -1,0 +1,93 @@
+{
+  "status": "passed",
+  "gameExecuted": false,
+  "cases": [
+    {
+      "rejectedReason": null,
+      "case": "valid-zero",
+      "passed": true
+    },
+    {
+      "rejectedReason": null,
+      "case": "valid-watchdog",
+      "passed": true
+    },
+    {
+      "rejectedReason": "Game exited abnormally: 5",
+      "case": "other-code",
+      "passed": true
+    },
+    {
+      "rejectedReason": "Native return code before quit was not zero.",
+      "case": "native-failure",
+      "passed": true
+    },
+    {
+      "rejectedReason": "Nonzero exit lacks a reviewed shutdown contract.",
+      "case": "missing-contract",
+      "passed": true
+    },
+    {
+      "rejectedReason": "Shutdown contract evidence changed.",
+      "case": "stale-contract",
+      "passed": true
+    },
+    {
+      "rejectedReason": "Shutdown contract does not cover this native build.",
+      "case": "wrong-native",
+      "passed": true
+    },
+    {
+      "rejectedReason": "Shutdown contract does not cover this native build.",
+      "case": "wrong-patch",
+      "passed": true
+    },
+    {
+      "rejectedReason": "Watchdog differs from the reviewed shutdown implementation.",
+      "case": "wrong-watchdog",
+      "passed": true
+    },
+    {
+      "rejectedReason": "No owned watchdog was observed for this process.",
+      "case": "no-owned-watchdog",
+      "passed": true
+    },
+    {
+      "rejectedReason": "Watchdog log belongs to a different PID.",
+      "case": "wrong-pid",
+      "passed": true
+    },
+    {
+      "rejectedReason": "Watchdog did not record the ordered normal shutdown command and exit.",
+      "case": "missing-kp",
+      "passed": true
+    },
+    {
+      "rejectedReason": "Watchdog did not record the ordered normal shutdown command and exit.",
+      "case": "reversed-kp",
+      "passed": true
+    },
+    {
+      "rejectedReason": "Watchdog recorded an exception or crash dump.",
+      "case": "exception",
+      "passed": true
+    },
+    {
+      "rejectedReason": "Engine final-cleanup milestones are missing or out of order.",
+      "case": "missing-cleanup",
+      "passed": true
+    },
+    {
+      "rejectedReason": "Engine final-cleanup milestones are missing or out of order.",
+      "case": "reversed-cleanup",
+      "passed": true
+    },
+    {
+      "rejectedReason": "Missing or stale per-process shutdown log.",
+      "case": "stale-log",
+      "passed": true
+    }
+  ],
+  "testSha256": "2185e18540f6bdf172be727c46bc30e8ef4673e9acbeff826d115ae93b1d74e0",
+  "helperSha256": "bd8cc8995a6855676945855154a71145c7dbe883441feab7c68de2aceefd10d4"
+}

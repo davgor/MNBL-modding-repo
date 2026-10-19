@@ -1,0 +1,51 @@
+﻿ok    square 1600 domain, 129 samples, spacing 12.5, seam period 64 columns
+ok    control points: every output sample on a source sample has the source height exactly (2137)
+ok    control points: categorical masks equal the source categories
+ok    midpoints between source columns are the bilinear mean
+ok    paired east/west seam columns match for height, 16-bit, rock, biome and intent
+ok    biome codes are copied, never blended
+ok    16-bit roundtrip error within half a step
+ok    96 padding rows flagged beyond the pole lines; rows 48-80 are the globe
+ok    pole intents recorded (ocean north, land south); no lake below the datum
+ok    row 0 repeats the north pole, the last row the south pole
+ok    +Y runs south: heights grow with rows on the synthetic slope
+ok    coastline coherent with the datum after coherence, and after 16-bit and 0.03 truncation
+ok    lake and river intents survive as distinct classes
+ok    material rule: biome rock and the slope ramp (0.9 -> 128, half to even)
+ok    river overrides land only; lake and ocean keep their class
+ok    fidelity: 2 x 1 output samples per source cell, no land lost
+ok    fidelity: all 994 distinct source samples are represented exactly
+ok    fidelity: decimated rows report the lost one-sample island
+ok    fidelity: height loss at unrepresented source samples is measured
+ok    fidelity: decimated rows leave 2048 of 4034 source samples unrepresented
+ok    central meridian 22.5 compiles with exact seam pairs
+ok    W = 800.1 compiles with exact seam pairs
+ok    compilation is deterministic
+ok    quantization tie 32767.5 -> 32768 (half to even, as the encoder)
+ok    slope tie 127.5 -> 128 (half to even, as the encoder)
+ok    zero-height-range special case: [hmin, hmin + 1], q = 0, exact
+ok    global range rounded outward to 0.001 (encoder rule), round-half-even codes
+ok    reconstruction within half a step
+ok    unknown biome id in the raster -> unmapped_category
+ok    unknown water class -> unmapped_category
+ok    unknown river code -> unmapped_category
+ok    landform outside the list -> unmapped_category
+ok    exported biome with another core name -> unmapped_category
+ok    exported biome the policy does not map -> unmapped_category
+ok    exported landforms differ -> unmapped_category
+ok    non-integral category value -> out_of_range
+ok    output side the calibration does not list -> out_of_range
+ok    non-square physical domain -> non_square_domain
+ok    seam not on output columns -> seam_not_on_grid
+ok    raster biome missing from the exported catalogue -> unmapped_category
+ok    coastline sign lost to the engine's truncation -> coast_sign
+ok    extent beyond the calibrated range -> out_of_range
+ok    heights beyond the calibrated limit -> out_of_range
+ok    material channels differ from the template layers -> unmapped_category
+ok    material policy unknown_member -> unknown_field
+ok    material policy duplicate_biome -> duplicate_id
+ok    material policy rock_300 -> out_of_range
+ok    material policy bad_ramp -> out_of_range
+ok    material policy unknown_intent -> unmapped_category
+ok    material policy landform_gap -> out_of_range
+50/50 checks passed

@@ -1,0 +1,1993 @@
+{
+ "schema": "mnbl.mission-transition-evidence",
+ "version": 1,
+ "ticket": "MMR-60",
+ "generatedUtc": "2026-10-14T07:59:37.612571+00:00",
+ "accepted": {
+  "file": "evidence/runtime/in-game/generated_campaign-22868.json",
+  "sha256": "7acf7befc227f8aa0baa30560135a84a73a83b2aff7025735c17300dfa89be95",
+  "status": "ok",
+  "pid": 22868,
+  "moduleSha256": "19fa06b01cb9813e2f15d28384cb1a6228e734aae31cbd45064aac925643aec3"
+ },
+ "history": [
+  {
+   "file": "evidence/runtime/in-game/generated_campaign-25112.json",
+   "sha256": "75fe4d72ea5bced36fbf9faad99951979de51496a6f7192e25ab5f90a6b276bb",
+   "status": "error"
+  },
+  {
+   "file": "evidence/runtime/in-game/generated_campaign-30296.json",
+   "sha256": "61cdf1292a09a3387102ddff0e6c0901c1fcd13db8e4af6f6e87dfed32bbf7aa",
+   "status": "error"
+  },
+  {
+   "file": "evidence/runtime/in-game/generated_campaign-19676.json",
+   "sha256": "2748765a10780adca129e920ab8578d6c7597e5e4ea3790e48984d928d70aab9",
+   "status": "ok"
+  },
+  {
+   "file": "evidence/runtime/in-game/generated_campaign-5532.json",
+   "sha256": "e5644691862f7c944e6912f475700c54d73dda0d92a5e791d5a63aeea1587b5a",
+   "status": "ok"
+  },
+  {
+   "file": "evidence/runtime/in-game/generated_campaign-14624.json",
+   "sha256": "92bff037f90267562e150e1c4f257cd2017643043898d10980ff98a2fd1ddd35",
+   "status": "ok"
+  },
+  {
+   "file": "evidence/runtime/in-game/generated_campaign-33472.json",
+   "sha256": "beba92f94db658feaa607aec067fc2b9ab6ada8635f2531ec08fa0f76ff8f5cd",
+   "status": "ok"
+  },
+  {
+   "file": "evidence/runtime/in-game/generated_campaign-24092.json",
+   "sha256": "15ba27b51fa4c479258af8f66f83719d6c847d926f46503e6b077123c45bdea0",
+   "status": "ok"
+  },
+  {
+   "file": "evidence/runtime/in-game/generated_campaign-13672.json",
+   "sha256": "e2d3031f0492449805fd79d26e1fe5cfcf354eae68602330a26af9820d39037c",
+   "status": "ok"
+  },
+  {
+   "file": "evidence/runtime/in-game/generated_campaign-17968.json",
+   "sha256": "25b94b64f99b489189cc26787c9b1088cecb18b074a67839fa5ff97370857593",
+   "status": "ok"
+  }
+ ],
+ "checks": {
+  "world0FieldSceneFromPatch": true,
+  "world0SettlementLocation": true,
+  "world0NavalSceneFromPatch": true,
+  "world0NavalReturnAtSea": true,
+  "world0WorldPreserved": true,
+  "world1FieldSceneFromPatch": true,
+  "world1SettlementLocation": true,
+  "world1NavalSceneFromPatch": true,
+  "world1NavalReturnAtSea": true,
+  "world1WorldPreserved": true,
+  "twoDistinctWorlds": true
+ },
+ "passed": true,
+ "worlds": [
+  {
+   "worldIndex": 0,
+   "identity": {
+    "worldId": "mnbl_0000002a",
+    "sceneName": "mnbl_generated_0000002a",
+    "placementSha256": "08eb6aa6cd1446a463849a7f53a7dbcf9516aa3ae1ff7be5399aa5786a6db12f",
+    "catalogReceiptSha256": "27bca57ee00ae08ab628d049b3409380ea9f1188b2b2aeba9706610fc481f80e",
+    "installedSceneHashes": {
+     "scene.xscene": "4e6b509247b8fbf31d3fd092c17bae43d24efc19d2ce54d76a6bbe34d4611e9b",
+     "terrain.bin": "71c97d4d85593461c1cb8284f11b5dbc171fb256603f08f459c5cffa52fa46e8",
+     "navmesh.bin": "0eac2daca290bb741348b2f716d5e72816e7aaa82045276e91cc38da1e269264",
+     "flora.bin": "a711b21e6cf9374aaf87b613e945f381b68a827fdf7dd8395add83364ed0a569",
+     "atmosphere.xml": "8375ecccc7a721b5d32e8e4fbc59e00b3a2182202d334a79cd01972668533f6d"
+    }
+   },
+   "contract": {
+    "sceneModel": "TaleWorlds.CampaignSystem.GameComponents.DefaultSceneModel",
+    "mapScene": "MNBL.ProceduralWorld.CampaignBootstrap.DiagnosticMapScene",
+    "battleScenePath": "MenuHelper.EncounterAttackConsequence -> SceneModel.GetBattleSceneForMapPatch(IMapScene.GetMapPatchAtPosition(MobileParty.MainParty.Position), isNaval) -> CampaignMission.OpenBattleMission / OpenNavalBattleMission (MissionInitializerRecord)",
+    "patchReader": "SandBox.MapScene.GetMapPatchAtPosition: cell = floor(position / _terrainSize * (width, height)); sceneIndex = map[2*cell], patch = (map[2*cell+1] & 15, map[2*cell+1] >> 4) / 15",
+    "sceneRule": "Scenes whose MapIndices contain sceneIndex and IsNaval == naval: one -> that scene; several naval -> those whose Terrain equals the terrain at the party, else random among them; several land -> random with FailedAssert; none -> silently random among scenes of the party's terrain (FailedAssert only if no scene has that terrain)",
+    "locationPath": "Settlement.LocationComplex location scene (generated settlements reuse prototype locations)"
+   },
+   "battleIndexMap": {
+    "present": true,
+    "width": 200,
+    "height": 200,
+    "sha256": "ce4d97bc2592b040f7e0a973d61d18d89336d19b160cbd86fd3900673f9ae55e",
+    "terrainSize": [
+     800,
+     800
+    ]
+   },
+   "battleIndexMapInstall": {
+    "status": "installed",
+    "method": "SandBox.MapScene._battleTerrainIndexMap/_Width/_Height set by reflection after AfterLoad navigation registration",
+    "layout": "2 bytes per cell: [0] sp_battle_scenes map index, [1] (x % 16) | (y % 16) << 4 -> patch coordinates (x/15, y/15)",
+    "terrainSize": [
+     800,
+     800
+    ],
+    "cellSize": [
+     4,
+     4
+    ],
+    "blockCells": 16,
+    "sceneTableSha256": "3aa0154cbc86905be7ef844b0105032710f7f19e491f09df097b32370b4ccb21",
+    "width": 200,
+    "height": 200,
+    "sha256": "ce4d97bc2592b040f7e0a973d61d18d89336d19b160cbd86fd3900673f9ae55e",
+    "landCandidates": {
+     "Plain": 106,
+     "Steppe": 50,
+     "Swamp": 7,
+     "Desert": 17
+    },
+    "landAndNavalCandidates": [
+     "35:battle_terrain_020/battle_terrain_opensea_southern",
+     "58:battle_terrain_biome_058/battle_terrain_coastal_03",
+     "110:battle_terrain_020/battle_terrain_coastal_021",
+     "116:battle_terrain_biome_094/battle_terrain_coastal_caspian_sea_02",
+     "117:battle_terrain_020/battle_terrain_coastal_caspian_sea_02",
+     "122:battle_terrain_020/battle_terrain_coastal_022",
+     "207:nord_battle_terrain_f/battle_terrain_opensea_northern",
+     "225:nord_battle_terrain_k/battle_terrain_coastal_021"
+    ],
+    "seaTouchingCells": 28778,
+    "buildMilliseconds": 91.5102,
+    "seaCandidates": {
+     "OpenSea": [
+      35,
+      207,
+      252,
+      253,
+      254
+     ],
+     "CoastalSea": [
+      58,
+      110,
+      116,
+      117,
+      122,
+      225
+     ]
+    },
+    "generatedTerrainCells": {
+     "land:Plain": 10028,
+     "land:Plain+sea:CoastalSea": 1589,
+     "land:Plain+sea:Lake": 18,
+     "land:Steppe": 18,
+     "land:Steppe+sea:CoastalSea": 3,
+     "sea:CoastalSea": 27156,
+     "sea:Lake": 12,
+     "unreachable:Mountain": 1176
+    },
+    "substitutions": {
+     "land:Mountain->Steppe": 1176,
+     "sea:Lake->CoastalSea": 30
+    },
+    "unreachableCells": 1176,
+    "cellsWithoutFaces": 0,
+    "scenesByCells": {
+     "land:battle_terrain_001 naval:-": 531,
+     "land:battle_terrain_003 naval:-": 303,
+     "land:battle_terrain_004 naval:-": 4,
+     "land:battle_terrain_011 naval:-": 147,
+     "land:battle_terrain_012 naval:-": 35,
+     "land:battle_terrain_014 naval:-": 128,
+     "land:battle_terrain_017 naval:-": 20,
+     "land:battle_terrain_020 naval:-": 396,
+     "land:battle_terrain_020 naval:battle_terrain_coastal_021": 5979,
+     "land:battle_terrain_020 naval:battle_terrain_coastal_022": 5802,
+     "land:battle_terrain_020 naval:battle_terrain_coastal_caspian_sea_02": 5383,
+     "land:battle_terrain_021 naval:-": 645,
+     "land:battle_terrain_023 naval:-": 19,
+     "land:battle_terrain_029 naval:-": 553,
+     "land:battle_terrain_030 naval:-": 299,
+     "land:battle_terrain_031 naval:-": 546,
+     "land:battle_terrain_032 naval:-": 292,
+     "land:battle_terrain_L naval:-": 101,
+     "land:battle_terrain_a naval:-": 531,
+     "land:battle_terrain_biome_006 naval:-": 38,
+     "land:battle_terrain_biome_022 naval:-": 191,
+     "land:battle_terrain_biome_025 naval:-": 17,
+     "land:battle_terrain_biome_027 naval:-": 94,
+     "land:battle_terrain_biome_028 naval:-": 67,
+     "land:battle_terrain_biome_030 naval:-": 441,
+     "land:battle_terrain_biome_034 naval:-": 336,
+     "land:battle_terrain_biome_040 naval:-": 96,
+     "land:battle_terrain_biome_044 naval:-": 123,
+     "land:battle_terrain_biome_047 naval:-": 37,
+     "land:battle_terrain_biome_048 naval:-": 42,
+     "land:battle_terrain_biome_058 naval:battle_terrain_coastal_03": 6233,
+     "land:battle_terrain_biome_075 naval:-": 11,
+     "land:battle_terrain_biome_076 naval:-": 51,
+     "land:battle_terrain_biome_083 naval:-": 5,
+     "land:battle_terrain_biome_089 naval:-": 185,
+     "land:battle_terrain_biome_094 naval:-": 42,
+     "land:battle_terrain_biome_094 naval:battle_terrain_coastal_caspian_sea_02": 3,
+     "land:battle_terrain_biome_096 naval:-": 4,
+     "land:battle_terrain_biome_097 naval:-": 153,
+     "land:battle_terrain_biome_098 naval:-": 266,
+     "land:battle_terrain_biome_106 naval:-": 15,
+     "land:battle_terrain_biome_114 naval:-": 36,
+     "land:battle_terrain_biome_130 naval:-": 28,
+     "land:battle_terrain_biome_131 naval:-": 66,
+     "land:battle_terrain_biome_148 naval:-": 4,
+     "land:battle_terrain_biome_149 naval:-": 168,
+     "land:battle_terrain_f naval:-": 41,
+     "land:battle_terrain_n naval:-": 21,
+     "land:battle_terrain_p naval:-": 1,
+     "land:battle_terrain_s naval:-": 7,
+     "land:battle_terrain_t naval:-": 14,
+     "land:battle_terrain_z naval:-": 821,
+     "land:nord_battle_terrain_a naval:-": 130,
+     "land:nord_battle_terrain_b naval:-": 542,
+     "land:nord_battle_terrain_c naval:-": 76,
+     "land:nord_battle_terrain_f naval:-": 318,
+     "land:nord_battle_terrain_g naval:-": 256,
+     "land:nord_battle_terrain_h naval:-": 88,
+     "land:nord_battle_terrain_k naval:-": 209,
+     "land:nord_battle_terrain_k naval:battle_terrain_coastal_021": 5871,
+     "land:nord_battle_terrain_l naval:-": 402,
+     "land:nord_battle_terrain_n naval:-": 471,
+     "land:nord_battle_terrain_o naval:-": 28,
+     "land:nord_battle_terrain_r naval:-": 238
+    },
+    "samplingNote": "3x3 points per cell; slivers under about 0.1 of a cell along diagonal face edges can be missed"
+   },
+   "syntheticWar": {
+    "playerFaction": "player_faction",
+    "enemyFaction": "mnbl_0000002a_kingdom_2",
+    "alreadyAtWar": false,
+    "atWarNow": true,
+    "town1Faction": "mnbl_0000002a_kingdom_1",
+    "action": "DeclareWarAction.ApplyByDefault(Clan.PlayerClan, enemy kingdom)"
+   },
+   "fingerprintBefore": {
+    "mapSceneWrapper": 9649274,
+    "sceneName": "mnbl_generated_0000002a",
+    "scenePointer": "3542328147968",
+    "battleIndexSha256": "ce4d97bc2592b040f7e0a973d61d18d89336d19b160cbd86fd3900673f9ae55e",
+    "settlements": "mnbl_0000002a_town_1:Harbor 1 mnbl_0000002a:609.375,165.625|mnbl_0000002a_town_2:Harbor 2 mnbl_0000002a:46.875,440.625|mnbl_0000002a_village_1:Village 1 mnbl_0000002a:590.625,146.875|mnbl_0000002a_village_2:Village 2 mnbl_0000002a:103.125,428.125",
+    "parties": 17,
+    "heroCount": 19,
+    "navigationFaces": 32768,
+    "landRouteTown1ToTown2": 718.0877,
+    "seaRouteTown1ToTown2": 699.5976,
+    "waterPlane": false
+   },
+   "fingerprintAfter": {
+    "mapSceneWrapper": 9649274,
+    "sceneName": "mnbl_generated_0000002a",
+    "scenePointer": "3542328147968",
+    "battleIndexSha256": "ce4d97bc2592b040f7e0a973d61d18d89336d19b160cbd86fd3900673f9ae55e",
+    "settlements": "mnbl_0000002a_town_1:Harbor 1 mnbl_0000002a:609.375,165.625|mnbl_0000002a_town_2:Harbor 2 mnbl_0000002a:46.875,440.625|mnbl_0000002a_village_1:Village 1 mnbl_0000002a:590.625,146.875|mnbl_0000002a_village_2:Village 2 mnbl_0000002a:103.125,428.125",
+    "parties": 17,
+    "heroCount": 19,
+    "navigationFaces": 32768,
+    "landRouteTown1ToTown2": 718.0877,
+    "seaRouteTown1ToTown2": 699.5976,
+    "waterPlane": false
+   },
+   "worldPreserved": true,
+   "failures": [],
+   "field": {
+    "passed": true,
+    "failures": [],
+    "error": null,
+    "setup": {
+     "enemy": "patrol_party_1_party_2",
+     "enemyFaction": "mnbl_0000002a_kingdom_2",
+     "enemyTroops": 15,
+     "enemyFrom": [
+      58.14798,
+      416.915558
+     ],
+     "enemyTo": [
+      607.9179,
+      166.067368
+     ],
+     "synthetic": "existing hostile party relocated next to the player"
+    },
+    "mapEvent": {
+     "naval": false,
+     "involved": [
+      "patrol_party_1_party_2",
+      "player_party"
+     ]
+    },
+    "before": {
+     "position": [
+      609.375,
+      165.625
+     ],
+     "isOnLand": true,
+     "atSea": false,
+     "face": {
+      "index": 6850,
+      "group": 1,
+      "terrain": "Plain",
+      "island": 2
+     },
+     "terrainAtPosition": "Plain",
+     "patch": {
+      "sceneIndex": 4,
+      "coordinates": [
+       0.533333361,
+       0.6
+      ]
+     },
+     "expectedBattleScene": {
+      "sceneIndex": 4,
+      "naval": false,
+      "candidates": [
+       "battle_terrain_030"
+      ],
+      "scene": "battle_terrain_030",
+      "deterministic": true,
+      "rule": "single scene lists the index"
+     },
+     "mapHeight": 0.195007324,
+     "camera": {
+      "screen": "NavalDLC.View.Map.NavalMapScreen",
+      "frameOrigin": [
+       609.375,
+       133.422134,
+       24.9221039
+      ],
+      "distance": 38,
+      "bearing": 0,
+      "followMode": "FollowParty",
+      "frameDistanceToParty": 32.20286534041362,
+      "lateralErrorToParty": 0,
+      "alongOffsetToParty": 32.20286560058594,
+      "frameFollowsParty": true,
+      "idealTarget": [
+       609.375,
+       165.625,
+       1.19500732
+      ],
+      "targetDistanceToParty": 0
+     },
+     "cameraSettle": {
+      "timedOut": false,
+      "seconds": 0.15664599999999496
+     },
+     "ships": 0,
+     "troops": 1
+    },
+    "mission": {
+     "scene": "battle_terrain_030",
+     "module": "$BASE/Modules/SandBoxCore/",
+     "combat": true,
+     "terrainType": "Plain",
+     "loadSeconds": 1.8026429999999962,
+     "missionTimeAdvanced": 3.04934985563159,
+     "agents": 20,
+     "ships": 0,
+     "teardownSeconds": 0.4191609000000014,
+     "initializerRecordSource": "TaleWorlds.MountAndBlade.Mission.<InitializerRecord>k__BackingField",
+     "initializerRecord": {
+      "TerrainType": 1,
+      "DamageToFriendsMultiplier": 0.5,
+      "DamageFromPlayerToFriendsMultiplier": 0.5,
+      "NeedsRandomTerrain": false,
+      "RandomTerrainSeed": 8848,
+      "SceneName": "battle_terrain_030",
+      "SceneLevels": "",
+      "PlayingInCampaignMode": true,
+      "EnableSceneRecording": false,
+      "SceneUpgradeLevel": 0,
+      "SceneHasMapPatch": true,
+      "PatchCoordinates": [
+       0.533333361,
+       0.6
+      ],
+      "PatchEncounterDir": [
+       0.956874,
+       -0.290503234
+      ],
+      "DoNotUseLoadingScreen": false,
+      "DisableDynamicPointlightShadows": false,
+      "DisableCorpseFadeOut": false,
+      "DecalAtlasGroup": 2,
+      "AtmosphereOnCampaign": "AtmosphereInfo"
+     },
+     "terrainSamples": [
+      {
+       "at": [
+        710.9649,
+        600.171631
+       ],
+       "terrainHeight": 26.7632961
+      },
+      {
+       "at": [
+        730.9649,
+        600.171631
+       ],
+       "terrainHeight": 27.032896
+      },
+      {
+       "at": [
+        690.9649,
+        600.171631
+       ],
+       "terrainHeight": 25.9259262
+      },
+      {
+       "at": [
+        710.9649,
+        620.171631
+       ],
+       "terrainHeight": 26.8505249
+      },
+      {
+       "at": [
+        710.9649,
+        580.171631
+       ],
+       "terrainHeight": 26.18736
+      }
+     ],
+     "mainAgentPosition": [
+      710.9649,
+      600.171631,
+      26.76329
+     ],
+     "screen": "TaleWorlds.MountAndBlade.View.Screens.MissionScreen"
+    },
+    "after": {
+     "position": [
+      608.773438,
+      165.75824
+     ],
+     "isOnLand": true,
+     "atSea": false,
+     "face": {
+      "index": 6851,
+      "group": 1,
+      "terrain": "Plain",
+      "island": 2
+     },
+     "terrainAtPosition": "Plain",
+     "patch": {
+      "sceneIndex": 4,
+      "coordinates": [
+       0.533333361,
+       0.6
+      ]
+     },
+     "expectedBattleScene": {
+      "sceneIndex": 4,
+      "naval": false,
+      "candidates": [
+       "battle_terrain_030"
+      ],
+      "scene": "battle_terrain_030",
+      "deterministic": true,
+      "rule": "single scene lists the index"
+     },
+     "mapHeight": 0.177383423,
+     "camera": {
+      "screen": "NavalDLC.View.Map.NavalMapScreen",
+      "frameOrigin": [
+       608.7815,
+       133.553574,
+       24.9047165
+      ],
+      "distance": 38,
+      "bearing": 0,
+      "followMode": "FollowParty",
+      "frameDistanceToParty": 32.20466775174059,
+      "lateralErrorToParty": 0.008056640625,
+      "alongOffsetToParty": 32.20466613769531,
+      "frameFollowsParty": true,
+      "idealTarget": [
+       608.773438,
+       165.75824,
+       1.17738342
+      ],
+      "targetDistanceToParty": 0
+     },
+     "cameraSettle": {
+      "timedOut": false,
+      "seconds": 0.5805346
+     },
+     "ships": 0,
+     "troops": 1
+    },
+    "returnDisplacement": 0.6161414347534879,
+    "returnBound": 0.635,
+    "sceneMatchesPatch": true,
+    "edgePatchSamples": null
+   },
+   "settlement": {
+    "passed": true,
+    "failures": [],
+    "error": null,
+    "setup": {
+     "settlement": "mnbl_0000002a_town_1",
+     "name": "Harbor 1 mnbl_0000002a",
+     "from": [
+      608.773438,
+      165.75824
+     ],
+     "gate": [
+      609.375,
+      165.625
+     ],
+     "expectedScene": "empire_town_q",
+     "synthetic": "player placed at the generated gate; official menus from there"
+    },
+    "mapEvent": null,
+    "before": {
+     "position": [
+      609.375,
+      165.625
+     ],
+     "isOnLand": true,
+     "atSea": false,
+     "face": {
+      "index": 6850,
+      "group": 1,
+      "terrain": "Plain",
+      "island": 2
+     },
+     "terrainAtPosition": "Plain",
+     "patch": {
+      "sceneIndex": 4,
+      "coordinates": [
+       0.533333361,
+       0.6
+      ]
+     },
+     "expectedBattleScene": {
+      "sceneIndex": 4,
+      "naval": false,
+      "candidates": [
+       "battle_terrain_030"
+      ],
+      "scene": "battle_terrain_030",
+      "deterministic": true,
+      "rule": "single scene lists the index"
+     },
+     "mapHeight": 0.195007324,
+     "camera": {
+      "screen": "NavalDLC.View.Map.NavalMapScreen",
+      "frameOrigin": [
+       609.3668,
+       133.42395,
+       24.9218636
+      ],
+      "distance": 38,
+      "bearing": 0,
+      "followMode": "FollowParty",
+      "frameDistanceToParty": 32.201051455561974,
+      "lateralErrorToParty": 0.0081787109375,
+      "alongOffsetToParty": 32.2010498046875,
+      "frameFollowsParty": true,
+      "idealTarget": [
+       609.375,
+       165.625,
+       1.19500732
+      ],
+      "targetDistanceToParty": 0
+     },
+     "cameraSettle": {
+      "timedOut": false,
+      "seconds": 0.31202899999999545
+     },
+     "ships": 0,
+     "troops": 1
+    },
+    "mission": {
+     "scene": "empire_town_q",
+     "module": "$BASE/Modules/SandBoxCore/",
+     "combat": false,
+     "terrainType": "Plain",
+     "loadSeconds": 2.203730400000005,
+     "missionTimeAdvanced": 2.9993298989720643,
+     "agents": 73,
+     "ships": 0,
+     "teardownSeconds": 0.34572340000001134,
+     "initializerRecordSource": "TaleWorlds.MountAndBlade.Mission.<InitializerRecord>k__BackingField",
+     "initializerRecord": {
+      "TerrainType": 1,
+      "DamageToFriendsMultiplier": 0.5,
+      "DamageFromPlayerToFriendsMultiplier": 0.5,
+      "NeedsRandomTerrain": false,
+      "RandomTerrainSeed": 0,
+      "SceneName": "empire_town_q",
+      "SceneLevels": "civilian level_1",
+      "PlayingInCampaignMode": true,
+      "EnableSceneRecording": false,
+      "SceneUpgradeLevel": 0,
+      "SceneHasMapPatch": false,
+      "PatchCoordinates": [
+       0,
+       0
+      ],
+      "PatchEncounterDir": [
+       0,
+       0
+      ],
+      "DoNotUseLoadingScreen": false,
+      "DisableDynamicPointlightShadows": false,
+      "DisableCorpseFadeOut": false,
+      "DecalAtlasGroup": 3,
+      "AtmosphereOnCampaign": "AtmosphereInfo"
+     },
+     "terrainSamples": [
+      {
+       "at": [
+        614.374,
+        642.071
+       ],
+       "terrainHeight": 36.3363571
+      },
+      {
+       "at": [
+        634.374,
+        642.071
+       ],
+       "terrainHeight": 35.095562
+      },
+      {
+       "at": [
+        594.374,
+        642.071
+       ],
+       "terrainHeight": 39.0736923
+      },
+      {
+       "at": [
+        614.374,
+        662.071
+       ],
+       "terrainHeight": 39.6780472
+      },
+      {
+       "at": [
+        614.374,
+        622.071
+       ],
+       "terrainHeight": 34.1807137
+      }
+     ],
+     "mainAgentPosition": [
+      614.374,
+      642.071,
+      36.3363533
+     ],
+     "screen": "TaleWorlds.MountAndBlade.View.Screens.MissionScreen"
+    },
+    "after": {
+     "position": [
+      609.375,
+      165.625
+     ],
+     "isOnLand": true,
+     "atSea": false,
+     "face": {
+      "index": 6850,
+      "group": 1,
+      "terrain": "Plain",
+      "island": 2
+     },
+     "terrainAtPosition": "Plain",
+     "patch": {
+      "sceneIndex": 4,
+      "coordinates": [
+       0.533333361,
+       0.6
+      ]
+     },
+     "expectedBattleScene": {
+      "sceneIndex": 4,
+      "naval": false,
+      "candidates": [
+       "battle_terrain_030"
+      ],
+      "scene": "battle_terrain_030",
+      "deterministic": true,
+      "rule": "single scene lists the index"
+     },
+     "mapHeight": 0.195007324,
+     "camera": {
+      "screen": "NavalDLC.View.Map.NavalMapScreen",
+      "frameOrigin": [
+       609.375,
+       133.422134,
+       24.9221039
+      ],
+      "distance": 38,
+      "bearing": 0,
+      "followMode": "FollowParty",
+      "frameDistanceToParty": 32.20286534041362,
+      "lateralErrorToParty": 0,
+      "alongOffsetToParty": 32.20286560058594,
+      "frameFollowsParty": true,
+      "idealTarget": [
+       609.375,
+       165.625,
+       1.19500732
+      ],
+      "targetDistanceToParty": 0
+     },
+     "cameraSettle": {
+      "timedOut": false,
+      "seconds": 0.27973349999999186
+     },
+     "ships": 0,
+     "troops": 1
+    },
+    "returnDisplacement": 0,
+    "returnBound": 0.635,
+    "sceneMatchesPatch": null,
+    "edgePatchSamples": null
+   },
+   "naval": {
+    "passed": true,
+    "failures": [],
+    "error": null,
+    "setup": {
+     "hull": "empire_heavy_ship",
+     "crewAdded": 43,
+     "ships": 1,
+     "port": [
+      609.375,
+      171.875
+     ],
+     "edgePoint": [
+      3,
+      171.875
+     ],
+     "synthetic": "crew and ship granted, departure from the generated port by SetSailAtPosition, both parties relocated at sea next to the west edge",
+     "enemy": "naval_patrol_party_1_party_3",
+     "enemyShips": 1,
+     "enemyFrom": [
+      26.40138,
+      446.088776
+     ],
+     "enemyTo": [
+      3.38928318,
+      170.198746
+     ]
+    },
+    "mapEvent": {
+     "naval": true,
+     "involved": [
+      "naval_patrol_party_1_party_3",
+      "player_party"
+     ]
+    },
+    "before": {
+     "position": [
+      3,
+      171.875
+     ],
+     "isOnLand": false,
+     "atSea": true,
+     "face": {
+      "index": 6913,
+      "group": 18,
+      "terrain": "CoastalSea",
+      "island": 2
+     },
+     "terrainAtPosition": "CoastalSea",
+     "patch": {
+      "sceneIndex": 225,
+      "coordinates": [
+       0,
+       0.6666667
+      ]
+     },
+     "expectedBattleScene": {
+      "sceneIndex": 225,
+      "naval": true,
+      "candidates": [
+       "battle_terrain_coastal_021"
+      ],
+      "scene": "battle_terrain_coastal_021",
+      "deterministic": true,
+      "rule": "single scene lists the index"
+     },
+     "mapHeight": 0,
+     "camera": {
+      "screen": "NavalDLC.View.Map.NavalMapScreen",
+      "frameOrigin": [
+       3.00832915,
+       139.672,
+       24.7270985
+      ],
+      "distance": 38,
+      "bearing": 0,
+      "followMode": "FollowParty",
+      "frameDistanceToParty": 32.203005594756796,
+      "lateralErrorToParty": 0.008329153060913086,
+      "alongOffsetToParty": 32.2030029296875,
+      "frameFollowsParty": true,
+      "idealTarget": [
+       3,
+       171.875,
+       1
+      ],
+      "targetDistanceToParty": 0
+     },
+     "cameraSettle": {
+      "timedOut": false,
+      "seconds": 3.9844024000000076
+     },
+     "ships": 1,
+     "troops": 44
+    },
+    "mission": {
+     "scene": "battle_terrain_coastal_021",
+     "module": "$BASE/Modules/NavalDLC/",
+     "combat": true,
+     "terrainType": "CoastalSea",
+     "loadSeconds": 1.4616946000000013,
+     "missionTimeAdvanced": 3.0042498856782913,
+     "agents": 84,
+     "ships": 2,
+     "teardownSeconds": 0.3423685000000063,
+     "initializerRecordSource": "TaleWorlds.MountAndBlade.Mission.<InitializerRecord>k__BackingField",
+     "initializerRecord": {
+      "TerrainType": 18,
+      "DamageToFriendsMultiplier": 0.5,
+      "DamageFromPlayerToFriendsMultiplier": 0.5,
+      "NeedsRandomTerrain": false,
+      "RandomTerrainSeed": 5733,
+      "SceneName": "battle_terrain_coastal_021",
+      "SceneLevels": "",
+      "PlayingInCampaignMode": true,
+      "EnableSceneRecording": false,
+      "SceneUpgradeLevel": 0,
+      "SceneHasMapPatch": true,
+      "PatchCoordinates": [
+       0,
+       0.6666667
+      ],
+      "PatchEncounterDir": [
+       -0.226213917,
+       0.974077642
+      ],
+      "DoNotUseLoadingScreen": false,
+      "DisableDynamicPointlightShadows": false,
+      "DisableCorpseFadeOut": false,
+      "DecalAtlasGroup": 2,
+      "AtmosphereOnCampaign": "AtmosphereInfo"
+     },
+     "terrainSamples": [
+      {
+       "at": [
+        5473.792,
+        3655.03076
+       ],
+       "terrainHeight": -21.18
+      },
+      {
+       "at": [
+        5493.792,
+        3655.03076
+       ],
+       "terrainHeight": -21.18
+      },
+      {
+       "at": [
+        5453.792,
+        3655.03076
+       ],
+       "terrainHeight": -21.18
+      },
+      {
+       "at": [
+        5473.792,
+        3675.03076
+       ],
+       "terrainHeight": -21.18
+      },
+      {
+       "at": [
+        5473.792,
+        3635.03076
+       ],
+       "terrainHeight": -21.18
+      }
+     ],
+     "mainAgentPosition": [
+      5473.792,
+      3655.03076,
+      30.0880871
+     ],
+     "screen": "NavalDLC.View.NavalMissionScreen"
+    },
+    "after": {
+     "position": [
+      1.46288848,
+      172.444672
+     ],
+     "isOnLand": false,
+     "atSea": true,
+     "face": {
+      "index": 6913,
+      "group": 18,
+      "terrain": "CoastalSea",
+      "island": 2
+     },
+     "terrainAtPosition": "CoastalSea",
+     "patch": {
+      "sceneIndex": 225,
+      "coordinates": [
+       0,
+       0.733333349
+      ]
+     },
+     "expectedBattleScene": {
+      "sceneIndex": 225,
+      "naval": true,
+      "candidates": [
+       "battle_terrain_coastal_021"
+      ],
+      "scene": "battle_terrain_coastal_021",
+      "deterministic": true,
+      "rule": "single scene lists the index"
+     },
+     "mapHeight": 0,
+     "camera": {
+      "screen": "NavalDLC.View.Map.NavalMapScreen",
+      "frameOrigin": [
+       1.47110164,
+       140.238754,
+       24.7270966
+      ],
+      "distance": 38,
+      "bearing": 0,
+      "followMode": "FollowParty",
+      "frameDistanceToParty": 32.20591857727784,
+      "lateralErrorToParty": 0.008213162422180176,
+      "alongOffsetToParty": 32.20591735839844,
+      "frameFollowsParty": true,
+      "idealTarget": [
+       1.46288848,
+       172.444672,
+       1
+      ],
+      "targetDistanceToParty": 0
+     },
+     "cameraSettle": {
+      "timedOut": false,
+      "seconds": 0.7275032999999951
+     },
+     "ships": 1,
+     "troops": 44
+    },
+    "returnDisplacement": 1.6392796404405772,
+    "returnBound": 1.885,
+    "sceneMatchesPatch": true,
+    "edgePatchSamples": [
+     {
+      "x": 0.01,
+      "y": 171.875,
+      "sceneIndex": 225,
+      "coordinates": [
+       0,
+       0.6666667
+      ]
+     },
+     {
+      "x": 2,
+      "y": 171.875,
+      "sceneIndex": 225,
+      "coordinates": [
+       0,
+       0.6666667
+      ]
+     },
+     {
+      "x": 798,
+      "y": 171.875,
+      "sceneIndex": 117,
+      "coordinates": [
+       0.466666669,
+       0.6666667
+      ]
+     },
+     {
+      "x": 799.99,
+      "y": 171.875,
+      "sceneIndex": 117,
+      "coordinates": [
+       0.466666669,
+       0.6666667
+      ]
+     },
+     {
+      "x": 805,
+      "y": 171.875,
+      "sceneIndex": 117,
+      "coordinates": [
+       0.466666669,
+       0.6666667
+      ]
+     },
+     {
+      "x": -5,
+      "y": 171.875,
+      "sceneIndex": 225,
+      "coordinates": [
+       0,
+       0.6666667
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "worldIndex": 1,
+   "identity": {
+    "worldId": "mnbl_0000002b",
+    "sceneName": "mnbl_generated_0000002b",
+    "placementSha256": "e71b1e6035dc932e9db2d05b0ee9263e1b47376822ba6af515cd8cd464f3ab8e",
+    "catalogReceiptSha256": "27bca57ee00ae08ab628d049b3409380ea9f1188b2b2aeba9706610fc481f80e",
+    "installedSceneHashes": {
+     "scene.xscene": "6688c9b65b1c4b3280e6ec1fcea391ad07aaed68c1e22761332404a232401a94",
+     "terrain.bin": "d241a9e027b56789737055484cfaf2a06817aa13be55d56030f5bfd4151519d1",
+     "navmesh.bin": "5ee30ac859cd80d7a75480ed59feac17568d85faa521f14c23ee7332b3ec5cfc",
+     "flora.bin": "a711b21e6cf9374aaf87b613e945f381b68a827fdf7dd8395add83364ed0a569",
+     "atmosphere.xml": "8375ecccc7a721b5d32e8e4fbc59e00b3a2182202d334a79cd01972668533f6d"
+    }
+   },
+   "contract": {
+    "sceneModel": "TaleWorlds.CampaignSystem.GameComponents.DefaultSceneModel",
+    "mapScene": "MNBL.ProceduralWorld.CampaignBootstrap.DiagnosticMapScene",
+    "battleScenePath": "MenuHelper.EncounterAttackConsequence -> SceneModel.GetBattleSceneForMapPatch(IMapScene.GetMapPatchAtPosition(MobileParty.MainParty.Position), isNaval) -> CampaignMission.OpenBattleMission / OpenNavalBattleMission (MissionInitializerRecord)",
+    "patchReader": "SandBox.MapScene.GetMapPatchAtPosition: cell = floor(position / _terrainSize * (width, height)); sceneIndex = map[2*cell], patch = (map[2*cell+1] & 15, map[2*cell+1] >> 4) / 15",
+    "sceneRule": "Scenes whose MapIndices contain sceneIndex and IsNaval == naval: one -> that scene; several naval -> those whose Terrain equals the terrain at the party, else random among them; several land -> random with FailedAssert; none -> silently random among scenes of the party's terrain (FailedAssert only if no scene has that terrain)",
+    "locationPath": "Settlement.LocationComplex location scene (generated settlements reuse prototype locations)"
+   },
+   "battleIndexMap": {
+    "present": true,
+    "width": 160,
+    "height": 160,
+    "sha256": "93ef0cc046510efca3c1cb3be2103a02b0c4c3cfc86cc9fb13e494b1e0fed29e",
+    "terrainSize": [
+     640,
+     640
+    ]
+   },
+   "battleIndexMapInstall": {
+    "status": "installed",
+    "method": "SandBox.MapScene._battleTerrainIndexMap/_Width/_Height set by reflection after AfterLoad navigation registration",
+    "layout": "2 bytes per cell: [0] sp_battle_scenes map index, [1] (x % 16) | (y % 16) << 4 -> patch coordinates (x/15, y/15)",
+    "terrainSize": [
+     640,
+     640
+    ],
+    "cellSize": [
+     4,
+     4
+    ],
+    "blockCells": 16,
+    "sceneTableSha256": "3aa0154cbc86905be7ef844b0105032710f7f19e491f09df097b32370b4ccb21",
+    "width": 160,
+    "height": 160,
+    "sha256": "93ef0cc046510efca3c1cb3be2103a02b0c4c3cfc86cc9fb13e494b1e0fed29e",
+    "landCandidates": {
+     "Plain": 106,
+     "Steppe": 50,
+     "Swamp": 7,
+     "Desert": 17
+    },
+    "landAndNavalCandidates": [
+     "35:battle_terrain_020/battle_terrain_opensea_southern",
+     "58:battle_terrain_biome_058/battle_terrain_coastal_03",
+     "110:battle_terrain_020/battle_terrain_coastal_021",
+     "116:battle_terrain_biome_094/battle_terrain_coastal_caspian_sea_02",
+     "117:battle_terrain_020/battle_terrain_coastal_caspian_sea_02",
+     "122:battle_terrain_020/battle_terrain_coastal_022",
+     "207:nord_battle_terrain_f/battle_terrain_opensea_northern",
+     "225:nord_battle_terrain_k/battle_terrain_coastal_021"
+    ],
+    "seaTouchingCells": 17459,
+    "buildMilliseconds": 101.59450000000001,
+    "seaCandidates": {
+     "OpenSea": [
+      35,
+      207,
+      252,
+      253,
+      254
+     ],
+     "CoastalSea": [
+      58,
+      110,
+      116,
+      117,
+      122,
+      225
+     ]
+    },
+    "generatedTerrainCells": {
+     "land:Plain": 7840,
+     "land:Plain+sea:CoastalSea": 985,
+     "land:Plain+sea:Lake": 11,
+     "land:Steppe": 15,
+     "sea:CoastalSea": 16454,
+     "sea:Lake": 9,
+     "unreachable:Mountain": 286
+    },
+    "substitutions": {
+     "land:Mountain->Steppe": 286,
+     "sea:Lake->CoastalSea": 20
+    },
+    "unreachableCells": 286,
+    "cellsWithoutFaces": 0,
+    "scenesByCells": {
+     "land:battle_terrain_001 naval:-": 215,
+     "land:battle_terrain_004 naval:-": 143,
+     "land:battle_terrain_012 naval:-": 5,
+     "land:battle_terrain_014 naval:-": 56,
+     "land:battle_terrain_017 naval:-": 1,
+     "land:battle_terrain_020 naval:-": 587,
+     "land:battle_terrain_020 naval:battle_terrain_coastal_021": 3452,
+     "land:battle_terrain_020 naval:battle_terrain_coastal_022": 3543,
+     "land:battle_terrain_020 naval:battle_terrain_coastal_caspian_sea_02": 2886,
+     "land:battle_terrain_020 naval:battle_terrain_opensea_southern": 379,
+     "land:battle_terrain_021 naval:-": 378,
+     "land:battle_terrain_023 naval:-": 12,
+     "land:battle_terrain_025 naval:-": 355,
+     "land:battle_terrain_026 naval:-": 87,
+     "land:battle_terrain_028 naval:-": 418,
+     "land:battle_terrain_029 naval:-": 461,
+     "land:battle_terrain_031 naval:-": 482,
+     "land:battle_terrain_032 naval:-": 233,
+     "land:battle_terrain_J naval:-": 287,
+     "land:battle_terrain_a naval:-": 103,
+     "land:battle_terrain_biome_006 naval:-": 88,
+     "land:battle_terrain_biome_012 naval:-": 179,
+     "land:battle_terrain_biome_025 naval:-": 2,
+     "land:battle_terrain_biome_030 naval:-": 13,
+     "land:battle_terrain_biome_040 naval:-": 22,
+     "land:battle_terrain_biome_044 naval:-": 23,
+     "land:battle_terrain_biome_047 naval:-": 17,
+     "land:battle_terrain_biome_050 naval:-": 3,
+     "land:battle_terrain_biome_058 naval:battle_terrain_coastal_03": 3750,
+     "land:battle_terrain_biome_075 naval:-": 53,
+     "land:battle_terrain_biome_083 naval:-": 1,
+     "land:battle_terrain_biome_088 naval:-": 137,
+     "land:battle_terrain_biome_089 naval:-": 12,
+     "land:battle_terrain_biome_094 naval:-": 6,
+     "land:battle_terrain_biome_096 naval:-": 3,
+     "land:battle_terrain_biome_098 naval:-": 238,
+     "land:battle_terrain_biome_114 naval:-": 149,
+     "land:battle_terrain_biome_130 naval:-": 7,
+     "land:battle_terrain_biome_131 naval:-": 2,
+     "land:battle_terrain_biome_149 naval:-": 212,
+     "land:battle_terrain_f naval:-": 185,
+     "land:battle_terrain_n naval:-": 200,
+     "land:battle_terrain_p naval:-": 102,
+     "land:battle_terrain_s naval:-": 12,
+     "land:battle_terrain_t naval:-": 124,
+     "land:battle_terrain_z naval:-": 272,
+     "land:nord_battle_terrain_b naval:-": 134,
+     "land:nord_battle_terrain_d naval:-": 49,
+     "land:nord_battle_terrain_e naval:-": 315,
+     "land:nord_battle_terrain_f naval:-": 9,
+     "land:nord_battle_terrain_f naval:battle_terrain_opensea_northern": 28,
+     "land:nord_battle_terrain_g naval:-": 141,
+     "land:nord_battle_terrain_h naval:-": 193,
+     "land:nord_battle_terrain_k naval:-": 188,
+     "land:nord_battle_terrain_k naval:battle_terrain_coastal_021": 4110,
+     "land:nord_battle_terrain_l naval:-": 189,
+     "land:nord_battle_terrain_n naval:-": 51,
+     "land:nord_battle_terrain_p naval:-": 89,
+     "land:nord_battle_terrain_r naval:-": 209
+    },
+    "samplingNote": "3x3 points per cell; slivers under about 0.1 of a cell along diagonal face edges can be missed"
+   },
+   "syntheticWar": {
+    "playerFaction": "player_faction",
+    "enemyFaction": "mnbl_0000002b_kingdom_2",
+    "alreadyAtWar": false,
+    "atWarNow": true,
+    "town1Faction": "mnbl_0000002b_kingdom_1",
+    "action": "DeclareWarAction.ApplyByDefault(Clan.PlayerClan, enemy kingdom)"
+   },
+   "fingerprintBefore": {
+    "mapSceneWrapper": 55343317,
+    "sceneName": "mnbl_generated_0000002b",
+    "scenePointer": "3542681190400",
+    "battleIndexSha256": "93ef0cc046510efca3c1cb3be2103a02b0c4c3cfc86cc9fb13e494b1e0fed29e",
+    "settlements": "mnbl_0000002b_town_1:Harbor 1 mnbl_0000002b:212.5,387.5|mnbl_0000002b_town_2:Harbor 2 mnbl_0000002b:132.5,97.5|mnbl_0000002b_village_1:Village 1 mnbl_0000002b:207.5,422.5|mnbl_0000002b_village_2:Village 2 mnbl_0000002b:207.5,112.5",
+    "parties": 17,
+    "heroCount": 20,
+    "navigationFaces": 32768,
+    "landRouteTown1ToTown2": 322.116272,
+    "seaRouteTown1ToTown2": 426.226929,
+    "waterPlane": false
+   },
+   "fingerprintAfter": {
+    "mapSceneWrapper": 55343317,
+    "sceneName": "mnbl_generated_0000002b",
+    "scenePointer": "3542681190400",
+    "battleIndexSha256": "93ef0cc046510efca3c1cb3be2103a02b0c4c3cfc86cc9fb13e494b1e0fed29e",
+    "settlements": "mnbl_0000002b_town_1:Harbor 1 mnbl_0000002b:212.5,387.5|mnbl_0000002b_town_2:Harbor 2 mnbl_0000002b:132.5,97.5|mnbl_0000002b_village_1:Village 1 mnbl_0000002b:207.5,422.5|mnbl_0000002b_village_2:Village 2 mnbl_0000002b:207.5,112.5",
+    "parties": 17,
+    "heroCount": 20,
+    "navigationFaces": 32768,
+    "landRouteTown1ToTown2": 322.116272,
+    "seaRouteTown1ToTown2": 426.226929,
+    "waterPlane": false
+   },
+   "worldPreserved": true,
+   "failures": [],
+   "field": {
+    "passed": true,
+    "failures": [],
+    "error": null,
+    "setup": {
+     "enemy": "patrol_party_1_party_2",
+     "enemyFaction": "mnbl_0000002b_kingdom_2",
+     "enemyTroops": 15,
+     "enemyFrom": [
+      139.975449,
+      103.954582
+     ],
+     "enemyTo": [
+      213.971909,
+      386.858765
+     ],
+     "synthetic": "existing hostile party relocated next to the player"
+    },
+    "mapEvent": {
+     "naval": false,
+     "involved": [
+      "patrol_party_1_party_2",
+      "player_party"
+     ]
+    },
+    "before": {
+     "position": [
+      212.5,
+      387.5
+     ],
+     "isOnLand": true,
+     "atSea": false,
+     "face": {
+      "index": 19796,
+      "group": 1,
+      "terrain": "Plain",
+      "island": 2
+     },
+     "terrainAtPosition": "Plain",
+     "patch": {
+      "sceneIndex": 39,
+      "coordinates": [
+       0.333333343,
+       0
+      ]
+     },
+     "expectedBattleScene": {
+      "sceneIndex": 39,
+      "naval": false,
+      "candidates": [
+       "battle_terrain_t"
+      ],
+      "scene": "battle_terrain_t",
+      "deterministic": true,
+      "rule": "single scene lists the index"
+     },
+     "mapHeight": 1.66500092,
+     "camera": {
+      "screen": "NavalDLC.View.Map.NavalMapScreen",
+      "frameOrigin": [
+       212.5,
+       355.297119,
+       26.3920975
+      ],
+      "distance": 38,
+      "bearing": 0,
+      "followMode": "FollowParty",
+      "frameDistanceToParty": 32.20288050307476,
+      "lateralErrorToParty": 0,
+      "alongOffsetToParty": 32.202880859375,
+      "frameFollowsParty": true,
+      "idealTarget": [
+       212.5,
+       387.5,
+       2.665001
+      ],
+      "targetDistanceToParty": 0
+     },
+     "cameraSettle": {
+      "timedOut": false,
+      "seconds": 0.14899059999999054
+     },
+     "ships": 0,
+     "troops": 1
+    },
+    "mission": {
+     "scene": "battle_terrain_t",
+     "module": "$BASE/Modules/SandBoxCore/",
+     "combat": true,
+     "terrainType": "Plain",
+     "loadSeconds": 0.9359244000000047,
+     "missionTimeAdvanced": 3.0642898827791214,
+     "agents": 20,
+     "ships": 0,
+     "teardownSeconds": 0.3146669999999858,
+     "initializerRecordSource": "TaleWorlds.MountAndBlade.Mission.<InitializerRecord>k__BackingField",
+     "initializerRecord": {
+      "TerrainType": 1,
+      "DamageToFriendsMultiplier": 0.5,
+      "DamageFromPlayerToFriendsMultiplier": 0.5,
+      "NeedsRandomTerrain": false,
+      "RandomTerrainSeed": 8459,
+      "SceneName": "battle_terrain_t",
+      "SceneLevels": "",
+      "PlayingInCampaignMode": true,
+      "EnableSceneRecording": false,
+      "SceneUpgradeLevel": 0,
+      "SceneHasMapPatch": true,
+      "PatchCoordinates": [
+       0.333333343,
+       0
+      ],
+      "PatchEncounterDir": [
+       -0.9167794,
+       0.399393946
+      ],
+      "DoNotUseLoadingScreen": false,
+      "DisableDynamicPointlightShadows": false,
+      "DisableCorpseFadeOut": false,
+      "DecalAtlasGroup": 2,
+      "AtmosphereOnCampaign": "AtmosphereInfo"
+     },
+     "terrainSamples": [
+      {
+       "at": [
+        475.140259,
+        549.154053
+       ],
+       "terrainHeight": 22.1979332
+      },
+      {
+       "at": [
+        495.140259,
+        549.154053
+       ],
+       "terrainHeight": 24.84435
+      },
+      {
+       "at": [
+        455.140259,
+        549.154053
+       ],
+       "terrainHeight": 22.02
+      },
+      {
+       "at": [
+        475.140259,
+        569.154053
+       ],
+       "terrainHeight": 25.5775776
+      },
+      {
+       "at": [
+        475.140259,
+        529.154053
+       ],
+       "terrainHeight": 21.8209667
+      }
+     ],
+     "mainAgentPosition": [
+      475.140259,
+      549.154053,
+      22.197937
+     ],
+     "screen": "TaleWorlds.MountAndBlade.View.Screens.MissionScreen"
+    },
+    "after": {
+     "position": [
+      212.164749,
+      387.018463
+     ],
+     "isOnLand": true,
+     "atSea": false,
+     "face": {
+      "index": 19796,
+      "group": 1,
+      "terrain": "Plain",
+      "island": 2
+     },
+     "terrainAtPosition": "Plain",
+     "patch": {
+      "sceneIndex": 39,
+      "coordinates": [
+       0.333333343,
+       0
+      ]
+     },
+     "expectedBattleScene": {
+      "sceneIndex": 39,
+      "naval": false,
+      "candidates": [
+       "battle_terrain_t"
+      ],
+      "scene": "battle_terrain_t",
+      "deterministic": true,
+      "rule": "single scene lists the index"
+     },
+     "mapHeight": 1.6599884,
+     "camera": {
+      "screen": "NavalDLC.View.Map.NavalMapScreen",
+      "frameOrigin": [
+       212.1706,
+       354.8239,
+       26.3871727
+      ],
+      "distance": 38,
+      "bearing": 0,
+      "followMode": "FollowParty",
+      "frameDistanceToParty": 32.19454944042353,
+      "lateralErrorToParty": 0.0058441162109375,
+      "alongOffsetToParty": 32.194549560546875,
+      "frameFollowsParty": true,
+      "idealTarget": [
+       212.164749,
+       387.018463,
+       2.6599884
+      ],
+      "targetDistanceToParty": 0
+     },
+     "cameraSettle": {
+      "timedOut": false,
+      "seconds": 0.6178123000000255
+     },
+     "ships": 0,
+     "troops": 1
+    },
+    "returnDisplacement": 0.5867460140390321,
+    "returnBound": 0.635,
+    "sceneMatchesPatch": true,
+    "edgePatchSamples": null
+   },
+   "settlement": {
+    "passed": true,
+    "failures": [],
+    "error": null,
+    "setup": {
+     "settlement": "mnbl_0000002b_town_1",
+     "name": "Harbor 1 mnbl_0000002b",
+     "from": [
+      212.164749,
+      387.018463
+     ],
+     "gate": [
+      212.5,
+      387.5
+     ],
+     "expectedScene": "empire_town_q",
+     "synthetic": "player placed at the generated gate; official menus from there"
+    },
+    "mapEvent": null,
+    "before": {
+     "position": [
+      212.5,
+      387.5
+     ],
+     "isOnLand": true,
+     "atSea": false,
+     "face": {
+      "index": 19796,
+      "group": 1,
+      "terrain": "Plain",
+      "island": 2
+     },
+     "terrainAtPosition": "Plain",
+     "patch": {
+      "sceneIndex": 39,
+      "coordinates": [
+       0.333333343,
+       0
+      ]
+     },
+     "expectedBattleScene": {
+      "sceneIndex": 39,
+      "naval": false,
+      "candidates": [
+       "battle_terrain_t"
+      ],
+      "scene": "battle_terrain_t",
+      "deterministic": true,
+      "rule": "single scene lists the index"
+     },
+     "mapHeight": 1.66500092,
+     "camera": {
+      "screen": "NavalDLC.View.Map.NavalMapScreen",
+      "frameOrigin": [
+       212.494141,
+       355.288757,
+       26.39201
+      ],
+      "distance": 38,
+      "bearing": 0,
+      "followMode": "FollowParty",
+      "frameDistanceToParty": 32.2112435181316,
+      "lateralErrorToParty": 0.005859375,
+      "alongOffsetToParty": 32.21124267578125,
+      "frameFollowsParty": true,
+      "idealTarget": [
+       212.5,
+       387.5,
+       2.665001
+      ],
+      "targetDistanceToParty": 0
+     },
+     "cameraSettle": {
+      "timedOut": false,
+      "seconds": 0.288574600000004
+     },
+     "ships": 0,
+     "troops": 1
+    },
+    "mission": {
+     "scene": "empire_town_q",
+     "module": "$BASE/Modules/SandBoxCore/",
+     "combat": false,
+     "terrainType": "Plain",
+     "loadSeconds": 2.209128200000009,
+     "missionTimeAdvanced": 3.006180017720908,
+     "agents": 69,
+     "ships": 0,
+     "teardownSeconds": 0.3677408000000071,
+     "initializerRecordSource": "TaleWorlds.MountAndBlade.Mission.<InitializerRecord>k__BackingField",
+     "initializerRecord": {
+      "TerrainType": 1,
+      "DamageToFriendsMultiplier": 0.5,
+      "DamageFromPlayerToFriendsMultiplier": 0.5,
+      "NeedsRandomTerrain": false,
+      "RandomTerrainSeed": 0,
+      "SceneName": "empire_town_q",
+      "SceneLevels": "civilian level_1",
+      "PlayingInCampaignMode": true,
+      "EnableSceneRecording": false,
+      "SceneUpgradeLevel": 0,
+      "SceneHasMapPatch": false,
+      "PatchCoordinates": [
+       0,
+       0
+      ],
+      "PatchEncounterDir": [
+       0,
+       0
+      ],
+      "DoNotUseLoadingScreen": false,
+      "DisableDynamicPointlightShadows": false,
+      "DisableCorpseFadeOut": false,
+      "DecalAtlasGroup": 3,
+      "AtmosphereOnCampaign": "AtmosphereInfo"
+     },
+     "terrainSamples": [
+      {
+       "at": [
+        614.374,
+        642.071
+       ],
+       "terrainHeight": 36.3363571
+      },
+      {
+       "at": [
+        634.374,
+        642.071
+       ],
+       "terrainHeight": 35.095562
+      },
+      {
+       "at": [
+        594.374,
+        642.071
+       ],
+       "terrainHeight": 39.0736923
+      },
+      {
+       "at": [
+        614.374,
+        662.071
+       ],
+       "terrainHeight": 39.6780472
+      },
+      {
+       "at": [
+        614.374,
+        622.071
+       ],
+       "terrainHeight": 34.1807137
+      }
+     ],
+     "mainAgentPosition": [
+      614.374,
+      642.071,
+      36.3363533
+     ],
+     "screen": "TaleWorlds.MountAndBlade.View.Screens.MissionScreen"
+    },
+    "after": {
+     "position": [
+      212.5,
+      387.5
+     ],
+     "isOnLand": true,
+     "atSea": false,
+     "face": {
+      "index": 19796,
+      "group": 1,
+      "terrain": "Plain",
+      "island": 2
+     },
+     "terrainAtPosition": "Plain",
+     "patch": {
+      "sceneIndex": 39,
+      "coordinates": [
+       0.333333343,
+       0
+      ]
+     },
+     "expectedBattleScene": {
+      "sceneIndex": 39,
+      "naval": false,
+      "candidates": [
+       "battle_terrain_t"
+      ],
+      "scene": "battle_terrain_t",
+      "deterministic": true,
+      "rule": "single scene lists the index"
+     },
+     "mapHeight": 1.66500092,
+     "camera": {
+      "screen": "NavalDLC.View.Map.NavalMapScreen",
+      "frameOrigin": [
+       212.5,
+       355.297119,
+       26.3920975
+      ],
+      "distance": 38,
+      "bearing": 0,
+      "followMode": "FollowParty",
+      "frameDistanceToParty": 32.20288050307476,
+      "lateralErrorToParty": 0,
+      "alongOffsetToParty": 32.202880859375,
+      "frameFollowsParty": true,
+      "idealTarget": [
+       212.5,
+       387.5,
+       2.665001
+      ],
+      "targetDistanceToParty": 0
+     },
+     "cameraSettle": {
+      "timedOut": false,
+      "seconds": 0.29426520000001233
+     },
+     "ships": 0,
+     "troops": 1
+    },
+    "returnDisplacement": 0,
+    "returnBound": 0.635,
+    "sceneMatchesPatch": null,
+    "edgePatchSamples": null
+   },
+   "naval": {
+    "passed": true,
+    "failures": [],
+    "error": null,
+    "setup": {
+     "hull": "empire_heavy_ship",
+     "crewAdded": 43,
+     "ships": 1,
+     "port": [
+      207.5,
+      387.5
+     ],
+     "edgePoint": [
+      15,
+      387.5
+     ],
+     "synthetic": "crew and ship granted, departure from the generated port by SetSailAtPosition, both parties relocated at sea next to the west edge",
+     "enemy": "naval_patrol_party_1_party_3",
+     "enemyShips": 1,
+     "enemyFrom": [
+      145.766235,
+      75.57173
+     ],
+     "enemyTo": [
+      15.6868553,
+      388.913666
+     ]
+    },
+    "mapEvent": {
+     "naval": true,
+     "involved": [
+      "naval_patrol_party_1_party_3",
+      "player_party"
+     ]
+    },
+    "before": {
+     "position": [
+      15,
+      387.5
+     ],
+     "isOnLand": false,
+     "atSea": true,
+     "face": {
+      "index": 19719,
+      "group": 18,
+      "terrain": "CoastalSea",
+      "island": 2
+     },
+     "terrainAtPosition": "CoastalSea",
+     "patch": {
+      "sceneIndex": 58,
+      "coordinates": [
+       0.2,
+       0
+      ]
+     },
+     "expectedBattleScene": {
+      "sceneIndex": 58,
+      "naval": true,
+      "candidates": [
+       "battle_terrain_coastal_03"
+      ],
+      "scene": "battle_terrain_coastal_03",
+      "deterministic": true,
+      "rule": "single scene lists the index"
+     },
+     "mapHeight": 1.27500153,
+     "camera": {
+      "screen": "NavalDLC.View.Map.NavalMapScreen",
+      "frameOrigin": [
+       15.0082722,
+       355.297119,
+       26.0021019
+      ],
+      "distance": 38,
+      "bearing": 0,
+      "followMode": "FollowParty",
+      "frameDistanceToParty": 32.2028823984069,
+      "lateralErrorToParty": 0.008272171020507812,
+      "alongOffsetToParty": 32.202880859375,
+      "frameFollowsParty": true,
+      "idealTarget": [
+       15,
+       387.5,
+       2.27500153
+      ],
+      "targetDistanceToParty": 0
+     },
+     "cameraSettle": {
+      "timedOut": false,
+      "seconds": 1.7678974000000096
+     },
+     "ships": 1,
+     "troops": 44
+    },
+    "mission": {
+     "scene": "battle_terrain_coastal_03",
+     "module": "$BASE/Modules/NavalDLC/",
+     "combat": true,
+     "terrainType": "CoastalSea",
+     "loadSeconds": 1.4870841999999982,
+     "missionTimeAdvanced": 3.057570032775402,
+     "agents": 84,
+     "ships": 2,
+     "teardownSeconds": 0.35477430000000254,
+     "initializerRecordSource": "TaleWorlds.MountAndBlade.Mission.<InitializerRecord>k__BackingField",
+     "initializerRecord": {
+      "TerrainType": 18,
+      "DamageToFriendsMultiplier": 0.5,
+      "DamageFromPlayerToFriendsMultiplier": 0.5,
+      "NeedsRandomTerrain": false,
+      "RandomTerrainSeed": 1619,
+      "SceneName": "battle_terrain_coastal_03",
+      "SceneLevels": "",
+      "PlayingInCampaignMode": true,
+      "EnableSceneRecording": false,
+      "SceneUpgradeLevel": 0,
+      "SceneHasMapPatch": true,
+      "PatchCoordinates": [
+       0.2,
+       0
+      ],
+      "PatchEncounterDir": [
+       -0.43701604,
+       -0.899453759
+      ],
+      "DoNotUseLoadingScreen": false,
+      "DisableDynamicPointlightShadows": false,
+      "DisableCorpseFadeOut": false,
+      "DecalAtlasGroup": 2,
+      "AtmosphereOnCampaign": "AtmosphereInfo"
+     },
+     "terrainSamples": [
+      {
+       "at": [
+        3717.36621,
+        3006.454
+       ],
+       "terrainHeight": 31.3499985
+      },
+      {
+       "at": [
+        3737.36621,
+        3006.454
+       ],
+       "terrainHeight": 31.3499985
+      },
+      {
+       "at": [
+        3697.36621,
+        3006.454
+       ],
+       "terrainHeight": 31.3499985
+      },
+      {
+       "at": [
+        3717.36621,
+        3026.454
+       ],
+       "terrainHeight": 31.289999
+      },
+      {
+       "at": [
+        3717.36621,
+        2986.454
+       ],
+       "terrainHeight": 31.38
+      }
+     ],
+     "mainAgentPosition": [
+      3717.36621,
+      3006.454,
+      125.087463
+     ],
+     "screen": "NavalDLC.View.NavalMissionScreen"
+    },
+    "after": {
+     "position": [
+      15.583106,
+      385.738342
+     ],
+     "isOnLand": false,
+     "atSea": true,
+     "face": {
+      "index": 19719,
+      "group": 18,
+      "terrain": "CoastalSea",
+      "island": 2
+     },
+     "terrainAtPosition": "CoastalSea",
+     "patch": {
+      "sceneIndex": 58,
+      "coordinates": [
+       0.2,
+       0
+      ]
+     },
+     "expectedBattleScene": {
+      "sceneIndex": 58,
+      "naval": true,
+      "candidates": [
+       "battle_terrain_coastal_03"
+      ],
+      "scene": "battle_terrain_coastal_03",
+      "deterministic": true,
+      "rule": "single scene lists the index"
+     },
+     "mapHeight": 0.632492065,
+     "camera": {
+      "screen": "NavalDLC.View.Map.NavalMapScreen",
+      "frameOrigin": [
+       15.5803108,
+       353.5439,
+       25.3626671
+      ],
+      "distance": 38,
+      "bearing": 0,
+      "followMode": "FollowParty",
+      "frameDistanceToParty": 32.194428107544866,
+      "lateralErrorToParty": 0.0027952194213867188,
+      "alongOffsetToParty": 32.194427490234375,
+      "frameFollowsParty": true,
+      "idealTarget": [
+       15.583106,
+       385.738342,
+       1.63249207
+      ],
+      "targetDistanceToParty": 0
+     },
+     "cameraSettle": {
+      "timedOut": false,
+      "seconds": 0.7775590999999906
+     },
+     "ships": 1,
+     "troops": 44
+    },
+    "returnDisplacement": 1.8556536451873815,
+    "returnBound": 1.885,
+    "sceneMatchesPatch": true,
+    "edgePatchSamples": [
+     {
+      "x": 0.01,
+      "y": 387.5,
+      "sceneIndex": 215,
+      "coordinates": [
+       0,
+       0
+      ]
+     },
+     {
+      "x": 2,
+      "y": 387.5,
+      "sceneIndex": 215,
+      "coordinates": [
+       0,
+       0
+      ]
+     },
+     {
+      "x": 638,
+      "y": 387.5,
+      "sceneIndex": 132,
+      "coordinates": [
+       1,
+       0
+      ]
+     },
+     {
+      "x": 639.99,
+      "y": 387.5,
+      "sceneIndex": 132,
+      "coordinates": [
+       1,
+       0
+      ]
+     },
+     {
+      "x": 645,
+      "y": 387.5,
+      "sceneIndex": 132,
+      "coordinates": [
+       1,
+       0
+      ]
+     },
+     {
+      "x": -5,
+      "y": 387.5,
+      "sceneIndex": 215,
+      "coordinates": [
+       0,
+       0
+      ]
+     }
+    ]
+   }
+  }
+ ],
+ "reproduce": [
+  "./tools/Build.ps1",
+  "./tools/Deploy-Dev.ps1",
+  "./tools/Start-OwnedProbe.ps1 -Probe generated_campaign -ProbeTimeoutSeconds 1800 -ArgsJson '{worldCount:2, seed:42, secondSeed:43, culture:empire, heroTemplate:spc_legion_of_the_betrayed_leader_0, townPrototype:town_EN2, villagePrototype:village_EN1_3, placement/secondPlacement: build/research-bootstrap18/final42e|final43e/placement.json, catalogReceipt: evidence/runtime/in-game/campaign_catalog-10212.json, holdSeconds:3, gameplayDays:0, navigationProbe:0, missionProbe:1}'",
+  "./tools/Collect-OwnedProbe.ps1",
+  "python tools/summarize_mission_probe.py --accepted evidence/runtime/in-game/generated_campaign-<pid>.json --out evidence/runtime/mission-transition-probe.json"
+ ]
+}

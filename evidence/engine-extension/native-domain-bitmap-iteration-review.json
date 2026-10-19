@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "status": "reviewed-bounded-storage-bitmap-iteration",
+  "createdAtUtc": "2026-10-17T18:00:54.933744+00:00",
+  "sources": {
+    "src/MNBL.AgentStorage/AgentDomainStorage.hpp": "c5d9ee96a5109438fdfff03287ee8f8a32130835212afef47f2b2044638b5274",
+    "src/MNBL.AgentStorage/StableAgentStorage.hpp": "34555749bbfdf9ad318a02aea660f36cfe57ee9183e856df48c216ebf8503458",
+    "tests/AgentStorage/agent_domain_storage_tests.cpp": "f8b6ebbf9c31aab5df46dbf3c0832f275b892ff028e7150b023563415c7895df",
+    "tests/AgentStorage/adopted_agent_storage_tests.cpp": "48d057fb0d5e9432c1eba49fc0b3dff647647db71654da1df9efef5cc541a445",
+    "tests/AgentStorage/segmented_iteration_tests.cpp": "f8a232388bd70fb3c19c3415b1b5180720fb6f2e00b9591e37ebb23e4f11829e",
+    "tools/battle-scale/Test-SegmentedIteration.cmd": "7ae1d486cb94e8f1465abbe517793aaa03d1fd5f101baec973869045de260ce7",
+    "evidence/engine-extension/segmented-agent-iteration-tests.json": "11d8e030140d2c9c1169f7de290705e9a4bb5f7d1bd97caa0c7d2e8f978b374c",
+    "build/agent-storage/bitmap_independent_review.cpp": "34de7ae7054faa8f5c3f1b4bea18671bb5229cec1a81ae0945f66bcfa81ad72b",
+    "build/agent-storage/Review-BitmapIndependent.cmd": "bff70d3acdad9ae6df7760b937375c295ac214afbfd4016495df3b92dad6d59b",
+    "build/agent-storage/bitmap_independent_review.exe": "341c12009254671ea23f133fe5a728b7c3e96cb894779f0ea5eef5d21e20af4c",
+    "build/agent-storage/bitmap_independent_review_asan.exe": "f719482b90c8d4c4738877a3a571132e9898a6160a1232dce2fe37b8247df7cf"
+  },
+  "findings": [],
+  "scope": "Independent source and offline synthetic-model review of per-domain occupancy bitmaps, ordered logical iteration, and reverse highwater shrink. No native engine integration approval.",
+  "sourceReview": [
+    "Each Block value-initializes ceil(size/64) words independently for both domains. Only in-range slot mutations set bits; unused high bits in partial final words remain zero.",
+    "Forward masking shifts by local%64 in [0,63]. Reverse masking shifts by 63-local%64 in [0,63]. countr_zero/countl_zero are used only for nonzero words. Each block restarts its local word index independently.",
+    "next is inclusive and rejects from>=capacity, including no_slot. previous is exclusive, clamps before to capacity, rejects zero, and safely crosses block boundaries. Public entry points reject unknown domains before indexing.",
+    "Adoption builds bitmap/slot/free-chain/highwater metadata before publishing any State fields. Invalid or duplicate occupancy destroys only temporary metadata and leaves borrowed payload untouched.",
+    "Grow initializes empty bitmaps in pending Blocks. Throwing metadata/payload construction and callback failures cannot publish capacity or occupancy. Publication follows reserved vector capacity and moves unique_ptr blocks; original payload addresses stay fixed.",
+    "acquire and acquire_at set occupied and bitmap together under the exclusive lock; release validates generation/domain, clears both, then shrinks highwater through reverse scan. Primary and secondary occupancy remain separate.",
+    "ReadLease retains State and the shared lock across the walk. try_close requires the exclusive lock, clears state and destroys blocks before releasing the borrowed owner. Native readers do not implicitly join this lock."
+  ],
+  "independentExecution": {
+    "command": "cmd /c build\\agent-storage\\Review-BitmapIndependent.cmd",
+    "exitCode": 0,
+    "builds": [
+      "MSVC C++20 /W4 /WX /O2",
+      "MSVC C++20 /W4 /WX /fsanitize=address /Od"
+    ],
+    "resultPerBuild": "PASS independent bitmap model: 421508 exhaustive-start queries; 3600 mixed mutations; 75 growth failure points; 10 block sizes; invalid/closed guards",
+    "startPositionsCheckedPerBuild": 421508,
+    "pairedNextPreviousAssertionsPerBuild": 843016,
+    "blockSizes": [
+      1,
+      3,
+      63,
+      64,
+      65,
+      127,
+      128,
+      129,
+      257,
+      2040
+    ],
+    "growthFailurePointsPerBuild": 75,
+    "checks": [
+      "Every start position 0..capacity+1 compared against independent std::set lower_bound after mixed acquire/acquire_at/release operations and block growth.",
+      "Both domain walks compared before failure, after each injected null-allocation/throwing-allocation/constructor failure, and after retry publication.",
+      "Both open and closed invalid-domain iteration rejected; sentinel and empty/closed results verified.",
+      "Repeated stale-handle release rejected without bitmap mutation."
+    ]
+  },
+  "rootExecutionReceipt": {
+    "path": "evidence/engine-extension/segmented-agent-iteration-tests.json",
+    "sourcesAndBinariesIndependentlyHashVerified": true,
+    "reExecutedFullRootSuite": false,
+    "reportedWideIndexCount": 66049,
+    "reportedBoundaryQueries": 7579,
+    "reportedRandomizedMutations": 5000,
+    "reportedBuilds": "optimized and ASAN iteration plus domain/adoption regressions"
+  },
+  "historicalReceiptPreserved": {
+    "path": "evidence/engine-extension/native-adopted-agent-storage-independent-review.json",
+    "sha256": "8ebae927767326b15fc64fb31bf5c7b5c9d52e587d230a4722391d3aa97da96f"
+  },
+  "limitations": [
+    "Synthetic storage callbacks only; no Bannerlord allocation, traversal, engine barrier, deployment or game execution.",
+    "ASAN is not a data-race or native-reader-quiescence proof.",
+    "Metadata allocation failures and generation exhaustion near UINT64_MAX are source-reviewed rather than exhaustively injected.",
+    "Transient independent model sources/binaries are under build/agent-storage and must be retained to replay this receipt."
+  ],
+  "enginePatchApproved": false,
+  "gameLaunched": false
+}

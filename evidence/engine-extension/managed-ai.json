@@ -1,0 +1,743 @@
+{
+  "status": "static-analysis",
+  "artifact": {
+    "path": "D:\\SteamLibrary\\steamapps\\common\\Mount & Blade II Bannerlord\\bin\\Win64_Shipping_Client\\TaleWorlds.MountAndBlade.dll",
+    "sha256": "19387f31557ff840d14f378f6bbdf1d58fcff406ab9ff2294dfbb3e49a50b87e"
+  },
+  "reaEvidenceId": "ev_11f78269a6ce02b45bf50d50daa9bd8686b62290cfecb75352ec91fc13a5a29f",
+  "observations": [
+    "Agent.TickAsAI has only 41 bytes of managed IL in this installed artifact; its name alone does not identify all native combat AI.",
+    "Mission.TickAgentsAndTeamsImp iterates agents and teams; Mission.TickAgentsAndTeamsAsync invokes the IMBMission boundary.",
+    "Layered population representation avoids creating a native agent for every logical soldier; this is an implementation design, not proof of a higher native cap."
+  ],
+  "limitations": [
+    "Static analysis did not execute or benchmark game code.",
+    "No native AI cost breakdown or cap removal verified."
+  ],
+  "methods": [
+    {
+      "token": "0x06000a3f",
+      "row_offset": 1204348,
+      "declaring_type_token": "0x020000fa",
+      "declaring_type": "TaleWorlds.MountAndBlade.Agent",
+      "name": "SetIsAIPaused",
+      "rva": 71805,
+      "impl_flags": 0,
+      "flags": 134,
+      "signature": {
+        "raw_length": 4,
+        "raw_sha256": "7366e2ddae008ee5e5ba63f1c2504e9a452ccd8cc0f40fdd3d8d03430bae9e33",
+        "kind": "method",
+        "parse_status": "decoded",
+        "calling_convention": "default has-this",
+        "generic_parameter_count": null,
+        "parameter_count": 1,
+        "return_type": "void",
+        "parameter_types": [
+          "bool"
+        ],
+        "field_type": null,
+        "issue": null
+      },
+      "body": {
+        "status": "present",
+        "header_format": "tiny",
+        "rva": 71805,
+        "file_offset": 64125,
+        "max_stack": 8,
+        "init_locals": false,
+        "local_var_sig_token": null,
+        "il_size": 8,
+        "il_sha256": "5d2a793af2110b5d9984772d62ce3f8cdc6f3ead478b543564127f436f183855",
+        "normalized_il_sha256": "1af151b06f9dcf080d5771b5ab78bcda2716c01feca0d9ca0e1881a66f782e24",
+        "instruction_count": 4,
+        "decoded_instruction_count": 4,
+        "truncated_instructions": 0,
+        "opcode_counts": {
+          "ldarg.0": 1,
+          "ldarg.1": 1,
+          "call": 1,
+          "ret": 1
+        },
+        "anchors": [
+          {
+            "il_offset": 2,
+            "opcode": "call",
+            "operand_kind": "method",
+            "operand": "0x060009c4"
+          }
+        ],
+        "exception_regions": [],
+        "issue": null
+      }
+    },
+    {
+      "token": "0x06000b3a",
+      "row_offset": 1208866,
+      "declaring_type_token": "0x020000fa",
+      "declaring_type": "TaleWorlds.MountAndBlade.Agent",
+      "name": "FadeOut",
+      "rva": 83132,
+      "impl_flags": 0,
+      "flags": 134,
+      "signature": {
+        "raw_length": 5,
+        "raw_sha256": "2d16db8b96e961e3a662218ec9861c0fd66e464c18562a1328509b2d5623955f",
+        "kind": "method",
+        "parse_status": "decoded",
+        "calling_convention": "default has-this",
+        "generic_parameter_count": null,
+        "parameter_count": 2,
+        "return_type": "void",
+        "parameter_types": [
+          "bool",
+          "bool"
+        ],
+        "field_type": null,
+        "issue": null
+      },
+      "body": {
+        "status": "present",
+        "header_format": "tiny",
+        "rva": 83132,
+        "file_offset": 75452,
+        "max_stack": 8,
+        "init_locals": false,
+        "local_var_sig_token": null,
+        "il_size": 42,
+        "il_sha256": "8023cd3348425123cbc5a7ad69b3111ca66a6796fac90f06af9056d3ac30e2d0",
+        "normalized_il_sha256": "58fcd8eb080fe54ba14c756ef6dbb2e326d6c32fb3e9a8b0a944cea8006334f2",
+        "instruction_count": 16,
+        "decoded_instruction_count": 16,
+        "truncated_instructions": 0,
+        "opcode_counts": {
+          "ldsfld": 1,
+          "ldarg.0": 3,
+          "call": 3,
+          "ldarg.1": 1,
+          "callvirt": 2,
+          "ldarg.2": 2,
+          "brfalse.s": 2,
+          "ldc.i4.0": 1,
+          "ret": 1
+        },
+        "anchors": [
+          {
+            "il_offset": 0,
+            "opcode": "ldsfld",
+            "operand_kind": "field",
+            "operand": "0x04000857"
+          },
+          {
+            "il_offset": 6,
+            "opcode": "call",
+            "operand_kind": "method",
+            "operand": "0x06000b84"
+          },
+          {
+            "il_offset": 12,
+            "opcode": "callvirt",
+            "operand_kind": "method",
+            "operand": "0x0600172d"
+          },
+          {
+            "il_offset": 18,
+            "opcode": "brfalse.s",
+            "operand_kind": "branch",
+            "operand": "41"
+          },
+          {
+            "il_offset": 21,
+            "opcode": "call",
+            "operand_kind": "method",
+            "operand": "0x06000960"
+          },
+          {
+            "il_offset": 26,
+            "opcode": "brfalse.s",
+            "operand_kind": "branch",
+            "operand": "41"
+          },
+          {
+            "il_offset": 29,
+            "opcode": "call",
+            "operand_kind": "method",
+            "operand": "0x060009bf"
+          },
+          {
+            "il_offset": 36,
+            "opcode": "callvirt",
+            "operand_kind": "method",
+            "operand": "0x06000b3a"
+          }
+        ],
+        "exception_regions": [],
+        "issue": null
+      }
+    },
+    {
+      "token": "0x06000b9d",
+      "row_offset": 1210648,
+      "declaring_type_token": "0x020000fa",
+      "declaring_type": "TaleWorlds.MountAndBlade.Agent",
+      "name": "TickAsAI",
+      "rva": 92020,
+      "impl_flags": 0,
+      "flags": 129,
+      "signature": {
+        "raw_length": 3,
+        "raw_sha256": "0c9373898d2dd1c85902837a9e979cb88484e2548a008ad2b2176cc7119d09df",
+        "kind": "method",
+        "parse_status": "decoded",
+        "calling_convention": "default has-this",
+        "generic_parameter_count": null,
+        "parameter_count": 0,
+        "return_type": "void",
+        "parameter_types": [],
+        "field_type": null,
+        "issue": null
+      },
+      "body": {
+        "status": "present",
+        "header_format": "tiny",
+        "rva": 92020,
+        "file_offset": 84340,
+        "max_stack": 8,
+        "init_locals": false,
+        "local_var_sig_token": null,
+        "il_size": 41,
+        "il_sha256": "f2272ee433811009c63b41b9929ade5cc5b3a6b7159c454dc4fd10d63a85a677",
+        "normalized_il_sha256": "1d06c9d4605ab01f6bcf7f5838ea88f6cd2d886c167a39a0fcd25f05292152c9",
+        "instruction_count": 15,
+        "decoded_instruction_count": 15,
+        "truncated_instructions": 0,
+        "opcode_counts": {
+          "ldarg.0": 4,
+          "ldfld": 1,
+          "call": 3,
+          "callvirt": 2,
+          "brfalse.s": 2,
+          "ldc.i4.0": 1,
+          "ldc.i4.1": 1,
+          "ret": 1
+        },
+        "anchors": [
+          {
+            "il_offset": 1,
+            "opcode": "ldfld",
+            "operand_kind": "field",
+            "operand": "0x04000245"
+          },
+          {
+            "il_offset": 7,
+            "opcode": "call",
+            "operand_kind": "method",
+            "operand": "0x06000988"
+          },
+          {
+            "il_offset": 12,
+            "opcode": "callvirt",
+            "operand_kind": "method",
+            "operand": "0x06001966"
+          },
+          {
+            "il_offset": 17,
+            "opcode": "callvirt",
+            "operand_kind": "method",
+            "operand": "0x0a0001ff"
+          },
+          {
+            "il_offset": 22,
+            "opcode": "brfalse.s",
+            "operand_kind": "branch",
+            "operand": "40"
+          },
+          {
+            "il_offset": 25,
+            "opcode": "call",
+            "operand_kind": "method",
+            "operand": "0x060009ca"
+          },
+          {
+            "il_offset": 30,
+            "opcode": "brfalse.s",
+            "operand_kind": "branch",
+            "operand": "40"
+          },
+          {
+            "il_offset": 35,
+            "opcode": "call",
+            "operand_kind": "method",
+            "operand": "0x06000b0a"
+          }
+        ],
+        "exception_regions": [],
+        "issue": null
+      }
+    },
+    {
+      "token": "0x06001983",
+      "row_offset": 1274692,
+      "declaring_type_token": "0x020001c1",
+      "declaring_type": "TaleWorlds.MountAndBlade.Mission",
+      "name": "TickAgentsAndTeamsAsync",
+      "rva": 344002,
+      "impl_flags": 0,
+      "flags": 134,
+      "signature": {
+        "raw_length": 4,
+        "raw_sha256": "7d50df739f41b3d5cdf6efc05539b18b1ea19e25f1aedd96a433ddc45068958f",
+        "kind": "method",
+        "parse_status": "decoded",
+        "calling_convention": "default has-this",
+        "generic_parameter_count": null,
+        "parameter_count": 1,
+        "return_type": "void",
+        "parameter_types": [
+          "r4"
+        ],
+        "field_type": null,
+        "issue": null
+      },
+      "body": {
+        "status": "present",
+        "header_format": "tiny",
+        "rva": 344002,
+        "file_offset": 336322,
+        "max_stack": 8,
+        "init_locals": false,
+        "local_var_sig_token": null,
+        "il_size": 18,
+        "il_sha256": "7ef403a9a055bd4bbacefca72bffc95399b3c82aeae52c59afae9dacbf11ba7e",
+        "normalized_il_sha256": "474bdf526c69fa28d17b816b22be48fdf4b8bb85a2c2f2ceb648661a17c5d867",
+        "instruction_count": 6,
+        "decoded_instruction_count": 6,
+        "truncated_instructions": 0,
+        "opcode_counts": {
+          "ldsfld": 1,
+          "ldarg.0": 1,
+          "call": 1,
+          "ldarg.1": 1,
+          "callvirt": 1,
+          "ret": 1
+        },
+        "anchors": [
+          {
+            "il_offset": 0,
+            "opcode": "ldsfld",
+            "operand_kind": "field",
+            "operand": "0x0400085d"
+          },
+          {
+            "il_offset": 6,
+            "opcode": "call",
+            "operand_kind": "method",
+            "operand": "0x06001929"
+          },
+          {
+            "il_offset": 12,
+            "opcode": "callvirt",
+            "operand_kind": "method",
+            "operand": "0x060017ef"
+          }
+        ],
+        "exception_regions": [],
+        "issue": null
+      }
+    },
+    {
+      "token": "0x06001a85",
+      "row_offset": 1279336,
+      "declaring_type_token": "0x020001c1",
+      "declaring_type": "TaleWorlds.MountAndBlade.Mission",
+      "name": "TickAgentsAndTeamsImp",
+      "rva": 360940,
+      "impl_flags": 0,
+      "flags": 134,
+      "signature": {
+        "raw_length": 5,
+        "raw_sha256": "57267e334909f289bd7067c0942d1f3986295edc827721a0cbf55623e8e8b271",
+        "kind": "method",
+        "parse_status": "decoded",
+        "calling_convention": "default has-this",
+        "generic_parameter_count": null,
+        "parameter_count": 2,
+        "return_type": "void",
+        "parameter_types": [
+          "r4",
+          "bool"
+        ],
+        "field_type": null,
+        "issue": null
+      },
+      "body": {
+        "status": "present",
+        "header_format": "fat",
+        "rva": 360940,
+        "file_offset": 353260,
+        "max_stack": 5,
+        "init_locals": true,
+        "local_var_sig_token": "0x1100029a",
+        "il_size": 208,
+        "il_sha256": "351d4cafd8a1efeaba21c0a9f048b3f6c0a33c81adac2d8a075c96374b9bb715",
+        "normalized_il_sha256": "b62652998f544f1e562f1e07c4808dd89144273d33034b96a6127679f0c19d9a",
+        "instruction_count": 71,
+        "decoded_instruction_count": 71,
+        "truncated_instructions": 0,
+        "opcode_counts": {
+          "ldarg.2": 1,
+          "brtrue.s": 4,
+          "ldarg.1": 3,
+          "br.s": 4,
+          "ldc.r4": 1,
+          "stloc.0": 1,
+          "ldc.i4.0": 1,
+          "ldarg.0": 6,
+          "call": 10,
+          "callvirt": 10,
+          "ldloc.0": 2,
+          "ldftn": 1,
+          "newobj": 1,
+          "ldc.i4.s": 1,
+          "stloc.1": 1,
+          "ldloca.s": 9,
+          "leave.s": 3,
+          "constrained.": 3,
+          "endfinally": 3,
+          "stloc.2": 1,
+          "ldc.i4.1": 1,
+          "stfld": 1,
+          "ldfld": 1,
+          "stloc.3": 1,
+          "ret": 1
+        },
+        "anchors": [
+          {
+            "il_offset": 1,
+            "opcode": "brtrue.s",
+            "operand_kind": "branch",
+            "operand": "6"
+          },
+          {
+            "il_offset": 4,
+            "opcode": "br.s",
+            "operand_kind": "branch",
+            "operand": "11"
+          },
+          {
+            "il_offset": 6,
+            "opcode": "ldc.r4",
+            "operand_kind": "constant",
+            "operand": "0"
+          },
+          {
+            "il_offset": 14,
+            "opcode": "call",
+            "operand_kind": "method",
+            "operand": "0x06001a2e"
+          },
+          {
+            "il_offset": 19,
+            "opcode": "callvirt",
+            "operand_kind": "method",
+            "operand": "0x0a000268"
+          },
+          {
+            "il_offset": 26,
+            "opcode": "ldftn",
+            "operand_kind": "method",
+            "operand": "0x06001a84"
+          },
+          {
+            "il_offset": 32,
+            "opcode": "newobj",
+            "operand_kind": "method",
+            "operand": "0x0a00065a"
+          },
+          {
+            "il_offset": 37,
+            "opcode": "ldc.i4.s",
+            "operand_kind": "constant",
+            "operand": "16"
+          },
+          {
+            "il_offset": 39,
+            "opcode": "call",
+            "operand_kind": "method",
+            "operand": "0x0a00065b"
+          },
+          {
+            "il_offset": 45,
+            "opcode": "call",
+            "operand_kind": "method",
+            "operand": "0x06001a2e"
+          },
+          {
+            "il_offset": 50,
+            "opcode": "callvirt",
+            "operand_kind": "method",
+            "operand": "0x0a000273"
+          },
+          {
+            "il_offset": 56,
+            "opcode": "br.s",
+            "operand_kind": "branch",
+            "operand": "71"
+          },
+          {
+            "il_offset": 58,
+            "opcode": "ldloca.s",
+            "operand_kind": "variable",
+            "operand": "1"
+          },
+          {
+            "il_offset": 60,
+            "opcode": "call",
+            "operand_kind": "method",
+            "operand": "0x0a000274"
+          },
+          {
+            "il_offset": 66,
+            "opcode": "callvirt",
+            "operand_kind": "method",
+            "operand": "0x06000b5e"
+          },
+          {
+            "il_offset": 71,
+            "opcode": "ldloca.s",
+            "operand_kind": "variable",
+            "operand": "1"
+          },
+          {
+            "il_offset": 73,
+            "opcode": "call",
+            "operand_kind": "method",
+            "operand": "0x0a000275"
+          },
+          {
+            "il_offset": 78,
+            "opcode": "brtrue.s",
+            "operand_kind": "branch",
+            "operand": "58"
+          },
+          {
+            "il_offset": 80,
+            "opcode": "leave.s",
+            "operand_kind": "branch",
+            "operand": "96"
+          },
+          {
+            "il_offset": 82,
+            "opcode": "ldloca.s",
+            "operand_kind": "variable",
+            "operand": "1"
+          },
+          {
+            "il_offset": 84,
+            "opcode": "constrained.",
+            "operand_kind": "type",
+            "operand": "0x1b0000a3"
+          },
+          {
+            "il_offset": 90,
+            "opcode": "callvirt",
+            "operand_kind": "method",
+            "operand": "0x0a00002f"
+          },
+          {
+            "il_offset": 97,
+            "opcode": "call",
+            "operand_kind": "method",
+            "operand": "0x06001a0b"
+          },
+          {
+            "il_offset": 102,
+            "opcode": "callvirt",
+            "operand_kind": "method",
+            "operand": "0x0a000288"
+          },
+          {
+            "il_offset": 108,
+            "opcode": "br.s",
+            "operand_kind": "branch",
+            "operand": "123"
+          },
+          {
+            "il_offset": 110,
+            "opcode": "ldloca.s",
+            "operand_kind": "variable",
+            "operand": "2"
+          },
+          {
+            "il_offset": 112,
+            "opcode": "call",
+            "operand_kind": "method",
+            "operand": "0x0a000289"
+          },
+          {
+            "il_offset": 118,
+            "opcode": "callvirt",
+            "operand_kind": "method",
+            "operand": "0x0600344a"
+          },
+          {
+            "il_offset": 123,
+            "opcode": "ldloca.s",
+            "operand_kind": "variable",
+            "operand": "2"
+          },
+          {
+            "il_offset": 125,
+            "opcode": "call",
+            "operand_kind": "method",
+            "operand": "0x0a00028a"
+          },
+          {
+            "il_offset": 130,
+            "opcode": "brtrue.s",
+            "operand_kind": "branch",
+            "operand": "110"
+          },
+          {
+            "il_offset": 132,
+            "opcode": "leave.s",
+            "operand_kind": "branch",
+            "operand": "148"
+          },
+          {
+            "il_offset": 134,
+            "opcode": "ldloca.s",
+            "operand_kind": "variable",
+            "operand": "2"
+          },
+          {
+            "il_offset": 136,
+            "opcode": "constrained.",
+            "operand_kind": "type",
+            "operand": "0x1b0000a7"
+          },
+          {
+            "il_offset": 142,
+            "opcode": "callvirt",
+            "operand_kind": "method",
+            "operand": "0x0a00002f"
+          },
+          {
+            "il_offset": 150,
+            "opcode": "stfld",
+            "operand_kind": "field",
+            "operand": "0x040008fc"
+          },
+          {
+            "il_offset": 156,
+            "opcode": "ldfld",
+            "operand_kind": "field",
+            "operand": "0x040008bc"
+          },
+          {
+            "il_offset": 161,
+            "opcode": "callvirt",
+            "operand_kind": "method",
+            "operand": "0x0a00065c"
+          },
+          {
+            "il_offset": 167,
+            "opcode": "br.s",
+            "operand_kind": "branch",
+            "operand": "182"
+          },
+          {
+            "il_offset": 169,
+            "opcode": "ldloca.s",
+            "operand_kind": "variable",
+            "operand": "3"
+          },
+          {
+            "il_offset": 171,
+            "opcode": "call",
+            "operand_kind": "method",
+            "operand": "0x0a00065d"
+          },
+          {
+            "il_offset": 177,
+            "opcode": "callvirt",
+            "operand_kind": "method",
+            "operand": "0x06001c2a"
+          },
+          {
+            "il_offset": 182,
+            "opcode": "ldloca.s",
+            "operand_kind": "variable",
+            "operand": "3"
+          },
+          {
+            "il_offset": 184,
+            "opcode": "call",
+            "operand_kind": "method",
+            "operand": "0x0a00065e"
+          },
+          {
+            "il_offset": 189,
+            "opcode": "brtrue.s",
+            "operand_kind": "branch",
+            "operand": "169"
+          },
+          {
+            "il_offset": 191,
+            "opcode": "leave.s",
+            "operand_kind": "branch",
+            "operand": "207"
+          },
+          {
+            "il_offset": 193,
+            "opcode": "ldloca.s",
+            "operand_kind": "variable",
+            "operand": "3"
+          },
+          {
+            "il_offset": 195,
+            "opcode": "constrained.",
+            "operand_kind": "type",
+            "operand": "0x1b0001bb"
+          },
+          {
+            "il_offset": 201,
+            "opcode": "callvirt",
+            "operand_kind": "method",
+            "operand": "0x0a00002f"
+          }
+        ],
+        "exception_regions": [
+          {
+            "flags": 2,
+            "try_offset": 56,
+            "try_length": 26,
+            "handler_offset": 82,
+            "handler_length": 14,
+            "class_token": null,
+            "filter_offset": null
+          },
+          {
+            "flags": 2,
+            "try_offset": 108,
+            "try_length": 26,
+            "handler_offset": 134,
+            "handler_length": 14,
+            "class_token": null,
+            "filter_offset": null
+          },
+          {
+            "flags": 2,
+            "try_offset": 167,
+            "try_length": 26,
+            "handler_offset": 193,
+            "handler_length": 14,
+            "class_token": null,
+            "filter_offset": null
+          }
+        ],
+        "issue": null
+      }
+    }
+  ]
+}

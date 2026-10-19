@@ -1,0 +1,308 @@
+{
+  "schema": "mnbl.evidence.world-recovery",
+  "version": 1,
+  "ticket": "MMR-47",
+  "accepted": {
+    "crash": {
+      "pid": "28280",
+      "result": "evidence/runtime/in-game/world_recovery-28280.json",
+      "status": "running"
+    },
+    "resume": {
+      "pid": "47264",
+      "result": "evidence/runtime/in-game/world_recovery-47264.json",
+      "status": "ok",
+      "failures": []
+    },
+    "checks": [
+      {
+        "check": "crash during the source generation",
+        "passed": true
+      },
+      {
+        "check": "startup: root verified, planted staging and leftover removed, crashed job kept, worlds unchanged",
+        "passed": true
+      },
+      {
+        "check": "the crashed job offered (resumable, its seed)",
+        "passed": true
+      },
+      {
+        "check": "continued in its own directory, request resumed",
+        "passed": true
+      },
+      {
+        "check": "the interrupted attempt ran again, the same world",
+        "passed": true
+      },
+      {
+        "check": "another generator's job: discard only, only it removed",
+        "passed": true
+      },
+      {
+        "check": "a cancelled generation shows its reference, diagnostics retained",
+        "passed": true
+      },
+      {
+        "check": "releases: the reviewed world by the next Generate, the cancelled job on close",
+        "passed": true
+      }
+    ],
+    "passed": 8,
+    "total": 8,
+    "resumeSeconds": 36.585352,
+    "attempts": [
+      "0 runs 2 accepted"
+    ],
+    "worldContentId": "f596b58cdcfc18798542fdef5a4d9c9f6d84abddca1425af8d0b87f521191d2d",
+    "cleanup": {
+      "stagingRemoved": [
+        "bundles/.staging-mmr47-28280"
+      ],
+      "jobsRemoved": [
+        "541426b1225843f5931631e1e69a5128"
+      ],
+      "jobsKept": [
+        {
+          "id": "2229220512314725b3303b80ebb4a99b",
+          "phase": "GeneratingSource",
+          "kind": "resumable",
+          "reason": "stopped while GeneratingSource"
+        },
+        {
+          "id": "8be23b3756db4200a9c39df884f9bfe0",
+          "phase": "Committing",
+          "kind": "committing",
+          "reason": "stopped while starting its campaign"
+        }
+      ]
+    },
+    "offered": [
+      {
+        "id": "2229220512314725b3303b80ebb4a99b",
+        "phase": "GeneratingSource",
+        "kind": "resumable",
+        "finished": false,
+        "resumable": true,
+        "reason": "stopped while GeneratingSource",
+        "seed": 42,
+        "seedSource": "explicit",
+        "campaignInstanceId": "0ad023a4-8fb9-49a8-b39c-d18d920062d1",
+        "lastWriteUtc": "2026-10-17T11:51:52.2114985Z"
+      },
+      {
+        "id": "2cdd5a659b844269b2f5a790e2b48fce",
+        "phase": "Compiling",
+        "kind": "other generator",
+        "finished": false,
+        "resumable": false,
+        "reason": "made by another version of the world generator",
+        "seed": 7,
+        "seedSource": "explicit",
+        "campaignInstanceId": "06a0b1be-c43b-4e17-8f93-dd75c22b7126",
+        "lastWriteUtc": "2026-10-17T11:50:52.2114985Z"
+      },
+      {
+        "id": "8be23b3756db4200a9c39df884f9bfe0",
+        "phase": "Committing",
+        "kind": "committing",
+        "finished": false,
+        "resumable": false,
+        "reason": "stopped while starting its campaign",
+        "seed": 42,
+        "seedSource": "explicit",
+        "campaignInstanceId": "7c2bb569-b9b4-4372-81fc-e1e5dc74e121",
+        "lastWriteUtc": "2026-10-17T08:36:49.2185204Z"
+      }
+    ],
+    "cancelled": {
+      "category": "InterruptedGeneration",
+      "correlationId": "MNBL-20261017-115305-76b078",
+      "reference": "Reference MNBL-20261017-115305-76b078 (include it when you report this).",
+      "details": "InterruptedGeneration generation.cancelled | OperationCanceledException: The operation was canceled. | diagnostics <store>\\diagnostics\\MNBL-20261017-115305-76b078",
+      "recordFiles": [
+        "choice.json",
+        "error.json",
+        "events.jsonl",
+        "generate-stderr.log",
+        "generate-stdout.log",
+        "request-stderr.log",
+        "request-stdout.log",
+        "request.json",
+        "stages.log",
+        "state.json",
+        "timings.json"
+      ]
+    }
+  },
+  "hostProblem": {
+    "pid": "41480",
+    "result": "evidence/runtime/in-game/world_setup-41480.json",
+    "status": "ok",
+    "failures": [],
+    "missingWarSails": {
+      "entryDisabled": false,
+      "entryReason": null,
+      "hostProblem": "Something required is missing | War Sails is required: procedural worlds use its seas, ports and ships. | Install or enable what is named above, then restart the game.",
+      "canGenerate": false,
+      "reference": "Reference MNBL-20261017-115434-e86c77 (include it when you report this).",
+      "confirm": "Generate",
+      "generating": false
+    },
+    "check": {
+      "check": "without War Sails the setup opens, refuses to generate and shows the problem with its reference",
+      "passed": true
+    }
+  },
+  "earlier": [
+    {
+      "crash": {
+        "pid": "50292",
+        "result": "evidence/runtime/in-game/world_recovery-50292.json",
+        "status": "running"
+      },
+      "resume": {
+        "pid": "49612",
+        "result": "evidence/runtime/in-game/world_recovery-49612.json",
+        "status": "error",
+        "failures": [
+          "a job made by another generator is offered only for Discard, and Discard removes just its directory (no bundle, package, activation or save changes)"
+        ]
+      },
+      "checks": [
+        {
+          "check": "crash during the source generation",
+          "passed": true
+        },
+        {
+          "check": "startup: root verified, planted staging and leftover removed, crashed job kept, worlds unchanged",
+          "passed": true
+        },
+        {
+          "check": "the crashed job offered (resumable, its seed)",
+          "passed": true
+        },
+        {
+          "check": "continued in its own directory, request resumed",
+          "passed": true
+        },
+        {
+          "check": "the interrupted attempt ran again, the same world",
+          "passed": false
+        },
+        {
+          "check": "another generator's job: discard only, only it removed",
+          "passed": false
+        },
+        {
+          "check": "a cancelled generation shows its reference, diagnostics retained",
+          "passed": true
+        },
+        {
+          "check": "releases: the reviewed world by the next Generate, the cancelled job on close",
+          "passed": false
+        }
+      ],
+      "passed": 5,
+      "total": 8,
+      "resumeSeconds": 36.1032852,
+      "attempts": [
+        "0 runs 2 accepted"
+      ],
+      "worldContentId": "f596b58cdcfc18798542fdef5a4d9c9f6d84abddca1425af8d0b87f521191d2d",
+      "cleanup": {
+        "stagingRemoved": [
+          "bundles/.staging-mmr47-50292"
+        ],
+        "jobsRemoved": [
+          "b0f4bff6a0bc4d12ab16420de58653c0"
+        ],
+        "jobsKept": [
+          {
+            "id": "10cc47db44cd4be2956079ac17936271",
+            "phase": "GeneratingSource",
+            "kind": null,
+            "reason": "stopped while GeneratingSource"
+          },
+          {
+            "id": "2e5c5e4c2561486793f16a63535d19ce",
+            "phase": "ReadyForReview",
+            "kind": null,
+            "reason": "stopped while ReadyForReview"
+          },
+          {
+            "id": "8be23b3756db4200a9c39df884f9bfe0",
+            "phase": "ReadyForReview",
+            "kind": null,
+            "reason": "stopped while ReadyForReview"
+          }
+        ]
+      },
+      "offered": [
+        {
+          "id": "10cc47db44cd4be2956079ac17936271",
+          "phase": "GeneratingSource",
+          "finished": false,
+          "resumable": true,
+          "reason": "stopped while GeneratingSource",
+          "seed": 42,
+          "seedSource": "explicit",
+          "campaignInstanceId": "7c4deaad-23ad-4f6f-8e3d-c9a1cfedf0bd",
+          "lastWriteUtc": "2026-10-17T11:19:07.9304383Z"
+        },
+        {
+          "id": "2e5c5e4c2561486793f16a63535d19ce",
+          "phase": "ReadyForReview",
+          "finished": false,
+          "resumable": true,
+          "reason": "stopped while ReadyForReview",
+          "seed": 42,
+          "seedSource": "explicit",
+          "campaignInstanceId": "6b128717-2c72-46a8-be73-a19d9d00d287",
+          "lastWriteUtc": "2026-10-17T08:45:20.8965319Z"
+        },
+        {
+          "id": "8be23b3756db4200a9c39df884f9bfe0",
+          "phase": "ReadyForReview",
+          "finished": false,
+          "resumable": true,
+          "reason": "stopped while ReadyForReview",
+          "seed": 42,
+          "seedSource": "explicit",
+          "campaignInstanceId": "7c2bb569-b9b4-4372-81fc-e1e5dc74e121",
+          "lastWriteUtc": "2026-10-17T08:36:49.2185204Z"
+        },
+        {
+          "id": "18441ff1ccbe48a39ab96e973a0f98f6",
+          "phase": "Compiling",
+          "finished": false,
+          "resumable": false,
+          "reason": "made by another version of the world generator",
+          "seed": 7,
+          "seedSource": "explicit",
+          "campaignInstanceId": "7613cc2e-4dff-4461-8611-71b1c026fe32",
+          "lastWriteUtc": "2026-09-17T11:19:47.4674604Z"
+        }
+      ],
+      "cancelled": {
+        "category": "InterruptedGeneration",
+        "correlationId": "MNBL-20261017-112027-b2d335",
+        "reference": "Reference MNBL-20261017-112027-b2d335 (include it when you report this).",
+        "details": "InterruptedGeneration generation.cancelled | OperationCanceledException: The operation was canceled. | diagnostics <store>\\diagnostics\\MNBL-20261017-112027-b2d335",
+        "recordFiles": [
+          "choice.json",
+          "error.json",
+          "events.jsonl",
+          "generate-stderr.log",
+          "generate-stdout.log",
+          "request-stderr.log",
+          "request-stdout.log",
+          "request.json",
+          "stages.log",
+          "state.json",
+          "timings.json"
+        ]
+      }
+    }
+  ]
+}

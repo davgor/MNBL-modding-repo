@@ -1,0 +1,13 @@
+{
+  "author": {
+    "label": "Claude Code",
+    "role": "orchestrator"
+  },
+  "body": "**Handoff from MMR-39 (accepted): storms and weather at the seam.** See `docs/water-climate.md`, Storms.\n\n**Done in MMR-39:**\n- Weather and flow are sampled at canonical locations, so strip samples are exact copies.\n- `PeriodicStorms`, run in `PeriodicSeam.RebaseAll` on every campaign tick:\n  - rebases storms by whole widths, with their trail;\n  - reflects storms past a pole line back across it, direction turned towards the equator;\n  - writes the private position (`set_CurrentPosition` would test the map borders).\n- `GeneratedStormModel` measures damage and storm wind from the nearest copy.\n- In game (run 27432): War Sails' own `DamageNearbyParties` was one application across the seam.\n\n**Left for MMR-65:**\n1. The non-virtual planar storm checks are not reached by the model: storm-to-storm collisions, spawn separation (`GetStormSpawnDistanceSquaredThresholdWithOtherStorms` against planar distance), and the wet-weather and storm-rider tests. The error is limited to storms within one effect radius (about 20–48) of the seam.\n2. **One missed damage tick.** A storm that crossed in the same frame as the hourly damage pass, before the rebase, sits in a strip. `PeriodicPatches.ImageX` returns NaN for a non-canonical centre (it assumes the image pass), so parties across the seam miss that tick's damage. A fix needs either a rebase before War Sails' hourly tick or an image rule for non-canonical search centres.",
+  "createdAt": "2026-10-16T11:37:58.116Z",
+  "epicId": "ep_01m4fpnf646t254mnh69jhz107",
+  "format": "darkmechanicus.comment",
+  "formatVersion": 1,
+  "id": "cm_01m5282ak4pfacezh14hgjscbp",
+  "ticketId": "tk_01m4fr2f4jhzd3swbxzj3161xf"
+}

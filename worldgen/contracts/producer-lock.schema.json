@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "mnbl.producer-lock.v1",
+  "title": "Pinned FWGC++ producer lock consumed by worldbridge --produce/--preflight",
+  "type": "object",
+  "required": ["schema", "version", "producer", "toolchain", "runtime", "contentProvenance", "acceptedEvidence"],
+  "properties": {
+    "schema": {"const": "mnbl.producer-lock"},
+    "version": {"const": 1},
+    "producer": {
+      "type": "object",
+      "required": ["implementation", "sourceCommit", "sourceDirty", "binary", "sha256", "generatorSchema", "schemaVersion",
+                   "splitVersion", "capabilitiesSha256", "helpSha256", "commands"],
+      "properties": {
+        "implementation": {"const": "fwgc++"},
+        "sourceCommit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "sourceDirty": {"const": false},
+        "binary": {"type": "string"},
+        "sha256": {"$ref": "#/$defs/sha256"},
+        "generatorSchema": {"const": "fwg.world"},
+        "schemaVersion": {"type": "integer", "minimum": 1},
+        "splitVersion": {"type": "integer", "minimum": 1},
+        "capabilitiesSha256": {"$ref": "#/$defs/sha256"},
+        "helpSha256": {"$ref": "#/$defs/sha256"},
+        "commands": {
+          "type": "object",
+          "required": ["generate", "capabilities", "help"],
+          "properties": {
+            "generate": {"$ref": "#/$defs/argv", "allOf": [{"contains": {"const": "{request}"}}, {"contains": {"const": "{split}"}}]},
+            "capabilities": {"$ref": "#/$defs/argv", "contains": {"const": "{output}"}},
+            "help": {"$ref": "#/$defs/argv"}
+          }
+        }
+      }
+    },
+    "toolchain": {
+      "type": "object",
+      "required": ["compiler", "compilerVersion", "toolset", "configuration", "architecture", "windowsSdk", "cmake"],
+      "properties": {"configuration": {"const": "Release"}, "architecture": {"const": "x64"}}
+    },
+    "runtime": {
+      "type": "object",
+      "required": ["ucrtbaseSha256", "requiredDlls"],
+      "properties": {
+        "ucrtbaseSha256": {"$ref": "#/$defs/sha256"},
+        "requiredDlls": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "pattern": "^[A-Za-z0-9_.-]+\\.dll$"}}
+      }
+    },
+    "contentProvenance": {"type": "object", "required": ["dependencyManifestSha256"], "properties": {"dependencyManifestSha256": {"$ref": "#/$defs/sha256"}}},
+    "acceptedEvidence": {"type": "object"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "argv": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}}
+  }
+}

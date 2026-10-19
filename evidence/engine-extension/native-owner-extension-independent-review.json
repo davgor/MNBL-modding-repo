@@ -1,0 +1,285 @@
+{
+  "schemaVersion": 1,
+  "status": "accepted-bounded-normal-return-owner-contribution-analysis-not-hook-approval",
+  "reviewedSourceSha256": {
+    "tools/battle-scale/bounded_native_register_effects.py": "97f95c176ec1fa806afbfcf86696121f2d752d4905ea593edc2253b3f3938cc6",
+    "tools/battle-scale/extend_live_agent_owner_proofs.py": "42c11d76e4609c7b481e4f933bb22524b0b5fae7431164b19e2eedaf9ddfe9e9",
+    "tools/battle-scale/install_live_growth_flow_contracts.py": "48d380523478fffd481a440c0e1f7e703acd250e71cb057f2a6ba731620a34db",
+    "tests/BattleScale/test_bounded_native_register_effects.py": "bac8783c12093a85140bfdafebedf9ec2f56ccc927e17e07f5d1a6502a13a986",
+    "build/battle-scale/owner-extension-review.py": "efb2f5d0a9d5695a84038f7e517225ce2f0a040a45c63cc32e55248464c7b604",
+    "build/battle-scale/owner-extension-review-results.json": "14a505113db9176d3712197b3fcd4f7d5748d24d77dc53f5f505703d76244e69",
+    "evidence/engine-extension/native-live-agent-owner-extension.json": "7b03fc003fc6cb662476a9fc9241c09fd3dd1a9f41d5b654fd82d3923b28bd1d",
+    "evidence/engine-extension/native-recursive-register-preservation-review.json": "19a7994a4a874937443c83df818ccba37d9255c2dcd99048a69a6b0acffdeea4"
+  },
+  "binarySha256": "2a5e0e0b15513ebb7052d747a621b82c50ee834553eba283b33bbbc33766e12a",
+  "reviewedOutput": {
+    "additionalOwnerProofs": 90,
+    "remainingUnresolved": 29,
+    "nonemptyRegisterSummaries": 267,
+    "dependencyHashesVerified": 26,
+    "missingDecodedFallthroughs": 0,
+    "equipmentArgumentAugmentations": 0
+  },
+  "findings": [
+    {
+      "id": "REG-01",
+      "status": "fixed",
+      "description": "Truncated instruction ranges previously retained register facts despite unclosed fallthrough. Module now verifies complete fallthrough and valid exit.",
+      "impact": "Latent defect: none of original266 current nonempty summaries had missing fallthrough."
+    },
+    {
+      "id": "REG-02",
+      "status": "fixed",
+      "description": "YMM/ZMM alias and state-restore implicit write sets were incomplete for trackedXMM facts. Unsupported families now reject.",
+      "impact": "Exact negative cases demonstrated prior unsound preservation; original266 accepted summaries contained none of these unsupported instructions."
+    },
+    {
+      "id": "OWNER-03",
+      "status": "fixed-by-parent",
+      "description": "Caller-specific additional equipment argument no longer merges into global procedure contract.",
+      "impact": "Only observed augmentation target5e9570 was alreadyblocked byR8Agent at6ab102 versusR8equipment at6aae5d; othercalls6a779d/6c6201 unknown. No accepted85 proof directly carriedadditionalOwnerProofs. Current analysis haszero augmentations."
+    },
+    {
+      "id": "REG-04",
+      "status": "fixed",
+      "description": "Exception metadata gate now rejects catch/SEH/unknown or malformed metadata, verifies chained parents and allows only exact-stock C++ unwind-only no-try/no-spec handler records.",
+      "impact": "Old current266 summaries includedseven C++ UHANDLER entries withzero try blocks. No demonstrated hiddencatch in originalcorpus. New gate prevents future reuse without metadata checks."
+    },
+    {
+      "id": "REG-05",
+      "status": "fixed-in-parent-review",
+      "description": "Analysis reuses name source asinteger. Binary identity now hashespe.__data__; regression proves source=int works with matchingPE and source=matchingbytes cannot authorize a differentPE."
+    },
+    {
+      "id": "REG-06",
+      "status": "fixed",
+      "description": "Far-call mnemonic lcall was not treated as an unknown callee. Far calls, privileged instructions and all instructions outside the current reviewed mnemonic vocabulary now reject. Regression coversfarcall/farjump,CLI,ENCLS,ENCLU and unlistedCPUID."
+    }
+  ],
+  "tests": {
+    "unitCommand": "python tests/BattleScale/test_bounded_native_register_effects.py -v",
+    "unitMethodsPassed": 19,
+    "unitExitCode": 0,
+    "retainedExactNegativeCases": [
+      {
+        "name": "truncated-nop",
+        "bytes": "90",
+        "preservedRegisters": [],
+        "unsoundPreservationObserved": false,
+        "instructions": [
+          {
+            "address": "0x1000",
+            "bytes": "90",
+            "mnemonic": "nop",
+            "operands": ""
+          }
+        ]
+      },
+      {
+        "name": "truncated-call",
+        "bytes": "e80b000000",
+        "preservedRegisters": [],
+        "unsoundPreservationObserved": false,
+        "instructions": [
+          {
+            "address": "0x1000",
+            "bytes": "e80b000000",
+            "mnemonic": "call",
+            "operands": "0x1010"
+          }
+        ]
+      },
+      {
+        "name": "ymm0-zero",
+        "bytes": "c5fc57c0c3",
+        "preservedRegisters": [],
+        "unsoundPreservationObserved": false,
+        "instructions": [
+          {
+            "address": "0x1000",
+            "bytes": "c5fc57c0",
+            "mnemonic": "vxorps",
+            "operands": "ymm0, ymm0, ymm0"
+          },
+          {
+            "address": "0x1004",
+            "bytes": "c3",
+            "mnemonic": "ret",
+            "operands": ""
+          }
+        ]
+      },
+      {
+        "name": "fxrstor",
+        "bytes": "0fae09c3",
+        "preservedRegisters": [],
+        "unsoundPreservationObserved": false,
+        "instructions": [
+          {
+            "address": "0x1000",
+            "bytes": "0fae09",
+            "mnemonic": "fxrstor",
+            "operands": "[rcx]"
+          },
+          {
+            "address": "0x1003",
+            "bytes": "c3",
+            "mnemonic": "ret",
+            "operands": ""
+          }
+        ]
+      },
+      {
+        "name": "xrstor",
+        "bytes": "0fae29c3",
+        "preservedRegisters": [],
+        "unsoundPreservationObserved": false,
+        "instructions": [
+          {
+            "address": "0x1000",
+            "bytes": "0fae29",
+            "mnemonic": "xrstor",
+            "operands": "ptr [rcx]"
+          },
+          {
+            "address": "0x1003",
+            "bytes": "c3",
+            "mnemonic": "ret",
+            "operands": ""
+          }
+        ]
+      },
+      {
+        "name": "vzeroall",
+        "bytes": "c5fc77c3",
+        "preservedRegisters": [],
+        "unsoundPreservationObserved": false,
+        "instructions": [
+          {
+            "address": "0x1000",
+            "bytes": "c5fc77",
+            "mnemonic": "vzeroall",
+            "operands": ""
+          },
+          {
+            "address": "0x1003",
+            "bytes": "c3",
+            "mnemonic": "ret",
+            "operands": ""
+          }
+        ]
+      }
+    ],
+    "cases": [
+      "partialCL write killsRCX",
+      "unknownnestedcall killsallvolatile",
+      "genericrecursion remainsconservative",
+      "indirectcall/tail rejects",
+      "conditionalpathwrite counted",
+      "malformed/nonstandard/noexit rejects",
+      "catch/SEH/unknownhandler/trymap/spec rejection",
+      "chain parent exactness/group/cycle/truncation checks",
+      "PE buffer identity despite source-name reuse"
+    ]
+  },
+  "remainingClosureRoutes": [
+    {
+      "sites": [
+        "5e719e"
+      ],
+      "route": "Missing equipment entry identity",
+      "exactInstructions": "root5e7150;5e718f MOVRDX,[RCX+f18];5e719e IMULRCX;5e71a5 [RCX+RDX+2d68].",
+      "requiredProof": "ProveRCX equipment from an exact caller or registration. Fieldf18 alone is not identity."
+    },
+    {
+      "sites": [
+        "5f6f3a",
+        "5f771c",
+        "5f8bf7",
+        "6536a3",
+        "6d2a14",
+        "6df3a4",
+        "6089a7"
+      ],
+      "route": "Missing Agent receiver/entry provenance",
+      "exactInstructions": "roots5f6e70/5f76d0/5f8500/6535a0/6d2960/6df380/608990. Mission loads5f7711RSI=[RBX+ab8],5f8be8R9=[RBX+ab8],65369cRAX=[RDI+ab8],6d2a0dRDI=[RSI+ab8],6df3ab[R8+ab8],6089aeRAX=[RCX+ab8].",
+      "requiredProof": "Obtain exact direct-caller or registered receiver contracts, then analyze complete bodies.5f6f3a also requires laterMission addition afterRDI multiply. No new offset-only receiver seed."
+    },
+    {
+      "sites": [
+        "70e8e3"
+      ],
+      "route": "Missing RDX Mission ABI contract",
+      "exactInstructions": "root70e860;70e86aRSI=RDX;70e894count[RSI+62da44];70e8ea[RDI+RSI+32b0].",
+      "requiredProof": "Prove registered wrapper or exact caller passesMission inRDX; do not assumeRCX receiver."
+    },
+    {
+      "sites": [
+        "6bfe25",
+        "6bfe82"
+      ],
+      "route": "Missing R10 AI provenance",
+      "exactInstructions": "root6bfd80;6bfe1cR9=[R10+14d8];6bfe2c[RCX+R9+35d0];6bfe8d[RCX+R9+2d70].",
+      "requiredProof": "Establish caller/entry receiver and allR10 definitions leading to both sites."
+    },
+    {
+      "sites": [
+        "65f7c8"
+      ],
+      "route": "Loop loses Missile R14",
+      "exactInstructions": "root65f6c0;65f7cfRAX=[R14+10];65f7d3RSI=RAX+2d50;65f7daADDRSI,RCX.",
+      "requiredProof": "Prove everyR14 loop definition/join and receiver relation. ExistingRCX/R8Missile seed does not imply all-iterationR14."
+    },
+    {
+      "sites": [
+        "686b26",
+        "686d9d",
+        "686f3d",
+        "6872d3",
+        "687b3c"
+      ],
+      "route": "Mission-base stack home and loop identity",
+      "exactInstructions": "root686450;686b19reloadR14=[RBP-68];ADDs686b2dR9,R14 /686db0RCX,R14 /686f48R10,[RBP-68] /6872daR14,[RBP-68] /687b4eRCX,[RBP-68].",
+      "requiredProof": "Recover originalMission+2d50 store and prove home remains nonaliased across every intervening call and loopwrite."
+    },
+    {
+      "sites": [
+        "68b905",
+        "68e3c2",
+        "68e525",
+        "6aa081",
+        "6ba459",
+        "6c5cc7",
+        "713316"
+      ],
+      "route": "Existing receiver loses loop or spill identity",
+      "exactInstructions": "68b90c[RSI+R14+35d0] needsR14Mission;68e3d0ADDRCX,R13 needsR13Mission;6aa088RAX=[R15+14d8] needsR15AI;6ba460RAX=[RBP+ab8] needsRBPAgent;6c5cceRAX=[RBP-8] and71331dRCX=[RBP-68] needMission homes.68e525 lateraddition requires fullCFG.",
+      "requiredProof": "Track exact stores/definitions and complete loop/callee memory effects; retain conservative joins until proof closes."
+    },
+    {
+      "sites": [
+        "6f2921",
+        "6f2b96",
+        "6f2c11",
+        "6f3194"
+      ],
+      "route": "Two switch tables and escaped home",
+      "exactInstructions": "root6f2770;Missionglobal load6f2798 toR14, home[RSP+30]store6f27c9. Tables16DWORDs each6f33f4/6f3434, guardeddispatches6f29d0..6f29ef and6f2edd..6f2ef4;bodyRET6f33f2.6f27f3call711220 receivesRDX=[RSP+24].",
+      "requiredProof": "Root switch module closes bounded CFG. ProveR13 imagebase and guarded indexwidth; separately prove escapedRSP+24 argument cannot mutateRSP+30. Never invent home preservation."
+    },
+    {
+      "sites": [
+        "7114d4"
+      ],
+      "route": "Missing exact leaf boundary and AI receiver",
+      "exactInstructions": "entry7114c0 after12INT3;compare[RCX+14f8],9;index[RCX+17a4];7114d4IMULRDX,RAX,c60;7114dbRAX=[RCX+14d8];7114e2compare[RDX+RAX+32b0],1;returns7114ee/7114f1.",
+      "requiredProof": "Establish exact caller or registration provingRCXAI and boundedeligibilityexception7114c0. Never seedpadding7114b4 asentry."
+    }
+  ],
+  "limitations": [
+    "Original owner seeds remain conditional on listed constructor/call/task evidence, not universal all-caller ABI proof.",
+    "Owner contribution at one computation does not establish every IMUL-result use, whole object lifetime, native index bounds or hook substitution safety.",
+    "Broader4491candidate/3305unresolved inventory is not closed by primaryIMUL owner additions.",
+    "No game, deployment, installed-file access or actual nativeengine execution."
+  ]
+}

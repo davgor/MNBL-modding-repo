@@ -1,0 +1,13 @@
+{
+  "author": {
+    "label": "Claude Code",
+    "role": "orchestrator"
+  },
+  "body": "**Handoff from MMR-39 (accepted): naval evidence to cite.** Sources: `evidence/world/water-climate.json` and `docs/water-climate.md`.\n\n- **Wind-sensitive movement (War Sails' `CalculateWindBoostForParty`):**\n  - periodic fixture (run 27432): downwind boost 0.60 at speed 6.49, upwind 0 at 4.06;\n  - w42 fixture (run 30900): 0.355 at 4.45 downwind, 0 at 3.28 upwind.\n- **Wakes:** War Sails' wrapper, with its `SetupWaterWake`, stays in place. A screenshot shows the ship's wake (`generated_campaign-27432-waterClimateSailingScreenshot.bmp`).\n- **Storms:**\n  - spawn chance scaled by node area and gated to the canonical range between the pole lines;\n  - the seam crossing kept the storm active and listed once;\n  - War Sails' damage pass was one application across the seam (187.24 HP each side);\n  - pole reflection.\n- **Pirates:** they spawn from generated naval records (8 points → 8 zones → 8 parties).\n- **Caveats for MMR-53:**\n  - campaign evidence is on fixtures; production activation is MMR-45;\n  - sailing legs drop samples within 1.5 × effect radius of a storm;\n  - rivers have no water surface (a ship on a river above the datum is drawn over the bed).",
+  "createdAt": "2026-10-16T11:37:58.160Z",
+  "epicId": "ep_01m4fpnf646t254mnh69jhz107",
+  "format": "darkmechanicus.comment",
+  "formatVersion": 1,
+  "id": "cm_01m5282amgvdf77h29d9w67ggd",
+  "ticketId": "tk_01m4fqfbgm6fz7za27erzb4tzv"
+}

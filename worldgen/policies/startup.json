@@ -1,0 +1,195 @@
+{
+ "schema": "mnbl.startup",
+ "version": 1,
+ "notes": "MMR-34 generated campaign startup (docs/campaign-behavior-compatibility.md). Owner: GeneratedCampaignInitializer (src/MNBL.ProceduralWorld/Campaign/GeneratedCampaignInitializer.cs). Every value comes from the installed campaign; no Calradia coordinate or settlement id is carried into a generated world.",
+ "streams": {
+  "rule": "value(stream, version, world prefix, entity, draw) = first 8 bytes of sha256(\"mnbl.startup-stream/1\\n\" + stream + \"\\n\" + version + \"\\n\" + prefix + \"\\n\" + entity + \"\\n\" + draw), big-endian; construction only (the campaign draws its own mutable gameplay randomness from MBRandom)",
+  "hideouts": 1,
+  "starts": 1
+ },
+ "passable": {
+  "rule": "a spawn anchor or a placed position must lie on a travel-graph cell of these classes (cells.bin after repairs) in a land component (4-neighbour, columns wrap) of an MMR-28 land group that holds a town (a component takes the group of the settlements on it; the compiler's groups join components across its required bridges)",
+  "classes": [
+   "land"
+  ]
+ },
+ "hideouts": {
+  "rule": "count = round(perTown x towns), shared out over the land groups with towns in proportion to their towns (largest remainder, at least one per land group that can hold one); a hideout takes a passable cell at least settlementDistance x spacing from every settlement and hideoutSpacing x spacing from every other hideout, candidates in hideouts-stream order; its bandit culture is drawn from cultureWeights of its nearest town's culture (all installed hideouts pooled for a culture without hideouts). Every requiredCultures culture then gets at least one hideout: a missing one takes the hideout whose nearest town weighs it most among the hideouts whose culture has more than one (BanditSpawnCampaignBehavior.CacheHideouts keys hideouts by culture, and at new game GetInfestedHideoutCount reads that map with each bandit clan's culture unchecked: a bandit culture without a hideout throws KeyNotFoundException, run 37036); a world with fewer hideouts than required cultures is refused. requiredCultures are the cultures of the installed land bandit clans that the engine counts as bandit factions (Clan.IsBanditFaction: a bandit culture with can_have_settlement and no naval capability)",
+  "perTown": 1.7368,
+  "requiredCultures": [
+   "desert_bandits",
+   "forest_bandits",
+   "mountain_bandits",
+   "sea_raiders",
+   "steppe_bandits"
+  ],
+  "settlementDistance": 0.1248,
+  "hideoutSpacing": 0.2555,
+  "cultureWeights": {
+   "aserai": {
+    "desert_bandits": 20,
+    "steppe_bandits": 3
+   },
+   "battania": {
+    "forest_bandits": 4,
+    "mountain_bandits": 1,
+    "sea_raiders": 1
+   },
+   "empire": {
+    "forest_bandits": 7,
+    "mountain_bandits": 15,
+    "sea_raiders": 2,
+    "steppe_bandits": 2
+   },
+   "khuzait": {
+    "steppe_bandits": 14
+   },
+   "nord": {
+    "forest_bandits": 6,
+    "mountain_bandits": 1,
+    "sea_raiders": 2
+   },
+   "sturgia": {
+    "forest_bandits": 1,
+    "mountain_bandits": 1,
+    "sea_raiders": 9,
+    "steppe_bandits": 1
+   },
+   "vlandia": {
+    "forest_bandits": 1,
+    "mountain_bandits": 2,
+    "sea_raiders": 6
+   }
+  },
+  "installed": {
+   "hideouts": 99,
+   "towns": 57,
+   "spacing": 66.88,
+   "toSettlement": {
+    "minimum": 0.0583,
+    "p10": 0.1248,
+    "median": 0.2146
+   },
+   "betweenHideouts": {
+    "minimum": 0.2555,
+    "median": 0.6615
+   }
+  }
+ },
+ "banditClans": {
+  "rule": "the installed land bandit clans, re-emitted with their installed ids as world aliases (installed behaviours and models find them by these ids: DefaultAlleyModel, HideoutCampaignBehavior, BanditInteractionsCampaignBehavior, DefaultBanditDensityModel, DesertersCampaignBehavior and others, evidence/fwg/behavior-scan.json); each one's initial home is the first generated hideout of its culture, else the first generated hideout. The pirate clans (northern_pirates, southern_pirates) are MMR-35's",
+  "clans": [
+   "desert_bandits",
+   "deserters",
+   "forest_bandits",
+   "looters",
+   "mountain_bandits",
+   "sea_raiders",
+   "steppe_bandits"
+  ]
+ },
+ "retreat": {
+  "rule": "the installed retirement retreat record (CustomSettlementComponent RetirementSettlementComponent, its location complex and scene), re-emitted with its installed ids as a world alias at the passable cell of the main land group farthest from every settlement (a hidden spot, as the installed one); its culture is the presentation culture of the nearest town",
+  "settlement": "retirement_retreat",
+  "component": "retirement_component"
+ },
+ "starts": {
+  "rule": "every creation culture (creationCultures: the installed main cultures with a start point, the cultures character creation can offer whether or not the world presents through them) gets a start, re-emitted as its start point so none of installedStartPoints survives: one of its towns that is a port town (its own port is the operational port and its shipyard the ship source; the player embarks only at a town port, MMR-17), whose trade-area food supply is at least foodMinimum, which has notables to recruit from, and whose port lies in an open sea basin with another port town (the sea destination, the nearest such port); among qualifying towns, the starts stream picks; a culture without a qualifying town of its own takes the qualifying town nearest its towns, and a culture without towns the qualifying town the starts stream draws for it (fallback, reported); a world without any qualifying town is refused. CultureObject.StartingPoint is the start town's gate (CharacterCreationManager.ApplyFinalEffects places the main party there when it is navigable)",
+  "creationCultures": [
+   "aserai",
+   "battania",
+   "empire",
+   "khuzait",
+   "nord",
+   "sturgia",
+   "vlandia"
+  ],
+  "installedStartPoints": {
+   "aserai": [
+    367.0,
+    251.0
+   ],
+   "battania": [
+    397.0,
+    476.0
+   ],
+   "empire": [
+    776.0,
+    280.0
+   ],
+   "khuzait": [
+    841.0,
+    541.0
+   ],
+   "nord": [
+    725.0,
+    811.0
+   ],
+   "sturgia": [
+    523.0,
+    603.0
+   ],
+   "vlandia": [
+    305.0,
+    414.0
+   ]
+  },
+  "foodMinimum": 25,
+  "foodMinimumSource": "the installed towns' 10th-percentile trade-area food supply (economy.json food.installed.p10)",
+  "notablesMinimum": 1
+ },
+ "spawns": {
+  "rule": "the positions installed behaviours spawn parties at: the player at the start gate; caravans at town gates (CaravansCampaignBehavior); villagers at village centres (VillagerCampaignBehavior); lords at their clan's home settlement gate (HeroSpawnCampaignBehavior); bandits at and around hideouts (BanditSpawnCampaignBehavior); every one must be passable and land-connected to a town",
+  "kinds": [
+   "player",
+   "caravan",
+   "villager",
+   "lord",
+   "bandit"
+  ]
+ },
+ "quality": {
+  "rule": "a world that cannot supply the startup is refused (GeneratedCampaignInitializer.StartupException) with these codes; a refusal is retryable only when every code is (another seed may pass); MMR-44 records them with the generation job and MMR-45 wires the initializer into generation",
+  "codes": {
+   "quality.startup_policy": {
+    "retryable": false,
+    "meaning": "the startup policy is malformed or disagrees with the installed catalog"
+   },
+   "quality.startup_catalog": {
+    "retryable": false,
+    "meaning": "an installed record the startup re-creates (retreat, bandit clan, creation culture) is missing"
+   },
+   "quality.startup_plan": {
+    "retryable": false,
+    "meaning": "a runtime hero intent has no template or generated home (an MMR-32 defect)"
+   },
+   "quality.startup_map": {
+    "retryable": true,
+    "meaning": "the travel cells disagree with the land groups, or no land group holds two towns"
+   },
+   "quality.startup_hideouts": {
+    "retryable": true,
+    "meaning": "no hideout could be placed, or fewer hideouts than required bandit cultures"
+   },
+   "quality.startup_retreat": {
+    "retryable": true,
+    "meaning": "no passable cell for the retirement retreat"
+   },
+   "quality.startup_no_start": {
+    "retryable": true,
+    "meaning": "no town qualifies as a player start"
+   },
+   "quality.startup_unplaceable_spawn": {
+    "retryable": true,
+    "meaning": "a spawn anchor is not passable land connected to a town"
+   }
+  }
+ },
+ "provenance": {
+  "catalogReceipt": "evidence/runtime/in-game/campaign_catalog-10212.json",
+  "settlementsSha256": "9183ca8d67e545ab7c25bdab3618cf4155d234c11c8efccd5e21756962c51d1e",
+  "factionsSha256": "475abbc0bb59bbc3432ad9b570901e9693a7ba19d3d66bab2488cb0c63cf9a1d",
+  "culturesSha256": "dd46f888a88ead9332dff93b86b514f480ce0611f590c4d740d651db6db89df6",
+  "economySha256": "30fecc08f226411c1d04bafe75ba757b91a1af345642450c5ad40df2cfe7efa4"
+ }
+}

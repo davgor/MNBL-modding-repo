@@ -1,0 +1,13 @@
+{
+  "author": {
+    "label": "Claude Code",
+    "role": "orchestrator"
+  },
+  "body": "**Handoff from MMR-62 (what the load reads), plus a forwarded MMR-34 item.**\n\n**Reading the binding.**\n- `BannerlordSaveCatalog.Read(name)` gives the header, plus, for a readable header, `BodyWhole` (`SaveFileCheck`: whole, torn, or unchecked).\n- `WorldBinding.FromHeader` returns null for a vanilla save and throws for a malformed binding.\n- An MMR-19 header (no instance, with an absolute `package` path) reads as legacy. Never use that path.\n- `GeneratedWorldPackage.Resolve(binding)` resolves `<store>/worlds/<id>-<manifest12>` and verifies it, failing closed.\n- A binding with `contentId` other than `none` also names a data bundle (`WorldDataBundle.OpenForSave`). Reinstall the world's scene from it; installed scene folders are swept.\n- Normal-menu routing or refusal is yours.\n\n**Startup order.** `SaveBindingRuntime.RunStartup` runs in `OnBeforeInitialModuleScreenSetAsRoot`, before `/continuegame` is handled. Interrupted initial saves are therefore resolved before any load can pick them. `SaveBindingRuntime.Startup` holds its report.\n\n**Forwarded from MMR-34** (comment on MMR-62; MMR-62 loads nothing):\n- MMR-19's exact snapshot comparison flags 8 path-state values of moving AI parties after a cold load (`nextTarget` and `_pathLastPosition`; a caravan's `nextTarget` (120, 295) became (207.5, 387.5)).\n- These are probably re-derived when paths are rebuilt on load. That needs confirming, and the comparison should exclude or tolerate derived path state.\n- `tools/summarize_startup_audit.py` reports them.",
+  "createdAt": "2026-10-16T20:24:35.607Z",
+  "epicId": "ep_01m4fpnf646t254mnh69jhz107",
+  "format": "darkmechanicus.comment",
+  "formatVersion": 1,
+  "id": "cm_01m5366kgqv27n3dk0jtgv4dtw",
+  "ticketId": "tk_01m4fqfbgkz61vc2vqzb3vhggb"
+}

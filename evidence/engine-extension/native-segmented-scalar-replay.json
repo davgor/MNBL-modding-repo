@@ -1,0 +1,3751 @@
+{
+  "schemaVersion": 1,
+  "status": "passed-isolated-scalar-adapter-replay-not-installable",
+  "nativeSourceSha256": "2a5e0e0b15513ebb7052d747a621b82c50ee834553eba283b33bbbc33766e12a",
+  "sources": {
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\build\\battle-scale\\native-run-20261017-065749-08e99ed9\\backup-0": "2a5e0e0b15513ebb7052d747a621b82c50ee834553eba283b33bbbc33766e12a",
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\evidence\\engine-extension\\native-simple-agent-operation-routes.json": "fb5e74eff6c0086c97bfc75da29db2768fce1047ac15aacdb0557933116f2516",
+    "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\tools\\battle-scale\\prepare_segmented_scalar_harness.py": "ac005278fd77d19c385c5d703c3b99a0abeecb1c344ee5ec1cb1eb8a1f675d00"
+  },
+  "generatedHeaderSha256": "6b8566845f64dcbf2d16b25331b5d0d6e653fcc0e2cf4fad20c7ea3aacc328f8",
+  "sites": [
+    {
+      "siteId": 0,
+      "route": {
+        "multiplyRva": "0x5c4032",
+        "windowStart": "0x1805c4032",
+        "windowEndExclusive": "0x1805c4041",
+        "windowLength": 15,
+        "fileOffset": 6042674,
+        "originalBytes": "4969cc600c0000428b9429ac320000",
+        "instructions": [
+          {
+            "address": "0x1805c4032",
+            "bytes": "4969cc600c0000",
+            "mnemonic": "imul",
+            "operands": "rcx, r12, 0xc60"
+          },
+          {
+            "address": "0x1805c4039",
+            "bytes": "428b9429ac320000",
+            "mnemonic": "mov",
+            "operands": "edx, dword ptr [rcx + r13 + 0x32ac]"
+          }
+        ],
+        "ownerProof": {
+          "procedure": "0x1805c37d0",
+          "definitionRva": "0x5c4032",
+          "useInstruction": {
+            "address": "0x1805c4039",
+            "bytes": "428b9429ac320000",
+            "mnemonic": "mov",
+            "operands": "edx, dword ptr [rcx + r13 + 0x32ac]"
+          },
+          "effectiveKind": "agent",
+          "effectiveBias": 1372,
+          "entryContract": {
+            "kind": "externally-established-Mission-entry",
+            "evidenceIds": [
+              "ev_7f98cb55e222805658367887babec2c45c888d73803b4be5deee49aa165d5ef6",
+              "ev_0903bb131caac6ae01cd6e9d1206055064bfa4ace2b11da20b3d9070aac17a5b",
+              "ev_85627aff0962d117a450369764fe7c952c58810aa7916dac526543304d5772b7"
+            ],
+            "proof": "572ee0 passes current Mission globalDAT180da9d60 to5d4810.5d4810 forwards unchanged param_1 to5c37d0.",
+            "entryPointerKind": "mission"
+          },
+          "definitionInstructions": [
+            {
+              "address": "0x1805c384e",
+              "bytes": "4c8be9",
+              "mnemonic": "mov",
+              "operands": "r13, rcx"
+            },
+            {
+              "address": "0x1805c4032",
+              "bytes": "4969cc600c0000",
+              "mnemonic": "imul",
+              "operands": "rcx, r12, 0xc60"
+            }
+          ]
+        },
+        "consumerContexts": [
+          {
+            "definition": "0x1805c4032",
+            "events": [
+              {
+                "address": "0x1805c4039",
+                "kind": "memory-read-address",
+                "detail": "rcx"
+              }
+            ],
+            "visitedInstructions": 1673,
+            "fixpointSteps": 1673,
+            "allResultUsesProvenAddressOnly": false,
+            "hookApproved": false,
+            "root": "0x1805c37d0",
+            "status": "bounded-may-use-inventory",
+            "eventCounts": {
+              "memory-read-address": 1
+            }
+          }
+        ],
+        "entryInputs": {
+          "missionRegister": "r13",
+          "logicalIndexRegister": "r12",
+          "indexWidthBits": 64,
+          "indexValueContract": "Capture unchanged original full-width index before helper argument marshalling; do not assume an arbitrary entry value has been sign-extended correctly. Existing native valid-index guards remain prerequisites."
+        },
+        "operation": {
+          "kind": "read",
+          "fieldOffset": "0x55c",
+          "widthBytes": 4,
+          "value": null,
+          "register": "edx"
+        },
+        "registerEffects": {
+          "productRegister": "rcx",
+          "productValue": "low64(original index *0xc60), computed by original IMUL",
+          "loadDestination": "edx",
+          "loadZeroExtends32": true,
+          "indexOverwrittenByLoad": false,
+          "missionOverwrittenByLoad": false,
+          "requiredOrdering": "Snapshot Mission/index; execute original IMUL or restore its exact result; perform field operation entirely under helper lease; return scalar only; apply scalar destination after register restoration so overlap does not restore stale index."
+        },
+        "flags": {
+          "scope": "normal execution; arithmetic flags dead before first flag consumer",
+          "overwriteInstruction": {
+            "address": "0x1805c4043",
+            "bytes": "c1e81f",
+            "mnemonic": "shr",
+            "operands": "eax, 0x1f"
+          },
+          "continuationThroughOverwrite": [
+            {
+              "address": "0x1805c4041",
+              "bytes": "8bc2",
+              "mnemonic": "mov",
+              "operands": "eax, edx"
+            },
+            {
+              "address": "0x1805c4043",
+              "bytes": "c1e81f",
+              "mnemonic": "shr",
+              "operands": "eax, 0x1f"
+            }
+          ],
+          "genericFlagsPreserved": false
+        },
+        "lifetimeContract": "Acquire registered Mission storage lease, validate occupied primary domain/index, perform this exact scalar copy/store while held, and release before returning. Return no Agent or pointee address. Shared leases protect lifetime, not same-byte concurrent writer serialization.",
+        "invalidLookupContract": "Unresolved: original instruction assumes a valid native index/object. No silent-zero or ignored-write policy is approved; helper failure must follow an independently defined engine-path contract.",
+        "overwriteContract": "Two complete original instructions form this window. A standard-call stub must preserve every unmodified GPR/SIMD register, original stack geometry and required output; exact unwind metadata and current native prologue alignment still require per-site integration proof.",
+        "hookApproved": false,
+        "entryContext": {
+          "runtimeBody": "0x1805c37d0",
+          "precedingInstructions": [
+            {
+              "address": "0x1805c3ff1",
+              "bytes": "458bc6",
+              "mnemonic": "mov",
+              "operands": "r8d, r14d"
+            },
+            {
+              "address": "0x1805c3ff4",
+              "bytes": "33d2",
+              "mnemonic": "xor",
+              "operands": "edx, edx"
+            },
+            {
+              "address": "0x1805c3ff6",
+              "bytes": "e8e5edc2ff",
+              "mnemonic": "call",
+              "operands": "0x1801f2de0"
+            },
+            {
+              "address": "0x1805c3ffb",
+              "bytes": "f30f104c2440",
+              "mnemonic": "movss",
+              "operands": "xmm1, dword ptr [rsp + 0x40]"
+            },
+            {
+              "address": "0x1805c4001",
+              "bytes": "410f2fcc",
+              "mnemonic": "comiss",
+              "operands": "xmm1, xmm12"
+            },
+            {
+              "address": "0x1805c4005",
+              "bytes": "0f8602150000",
+              "mnemonic": "jbe",
+              "operands": "0x1805c550d"
+            },
+            {
+              "address": "0x1805c400b",
+              "bytes": "440fb6442448",
+              "mnemonic": "movzx",
+              "operands": "r8d, byte ptr [rsp + 0x48]"
+            },
+            {
+              "address": "0x1805c4011",
+              "bytes": "498bcd",
+              "mnemonic": "mov",
+              "operands": "rcx, r13"
+            },
+            {
+              "address": "0x1805c4014",
+              "bytes": "e8079e0000",
+              "mnemonic": "call",
+              "operands": "0x1805cde20"
+            },
+            {
+              "address": "0x1805c4019",
+              "bytes": "4d63a5384a1801",
+              "mnemonic": "movsxd",
+              "operands": "r12, dword ptr [r13 + 0x1184a38]"
+            },
+            {
+              "address": "0x1805c4020",
+              "bytes": "418bc4",
+              "mnemonic": "mov",
+              "operands": "eax, r12d"
+            },
+            {
+              "address": "0x1805c4023",
+              "bytes": "c1e81f",
+              "mnemonic": "shr",
+              "operands": "eax, 0x1f"
+            },
+            {
+              "address": "0x1805c4026",
+              "bytes": "3401",
+              "mnemonic": "xor",
+              "operands": "al, 1"
+            },
+            {
+              "address": "0x1805c4028",
+              "bytes": "7508",
+              "mnemonic": "jne",
+              "operands": "0x1805c4032"
+            },
+            {
+              "address": "0x1805c402a",
+              "bytes": "41bcffffffff",
+              "mnemonic": "mov",
+              "operands": "r12d, 0xffffffff"
+            },
+            {
+              "address": "0x1805c4030",
+              "bytes": "eb1a",
+              "mnemonic": "jmp",
+              "operands": "0x1805c404c"
+            }
+          ],
+          "scope": "Exact nearby index loads/guards are retained as context, not a fresh all-predecessor proof. Mission identity comes from the accepted owner flow; valid native index and registry participation remain integration prerequisites."
+        },
+        "incomingControlFlow": {
+          "executableBytesScanned": 10663424,
+          "rawRelativeCandidates": [
+            {
+              "source": "0x1805c4028",
+              "target": "0x1805c4032",
+              "bytes": "7508",
+              "entersInterior": false,
+              "status": "raw-encoding-candidate-not-necessarily-instruction-boundary",
+              "boundaryContext": {
+                "status": "at-retained-instruction-start",
+                "body": "0x1805c37d0",
+                "instruction": {
+                  "address": "0x1805c4028",
+                  "bytes": "7508",
+                  "mnemonic": "jne",
+                  "operands": "0x1805c4032"
+                }
+              }
+            }
+          ],
+          "interiorLiteralCandidates": [],
+          "interiorRuntimeFunctionBoundaries": [],
+          "indirectEntryClosureProven": false,
+          "boundaryClassificationScope": "A raw match inside a retained decoded instruction is not an ordinary direct branch/literal at that boundary; alternate computed instruction entries remain unproved. Literal matches may be unrelated RIP-relative displacements, never automatically absolute addresses.",
+          "normalFallthrough": "Operation follows IMUL directly; an entry at the operation or any other overwritten byte would bypass capture and is not allowed without rewriting that entry."
+        }
+      },
+      "stub": {
+        "bytes": "4969cc600c00004881ec08010000488984242000000048898c2428000000488994243000000048899c24380000004889ac24400000004889b424480000004889bc24500000004c898424580000004c898c24600000004c899424680000004c899c24700000004c89a424780000004c89ac24800000004c89b424880000004c89bc24900000000f118424a00000000f118c24b00000000f119424c00000000f119c24d00000000f11a424e00000000f11ac24f0000000488b8c2480000000488b94247800000041b80000000048b80080108101000000ffd0488984249800000083bc249c0000000074020f0b408b84249800000048898424300000000f108424a00000000f108c24b00000000f109424c00000000f109c24d00000000f10a424e00000000f10ac24f0000000488b842420000000488b8c2428000000488b942430000000488b9c2438000000488bac2440000000488bb42448000000488bbc24500000004c8b8424580000004c8b8c24600000004c8b9424680000004c8b9c24700000004c8ba424780000004c8bac24800000004c8bb424880000004c8bbc24900000004881c408010000c3",
+        "unwind": "0186120086f412007ee4110076d410006ec40f0046740a003e640900365408002e3407000e012100",
+        "instructionOffsets": [
+          0,
+          7,
+          14,
+          22,
+          30,
+          38,
+          46,
+          54,
+          62,
+          70,
+          78,
+          86,
+          94,
+          102,
+          110,
+          118,
+          126,
+          134,
+          142,
+          150,
+          158,
+          166,
+          174,
+          182,
+          190,
+          198,
+          204,
+          214,
+          216,
+          224,
+          232,
+          234,
+          236,
+          244,
+          252,
+          260,
+          268,
+          276,
+          284,
+          292,
+          300,
+          308,
+          316,
+          324,
+          332,
+          340,
+          348,
+          356,
+          364,
+          372,
+          380,
+          388,
+          396,
+          404,
+          412,
+          420,
+          427
+        ],
+        "allocationEnd": 14,
+        "prologEnd": 134,
+        "epilogStart": 420,
+        "nonvolatileSaves": [
+          {
+            "endOffset": 46,
+            "code": 3,
+            "slot": 56
+          },
+          {
+            "endOffset": 54,
+            "code": 5,
+            "slot": 64
+          },
+          {
+            "endOffset": 62,
+            "code": 6,
+            "slot": 72
+          },
+          {
+            "endOffset": 70,
+            "code": 7,
+            "slot": 80
+          },
+          {
+            "endOffset": 110,
+            "code": 12,
+            "slot": 120
+          },
+          {
+            "endOffset": 118,
+            "code": 13,
+            "slot": 128
+          },
+          {
+            "endOffset": 126,
+            "code": 14,
+            "slot": 136
+          },
+          {
+            "endOffset": 134,
+            "code": 15,
+            "slot": 144
+          }
+        ]
+      },
+      "entry": {
+        "bytes": "4881ec08010000488984242000000048898c2428000000488994243000000048899c24380000004889ac24400000004889b424480000004889bc24500000004c898424580000004c898c24600000004c899424680000004c899c24700000004c89a424780000004c89ac24800000004c89b424880000004c89bc24900000004c8bac24280000004c8ba42430000000e86cfbffff8bc24889842498000000488b842420000000488b8c2428000000488b942430000000488b9c2438000000488bac2440000000488bb42448000000488bbc24500000004c8b8424580000004c8b8c24600000004c8b9424680000004c8b9c24700000004c8ba424780000004c8bac24800000004c8bb424880000004c8bbc2490000000408b8424980000004881c408010000c3",
+        "unwind": "017f12007ff4120077e411006fd4100067c40f003f740a00376409002f5408002734070007012100",
+        "instructionOffsets": [
+          0,
+          7,
+          15,
+          23,
+          31,
+          39,
+          47,
+          55,
+          63,
+          71,
+          79,
+          87,
+          95,
+          103,
+          111,
+          119,
+          127,
+          135,
+          143,
+          148,
+          150,
+          158,
+          166,
+          174,
+          182,
+          190,
+          198,
+          206,
+          214,
+          222,
+          230,
+          238,
+          246,
+          254,
+          262,
+          270,
+          278,
+          286,
+          293
+        ],
+        "allocationEnd": 7,
+        "prologEnd": 127,
+        "epilogStart": 286,
+        "nonvolatileSaves": [
+          {
+            "endOffset": 39,
+            "code": 3,
+            "slot": 56
+          },
+          {
+            "endOffset": 47,
+            "code": 5,
+            "slot": 64
+          },
+          {
+            "endOffset": 55,
+            "code": 6,
+            "slot": 72
+          },
+          {
+            "endOffset": 63,
+            "code": 7,
+            "slot": 80
+          },
+          {
+            "endOffset": 103,
+            "code": 12,
+            "slot": 120
+          },
+          {
+            "endOffset": 111,
+            "code": 13,
+            "slot": 128
+          },
+          {
+            "endOffset": 119,
+            "code": 14,
+            "slot": 136
+          },
+          {
+            "endOffset": 127,
+            "code": 15,
+            "slot": 144
+          }
+        ]
+      },
+      "helperOffset": 206,
+      "trapOffset": 234,
+      "cases": [
+        {
+          "index": 0,
+          "scenario": "ok",
+          "explicitTrap": false,
+          "passed": true
+        },
+        {
+          "index": 2039,
+          "scenario": "ok",
+          "explicitTrap": false,
+          "passed": true
+        },
+        {
+          "index": 2040,
+          "scenario": "ok",
+          "explicitTrap": false,
+          "passed": true
+        },
+        {
+          "index": 4079,
+          "scenario": "ok",
+          "explicitTrap": false,
+          "passed": true
+        },
+        {
+          "index": 4080,
+          "scenario": "ok",
+          "explicitTrap": false,
+          "passed": true
+        },
+        {
+          "index": 6119,
+          "scenario": "ok",
+          "explicitTrap": false,
+          "passed": true
+        },
+        {
+          "index": 6120,
+          "scenario": "ok",
+          "explicitTrap": false,
+          "passed": true
+        },
+        {
+          "index": 65535,
+          "scenario": "ok",
+          "explicitTrap": false,
+          "passed": true
+        },
+        {
+          "index": 66048,
+          "scenario": "ok",
+          "explicitTrap": false,
+          "passed": true
+        },
+        {
+          "index": 70000,
+          "scenario": "ok",
+          "explicitTrap": false,
+          "passed": true
+        },
+        {
+          "index": -1,
+          "scenario": "invalid-index",
+          "explicitTrap": true,
+          "passed": true
+        },
+        {
+          "index": 70001,
+          "scenario": "invalid-index",
+          "explicitTrap": true,
+          "passed": true
+        },
+        {
+          "index": 9223372036854775807,
+          "scenario": "invalid-index",
+          "explicitTrap": true,
+          "passed": true
+        },
+        {
+          "index": 0,
+          "scenario": "foreign-owner",
+          "explicitTrap": true,
+          "passed": true
+        },
+        {
+          "index": 1,
+          "scenario": "unoccupied",
+          "explicitTrap": true,
+          "passed": true
+        },
+        {
+          "index": 0,
+          "scenario": "injected-failure",
+          "explicitTrap": true,
+          "passed": true
+        }
+      ]
+    },
+    {
+      "siteId": 1,
+      "route": {
+        "multiplyRva": "0x5c55c0",
+        "windowStart": "0x1805c55c0",
+        "windowEndExclusive": "0x1805c55cf",
+        "windowLength": 15,
+        "fileOffset": 6048192,
+        "originalBytes": "4969c8600c0000428b9429ac320000",
+        "instructions": [
+          {
+            "address": "0x1805c55c0",
+            "bytes": "4969c8600c0000",
+            "mnemonic": "imul",
+            "operands": "rcx, r8, 0xc60"
+          },
+          {
+            "address": "0x1805c55c7",
+            "bytes": "428b9429ac320000",
+            "mnemonic": "mov",
+            "operands": "edx, dword ptr [rcx + r13 + 0x32ac]"
+          }
+        ],
+        "ownerProof": {
+          "procedure": "0x1805c37d0",
+          "definitionRva": "0x5c55c0",
+          "useInstruction": {
+            "address": "0x1805c55c7",
+            "bytes": "428b9429ac320000",
+            "mnemonic": "mov",
+            "operands": "edx, dword ptr [rcx + r13 + 0x32ac]"
+          },
+          "effectiveKind": "agent",
+          "effectiveBias": 1372,
+          "entryContract": {
+            "kind": "externally-established-Mission-entry",
+            "evidenceIds": [
+              "ev_7f98cb55e222805658367887babec2c45c888d73803b4be5deee49aa165d5ef6",
+              "ev_0903bb131caac6ae01cd6e9d1206055064bfa4ace2b11da20b3d9070aac17a5b",
+              "ev_85627aff0962d117a450369764fe7c952c58810aa7916dac526543304d5772b7"
+            ],
+            "proof": "572ee0 passes current Mission globalDAT180da9d60 to5d4810.5d4810 forwards unchanged param_1 to5c37d0.",
+            "entryPointerKind": "mission"
+          },
+          "definitionInstructions": [
+            {
+              "address": "0x1805c384e",
+              "bytes": "4c8be9",
+              "mnemonic": "mov",
+              "operands": "r13, rcx"
+            },
+            {
+              "address": "0x1805c55c0",
+              "bytes": "4969c8600c0000",
+              "mnemonic": "imul",
+              "operands": "rcx, r8, 0xc60"
+            }
+          ]
+        },
+        "consumerContexts": [
+          {
+            "definition": "0x1805c55c0",
+            "events": [
+              {
+                "address": "0x1805c55c7",
+                "kind": "memory-read-address",
+                "detail": "rcx"
+              }
+            ],
+            "visitedInstructions": 509,
+            "fixpointSteps": 509,
+            "allResultUsesProvenAddressOnly": false,
+            "hookApproved": false,
+            "root": "0x1805c37d0",
+            "status": "bounded-may-use-inventory",
+            "eventCounts": {
+              "memory-read-address": 1
+            }
+          }
+        ],
+        "entryInputs": {
+          "missionRegister": "r13",
+          "logicalIndexRegister": "r8",
+          "indexWidthBits": 64,
+          "indexValueContract": "Capture unchanged original full-width index before helper argument marshalling; do not assume an arbitrary entry value has been sign-extended correctly. Existing native valid-index guards remain prerequisites."
+        },
+        "operation": {
+          "kind": "read",
+          "fieldOffset": "0x55c",
+          "widthBytes": 4,
+          "value": null,
+          "register": "edx"
+        },
+        "registerEffects": {
+          "productRegister": "rcx",
+          "productValue": "low64(original index *0xc60), computed by original IMUL",
+          "loadDestination": "edx",
+          "loadZeroExtends32": true,
+          "indexOverwrittenByLoad": false,
+          "missionOverwrittenByLoad": false,
+          "requiredOrdering": "Snapshot Mission/index; execute original IMUL or restore its exact result; perform field operation entirely under helper lease; return scalar only; apply scalar destination after register restoration so overlap does not restore stale index."
+        },
+        "flags": {
+          "scope": "normal execution; arithmetic flags dead before first flag consumer",
+          "overwriteInstruction": {
+            "address": "0x1805c55d8",
+            "bytes": "c1e81f",
+            "mnemonic": "shr",
+            "operands": "eax, 0x1f"
+          },
+          "continuationThroughOverwrite": [
+            {
+              "address": "0x1805c55cf",
+              "bytes": "498b8d58630401",
+              "mnemonic": "mov",
+              "operands": "rcx, qword ptr [r13 + 0x1046358]"
+            },
+            {
+              "address": "0x1805c55d6",
+              "bytes": "8bc2",
+              "mnemonic": "mov",
+              "operands": "eax, edx"
+            },
+            {
+              "address": "0x1805c55d8",
+              "bytes": "c1e81f",
+              "mnemonic": "shr",
+              "operands": "eax, 0x1f"
+            }
+          ],
+          "genericFlagsPreserved": false
+        },
+        "lifetimeContract": "Acquire registered Mission storage lease, validate occupied primary domain/index, perform this exact scalar copy/store while held, and release before returning. Return no Agent or pointee address. Shared leases protect lifetime, not same-byte concurrent writer serialization.",
+        "invalidLookupContract": "Unresolved: original instruction assumes a valid native index/object. No silent-zero or ignored-write policy is approved; helper failure must follow an independently defined engine-path contract.",
+        "overwriteContract": "Two complete original instructions form this window. A standard-call stub must preserve every unmodified GPR/SIMD register, original stack geometry and required output; exact unwind metadata and current native prologue alignment still require per-site integration proof.",
+        "hookApproved": false,
+        "entryContext": {
+          "runtimeBody": "0x1805c37d0",
+          "precedingInstructions": [
+            {
+              "address": "0x1805c5577",
+              "bytes": "418b8570431801",
+              "mnemonic": "mov",
+              "operands": "eax, dword ptr [r13 + 0x1184370]"
+            },
+            {
+              "address": "0x1805c557e",
+              "bytes": "ffc0",
+              "mnemonic": "inc",
+              "operands": "eax"
+            },
+            {
+              "address": "0x1805c5580",
+              "bytes": "25ff030080",
+              "mnemonic": "and",
+              "operands": "eax, 0x800003ff"
+            },
+            {
+              "address": "0x1805c5585",
+              "bytes": "7d09",
+              "mnemonic": "jge",
+              "operands": "0x1805c5590"
+            },
+            {
+              "address": "0x1805c5587",
+              "bytes": "ffc8",
+              "mnemonic": "dec",
+              "operands": "eax"
+            },
+            {
+              "address": "0x1805c5589",
+              "bytes": "0d00fcffff",
+              "mnemonic": "or",
+              "operands": "eax, 0xfffffc00"
+            },
+            {
+              "address": "0x1805c558e",
+              "bytes": "ffc0",
+              "mnemonic": "inc",
+              "operands": "eax"
+            },
+            {
+              "address": "0x1805c5590",
+              "bytes": "41898570431801",
+              "mnemonic": "mov",
+              "operands": "dword ptr [r13 + 0x1184370], eax"
+            },
+            {
+              "address": "0x1805c5597",
+              "bytes": "41ff8d74431801",
+              "mnemonic": "dec",
+              "operands": "dword ptr [r13 + 0x1184374]"
+            },
+            {
+              "address": "0x1805c559e",
+              "bytes": "4181bd6c230d0100010000",
+              "mnemonic": "cmp",
+              "operands": "dword ptr [r13 + 0x10d236c], 0x100"
+            },
+            {
+              "address": "0x1805c55a9",
+              "bytes": "7fa5",
+              "mnemonic": "jg",
+              "operands": "0x1805c5550"
+            },
+            {
+              "address": "0x1805c55ab",
+              "bytes": "4d6385384a1801",
+              "mnemonic": "movsxd",
+              "operands": "r8, dword ptr [r13 + 0x1184a38]"
+            },
+            {
+              "address": "0x1805c55b2",
+              "bytes": "418bc0",
+              "mnemonic": "mov",
+              "operands": "eax, r8d"
+            },
+            {
+              "address": "0x1805c55b5",
+              "bytes": "c1e81f",
+              "mnemonic": "shr",
+              "operands": "eax, 0x1f"
+            },
+            {
+              "address": "0x1805c55b8",
+              "bytes": "3401",
+              "mnemonic": "xor",
+              "operands": "al, 1"
+            },
+            {
+              "address": "0x1805c55ba",
+              "bytes": "0f844f010000",
+              "mnemonic": "je",
+              "operands": "0x1805c570f"
+            }
+          ],
+          "scope": "Exact nearby index loads/guards are retained as context, not a fresh all-predecessor proof. Mission identity comes from the accepted owner flow; valid native index and registry participation remain integration prerequisites."
+        },
+        "incomingControlFlow": {
+          "executableBytesScanned": 10663424,
+          "rawRelativeCandidates": [],
+          "interiorLiteralCandidates": [
+            {
+              "fileOffset": 5447395,
+              "target": "0x1805c55c1",
+              "encoding": "RVA32",
+              "boundaryContext": {
+                "status": "inside-retained-instruction",
+                "body": "0x180532010",
+                "instruction": {
+                  "address": "0x180532ae0",
+                  "bytes": "488d15c1555c00",
+                  "mnemonic": "lea",
+                  "operands": "rdx, [rip + 0x5c55c1]"
+                },
+                "ripRelativeEffectiveAddress": "0x180af80a8"
+              },
+              "interpretation": "RIP-relative-displacement-match-not-an-absolute-entry-address"
+            }
+          ],
+          "interiorRuntimeFunctionBoundaries": [],
+          "indirectEntryClosureProven": false,
+          "boundaryClassificationScope": "A raw match inside a retained decoded instruction is not an ordinary direct branch/literal at that boundary; alternate computed instruction entries remain unproved. Literal matches may be unrelated RIP-relative displacements, never automatically absolute addresses.",
+          "normalFallthrough": "Operation follows IMUL directly; an entry at the operation or any other overwritten byte would bypass capture and is not allowed without rewriting that entry."
+        }
+      },
+      "stub": {
+        "bytes": "4969c8600c00004881ec08010000488984242000000048898c2428000000488994243000000048899c24380000004889ac24400000004889b424480000004889bc24500000004c898424580000004c898c24600000004c899424680000004c899c24700000004c89a424780000004c89ac24800000004c89b424880000004c89bc24900000000f118424a00000000f118c24b00000000f119424c00000000f119c24d00000000f11a424e00000000f11ac24f0000000488b8c2480000000488b94245800000041b80100000048b80080108101000000ffd0488984249800000083bc249c0000000074020f0b408b84249800000048898424300000000f108424a00000000f108c24b00000000f109424c00000000f109c24d00000000f10a424e00000000f10ac24f0000000488b842420000000488b8c2428000000488b942430000000488b9c2438000000488bac2440000000488bb42448000000488bbc24500000004c8b8424580000004c8b8c24600000004c8b9424680000004c8b9c24700000004c8ba424780000004c8bac24800000004c8bb424880000004c8bbc24900000004881c408010000c3",
+        "unwind": "0186120086f412007ee4110076d410006ec40f0046740a003e640900365408002e3407000e012100",
+        "instructionOffsets": [
+          0,
+          7,
+          14,
+          22,
+          30,
+          38,
+          46,
+          54,
+          62,
+          70,
+          78,
+          86,
+          94,
+          102,
+          110,
+          118,
+          126,
+          134,
+          142,
+          150,
+          158,
+          166,
+          174,
+          182,
+          190,
+          198,
+          204,
+          214,
+          216,
+          224,
+          232,
+          234,
+          236,
+          244,
+          252,
+          260,
+          268,
+          276,
+          284,
+          292,
+          300,
+          308,
+          316,
+          324,
+          332,
+          340,
+          348,
+          356,
+          364,
+          372,
+          380,
+          388,
+          396,
+          404,
+          412,
+          420,
+          427
+        ],
+        "allocationEnd": 14,
+        "prologEnd": 134,
+        "epilogStart": 420,
+        "nonvolatileSaves": [
+          {
+            "endOffset": 46,
+            "code": 3,
+            "slot": 56
+          },
+          {
+            "endOffset": 54,
+            "code": 5,
+            "slot": 64
+          },
+          {
+            "endOffset": 62,
+            "code": 6,
+            "slot": 72
+          },
+          {
+            "endOffset": 70,
+            "code": 7,
+            "slot": 80
+          },
+          {
+            "endOffset": 110,
+            "code": 12,
+            "slot": 120
+          },
+          {
+            "endOffset": 118,
+            "code": 13,
+            "slot": 128
+          },
+          {
+            "endOffset": 126,
+            "code": 14,
+            "slot": 136
+          },
+          {
+            "endOffset": 134,
+            "code": 15,
+            "slot": 144
+          }
+        ]
+      },
+      "entry": {
+        "bytes": "4881ec08010000488984242000000048898c2428000000488994243000000048899c24380000004889ac24400000004889b424480000004889bc24500000004c898424580000004c898c24600000004c899424680000004c899c24700000004c89a424780000004c89ac24800000004c89b424880000004c89bc24900000004c8bac24280000004c8b842430000000e86cfbffff8bc24889842498000000488b842420000000488b8c2428000000488b942430000000488b9c2438000000488bac2440000000488bb42448000000488bbc24500000004c8b8424580000004c8b8c24600000004c8b9424680000004c8b9c24700000004c8ba424780000004c8bac24800000004c8bb424880000004c8bbc2490000000408b8424980000004881c408010000c3",
+        "unwind": "017f12007ff4120077e411006fd4100067c40f003f740a00376409002f5408002734070007012100",
+        "instructionOffsets": [
+          0,
+          7,
+          15,
+          23,
+          31,
+          39,
+          47,
+          55,
+          63,
+          71,
+          79,
+          87,
+          95,
+          103,
+          111,
+          119,
+          127,
+          135,
+          143,
+          148,
+          150,
+          158,
+          166,
+          174,
+          182,
+          190,
+          198,
+          206,
+          214,
+          222,
+          230,
+          238,
+          246,
+          254,
+          262,
+          270,
+          278,
+          286,
+          293
+        ],
+        "allocationEnd": 7,
+        "prologEnd": 127,
+        "epilogStart": 286,
+        "nonvolatileSaves": [
+          {
+            "endOffset": 39,
+            "code": 3,
+            "slot": 56
+          },
+          {
+            "endOffset": 47,
+            "code": 5,
+            "slot": 64
+          },
+          {
+            "endOffset": 55,
+            "code": 6,
+            "slot": 72
+          },
+          {
+            "endOffset": 63,
+            "code": 7,
+            "slot": 80
+          },
+          {
+            "endOffset": 103,
+            "code": 12,
+            "slot": 120
+          },
+          {
+            "endOffset": 111,
+            "code": 13,
+            "slot": 128
+          },
+          {
+            "endOffset": 119,
+            "code": 14,
+            "slot": 136
+          },
+          {
+            "endOffset": 127,
+            "code": 15,
+            "slot": 144
+          }
+        ]
+      },
+      "helperOffset": 206,
+      "trapOffset": 234,
+      "cases": [
+        {
+          "index": 0,
+          "scenario": "ok",
+          "explicitTrap": false,
+          "passed": true
+        },
+        {
+          "index": 2039,
+          "scenario": "ok",
+          "explicitTrap": false,
+          "passed": true
+        },
+        {
+          "index": 2040,
+          "scenario": "ok",
+          "explicitTrap": false,
+          "passed": true
+        },
+        {
+          "index": 4079,
+          "scenario": "ok",
+          "explicitTrap": false,
+          "passed": true
+        },
+        {
+          "index": 4080,
+          "scenario": "ok",
+          "explicitTrap": false,
+          "passed": true
+        },
+        {
+          "index": 6119,
+          "scenario": "ok",
+          "explicitTrap": false,
+          "passed": true
+        },
+        {
+          "index": 6120,
+          "scenario": "ok",
+          "explicitTrap": false,
+          "passed": true
+        },
+        {
+          "index": 65535,
+          "scenario": "ok",
+          "explicitTrap": false,
+          "passed": true
+        },
+        {
+          "index": 66048,
+          "scenario": "ok",
+          "explicitTrap": false,
+          "passed": true
+        },
+        {
+          "index": 70000,
+          "scenario": "ok",
+          "explicitTrap": false,
+          "passed": true
+        },
+        {
+          "index": -1,
+          "scenario": "invalid-index",
+          "explicitTrap": true,
+          "passed": true
+        },
+        {
+          "index": 70001,
+          "scenario": "invalid-index",
+          "explicitTrap": true,
+          "passed": true
+        },
+        {
+          "index": 9223372036854775807,
+          "scenario": "invalid-index",
+          "explicitTrap": true,
+          "passed": true
+        },
+        {
+          "index": 0,
+          "scenario": "foreign-owner",
+          "explicitTrap": true,
+          "passed": true
+        },
+        {
+          "index": 1,
+          "scenario": "unoccupied",
+          "explicitTrap": true,
+          "passed": true
+        },
+        {
+          "index": 0,
+          "scenario": "injected-failure",
+          "explicitTrap": true,
+          "passed": true
+        }
+      ]
+    },
+    {
+      "siteId": 2,
+      "route": {
+        "multiplyRva": "0x5d3dac",
+        "windowStart": "0x1805d3dac",
+        "windowEndExclusive": "0x1805d3dbb",
+        "windowLength": 15,
+        "fileOffset": 6107564,
+        "originalBytes": "4969c1600c0000428b8c1090330000",
+        "instructions": [
+          {
+            "address": "0x1805d3dac",
+            "bytes": "4969c1600c0000",
+            "mnemonic": "imul",
+            "operands": "rax, r9, 0xc60"
+          },
+          {
+            "address": "0x1805d3db3",
+            "bytes": "428b8c1090330000",
+            "mnemonic": "mov",
+            "operands": "ecx, dword ptr [rax + r10 + 0x3390]"
+          }
+        ],
+        "ownerProof": {
+          "procedure": "0x1805d3c50",
+          "definitionRva": "0x5d3dac",
+          "useInstruction": {
+            "address": "0x1805d3db3",
+            "bytes": "428b8c1090330000",
+            "mnemonic": "mov",
+            "operands": "ecx, dword ptr [rax + r10 + 0x3390]"
+          },
+          "effectiveKind": "agent",
+          "effectiveBias": 1600,
+          "entryContract": {
+            "kind": "direct-established-owner-argument",
+            "entryPointerKind": "mission",
+            "sourceProcedure": "0x1805d40a0",
+            "firstArgument": "param_1",
+            "evidenceIds": [
+              "ev_a6c9a6fd60e5f90d5bb569c190f7c4943eb55376c0367835a2f80df6adc869dc",
+              "ev_14f983a8fad3ac142186a868eae65b72c6a72a90027af17ec43ecc035ca1019e",
+              "ev_9e9945bb81c2694f4088be078e0583675691e0d2cfd346c408cc24fb86f5c2b8",
+              "ev_813e68b9873e3c56ad20ed7b4173b3c9e9bc97431c6a16ad10dec670fa46c4b5"
+            ]
+          },
+          "definitionInstructions": [
+            {
+              "address": "0x1805d3c5b",
+              "bytes": "4c8bd1",
+              "mnemonic": "mov",
+              "operands": "r10, rcx"
+            },
+            {
+              "address": "0x1805d3dac",
+              "bytes": "4969c1600c0000",
+              "mnemonic": "imul",
+              "operands": "rax, r9, 0xc60"
+            }
+          ]
+        },
+        "consumerContexts": [
+          {
+            "definition": "0x1805d3dac",
+            "events": [
+              {
+                "address": "0x1805d3db3",
+                "kind": "memory-read-address",
+                "detail": "rax"
+              }
+            ],
+            "visitedInstructions": 36,
+            "fixpointSteps": 36,
+            "allResultUsesProvenAddressOnly": false,
+            "hookApproved": false,
+            "root": "0x1805d3c50",
+            "status": "bounded-may-use-inventory",
+            "eventCounts": {
+              "memory-read-address": 1
+            }
+          }
+        ],
+        "entryInputs": {
+          "missionRegister": "r10",
+          "logicalIndexRegister": "r9",
+          "indexWidthBits": 64,
+          "indexValueContract": "Capture unchanged original full-width index before helper argument marshalling; do not assume an arbitrary entry value has been sign-extended correctly. Existing native valid-index guards remain prerequisites."
+        },
+        "operation": {
+          "kind": "read",
+          "fieldOffset": "0x640",
+          "widthBytes": 4,
+          "value": null,
+          "register": "ecx"
+        },
+        "registerEffects": {
+          "productRegister": "rax",
+          "productValue": "low64(original index *0xc60), computed by original IMUL",
+          "loadDestination": "ecx",
+          "loadZeroExtends32": true,
+          "indexOverwrittenByLoad": false,
+          "missionOverwrittenByLoad": false,
+          "requiredOrdering": "Snapshot Mission/index; execute original IMUL or restore its exact result; perform field operation entirely under helper lease; return scalar only; apply scalar destination after register restoration so overlap does not restore stale index."
+        },
+        "flags": {
+          "scope": "normal execution; arithmetic flags dead before first flag consumer",
+          "overwriteInstruction": {
+            "address": "0x1805d3dd3",
+            "bytes": "85c0",
+            "mnemonic": "test",
+            "operands": "eax, eax"
+          },
+          "continuationThroughOverwrite": [
+            {
+              "address": "0x1805d3dbb",
+              "bytes": "890f",
+              "mnemonic": "mov",
+              "operands": "dword ptr [rdi], ecx"
+            },
+            {
+              "address": "0x1805d3dbd",
+              "bytes": "418b82384a1801",
+              "mnemonic": "mov",
+              "operands": "eax, dword ptr [r10 + 0x1184a38]"
+            },
+            {
+              "address": "0x1805d3dc4",
+              "bytes": "4c8b742448",
+              "mnemonic": "mov",
+              "operands": "r14, qword ptr [rsp + 0x48]"
+            },
+            {
+              "address": "0x1805d3dc9",
+              "bytes": "488b7c2440",
+              "mnemonic": "mov",
+              "operands": "rdi, qword ptr [rsp + 0x40]"
+            },
+            {
+              "address": "0x1805d3dce",
+              "bytes": "488b742438",
+              "mnemonic": "mov",
+              "operands": "rsi, qword ptr [rsp + 0x38]"
+            },
+            {
+              "address": "0x1805d3dd3",
+              "bytes": "85c0",
+              "mnemonic": "test",
+              "operands": "eax, eax"
+            }
+          ],
+          "genericFlagsPreserved": false
+        },
+        "lifetimeContract": "Acquire registered Mission storage lease, validate occupied primary domain/index, perform this exact scalar copy/store while held, and release before returning. Return no Agent or pointee address. Shared leases protect lifetime, not same-byte concurrent writer serialization.",
+        "invalidLookupContract": "Unresolved: original instruction assumes a valid native index/object. No silent-zero or ignored-write policy is approved; helper failure must follow an independently defined engine-path contract.",
+        "overwriteContract": "Two complete original instructions form this window. A standard-call stub must preserve every unmodified GPR/SIMD register, original stack geometry and required output; exact unwind metadata and current native prologue alignment still require per-site integration proof.",
+        "hookApproved": false,
+        "entryContext": {
+          "runtimeBody": "0x1805d3d80",
+          "precedingInstructions": [
+            {
+              "address": "0x1805d3d80",
+              "bytes": "f3430f10841390330000",
+              "mnemonic": "movss",
+              "operands": "xmm0, dword ptr [r11 + r10 + 0x3390]"
+            },
+            {
+              "address": "0x1805d3d8a",
+              "bytes": "f30f1107",
+              "mnemonic": "movss",
+              "operands": "dword ptr [rdi], xmm0"
+            },
+            {
+              "address": "0x1805d3d8e",
+              "bytes": "eb2d",
+              "mnemonic": "jmp",
+              "operands": "0x1805d3dbd"
+            },
+            {
+              "address": "0x1805d3d90",
+              "bytes": "4869c6600c0000",
+              "mnemonic": "imul",
+              "operands": "rax, rsi, 0xc60"
+            },
+            {
+              "address": "0x1805d3d97",
+              "bytes": "f3420f10841090330000",
+              "mnemonic": "movss",
+              "operands": "xmm0, dword ptr [rax + r10 + 0x3390]"
+            },
+            {
+              "address": "0x1805d3da1",
+              "bytes": "f30f1107",
+              "mnemonic": "movss",
+              "operands": "dword ptr [rdi], xmm0"
+            },
+            {
+              "address": "0x1805d3da5",
+              "bytes": "eb16",
+              "mnemonic": "jmp",
+              "operands": "0x1805d3dbd"
+            },
+            {
+              "address": "0x1805d3da7",
+              "bytes": "4584db",
+              "mnemonic": "test",
+              "operands": "r11b, r11b"
+            },
+            {
+              "address": "0x1805d3daa",
+              "bytes": "7411",
+              "mnemonic": "je",
+              "operands": "0x1805d3dbd"
+            }
+          ],
+          "scope": "Exact nearby index loads/guards are retained as context, not a fresh all-predecessor proof. Mission identity comes from the accepted owner flow; valid native index and registry participation remain integration prerequisites."
+        },
+        "incomingControlFlow": {
+          "executableBytesScanned": 10663424,
+          "rawRelativeCandidates": [],
+          "interiorLiteralCandidates": [],
+          "interiorRuntimeFunctionBoundaries": [],
+          "indirectEntryClosureProven": false,
+          "boundaryClassificationScope": "A raw match inside a retained decoded instruction is not an ordinary direct branch/literal at that boundary; alternate computed instruction entries remain unproved. Literal matches may be unrelated RIP-relative displacements, never automatically absolute addresses.",
+          "normalFallthrough": "Operation follows IMUL directly; an entry at the operation or any other overwritten byte would bypass capture and is not allowed without rewriting that entry."
+        }
+      },
+      "stub": {
+        "bytes": "4969c1600c00004881ec08010000488984242000000048898c2428000000488994243000000048899c24380000004889ac24400000004889b424480000004889bc24500000004c898424580000004c898c24600000004c899424680000004c899c24700000004c89a424780000004c89ac24800000004c89b424880000004c89bc24900000000f118424a00000000f118c24b00000000f119424c00000000f119c24d00000000f11a424e00000000f11ac24f0000000488b8c2468000000488b94246000000041b80200000048b80080108101000000ffd0488984249800000083bc249c0000000074020f0b408b84249800000048898424280000000f108424a00000000f108c24b00000000f109424c00000000f109c24d00000000f10a424e00000000f10ac24f0000000488b842420000000488b8c2428000000488b942430000000488b9c2438000000488bac2440000000488bb42448000000488bbc24500000004c8b8424580000004c8b8c24600000004c8b9424680000004c8b9c24700000004c8ba424780000004c8bac24800000004c8bb424880000004c8bbc24900000004881c408010000c3",
+        "unwind": "0186120086f412007ee4110076d410006ec40f0046740a003e640900365408002e3407000e012100",
+        "instructionOffsets": [
+          0,
+          7,
+          14,
+          22,
+          30,
+          38,
+          46,
+          54,
+          62,
+          70,
+          78,
+          86,
+          94,
+          102,
+          110,
+          118,
+          126,
+          134,
+          142,
+          150,
+          158,
+          166,
+          174,
+          182,
+          190,
+          198,
+          204,
+          214,
+          216,
+          224,
+          232,
+          234,
+          236,
+          244,
+          252,
+          260,
+          268,
+          276,
+          284,
+          292,
+          300,
+          308,
+          316,
+          324,
+          332,
+          340,
+          348,
+          356,
+          364,
+          372,
+          380,
+          388,
+          396,
+          404,
+          412,
+          420,
+          427
+        ],
+        "allocationEnd": 14,
+        "prologEnd": 134,
+        "epilogStart": 420,
+        "nonvolatileSaves": [
+          {
+            "endOffset": 46,
+            "code": 3,
+            "slot": 56
+          },
+          {
+            "endOffset": 54,
+            "code": 5,
+            "slot": 64
+          },
+          {
+            "endOffset": 62,
+            "code": 6,
+            "slot": 72
+          },
+          {
+            "endOffset": 70,
+            "code": 7,
+            "slot": 80
+          },
+          {
+            "endOffset": 110,
+            "code": 12,
+            "slot": 120
+          },
+          {
+            "endOffset": 118,
+            "code": 13,
+            "slot": 128
+          },
+          {
+            "endOffset": 126,
+            "code": 14,
+            "slot": 136
+          },
+          {
+            "endOffset": 134,
+            "code": 15,
+            "slot": 144
+          }
+        ]
+      },
+      "entry": {
+        "bytes": "4881ec08010000488984242000000048898c2428000000488994243000000048899c24380000004889ac24400000004889b424480000004889bc24500000004c898424580000004c898c24600000004c899424680000004c899c24700000004c89a424780000004c89ac24800000004c89b424880000004c89bc24900000004c8b9424280000004c8b8c2430000000e86cfbffff8bc14889842498000000488b842420000000488b8c2428000000488b942430000000488b9c2438000000488bac2440000000488bb42448000000488bbc24500000004c8b8424580000004c8b8c24600000004c8b9424680000004c8b9c24700000004c8ba424780000004c8bac24800000004c8bb424880000004c8bbc2490000000408b8424980000004881c408010000c3",
+        "unwind": "017f12007ff4120077e411006fd4100067c40f003f740a00376409002f5408002734070007012100",
+        "instructionOffsets": [
+          0,
+          7,
+          15,
+          23,
+          31,
+          39,
+          47,
+          55,
+          63,
+          71,
+          79,
+          87,
+          95,
+          103,
+          111,
+          119,
+          127,
+          135,
+          143,
+          148,
+          150,
+          158,
+          166,
+          174,
+          182,
+          190,
+          198,
+          206,
+          214,
+          222,
+          230,
+          238,
+          246,
+          254,
+          262,
+          270,
+          278,
+          286,
+          293
+        ],
+        "allocationEnd": 7,
+        "prologEnd": 127,
+        "epilogStart": 286,
+        "nonvolatileSaves": [
+          {
+            "endOffset": 39,
+            "code": 3,
+            "slot": 56
+          },
+          {
+            "endOffset": 47,
+            "code": 5,
+            "slot": 64
+          },
+          {
+            "endOffset": 55,
+            "code": 6,
+            "slot": 72
+          },
+          {
+            "endOffset": 63,
+            "code": 7,
+            "slot": 80
+          },
+          {
+            "endOffset": 103,
+            "code": 12,
+            "slot": 120
+          },
+          {
+            "endOffset": 111,
+            "code": 13,
+            "slot": 128
+          },
+          {
+            "endOffset": 119,
+            "code": 14,
+            "slot": 136
+          },
+          {
+            "endOffset": 127,
+            "code": 15,
+            "slot": 144
+          }
+        ]
+      },
+      "helperOffset": 206,
+      "trapOffset": 234,
+      "cases": [
+        {
+          "index": 0,
+          "scenario": "ok",
+          "explicitTrap": false,
+          "passed": true
+        },
+        {
+          "index": 2039,
+          "scenario": "ok",
+          "explicitTrap": false,
+          "passed": true
+        },
+        {
+          "index": 2040,
+          "scenario": "ok",
+          "explicitTrap": false,
+          "passed": true
+        },
+        {
+          "index": 4079,
+          "scenario": "ok",
+          "explicitTrap": false,
+          "passed": true
+        },
+        {
+          "index": 4080,
+          "scenario": "ok",
+          "explicitTrap": false,
+          "passed": true
+        },
+        {
+          "index": 6119,
+          "scenario": "ok",
+          "explicitTrap": false,
+          "passed": true
+        },
+        {
+          "index": 6120,
+          "scenario": "ok",
+          "explicitTrap": false,
+          "passed": true
+        },
+        {
+          "index": 65535,
+          "scenario": "ok",
+          "explicitTrap": false,
+          "passed": true
+        },
+        {
+          "index": 66048,
+          "scenario": "ok",
+          "explicitTrap": false,
+          "passed": true
+        },
+        {
+          "index": 70000,
+          "scenario": "ok",
+          "explicitTrap": false,
+          "passed": true
+        },
+        {
+          "index": -1,
+          "scenario": "invalid-index",
+          "explicitTrap": true,
+          "passed": true
+        },
+        {
+          "index": 70001,
+          "scenario": "invalid-index",
+          "explicitTrap": true,
+          "passed": true
+        },
+        {
+          "index": 9223372036854775807,
+          "scenario": "invalid-index",
+          "explicitTrap": true,
+          "passed": true
+        },
+        {
+          "index": 0,
+          "scenario": "foreign-owner",
+          "explicitTrap": true,
+          "passed": true
+        },
+        {
+          "index": 1,
+          "scenario": "unoccupied",
+          "explicitTrap": true,
+          "passed": true
+        },
+        {
+          "index": 0,
+          "scenario": "injected-failure",
+          "explicitTrap": true,
+          "passed": true
+        }
+      ]
+    },
+    {
+      "siteId": 3,
+      "route": {
+        "multiplyRva": "0x5d3dea",
+        "windowStart": "0x1805d3dea",
+        "windowEndExclusive": "0x1805d3df9",
+        "windowLength": 15,
+        "fileOffset": 6107626,
+        "originalBytes": "4869c8600c0000428b8411ac320000",
+        "instructions": [
+          {
+            "address": "0x1805d3dea",
+            "bytes": "4869c8600c0000",
+            "mnemonic": "imul",
+            "operands": "rcx, rax, 0xc60"
+          },
+          {
+            "address": "0x1805d3df1",
+            "bytes": "428b8411ac320000",
+            "mnemonic": "mov",
+            "operands": "eax, dword ptr [rcx + r10 + 0x32ac]"
+          }
+        ],
+        "ownerProof": {
+          "procedure": "0x1805d3c50",
+          "definitionRva": "0x5d3dea",
+          "useInstruction": {
+            "address": "0x1805d3df1",
+            "bytes": "428b8411ac320000",
+            "mnemonic": "mov",
+            "operands": "eax, dword ptr [rcx + r10 + 0x32ac]"
+          },
+          "effectiveKind": "agent",
+          "effectiveBias": 1372,
+          "entryContract": {
+            "kind": "direct-established-owner-argument",
+            "entryPointerKind": "mission",
+            "sourceProcedure": "0x1805d40a0",
+            "firstArgument": "param_1",
+            "evidenceIds": [
+              "ev_a6c9a6fd60e5f90d5bb569c190f7c4943eb55376c0367835a2f80df6adc869dc",
+              "ev_14f983a8fad3ac142186a868eae65b72c6a72a90027af17ec43ecc035ca1019e",
+              "ev_9e9945bb81c2694f4088be078e0583675691e0d2cfd346c408cc24fb86f5c2b8",
+              "ev_813e68b9873e3c56ad20ed7b4173b3c9e9bc97431c6a16ad10dec670fa46c4b5"
+            ]
+          },
+          "definitionInstructions": [
+            {
+              "address": "0x1805d3c5b",
+              "bytes": "4c8bd1",
+              "mnemonic": "mov",
+              "operands": "r10, rcx"
+            },
+            {
+              "address": "0x1805d3dea",
+              "bytes": "4869c8600c0000",
+              "mnemonic": "imul",
+              "operands": "rcx, rax, 0xc60"
+            }
+          ]
+        },
+        "consumerContexts": [
+          {
+            "definition": "0x1805d3dea",
+            "events": [
+              {
+                "address": "0x1805d3df1",
+                "kind": "memory-read-address",
+                "detail": "rcx"
+              }
+            ],
+            "visitedInstructions": 17,
+            "fixpointSteps": 17,
+            "allResultUsesProvenAddressOnly": false,
+            "hookApproved": false,
+            "root": "0x1805d3c50",
+            "status": "bounded-may-use-inventory",
+            "eventCounts": {
+              "memory-read-address": 1
+            }
+          }
+        ],
+        "entryInputs": {
+          "missionRegister": "r10",
+          "logicalIndexRegister": "rax",
+          "indexWidthBits": 64,
+          "indexValueContract": "Capture unchanged original full-width index before helper argument marshalling; do not assume an arbitrary entry value has been sign-extended correctly. Existing native valid-index guards remain prerequisites."
+        },
+        "operation": {
+          "kind": "read",
+          "fieldOffset": "0x55c",
+          "widthBytes": 4,
+          "value": null,
+          "register": "eax"
+        },
+        "registerEffects": {
+          "productRegister": "rcx",
+          "productValue": "low64(original index *0xc60), computed by original IMUL",
+          "loadDestination": "eax",
+          "loadZeroExtends32": true,
+          "indexOverwrittenByLoad": true,
+          "missionOverwrittenByLoad": false,
+          "requiredOrdering": "Snapshot Mission/index; execute original IMUL or restore its exact result; perform field operation entirely under helper lease; return scalar only; apply scalar destination after register restoration so overlap does not restore stale index."
+        },
+        "flags": {
+          "scope": "normal execution; arithmetic flags dead before first flag consumer",
+          "overwriteInstruction": {
+            "address": "0x1805d3df9",
+            "bytes": "85c0",
+            "mnemonic": "test",
+            "operands": "eax, eax"
+          },
+          "continuationThroughOverwrite": [
+            {
+              "address": "0x1805d3df9",
+              "bytes": "85c0",
+              "mnemonic": "test",
+              "operands": "eax, eax"
+            }
+          ],
+          "genericFlagsPreserved": false
+        },
+        "lifetimeContract": "Acquire registered Mission storage lease, validate occupied primary domain/index, perform this exact scalar copy/store while held, and release before returning. Return no Agent or pointee address. Shared leases protect lifetime, not same-byte concurrent writer serialization.",
+        "invalidLookupContract": "Unresolved: original instruction assumes a valid native index/object. No silent-zero or ignored-write policy is approved; helper failure must follow an independently defined engine-path contract.",
+        "overwriteContract": "Two complete original instructions form this window. A standard-call stub must preserve every unmodified GPR/SIMD register, original stack geometry and required output; exact unwind metadata and current native prologue alignment still require per-site integration proof.",
+        "hookApproved": false,
+        "entryContext": {
+          "runtimeBody": "0x1805d3dd7",
+          "precedingInstructions": [
+            {
+              "address": "0x1805d3dd7",
+              "bytes": "3bc2",
+              "mnemonic": "cmp",
+              "operands": "eax, edx"
+            },
+            {
+              "address": "0x1805d3dd9",
+              "bytes": "7435",
+              "mnemonic": "je",
+              "operands": "0x1805d3e10"
+            },
+            {
+              "address": "0x1805d3ddb",
+              "bytes": "413bc0",
+              "mnemonic": "cmp",
+              "operands": "eax, r8d"
+            },
+            {
+              "address": "0x1805d3dde",
+              "bytes": "7430",
+              "mnemonic": "je",
+              "operands": "0x1805d3e10"
+            },
+            {
+              "address": "0x1805d3de0",
+              "bytes": "c60300",
+              "mnemonic": "mov",
+              "operands": "byte ptr [rbx], 0"
+            },
+            {
+              "address": "0x1805d3de3",
+              "bytes": "496382384a1801",
+              "mnemonic": "movsxd",
+              "operands": "rax, dword ptr [r10 + 0x1184a38]"
+            }
+          ],
+          "scope": "Exact nearby index loads/guards are retained as context, not a fresh all-predecessor proof. Mission identity comes from the accepted owner flow; valid native index and registry participation remain integration prerequisites."
+        },
+        "incomingControlFlow": {
+          "executableBytesScanned": 10663424,
+          "rawRelativeCandidates": [
+            {
+              "source": "0x1805d3dc6",
+              "target": "0x1805d3dec",
+              "bytes": "7424",
+              "entersInterior": true,
+              "status": "raw-encoding-candidate-not-necessarily-instruction-boundary",
+              "boundaryContext": {
+                "status": "inside-retained-instruction",
+                "body": "0x1805d3d80",
+                "instruction": {
+                  "address": "0x1805d3dc4",
+                  "bytes": "4c8b742448",
+                  "mnemonic": "mov",
+                  "operands": "r14, qword ptr [rsp + 0x48]"
+                }
+              }
+            },
+            {
+              "source": "0x1805d3dcb",
+              "target": "0x1805d3df1",
+              "bytes": "7c24",
+              "entersInterior": true,
+              "status": "raw-encoding-candidate-not-necessarily-instruction-boundary",
+              "boundaryContext": {
+                "status": "inside-retained-instruction",
+                "body": "0x1805d3d80",
+                "instruction": {
+                  "address": "0x1805d3dc9",
+                  "bytes": "488b7c2440",
+                  "mnemonic": "mov",
+                  "operands": "rdi, qword ptr [rsp + 0x40]"
+                }
+              }
+            },
+            {
+              "source": "0x1805d3dd0",
+              "target": "0x1805d3df6",
+              "bytes": "7424",
+              "entersInterior": true,
+              "status": "raw-encoding-candidate-not-necessarily-instruction-boundary",
+              "boundaryContext": {
+                "status": "inside-retained-instruction",
+                "body": "0x1805d3d80",
+                "instruction": {
+                  "address": "0x1805d3dce",
+                  "bytes": "488b742438",
+                  "mnemonic": "mov",
+                  "operands": "rsi, qword ptr [rsp + 0x38]"
+                }
+              }
+            }
+          ],
+          "interiorLiteralCandidates": [],
+          "interiorRuntimeFunctionBoundaries": [],
+          "indirectEntryClosureProven": false,
+          "boundaryClassificationScope": "A raw match inside a retained decoded instruction is not an ordinary direct branch/literal at that boundary; alternate computed instruction entries remain unproved. Literal matches may be unrelated RIP-relative displacements, never automatically absolute addresses.",
+          "normalFallthrough": "Operation follows IMUL directly; an entry at the operation or any other overwritten byte would bypass capture and is not allowed without rewriting that entry."
+        }
+      },
+      "stub": {
+        "bytes": "4869c8600c00004881ec08010000488984242000000048898c2428000000488994243000000048899c24380000004889ac24400000004889b424480000004889bc24500000004c898424580000004c898c24600000004c899424680000004c899c24700000004c89a424780000004c89ac24800000004c89b424880000004c89bc24900000000f118424a00000000f118c24b00000000f119424c00000000f119c24d00000000f11a424e00000000f11ac24f0000000488b8c2468000000488b94242000000041b80300000048b80080108101000000ffd0488984249800000083bc249c0000000074020f0b408b84249800000048898424200000000f108424a00000000f108c24b00000000f109424c00000000f109c24d00000000f10a424e00000000f10ac24f0000000488b842420000000488b8c2428000000488b942430000000488b9c2438000000488bac2440000000488bb42448000000488bbc24500000004c8b8424580000004c8b8c24600000004c8b9424680000004c8b9c24700000004c8ba424780000004c8bac24800000004c8bb424880000004c8bbc24900000004881c408010000c3",
+        "unwind": "0186120086f412007ee4110076d410006ec40f0046740a003e640900365408002e3407000e012100",
+        "instructionOffsets": [
+          0,
+          7,
+          14,
+          22,
+          30,
+          38,
+          46,
+          54,
+          62,
+          70,
+          78,
+          86,
+          94,
+          102,
+          110,
+          118,
+          126,
+          134,
+          142,
+          150,
+          158,
+          166,
+          174,
+          182,
+          190,
+          198,
+          204,
+          214,
+          216,
+          224,
+          232,
+          234,
+          236,
+          244,
+          252,
+          260,
+          268,
+          276,
+          284,
+          292,
+          300,
+          308,
+          316,
+          324,
+          332,
+          340,
+          348,
+          356,
+          364,
+          372,
+          380,
+          388,
+          396,
+          404,
+          412,
+          420,
+          427
+        ],
+        "allocationEnd": 14,
+        "prologEnd": 134,
+        "epilogStart": 420,
+        "nonvolatileSaves": [
+          {
+            "endOffset": 46,
+            "code": 3,
+            "slot": 56
+          },
+          {
+            "endOffset": 54,
+            "code": 5,
+            "slot": 64
+          },
+          {
+            "endOffset": 62,
+            "code": 6,
+            "slot": 72
+          },
+          {
+            "endOffset": 70,
+            "code": 7,
+            "slot": 80
+          },
+          {
+            "endOffset": 110,
+            "code": 12,
+            "slot": 120
+          },
+          {
+            "endOffset": 118,
+            "code": 13,
+            "slot": 128
+          },
+          {
+            "endOffset": 126,
+            "code": 14,
+            "slot": 136
+          },
+          {
+            "endOffset": 134,
+            "code": 15,
+            "slot": 144
+          }
+        ]
+      },
+      "entry": {
+        "bytes": "4881ec08010000488984242000000048898c2428000000488994243000000048899c24380000004889ac24400000004889b424480000004889bc24500000004c898424580000004c898c24600000004c899424680000004c899c24700000004c89a424780000004c89ac24800000004c89b424880000004c89bc24900000004c8b942428000000488b842430000000e86cfbffff8bc04889842498000000488b842420000000488b8c2428000000488b942430000000488b9c2438000000488bac2440000000488bb42448000000488bbc24500000004c8b8424580000004c8b8c24600000004c8b9424680000004c8b9c24700000004c8ba424780000004c8bac24800000004c8bb424880000004c8bbc2490000000408b8424980000004881c408010000c3",
+        "unwind": "017f12007ff4120077e411006fd4100067c40f003f740a00376409002f5408002734070007012100",
+        "instructionOffsets": [
+          0,
+          7,
+          15,
+          23,
+          31,
+          39,
+          47,
+          55,
+          63,
+          71,
+          79,
+          87,
+          95,
+          103,
+          111,
+          119,
+          127,
+          135,
+          143,
+          148,
+          150,
+          158,
+          166,
+          174,
+          182,
+          190,
+          198,
+          206,
+          214,
+          222,
+          230,
+          238,
+          246,
+          254,
+          262,
+          270,
+          278,
+          286,
+          293
+        ],
+        "allocationEnd": 7,
+        "prologEnd": 127,
+        "epilogStart": 286,
+        "nonvolatileSaves": [
+          {
+            "endOffset": 39,
+            "code": 3,
+            "slot": 56
+          },
+          {
+            "endOffset": 47,
+            "code": 5,
+            "slot": 64
+          },
+          {
+            "endOffset": 55,
+            "code": 6,
+            "slot": 72
+          },
+          {
+            "endOffset": 63,
+            "code": 7,
+            "slot": 80
+          },
+          {
+            "endOffset": 103,
+            "code": 12,
+            "slot": 120
+          },
+          {
+            "endOffset": 111,
+            "code": 13,
+            "slot": 128
+          },
+          {
+            "endOffset": 119,
+            "code": 14,
+            "slot": 136
+          },
+          {
+            "endOffset": 127,
+            "code": 15,
+            "slot": 144
+          }
+        ]
+      },
+      "helperOffset": 206,
+      "trapOffset": 234,
+      "cases": [
+        {
+          "index": 0,
+          "scenario": "ok",
+          "explicitTrap": false,
+          "passed": true
+        },
+        {
+          "index": 2039,
+          "scenario": "ok",
+          "explicitTrap": false,
+          "passed": true
+        },
+        {
+          "index": 2040,
+          "scenario": "ok",
+          "explicitTrap": false,
+          "passed": true
+        },
+        {
+          "index": 4079,
+          "scenario": "ok",
+          "explicitTrap": false,
+          "passed": true
+        },
+        {
+          "index": 4080,
+          "scenario": "ok",
+          "explicitTrap": false,
+          "passed": true
+        },
+        {
+          "index": 6119,
+          "scenario": "ok",
+          "explicitTrap": false,
+          "passed": true
+        },
+        {
+          "index": 6120,
+          "scenario": "ok",
+          "explicitTrap": false,
+          "passed": true
+        },
+        {
+          "index": 65535,
+          "scenario": "ok",
+          "explicitTrap": false,
+          "passed": true
+        },
+        {
+          "index": 66048,
+          "scenario": "ok",
+          "explicitTrap": false,
+          "passed": true
+        },
+        {
+          "index": 70000,
+          "scenario": "ok",
+          "explicitTrap": false,
+          "passed": true
+        },
+        {
+          "index": -1,
+          "scenario": "invalid-index",
+          "explicitTrap": true,
+          "passed": true
+        },
+        {
+          "index": 70001,
+          "scenario": "invalid-index",
+          "explicitTrap": true,
+          "passed": true
+        },
+        {
+          "index": 9223372036854775807,
+          "scenario": "invalid-index",
+          "explicitTrap": true,
+          "passed": true
+        },
+        {
+          "index": 0,
+          "scenario": "foreign-owner",
+          "explicitTrap": true,
+          "passed": true
+        },
+        {
+          "index": 1,
+          "scenario": "unoccupied",
+          "explicitTrap": true,
+          "passed": true
+        },
+        {
+          "index": 0,
+          "scenario": "injected-failure",
+          "explicitTrap": true,
+          "passed": true
+        }
+      ]
+    },
+    {
+      "siteId": 4,
+      "route": {
+        "multiplyRva": "0x5e5e96",
+        "windowStart": "0x1805e5e96",
+        "windowEndExclusive": "0x1805e5ea5",
+        "windowLength": 15,
+        "fileOffset": 6181526,
+        "originalBytes": "4869c8600c0000c68439d032000001",
+        "instructions": [
+          {
+            "address": "0x1805e5e96",
+            "bytes": "4869c8600c0000",
+            "mnemonic": "imul",
+            "operands": "rcx, rax, 0xc60"
+          },
+          {
+            "address": "0x1805e5e9d",
+            "bytes": "c68439d032000001",
+            "mnemonic": "mov",
+            "operands": "byte ptr [rcx + rdi + 0x32d0], 1"
+          }
+        ],
+        "ownerProof": {
+          "procedure": "0x1805e5e40",
+          "definitionRva": "0x5e5e96",
+          "useInstruction": {
+            "address": "0x1805e5e9d",
+            "bytes": "c68439d032000001",
+            "mnemonic": "mov",
+            "operands": "byte ptr [rcx + rdi + 0x32d0], 1"
+          },
+          "effectiveKind": "agent",
+          "effectiveBias": 1408,
+          "entryContract": {
+            "kind": "registered-network-Mission-context",
+            "entryPointerKind": null,
+            "entryRegisters": {
+              "rcx": "mission-path:0"
+            },
+            "proof": "Mission reset5cf3c0 calls6e9ea0(&DATda98b0). Registration binds listed function pointers beside context &DATda9d60. Dispatcher647388..3aa indexes16-byte rows fromDATda98b8, loadsRCX fromrow+0 and CALLs row+8. Seconddispatcher64864e..675 agrees. Thus first callback argument is address of currentMission global; dereference+0 yieldsMission.",
+            "evidenceIds": [
+              "ev_a71eb29c22d900f362febff6d995e988b40a0244e7b1c943cdca4ef724ed71dc",
+              "ev_dbeb9110c41451f7a964f29db4d1cff34e52c9cbeedc258f5d72fdcfdb4313a1"
+            ]
+          },
+          "definitionInstructions": [
+            {
+              "address": "0x1805e5e46",
+              "bytes": "488b39",
+              "mnemonic": "mov",
+              "operands": "rdi, qword ptr [rcx]"
+            },
+            {
+              "address": "0x1805e5e96",
+              "bytes": "4869c8600c0000",
+              "mnemonic": "imul",
+              "operands": "rcx, rax, 0xc60"
+            }
+          ]
+        },
+        "consumerContexts": [
+          {
+            "definition": "0x1805e5e96",
+            "events": [
+              {
+                "address": "0x1805e5e9d",
+                "kind": "memory-write-address",
+                "detail": "rcx"
+              }
+            ],
+            "visitedInstructions": 4,
+            "fixpointSteps": 4,
+            "allResultUsesProvenAddressOnly": false,
+            "hookApproved": false,
+            "root": "0x1805e5e40",
+            "status": "bounded-may-use-inventory",
+            "eventCounts": {
+              "memory-write-address": 1
+            }
+          }
+        ],
+        "entryInputs": {
+          "missionRegister": "rdi",
+          "logicalIndexRegister": "rax",
+          "indexWidthBits": 64,
+          "indexValueContract": "Capture unchanged original full-width index before helper argument marshalling; do not assume an arbitrary entry value has been sign-extended correctly. Existing native valid-index guards remain prerequisites."
+        },
+        "operation": {
+          "kind": "write",
+          "fieldOffset": "0x580",
+          "widthBytes": 1,
+          "value": 1,
+          "register": null
+        },
+        "registerEffects": {
+          "productRegister": "rcx",
+          "productValue": "low64(original index *0xc60), computed by original IMUL",
+          "loadDestination": null,
+          "loadZeroExtends32": false,
+          "indexOverwrittenByLoad": false,
+          "missionOverwrittenByLoad": false,
+          "requiredOrdering": "Snapshot Mission/index; execute original IMUL or restore its exact result; perform field operation entirely under helper lease; return scalar only; apply scalar destination after register restoration so overlap does not restore stale index."
+        },
+        "flags": {
+          "scope": "normal execution; arithmetic flags dead before first flag consumer",
+          "overwriteInstruction": {
+            "address": "0x1805e5ea5",
+            "bytes": "4883c420",
+            "mnemonic": "add",
+            "operands": "rsp, 0x20"
+          },
+          "continuationThroughOverwrite": [
+            {
+              "address": "0x1805e5ea5",
+              "bytes": "4883c420",
+              "mnemonic": "add",
+              "operands": "rsp, 0x20"
+            }
+          ],
+          "genericFlagsPreserved": false
+        },
+        "lifetimeContract": "Acquire registered Mission storage lease, validate occupied primary domain/index, perform this exact scalar copy/store while held, and release before returning. Return no Agent or pointee address. Shared leases protect lifetime, not same-byte concurrent writer serialization.",
+        "invalidLookupContract": "Unresolved: original instruction assumes a valid native index/object. No silent-zero or ignored-write policy is approved; helper failure must follow an independently defined engine-path contract.",
+        "overwriteContract": "Two complete original instructions form this window. A standard-call stub must preserve every unmodified GPR/SIMD register, original stack geometry and required output; exact unwind metadata and current native prologue alignment still require per-site integration proof.",
+        "hookApproved": false,
+        "entryContext": {
+          "runtimeBody": "0x1805e5e91",
+          "precedingInstructions": [
+            {
+              "address": "0x1805e5e91",
+              "bytes": "4863442430",
+              "mnemonic": "movsxd",
+              "operands": "rax, dword ptr [rsp + 0x30]"
+            }
+          ],
+          "scope": "Exact nearby index loads/guards are retained as context, not a fresh all-predecessor proof. Mission identity comes from the accepted owner flow; valid native index and registry participation remain integration prerequisites."
+        },
+        "incomingControlFlow": {
+          "executableBytesScanned": 10663424,
+          "rawRelativeCandidates": [],
+          "interiorLiteralCandidates": [],
+          "interiorRuntimeFunctionBoundaries": [],
+          "indirectEntryClosureProven": false,
+          "boundaryClassificationScope": "A raw match inside a retained decoded instruction is not an ordinary direct branch/literal at that boundary; alternate computed instruction entries remain unproved. Literal matches may be unrelated RIP-relative displacements, never automatically absolute addresses.",
+          "normalFallthrough": "Operation follows IMUL directly; an entry at the operation or any other overwritten byte would bypass capture and is not allowed without rewriting that entry."
+        }
+      },
+      "stub": {
+        "bytes": "4869c8600c00004881ec08010000488984242000000048898c2428000000488994243000000048899c24380000004889ac24400000004889b424480000004889bc24500000004c898424580000004c898c24600000004c899424680000004c899c24700000004c89a424780000004c89ac24800000004c89b424880000004c89bc24900000000f118424a00000000f118c24b00000000f119424c00000000f119c24d00000000f11a424e00000000f11ac24f0000000488b8c2450000000488b94242000000041b80400000048b80080108101000000ffd0488984249800000083bc249c0000000074020f0b0f108424a00000000f108c24b00000000f109424c00000000f109c24d00000000f10a424e00000000f10ac24f0000000488b842420000000488b8c2428000000488b942430000000488b9c2438000000488bac2440000000488bb42448000000488bbc24500000004c8b8424580000004c8b8c24600000004c8b9424680000004c8b9c24700000004c8ba424780000004c8bac24800000004c8bb424880000004c8bbc24900000004881c408010000c3",
+        "unwind": "0186120086f412007ee4110076d410006ec40f0046740a003e640900365408002e3407000e012100",
+        "instructionOffsets": [
+          0,
+          7,
+          14,
+          22,
+          30,
+          38,
+          46,
+          54,
+          62,
+          70,
+          78,
+          86,
+          94,
+          102,
+          110,
+          118,
+          126,
+          134,
+          142,
+          150,
+          158,
+          166,
+          174,
+          182,
+          190,
+          198,
+          204,
+          214,
+          216,
+          224,
+          232,
+          234,
+          236,
+          244,
+          252,
+          260,
+          268,
+          276,
+          284,
+          292,
+          300,
+          308,
+          316,
+          324,
+          332,
+          340,
+          348,
+          356,
+          364,
+          372,
+          380,
+          388,
+          396,
+          404,
+          411
+        ],
+        "allocationEnd": 14,
+        "prologEnd": 134,
+        "epilogStart": 404,
+        "nonvolatileSaves": [
+          {
+            "endOffset": 46,
+            "code": 3,
+            "slot": 56
+          },
+          {
+            "endOffset": 54,
+            "code": 5,
+            "slot": 64
+          },
+          {
+            "endOffset": 62,
+            "code": 6,
+            "slot": 72
+          },
+          {
+            "endOffset": 70,
+            "code": 7,
+            "slot": 80
+          },
+          {
+            "endOffset": 110,
+            "code": 12,
+            "slot": 120
+          },
+          {
+            "endOffset": 118,
+            "code": 13,
+            "slot": 128
+          },
+          {
+            "endOffset": 126,
+            "code": 14,
+            "slot": 136
+          },
+          {
+            "endOffset": 134,
+            "code": 15,
+            "slot": 144
+          }
+        ]
+      },
+      "entry": {
+        "bytes": "4881ec08010000488984242000000048898c2428000000488994243000000048899c24380000004889ac24400000004889b424480000004889bc24500000004c898424580000004c898c24600000004c899424680000004c899c24700000004c89a424780000004c89ac24800000004c89b424880000004c89bc2490000000488bbc2428000000488b842430000000e86cfbffffb8010000004889842498000000488b842420000000488b8c2428000000488b942430000000488b9c2438000000488bac2440000000488bb42448000000488bbc24500000004c8b8424580000004c8b8c24600000004c8b9424680000004c8b9c24700000004c8ba424780000004c8bac24800000004c8bb424880000004c8bbc2490000000408b8424980000004881c408010000c3",
+        "unwind": "017f12007ff4120077e411006fd4100067c40f003f740a00376409002f5408002734070007012100",
+        "instructionOffsets": [
+          0,
+          7,
+          15,
+          23,
+          31,
+          39,
+          47,
+          55,
+          63,
+          71,
+          79,
+          87,
+          95,
+          103,
+          111,
+          119,
+          127,
+          135,
+          143,
+          148,
+          153,
+          161,
+          169,
+          177,
+          185,
+          193,
+          201,
+          209,
+          217,
+          225,
+          233,
+          241,
+          249,
+          257,
+          265,
+          273,
+          281,
+          289,
+          296
+        ],
+        "allocationEnd": 7,
+        "prologEnd": 127,
+        "epilogStart": 289,
+        "nonvolatileSaves": [
+          {
+            "endOffset": 39,
+            "code": 3,
+            "slot": 56
+          },
+          {
+            "endOffset": 47,
+            "code": 5,
+            "slot": 64
+          },
+          {
+            "endOffset": 55,
+            "code": 6,
+            "slot": 72
+          },
+          {
+            "endOffset": 63,
+            "code": 7,
+            "slot": 80
+          },
+          {
+            "endOffset": 103,
+            "code": 12,
+            "slot": 120
+          },
+          {
+            "endOffset": 111,
+            "code": 13,
+            "slot": 128
+          },
+          {
+            "endOffset": 119,
+            "code": 14,
+            "slot": 136
+          },
+          {
+            "endOffset": 127,
+            "code": 15,
+            "slot": 144
+          }
+        ]
+      },
+      "helperOffset": 206,
+      "trapOffset": 234,
+      "cases": [
+        {
+          "index": 0,
+          "scenario": "ok",
+          "explicitTrap": false,
+          "passed": true
+        },
+        {
+          "index": 2039,
+          "scenario": "ok",
+          "explicitTrap": false,
+          "passed": true
+        },
+        {
+          "index": 2040,
+          "scenario": "ok",
+          "explicitTrap": false,
+          "passed": true
+        },
+        {
+          "index": 4079,
+          "scenario": "ok",
+          "explicitTrap": false,
+          "passed": true
+        },
+        {
+          "index": 4080,
+          "scenario": "ok",
+          "explicitTrap": false,
+          "passed": true
+        },
+        {
+          "index": 6119,
+          "scenario": "ok",
+          "explicitTrap": false,
+          "passed": true
+        },
+        {
+          "index": 6120,
+          "scenario": "ok",
+          "explicitTrap": false,
+          "passed": true
+        },
+        {
+          "index": 65535,
+          "scenario": "ok",
+          "explicitTrap": false,
+          "passed": true
+        },
+        {
+          "index": 66048,
+          "scenario": "ok",
+          "explicitTrap": false,
+          "passed": true
+        },
+        {
+          "index": 70000,
+          "scenario": "ok",
+          "explicitTrap": false,
+          "passed": true
+        },
+        {
+          "index": -1,
+          "scenario": "invalid-index",
+          "explicitTrap": true,
+          "passed": true
+        },
+        {
+          "index": 70001,
+          "scenario": "invalid-index",
+          "explicitTrap": true,
+          "passed": true
+        },
+        {
+          "index": 9223372036854775807,
+          "scenario": "invalid-index",
+          "explicitTrap": true,
+          "passed": true
+        },
+        {
+          "index": 0,
+          "scenario": "foreign-owner",
+          "explicitTrap": true,
+          "passed": true
+        },
+        {
+          "index": 1,
+          "scenario": "unoccupied",
+          "explicitTrap": true,
+          "passed": true
+        },
+        {
+          "index": 0,
+          "scenario": "injected-failure",
+          "explicitTrap": true,
+          "passed": true
+        }
+      ]
+    },
+    {
+      "siteId": 5,
+      "route": {
+        "multiplyRva": "0x648262",
+        "windowStart": "0x180648262",
+        "windowEndExclusive": "0x180648271",
+        "windowLength": 15,
+        "fileOffset": 6583906,
+        "originalBytes": "4869c8600c0000428b8401ec310000",
+        "instructions": [
+          {
+            "address": "0x180648262",
+            "bytes": "4869c8600c0000",
+            "mnemonic": "imul",
+            "operands": "rcx, rax, 0xc60"
+          },
+          {
+            "address": "0x180648269",
+            "bytes": "428b8401ec310000",
+            "mnemonic": "mov",
+            "operands": "eax, dword ptr [rcx + r8 + 0x31ec]"
+          }
+        ],
+        "ownerProof": {
+          "procedure": "0x180648200",
+          "definitionRva": "0x648262",
+          "useInstruction": {
+            "address": "0x180648269",
+            "bytes": "428b8401ec310000",
+            "mnemonic": "mov",
+            "operands": "eax, dword ptr [rcx + r8 + 0x31ec]"
+          },
+          "effectiveKind": "agent",
+          "effectiveBias": 1180,
+          "entryContract": {
+            "kind": "global-only-analysis-root",
+            "entryPointerKind": null,
+            "entryRegisters": {},
+            "evidenceIds": [
+              "ev_c014ee8d4fe6b83fadd858b61332e9d5618f9d8a57660bc1f5980b63d7ef3118"
+            ],
+            "proof": "No receiver identity assumed; only local established globals and derived owners may contribute."
+          },
+          "definitionInstructions": [
+            {
+              "address": "0x18064820c",
+              "bytes": "4c8b054d1b7600",
+              "mnemonic": "mov",
+              "operands": "r8, qword ptr [rip + 0x761b4d]"
+            },
+            {
+              "address": "0x180648262",
+              "bytes": "4869c8600c0000",
+              "mnemonic": "imul",
+              "operands": "rcx, rax, 0xc60"
+            }
+          ]
+        },
+        "consumerContexts": [
+          {
+            "definition": "0x180648262",
+            "events": [
+              {
+                "address": "0x180648269",
+                "kind": "memory-read-address",
+                "detail": "rcx"
+              }
+            ],
+            "visitedInstructions": 143,
+            "fixpointSteps": 143,
+            "allResultUsesProvenAddressOnly": false,
+            "hookApproved": false,
+            "root": "0x180648200",
+            "status": "bounded-may-use-inventory",
+            "eventCounts": {
+              "memory-read-address": 1
+            }
+          }
+        ],
+        "entryInputs": {
+          "missionRegister": "r8",
+          "logicalIndexRegister": "rax",
+          "indexWidthBits": 64,
+          "indexValueContract": "Capture unchanged original full-width index before helper argument marshalling; do not assume an arbitrary entry value has been sign-extended correctly. Existing native valid-index guards remain prerequisites."
+        },
+        "operation": {
+          "kind": "read",
+          "fieldOffset": "0x49c",
+          "widthBytes": 4,
+          "value": null,
+          "register": "eax"
+        },
+        "registerEffects": {
+          "productRegister": "rcx",
+          "productValue": "low64(original index *0xc60), computed by original IMUL",
+          "loadDestination": "eax",
+          "loadZeroExtends32": true,
+          "indexOverwrittenByLoad": true,
+          "missionOverwrittenByLoad": false,
+          "requiredOrdering": "Snapshot Mission/index; execute original IMUL or restore its exact result; perform field operation entirely under helper lease; return scalar only; apply scalar destination after register restoration so overlap does not restore stale index."
+        },
+        "flags": {
+          "scope": "normal execution; arithmetic flags dead before first flag consumer",
+          "overwriteInstruction": {
+            "address": "0x180648271",
+            "bytes": "250c800700",
+            "mnemonic": "and",
+            "operands": "eax, 0x7800c"
+          },
+          "continuationThroughOverwrite": [
+            {
+              "address": "0x180648271",
+              "bytes": "250c800700",
+              "mnemonic": "and",
+              "operands": "eax, 0x7800c"
+            }
+          ],
+          "genericFlagsPreserved": false
+        },
+        "lifetimeContract": "Acquire registered Mission storage lease, validate occupied primary domain/index, perform this exact scalar copy/store while held, and release before returning. Return no Agent or pointee address. Shared leases protect lifetime, not same-byte concurrent writer serialization.",
+        "invalidLookupContract": "Unresolved: original instruction assumes a valid native index/object. No silent-zero or ignored-write policy is approved; helper failure must follow an independently defined engine-path contract.",
+        "overwriteContract": "Two complete original instructions form this window. A standard-call stub must preserve every unmodified GPR/SIMD register, original stack geometry and required output; exact unwind metadata and current native prologue alignment still require per-site integration proof.",
+        "hookApproved": false,
+        "entryContext": {
+          "runtimeBody": "0x180648200",
+          "precedingInstructions": [
+            {
+              "address": "0x180648221",
+              "bytes": "418bdd",
+              "mnemonic": "mov",
+              "operands": "ebx, r13d"
+            },
+            {
+              "address": "0x180648224",
+              "bytes": "4d85c0",
+              "mnemonic": "test",
+              "operands": "r8, r8"
+            },
+            {
+              "address": "0x180648227",
+              "bytes": "745d",
+              "mnemonic": "je",
+              "operands": "0x180648286"
+            },
+            {
+              "address": "0x180648229",
+              "bytes": "496380384a1801",
+              "mnemonic": "movsxd",
+              "operands": "rax, dword ptr [r8 + 0x1184a38]"
+            },
+            {
+              "address": "0x180648230",
+              "bytes": "85c0",
+              "mnemonic": "test",
+              "operands": "eax, eax"
+            },
+            {
+              "address": "0x180648232",
+              "bytes": "7852",
+              "mnemonic": "js",
+              "operands": "0x180648286"
+            },
+            {
+              "address": "0x180648234",
+              "bytes": "4869c8600c0000",
+              "mnemonic": "imul",
+              "operands": "rcx, rax, 0xc60"
+            },
+            {
+              "address": "0x18064823b",
+              "bytes": "498d90502d0000",
+              "mnemonic": "lea",
+              "operands": "rdx, [r8 + 0x2d50]"
+            },
+            {
+              "address": "0x180648242",
+              "bytes": "4803d1",
+              "mnemonic": "add",
+              "operands": "rdx, rcx"
+            },
+            {
+              "address": "0x180648245",
+              "bytes": "743f",
+              "mnemonic": "je",
+              "operands": "0x180648286"
+            },
+            {
+              "address": "0x180648247",
+              "bytes": "0f108294040000",
+              "mnemonic": "movups",
+              "operands": "xmm0, xmmword ptr [rdx + 0x494]"
+            },
+            {
+              "address": "0x18064824e",
+              "bytes": "4863825c050000",
+              "mnemonic": "movsxd",
+              "operands": "rax, dword ptr [rdx + 0x55c]"
+            },
+            {
+              "address": "0x180648255",
+              "bytes": "0f11442440",
+              "mnemonic": "movups",
+              "operands": "xmmword ptr [rsp + 0x40], xmm0"
+            },
+            {
+              "address": "0x18064825a",
+              "bytes": "8b5c2448",
+              "mnemonic": "mov",
+              "operands": "ebx, dword ptr [rsp + 0x48]"
+            },
+            {
+              "address": "0x18064825e",
+              "bytes": "85c0",
+              "mnemonic": "test",
+              "operands": "eax, eax"
+            },
+            {
+              "address": "0x180648260",
+              "bytes": "7816",
+              "mnemonic": "js",
+              "operands": "0x180648278"
+            }
+          ],
+          "scope": "Exact nearby index loads/guards are retained as context, not a fresh all-predecessor proof. Mission identity comes from the accepted owner flow; valid native index and registry participation remain integration prerequisites."
+        },
+        "incomingControlFlow": {
+          "executableBytesScanned": 10663424,
+          "rawRelativeCandidates": [],
+          "interiorLiteralCandidates": [],
+          "interiorRuntimeFunctionBoundaries": [],
+          "indirectEntryClosureProven": false,
+          "boundaryClassificationScope": "A raw match inside a retained decoded instruction is not an ordinary direct branch/literal at that boundary; alternate computed instruction entries remain unproved. Literal matches may be unrelated RIP-relative displacements, never automatically absolute addresses.",
+          "normalFallthrough": "Operation follows IMUL directly; an entry at the operation or any other overwritten byte would bypass capture and is not allowed without rewriting that entry."
+        }
+      },
+      "stub": {
+        "bytes": "4869c8600c00004881ec08010000488984242000000048898c2428000000488994243000000048899c24380000004889ac24400000004889b424480000004889bc24500000004c898424580000004c898c24600000004c899424680000004c899c24700000004c89a424780000004c89ac24800000004c89b424880000004c89bc24900000000f118424a00000000f118c24b00000000f119424c00000000f119c24d00000000f11a424e00000000f11ac24f0000000488b8c2458000000488b94242000000041b80500000048b80080108101000000ffd0488984249800000083bc249c0000000074020f0b408b84249800000048898424200000000f108424a00000000f108c24b00000000f109424c00000000f109c24d00000000f10a424e00000000f10ac24f0000000488b842420000000488b8c2428000000488b942430000000488b9c2438000000488bac2440000000488bb42448000000488bbc24500000004c8b8424580000004c8b8c24600000004c8b9424680000004c8b9c24700000004c8ba424780000004c8bac24800000004c8bb424880000004c8bbc24900000004881c408010000c3",
+        "unwind": "0186120086f412007ee4110076d410006ec40f0046740a003e640900365408002e3407000e012100",
+        "instructionOffsets": [
+          0,
+          7,
+          14,
+          22,
+          30,
+          38,
+          46,
+          54,
+          62,
+          70,
+          78,
+          86,
+          94,
+          102,
+          110,
+          118,
+          126,
+          134,
+          142,
+          150,
+          158,
+          166,
+          174,
+          182,
+          190,
+          198,
+          204,
+          214,
+          216,
+          224,
+          232,
+          234,
+          236,
+          244,
+          252,
+          260,
+          268,
+          276,
+          284,
+          292,
+          300,
+          308,
+          316,
+          324,
+          332,
+          340,
+          348,
+          356,
+          364,
+          372,
+          380,
+          388,
+          396,
+          404,
+          412,
+          420,
+          427
+        ],
+        "allocationEnd": 14,
+        "prologEnd": 134,
+        "epilogStart": 420,
+        "nonvolatileSaves": [
+          {
+            "endOffset": 46,
+            "code": 3,
+            "slot": 56
+          },
+          {
+            "endOffset": 54,
+            "code": 5,
+            "slot": 64
+          },
+          {
+            "endOffset": 62,
+            "code": 6,
+            "slot": 72
+          },
+          {
+            "endOffset": 70,
+            "code": 7,
+            "slot": 80
+          },
+          {
+            "endOffset": 110,
+            "code": 12,
+            "slot": 120
+          },
+          {
+            "endOffset": 118,
+            "code": 13,
+            "slot": 128
+          },
+          {
+            "endOffset": 126,
+            "code": 14,
+            "slot": 136
+          },
+          {
+            "endOffset": 134,
+            "code": 15,
+            "slot": 144
+          }
+        ]
+      },
+      "entry": {
+        "bytes": "4881ec08010000488984242000000048898c2428000000488994243000000048899c24380000004889ac24400000004889b424480000004889bc24500000004c898424580000004c898c24600000004c899424680000004c899c24700000004c89a424780000004c89ac24800000004c89b424880000004c89bc24900000004c8b842428000000488b842430000000e86cfbffff8bc04889842498000000488b842420000000488b8c2428000000488b942430000000488b9c2438000000488bac2440000000488bb42448000000488bbc24500000004c8b8424580000004c8b8c24600000004c8b9424680000004c8b9c24700000004c8ba424780000004c8bac24800000004c8bb424880000004c8bbc2490000000408b8424980000004881c408010000c3",
+        "unwind": "017f12007ff4120077e411006fd4100067c40f003f740a00376409002f5408002734070007012100",
+        "instructionOffsets": [
+          0,
+          7,
+          15,
+          23,
+          31,
+          39,
+          47,
+          55,
+          63,
+          71,
+          79,
+          87,
+          95,
+          103,
+          111,
+          119,
+          127,
+          135,
+          143,
+          148,
+          150,
+          158,
+          166,
+          174,
+          182,
+          190,
+          198,
+          206,
+          214,
+          222,
+          230,
+          238,
+          246,
+          254,
+          262,
+          270,
+          278,
+          286,
+          293
+        ],
+        "allocationEnd": 7,
+        "prologEnd": 127,
+        "epilogStart": 286,
+        "nonvolatileSaves": [
+          {
+            "endOffset": 39,
+            "code": 3,
+            "slot": 56
+          },
+          {
+            "endOffset": 47,
+            "code": 5,
+            "slot": 64
+          },
+          {
+            "endOffset": 55,
+            "code": 6,
+            "slot": 72
+          },
+          {
+            "endOffset": 63,
+            "code": 7,
+            "slot": 80
+          },
+          {
+            "endOffset": 103,
+            "code": 12,
+            "slot": 120
+          },
+          {
+            "endOffset": 111,
+            "code": 13,
+            "slot": 128
+          },
+          {
+            "endOffset": 119,
+            "code": 14,
+            "slot": 136
+          },
+          {
+            "endOffset": 127,
+            "code": 15,
+            "slot": 144
+          }
+        ]
+      },
+      "helperOffset": 206,
+      "trapOffset": 234,
+      "cases": [
+        {
+          "index": 0,
+          "scenario": "ok",
+          "explicitTrap": false,
+          "passed": true
+        },
+        {
+          "index": 2039,
+          "scenario": "ok",
+          "explicitTrap": false,
+          "passed": true
+        },
+        {
+          "index": 2040,
+          "scenario": "ok",
+          "explicitTrap": false,
+          "passed": true
+        },
+        {
+          "index": 4079,
+          "scenario": "ok",
+          "explicitTrap": false,
+          "passed": true
+        },
+        {
+          "index": 4080,
+          "scenario": "ok",
+          "explicitTrap": false,
+          "passed": true
+        },
+        {
+          "index": 6119,
+          "scenario": "ok",
+          "explicitTrap": false,
+          "passed": true
+        },
+        {
+          "index": 6120,
+          "scenario": "ok",
+          "explicitTrap": false,
+          "passed": true
+        },
+        {
+          "index": 65535,
+          "scenario": "ok",
+          "explicitTrap": false,
+          "passed": true
+        },
+        {
+          "index": 66048,
+          "scenario": "ok",
+          "explicitTrap": false,
+          "passed": true
+        },
+        {
+          "index": 70000,
+          "scenario": "ok",
+          "explicitTrap": false,
+          "passed": true
+        },
+        {
+          "index": -1,
+          "scenario": "invalid-index",
+          "explicitTrap": true,
+          "passed": true
+        },
+        {
+          "index": 70001,
+          "scenario": "invalid-index",
+          "explicitTrap": true,
+          "passed": true
+        },
+        {
+          "index": 9223372036854775807,
+          "scenario": "invalid-index",
+          "explicitTrap": true,
+          "passed": true
+        },
+        {
+          "index": 0,
+          "scenario": "foreign-owner",
+          "explicitTrap": true,
+          "passed": true
+        },
+        {
+          "index": 1,
+          "scenario": "unoccupied",
+          "explicitTrap": true,
+          "passed": true
+        },
+        {
+          "index": 0,
+          "scenario": "injected-failure",
+          "explicitTrap": true,
+          "passed": true
+        }
+      ]
+    },
+    {
+      "siteId": 6,
+      "route": {
+        "multiplyRva": "0x6a59da",
+        "windowStart": "0x1806a59da",
+        "windowEndExclusive": "0x1806a59e8",
+        "windowLength": 14,
+        "fileOffset": 6966746,
+        "originalBytes": "4869c8600c00008b84114c320000",
+        "instructions": [
+          {
+            "address": "0x1806a59da",
+            "bytes": "4869c8600c0000",
+            "mnemonic": "imul",
+            "operands": "rcx, rax, 0xc60"
+          },
+          {
+            "address": "0x1806a59e1",
+            "bytes": "8b84114c320000",
+            "mnemonic": "mov",
+            "operands": "eax, dword ptr [rcx + rdx + 0x324c]"
+          }
+        ],
+        "ownerProof": {
+          "procedure": "0x1806a5700",
+          "definitionRva": "0x6a59da",
+          "useInstruction": {
+            "address": "0x1806a59e1",
+            "bytes": "8b84114c320000",
+            "mnemonic": "mov",
+            "operands": "eax, dword ptr [rcx + rdx + 0x324c]"
+          },
+          "effectiveKind": "agent",
+          "effectiveBias": 1276,
+          "entryContract": {
+            "kind": "exact-direct-call-register-owner",
+            "entryPointerKind": "agent-ai",
+            "entryRegisters": {
+              "rcx": "agent-ai"
+            },
+            "sourceProcedure": "0x1806a7120",
+            "entryBiases": {
+              "rcx": 0
+            },
+            "callInstruction": {
+              "address": "0x1806a77bb",
+              "bytes": "e840dfffff",
+              "mnemonic": "call",
+              "operands": "0x1806a5700"
+            },
+            "argumentProvenance": {
+              "rcx": [
+                {
+                  "address": "0x1806a7141",
+                  "bytes": "488bd9",
+                  "mnemonic": "mov",
+                  "operands": "rbx, rcx"
+                },
+                {
+                  "address": "0x1806a77b8",
+                  "bytes": "488bcb",
+                  "mnemonic": "mov",
+                  "operands": "rcx, rbx"
+                }
+              ]
+            },
+            "evidenceIds": [
+              "ev_7f98cb55e222805658367887babec2c45c888d73803b4be5deee49aa165d5ef6",
+              "ev_0903bb131caac6ae01cd6e9d1206055064bfa4ace2b11da20b3d9070aac17a5b",
+              "ev_85627aff0962d117a450369764fe7c952c58810aa7916dac526543304d5772b7",
+              "ev_d5f8505d1a38e3835ce6f81881040adf46fec5f1d050ea9b474a58cbc428bd1c",
+              "ev_4cf07ee188d1db8a5da960a2827cdf71929ac7410ee167140656458101ded433",
+              "ev_b8140788e7f917bf4113c860960f1e6e6a83ac7c6a0e459017f39f1adbfb9a6b"
+            ]
+          },
+          "definitionInstructions": [
+            {
+              "address": "0x1806a5717",
+              "bytes": "4c8bc1",
+              "mnemonic": "mov",
+              "operands": "r8, rcx"
+            },
+            {
+              "address": "0x1806a5975",
+              "bytes": "498b90d8140000",
+              "mnemonic": "mov",
+              "operands": "rdx, qword ptr [r8 + 0x14d8]"
+            },
+            {
+              "address": "0x1806a59da",
+              "bytes": "4869c8600c0000",
+              "mnemonic": "imul",
+              "operands": "rcx, rax, 0xc60"
+            }
+          ]
+        },
+        "consumerContexts": [
+          {
+            "definition": "0x1806a59da",
+            "events": [
+              {
+                "address": "0x1806a59e1",
+                "kind": "memory-read-address",
+                "detail": "rcx"
+              }
+            ],
+            "visitedInstructions": 93,
+            "fixpointSteps": 93,
+            "allResultUsesProvenAddressOnly": false,
+            "hookApproved": false,
+            "root": "0x1806a5700",
+            "status": "bounded-may-use-inventory",
+            "eventCounts": {
+              "memory-read-address": 1
+            }
+          }
+        ],
+        "entryInputs": {
+          "missionRegister": "rdx",
+          "logicalIndexRegister": "rax",
+          "indexWidthBits": 64,
+          "indexValueContract": "Capture unchanged original full-width index before helper argument marshalling; do not assume an arbitrary entry value has been sign-extended correctly. Existing native valid-index guards remain prerequisites."
+        },
+        "operation": {
+          "kind": "read",
+          "fieldOffset": "0x4fc",
+          "widthBytes": 4,
+          "value": null,
+          "register": "eax"
+        },
+        "registerEffects": {
+          "productRegister": "rcx",
+          "productValue": "low64(original index *0xc60), computed by original IMUL",
+          "loadDestination": "eax",
+          "loadZeroExtends32": true,
+          "indexOverwrittenByLoad": true,
+          "missionOverwrittenByLoad": false,
+          "requiredOrdering": "Snapshot Mission/index; execute original IMUL or restore its exact result; perform field operation entirely under helper lease; return scalar only; apply scalar destination after register restoration so overlap does not restore stale index."
+        },
+        "flags": {
+          "scope": "normal execution; arithmetic flags dead before first flag consumer",
+          "overwriteInstruction": {
+            "address": "0x1806a59e8",
+            "bytes": "41398094200000",
+            "mnemonic": "cmp",
+            "operands": "dword ptr [r8 + 0x2094], eax"
+          },
+          "continuationThroughOverwrite": [
+            {
+              "address": "0x1806a59e8",
+              "bytes": "41398094200000",
+              "mnemonic": "cmp",
+              "operands": "dword ptr [r8 + 0x2094], eax"
+            }
+          ],
+          "genericFlagsPreserved": false
+        },
+        "lifetimeContract": "Acquire registered Mission storage lease, validate occupied primary domain/index, perform this exact scalar copy/store while held, and release before returning. Return no Agent or pointee address. Shared leases protect lifetime, not same-byte concurrent writer serialization.",
+        "invalidLookupContract": "Unresolved: original instruction assumes a valid native index/object. No silent-zero or ignored-write policy is approved; helper failure must follow an independently defined engine-path contract.",
+        "overwriteContract": "Two complete original instructions form this window. A standard-call stub must preserve every unmodified GPR/SIMD register, original stack geometry and required output; exact unwind metadata and current native prologue alignment still require per-site integration proof.",
+        "hookApproved": false,
+        "entryContext": {
+          "runtimeBody": "0x1806a58a5",
+          "precedingInstructions": [
+            {
+              "address": "0x1806a5999",
+              "bytes": "745a",
+              "mnemonic": "je",
+              "operands": "0x1806a59f5"
+            },
+            {
+              "address": "0x1806a599b",
+              "bytes": "4084f6",
+              "mnemonic": "test",
+              "operands": "sil, sil"
+            },
+            {
+              "address": "0x1806a599e",
+              "bytes": "7409",
+              "mnemonic": "je",
+              "operands": "0x1806a59a9"
+            },
+            {
+              "address": "0x1806a59a0",
+              "bytes": "418b805c220000",
+              "mnemonic": "mov",
+              "operands": "eax, dword ptr [r8 + 0x225c]"
+            },
+            {
+              "address": "0x1806a59a7",
+              "bytes": "eb07",
+              "mnemonic": "jmp",
+              "operands": "0x1806a59b0"
+            },
+            {
+              "address": "0x1806a59a9",
+              "bytes": "418b8004150000",
+              "mnemonic": "mov",
+              "operands": "eax, dword ptr [r8 + 0x1504]"
+            },
+            {
+              "address": "0x1806a59b0",
+              "bytes": "4898",
+              "mnemonic": "cdqe",
+              "operands": ""
+            },
+            {
+              "address": "0x1806a59b2",
+              "bytes": "4869c8600c0000",
+              "mnemonic": "imul",
+              "operands": "rcx, rax, 0xc60"
+            },
+            {
+              "address": "0x1806a59b9",
+              "bytes": "83bc11b032000001",
+              "mnemonic": "cmp",
+              "operands": "dword ptr [rcx + rdx + 0x32b0], 1"
+            },
+            {
+              "address": "0x1806a59c1",
+              "bytes": "7532",
+              "mnemonic": "jne",
+              "operands": "0x1806a59f5"
+            },
+            {
+              "address": "0x1806a59c3",
+              "bytes": "4084f6",
+              "mnemonic": "test",
+              "operands": "sil, sil"
+            },
+            {
+              "address": "0x1806a59c6",
+              "bytes": "7409",
+              "mnemonic": "je",
+              "operands": "0x1806a59d1"
+            },
+            {
+              "address": "0x1806a59c8",
+              "bytes": "418b805c220000",
+              "mnemonic": "mov",
+              "operands": "eax, dword ptr [r8 + 0x225c]"
+            },
+            {
+              "address": "0x1806a59cf",
+              "bytes": "eb07",
+              "mnemonic": "jmp",
+              "operands": "0x1806a59d8"
+            },
+            {
+              "address": "0x1806a59d1",
+              "bytes": "418b8004150000",
+              "mnemonic": "mov",
+              "operands": "eax, dword ptr [r8 + 0x1504]"
+            },
+            {
+              "address": "0x1806a59d8",
+              "bytes": "4898",
+              "mnemonic": "cdqe",
+              "operands": ""
+            }
+          ],
+          "scope": "Exact nearby index loads/guards are retained as context, not a fresh all-predecessor proof. Mission identity comes from the accepted owner flow; valid native index and registry participation remain integration prerequisites."
+        },
+        "incomingControlFlow": {
+          "executableBytesScanned": 10663424,
+          "rawRelativeCandidates": [],
+          "interiorLiteralCandidates": [],
+          "interiorRuntimeFunctionBoundaries": [],
+          "indirectEntryClosureProven": false,
+          "boundaryClassificationScope": "A raw match inside a retained decoded instruction is not an ordinary direct branch/literal at that boundary; alternate computed instruction entries remain unproved. Literal matches may be unrelated RIP-relative displacements, never automatically absolute addresses.",
+          "normalFallthrough": "Operation follows IMUL directly; an entry at the operation or any other overwritten byte would bypass capture and is not allowed without rewriting that entry."
+        }
+      },
+      "stub": {
+        "bytes": "4869c8600c00004881ec08010000488984242000000048898c2428000000488994243000000048899c24380000004889ac24400000004889b424480000004889bc24500000004c898424580000004c898c24600000004c899424680000004c899c24700000004c89a424780000004c89ac24800000004c89b424880000004c89bc24900000000f118424a00000000f118c24b00000000f119424c00000000f119c24d00000000f11a424e00000000f11ac24f0000000488b8c2430000000488b94242000000041b80600000048b80080108101000000ffd0488984249800000083bc249c0000000074020f0b408b84249800000048898424200000000f108424a00000000f108c24b00000000f109424c00000000f109c24d00000000f10a424e00000000f10ac24f0000000488b842420000000488b8c2428000000488b942430000000488b9c2438000000488bac2440000000488bb42448000000488bbc24500000004c8b8424580000004c8b8c24600000004c8b9424680000004c8b9c24700000004c8ba424780000004c8bac24800000004c8bb424880000004c8bbc24900000004881c408010000c3",
+        "unwind": "0186120086f412007ee4110076d410006ec40f0046740a003e640900365408002e3407000e012100",
+        "instructionOffsets": [
+          0,
+          7,
+          14,
+          22,
+          30,
+          38,
+          46,
+          54,
+          62,
+          70,
+          78,
+          86,
+          94,
+          102,
+          110,
+          118,
+          126,
+          134,
+          142,
+          150,
+          158,
+          166,
+          174,
+          182,
+          190,
+          198,
+          204,
+          214,
+          216,
+          224,
+          232,
+          234,
+          236,
+          244,
+          252,
+          260,
+          268,
+          276,
+          284,
+          292,
+          300,
+          308,
+          316,
+          324,
+          332,
+          340,
+          348,
+          356,
+          364,
+          372,
+          380,
+          388,
+          396,
+          404,
+          412,
+          420,
+          427
+        ],
+        "allocationEnd": 14,
+        "prologEnd": 134,
+        "epilogStart": 420,
+        "nonvolatileSaves": [
+          {
+            "endOffset": 46,
+            "code": 3,
+            "slot": 56
+          },
+          {
+            "endOffset": 54,
+            "code": 5,
+            "slot": 64
+          },
+          {
+            "endOffset": 62,
+            "code": 6,
+            "slot": 72
+          },
+          {
+            "endOffset": 70,
+            "code": 7,
+            "slot": 80
+          },
+          {
+            "endOffset": 110,
+            "code": 12,
+            "slot": 120
+          },
+          {
+            "endOffset": 118,
+            "code": 13,
+            "slot": 128
+          },
+          {
+            "endOffset": 126,
+            "code": 14,
+            "slot": 136
+          },
+          {
+            "endOffset": 134,
+            "code": 15,
+            "slot": 144
+          }
+        ]
+      },
+      "entry": {
+        "bytes": "4881ec08010000488984242000000048898c2428000000488994243000000048899c24380000004889ac24400000004889b424480000004889bc24500000004c898424580000004c898c24600000004c899424680000004c899c24700000004c89a424780000004c89ac24800000004c89b424880000004c89bc2490000000488b942428000000488b842430000000e86cfbffff8bc04889842498000000488b842420000000488b8c2428000000488b942430000000488b9c2438000000488bac2440000000488bb42448000000488bbc24500000004c8b8424580000004c8b8c24600000004c8b9424680000004c8b9c24700000004c8ba424780000004c8bac24800000004c8bb424880000004c8bbc2490000000408b8424980000004881c408010000c3",
+        "unwind": "017f12007ff4120077e411006fd4100067c40f003f740a00376409002f5408002734070007012100",
+        "instructionOffsets": [
+          0,
+          7,
+          15,
+          23,
+          31,
+          39,
+          47,
+          55,
+          63,
+          71,
+          79,
+          87,
+          95,
+          103,
+          111,
+          119,
+          127,
+          135,
+          143,
+          148,
+          150,
+          158,
+          166,
+          174,
+          182,
+          190,
+          198,
+          206,
+          214,
+          222,
+          230,
+          238,
+          246,
+          254,
+          262,
+          270,
+          278,
+          286,
+          293
+        ],
+        "allocationEnd": 7,
+        "prologEnd": 127,
+        "epilogStart": 286,
+        "nonvolatileSaves": [
+          {
+            "endOffset": 39,
+            "code": 3,
+            "slot": 56
+          },
+          {
+            "endOffset": 47,
+            "code": 5,
+            "slot": 64
+          },
+          {
+            "endOffset": 55,
+            "code": 6,
+            "slot": 72
+          },
+          {
+            "endOffset": 63,
+            "code": 7,
+            "slot": 80
+          },
+          {
+            "endOffset": 103,
+            "code": 12,
+            "slot": 120
+          },
+          {
+            "endOffset": 111,
+            "code": 13,
+            "slot": 128
+          },
+          {
+            "endOffset": 119,
+            "code": 14,
+            "slot": 136
+          },
+          {
+            "endOffset": 127,
+            "code": 15,
+            "slot": 144
+          }
+        ]
+      },
+      "helperOffset": 206,
+      "trapOffset": 234,
+      "cases": [
+        {
+          "index": 0,
+          "scenario": "ok",
+          "explicitTrap": false,
+          "passed": true
+        },
+        {
+          "index": 2039,
+          "scenario": "ok",
+          "explicitTrap": false,
+          "passed": true
+        },
+        {
+          "index": 2040,
+          "scenario": "ok",
+          "explicitTrap": false,
+          "passed": true
+        },
+        {
+          "index": 4079,
+          "scenario": "ok",
+          "explicitTrap": false,
+          "passed": true
+        },
+        {
+          "index": 4080,
+          "scenario": "ok",
+          "explicitTrap": false,
+          "passed": true
+        },
+        {
+          "index": 6119,
+          "scenario": "ok",
+          "explicitTrap": false,
+          "passed": true
+        },
+        {
+          "index": 6120,
+          "scenario": "ok",
+          "explicitTrap": false,
+          "passed": true
+        },
+        {
+          "index": 65535,
+          "scenario": "ok",
+          "explicitTrap": false,
+          "passed": true
+        },
+        {
+          "index": 66048,
+          "scenario": "ok",
+          "explicitTrap": false,
+          "passed": true
+        },
+        {
+          "index": 70000,
+          "scenario": "ok",
+          "explicitTrap": false,
+          "passed": true
+        },
+        {
+          "index": -1,
+          "scenario": "invalid-index",
+          "explicitTrap": true,
+          "passed": true
+        },
+        {
+          "index": 70001,
+          "scenario": "invalid-index",
+          "explicitTrap": true,
+          "passed": true
+        },
+        {
+          "index": 9223372036854775807,
+          "scenario": "invalid-index",
+          "explicitTrap": true,
+          "passed": true
+        },
+        {
+          "index": 0,
+          "scenario": "foreign-owner",
+          "explicitTrap": true,
+          "passed": true
+        },
+        {
+          "index": 1,
+          "scenario": "unoccupied",
+          "explicitTrap": true,
+          "passed": true
+        },
+        {
+          "index": 0,
+          "scenario": "injected-failure",
+          "explicitTrap": true,
+          "passed": true
+        }
+      ]
+    }
+  ],
+  "passedCases": 112,
+  "errorContract": "Packed high32 nonzero causes exact generated UD2. The fixture handles that exception and records explicit failure. No silent zero/ignored write and no production error policy.",
+  "limitations": [
+    "Standard CALL entry with RSP8mod16 only; real native replacement call alignment/incoming entries/unwind scope remains unproved.",
+    "Normal-path register and scalar semantics only; no general arithmetic flag preservation claim. Accepted per-site continuation proofs make arithmetic flags dead.",
+    "Helper lease must cover operation; no Agent pointer escapes. Concurrent same-location writes still need engine ownership."
+  ],
+  "enginePatchApproved": false,
+  "gameLaunched": false
+}

@@ -1,0 +1,13 @@
+{
+  "author": {
+    "label": "Claude Code",
+    "role": "orchestrator"
+  },
+  "body": "**Handoff from MMR-42 (mission scenes from the generated map; `docs/mission-scenes.md`)**\n\n**Terrain context for a compiled world's battle map.** Before a compiled world's campaign loads, register `GeneratedBattleTerrain.ContextSources[sceneName]`. It is a function from a physical point to `TerrainContext { Biome, Landform }`, built over the world's `WorldSurface`:\n- `BiomeAt(x, y)` and `LandformAt(x, y)` read masks.bin planes 0 and 2;\n- `worldgen/policies/terrain-materials.json` names them: `biomes[].core` and `landforms[].name`.\n- **What changes:** the battle map then prefers each cell's biome class (woodland, desert, cold, rock, wetland) and relief (mountain or valley ground). Offline this is shown on worlds A and B (`evidence/world/mission-scenes-tests.json`).\n- **Without it:** the map still installs and stays deterministic, but uses only the face terrain. Compiled navmesh land faces are all Plain, so every land cell takes the open class.\n- The report records the source as `mapSupport.battleSceneSelection.terrainContextSource`.\n\n**First compiled-world campaign run checks:**\n- `battleSceneSelection`: status installed, `landDeterministic == landCells`, `seaDeterministic == seaTerrainChecks`, `navigationSetsMatchCatalogue`, and the inventory hash equal to the catalogue's;\n- `missionScenesProbe=1`: every generated settlement's live location scenes meet the contracts and are found by the engine (there are 292 settlements on A, so expect a longer probe);\n- `missionSceneGuard.mismatches == 0`.\n\n**Settlement factory.** World-scale `SettlementFactory` construction (the MMR-45 path) must pass `MissionScenes.Installed()` as the last constructor argument. That turns on `Conform` and the `prototypeAndScenes` slot claims. The graph validator's `Input.MissionScenes` must be set too: MMR-42 is now a delivered owner, so unclaimed or unverifiable `prototypeAndScenes` slots refuse the world.\n\n**Fail-closed table.** A game whose `sp_battle_scenes` table (or its forest density and ground inventory) differs from the catalogue's refuses the battle map at `AfterLoad`. Regenerate the catalogue with `tools/make_mission_scenes.py` after any game or War Sails update.",
+  "createdAt": "2026-10-17T06:24:30.454Z",
+  "epicId": "ep_01m4fpnf646t254mnh69jhz107",
+  "format": "darkmechanicus.comment",
+  "formatVersion": 1,
+  "id": "cm_01m548h2qpecgetncy4e29p99c",
+  "ticketId": "tk_01m4fqfbgknga8wqn5seq3j94d"
+}

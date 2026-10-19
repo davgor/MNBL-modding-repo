@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "status": "independent-contact-capacity-guard-review-passed",
+  "targetSha256": "2a5e0e0b15513ebb7052d747a621b82c50ee834553eba283b33bbbc33766e12a",
+  "gameExecuted": false,
+  "reviewedArtifact": {
+    "path": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\evidence\\engine-extension\\native-contact-capacity-guard.json",
+    "sha256": "5b9dfaf211e0dbbc2321489a827c510f807c1dc712e43ed9d9f6d68acd90c385"
+  },
+  "reviewerSourceSha256": "81cb48d5cf16aacb32771e6765b2270cfe24881054e4d6286e1311449d7c86a2",
+  "rawInstructionsChecked": 536,
+  "executableDirectBranchEntries": [
+    {
+      "address": "0x1805b7943",
+      "target": "0x1805b7a2c"
+    },
+    {
+      "address": "0x1805b7a8a",
+      "target": "0x1805b79c0"
+    }
+  ],
+  "inputByteCases": 256,
+  "findings": [
+    "Builder guard precedes the first indexed table write; its backedge decrements the guarded index and never increases the bound.",
+    "Cache-hit guard recovers the exact original return pointer and checks the returned count before the common cookie-check epilogue.",
+    "No stack size, unwind record, nonvolatile register value or live arithmetic flag contract is changed.",
+    "Each selected contact producer resets its output count and emits at most once per capsule. At most64 capsules bounds the final byte to candidate+c00, before Agent metadata+c08 and next candidate+c20."
+  ],
+  "limitations": [
+    "Static review only. Cache lifetime, original allocation failures and data races retain original engine contracts.",
+    "Arbitrary computed code entry, native tampering and third-party code are outside the restricted probe profile.",
+    "Does not approve any other patch sites or certify runtime behavior."
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "status": "accepted-bounded-companion-identity-extension-not-hooks",
+  "sourceBinarySha256": "2a5e0e0b15513ebb7052d747a621b82c50ee834553eba283b33bbbc33766e12a",
+  "reviewScriptSha256": "776cc7607bfdb805ffa17e25bc87b12704c0022136889f18f06bbf5e177c77bb",
+  "input": {
+    "path": "evidence\\engine-extension\\native-segmented-companion-worker-extension.json",
+    "sha256": "0121276a9014101ca96e98692aa89d4f52d45a913146360f1e7eb79812f98872"
+  },
+  "verifiedSources": 31,
+  "uniqueExactByteRows": 1757,
+  "review": [
+    "Caller-owned homes are preserved only over the reverse-predecessor lifetime of the named reads; later reuse is excluded.",
+    "Direct stores and exact call output ranges do not overlap the three private homes. The contact-array counter has two zero resets and a single guarded increment; indexed writes lie in RSP+4e0..10e0.",
+    "Closure contracts retain actual field geometry and distinguish copied pointer values from pointers to caller homes. Exact copy managers preserve those fields; this is not a generic closure rule.",
+    "690170 has exactly two external DWORD stores through R8/R9. Its other stores target its frame; its only direct call is the existing cookie check.",
+    "The optional B selection keeps null and nonnull B distinct before the per-record fallback; a shared multiply is never assigned exclusively to A or B.",
+    "The observed-use list is not used as a complete escape or scalar-use proof."
+  ],
+  "result": {
+    "candidateCount": 73,
+    "provenCompanionContributions": 52,
+    "distinctHistoryUses": 10,
+    "distinctFmodAllocationOrRecordUses": 5,
+    "unresolvedFmodReceiverAssociations": 6
+  },
+  "limits": [
+    "All-use routing, original capture lifetime, metadata publication and complete runtime quiescence remain unproved.",
+    "No engine patch approved or installed; no game launched."
+  ],
+  "enginePatchApproved": false,
+  "gameLaunched": false
+}

@@ -1,0 +1,2601 @@
+{
+ "schema": "mnbl.map-scene-trace",
+ "version": 1,
+ "generated_utc": "2026-10-09T23:16:52Z",
+ "game": {
+  "bannerlord": "v1.4.8.119303",
+  "naval_dlc": "v1.2.8.119303",
+  "root": "<game> = D:/SteamLibrary/steamapps/common/Mount & Blade II Bannerlord"
+ },
+ "method": {
+  "game_launched": false,
+  "il_tool": "Mono.Cecil 0.11.0.0 from <game>/bin/Win64_Shipping_Client/mono/lib/mono/gac (via build/scenetrace/Run-Dump.ps1 + CecilDump.cs)",
+  "il_inventory": "build/scenetrace/il/{assemblies,strings,calls,fieldrefs,types}.tsv (88 managed assemblies; TaleWorlds.Native.dll is native and was string-scanned instead)",
+  "il_method_dumps": [
+   "build/scenetrace/il-mapscene.txt",
+   "build/scenetrace/il-engine.txt",
+   "build/scenetrace/il-modules.txt",
+   "build/scenetrace/il-cache.txt",
+   "build/scenetrace/il-nav.txt",
+   "build/scenetrace/il-settlementvisual.txt",
+   "build/scenetrace/il-checkmap.txt",
+   "build/scenetrace/il-partyid.txt"
+  ],
+  "xscene_skeletons": [
+   "build/scenetrace/skeleton_sandbox_main_map.json",
+   "build/scenetrace/skeleton_naval_main_map.json",
+   "build/scenetrace/skeleton_battle_terrain_001.json"
+  ],
+  "other": [
+   "build/scenetrace/terrain_survey.json (567 installed scenes)",
+   "build/scenetrace/native_strings.txt",
+   "build/scenetrace/tpac_hits.json",
+   "build/scenetrace/prefab_scripts.json",
+   "build/scenetrace/map_entity_lookups.tsv"
+  ],
+  "engine_logs_read": "C:/ProgramData/Mount and Blade II Bannerlord/logs/rgl_log_*.txt (read-only)"
+ },
+ "assemblies": [
+  {
+   "assembly": "NavalDLC",
+   "path": "<game>/Modules/NavalDLC/bin/Win64_Shipping_Client/NavalDLC.dll",
+   "sha256": "146e16de9ac242ef63047cc337c858ffaf24a7b153f7bd7e18f1ccca1d268a94"
+  },
+  {
+   "assembly": "NavalDLC.View",
+   "path": "<game>/Modules/NavalDLC/bin/Win64_Shipping_Client/NavalDLC.View.dll",
+   "sha256": "4d074b0558467b534e06aa132c5b9ade0c0e431007a42a754fe61e39674fab8b"
+  },
+  {
+   "assembly": "SandBox",
+   "path": "<game>/Modules/SandBox/bin/Win64_Shipping_Client/SandBox.dll",
+   "sha256": "587c6e94c425745c1478f632f3b66226ff8298666cb27e8e6d9a62488df5956a"
+  },
+  {
+   "assembly": "SandBox.GauntletUI",
+   "path": "<game>/Modules/SandBox/bin/Win64_Shipping_Client/SandBox.GauntletUI.dll",
+   "sha256": "69f2a87c3c3883d04ece46200c5cddf39c188f0ee7c20e26c47fcf64c0f97ed3"
+  },
+  {
+   "assembly": "SandBox.View",
+   "path": "<game>/Modules/SandBox/bin/Win64_Shipping_Client/SandBox.View.dll",
+   "sha256": "c7360e71da06799a0cb6c00c4a0cfab5877621197ba25101433ac28654d169e2"
+  },
+  {
+   "assembly": "StoryMode",
+   "path": "<game>/Modules/StoryMode/bin/Win64_Shipping_Client/StoryMode.dll",
+   "sha256": "cc205186bca26ea04197c543f06bfd14ec7ca8a94b559a3a2753921c4bb27ef0"
+  },
+  {
+   "assembly": "TaleWorlds.CampaignSystem",
+   "path": "<game>/bin/Win64_Shipping_Client/TaleWorlds.CampaignSystem.dll",
+   "sha256": "1f8e33e2ed73e6ec653d7629180afb70649ddc6e5bd1657a802a264efda1c3ae"
+  },
+  {
+   "assembly": "TaleWorlds.Core",
+   "path": "<game>/bin/Win64_Shipping_Client/TaleWorlds.Core.dll",
+   "sha256": "3e5cece8ca42faf3fdde27632519ed2a6f86d1ec6d1a742867729f00001689bf"
+  },
+  {
+   "assembly": "TaleWorlds.Engine",
+   "path": "<game>/bin/Win64_Shipping_Client/TaleWorlds.Engine.dll",
+   "sha256": "bfd5db82d92f75ef15a5eb9a9f0c9391412566933193122db1684019ed704d68"
+  },
+  {
+   "assembly": "TaleWorlds.Library",
+   "path": "<game>/bin/Win64_Shipping_Client/TaleWorlds.Library.dll",
+   "sha256": "ab4ff23e94a6f4b6f293d0cb4333cae731a0499063fe4a8b6c6a3770de32c4e5"
+  },
+  {
+   "assembly": "TaleWorlds.ModuleManager",
+   "path": "<game>/bin/Win64_Shipping_Client/TaleWorlds.ModuleManager.dll",
+   "sha256": "4bf89cc201611b22e158b1c319a20aa0f98fafd925ccef1227168b079f25bcc7"
+  },
+  {
+   "assembly": "TaleWorlds.MountAndBlade",
+   "path": "<game>/bin/Win64_Shipping_Client/TaleWorlds.MountAndBlade.dll",
+   "sha256": "19387f31557ff840d14f378f6bbdf1d58fcff406ab9ff2294dfbb3e49a50b87e"
+  },
+  {
+   "assembly": "TaleWorlds.MountAndBlade.DedicatedCustomServer.ClientHelper",
+   "path": "<game>/Modules/Multiplayer/bin/Win64_Shipping_Client/TaleWorlds.MountAndBlade.DedicatedCustomServer.ClientHelper.dll",
+   "sha256": "54040db39152059ab84decd51a710b165cbe9d4d2b7d6961294c364b3d0ae123"
+  },
+  {
+   "assembly": "TaleWorlds.MountAndBlade.View",
+   "path": "<game>/Modules/Native/bin/Win64_Shipping_Client/TaleWorlds.MountAndBlade.View.dll",
+   "sha256": "ffaac5ed867cd299f8c14f58ffee64f86e50d8b197db5f966759524c3e574ba1"
+  }
+ ],
+ "native": {
+  "path": "<game>/bin/Win64_Shipping_Client/TaleWorlds.Native.dll",
+  "sha256": "2a5e0e0b15513ebb7052d747a621b82c50ee834553eba283b33bbbc33766e12a",
+  "strings_observed": [
+   "%s/%sSceneObj/%s",
+   "%s/SceneObj",
+   "SceneObj/%s/TileSets/",
+   "/scene.xscene",
+   "/terrain.bin",
+   "/navmesh.bin",
+   "%s/flora.bin",
+   "/river_triangles.bin",
+   "/flowmap.dds",
+   "/atmosphere.xml",
+   "%s/ShaderCache/%s",
+   "terrain_shaders_header_data.bin",
+   "SCENE_NOT_FOUND",
+   "reload_tilesets",
+   "Tilesets reloaded.",
+   "invalidate_temp_shader_cache_of_scene",
+   "snapped_water_body",
+   "vista_tileset",
+   "worldmap_battle_scene_grid",
+   "world_map_heightmap",
+   "_physics_heightmap",
+   "scene_has_map_patch",
+   "Main_map",
+   "main_map",
+   "playing_in_campaign_mode"
+  ]
+ },
+ "harmony": {
+  "files_named_like_harmony_under_game_root": [],
+  "official_assemblies_referencing_0Harmony": [],
+  "result": "No official assembly references 0Harmony and no Harmony file exists under the game root (find -iname '*harmony*' returned nothing; assemblies.tsv reference column has no Harmony)."
+ },
+ "scene_resolution": {
+  "managed_scene_path_list": "none - only SandBox.MapScene.GetMainMapModule (File.Exists on SceneObj/Main_map/scene.xscene) and the Multiplayer ClientHelper touch SceneObj paths in managed code",
+  "native_resolver": "IUtil.GetFullFilePathOfScene / IUtil.PairSceneNameToModuleName / IUtil.GetSingleModuleScenesOfModule; IScene.Read (name only) and IScene.ReadInModule (name + module id)",
+  "main_map_precedence": "managed: last active module (launch order) with SceneObj/Main_map/scene.xscene; read with ReadInModule(\"Main_map\", moduleId). Not an override list and not a different scene name.",
+  "unique_scene_names_per_module": "Of 567 installed SceneObj folders that contain scene.xscene (SandBoxCore 202, SandBox 193, NavalDLC 89, Native 79, StoryMode 4) only Main_map appears in two modules (SandBox, NavalDLC); every other name is unique, i.e. official modules add new scene names freely (NavalDLC adds 88 besides Main_map). All of these were present at startup.",
+  "xscene_root_name_matches_folder": "567/567 installed scenes",
+  "runtime_reindex_candidates": [
+   "Utilities.PairSceneNameToModuleName(scene, module) - used by official Multiplayer map download (untested for singleplayer)",
+   "Utilities.ExecuteCommandLineCommand(\"resource.shader.invalidate_temp_shader_cache_of_scene <Module>/<scene>\")",
+   "console 'reload_tilesets' (native string only)",
+   "Utilities.CheckResourceModifications() (purpose unproven)"
+  ],
+  "observed_fallback_path": "Our earlier SurfaceProbeScreen named a scene 'mnbl_render_probe' via Scene.SetName; the engine created <game>/bin/Win64_Shipping_Client/SceneObj/mnbl_render_probe/ShaderCache/D3D11/terrain_shaders_header_data.bin (8 zero bytes) - i.e. an unindexed name resolves to a bare cwd-relative SceneObj path."
+ },
+ "engine_log_evidence": [
+  {
+   "file": "rgl_log_17972.txt (2026-10-09, build 119303)",
+   "line": "Command Args: /singleplayer _MODULES_*Native*SandBoxCore*CustomBattle*Sandbox*StoryMode*NavalDLC*MNBL.ProceduralWorld*_MODULES_"
+  },
+  {
+   "file": "rgl_log_18444.txt (June, build 115628 - older client)",
+   "line": "Loading xml file: $BASE/Modules/NavalDLC/SceneObj/Main_map/scene.xscene. / .../Main_map/atmosphere.xml."
+  },
+  {
+   "file": "rgl_log_*.txt (June, build 115628)",
+   "line": "Overriding item main_map_physics_heightmap | main_map_snow_flowmap | world_map_heightmap | worldmap_battle_scene_grid | worldmap_river_mask | worldmap_river_undermask | worldmap_ocean_gradient | worldmap_water_normal_map"
+  }
+ ],
+ "global_texture_resources": {
+  "note": "Map textures are global named resources in asset packages, not scene-folder files. NavalDLC packs override Native packs by name (log 'Overriding item').",
+  "locations": [
+   {
+    "file": "$GAME\\Modules\\Native\\AssetPackages\\materials.tpac",
+    "size": 795935,
+    "names": [
+     "wat_main_map_ocean_g",
+     "worldmap_river_mat"
+    ]
+   },
+   {
+    "file": "$GAME\\Modules\\Native\\AssetPackages\\pack_0.tpac",
+    "size": 496460578,
+    "names": [
+     "worldmap_river_normal"
+    ]
+   },
+   {
+    "file": "$GAME\\Modules\\Native\\AssetPackages\\pack_1.tpac",
+    "size": 285041619,
+    "names": [
+     "worldmap_river_undermask"
+    ]
+   },
+   {
+    "file": "$GAME\\Modules\\Native\\AssetPackages\\pack_10.tpac",
+    "size": 371428944,
+    "names": [
+     "worldmap_battle_scene_grid"
+    ]
+   },
+   {
+    "file": "$GAME\\Modules\\Native\\AssetPackages\\pack_14.tpac",
+    "size": 444479361,
+    "names": [
+     "worldmap_ocean_gradient"
+    ]
+   },
+   {
+    "file": "$GAME\\Modules\\Native\\AssetPackages\\pack_18.tpac",
+    "size": 526392777,
+    "names": [
+     "worldmap_river_mask"
+    ]
+   },
+   {
+    "file": "$GAME\\Modules\\Native\\AssetPackages\\pack_19.tpac",
+    "size": 303134057,
+    "names": [
+     "world_map_heightmap"
+    ]
+   },
+   {
+    "file": "$GAME\\Modules\\Native\\AssetPackages\\pack_3.tpac",
+    "size": 251878206,
+    "names": [
+     "main_map_snow_flowmap",
+     "worldmap_water_normal_map"
+    ]
+   },
+   {
+    "file": "$GAME\\Modules\\Native\\AssetPackages\\pack_9.tpac",
+    "size": 246443201,
+    "names": [
+     "main_map_physics_heightmap"
+    ]
+   },
+   {
+    "file": "$GAME\\Modules\\Native\\EmAssetPackages\\editor_contents\\editor_contents.tpac",
+    "size": 71457636,
+    "names": [
+     "main_map_snow_flowmap"
+    ]
+   },
+   {
+    "file": "$GAME\\Modules\\Native\\EmAssetPackages\\water_prefabs\\water_prefabs\\water_prefabs.tpac",
+    "size": 16974,
+    "names": [
+     "wat_main_map_ocean_g"
+    ]
+   },
+   {
+    "file": "$GAME\\Modules\\Native\\EmAssetPackages\\world_map\\world_map.tpac",
+    "size": 202554507,
+    "names": [
+     "main_map_physics_heightmap",
+     "world_map_heightmap",
+     "worldmap_battle_scene_grid",
+     "worldmap_ocean_gradient",
+     "worldmap_river_mask",
+     "worldmap_river_mat",
+     "worldmap_river_normal",
+     "worldmap_river_undermask",
+     "worldmap_water_normal_map"
+    ]
+   },
+   {
+    "file": "$GAME\\Modules\\NavalDLC\\AssetPackages\\materials.tpac",
+    "size": 261187,
+    "names": [
+     "naval_worldmap_river",
+     "naval_worldmap_water"
+    ]
+   },
+   {
+    "file": "$GAME\\Modules\\NavalDLC\\AssetPackages\\pack_10.tpac",
+    "size": 211978255,
+    "names": [
+     "worldmap_river_undermask"
+    ]
+   },
+   {
+    "file": "$GAME\\Modules\\NavalDLC\\AssetPackages\\pack_11.tpac",
+    "size": 350251564,
+    "names": [
+     "worldmap_water_normal_map"
+    ]
+   },
+   {
+    "file": "$GAME\\Modules\\NavalDLC\\AssetPackages\\pack_12.tpac",
+    "size": 256871356,
+    "names": [
+     "world_map_heightmap"
+    ]
+   },
+   {
+    "file": "$GAME\\Modules\\NavalDLC\\AssetPackages\\pack_2.tpac",
+    "size": 217120024,
+    "names": [
+     "main_map_physics_heightmap"
+    ]
+   },
+   {
+    "file": "$GAME\\Modules\\NavalDLC\\AssetPackages\\pack_3.tpac",
+    "size": 363743605,
+    "names": [
+     "worldmap_ocean_gradient"
+    ]
+   },
+   {
+    "file": "$GAME\\Modules\\NavalDLC\\AssetPackages\\pack_4.tpac",
+    "size": 254484717,
+    "names": [
+     "main_map_snow_flowmap"
+    ]
+   },
+   {
+    "file": "$GAME\\Modules\\NavalDLC\\AssetPackages\\pack_7.tpac",
+    "size": 381520522,
+    "names": [
+     "worldmap_battle_scene_grid"
+    ]
+   },
+   {
+    "file": "$GAME\\Modules\\NavalDLC\\AssetPackages\\pack_9.tpac",
+    "size": 350491717,
+    "names": [
+     "worldmap_river_mask"
+    ]
+   }
+  ]
+ },
+ "call_sites": [
+  {
+   "id": "creator-registered",
+   "assembly": "SandBox",
+   "sha256": "587c6e94c425745c1478f632f3b66226ff8298666cb27e8e6d9a62488df5956a",
+   "method": "SandBox.SandBoxSubModule::OnGameInitializationFinished(Game)",
+   "il_offset": "IL_0020",
+   "instruction": "callvirt Campaign::set_MapSceneCreator(new SandBox.MapSceneCreator())",
+   "requirement": "Campaign.MapSceneCreator is a public settable property (IMapSceneCreator); SandBox assigns it on every campaign game init.",
+   "generated_world_substitution": "Our submodule (loaded after SandBox) may assign its own IMapSceneCreator in OnGameInitializationFinished.",
+   "least_invasive_hook": "Campaign.MapSceneCreator setter (public)",
+   "hook_kind": "official-extension-point",
+   "status": "il"
+  },
+  {
+   "id": "submodule-order",
+   "assembly": "TaleWorlds.MountAndBlade",
+   "sha256": "19387f31557ff840d14f378f6bbdf1d58fcff406ab9ff2294dfbb3e49a50b87e",
+   "method": "TaleWorlds.MountAndBlade.MBGameManager::OnGameInitializationFinished(Game)",
+   "il_offset": "IL_0005..IL_001a",
+   "instruction": "foreach MBSubModuleBase in Module.CurrentModule.CollectSubModules(): OnGameInitializationFinished(game)",
+   "requirement": "Submodule callbacks run in module load order, so a later module overrides SandBox's creator.",
+   "generated_world_substitution": "none",
+   "least_invasive_hook": "module load order (SubModule.xml DependedModules: NavalDLC)",
+   "hook_kind": "official-extension-point",
+   "status": "il"
+  },
+  {
+   "id": "load-map-scene",
+   "assembly": "TaleWorlds.CampaignSystem",
+   "sha256": "1f8e33e2ed73e6ec653d7629180afb70649ddc6e5bd1657a802a264efda1c3ae",
+   "method": "TaleWorlds.CampaignSystem.Campaign::LoadMapScene()",
+   "il_offset": "IL_0007/IL_005e/IL_0069/IL_007a/IL_00ff",
+   "instruction": "CreateMapScene(); SetSceneLevels(level_1,level_2,level_3,siege,raid,burned); Load(); GetMapBorders(); AfterLoad()",
+   "requirement": "Map scene object comes only from Campaign.MapSceneCreator; borders feed MapMinimumPosition/MapMaximumPosition/MapMaximumHeight/MapDiagonal and PathFindingMaxCostLimit.",
+   "generated_world_substitution": "Creator returns a SandBox.MapScene (or subclass); borders from border_min/border_max entities.",
+   "least_invasive_hook": "Campaign.MapSceneCreator",
+   "hook_kind": "official-extension-point",
+   "status": "il"
+  },
+  {
+   "id": "load-trigger",
+   "assembly": "TaleWorlds.CampaignSystem",
+   "sha256": "1f8e33e2ed73e6ec653d7629180afb70649ddc6e5bd1657a802a264efda1c3ae",
+   "method": "TaleWorlds.CampaignSystem.Campaign::DoLoadingForGameType(GameTypeLoadingStates,GameTypeLoadingStates&)",
+   "il_offset": "IL_0037",
+   "instruction": "call Campaign::LoadMapScene() when GameMode == Campaign (state 2); Game.Initialize()->Campaign.OnInitialize() ran in state 0",
+   "requirement": "Creator must be set before loading state 2; OnGameInitializationFinished (end of Campaign.OnInitialize) satisfies this.",
+   "generated_world_substitution": "none",
+   "least_invasive_hook": "n/a",
+   "hook_kind": "official-extension-point",
+   "status": "il"
+  },
+  {
+   "id": "crc-store-new-game",
+   "assembly": "TaleWorlds.CampaignSystem",
+   "sha256": "1f8e33e2ed73e6ec653d7629180afb70649ddc6e5bd1657a802a264efda1c3ae",
+   "method": "TaleWorlds.CampaignSystem.Campaign::DoLoadingForGameType",
+   "il_offset": "IL_010a/IL_011b",
+   "instruction": "stores IMapScene.GetSceneXmlCrc()/GetSceneNavigationMeshCrc() into _campaignMapSceneXmlCrc/_campaignMapSceneNavigationMeshCrc",
+   "requirement": "Saved campaigns remember the map scene CRCs.",
+   "generated_world_substitution": "Republish identical slot bytes before loading a save.",
+   "least_invasive_hook": "slot publication before load",
+   "hook_kind": "file",
+   "status": "il"
+  },
+  {
+   "id": "crc-check-on-load",
+   "assembly": "TaleWorlds.CampaignSystem",
+   "sha256": "1f8e33e2ed73e6ec653d7629180afb70649ddc6e5bd1657a802a264efda1c3ae",
+   "method": "TaleWorlds.CampaignSystem.Campaign::CheckMapUpdate()",
+   "il_offset": "IL_0006..IL_0028",
+   "instruction": "if xml or navmesh CRC differs from save: CalculateCachedValues + CheckPositionsForMapChangeAndUpdateIfNeeded on settlements/map events/armies/parties",
+   "requirement": "Loading a save against different scene bytes silently repositions entities.",
+   "generated_world_substitution": "Cold-load must republish the world's exact scene.xscene/navmesh.bin into the slot first.",
+   "least_invasive_hook": "slot publication before load",
+   "hook_kind": "file",
+   "status": "il"
+  },
+  {
+   "id": "mapscene-subclass-required",
+   "assembly": "NavalDLC.View",
+   "sha256": "4d074b0558467b534e06aa132c5b9ade0c0e431007a42a754fe61e39674fab8b",
+   "method": "NavalDLC.View.NavalMapSceneWrapper::.ctor()",
+   "il_offset": "IL_001c",
+   "instruction": "castclass SandBox.MapScene on Campaign.MapSceneWrapper",
+   "requirement": "31 instructions (25 castclass, 6 isinst) in 22 methods of NavalDLC, NavalDLC.View, SandBox, SandBox.View and SandBox.GauntletUI take SandBox.MapScene from the campaign map scene; with a non-MapScene IMapScene the castclass sites throw InvalidCastException and the isinst sites get null.",
+   "generated_world_substitution": "Any replacement must derive from SandBox.MapScene (class is public, not sealed; its IMapScene methods are virtual final, so a subclass must re-implement IMapScene to redirect Load).",
+   "least_invasive_hook": "subclass SandBox.MapScene + interface re-implementation",
+   "hook_kind": "official-extension-point",
+   "status": "il",
+   "notes": "all 31 sites listed in call_sites_castclass_mapscene (Cecil scan of Modules/*/bin SandBox*/NavalDLC*/StoryMode* assemblies). Cecil visibility check: every non-System member referenced by SandBox.MapScene::Load IL outside MapScene itself is public (incl. SandBoxHelpers/MapSceneHelper.GetRegionMapping, ManagedDelegate/DelegateDefinition..ctor, Campaign.LateAITick, Campaign.CampaignLateAITickTask); MapScene private fields would need reflection."
+  },
+  {
+   "id": "mapscene-load-create",
+   "assembly": "SandBox",
+   "sha256": "587c6e94c425745c1478f632f3b66226ff8298666cb27e8e6d9a62488df5956a",
+   "method": "SandBox.MapScene::Load()",
+   "il_offset": "IL_001f",
+   "instruction": "Scene.CreateNewScene(true,true,DecalAtlasGroup 1,\"MapScene\"); SetClothSimulationState; agent renderer; SetOcclusionMode(true)",
+   "requirement": "Native scene object named MapScene before Read.",
+   "generated_world_substitution": "none",
+   "least_invasive_hook": "n/a",
+   "hook_kind": "official-extension-point",
+   "status": "il"
+  },
+  {
+   "id": "region-map",
+   "assembly": "SandBox",
+   "sha256": "587c6e94c425745c1478f632f3b66226ff8298666cb27e8e6d9a62488df5956a",
+   "method": "SandBox.MapScene::Load()",
+   "il_offset": "IL_00a7/IL_00b4",
+   "instruction": "SandBoxHelpers.MapSceneHelper.GetRegionMapping(PartyNavigationModel) -> Scene.SetNavMeshRegionMap(bool[])",
+   "requirement": "bool[max(TerrainType)+1]; true where TerrainType valid for NavigationType.Default. Navmesh face group ids must be TerrainType values (GetFaceTerrainType returns FaceGroupIndex).",
+   "generated_world_substitution": "navmesh.bin faces typed with TerrainType ids (Plain=1..UnderBridge=25; sea = Water 10, CoastalSea 18, OpenSea 19).",
+   "least_invasive_hook": "PartyNavigationModel (game model) - normally unchanged",
+   "hook_kind": "official-extension-point",
+   "status": "il"
+  },
+  {
+   "id": "disable-unwalkable",
+   "assembly": "SandBox",
+   "sha256": "587c6e94c425745c1478f632f3b66226ff8298666cb27e8e6d9a62488df5956a",
+   "method": "SandBox.MapScene::DisableUnwalkableNavigationMeshes()",
+   "il_offset": "IL_000f/IL_0026",
+   "instruction": "PartyNavigationModel.GetInvalidTerrainTypesForNavigationType(All=3) -> Scene.SetAbilityOfFacesWithId(id,false)",
+   "requirement": "Face ids invalid for all navigation types are disabled before Read.",
+   "generated_world_substitution": "Use TerrainType ids consistently.",
+   "least_invasive_hook": "n/a",
+   "hook_kind": "official-extension-point",
+   "status": "il"
+  },
+  {
+   "id": "main-map-module",
+   "assembly": "SandBox",
+   "sha256": "587c6e94c425745c1478f632f3b66226ff8298666cb27e8e6d9a62488df5956a",
+   "method": "SandBox.MapScene::GetMainMapModule()",
+   "il_offset": "IL_0002/IL_0034/IL_0039/IL_0041",
+   "instruction": "foreach ModuleHelper.GetActiveModules(): if File.Exists(Path.Combine(FolderPath,\"SceneObj\",\"Main_map\",\"scene.xscene\")) result = module  (no break -> LAST match wins)",
+   "requirement": "Main_map precedence is managed: last active module in launch order that has SceneObj/Main_map/scene.xscene. NavalDLC beats SandBox because it is later in the module list.",
+   "generated_world_substitution": "Shipping Modules/MNBL.ProceduralWorld/SceneObj/Main_map/scene.xscene makes SandBox.MapScene.Load read OUR folder with no code (our module is last in the launch list).",
+   "least_invasive_hook": "file presence in our module (zero-code)",
+   "hook_kind": "file",
+   "status": "il"
+  },
+  {
+   "id": "main-map-read",
+   "assembly": "SandBox",
+   "sha256": "587c6e94c425745c1478f632f3b66226ff8298666cb27e8e6d9a62488df5956a",
+   "method": "SandBox.MapScene::Load()",
+   "il_offset": "IL_00c9..IL_00db (fallback IL_00e8..IL_00f4)",
+   "instruction": "Scene.Read(\"Main_map\", moduleInfo.Id, ref SceneInitializationData(true){UsePhysicsMaterials=false,EnableFloraPhysics=false,UseTerrainMeshBlending=false,CreateOros=false}, \"\") -> IScene.ReadInModule",
+   "requirement": "Scene name literal \"Main_map\" is hard-coded; module id comes from GetMainMapModule; LoadNavMesh/InitPhysicsWorld/InitFloraNodes stay true.",
+   "generated_world_substitution": "Either the Main_map override slot (zero code) or a MapScene subclass that calls Scene.Read(slotName, \"MNBL.ProceduralWorld\", ...).",
+   "least_invasive_hook": "file presence or MapScene subclass",
+   "hook_kind": "file",
+   "status": "il"
+  },
+  {
+   "id": "borders",
+   "assembly": "SandBox",
+   "sha256": "587c6e94c425745c1478f632f3b66226ff8298666cb27e8e6d9a62488df5956a",
+   "method": "SandBox.MapScene::Load()",
+   "il_offset": "IL_010a/IL_011b",
+   "instruction": "Scene.GetFirstEntityWithName(\"border_min\"/\"border_max\") -> GetGlobalFrame().origin (no null check)",
+   "requirement": "Entities named border_min and border_max are mandatory; border_max.z is MapMaximumHeight.",
+   "generated_world_substitution": "Emit both entities in scene.xscene.",
+   "least_invasive_hook": "scene.xscene",
+   "hook_kind": "file",
+   "status": "il"
+  },
+  {
+   "id": "medit-water-plane",
+   "assembly": "SandBox",
+   "sha256": "587c6e94c425745c1478f632f3b66226ff8298666cb27e8e6d9a62488df5956a",
+   "method": "SandBox.MapScene::Load()",
+   "il_offset": "IL_019c",
+   "instruction": "GetFirstEntityWithName(\"medit_water_plane\") -> SetDoNotCheckVisibility(true) if present",
+   "requirement": "Optional.",
+   "generated_world_substitution": "Optional entity.",
+   "least_invasive_hook": "scene.xscene",
+   "hook_kind": "file",
+   "status": "il"
+  },
+  {
+   "id": "town-scene-manager",
+   "assembly": "SandBox",
+   "sha256": "587c6e94c425745c1478f632f3b66226ff8298666cb27e8e6d9a62488df5956a",
+   "method": "SandBox.MapScene::Load()",
+   "il_offset": "IL_01c0..IL_01d7",
+   "instruction": "GetFirstEntityWithScriptComponent(\"Town Scene Manager\") == null -> MBDebug.ShowWarning",
+   "requirement": "Native script \"Town Scene Manager\" expected once (warning only).",
+   "generated_world_substitution": "Emit one entity with <script name=\"Town Scene Manager\"/>.",
+   "least_invasive_hook": "scene.xscene",
+   "hook_kind": "file",
+   "status": "il"
+  },
+  {
+   "id": "atmosphere",
+   "assembly": "SandBox",
+   "sha256": "587c6e94c425745c1478f632f3b66226ff8298666cb27e8e6d9a62488df5956a",
+   "method": "SandBox.MapScene::Load()",
+   "il_offset": "IL_01e3/IL_01f7/IL_01fc",
+   "instruction": "MBMapScene.LoadAtmosphereData(scene) [native]; MapWeatherModel.InitializeCaches(); MBMapScene.ValidateTerrainSoundIds() [native]",
+   "requirement": "atmosphere.xml in the scene folder (engine log shows .../SceneObj/Main_map/atmosphere.xml loaded after scene.xscene).",
+   "generated_world_substitution": "Copy template atmosphere.xml.",
+   "least_invasive_hook": "scene folder file",
+   "hook_kind": "file",
+   "status": "il"
+  },
+  {
+   "id": "terrain-size",
+   "assembly": "SandBox",
+   "sha256": "587c6e94c425745c1478f632f3b66226ff8298666cb27e8e6d9a62488df5956a",
+   "method": "SandBox.MapScene::Load()",
+   "il_offset": "IL_021c",
+   "instruction": "Scene.GetTerrainData(out Vec2i nodeDims, out float nodeSize, out int layerCount, out int layerVersion); _terrainSize = nodeDims * nodeSize",
+   "requirement": "Terrain must exist; _terrainSize drives snow/rain/wind/battle-patch texture lookups.",
+   "generated_world_substitution": "terrain element node_dimension_x/y and node_size.",
+   "least_invasive_hook": "scene.xscene + terrain.bin",
+   "hook_kind": "file",
+   "status": "il"
+  },
+  {
+   "id": "battle-index-map",
+   "assembly": "SandBox",
+   "sha256": "587c6e94c425745c1478f632f3b66226ff8298666cb27e8e6d9a62488df5956a",
+   "method": "SandBox.MapScene::Load()",
+   "il_offset": "IL_0265",
+   "instruction": "MBMapScene.GetBattleSceneIndexMap(scene, ref byte[] map, ref w, ref h) [native IMBMapScene.GetBattleSceneIndexMapResolution/GetBattleSceneIndexMap]",
+   "requirement": "2 bytes per texel: sceneIndex, packed normalized coords (4+4 bits); consumed only by MapScene.GetMapPatchAtPosition (managed). Native source is probably texture resource worldmap_battle_scene_grid (hypothesis).",
+   "generated_world_substitution": "After Load, overwrite private fields _battleTerrainIndexMap/_battleTerrainIndexMapWidth/_battleTerrainIndexMapHeight by reflection from a MapScene subclass, or ship a texture.",
+   "least_invasive_hook": "MapScene subclass + reflection (no Harmony)",
+   "hook_kind": "reflection",
+   "status": "il",
+   "notes": "native data source is a hypothesis; the managed consumer is IL-proven"
+  },
+  {
+   "id": "first-tick-late-ai",
+   "assembly": "SandBox",
+   "sha256": "587c6e94c425745c1478f632f3b66226ff8298666cb27e8e6d9a62488df5956a",
+   "method": "SandBox.MapScene::Load()",
+   "il_offset": "IL_028b/IL_02b6",
+   "instruction": "Scene.Tick(0.1); Campaign.CampaignLateAITickTask = AsyncTask.CreateWithDelegate(Campaign.LateAITick)",
+   "requirement": "A replacement Load must replicate this or campaign late AI never runs.",
+   "generated_world_substitution": "Replicate in subclass Load.",
+   "least_invasive_hook": "MapScene subclass",
+   "hook_kind": "official-extension-point",
+   "status": "il"
+  },
+  {
+   "id": "face-index",
+   "assembly": "SandBox",
+   "sha256": "587c6e94c425745c1478f632f3b66226ff8298666cb27e8e6d9a62488df5956a",
+   "method": "SandBox.MapScene::GetFaceIndex(CampaignVec2&)",
+   "il_offset": "IL_0028",
+   "instruction": "Scene.GetNavMeshFaceIndex(ref PathFaceRecord, Vec2, IsOnLand, false, true)",
+   "requirement": "Land/sea split comes from the navmesh region map.",
+   "generated_world_substitution": "navmesh.bin",
+   "least_invasive_hook": "native navmesh",
+   "hook_kind": "file",
+   "status": "il"
+  },
+  {
+   "id": "height-at-point",
+   "assembly": "SandBox",
+   "sha256": "587c6e94c425745c1478f632f3b66226ff8298666cb27e8e6d9a62488df5956a",
+   "method": "SandBox.MapScene::GetHeightAtPoint(CampaignVec2&,float&)",
+   "il_offset": "IL_0030",
+   "instruction": "Scene.GetHeightAtPoint(Vec2, BodyFlags 16 | (IsOnLand ? 128 : 544321929), out float)",
+   "requirement": "Native physics/terrain height query.",
+   "generated_world_substitution": "terrain.bin (HGHT/PHYM) + water bodies",
+   "least_invasive_hook": "native terrain",
+   "hook_kind": "file",
+   "status": "il"
+  },
+  {
+   "id": "terrain-normal",
+   "assembly": "SandBox",
+   "sha256": "587c6e94c425745c1478f632f3b66226ff8298666cb27e8e6d9a62488df5956a",
+   "method": "SandBox.MapScene::GetTerrainHeightAndNormal / GetGroundNormal",
+   "il_offset": "IL_0009 / IL_0007",
+   "instruction": "Scene.GetTerrainHeightAndNormal / Scene.GetNormalAt",
+   "requirement": "Native terrain queries.",
+   "generated_world_substitution": "terrain.bin",
+   "least_invasive_hook": "native terrain",
+   "hook_kind": "file",
+   "status": "il"
+  },
+  {
+   "id": "winter-factor",
+   "assembly": "SandBox",
+   "sha256": "587c6e94c425745c1478f632f3b66226ff8298666cb27e8e6d9a62488df5956a",
+   "method": "SandBox.MapScene::GetWinterTimeFactor()",
+   "il_offset": "IL_0006",
+   "instruction": "Scene.GetWinterTimeFactor()",
+   "requirement": "Native.",
+   "generated_world_substitution": "none",
+   "least_invasive_hook": "n/a",
+   "hook_kind": "file",
+   "status": "il"
+  },
+  {
+   "id": "crc",
+   "assembly": "SandBox",
+   "sha256": "587c6e94c425745c1478f632f3b66226ff8298666cb27e8e6d9a62488df5956a",
+   "method": "SandBox.MapScene::GetSceneXmlCrc / GetSceneNavigationMeshCrc",
+   "il_offset": "IL_0006",
+   "instruction": "Scene.GetSceneXMLCRC() / Scene.GetNavigationMeshCRC() (requires SetFetchCrcInfoOfScene(true) at Load IL_008d)",
+   "requirement": "Stored in saves.",
+   "generated_world_substitution": "deterministic files per world",
+   "least_invasive_hook": "file",
+   "hook_kind": "file",
+   "status": "il"
+  },
+  {
+   "id": "snow-rain-wind",
+   "assembly": "SandBox.View",
+   "sha256": "c7360e71da06799a0cb6c00c4a0cfab5877621197ba25101433ac28654d169e2",
+   "method": "SandBox.View.Map.SnowAndRainTextureDefiner::SetDataToScene()",
+   "il_offset": "IL_0029",
+   "instruction": "MapScene.SetSnowAndRainDataWithDimension(Texture SnowAndRainTexture, int WeatherNodeGridWidthAndHeight)",
+   "requirement": "Only caller that allocates MapScene._snowAndRainData and _windFlowMapData (512*512*2 floats via Scene.GetWindFlowMapData). Without it GetSnowAmountAtPosition/GetRainAmountAtPosition/GetWindAtPosition index null arrays.",
+   "generated_world_substitution": "Include prefab MapSnowAndRainDefiner (SandBox/Prefabs/map_icons.xml: SnowAndRainTexture=main_map_snow_flowmap, WeatherNodeGridWidthAndHeight=32) or call SetSnowAndRainDataWithDimension(ourTexture,32) ourselves (public method).",
+   "least_invasive_hook": "scene prefab or public MapScene method",
+   "hook_kind": "official-extension-point",
+   "status": "il"
+  },
+  {
+   "id": "dynamic-snow-texture",
+   "assembly": "SandBox",
+   "sha256": "587c6e94c425745c1478f632f3b66226ff8298666cb27e8e6d9a62488df5956a",
+   "method": "SandBox.MapScene::SetSnowAndRainDataWithDimension(Texture,int)",
+   "il_offset": "IL_0008/IL_0046/IL_0052/IL_0079",
+   "instruction": "Scene.CreateDynamicRainTexture(dim,dim); Texture.GetPixelData(byte[w*h*2]); Scene.SetDynamicSnowTexture(texture); Campaign.DefaultWeatherNodeDimension=dim; Scene.GetWindFlowMapData(float[524288])",
+   "requirement": "Snow/rain per-pixel bytes come from a texture (resource main_map_snow_flowmap, also terrain attribute dynamic_flowmap_texture_name).",
+   "generated_world_substitution": "Texture.CreateFromByteArray(byte[],w,h) or Texture.CreateFromMemory(byte[]) for a per-seed texture (hypothesis: format/registration).",
+   "least_invasive_hook": "public Texture factory + public MapScene method",
+   "hook_kind": "official-extension-point",
+   "status": "hypothesis"
+  },
+  {
+   "id": "siege-camp",
+   "assembly": "SandBox",
+   "sha256": "587c6e94c425745c1478f632f3b66226ff8298666cb27e8e6d9a62488df5956a",
+   "method": "SandBox.MapScene::GetSiegeCampFrames(Settlement,...)",
+   "il_offset": "IL_001f/IL_0056/IL_0072",
+   "instruction": "Scene.GetCampaignEntityWithName(settlement.Party.Id) children tagged map_camp_area_1 / map_camp_area_2",
+   "requirement": "Fortification entities need camp-area children.",
+   "generated_world_substitution": "scene.xscene settlement entities",
+   "least_invasive_hook": "scene.xscene",
+   "hook_kind": "file",
+   "status": "il"
+  },
+  {
+   "id": "atmosphere-probes",
+   "assembly": "SandBox",
+   "sha256": "587c6e94c425745c1478f632f3b66226ff8298666cb27e8e6d9a62488df5956a",
+   "method": "SandBox.MapScene::GetAtmosphereStates()",
+   "il_offset": "IL_000c",
+   "instruction": "Scene.FindEntitiesWithTag(\"atmosphere_probe\") + MapAtmosphereProbe script",
+   "requirement": "Optional; both official Main_map scenes have zero such tags.",
+   "generated_world_substitution": "none",
+   "least_invasive_hook": "scene.xscene",
+   "hook_kind": "file",
+   "status": "il"
+  },
+  {
+   "id": "settlement-entities",
+   "assembly": "SandBox.View",
+   "sha256": "c7360e71da06799a0cb6c00c4a0cfab5877621197ba25101433ac28654d169e2",
+   "method": "SandBox.View.Map.Visuals.SettlementVisual::OnStartup()",
+   "il_offset": "IL_0014/IL_0059",
+   "instruction": "Scene.GetCampaignEntityWithName(PartyBase.Id == Settlement.StringId); if null -> IMapScene.AddNewEntityToMapScene(settlement.StringId, position) -> GameEntity.Instantiate(scene, prefabName=StringId)",
+   "requirement": "Every settlement needs a scene entity named exactly its StringId, or a registered PREFAB with that name. Children tags: main_map_city_gate, main_map_city_port, map_settlement_circle, map_banner_placeholder, siege_preparation, map_solid_wall/map_broken_wall/map_breachable_wall, map_siege_*.",
+   "generated_world_substitution": "Bake settlement entities (named by generated StringIds) into scene.xscene; prefab fallback needs prefab names registered at startup.",
+   "least_invasive_hook": "scene.xscene",
+   "hook_kind": "file",
+   "status": "il"
+  },
+  {
+   "id": "settlement-position-script",
+   "assembly": "SandBox.View",
+   "sha256": "c7360e71da06799a0cb6c00c4a0cfab5877621197ba25101433ac28654d169e2",
+   "method": "SandBox.View.Map.SettlementPositionScript::OnInit()",
+   "il_offset": "IL_0001/IL_0028",
+   "instruction": "InitializeCachedVariables (GetMapModuleId from Scene.GetModulePath; compares \"NavalDLC\"/\"Sandbox\"); RegisterNavigationCachesOnGameLoad(naval = mapIsNavalDLC || (!mapIsSandBox && NavalDLC active))",
+   "requirement": "Scene must contain an entity with SettlementPositionScript (official maps: entity settlements_scripts, variables _partyNavigationModelOverriddenClassName/_distanceModelOverridenClassName).",
+   "generated_world_substitution": "Emit settlements_scripts entity; for a scene in our module with NavalDLC active, Default+Naval+All caches are registered.",
+   "least_invasive_hook": "scene.xscene",
+   "hook_kind": "file",
+   "status": "il"
+  },
+  {
+   "id": "distance-cache-path",
+   "assembly": "SandBox.View",
+   "sha256": "c7360e71da06799a0cb6c00c4a0cfab5877621197ba25101433ac28654d169e2",
+   "method": "SandBox.View.Map.SettlementPositionScript::ReadNavigationCacheForNavigationTypeOnGameLoad / GetSettlementsDistanceCacheFileForCapability",
+   "il_offset": "IL_0006,IL_002d / IL_0006..IL_0034",
+   "instruction": "foreach active module: <ModuleHelper.GetModuleFullPath(id)>ModuleData/DistanceCaches/settlements_distance_cache_<Default|Naval|All>.bin, File.Exists, last match wins; missing -> FailedAssert + SandBoxNavigationCache.GenerateCacheData() (slow)",
+   "requirement": "Distance caches are per MODULE, not per scene. Installed: SandBox Default; NavalDLC Default/Naval/All.",
+   "generated_world_substitution": "Write our module's ModuleData/DistanceCaches/settlements_distance_cache_{Default,Naval,All}.bin per generated world (NavigationCache.Serialize is public), or let the engine generate on first load.",
+   "least_invasive_hook": "file in our module",
+   "hook_kind": "file",
+   "status": "il"
+  },
+  {
+   "id": "distance-cache-crc",
+   "assembly": "TaleWorlds.CampaignSystem",
+   "sha256": "1f8e33e2ed73e6ec653d7629180afb70649ddc6e5bd1657a802a264efda1c3ae",
+   "method": "TaleWorlds.CampaignSystem.Map.DistanceCache.NavigationCache`1::Deserialize(string)",
+   "il_offset": "IL_002b/IL_0032/IL_0042/IL_0052",
+   "instruction": "ReadUInt32 x2 then GetSceneXmlCrc()/GetSceneNavigationMeshCrc() - all four results popped (never compared)",
+   "requirement": "Cache files are not validated against the scene; a stale cache is silently used.",
+   "generated_world_substitution": "Always rewrite caches together with the slot.",
+   "least_invasive_hook": "file in our module",
+   "hook_kind": "file",
+   "status": "il"
+  },
+  {
+   "id": "siege-prefab-cache",
+   "assembly": "SandBox.View",
+   "sha256": "c7360e71da06799a0cb6c00c4a0cfab5877621197ba25101433ac28654d169e2",
+   "method": "SandBox.View.Map.MapScreen::OnInitialize()",
+   "il_offset": "IL_0229",
+   "instruction": "SceneView.GetScene().GetFirstEntityWithScriptComponent<CampaignMapSiegePrefabEntityCache>().GetFirstScriptOfType<...>()",
+   "requirement": "Exactly one entity with CampaignMapSiegePrefabEntityCache is dereferenced without null check (hypothesis: missing -> NullReferenceException).",
+   "generated_world_substitution": "Copy the template entity.",
+   "least_invasive_hook": "scene.xscene",
+   "hook_kind": "file",
+   "status": "il"
+  },
+  {
+   "id": "color-grade-manager",
+   "assembly": "SandBox.View",
+   "sha256": "c7360e71da06799a0cb6c00c4a0cfab5877621197ba25101433ac28654d169e2",
+   "method": "SandBox.View.Map.MapScreen::OnInitialize()",
+   "il_offset": "IL_02cc",
+   "instruction": "GetFirstEntityWithScriptComponent<MapColorGradeManager>()",
+   "requirement": "Entity color_grade_manager with MapColorGradeManager script.",
+   "generated_world_substitution": "Copy template entity.",
+   "least_invasive_hook": "scene.xscene",
+   "hook_kind": "file",
+   "status": "il"
+  },
+  {
+   "id": "ticked-entities",
+   "assembly": "SandBox.View",
+   "sha256": "c7360e71da06799a0cb6c00c4a0cfab5877621197ba25101433ac28654d169e2",
+   "method": "SandBox.View.Map.MapScreen::CollectTickableMapMeshes",
+   "il_offset": "n/a",
+   "instruction": "FindEntitiesWithTag(\"ticked_map_entity\")",
+   "requirement": "Optional.",
+   "generated_world_substitution": "none",
+   "least_invasive_hook": "scene.xscene",
+   "hook_kind": "file",
+   "status": "il"
+  },
+  {
+   "id": "naval-ship-cache",
+   "assembly": "NavalDLC.View",
+   "sha256": "4d074b0558467b534e06aa132c5b9ade0c0e431007a42a754fe61e39674fab8b",
+   "method": "NavalDLC.View.NavalDLCViewSubModule::OnAfterGameInitializationFinished",
+   "il_offset": "IL_0025/IL_002f",
+   "instruction": "castclass SandBox.MapScene; VisualShipFactory.InitializeShipEntityCache(mapScene.Scene)",
+   "requirement": "Needs SandBox.MapScene instance.",
+   "generated_world_substitution": "Return a SandBox.MapScene or subclass.",
+   "least_invasive_hook": "MapScene subclass",
+   "hook_kind": "official-extension-point",
+   "status": "il"
+  },
+  {
+   "id": "naval-wrapper",
+   "assembly": "NavalDLC.View",
+   "sha256": "4d074b0558467b534e06aa132c5b9ade0c0e431007a42a754fe61e39674fab8b",
+   "method": "NavalDLC.View.NavalDLCViewSubModule::OnNewGameCreated / OnAfterGameLoaded",
+   "il_offset": "IL_0012",
+   "instruction": "NavalDLCManager.NavalMapSceneWrapper = new NavalMapSceneWrapper()",
+   "requirement": "Naval wrapper is created from the loaded MapScene.",
+   "generated_world_substitution": "none",
+   "least_invasive_hook": "n/a",
+   "hook_kind": "official-extension-point",
+   "status": "il"
+  },
+  {
+   "id": "pirate-spawns",
+   "assembly": "NavalDLC.View",
+   "sha256": "4d074b0558467b534e06aa132c5b9ade0c0e431007a42a754fe61e39674fab8b",
+   "method": "NavalDLC.View.NavalMapSceneWrapper::InitializePirateSpawnPoints()",
+   "il_offset": "IL_0013",
+   "instruction": "Scene.GetAllEntitiesWithScriptComponent<PirateSpawnPoint>() (ClanStringId, Radius)",
+   "requirement": "Naval pirate spawn points (48 in NavalDLC Main_map).",
+   "generated_world_substitution": "Emit PirateSpawnPoint entities for generated pirate clans.",
+   "least_invasive_hook": "scene.xscene",
+   "hook_kind": "file",
+   "status": "il"
+  },
+  {
+   "id": "dropoffs",
+   "assembly": "NavalDLC.View",
+   "sha256": "4d074b0558467b534e06aa132c5b9ade0c0e431007a42a754fe61e39674fab8b",
+   "method": "NavalDLC.View.NavalMapSceneWrapper::InitializeDropOffLocations()",
+   "il_offset": "IL_000b",
+   "instruction": "Scene.FindEntitiesWithTag(\"main_map_village_dropoff\") matched to villages",
+   "requirement": "Village naval drop-off points (144 tags in NavalDLC Main_map).",
+   "generated_world_substitution": "Emit tags under village entities.",
+   "least_invasive_hook": "scene.xscene",
+   "hook_kind": "file",
+   "status": "il"
+  },
+  {
+   "id": "water-wake",
+   "assembly": "NavalDLC.View",
+   "sha256": "4d074b0558467b534e06aa132c5b9ade0c0e431007a42a754fe61e39674fab8b",
+   "method": "NavalDLC.View.NavalMapSceneWrapper::InitializeMapWaterWake()",
+   "il_offset": "IL_0010",
+   "instruction": "MapScene.SetupWaterWake(128, 8) -> Scene.EnsureWaterWakeRenderer/SetWaterWakeWorldSize/SetWaterWakeCameraOffset",
+   "requirement": "Native water wake renderer.",
+   "generated_world_substitution": "none",
+   "least_invasive_hook": "n/a",
+   "hook_kind": "official-extension-point",
+   "status": "il"
+  },
+  {
+   "id": "naval-wind",
+   "assembly": "NavalDLC.View",
+   "sha256": "4d074b0558467b534e06aa132c5b9ade0c0e431007a42a754fe61e39674fab8b",
+   "method": "NavalDLC.View.NavalMapSceneWrapper::GetWindAtPosition(Vec2)",
+   "il_offset": "IL_0007",
+   "instruction": "MapScene.GetWindAtPosition -> _windFlowMapData (512x512x2 floats from Scene.GetWindFlowMapData)",
+   "requirement": "Requires snow/rain definer to have run (see snow-rain-wind).",
+   "generated_world_substitution": "see snow-rain-wind",
+   "least_invasive_hook": "public MapScene method",
+   "hook_kind": "official-extension-point",
+   "status": "il"
+  },
+  {
+   "id": "ship-campaign-mode",
+   "assembly": "NavalDLC",
+   "sha256": "146e16de9ac242ef63047cc337c858ffaf24a7b153f7bd7e18f1ccca1d268a94",
+   "method": "NavalDLC.Missions.Objects.ShipWaterEffects::OnInit()",
+   "il_offset": "IL_00f9/IL_00fe",
+   "instruction": "_inCampaignMode = entity.Scene.GetName() == \"Main_map\"",
+   "requirement": "Ship wake/particle behaviour keys on the native SCENE NAME being exactly Main_map.",
+   "generated_world_substitution": "Keep the name Main_map (override slot) or call Scene.SetName(\"Main_map\") on a differently named slot after Read (hypothesis: SetName also affects native ShaderCache path).",
+   "least_invasive_hook": "scene name / Scene.SetName",
+   "hook_kind": "official-extension-point",
+   "status": "il"
+  },
+  {
+   "id": "scene-path-native",
+   "assembly": "TaleWorlds.Engine",
+   "sha256": "bfd5db82d92f75ef15a5eb9a9f0c9391412566933193122db1684019ed704d68",
+   "method": "TaleWorlds.Engine.Utilities::GetFullFilePathOfScene(string)",
+   "il_offset": "IL_0006/IL_000c/IL_002e",
+   "instruction": "IUtil.GetFullFilePathOfScene(name) [native]; \"SCENE_NOT_FOUND\" -> exception; \"$BASE/\" replaced with base path",
+   "requirement": "Scene-name -> folder resolution is native; there is no managed list of scene paths.",
+   "generated_world_substitution": "Use TryGetFullFilePathOfScene as an in-game diagnostic of slot indexing.",
+   "least_invasive_hook": "diagnostic",
+   "hook_kind": "official-extension-point",
+   "status": "il"
+  },
+  {
+   "id": "scene-pairing-runtime",
+   "assembly": "TaleWorlds.MountAndBlade.DedicatedCustomServer.ClientHelper",
+   "sha256": "54040db39152059ab84decd51a710b165cbe9d4d2b7d6961294c364b3d0ae123",
+   "method": "TaleWorlds.MountAndBlade.DedicatedCustomServer.ClientHelper.DedicatedCustomServerClientHelperSubModule/<DownloadMapFromHost>d__7::MoveNext()",
+   "il_offset": "IL_011f/IL_01d0/IL_01da/IL_0269",
+   "instruction": "TryGetFullFilePathOfScene(mapName); ExecuteCommandLineCommand(\"resource.shader.invalidate_temp_shader_cache_of_scene Multiplayer/\"+scene); Directory.Move(temp, Modules/Multiplayer/SceneObj/<scene>); Utilities.PairSceneNameToModuleName(scene, \"Multiplayer\")",
+   "requirement": "Official runtime path that installs a NEW scene folder during a session and informs RGL (log text: 'RGL has been informed of the module pairing for scene'). If another module already owns the name it tells the user to restart.",
+   "generated_world_substitution": "Candidate re-index API for fresh slot names: write SceneObj/<name>/ then Utilities.PairSceneNameToModuleName(name, \"MNBL.ProceduralWorld\").",
+   "least_invasive_hook": "Utilities.PairSceneNameToModuleName (public static)",
+   "hook_kind": "official-extension-point",
+   "status": "hypothesis",
+   "notes": "IL proves the official call sequence for Multiplayer; whether it makes Scene.Read load a fresh singleplayer slot is untested"
+  },
+  {
+   "id": "module-order",
+   "assembly": "TaleWorlds.MountAndBlade",
+   "sha256": "19387f31557ff840d14f378f6bbdf1d58fcff406ab9ff2294dfbb3e49a50b87e",
+   "method": "TaleWorlds.MountAndBlade.Module::Initialize()",
+   "il_offset": "IL_0073/IL_0079",
+   "instruction": "ModuleHelper.InitializeModules(Utilities.GetModulesNames() [native command-line module list], platform modules)",
+   "requirement": "_loadedModules is filled in launch-list order; GetActiveModules enumerates that Dictionary (insertion order).",
+   "generated_world_substitution": "Observed launch list: _MODULES_*Native*SandBoxCore*CustomBattle*Sandbox*StoryMode*NavalDLC*MNBL.ProceduralWorld*_MODULES_ (rgl_log_17972.txt).",
+   "least_invasive_hook": "SubModule.xml DependedModules",
+   "hook_kind": "official-extension-point",
+   "status": "il"
+  }
+ ],
+ "call_sites_castclass_mapscene": [
+  {
+   "assembly": "NavalDLC",
+   "method": "NavalDLC.Storyline.Quests.HuntDownTheEmiraAlFahdaAndTheCorsairsQuest::OnFinalizeInternal",
+   "il_offset": "IL_0017",
+   "opcode": "castclass",
+   "operand": "SandBox.MapScene"
+  },
+  {
+   "assembly": "NavalDLC",
+   "method": "NavalDLC.Storyline.Quests.HuntDownTheEmiraAlFahdaAndTheCorsairsQuest::SpawnStormEntity",
+   "il_offset": "IL_0021",
+   "opcode": "castclass",
+   "operand": "SandBox.MapScene"
+  },
+  {
+   "assembly": "NavalDLC.View",
+   "method": "NavalDLC.View.NavalDLCViewSubModule::OnAfterGameInitializationFinished",
+   "il_offset": "IL_0025",
+   "opcode": "castclass",
+   "operand": "SandBox.MapScene"
+  },
+  {
+   "assembly": "NavalDLC.View",
+   "method": "NavalDLC.View.NavalMapSceneWrapper::.ctor",
+   "il_offset": "IL_001c",
+   "opcode": "castclass",
+   "operand": "SandBox.MapScene"
+  },
+  {
+   "assembly": "NavalDLC.View",
+   "method": "NavalDLC.View.Map.Visuals.AnchorVisual::get_MapScene",
+   "il_offset": "IL_002c",
+   "opcode": "castclass",
+   "operand": "SandBox.MapScene"
+  },
+  {
+   "assembly": "NavalDLC.View",
+   "method": "NavalDLC.View.Map.Visuals.NavalMobilePartyVisual::get_MapScene",
+   "il_offset": "IL_002c",
+   "opcode": "castclass",
+   "operand": "SandBox.MapScene"
+  },
+  {
+   "assembly": "NavalDLC.View",
+   "method": "NavalDLC.View.Map.Visuals.StormVisual::.ctor",
+   "il_offset": "IL_0012",
+   "opcode": "castclass",
+   "operand": "SandBox.MapScene"
+  },
+  {
+   "assembly": "SandBox",
+   "method": "SandBox.CampaignMapSiegePrefabEntityCache::OnInit",
+   "il_offset": "IL_0010",
+   "opcode": "castclass",
+   "operand": "SandBox.MapScene"
+  },
+  {
+   "assembly": "SandBox",
+   "method": "SandBox.CampaignMapSiegePrefabEntityCache::OnInit",
+   "il_offset": "IL_0073",
+   "opcode": "castclass",
+   "operand": "SandBox.MapScene"
+  },
+  {
+   "assembly": "SandBox",
+   "method": "SandBox.CampaignMapSiegePrefabEntityCache::OnInit",
+   "il_offset": "IL_00d6",
+   "opcode": "castclass",
+   "operand": "SandBox.MapScene"
+  },
+  {
+   "assembly": "SandBox",
+   "method": "SandBox.CampaignMapSiegePrefabEntityCache::OnInit",
+   "il_offset": "IL_0139",
+   "opcode": "castclass",
+   "operand": "SandBox.MapScene"
+  },
+  {
+   "assembly": "SandBox",
+   "method": "SandBox.CampaignMapSiegePrefabEntityCache::OnInit",
+   "il_offset": "IL_019c",
+   "opcode": "castclass",
+   "operand": "SandBox.MapScene"
+  },
+  {
+   "assembly": "SandBox",
+   "method": "SandBox.CampaignMapSiegePrefabEntityCache::OnInit",
+   "il_offset": "IL_0202",
+   "opcode": "castclass",
+   "operand": "SandBox.MapScene"
+  },
+  {
+   "assembly": "SandBox",
+   "method": "SandBox.CampaignMapSiegePrefabEntityCache::OnInit",
+   "il_offset": "IL_0268",
+   "opcode": "castclass",
+   "operand": "SandBox.MapScene"
+  },
+  {
+   "assembly": "SandBox",
+   "method": "SandBox.CampaignMapSiegePrefabEntityCache::OnInit",
+   "il_offset": "IL_02ce",
+   "opcode": "castclass",
+   "operand": "SandBox.MapScene"
+  },
+  {
+   "assembly": "SandBox",
+   "method": "SandBox.CampaignMapSiegePrefabEntityCache::OnInit",
+   "il_offset": "IL_0334",
+   "opcode": "castclass",
+   "operand": "SandBox.MapScene"
+  },
+  {
+   "assembly": "SandBox",
+   "method": "SandBox.CampaignMapSiegePrefabEntityCache::OnInit",
+   "il_offset": "IL_039a",
+   "opcode": "castclass",
+   "operand": "SandBox.MapScene"
+  },
+  {
+   "assembly": "SandBox.GauntletUI",
+   "method": "SandBox.GauntletUI.Map.GauntletMapEventVisual::get_MapScene",
+   "il_offset": "IL_002c",
+   "opcode": "castclass",
+   "operand": "SandBox.MapScene"
+  },
+  {
+   "assembly": "SandBox.View",
+   "method": "SandBox.View.Map.MapCameraView::.ctor",
+   "il_offset": "IL_00ba",
+   "opcode": "castclass",
+   "operand": "SandBox.MapScene"
+  },
+  {
+   "assembly": "SandBox.View",
+   "method": "SandBox.View.Map.MapCursor::Initialize",
+   "il_offset": "IL_0023",
+   "opcode": "isinst",
+   "operand": "SandBox.MapScene"
+  },
+  {
+   "assembly": "SandBox.View",
+   "method": "SandBox.View.Map.MapScreen::OnResume",
+   "il_offset": "IL_00a8",
+   "opcode": "isinst",
+   "operand": "SandBox.MapScene"
+  },
+  {
+   "assembly": "SandBox.View",
+   "method": "SandBox.View.Map.MapScreen::OnInitialize",
+   "il_offset": "IL_00c6",
+   "opcode": "castclass",
+   "operand": "SandBox.MapScene"
+  },
+  {
+   "assembly": "SandBox.View",
+   "method": "SandBox.View.Map.MapScreen::InitializeVisuals",
+   "il_offset": "IL_0020",
+   "opcode": "isinst",
+   "operand": "SandBox.MapScene"
+  },
+  {
+   "assembly": "SandBox.View",
+   "method": "SandBox.View.Map.SnowAndRainTextureDefiner::SetDataToScene",
+   "il_offset": "IL_0018",
+   "opcode": "castclass",
+   "operand": "SandBox.MapScene"
+  },
+  {
+   "assembly": "SandBox.View",
+   "method": "SandBox.View.Map.Visuals.MobilePartyVisual::get_MapScene",
+   "il_offset": "IL_002c",
+   "opcode": "castclass",
+   "operand": "SandBox.MapScene"
+  },
+  {
+   "assembly": "SandBox.View",
+   "method": "SandBox.View.Map.Visuals.SettlementVisual::get_MapScene",
+   "il_offset": "IL_002c",
+   "opcode": "castclass",
+   "operand": "SandBox.MapScene"
+  },
+  {
+   "assembly": "SandBox.View",
+   "method": "SandBox.View.Map.Managers.EntityVisualManagerBase::get_MapScene",
+   "il_offset": "IL_002c",
+   "opcode": "castclass",
+   "operand": "SandBox.MapScene"
+  },
+  {
+   "assembly": "SandBox.View",
+   "method": "SandBox.View.Map.Managers.MapWeatherVisualManager::.ctor",
+   "il_offset": "IL_00a1",
+   "opcode": "castclass",
+   "operand": "SandBox.MapScene"
+  },
+  {
+   "assembly": "SandBox.View",
+   "method": "SandBox.View.Map.Managers.SettlementVisualManager::RemoveSiegeCircleVisuals",
+   "il_offset": "IL_0015",
+   "opcode": "isinst",
+   "operand": "SandBox.MapScene"
+  },
+  {
+   "assembly": "SandBox.View",
+   "method": "SandBox.View.Map.Managers.SettlementVisualManager::InitializeSiegeCircleVisuals",
+   "il_offset": "IL_001d",
+   "opcode": "isinst",
+   "operand": "SandBox.MapScene"
+  },
+  {
+   "assembly": "SandBox.View",
+   "method": "SandBox.View.Map.Managers.MapAudioManager::.ctor",
+   "il_offset": "IL_0011",
+   "opcode": "isinst",
+   "operand": "SandBox.MapScene"
+  }
+ ],
+ "imapscene_member_call_counts": {
+  "GetFaceTerrainType": {
+   "TaleWorlds.CampaignSystem": 33,
+   "NavalDLC": 12,
+   "SandBox": 3,
+   "SandBox.View": 2,
+   "NavalDLC.View": 2,
+   "SandBox.GauntletUI": 1,
+   "StoryMode": 1,
+   "TaleWorlds.CampaignSystem.ViewModelCollection": 2
+  },
+  "GetPathDistanceBetweenAIFaces": {
+   "TaleWorlds.CampaignSystem": 13,
+   "NavalDLC": 2
+  },
+  "GetFaceIndex": {
+   "TaleWorlds.CampaignSystem": 11,
+   "NavalDLC": 3
+  },
+  "GetHeightAtPoint": {
+   "SandBox.View": 7,
+   "TaleWorlds.CampaignSystem": 2,
+   "SandBox.GauntletUI": 2
+  },
+  "GetSceneLevel": {
+   "SandBox.View": 11
+  },
+  "GetMapBorders": {
+   "TaleWorlds.CampaignSystem": 5,
+   "NavalDLC": 1
+  },
+  "GetSceneXmlCrc": {
+   "TaleWorlds.CampaignSystem": 4
+  },
+  "GetSceneNavigationMeshCrc": {
+   "TaleWorlds.CampaignSystem": 4
+  },
+  "GetMapPatchAtPosition": {
+   "TaleWorlds.CampaignSystem": 4
+  },
+  "GetLastPointOnNavigationMeshFromPositionToDestination": {
+   "TaleWorlds.CampaignSystem": 4
+  },
+  "GetPathBetweenAIFaces": {
+   "TaleWorlds.CampaignSystem": 3
+  },
+  "GetNavigationMeshCenterPosition": {
+   "TaleWorlds.CampaignSystem": 3
+  },
+  "GetNearestFaceCenterForPositionWithPath": {
+   "TaleWorlds.CampaignSystem": 3
+  },
+  "GetEnvironmentTerrainTypesCount": {
+   "TaleWorlds.CampaignSystem": 3
+  },
+  "GetTerrainSize": {
+   "SandBox.View": 3,
+   "TaleWorlds.CampaignSystem": 2,
+   "NavalDLC": 1
+  },
+  "GetTerrainTypeAtPosition": {
+   "TaleWorlds.CampaignSystem": 2,
+   "NavalDLC": 1
+  },
+  "GetSiegeCampFrames": {
+   "TaleWorlds.CampaignSystem": 2,
+   "SandBox.View": 1
+  },
+  "GetTerrainHeightAndNormal": {
+   "SandBox.View": 1,
+   "NavalDLC.View": 1
+  },
+  "AddNewEntityToMapScene": {
+   "SandBox.View": 1,
+   "StoryMode": 1
+  },
+  "GetSnowAmountAtPosition": {
+   "TaleWorlds.CampaignSystem": 1
+  },
+  "GetRainAmountAtPosition": {
+   "TaleWorlds.CampaignSystem": 1
+  },
+  "GetAtmosphereStates": {
+   "TaleWorlds.CampaignSystem": 1
+  },
+  "GetAccessiblePointNearPosition": {
+   "StoryMode": 1
+  },
+  "GetFaceAtIndex": {
+   "TaleWorlds.CampaignSystem": 1
+  },
+  "GetNumberOfNavigationMeshFaces": {
+   "TaleWorlds.CampaignSystem": 1
+  },
+  "GetNearestFaceCenterForPosition": {
+   "TaleWorlds.CampaignSystem": 1
+  },
+  "GetLastPositionOnNavMeshFaceForPointAndDirection": {
+   "TaleWorlds.CampaignSystem": 1
+  }
+ },
+ "scene_folders": {
+  "<game>/Modules/SandBox/SceneObj/Main_map": {
+   "ShaderCache/": {
+    "dir": true
+   },
+   "TileSets/": {
+    "dir": true
+   },
+   "atmosphere.xml": {
+    "size": 4962,
+    "sha256": "7848867d9e0e72a5fbec4db20c9f022a7b3d77410da52eab7435f2a0d90d623d"
+   },
+   "flora.bin": {
+    "size": 7849897,
+    "sha256": "78fe9777af8cc7161796a72e325803be83bbd5bf73c4e8c9b72cbb4375f4815d"
+   },
+   "navmesh.bin": {
+    "size": 839040,
+    "sha256": "e01ad7ff2aa870a8933ece39df35be4370b7e4d29683b6df8e680a81880eb7f7"
+   },
+   "scene.xscene": {
+    "size": 19877756,
+    "sha256": "919796b65e497260a8eebab5442ac79af6992957de9e8a17fbb2aaf6fd1b5019"
+   },
+   "terrain.bin": {
+    "size": 27646798,
+    "sha256": "3b583d9ff5504a6c871caa466a14654593bee42c27df3e3316eda6cb4d85ab49"
+   }
+  },
+  "<game>/Modules/NavalDLC/SceneObj/Main_map": {
+   "ShaderCache/": {
+    "dir": true
+   },
+   "TileSets/": {
+    "dir": true
+   },
+   "atmosphere.xml": {
+    "size": 4941,
+    "sha256": "8375ecccc7a721b5d32e8e4fbc59e00b3a2182202d334a79cd01972668533f6d"
+   },
+   "flora.bin": {
+    "size": 7253409,
+    "sha256": "7996acbbcbfc09ed9cc8e3fc88fe74de2008cbc736c42e584a2efc3742a2d884"
+   },
+   "flowmap.dds": {
+    "size": 1048704,
+    "sha256": "22d11e2e488535c95f1ab80abefe9da1fd85b186a80d5f4346b13212ec31deea"
+   },
+   "navmesh.bin": {
+    "size": 926074,
+    "sha256": "f8b4b846eb930fbfb64da64bf9c9c191a5aee2f825bfce7d1a59deaa21b0175f"
+   },
+   "river_triangles.bin": {
+    "size": 1057044,
+    "sha256": "24fefdbe74302bb2f678db7b4533f00524c9f153613114d88db9187a3252ab24"
+   },
+   "scene.xscene": {
+    "size": 21127988,
+    "sha256": "1fb8bb08210a377fb727dc9e69454f0368254f28f317cb81c5db2569e3862ebc"
+   },
+   "terrain.bin": {
+    "size": 28336976,
+    "sha256": "56c3a0663fb2bf8404210772e187dcd707eb64d8b7e9b5496dfb509bdc3ea9fd"
+   }
+  },
+  "<game>/Modules/SandBoxCore/SceneObj/battle_terrain_001": {
+   "ShaderCache/": {
+    "dir": true
+   },
+   "atmosphere.xml": {
+    "size": 4895,
+    "sha256": "8416cca3ee54687909b0c40c48e926e4d26c97938491b09f0a5e80b80ccdcdb0"
+   },
+   "flora.bin": {
+    "size": 25916,
+    "sha256": "0a9a0b67bdb4e5db1c42d543a474a6f38888c5a715cba1e0d5a9a10475407587"
+   },
+   "navmesh.bin": {
+    "size": 458960,
+    "sha256": "084759f2363e528a3b137660272308a14c589a0075c5bfb9ab89171b5db05ee8"
+   },
+   "scene.xscene": {
+    "size": 154971,
+    "sha256": "f6f33cdab0cfece98e9bf46a491beb00177034a177afbbf6b4a39339d4b1fe74"
+   },
+   "terrain.bin": {
+    "size": 466163,
+    "sha256": "4f13e1a8a45e65f48a8e65a0f6a8534bf7ad72004eac5ce615af103c9f81ed00"
+   }
+  }
+ },
+ "terrain_bin_directory_observed": {
+  "layout": "magic 'ZGR6RTRN', u32 2, then 5 entries of (tag[4], u32 version, u32 offset, u32 storedSize, u32 rawSize); field meaning of the last two is inferred",
+  "entries": {
+   "<game>/Modules/SandBox/SceneObj/Main_map/terrain.bin": {
+    "MIDX": [
+     1,
+     112,
+     4188510,
+     4195017
+    ],
+    "HGHT": [
+     1,
+     4188622,
+     17888368,
+     17862043
+    ],
+    "NRML": [
+     1,
+     22078014,
+     0,
+     0
+    ],
+    "WGHT": [
+     1,
+     22078014,
+     0,
+     0
+    ],
+    "PHYM": [
+     1,
+     22078014,
+     5567760,
+     67642368
+    ]
+   },
+   "<game>/Modules/NavalDLC/SceneObj/Main_map/terrain.bin": {
+    "MIDX": [
+     1,
+     112,
+     6939778,
+     6924693
+    ],
+    "HGHT": [
+     1,
+     6939890,
+     14677130,
+     14684844
+    ],
+    "NRML": [
+     1,
+     21618044,
+     0,
+     0
+    ],
+    "WGHT": [
+     1,
+     21618044,
+     0,
+     0
+    ],
+    "PHYM": [
+     1,
+     21618044,
+     6717908,
+     67642368
+    ]
+   },
+   "<game>/Modules/SandBoxCore/SceneObj/battle_terrain_001/terrain.bin": {
+    "MIDX": [
+     1,
+     112,
+     288,
+     27064
+    ],
+    "HGHT": [
+     1,
+     400,
+     178040,
+     180028
+    ],
+    "NRML": [
+     1,
+     178600,
+     179035,
+     180939
+    ],
+    "WGHT": [
+     1,
+     357795,
+     91144,
+     104694
+    ],
+    "PHYM": [
+     1,
+     449099,
+     16904,
+     677280
+    ]
+   }
+  },
+  "observation": "Both Main_map terrain.bin files have EMPTY NRML and WGHT sections (size 0); battle_terrain_001 has both. PHYM rawSize = nodes*((2^L+1)^2*4+32): 256*(257^2*4+32)=67642368 and 40*(65^2*4+32)=677280 (arithmetic fit; meaning is a hypothesis)."
+ },
+ "scene_skeletons": {
+  "SandBox/Main_map": {
+   "file": "<game>/Modules/SandBox/SceneObj/Main_map/scene.xscene",
+   "sha256": "919796b65e497260a8eebab5442ac79af6992957de9e8a17fbb2aaf6fd1b5019",
+   "root": {
+    "name": "Main_map",
+    "version": "2"
+   },
+   "top_level_order": [
+    "flora_bounding_rect",
+    "levels",
+    "environment_properties",
+    "entities",
+    "terrain",
+    "editor_data",
+    "camera_data",
+    "Paths"
+   ],
+   "levels": [
+    "base",
+    "level_1",
+    "level_2",
+    "level_3",
+    "civilian",
+    "siege",
+    "looted"
+   ],
+   "flora_bounding_rect": {
+    "min": "0.000, 0.000",
+    "max": "848.000, 848.000"
+   },
+   "environment_selected": {
+    "nav_mesh_auto_generated_": "true",
+    "physics_world_min": "-973.117, -936.996",
+    "physics_world_max_": "848.000, 848.000",
+    "atmosphere_name": "scene_atmosphere",
+    "water_level": "-100.000",
+    "water_exists": "false",
+    "water_material": "wat_main_map_ocean_g",
+    "gi_data_exists": "false"
+   },
+   "terrain_attributes": {
+    "enabled": "true",
+    "node_dimension_x": "16",
+    "node_dimension_y": "16",
+    "node_size": "53.000",
+    "lod_multiplier": "3.000",
+    "min_height": "-0.723",
+    "max_height": "23.052",
+    "vista_normalmap": "",
+    "vista_diffuse_name": "",
+    "vista_diffuse_winter_name": "",
+    "vista_diffuse_fall_name": "",
+    "vista_diffuse_blend_type": "1",
+    "vista_diffuse_blend_amount": "1.000",
+    "vista_layer_detail_distance": "10000.000",
+    "vista_albedo_multiplier": "0.670",
+    "vista_detail_albedo_name": "",
+    "vista_detail_normal_name": "",
+    "vista_detail_tile": "1.000",
+    "vista_blend_start": "0.000",
+    "vista_blend_end": "0.000",
+    "vista_tileset": "WorldMap",
+    "terrain_render_version": "1",
+    "use_dynamic_weather_effects": "true",
+    "dynamic_flowmap_texture_name": "main_map_snow_flowmap",
+    "colormap_detail_level": "0",
+    "ao_intensity": "4.000"
+   },
+   "terrain_children": [
+    "outer_mesh",
+    "layers",
+    "nodes"
+   ],
+   "terrain_layers": [
+    {
+     "name": "default",
+     "physics_material": "grass",
+     "diffusemap": "ground_grass_b_d_mainmap",
+     "flora_meshes": 0
+    },
+    {
+     "name": "flora_forest",
+     "physics_material": "grass",
+     "diffusemap": "ground_forest_b_d_main_map",
+     "flora_meshes": 3
+    },
+    {
+     "name": "rock",
+     "physics_material": "stone",
+     "diffusemap": "main_map_mountains_d",
+     "flora_meshes": 0
+    },
+    {
+     "name": "grass",
+     "physics_material": "grass",
+     "diffusemap": "ground_grass_b_d_mainmap",
+     "flora_meshes": 0
+    },
+    {
+     "name": "dirt",
+     "physics_material": "burning_jar_small",
+     "diffusemap": "ground_soil_a_d_mainmap",
+     "flora_meshes": 0
+    },
+    {
+     "name": "dirt2",
+     "physics_material": "soil",
+     "diffusemap": "ground_soil_a_d_mainmap",
+     "flora_meshes": 0
+    },
+    {
+     "name": "forest2",
+     "physics_material": "soil",
+     "diffusemap": "ground_forest_b_d_main_map",
+     "flora_meshes": 3
+    },
+    {
+     "name": "river",
+     "physics_material": "soil",
+     "diffusemap": "water_ground",
+     "flora_meshes": 0
+    }
+   ],
+   "terrain_node_elements": {
+    "variable": 5120,
+    "node": 256,
+    "texture_levels": 256,
+    "nodes": 1
+   },
+   "entity_elements": 37918,
+   "top_level_entities": 718,
+   "scripts_inline": [
+    [
+     "VolumeBox",
+     1145
+    ],
+    [
+     "Town Entity Manager",
+     644
+    ],
+    [
+     "path_converger",
+     18
+    ],
+    [
+     "water_body",
+     8
+    ],
+    [
+     "MapColorGradeManager",
+     1
+    ],
+    [
+     "CampaignMapSiegePrefabEntityCache",
+     1
+    ],
+    [
+     "ReflectionCapturer",
+     1
+    ],
+    [
+     "Town Scene Manager",
+     1
+    ],
+    [
+     "SceneLeveler",
+     1
+    ],
+    [
+     "river_generator",
+     1
+    ],
+    [
+     "SettlementPositionScript",
+     1
+    ]
+   ],
+   "tags": [
+    [
+     "siege_preparation",
+     947
+    ],
+    [
+     "map_banner_placeholder",
+     798
+    ],
+    [
+     "map_breachable_wall",
+     720
+    ],
+    [
+     "map_solid_wall",
+     691
+    ],
+    [
+     "map_broken_wall",
+     676
+    ],
+    [
+     "map_defensive_engine_3",
+     368
+    ],
+    [
+     "map_defensive_engine_1",
+     360
+    ],
+    [
+     "map_defensive_engine_2",
+     360
+    ],
+    [
+     "map_defensive_engine_0",
+     352
+    ],
+    [
+     "map_camp_area_2",
+     339
+    ],
+    [
+     "village",
+     273
+    ],
+    [
+     "map_siege_tower",
+     240
+    ],
+    [
+     "castle",
+     199
+    ],
+    [
+     "map_camp_area_1",
+     120
+    ],
+    [
+     "map_siege_engine_3",
+     120
+    ],
+    [
+     "map_siege_engine_2",
+     120
+    ],
+    [
+     "map_siege_engine_1",
+     120
+    ],
+    [
+     "map_siege_engine_0",
+     120
+    ],
+    [
+     "map_siege_ram",
+     120
+    ],
+    [
+     "main_map_city_gate",
+     120
+    ],
+    [
+     "map_settlement_circle",
+     119
+    ],
+    [
+     "wm_hideout",
+     99
+    ],
+    [
+     "bo_town",
+     97
+    ],
+    [
+     "main_map_castle_gate",
+     53
+    ],
+    [
+     "town",
+     53
+    ],
+    [
+     "main_map_keep",
+     3
+    ],
+    [
+     "hideout",
+     1
+    ],
+    [
+     "main_map_tavern",
+     1
+    ],
+    [
+     "main_map_arena",
+     1
+    ]
+   ],
+   "named_lookups": {
+    "medit_water_plane": {
+     "transform": {
+      "position": "400.000, 400.000, -50.000",
+      "rotation_euler": "0.000, 0.000, 0.000",
+      "scale": "2500.000, 2500.000, 50.000"
+     },
+     "tags": [],
+     "prefab": null
+    },
+    "border_min": {
+     "transform": {
+      "position": "62.000, 30.000, 0.000",
+      "rotation_euler": "0.000, 0.000, 0.000"
+     },
+     "tags": [],
+     "prefab": null
+    },
+    "border_max": {
+     "transform": {
+      "position": "790.000, 640.000, 620.000",
+      "rotation_euler": "0.000, 0.000, 0.000"
+     },
+     "tags": [],
+     "prefab": null
+    }
+   },
+   "snapped_water_bodies": [],
+   "settlement_like_named_entities": {
+    "castle": 199,
+    "hideout": 43,
+    "village": 141,
+    "town": 53
+   },
+   "script_examples": {
+    "MapColorGradeManager": {
+     "entity": "color_grade_manager",
+     "tags": [],
+     "position": "476.441, 221.187, 2.895",
+     "scale": null,
+     "variables": {
+      "ColorGradeEnabled": "true",
+      "AtmosphereSimulationEnabled": "false",
+      "TimeOfDay": "22.000",
+      "SeasonTimeFactor": "0.000"
+     },
+     "materials": [],
+     "physics": null
+    },
+    "CampaignMapSiegePrefabEntityCache": {
+     "entity": "__empty_object",
+     "tags": [],
+     "position": "700.000, 750.000, 0.000",
+     "scale": null,
+     "variables": {
+      "_attackerBallistaPrefab": "ballista_a_mapicon",
+      "_defenderBallistaPrefab": "ballista_b_mapicon",
+      "_attackerFireBallistaPrefab": "ballista_a_fire_mapicon",
+      "_defenderFireBallistaPrefab": "ballista_b_fire_mapicon",
+      "_attackerMangonelPrefab": "mangonel_a_mapicon",
+      "_defenderMangonelPrefab": "mangonel_b_mapicon",
+      "_attackerFireMangonelPrefab": "mangonel_a_fire_mapicon",
+      "_defenderFireMangonelPrefab": "mangonel_b_fire_mapicon",
+      "_attackerTrebuchetPrefab": "trebuchet_a_mapicon",
+      "_defenderTrebuchetPrefab": "trebuchet_b_mapicon"
+     },
+     "materials": [],
+     "physics": null
+    },
+    "water_body": {
+     "entity": "",
+     "tags": [],
+     "position": "662.190, 531.310, 2.315",
+     "scale": "71.180, 69.450, 1.000",
+     "variables": {
+      "Water Prefab": "Main Map Sea"
+     },
+     "materials": [
+      "worldmap_lake_clear"
+     ],
+     "physics": {}
+    },
+    "Town Scene Manager": {
+     "entity": "empty_object",
+     "tags": [],
+     "position": "463.025, 375.041, 7.116",
+     "scale": null,
+     "variables": {},
+     "materials": [],
+     "physics": null
+    },
+    "river_generator": {
+     "entity": "river_script",
+     "tags": [],
+     "position": "0.000, 0.000, 0.000",
+     "scale": null,
+     "variables": {
+      "FlowMap": "worldmap_river_mask",
+      "NormalMap": "worldmap_river_normal",
+      "HeightMap": "world_map_heightmap",
+      "Material": "worldmap_river_mat",
+      "Extra Pixel Count": "1",
+      "Show River Area": "false",
+      "Terrain Height Offset": "0.320",
+      "Water Plane Height Offset": "0.000",
+      "Snap To Water Planes": "true"
+     },
+     "materials": [],
+     "physics": null
+    },
+    "SettlementPositionScript": {
+     "entity": "settlements_scripts",
+     "tags": [],
+     "position": "102.717, 54.158, 0.000",
+     "scale": null,
+     "variables": {
+      "_partyNavigationModelOverriddenClassName": "DefaultPartyNavigationModel",
+      "_distanceModelOverridenClassName": "DefaultMapDistanceModel"
+     },
+     "materials": [],
+     "physics": null
+    }
+   },
+   "paths": {
+    "count": 20,
+    "name_prefixes": [
+     [
+      "river_emp",
+      5
+     ],
+     [
+      "river_bat",
+      4
+     ],
+     [
+      "tigris",
+      2
+     ],
+     [
+      "river_vlandia",
+      1
+     ],
+     [
+      "Euphrates",
+      1
+     ],
+     [
+      "volga",
+      1
+     ],
+     [
+      "nile",
+      1
+     ],
+     [
+      "northsea",
+      1
+     ],
+     [
+      "ocean",
+      1
+     ],
+     [
+      "mediterranean",
+      1
+     ],
+     [
+      "capsian",
+      1
+     ],
+     [
+      "lake_bat",
+      1
+     ]
+    ]
+   }
+  },
+  "NavalDLC/Main_map": {
+   "file": "<game>/Modules/NavalDLC/SceneObj/Main_map/scene.xscene",
+   "sha256": "1fb8bb08210a377fb727dc9e69454f0368254f28f317cb81c5db2569e3862ebc",
+   "root": {
+    "name": "Main_map",
+    "version": "2",
+    "unique_token": "{893C6F3B-95F2-43CB-9DB0-22A22EB56F41}",
+    "revision": "1776846426947",
+    "id_automatic": "true"
+   },
+   "top_level_order": [
+    "flora_bounding_rect",
+    "levels",
+    "environment_properties",
+    "entities",
+    "terrain",
+    "editor_data",
+    "camera_data",
+    "Paths"
+   ],
+   "levels": [
+    "base",
+    "level_1",
+    "level_2",
+    "level_3",
+    "civilian",
+    "siege",
+    "looted"
+   ],
+   "flora_bounding_rect": {
+    "min": "0.000, 0.000",
+    "max": "1040.000, 1040.000"
+   },
+   "environment_selected": {
+    "nav_mesh_auto_generated_": "false",
+    "physics_world_min": "-1174.882, -1164.439",
+    "physics_world_max_": "1040.000, 1040.000",
+    "atmosphere_name": "scene_atmosphere",
+    "water_level": "-100.000",
+    "water_exists": "false",
+    "water_material": "wat_open_ocean_g",
+    "gi_data_exists": "false"
+   },
+   "terrain_attributes": {
+    "enabled": "true",
+    "node_dimension_x": "16",
+    "node_dimension_y": "16",
+    "node_size": "65.000",
+    "lod_multiplier": "16.000",
+    "min_height": "-0.900",
+    "max_height": "29.109",
+    "vista_normalmap": "",
+    "vista_diffuse_name": "",
+    "vista_diffuse_winter_name": "",
+    "vista_diffuse_fall_name": "",
+    "vista_diffuse_blend_type": "1",
+    "vista_diffuse_blend_amount": "1.000",
+    "vista_layer_detail_distance": "10000.000",
+    "vista_albedo_multiplier": "0.670",
+    "vista_detail_albedo_name": "",
+    "vista_detail_normal_name": "",
+    "vista_detail_tile": "1.000",
+    "vista_blend_start": "0.000",
+    "vista_blend_end": "0.000",
+    "vista_tileset": "worldmap",
+    "terrain_render_version": "1",
+    "use_dynamic_weather_effects": "true",
+    "dynamic_flowmap_texture_name": "main_map_snow_flowmap",
+    "colormap_detail_level": "0",
+    "ao_intensity": "4.000"
+   },
+   "terrain_children": [
+    "outer_mesh",
+    "layers",
+    "nodes"
+   ],
+   "terrain_layers": [
+    {
+     "name": "default",
+     "physics_material": "grass",
+     "diffusemap": "ground_grass_b_d_mainmap",
+     "flora_meshes": 0
+    },
+    {
+     "name": "default_1",
+     "physics_material": "soil",
+     "diffusemap": "ground_soil_a_d_mainmap",
+     "flora_meshes": 0
+    },
+    {
+     "name": "rock",
+     "physics_material": "soil",
+     "diffusemap": "main_map_mountains_d",
+     "flora_meshes": 0
+    },
+    {
+     "name": "grass",
+     "physics_material": "soil",
+     "diffusemap": "ground_grass_b_d_mainmap",
+     "flora_meshes": 0
+    },
+    {
+     "name": "dirt",
+     "physics_material": "soil",
+     "diffusemap": "ground_soil_a_d_mainmap",
+     "flora_meshes": 0
+    },
+    {
+     "name": "dirt2",
+     "physics_material": "soil",
+     "diffusemap": "ground_pebbles_a_d_mainmap",
+     "flora_meshes": 0
+    },
+    {
+     "name": "forest",
+     "physics_material": "soil",
+     "diffusemap": "ground_forest_b_d_main_map",
+     "flora_meshes": 0
+    }
+   ],
+   "terrain_node_elements": {
+    "variable": 5120,
+    "node": 256,
+    "texture_levels": 256,
+    "nodes": 1
+   },
+   "entity_elements": 41834,
+   "top_level_entities": 996,
+   "scripts_inline": [
+    [
+     "VolumeBox",
+     1297
+    ],
+    [
+     "Town Entity Manager",
+     553
+    ],
+    [
+     "PirateSpawnPoint",
+     48
+    ],
+    [
+     "sound_emitter",
+     37
+    ],
+    [
+     "BlockadePositionScript",
+     29
+    ],
+    [
+     "path_converger",
+     18
+    ],
+    [
+     "SceneLeveler",
+     14
+    ],
+    [
+     "water_flowmap",
+     3
+    ],
+    [
+     "CampaignMapAmbientOccluder",
+     2
+    ],
+    [
+     "SettlementPositionScript",
+     1
+    ],
+    [
+     "river_generator",
+     1
+    ],
+    [
+     "MapColorGradeManager",
+     1
+    ],
+    [
+     "ReflectionCapturer",
+     1
+    ],
+    [
+     "Town Scene Manager",
+     1
+    ],
+    [
+     "CampaignMapSiegePrefabEntityCache",
+     1
+    ]
+   ],
+   "tags": [
+    [
+     "siege_preparation",
+     1044
+    ],
+    [
+     "map_banner_placeholder",
+     900
+    ],
+    [
+     "map_breachable_wall",
+     798
+    ],
+    [
+     "map_solid_wall",
+     770
+    ],
+    [
+     "map_broken_wall",
+     756
+    ],
+    [
+     "map_defensive_engine_3",
+     407
+    ],
+    [
+     "map_defensive_engine_1",
+     399
+    ],
+    [
+     "map_defensive_engine_2",
+     399
+    ],
+    [
+     "map_defensive_engine_0",
+     391
+    ],
+    [
+     "map_camp_area_2",
+     378
+    ],
+    [
+     "village",
+     307
+    ],
+    [
+     "map_siege_tower",
+     266
+    ],
+    [
+     "castle",
+     242
+    ],
+    [
+     "main_map_village_dropoff",
+     144
+    ],
+    [
+     "map_settlement_circle",
+     134
+    ],
+    [
+     "map_camp_area_1",
+     133
+    ],
+    [
+     "map_siege_ram",
+     133
+    ],
+    [
+     "map_siege_engine_0",
+     133
+    ],
+    [
+     "map_siege_engine_1",
+     133
+    ],
+    [
+     "map_siege_engine_2",
+     133
+    ],
+    [
+     "map_siege_engine_3",
+     133
+    ],
+    [
+     "main_map_city_gate",
+     133
+    ],
+    [
+     "bo_town",
+     120
+    ],
+    [
+     "wm_hideout",
+     99
+    ],
+    [
+     "town",
+     57
+    ],
+    [
+     "main_map_castle_gate",
+     54
+    ],
+    [
+     "Blockade_Arc_End",
+     30
+    ],
+    [
+     "Blockade_Arc_Start",
+     30
+    ],
+    [
+     "main_map_city_port",
+     29
+    ],
+    [
+     "bridge",
+     22
+    ],
+    [
+     "snapped_water_body",
+     2
+    ],
+    [
+     "hideout",
+     1
+    ]
+   ],
+   "named_lookups": {
+    "border_min": {
+     "transform": {
+      "position": "13.353, 6.733, 0.000",
+      "rotation_euler": "0.000, 0.000, 0.000"
+     },
+     "tags": [],
+     "prefab": null
+    },
+    "border_max": {
+     "transform": {
+      "position": "992.535, 937.948, 756.484",
+      "rotation_euler": "0.000, 0.000, 0.000"
+     },
+     "tags": [],
+     "prefab": null
+    }
+   },
+   "snapped_water_bodies": [
+    {
+     "entity": "water_plane",
+     "position": "514.000, 422.000, 2.570",
+     "scale": "2744.000, 2744.000, 2.280",
+     "materials": [
+      "naval_worldmap_water"
+     ],
+     "scripts": [
+      "water_flowmap",
+      "CampaignMapAmbientOccluder"
+     ],
+     "physics": {
+      "shape": "bo_editor_plane"
+     }
+    },
+    {
+     "entity": "water_plane",
+     "position": "653.761, 417.738, 6.747",
+     "scale": "29.050, 17.808, 1.000",
+     "materials": [
+      "naval_worldmap_water"
+     ],
+     "scripts": [
+      "water_flowmap"
+     ],
+     "physics": {
+      "shape": "bo_editor_plane"
+     }
+    }
+   ],
+   "settlement_like_named_entities": {
+    "castle": 226,
+    "village": 157,
+    "town": 57,
+    "hideout": 43
+   },
+   "script_examples": {
+    "PirateSpawnPoint": {
+     "entity": "southern_pirates",
+     "tags": [],
+     "position": "296.062, 365.080, 2.580",
+     "scale": null,
+     "variables": {
+      "ClanStringId": "southern_pirates",
+      "ToggleDebugRadius": "false",
+      "Radius": "50.000"
+     },
+     "materials": [],
+     "physics": null
+    },
+    "SettlementPositionScript": {
+     "entity": "settlements_scripts",
+     "tags": [],
+     "position": "102.727, 54.157, 0.000",
+     "scale": null,
+     "variables": {
+      "_partyNavigationModelOverriddenClassName": "NavalPartyNavigationModel",
+      "_distanceModelOverridenClassName": "NavalDLCMapDistanceModel"
+     },
+     "materials": [],
+     "physics": null
+    },
+    "water_flowmap": {
+     "entity": "water_plane",
+     "tags": [
+      "snapped_water_body"
+     ],
+     "position": "514.000, 422.000, 2.570",
+     "scale": "2744.000, 2744.000, 2.280",
+     "variables": {},
+     "materials": [
+      "naval_worldmap_water"
+     ],
+     "physics": {
+      "shape": "bo_editor_plane"
+     }
+    },
+    "CampaignMapAmbientOccluder": {
+     "entity": "water_plane",
+     "tags": [
+      "snapped_water_body"
+     ],
+     "position": "514.000, 422.000, 2.570",
+     "scale": "2744.000, 2744.000, 2.280",
+     "variables": {},
+     "materials": [
+      "naval_worldmap_water"
+     ],
+     "physics": {
+      "shape": "bo_editor_plane"
+     }
+    },
+    "river_generator": {
+     "entity": "river_script",
+     "tags": [],
+     "position": "0.000, 0.000, 0.000",
+     "scale": null,
+     "variables": {
+      "FlowMap": "worldmap_river_mask",
+      "NormalMap": "worldmap_river_normal",
+      "HeightMap": "world_map_heightmap",
+      "Material": "naval_worldmap_river",
+      "Extra Pixel Count": "0",
+      "Show River Area": "false",
+      "Terrain Height Offset": "0.000",
+      "Water Plane Height Offset": "0.000",
+      "Snap To Water Planes": "true"
+     },
+     "materials": [],
+     "physics": null
+    },
+    "MapColorGradeManager": {
+     "entity": "color_grade_manager",
+     "tags": [],
+     "position": "476.441, 221.187, 2.895",
+     "scale": null,
+     "variables": {
+      "ColorGradeEnabled": "true",
+      "AtmosphereSimulationEnabled": "false",
+      "TimeOfDay": "6.000",
+      "SeasonTimeFactor": "0.000"
+     },
+     "materials": [],
+     "physics": null
+    },
+    "Town Scene Manager": {
+     "entity": "empty_object",
+     "tags": [],
+     "position": "502.327, 365.629, 17.441",
+     "scale": null,
+     "variables": {},
+     "materials": [],
+     "physics": null
+    },
+    "CampaignMapSiegePrefabEntityCache": {
+     "entity": "empty_object",
+     "tags": [],
+     "position": "363.094, 249.647, 5.670",
+     "scale": null,
+     "variables": {
+      "_attackerBallistaPrefab": "ballista_a_mapicon",
+      "_defenderBallistaPrefab": "ballista_b_mapicon",
+      "_attackerFireBallistaPrefab": "ballista_a_fire_mapicon",
+      "_defenderFireBallistaPrefab": "ballista_b_fire_mapicon",
+      "_attackerMangonelPrefab": "mangonel_a_mapicon",
+      "_defenderMangonelPrefab": "mangonel_b_mapicon",
+      "_attackerFireMangonelPrefab": "mangonel_a_fire_mapicon",
+      "_defenderFireMangonelPrefab": "mangonel_b_fire_mapicon",
+      "_attackerTrebuchetPrefab": "trebuchet_a_mapicon",
+      "_defenderTrebuchetPrefab": "trebuchet_b_mapicon"
+     },
+     "materials": [],
+     "physics": null
+    }
+   },
+   "paths": {
+    "count": 0,
+    "name_prefixes": []
+   }
+  },
+  "SandBoxCore/battle_terrain_001": {
+   "file": "<game>/Modules/SandBoxCore/SceneObj/battle_terrain_001/scene.xscene",
+   "sha256": "f6f33cdab0cfece98e9bf46a491beb00177034a177afbbf6b4a39339d4b1fe74",
+   "root": {
+    "name": "battle_terrain_001",
+    "version": "2"
+   },
+   "top_level_order": [
+    "flora_bounding_rect",
+    "levels",
+    "environment_properties",
+    "entities",
+    "terrain",
+    "editor_data",
+    "camera_data",
+    "Paths"
+   ],
+   "levels": [
+    "base",
+    "level_1",
+    "level_2",
+    "level_3"
+   ],
+   "flora_bounding_rect": {
+    "min": "111.184, 125.113",
+    "max": "398.282, 585.528"
+   },
+   "environment_selected": {
+    "nav_mesh_auto_generated_": "false",
+    "physics_world_min": "-30.744, -908.831",
+    "physics_world_max_": "500.000, 800.000",
+    "atmosphere_name": "scene_atmosphere",
+    "water_level": "-100.000",
+    "water_exists": "false",
+    "water_material": "water_default",
+    "gi_data_exists": null
+   },
+   "terrain_attributes": {
+    "enabled": "true",
+    "node_dimension_x": "5",
+    "node_dimension_y": "8",
+    "node_size": "100.000",
+    "lod_multiplier": "3.000",
+    "min_height": "-100.000",
+    "max_height": "500.000",
+    "vista_normalmap": "",
+    "vista_diffuse_name": "",
+    "vista_diffuse_blend_type": "0",
+    "vista_diffuse_blend_amount": "0.000",
+    "vista_layer_detail_distance": "35.000",
+    "vista_albedo_multiplier": "0.670",
+    "vista_detail_albedo_name": "",
+    "vista_detail_normal_name": "",
+    "vista_detail_tile": "20.000",
+    "vista_tileset": "",
+    "colormap_detail_level": "10",
+    "ao_intensity": "3.000"
+   },
+   "terrain_children": [
+    "outer_mesh",
+    "layers",
+    "nodes"
+   ],
+   "terrain_layers": [
+    {
+     "name": "grass",
+     "physics_material": "grass",
+     "diffusemap": "ground_grass_b_d",
+     "flora_meshes": 1
+    },
+    {
+     "name": "rock_k",
+     "physics_material": "stone",
+     "diffusemap": "rock_k_d",
+     "flora_meshes": 0
+    },
+    {
+     "name": "forest",
+     "physics_material": "grass",
+     "diffusemap": "ground_forest_b_d",
+     "flora_meshes": 7
+    },
+    {
+     "name": "grass_stone",
+     "physics_material": "grass",
+     "diffusemap": "ground_grass_stone_a_d",
+     "flora_meshes": 2
+    }
+   ],
+   "terrain_node_elements": {
+    "variable": 800,
+    "node": 40,
+    "texture_levels": 40,
+    "nodes": 1
+   },
+   "entity_elements": 402,
+   "top_level_entities": 390,
+   "scripts_inline": [
+    [
+     "TacticalPosition",
+     9
+    ],
+    [
+     "TacticalRegion",
+     7
+    ],
+    [
+     "ReflectionCapturer",
+     1
+    ],
+    [
+     "AmbientSoundEmitter",
+     1
+    ]
+   ],
+   "tags": [
+    [
+     "defender_cavalry_reinforcement",
+     1
+    ],
+    [
+     "envmap_probe",
+     1
+    ]
+   ],
+   "named_lookups": {},
+   "snapped_water_bodies": [],
+   "settlement_like_named_entities": {},
+   "script_examples": {},
+   "paths": {
+    "count": 1,
+    "name_prefixes": [
+     [
+      "spawn_path",
+      1
+     ]
+    ]
+   }
+  }
+ },
+ "terrain_survey": {
+  "scenes": 567,
+  "with_terrain": 487,
+  "vista_tileset_nonempty": [
+   "SandBox/Main_map",
+   "NavalDLC/Main_map"
+  ],
+  "terrain_render_version_set": [
+   "SandBox/Main_map",
+   "NavalDLC/Main_map"
+  ],
+  "largest_extent_without_tileset": [
+   {
+    "scene": "NavalDLC/naval_storyline_act_3_quest_3",
+    "nodes": [
+     10,
+     10
+    ],
+    "node_size": 400.0,
+    "heightmap_levels": [
+     8
+    ]
+   },
+   {
+    "scene": "NavalDLC/naval_storyline_act_3_quest_5",
+    "nodes": [
+     8,
+     8
+    ],
+    "node_size": 500.0,
+    "heightmap_levels": [
+     5,
+     6,
+     7
+    ]
+   },
+   {
+    "scene": "NavalDLC/prototype_port_scene",
+    "nodes": [
+     10,
+     10
+    ],
+    "node_size": 400.0,
+    "heightmap_levels": [
+     8
+    ]
+   }
+  ]
+ }
+}

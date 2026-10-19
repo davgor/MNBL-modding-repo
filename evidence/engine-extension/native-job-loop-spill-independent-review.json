@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "status": "independent-bounded-job-loop-spill-review-passed",
+  "gameExecuted": false,
+  "targetSha256": "2a5e0e0b15513ebb7052d747a621b82c50ee834553eba283b33bbbc33766e12a",
+  "proofSha256": "f2a1effb5047b9e07e211e35cb5c6b6e23df6187b23adb39fce657fd0b3dda25",
+  "sourceProofPath": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\evidence\\engine-extension\\pool-semantic-review-mid.json",
+  "instructions": 1176,
+  "directFrameWrites": 258,
+  "allCalls": 34,
+  "backwardStoreDominanceStates": 1123,
+  "approvedReload": "0x180687050",
+  "approvedOperand": "0x180687054",
+  "checks": [
+    "Full original function byte-match and gap-free disassembly; branch predecessors include late687ba6/687bac loop backedges.",
+    "Entry typed80-byte job\u2192Agent at+20\u2192Mission atAgent+ab8; sole saved homeRBP-60 store6864c7 dominatesreload687050.",
+    "Semantic SIMD-store fallback included. No indexed stack alias, home address escape or overlapping direct write.",
+    "Independently inspected34call contexts and retained local-pointer consumers. Nearest outputs are Single4 at-7c, Reaction4 at-80, HitParticleResultData12 at-58; none overlaps[-60,-58).",
+    "619de0 output+60..155;61a0c0/2ca050 output16bytes atpositive offsets;5ff1c0/63e000 output16/144bytes atpositive offsets. Other forwarded records use read-only source or bounded positive-field writes.",
+    "690470 copies particle IDs before reusing callee argument slot;689510 forwards original vector only toreadonly5f57a0;6899a0 networkrecord forwarding closes via63cca0\u2192698600/698750\u2192readonly2692d0.",
+    "5d42e0 unusedparam6 cannot interpret stale callerRSP28; other apparent heap-only callees have no omitted caller-local arguments."
+  ],
+  "limitations": [
+    "Exact installed ABI and managed callback declarations only. This is pointer provenance, not engine runtime safety or whole-patch readiness."
+  ]
+}

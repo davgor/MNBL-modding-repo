@@ -1,0 +1,558 @@
+{
+ "schema": "mnbl.one-shot-run",
+ "version": 1,
+ "ticket": "MMR-1",
+ "raw": "build/mmr1/one-shot-raw.json",
+ "startedUtc": "2026-10-19T19:24:08.4793952Z",
+ "finishedUtc": "2026-10-19T20:31:49.7366639Z",
+ "status": "pass",
+ "summary": {
+  "1": "pass",
+  "2": "pass",
+  "3": "pass",
+  "4": "pass",
+  "5": "pass",
+  "6": "pass",
+  "sequence": "pass"
+ },
+ "steps": [
+  {
+   "step": "1",
+   "text": "Verify pinned producer/game/DLC identities; from the actual New Campaign screen generate A, select a generated culture, finish character creation and enter play; confirm full-globe coverage and source-derived faction/settlement identities.",
+   "status": "pass",
+   "aspects": [
+    {
+     "aspect": "the package installed alone, matching its manifest, no development receipt",
+     "status": "pass",
+     "note": "11 files; the development module and store were moved aside",
+     "runs": []
+    },
+    {
+     "aspect": "the running module, fwg.exe and worldbridge.exe are the package's and the pins",
+     "status": "pass",
+     "note": "module bb6c6fd2da1a, producer 564c2629b5b9, worldbridge 2bfdbb9d0e2a; game v1.4.8.119303, War Sails v1.2.8.119303",
+     "runs": [
+      "step1 profile"
+     ]
+    },
+    {
+     "aspect": "the producer's pinned runtime (ucrtbase.dll) matches this installation",
+     "status": "pass",
+     "note": "the producer process contract's preflight (evidence/fwg/producer-process-contract.json, re-run with the offline suites) passed: the UCRT pin was renewed on 2026-10-19 after a Windows update replaced the system UCRT (evidence/one-shot/ucrt-drift.json); world A's content id is unchanged",
+     "runs": []
+    },
+    {
+     "aspect": "world A generated from the New Campaign screen, its culture chosen, character creation finished, the map entered, saved and loaded",
+     "status": "pass",
+     "note": "seed 42: generated in 35.0 s, content id f596b58cdcfc1879; the map after 395.3 s (navigation caches built); save mnbl_probe56_A_23852, loaded in 14.4 s",
+     "runs": [
+      "step1 profile"
+     ]
+    },
+    {
+     "aspect": "source-derived identities: every preview settlement and kingdom matches the live campaign; creation lists exactly the world's cultures",
+     "status": "pass",
+     "note": "new_campaign_flow, world A",
+     "runs": [
+      "step1 identities"
+     ]
+    },
+    {
+     "aspect": "full-globe coverage",
+     "status": "pass",
+     "note": "every cell of world A's periodic 128 x 64 grid is classified from the generated globe (8192 cells: {\"land\": 1898, \"mountain\": 491, \"sea\": 5707, \"lake\": 59, \"river\": 37})",
+     "runs": [
+      "step1 profile"
+     ]
+    }
+   ]
+  },
+  {
+   "step": "2",
+   "text": "Travel on land, enter a generated settlement, trade/recruit, enter one land mission and return to the same world.",
+   "status": "pass",
+   "aspects": [
+    {
+     "aspect": "travel by land to a generated town, trade and recruit there, leave; a day of campaign stays coherent",
+     "status": "pass",
+     "note": "campaign_soak world A (trade and recruitment through the screens' logic, not the screens)",
+     "runs": [
+      "step2 visit"
+     ]
+    },
+    {
+     "aspect": "land missions and settlement interactions, returning to the map each time",
+     "status": "pass",
+     "note": "land_missions world A cases ['B.field.steppe', 'B.field.wetland', 'capture', 'castle', 'crossing', 'field.cold', 'field.desert', 'field.open', 'field.rock', 'field.steppe', 'field.wetland', 'field.woodland', 'hideout', 'retreat', 'siege', 'town', 'village']",
+     "runs": [
+      "step2 land"
+     ]
+    },
+    {
+     "aspect": "land missions needing a battle class world A lacks, on world B",
+     "status": "pass",
+     "note": "world A lacks ['steppe', 'wetland']; on B (seed 73): ran ['B.field.wetland'], failed []; absent from B too (neither world has them) ['B.field.steppe']",
+     "runs": [
+      "step2 land"
+     ]
+    },
+    {
+     "aspect": "the same world after a mission (world identity re-checked)",
+     "status": "pass",
+     "note": "14 mission returns with the world identity recorded before and after, 14 equal (the campaign's bound world id, content id and instance, and its periodic frame)",
+     "runs": [
+      "step2 land"
+     ]
+    }
+   ]
+  },
+  {
+   "step": "3",
+   "text": "Reach a generated operational port, embark, sail to another valid destination, enter/return from a naval encounter and disembark; the seaborne raid, blockade and anchor scenario.",
+   "status": "pass",
+   "aspects": [
+    {
+     "aspect": "ship purchase, port and island voyages, drop-off and coastal landing, blockade and anchor, pirate battle (retreat), seaborne raid, defeat with the raft",
+     "status": "pass",
+     "note": "naval_missions world A cases ['blockade', 'dropoff', 'naval.defeat', 'pirate.battle', 'pirate.seam', 'raid', 'route.island', 'route.port', 'route.seam', 'shipyard.buy', 'shipyard.repair']",
+     "runs": [
+      "step3 naval"
+     ]
+    }
+   ]
+  },
+  {
+   "step": "4",
+   "text": "East/west crossing for player and AI on land and sea, route execution, nearby-party encounter/visibility, distance caches, camera and picking.",
+   "status": "pass",
+   "aspects": [
+    {
+     "aspect": "the player crosses the seam on land, an AI party pursues across it, a fleet is called across it and an anchored fleet stays by it; all survive save and load",
+     "status": "pass",
+     "note": "two_world_matrix create, world A",
+     "runs": [
+      "step4-5 create"
+     ]
+    },
+    {
+     "aspect": "the navigation caches built once per world and reused by every load",
+     "status": "pass",
+     "note": "A built at its start (generated, key dadc84ff); loads: A profile same-process reused dadc84ff; A matrix same-process reused dadc84ff; B matrix same-process reused ebc5475a; A matrix cold reused dadc84ff; B matrix cold reused ebc5475a; B seam presentation reused ebc5475a; B's key ['ebc5475a']; keys in the engine logs ['dadc84ff', 'ebc5475a'], built in runs ['step1 profile', 'step2 land', 'step4-5 create'] (A's start, and B's start in the matrix)",
+     "runs": [
+      "step1 profile",
+      "step4-5 create",
+      "step5 cold",
+      "step4 seam"
+     ]
+    },
+    {
+     "aspect": "camera and picking across the seam on the generated world: display copies, the camera following the player across and back, free pan, fast moves, picking through the strip and on a display copy, tracks, terrain alignment, a town menu across the seam, the wrap budget",
+     "status": "pass",
+     "note": "seam_presentation on world B's matrix save (mnbl_probe49_B_54052), towns {\"east\": \"mnbl_214f6557_t_95202799a9\", \"west\": \"mnbl_214f6557_t_28bc27fd66\", \"periodic\": 31.4622, \"land\": 33.9505157}; world A's only land across the seam has no town west of it",
+     "runs": [
+      "step4 seam"
+     ]
+    },
+    {
+     "aspect": "the player sailing across the seam and a naval encounter at the seam",
+     "status": "pass",
+     "note": "naval_missions route.seam {\"arrived\": true, \"hours\": 2.179968527983874, \"travelledPeriodic\": 7.5249176, \"straightPeriodic\": 8.047805, \"rebases\": 1, \"rebaseShifts\": [-800], \"atSea\": true, \"offNavigationSamples\": 0, \"nonCanonicalSamples\": 0}, pirate.seam {\"party\": [400.707458, 879.3039], \"pirate\": [1199.17688, 878.8777], \"periodic\": 1.58881235, \"planar\": 798.469543}",
+     "runs": [
+      "step3 naval"
+     ]
+    }
+   ]
+  },
+  {
+   "step": "5",
+   "text": "Save A with mutable state; generate B in the same process and note the difference; save B, cold-restart, load A then B; ordinary loads must not launch FWGC++.",
+   "status": "pass",
+   "aspects": [
+    {
+     "aspect": "A saved with mutable ownership, party, prisoner, siege, ship and anchor state, loaded in the same process and equal to its save",
+     "status": "pass",
+     "note": "two_world_matrix create",
+     "runs": [
+      "step4-5 create"
+     ]
+    },
+    {
+     "aspect": "after a cold restart, A loads (scene swept and re-encoded) equal to its save, and no generator process starts during the load",
+     "status": "pass",
+     "note": "two_world_matrix cold",
+     "runs": [
+      "step5 cold"
+     ]
+    },
+    {
+     "aspect": "B (seed 73) generated in the same process as A, with different geography and routes",
+     "status": "pass",
+     "note": "B generated in 54.7 s, content id f63c6841085725e2; land cells A 2389 vs B 4192, coastlines differ",
+     "runs": [
+      "step1 profile"
+     ]
+    },
+    {
+     "aspect": "B started from the setup screen, changed, saved; loaded in the same process from inside A and after the cold restart, each equal to its save",
+     "status": "pass",
+     "note": "B seed 73, content id f63c6841085725e2 (A f596b58cdcfc1879); save mnbl_probe49_B_54052; loads same process, from inside A and cold restart, from inside A",
+     "runs": [
+      "step4-5 create",
+      "step5 cold"
+     ]
+    }
+   ]
+  },
+  {
+   "step": "6",
+   "text": "Cancel another generation and load an isolated invalid copy of world data; usable-menu recovery, unchanged original hashes, no orphan producer or cross-world callbacks.",
+   "status": "pass",
+   "aspects": [
+    {
+     "aspect": "a second generation cancelled through the setup screen (New Seed, then Back): interrupted, the committed world unchanged",
+     "status": "pass",
+     "note": "new_campaign_flow",
+     "runs": [
+      "step1 identities"
+     ]
+    },
+    {
+     "aspect": "invalid copies of A's save (torn, missing world, other build) and a Continue into a missing world refused before anything loads; A's package and bundle unchanged",
+     "status": "pass",
+     "note": "two_world_matrix create, refusals ['fromRunningGame', 'missing-bundle', 'other-game-version', 'torn', 'worldUnchanged']",
+     "runs": [
+      "step4-5 create"
+     ]
+    },
+    {
+     "aspect": "more invalid copies (incompatible schema and build, missing DLC, corrupted manifest hash) refused; A's save, package and bundle unchanged",
+     "status": "pass",
+     "note": "compat_matrix",
+     "runs": [
+      "step6 refusals"
+     ]
+    },
+    {
+     "aspect": "no generator process left after any run",
+     "status": "pass",
+     "note": "fwg and worldbridge after every run: none",
+     "runs": [
+      "step1 profile",
+      "step1 identities",
+      "step3 prepare",
+      "step3 naval",
+      "step2 land",
+      "step2 visit",
+      "step4-5 create",
+      "step5 cold",
+      "step4 seam",
+      "step6 refusals"
+     ]
+    },
+    {
+     "aspect": "the world bundles unchanged through the matrix, refusal and cold-load runs",
+     "status": "pass",
+     "note": "store snapshots before and after the two_world_matrix and compat_matrix runs",
+     "runs": []
+    },
+    {
+     "aspect": "an isolated invalid copy of world data, from a separate test root, refused before anything loads",
+     "status": "pass",
+     "note": "compat_matrix: <temp>/mnbl-isolated-<pid>/bundles/f596b58cdcfc18798542fdef5a4d9c9f6d84abddca1425af8d0b87f521191d2d with compiled/travel/cells.bin damaged, opened by the bundle verifier: The world data bundle in <test root>\\bundles\\f596b58cdcfc18798542fdef5a4d9c9f6d84abddca1425af8d0b87f521191d2d cannot be used: hash differs: compiled/travel/cell; the copy removed True; the original bundle and package unchanged True",
+     "runs": [
+      "step6 refusals"
+     ]
+    },
+    {
+     "aspect": "no cross-world callbacks: after each load nothing of the other world is registered, and the frame and terrain context are the loaded world's only",
+     "status": "pass",
+     "note": "two_world_matrix create and cold, A and B each loaded from inside the other",
+     "runs": [
+      "step4-5 create",
+      "step5 cold"
+     ]
+    }
+   ]
+  },
+  {
+   "step": "sequence",
+   "text": "The sequence itself: the installation and the development environment.",
+   "status": "pass",
+   "aspects": [
+    {
+     "aspect": "the official module descriptors and engine binaries unchanged",
+     "status": "pass",
+     "note": "snapshots before and after",
+     "runs": []
+    },
+    {
+     "aspect": "every save from before the sequence unchanged",
+     "status": "pass",
+     "note": "143 saves",
+     "runs": []
+    },
+    {
+     "aspect": "the development module and store put back",
+     "status": "pass",
+     "note": "{'development module restored': True, 'development store restored': True}",
+     "runs": []
+    }
+   ]
+  }
+ ],
+ "runs": {
+  "step1 profile": {
+   "probe": "first_test_profile",
+   "pid": 23852,
+   "status": "ok",
+   "ok": true,
+   "failures": [],
+   "error": null,
+   "stopped": null,
+   "seconds": 660.4,
+   "generatorProcessesAfter": [],
+   "result": "evidence/runtime/in-game/first_test_profile-23852.json",
+   "resultSha256": "56df2e7c14062318464126a0918751024422e4fcedb9bcf6095333887f47779a"
+  },
+  "step1 identities": {
+   "probe": "new_campaign_flow",
+   "pid": 35592,
+   "status": "ok",
+   "ok": true,
+   "failures": [],
+   "error": null,
+   "stopped": null,
+   "seconds": 150.1,
+   "generatorProcessesAfter": [],
+   "result": "evidence/runtime/in-game/new_campaign_flow-35592.json",
+   "resultSha256": "8f83d0b1e131a9abf6485d89d0dece5d7bd89b6ffb99ee9b7e2849ee4b8c6e2b"
+  },
+  "step3 prepare": {
+   "probe": "land_missions",
+   "pid": 46848,
+   "status": "ok",
+   "ok": true,
+   "failures": [],
+   "error": null,
+   "stopped": null,
+   "seconds": 90,
+   "generatorProcessesAfter": [],
+   "result": "evidence/runtime/in-game/land_missions-46848.json",
+   "resultSha256": "3a9e805215653ead94e226f6c2f3a91a1e96e1735aabc8417b2989b2a550e39e"
+  },
+  "step3 naval": {
+   "probe": "naval_missions",
+   "pid": 51924,
+   "status": "ok",
+   "ok": true,
+   "failures": [],
+   "error": null,
+   "stopped": null,
+   "seconds": 375.2,
+   "generatorProcessesAfter": [],
+   "result": "evidence/runtime/in-game/naval_missions-51924.json",
+   "resultSha256": "93464e65405c097f0aa7308d93bd477673e230dbc1eed0a0d0317ed290c4166d"
+  },
+  "step2 land": {
+   "probe": "land_missions",
+   "pid": 52204,
+   "status": "ok",
+   "ok": true,
+   "failures": [],
+   "error": null,
+   "stopped": null,
+   "seconds": 1185.7,
+   "generatorProcessesAfter": [],
+   "result": "evidence/runtime/in-game/land_missions-52204.json",
+   "resultSha256": "226ea105fcdbf58c25f5f2919f779f1632664fb35b2a3ef8f63b8cf2202fbe68"
+  },
+  "step2 visit": {
+   "probe": "campaign_soak",
+   "pid": 7156,
+   "status": "ok",
+   "ok": true,
+   "failures": [],
+   "error": null,
+   "stopped": null,
+   "seconds": 135.1,
+   "generatorProcessesAfter": [],
+   "result": "evidence/runtime/in-game/campaign_soak-7156.json",
+   "resultSha256": "2eb7807ee2486eae0f480900e2e3e714c0b786f47cc6c041372aedfb0375622a"
+  },
+  "step4-5 create": {
+   "probe": "two_world_matrix",
+   "pid": 54052,
+   "status": "ok",
+   "ok": true,
+   "failures": [],
+   "error": null,
+   "stopped": null,
+   "seconds": 1080.7,
+   "generatorProcessesAfter": [],
+   "result": "evidence/runtime/in-game/two_world_matrix-54052.json",
+   "resultSha256": "6d79a0538e61be23d7feaf16fed36e6b2dd91f62a168652ae7615264f6bc0354"
+  },
+  "step5 cold": {
+   "probe": "two_world_matrix",
+   "pid": 30068,
+   "status": "ok",
+   "ok": true,
+   "failures": [],
+   "error": null,
+   "stopped": null,
+   "seconds": 120.1,
+   "generatorProcessesAfter": [],
+   "result": "evidence/runtime/in-game/two_world_matrix-30068.json",
+   "resultSha256": "5dd7e590e861a88a8046ec7d285889f266eb5ae0d6227ad8febcadd31cff6084"
+  },
+  "step4 seam": {
+   "probe": "seam_presentation",
+   "pid": 54116,
+   "status": "ok",
+   "ok": true,
+   "failures": [],
+   "error": null,
+   "stopped": null,
+   "seconds": 120.1,
+   "generatorProcessesAfter": [],
+   "result": "evidence/runtime/in-game/seam_presentation-54116.json",
+   "resultSha256": "51e4bfdb43b3989fd312923529581906ae088f446d72c03745aee110392bea52"
+  },
+  "step6 refusals": {
+   "probe": "compat_matrix",
+   "pid": 36200,
+   "status": "ok",
+   "ok": true,
+   "failures": [],
+   "error": null,
+   "stopped": null,
+   "seconds": 75.1,
+   "generatorProcessesAfter": [],
+   "result": "evidence/runtime/in-game/compat_matrix-36200.json",
+   "resultSha256": "42a4b54f8df1d50e06dfb75e2a48d02d59d06a0641213d5cb447e4a9b956d8bd"
+  }
+ },
+ "reruns": [],
+ "identities": {
+  "commit": "6d34cef12aed416550732885abec19ff539fe76b",
+  "sourceTreeClean": false,
+  "package": {
+   "sha256": "51abd1cc9b88dc3d2a7e3d0d8f5b15f9301a54d9288fbde23864a5d542789a66",
+   "moduleAssemblySha256": "bb6c6fd2da1a5f47ee71fc0394702a80005b4d537b1ab5db09cd9548349fd03e",
+   "worldbridgeSha256": "2bfdbb9d0e2ae55dc356e9a8873bd70a5cded3b647faed28d261e5abc442f53a",
+   "manifestSource": {
+    "commit": "6d34cef12aed416550732885abec19ff539fe76b",
+    "ownedFilesUncommitted": true
+   }
+  },
+  "producerSha256": "564c2629b5b92d49e52cd466a5a1aaa9339380464207ddcae669dd487d2f695e",
+  "game": "v1.4.8.119303",
+  "navalDlc": "v1.2.8.119303",
+  "worlds": {
+   "A": {
+    "seed": 42,
+    "worldContentId": "f596b58cdcfc18798542fdef5a4d9c9f6d84abddca1425af8d0b87f521191d2d",
+    "save": "mnbl_probe56_A_23852",
+    "binding": {
+     "worldId": "mnbl_1609fb72",
+     "package": "mnbl_1609fb72-423268b6fc6c",
+     "instance": "029fd4b667d04e208207255be5718cfc",
+     "contentId": "f596b58cdcfc18798542fdef5a4d9c9f6d84abddca1425af8d0b87f521191d2d"
+    },
+    "scene": "mnbl_world_f596b58cdcfc1879_019bf8ec927e",
+    "seconds": {
+     "generate": 34.991769,
+     "mapAfterStart": 395.32428170000003,
+     "load": 14.443538199999978
+    }
+   },
+   "B": {
+    "seed": 73,
+    "worldContentId": "f63c6841085725e2c437b7d5d087a52cf4dc7d5d8fe3e2d583d46cba6a775550",
+    "activated": true,
+    "matrixContentId": "f63c6841085725e2c437b7d5d087a52cf4dc7d5d8fe3e2d583d46cba6a775550",
+    "save": "mnbl_probe49_B_54052",
+    "instance": "333463c267d147a89a975c7e934db37c",
+    "seconds": {
+     "generate": 54.70147250000002,
+     "matrixStart": 854.8579004
+    }
+   }
+  },
+  "request": {
+   "jobA": "5987aff676004625807553b53a2084e0",
+   "jobB": "d9ffdfc6f4cb4e6da416f1b8c6ec085c",
+   "recipeVersion": 3,
+   "overrides": {
+    "phase": 16,
+    "size": 129
+   },
+   "qualityAttempts": 3
+  },
+  "campaigns": {
+   "profile": "029fd4b667d04e208207255be5718cfc",
+   "matrix": "18daa6b69520426d82d28bd59bdc7399",
+   "designated": "9a5318d45b5341c3a1f9f21e1630cdab"
+  },
+  "matrixSave": "mnbl_probe49_A_54052",
+  "designatedSave": "mnbl_oneshot_A_designated",
+  "navigationCaches": {
+   "keys": [
+    "dadc84ff",
+    "ebc5475a"
+   ],
+   "builtIn": [
+    "step1 profile",
+    "step2 land",
+    "step4-5 create"
+   ],
+   "aStart": "dadc84ff",
+   "loads": [
+    {
+     "world": "A",
+     "how": "profile same-process",
+     "status": "reused",
+     "key": "dadc84ff"
+    },
+    {
+     "world": "A",
+     "how": "matrix same-process",
+     "status": "reused",
+     "key": "dadc84ff"
+    },
+    {
+     "world": "B",
+     "how": "matrix same-process",
+     "status": "reused",
+     "key": "ebc5475a"
+    },
+    {
+     "world": "A",
+     "how": "matrix cold",
+     "status": "reused",
+     "key": "dadc84ff"
+    },
+    {
+     "world": "B",
+     "how": "matrix cold",
+     "status": "reused",
+     "key": "ebc5475a"
+    },
+    {
+     "world": "B",
+     "how": "seam presentation",
+     "status": "reused",
+     "key": "ebc5475a"
+    }
+   ],
+   "loadSeconds": {
+    "profile same-process": 14.443538199999978,
+    "matrix same-process A": 14.205048000000033,
+    "matrix same-process B": 18.249198699999965,
+    "matrix cold A": 32.7053725,
+    "matrix cold B": 18.5391701
+   }
+  }
+ },
+ "sequenceError": null
+}

@@ -1,0 +1,1248 @@
+[
+  {
+    "signature": "System.Void TaleWorlds.Engine.PhysicsShape::AddPreloadQueueWithName(System.String,TaleWorlds.Library.Vec3)",
+    "parameters": [
+      {
+        "type": "System.String",
+        "name": "bodyName"
+      },
+      {
+        "type": "TaleWorlds.Library.Vec3",
+        "name": "scale"
+      }
+    ],
+    "body": [
+      "IL_0000: ldsfld TaleWorlds.Engine.IPhysicsShape TaleWorlds.Engine.EngineApplicationInterface::IPhysicsShape",
+      "IL_0005: ldarg.0",
+      "IL_0006: ldarga.s scale",
+      "IL_0008: callvirt System.Void TaleWorlds.Engine.IPhysicsShape::AddPreloadQueueWithName(System.String,TaleWorlds.Library.Vec3&)",
+      "IL_000d: ret"
+    ]
+  },
+  {
+    "signature": "System.Void TaleWorlds.Engine.PhysicsShape::UnloadDynamicBodies()",
+    "parameters": [],
+    "body": [
+      "IL_0000: ldsfld TaleWorlds.Engine.IPhysicsShape TaleWorlds.Engine.EngineApplicationInterface::IPhysicsShape",
+      "IL_0005: callvirt System.Void TaleWorlds.Engine.IPhysicsShape::UnloadDynamicBodies()",
+      "IL_000a: ret"
+    ]
+  },
+  {
+    "signature": "TaleWorlds.Engine.PhysicsShape TaleWorlds.Engine.PhysicsShape::CreateCopy()",
+    "parameters": [],
+    "body": [
+      "IL_0000: ldsfld TaleWorlds.Engine.IPhysicsShape TaleWorlds.Engine.EngineApplicationInterface::IPhysicsShape",
+      "IL_0005: ldarg.0",
+      "IL_0006: call System.UIntPtr TaleWorlds.DotNet.NativeObject::get_Pointer()",
+      "IL_000b: callvirt TaleWorlds.Engine.PhysicsShape TaleWorlds.Engine.IPhysicsShape::CreateBodyCopy(System.UIntPtr)",
+      "IL_0010: ret"
+    ]
+  },
+  {
+    "signature": "System.Void TaleWorlds.Engine.PhysicsShape::AddCapsule(TaleWorlds.Engine.CapsuleData)",
+    "parameters": [
+      {
+        "type": "TaleWorlds.Engine.CapsuleData",
+        "name": "data"
+      }
+    ],
+    "body": [
+      "IL_0000: ldsfld TaleWorlds.Engine.IPhysicsShape TaleWorlds.Engine.EngineApplicationInterface::IPhysicsShape",
+      "IL_0005: ldarg.0",
+      "IL_0006: call System.UIntPtr TaleWorlds.DotNet.NativeObject::get_Pointer()",
+      "IL_000b: ldarga.s data",
+      "IL_000d: callvirt System.Void TaleWorlds.Engine.IPhysicsShape::AddCapsule(System.UIntPtr,TaleWorlds.Engine.CapsuleData&)",
+      "IL_0012: ret"
+    ]
+  },
+  {
+    "signature": "System.Void TaleWorlds.Engine.PhysicsShape::AddSphere(TaleWorlds.Engine.SphereData)",
+    "parameters": [
+      {
+        "type": "TaleWorlds.Engine.SphereData",
+        "name": "data"
+      }
+    ],
+    "body": [
+      "IL_0000: ldsfld TaleWorlds.Engine.IPhysicsShape TaleWorlds.Engine.EngineApplicationInterface::IPhysicsShape",
+      "IL_0005: ldarg.0",
+      "IL_0006: call System.UIntPtr TaleWorlds.DotNet.NativeObject::get_Pointer()",
+      "IL_000b: ldarga.s data",
+      "IL_000d: ldflda TaleWorlds.Library.Vec3 TaleWorlds.Engine.SphereData::Origin",
+      "IL_0012: ldarg.1",
+      "IL_0013: ldfld System.Single TaleWorlds.Engine.SphereData::Radius",
+      "IL_0018: callvirt System.Void TaleWorlds.Engine.IPhysicsShape::AddSphere(System.UIntPtr,TaleWorlds.Library.Vec3&,System.Single)",
+      "IL_001d: ret"
+    ]
+  },
+  {
+    "signature": "System.Void TaleWorlds.Engine.PhysicsShape::SetCapsule(TaleWorlds.Engine.CapsuleData,System.Int32)",
+    "parameters": [
+      {
+        "type": "TaleWorlds.Engine.CapsuleData",
+        "name": "data"
+      },
+      {
+        "type": "System.Int32",
+        "name": "index"
+      }
+    ],
+    "body": [
+      "IL_0000: ldsfld TaleWorlds.Engine.IPhysicsShape TaleWorlds.Engine.EngineApplicationInterface::IPhysicsShape",
+      "IL_0005: ldarg.0",
+      "IL_0006: call System.UIntPtr TaleWorlds.DotNet.NativeObject::get_Pointer()",
+      "IL_000b: ldarga.s data",
+      "IL_000d: ldarg.2",
+      "IL_000e: callvirt System.Void TaleWorlds.Engine.IPhysicsShape::SetCapsule(System.UIntPtr,TaleWorlds.Engine.CapsuleData&,System.Int32)",
+      "IL_0013: ret"
+    ]
+  },
+  {
+    "signature": "System.Void TaleWorlds.Engine.GameEntityPhysicsExtensions::AddSphereAsBody(TaleWorlds.Engine.GameEntity,TaleWorlds.Library.Vec3,System.Single,TaleWorlds.Engine.BodyFlags)",
+    "parameters": [
+      {
+        "type": "TaleWorlds.Engine.GameEntity",
+        "name": "gameEntity"
+      },
+      {
+        "type": "TaleWorlds.Library.Vec3",
+        "name": "sphere"
+      },
+      {
+        "type": "System.Single",
+        "name": "radius"
+      },
+      {
+        "type": "TaleWorlds.Engine.BodyFlags",
+        "name": "bodyFlags"
+      }
+    ],
+    "body": [
+      "IL_0000: ldsfld TaleWorlds.Engine.IGameEntity TaleWorlds.Engine.EngineApplicationInterface::IGameEntity",
+      "IL_0005: ldarg.0",
+      "IL_0006: callvirt System.UIntPtr TaleWorlds.DotNet.NativeObject::get_Pointer()",
+      "IL_000b: ldarg.1",
+      "IL_000c: ldarg.2",
+      "IL_000d: ldarg.3",
+      "IL_000e: callvirt System.Void TaleWorlds.Engine.IGameEntity::AddSphereAsBody(System.UIntPtr,TaleWorlds.Library.Vec3,System.Single,System.UInt32)",
+      "IL_0013: ret"
+    ]
+  },
+  {
+    "signature": "System.Void TaleWorlds.Engine.GameEntityPhysicsExtensions::AddCapsuleAsBody(TaleWorlds.Engine.GameEntity,TaleWorlds.Library.Vec3,TaleWorlds.Library.Vec3,System.Single,TaleWorlds.Engine.BodyFlags,System.String)",
+    "parameters": [
+      {
+        "type": "TaleWorlds.Engine.GameEntity",
+        "name": "gameEntity"
+      },
+      {
+        "type": "TaleWorlds.Library.Vec3",
+        "name": "p1"
+      },
+      {
+        "type": "TaleWorlds.Library.Vec3",
+        "name": "p2"
+      },
+      {
+        "type": "System.Single",
+        "name": "radius"
+      },
+      {
+        "type": "TaleWorlds.Engine.BodyFlags",
+        "name": "bodyFlags"
+      },
+      {
+        "type": "System.String",
+        "name": "physicsMaterialName"
+      }
+    ],
+    "body": [
+      "IL_0000: ldsfld TaleWorlds.Engine.IGameEntity TaleWorlds.Engine.EngineApplicationInterface::IGameEntity",
+      "IL_0005: ldarg.0",
+      "IL_0006: callvirt System.UIntPtr TaleWorlds.DotNet.NativeObject::get_Pointer()",
+      "IL_000b: ldarg.1",
+      "IL_000c: ldarg.2",
+      "IL_000d: ldarg.3",
+      "IL_000e: ldarg.s bodyFlags",
+      "IL_0010: ldarg.s physicsMaterialName",
+      "IL_0012: callvirt System.Void TaleWorlds.Engine.IGameEntity::AddCapsuleAsBody(System.UIntPtr,TaleWorlds.Library.Vec3,TaleWorlds.Library.Vec3,System.Single,System.UInt32,System.String)",
+      "IL_0017: ret"
+    ]
+  },
+  {
+    "signature": "System.Void TaleWorlds.Engine.GameEntityPhysicsExtensions::UpdateBodyRestOffset(TaleWorlds.Engine.WeakGameEntity,System.Single)",
+    "parameters": [
+      {
+        "type": "TaleWorlds.Engine.WeakGameEntity",
+        "name": "gameEntity"
+      },
+      {
+        "type": "System.Single",
+        "name": "restOffset"
+      }
+    ],
+    "body": [
+      "IL_0000: ldsfld TaleWorlds.Engine.IGameEntity TaleWorlds.Engine.EngineApplicationInterface::IGameEntity",
+      "IL_0005: ldarga.s gameEntity",
+      "IL_0007: call System.UIntPtr TaleWorlds.Engine.WeakGameEntity::get_Pointer()",
+      "IL_000c: ldarg.1",
+      "IL_000d: callvirt System.Void TaleWorlds.Engine.IGameEntity::UpdateBodyRestOffset(System.UIntPtr,System.Single)",
+      "IL_0012: ret"
+    ]
+  },
+  {
+    "signature": "System.Void TaleWorlds.Engine.GameEntityPhysicsExtensions::AddSphereAsBody(TaleWorlds.Engine.WeakGameEntity,TaleWorlds.Library.Vec3,System.Single,TaleWorlds.Engine.BodyFlags)",
+    "parameters": [
+      {
+        "type": "TaleWorlds.Engine.WeakGameEntity",
+        "name": "gameEntity"
+      },
+      {
+        "type": "TaleWorlds.Library.Vec3",
+        "name": "sphere"
+      },
+      {
+        "type": "System.Single",
+        "name": "radius"
+      },
+      {
+        "type": "TaleWorlds.Engine.BodyFlags",
+        "name": "bodyFlags"
+      }
+    ],
+    "body": [
+      "IL_0000: ldsfld TaleWorlds.Engine.IGameEntity TaleWorlds.Engine.EngineApplicationInterface::IGameEntity",
+      "IL_0005: ldarga.s gameEntity",
+      "IL_0007: call System.UIntPtr TaleWorlds.Engine.WeakGameEntity::get_Pointer()",
+      "IL_000c: ldarg.1",
+      "IL_000d: ldarg.2",
+      "IL_000e: ldarg.3",
+      "IL_000f: callvirt System.Void TaleWorlds.Engine.IGameEntity::AddSphereAsBody(System.UIntPtr,TaleWorlds.Library.Vec3,System.Single,System.UInt32)",
+      "IL_0014: ret"
+    ]
+  },
+  {
+    "signature": "System.Void TaleWorlds.Engine.GameEntityPhysicsExtensions::AddCapsuleAsBody(TaleWorlds.Engine.WeakGameEntity,TaleWorlds.Library.Vec3,TaleWorlds.Library.Vec3,System.Single,TaleWorlds.Engine.BodyFlags,System.String)",
+    "parameters": [
+      {
+        "type": "TaleWorlds.Engine.WeakGameEntity",
+        "name": "gameEntity"
+      },
+      {
+        "type": "TaleWorlds.Library.Vec3",
+        "name": "p1"
+      },
+      {
+        "type": "TaleWorlds.Library.Vec3",
+        "name": "p2"
+      },
+      {
+        "type": "System.Single",
+        "name": "radius"
+      },
+      {
+        "type": "TaleWorlds.Engine.BodyFlags",
+        "name": "bodyFlags"
+      },
+      {
+        "type": "System.String",
+        "name": "physicsMaterialName"
+      }
+    ],
+    "body": [
+      "IL_0000: ldsfld TaleWorlds.Engine.IGameEntity TaleWorlds.Engine.EngineApplicationInterface::IGameEntity",
+      "IL_0005: ldarga.s gameEntity",
+      "IL_0007: call System.UIntPtr TaleWorlds.Engine.WeakGameEntity::get_Pointer()",
+      "IL_000c: ldarg.1",
+      "IL_000d: ldarg.2",
+      "IL_000e: ldarg.3",
+      "IL_000f: ldarg.s bodyFlags",
+      "IL_0011: ldarg.s physicsMaterialName",
+      "IL_0013: callvirt System.Void TaleWorlds.Engine.IGameEntity::AddCapsuleAsBody(System.UIntPtr,TaleWorlds.Library.Vec3,TaleWorlds.Library.Vec3,System.Single,System.UInt32,System.String)",
+      "IL_0018: ret"
+    ]
+  },
+  {
+    "signature": "System.Void TaleWorlds.Engine.GameEntityPhysicsExtensions::CreateVariableRatePhysics(TaleWorlds.Engine.GameEntity,System.Boolean)",
+    "parameters": [
+      {
+        "type": "TaleWorlds.Engine.GameEntity",
+        "name": "gameEntity"
+      },
+      {
+        "type": "System.Boolean",
+        "name": "forChildren"
+      }
+    ],
+    "body": [
+      "IL_0000: ldsfld TaleWorlds.Engine.IGameEntity TaleWorlds.Engine.EngineApplicationInterface::IGameEntity",
+      "IL_0005: ldarg.0",
+      "IL_0006: callvirt System.UIntPtr TaleWorlds.DotNet.NativeObject::get_Pointer()",
+      "IL_000b: ldarg.1",
+      "IL_000c: callvirt System.Void TaleWorlds.Engine.IGameEntity::CreateVariableRatePhysics(System.UIntPtr,System.Boolean)",
+      "IL_0011: ret"
+    ]
+  },
+  {
+    "signature": "System.Void TaleWorlds.Engine.GameEntityPhysicsExtensions::CreateVariableRatePhysics(TaleWorlds.Engine.WeakGameEntity,System.Boolean)",
+    "parameters": [
+      {
+        "type": "TaleWorlds.Engine.WeakGameEntity",
+        "name": "gameEntity"
+      },
+      {
+        "type": "System.Boolean",
+        "name": "forChildren"
+      }
+    ],
+    "body": [
+      "IL_0000: ldsfld TaleWorlds.Engine.IGameEntity TaleWorlds.Engine.EngineApplicationInterface::IGameEntity",
+      "IL_0005: ldarga.s gameEntity",
+      "IL_0007: call System.UIntPtr TaleWorlds.Engine.WeakGameEntity::get_Pointer()",
+      "IL_000c: ldarg.1",
+      "IL_000d: callvirt System.Void TaleWorlds.Engine.IGameEntity::CreateVariableRatePhysics(System.UIntPtr,System.Boolean)",
+      "IL_0012: ret"
+    ]
+  },
+  {
+    "signature": "System.Void TaleWorlds.Engine.GameEntityPhysicsExtensions::SetPhysicsState(TaleWorlds.Engine.GameEntity,System.Boolean,System.Boolean)",
+    "parameters": [
+      {
+        "type": "TaleWorlds.Engine.GameEntity",
+        "name": "gameEntity"
+      },
+      {
+        "type": "System.Boolean",
+        "name": "isEnabled"
+      },
+      {
+        "type": "System.Boolean",
+        "name": "setChildren"
+      }
+    ],
+    "body": [
+      "IL_0000: ldsfld TaleWorlds.Engine.IGameEntity TaleWorlds.Engine.EngineApplicationInterface::IGameEntity",
+      "IL_0005: ldarg.0",
+      "IL_0006: callvirt System.UIntPtr TaleWorlds.DotNet.NativeObject::get_Pointer()",
+      "IL_000b: ldarg.1",
+      "IL_000c: ldarg.2",
+      "IL_000d: callvirt System.Void TaleWorlds.Engine.IGameEntity::SetPhysicsState(System.UIntPtr,System.Boolean,System.Boolean)",
+      "IL_0012: ret"
+    ]
+  },
+  {
+    "signature": "System.Void TaleWorlds.Engine.GameEntityPhysicsExtensions::SetPhysicsState(TaleWorlds.Engine.WeakGameEntity,System.Boolean,System.Boolean)",
+    "parameters": [
+      {
+        "type": "TaleWorlds.Engine.WeakGameEntity",
+        "name": "gameEntity"
+      },
+      {
+        "type": "System.Boolean",
+        "name": "isEnabled"
+      },
+      {
+        "type": "System.Boolean",
+        "name": "setChildren"
+      }
+    ],
+    "body": [
+      "IL_0000: ldsfld TaleWorlds.Engine.IGameEntity TaleWorlds.Engine.EngineApplicationInterface::IGameEntity",
+      "IL_0005: ldarga.s gameEntity",
+      "IL_0007: call System.UIntPtr TaleWorlds.Engine.WeakGameEntity::get_Pointer()",
+      "IL_000c: ldarg.1",
+      "IL_000d: ldarg.2",
+      "IL_000e: callvirt System.Void TaleWorlds.Engine.IGameEntity::SetPhysicsState(System.UIntPtr,System.Boolean,System.Boolean)",
+      "IL_0013: ret"
+    ]
+  },
+  {
+    "signature": "System.Void TaleWorlds.Engine.GameEntityPhysicsExtensions::SetPhysicsStateOnlyVariable(TaleWorlds.Engine.GameEntity,System.Boolean,System.Boolean)",
+    "parameters": [
+      {
+        "type": "TaleWorlds.Engine.GameEntity",
+        "name": "gameEntity"
+      },
+      {
+        "type": "System.Boolean",
+        "name": "isEnabled"
+      },
+      {
+        "type": "System.Boolean",
+        "name": "setChildren"
+      }
+    ],
+    "body": [
+      "IL_0000: ldsfld TaleWorlds.Engine.IGameEntity TaleWorlds.Engine.EngineApplicationInterface::IGameEntity",
+      "IL_0005: ldarg.0",
+      "IL_0006: callvirt System.UIntPtr TaleWorlds.DotNet.NativeObject::get_Pointer()",
+      "IL_000b: ldarg.1",
+      "IL_000c: ldarg.2",
+      "IL_000d: callvirt System.Void TaleWorlds.Engine.IGameEntity::SetPhysicsStateOnlyVariable(System.UIntPtr,System.Boolean,System.Boolean)",
+      "IL_0012: ret"
+    ]
+  },
+  {
+    "signature": "System.Void TaleWorlds.Engine.GameEntityPhysicsExtensions::SetPhysicsStateOnlyVariable(TaleWorlds.Engine.WeakGameEntity,System.Boolean,System.Boolean)",
+    "parameters": [
+      {
+        "type": "TaleWorlds.Engine.WeakGameEntity",
+        "name": "gameEntity"
+      },
+      {
+        "type": "System.Boolean",
+        "name": "isEnabled"
+      },
+      {
+        "type": "System.Boolean",
+        "name": "setChildren"
+      }
+    ],
+    "body": [
+      "IL_0000: ldsfld TaleWorlds.Engine.IGameEntity TaleWorlds.Engine.EngineApplicationInterface::IGameEntity",
+      "IL_0005: ldarga.s gameEntity",
+      "IL_0007: call System.UIntPtr TaleWorlds.Engine.WeakGameEntity::get_Pointer()",
+      "IL_000c: ldarg.1",
+      "IL_000d: ldarg.2",
+      "IL_000e: callvirt System.Void TaleWorlds.Engine.IGameEntity::SetPhysicsStateOnlyVariable(System.UIntPtr,System.Boolean,System.Boolean)",
+      "IL_0013: ret"
+    ]
+  },
+  {
+    "signature": "System.Void TaleWorlds.Engine.GameEntityPhysicsExtensions::ReplacePhysicsBodyWithQuadPhysicsBody(TaleWorlds.Engine.GameEntity,System.UIntPtr,System.Int32,TaleWorlds.Engine.PhysicsMaterial,TaleWorlds.Engine.BodyFlags,System.UIntPtr,System.Int32)",
+    "parameters": [
+      {
+        "type": "TaleWorlds.Engine.GameEntity",
+        "name": "gameEntity"
+      },
+      {
+        "type": "System.UIntPtr",
+        "name": "vertices"
+      },
+      {
+        "type": "System.Int32",
+        "name": "numberOfVertices"
+      },
+      {
+        "type": "TaleWorlds.Engine.PhysicsMaterial",
+        "name": "physicsMaterial"
+      },
+      {
+        "type": "TaleWorlds.Engine.BodyFlags",
+        "name": "bodyFlags"
+      },
+      {
+        "type": "System.UIntPtr",
+        "name": "indices"
+      },
+      {
+        "type": "System.Int32",
+        "name": "numberOfIndices"
+      }
+    ],
+    "body": [
+      "IL_0000: ldsfld TaleWorlds.Engine.IGameEntity TaleWorlds.Engine.EngineApplicationInterface::IGameEntity",
+      "IL_0005: ldarg.0",
+      "IL_0006: callvirt System.UIntPtr TaleWorlds.DotNet.NativeObject::get_Pointer()",
+      "IL_000b: ldarg.1",
+      "IL_000c: ldarg.3",
+      "IL_000d: ldfld System.Int32 TaleWorlds.Engine.PhysicsMaterial::Index",
+      "IL_0012: ldarg.s bodyFlags",
+      "IL_0014: ldarg.2",
+      "IL_0015: ldarg.s indices",
+      "IL_0017: ldarg.s numberOfIndices",
+      "IL_0019: callvirt System.Void TaleWorlds.Engine.IGameEntity::ReplacePhysicsBodyWithQuadPhysicsBody(System.UIntPtr,System.UIntPtr,System.Int32,TaleWorlds.Engine.BodyFlags,System.Int32,System.UIntPtr,System.Int32)",
+      "IL_001e: ret"
+    ]
+  },
+  {
+    "signature": "System.Void TaleWorlds.Engine.GameEntityPhysicsExtensions::ReplacePhysicsBodyWithQuadPhysicsBody(TaleWorlds.Engine.WeakGameEntity,System.UIntPtr,System.Int32,TaleWorlds.Engine.PhysicsMaterial,TaleWorlds.Engine.BodyFlags,System.UIntPtr,System.Int32)",
+    "parameters": [
+      {
+        "type": "TaleWorlds.Engine.WeakGameEntity",
+        "name": "gameEntity"
+      },
+      {
+        "type": "System.UIntPtr",
+        "name": "vertices"
+      },
+      {
+        "type": "System.Int32",
+        "name": "numberOfVertices"
+      },
+      {
+        "type": "TaleWorlds.Engine.PhysicsMaterial",
+        "name": "physicsMaterial"
+      },
+      {
+        "type": "TaleWorlds.Engine.BodyFlags",
+        "name": "bodyFlags"
+      },
+      {
+        "type": "System.UIntPtr",
+        "name": "indices"
+      },
+      {
+        "type": "System.Int32",
+        "name": "numberOfIndices"
+      }
+    ],
+    "body": [
+      "IL_0000: ldsfld TaleWorlds.Engine.IGameEntity TaleWorlds.Engine.EngineApplicationInterface::IGameEntity",
+      "IL_0005: ldarga.s gameEntity",
+      "IL_0007: call System.UIntPtr TaleWorlds.Engine.WeakGameEntity::get_Pointer()",
+      "IL_000c: ldarg.1",
+      "IL_000d: ldarg.3",
+      "IL_000e: ldfld System.Int32 TaleWorlds.Engine.PhysicsMaterial::Index",
+      "IL_0013: ldarg.s bodyFlags",
+      "IL_0015: ldarg.2",
+      "IL_0016: ldarg.s indices",
+      "IL_0018: ldarg.s numberOfIndices",
+      "IL_001a: callvirt System.Void TaleWorlds.Engine.IGameEntity::ReplacePhysicsBodyWithQuadPhysicsBody(System.UIntPtr,System.UIntPtr,System.Int32,TaleWorlds.Engine.BodyFlags,System.Int32,System.UIntPtr,System.Int32)",
+      "IL_001f: ret"
+    ]
+  },
+  {
+    "signature": "System.Void TaleWorlds.Engine.GameEntityPhysicsExtensions::SetBodyShape(TaleWorlds.Engine.GameEntity,TaleWorlds.Engine.PhysicsShape)",
+    "parameters": [
+      {
+        "type": "TaleWorlds.Engine.GameEntity",
+        "name": "gameEntity"
+      },
+      {
+        "type": "TaleWorlds.Engine.PhysicsShape",
+        "name": "shape"
+      }
+    ],
+    "body": [
+      "IL_0000: ldsfld TaleWorlds.Engine.IGameEntity TaleWorlds.Engine.EngineApplicationInterface::IGameEntity",
+      "IL_0005: ldarg.0",
+      "IL_0006: callvirt System.UIntPtr TaleWorlds.DotNet.NativeObject::get_Pointer()",
+      "IL_000b: ldarg.1",
+      "IL_000c: ldnull",
+      "IL_000d: call System.Boolean TaleWorlds.DotNet.NativeObject::op_Equality(TaleWorlds.DotNet.NativeObject,TaleWorlds.DotNet.NativeObject)",
+      "IL_0012: brtrue.s IL_001c",
+      "IL_0014: ldarg.1",
+      "IL_0015: callvirt System.UIntPtr TaleWorlds.DotNet.NativeObject::get_Pointer()",
+      "IL_001a: br.s IL_0023",
+      "IL_001c: ldc.i4.0",
+      "IL_001d: conv.i8",
+      "IL_001e: call System.UIntPtr System.UIntPtr::op_Explicit(System.UInt64)",
+      "IL_0023: callvirt System.Void TaleWorlds.Engine.IGameEntity::SetBodyShape(System.UIntPtr,System.UIntPtr)",
+      "IL_0028: ret"
+    ]
+  },
+  {
+    "signature": "System.Void TaleWorlds.Engine.GameEntityPhysicsExtensions::SetBodyShape(TaleWorlds.Engine.WeakGameEntity,TaleWorlds.Engine.PhysicsShape)",
+    "parameters": [
+      {
+        "type": "TaleWorlds.Engine.WeakGameEntity",
+        "name": "gameEntity"
+      },
+      {
+        "type": "TaleWorlds.Engine.PhysicsShape",
+        "name": "shape"
+      }
+    ],
+    "body": [
+      "IL_0000: ldsfld TaleWorlds.Engine.IGameEntity TaleWorlds.Engine.EngineApplicationInterface::IGameEntity",
+      "IL_0005: ldarga.s gameEntity",
+      "IL_0007: call System.UIntPtr TaleWorlds.Engine.WeakGameEntity::get_Pointer()",
+      "IL_000c: ldarg.1",
+      "IL_000d: ldnull",
+      "IL_000e: call System.Boolean TaleWorlds.DotNet.NativeObject::op_Equality(TaleWorlds.DotNet.NativeObject,TaleWorlds.DotNet.NativeObject)",
+      "IL_0013: brtrue.s IL_001d",
+      "IL_0015: ldarg.1",
+      "IL_0016: callvirt System.UIntPtr TaleWorlds.DotNet.NativeObject::get_Pointer()",
+      "IL_001b: br.s IL_0024",
+      "IL_001d: ldc.i4.0",
+      "IL_001e: conv.i8",
+      "IL_001f: call System.UIntPtr System.UIntPtr::op_Explicit(System.UInt64)",
+      "IL_0024: callvirt System.Void TaleWorlds.Engine.IGameEntity::SetBodyShape(System.UIntPtr,System.UIntPtr)",
+      "IL_0029: ret"
+    ]
+  },
+  {
+    "signature": "System.Void TaleWorlds.Engine.GameEntityPhysicsExtensions::AddPhysics(TaleWorlds.Engine.GameEntity,System.Single,TaleWorlds.Library.Vec3,TaleWorlds.Engine.PhysicsShape,TaleWorlds.Library.Vec3,TaleWorlds.Library.Vec3,TaleWorlds.Engine.PhysicsMaterial,System.Boolean,System.Int32)",
+    "parameters": [
+      {
+        "type": "TaleWorlds.Engine.GameEntity",
+        "name": "gameEntity"
+      },
+      {
+        "type": "System.Single",
+        "name": "mass"
+      },
+      {
+        "type": "TaleWorlds.Library.Vec3",
+        "name": "localCenterOfMass"
+      },
+      {
+        "type": "TaleWorlds.Engine.PhysicsShape",
+        "name": "body"
+      },
+      {
+        "type": "TaleWorlds.Library.Vec3",
+        "name": "initialGlobalVelocity"
+      },
+      {
+        "type": "TaleWorlds.Library.Vec3",
+        "name": "angularGlobalVelocity"
+      },
+      {
+        "type": "TaleWorlds.Engine.PhysicsMaterial",
+        "name": "physicsMaterial"
+      },
+      {
+        "type": "System.Boolean",
+        "name": "isStatic"
+      },
+      {
+        "type": "System.Int32",
+        "name": "collisionGroupID"
+      }
+    ],
+    "body": [
+      "IL_0000: ldsfld TaleWorlds.Engine.IGameEntity TaleWorlds.Engine.EngineApplicationInterface::IGameEntity",
+      "IL_0005: ldarg.0",
+      "IL_0006: callvirt System.UIntPtr TaleWorlds.DotNet.NativeObject::get_Pointer()",
+      "IL_000b: ldarg.3",
+      "IL_000c: ldnull",
+      "IL_000d: call System.Boolean TaleWorlds.DotNet.NativeObject::op_Inequality(TaleWorlds.DotNet.NativeObject,TaleWorlds.DotNet.NativeObject)",
+      "IL_0012: brtrue.s IL_001b",
+      "IL_0014: ldsfld System.UIntPtr System.UIntPtr::Zero",
+      "IL_0019: br.s IL_0021",
+      "IL_001b: ldarg.3",
+      "IL_001c: callvirt System.UIntPtr TaleWorlds.DotNet.NativeObject::get_Pointer()",
+      "IL_0021: ldarg.1",
+      "IL_0022: ldarga.s localCenterOfMass",
+      "IL_0024: ldarga.s initialGlobalVelocity",
+      "IL_0026: ldarga.s angularGlobalVelocity",
+      "IL_0028: ldarg.s physicsMaterial",
+      "IL_002a: ldfld System.Int32 TaleWorlds.Engine.PhysicsMaterial::Index",
+      "IL_002f: ldarg.s isStatic",
+      "IL_0031: ldarg.s collisionGroupID",
+      "IL_0033: callvirt System.Void TaleWorlds.Engine.IGameEntity::AddPhysics(System.UIntPtr,System.UIntPtr,System.Single,TaleWorlds.Library.Vec3&,TaleWorlds.Library.Vec3&,TaleWorlds.Library.Vec3&,System.Int32,System.Boolean,System.Int32)",
+      "IL_0038: ret"
+    ]
+  },
+  {
+    "signature": "System.Void TaleWorlds.Engine.GameEntityPhysicsExtensions::AddPhysics(TaleWorlds.Engine.WeakGameEntity,System.Single,TaleWorlds.Library.Vec3,TaleWorlds.Engine.PhysicsShape,TaleWorlds.Library.Vec3,TaleWorlds.Library.Vec3,TaleWorlds.Engine.PhysicsMaterial,System.Boolean,System.Int32)",
+    "parameters": [
+      {
+        "type": "TaleWorlds.Engine.WeakGameEntity",
+        "name": "gameEntity"
+      },
+      {
+        "type": "System.Single",
+        "name": "mass"
+      },
+      {
+        "type": "TaleWorlds.Library.Vec3",
+        "name": "localCenterOfMass"
+      },
+      {
+        "type": "TaleWorlds.Engine.PhysicsShape",
+        "name": "body"
+      },
+      {
+        "type": "TaleWorlds.Library.Vec3",
+        "name": "initialVelocity"
+      },
+      {
+        "type": "TaleWorlds.Library.Vec3",
+        "name": "angularVelocity"
+      },
+      {
+        "type": "TaleWorlds.Engine.PhysicsMaterial",
+        "name": "physicsMaterial"
+      },
+      {
+        "type": "System.Boolean",
+        "name": "isStatic"
+      },
+      {
+        "type": "System.Int32",
+        "name": "collisionGroupID"
+      }
+    ],
+    "body": [
+      "IL_0000: ldsfld TaleWorlds.Engine.IGameEntity TaleWorlds.Engine.EngineApplicationInterface::IGameEntity",
+      "IL_0005: ldarga.s gameEntity",
+      "IL_0007: call System.UIntPtr TaleWorlds.Engine.WeakGameEntity::get_Pointer()",
+      "IL_000c: ldarg.3",
+      "IL_000d: ldnull",
+      "IL_000e: call System.Boolean TaleWorlds.DotNet.NativeObject::op_Inequality(TaleWorlds.DotNet.NativeObject,TaleWorlds.DotNet.NativeObject)",
+      "IL_0013: brtrue.s IL_001c",
+      "IL_0015: ldsfld System.UIntPtr System.UIntPtr::Zero",
+      "IL_001a: br.s IL_0022",
+      "IL_001c: ldarg.3",
+      "IL_001d: callvirt System.UIntPtr TaleWorlds.DotNet.NativeObject::get_Pointer()",
+      "IL_0022: ldarg.1",
+      "IL_0023: ldarga.s localCenterOfMass",
+      "IL_0025: ldarga.s initialVelocity",
+      "IL_0027: ldarga.s angularVelocity",
+      "IL_0029: ldarg.s physicsMaterial",
+      "IL_002b: ldfld System.Int32 TaleWorlds.Engine.PhysicsMaterial::Index",
+      "IL_0030: ldarg.s isStatic",
+      "IL_0032: ldarg.s collisionGroupID",
+      "IL_0034: callvirt System.Void TaleWorlds.Engine.IGameEntity::AddPhysics(System.UIntPtr,System.UIntPtr,System.Single,TaleWorlds.Library.Vec3&,TaleWorlds.Library.Vec3&,TaleWorlds.Library.Vec3&,System.Int32,System.Boolean,System.Int32)",
+      "IL_0039: ret"
+    ]
+  },
+  {
+    "signature": "System.Void TaleWorlds.Engine.GameEntityPhysicsExtensions::SetVelocityLimits(TaleWorlds.Engine.GameEntity,System.Single,System.Single)",
+    "parameters": [
+      {
+        "type": "TaleWorlds.Engine.GameEntity",
+        "name": "gameEntity"
+      },
+      {
+        "type": "System.Single",
+        "name": "maxLinearVelocity"
+      },
+      {
+        "type": "System.Single",
+        "name": "maxAngularVelocity"
+      }
+    ],
+    "body": [
+      "IL_0000: ldsfld TaleWorlds.Engine.IGameEntity TaleWorlds.Engine.EngineApplicationInterface::IGameEntity",
+      "IL_0005: ldarg.0",
+      "IL_0006: callvirt System.UIntPtr TaleWorlds.DotNet.NativeObject::get_Pointer()",
+      "IL_000b: ldarg.1",
+      "IL_000c: ldarg.2",
+      "IL_000d: callvirt System.Void TaleWorlds.Engine.IGameEntity::SetVelocityLimits(System.UIntPtr,System.Single,System.Single)",
+      "IL_0012: ret"
+    ]
+  },
+  {
+    "signature": "System.Void TaleWorlds.Engine.GameEntityPhysicsExtensions::SetVelocityLimits(TaleWorlds.Engine.WeakGameEntity,System.Single,System.Single)",
+    "parameters": [
+      {
+        "type": "TaleWorlds.Engine.WeakGameEntity",
+        "name": "gameEntity"
+      },
+      {
+        "type": "System.Single",
+        "name": "maxLinearVelocity"
+      },
+      {
+        "type": "System.Single",
+        "name": "maxAngularVelocity"
+      }
+    ],
+    "body": [
+      "IL_0000: ldsfld TaleWorlds.Engine.IGameEntity TaleWorlds.Engine.EngineApplicationInterface::IGameEntity",
+      "IL_0005: ldarga.s gameEntity",
+      "IL_0007: call System.UIntPtr TaleWorlds.Engine.WeakGameEntity::get_Pointer()",
+      "IL_000c: ldarg.1",
+      "IL_000d: ldarg.2",
+      "IL_000e: callvirt System.Void TaleWorlds.Engine.IGameEntity::SetVelocityLimits(System.UIntPtr,System.Single,System.Single)",
+      "IL_0013: ret"
+    ]
+  },
+  {
+    "signature": "System.Void TaleWorlds.Engine.GameEntityPhysicsExtensions::SetMaxDepenetrationVelocity(TaleWorlds.Engine.GameEntity,System.Single)",
+    "parameters": [
+      {
+        "type": "TaleWorlds.Engine.GameEntity",
+        "name": "gameEntity"
+      },
+      {
+        "type": "System.Single",
+        "name": "maxDepenetrationVelocity"
+      }
+    ],
+    "body": [
+      "IL_0000: ldsfld TaleWorlds.Engine.IGameEntity TaleWorlds.Engine.EngineApplicationInterface::IGameEntity",
+      "IL_0005: ldarg.0",
+      "IL_0006: callvirt System.UIntPtr TaleWorlds.DotNet.NativeObject::get_Pointer()",
+      "IL_000b: ldarg.1",
+      "IL_000c: callvirt System.Void TaleWorlds.Engine.IGameEntity::SetMaxDepenetrationVelocity(System.UIntPtr,System.Single)",
+      "IL_0011: ret"
+    ]
+  },
+  {
+    "signature": "System.Void TaleWorlds.Engine.GameEntityPhysicsExtensions::SetMaxDepenetrationVelocity(TaleWorlds.Engine.WeakGameEntity,System.Single)",
+    "parameters": [
+      {
+        "type": "TaleWorlds.Engine.WeakGameEntity",
+        "name": "gameEntity"
+      },
+      {
+        "type": "System.Single",
+        "name": "maxDepenetrationVelocity"
+      }
+    ],
+    "body": [
+      "IL_0000: ldsfld TaleWorlds.Engine.IGameEntity TaleWorlds.Engine.EngineApplicationInterface::IGameEntity",
+      "IL_0005: ldarga.s gameEntity",
+      "IL_0007: call System.UIntPtr TaleWorlds.Engine.WeakGameEntity::get_Pointer()",
+      "IL_000c: ldarg.1",
+      "IL_000d: callvirt System.Void TaleWorlds.Engine.IGameEntity::SetMaxDepenetrationVelocity(System.UIntPtr,System.Single)",
+      "IL_0012: ret"
+    ]
+  },
+  {
+    "signature": "System.Void TaleWorlds.Engine.GameEntityPhysicsExtensions::SetSolverIterationCounts(TaleWorlds.Engine.GameEntity,System.Int32,System.Int32)",
+    "parameters": [
+      {
+        "type": "TaleWorlds.Engine.GameEntity",
+        "name": "gameEntity"
+      },
+      {
+        "type": "System.Int32",
+        "name": "positionIterationCount"
+      },
+      {
+        "type": "System.Int32",
+        "name": "velocityIterationCount"
+      }
+    ],
+    "body": [
+      "IL_0000: ldsfld TaleWorlds.Engine.IGameEntity TaleWorlds.Engine.EngineApplicationInterface::IGameEntity",
+      "IL_0005: ldarg.0",
+      "IL_0006: callvirt System.UIntPtr TaleWorlds.DotNet.NativeObject::get_Pointer()",
+      "IL_000b: ldarg.1",
+      "IL_000c: ldarg.2",
+      "IL_000d: callvirt System.Void TaleWorlds.Engine.IGameEntity::SetSolverIterationCounts(System.UIntPtr,System.Int32,System.Int32)",
+      "IL_0012: ret"
+    ]
+  },
+  {
+    "signature": "System.Void TaleWorlds.Engine.GameEntityPhysicsExtensions::SetSolverIterationCounts(TaleWorlds.Engine.WeakGameEntity,System.Int32,System.Int32)",
+    "parameters": [
+      {
+        "type": "TaleWorlds.Engine.WeakGameEntity",
+        "name": "gameEntity"
+      },
+      {
+        "type": "System.Int32",
+        "name": "positionIterationCount"
+      },
+      {
+        "type": "System.Int32",
+        "name": "velocityIterationCount"
+      }
+    ],
+    "body": [
+      "IL_0000: ldsfld TaleWorlds.Engine.IGameEntity TaleWorlds.Engine.EngineApplicationInterface::IGameEntity",
+      "IL_0005: ldarga.s gameEntity",
+      "IL_0007: call System.UIntPtr TaleWorlds.Engine.WeakGameEntity::get_Pointer()",
+      "IL_000c: ldarg.1",
+      "IL_000d: ldarg.2",
+      "IL_000e: callvirt System.Void TaleWorlds.Engine.IGameEntity::SetSolverIterationCounts(System.UIntPtr,System.Int32,System.Int32)",
+      "IL_0013: ret"
+    ]
+  },
+  {
+    "signature": "System.Void TaleWorlds.Engine.GameEntityPhysicsExtensions::ApplyLocalImpulseToDynamicBody(TaleWorlds.Engine.GameEntity,TaleWorlds.Library.Vec3,TaleWorlds.Library.Vec3)",
+    "parameters": [
+      {
+        "type": "TaleWorlds.Engine.GameEntity",
+        "name": "gameEntity"
+      },
+      {
+        "type": "TaleWorlds.Library.Vec3",
+        "name": "localPosition"
+      },
+      {
+        "type": "TaleWorlds.Library.Vec3",
+        "name": "impulse"
+      }
+    ],
+    "body": [
+      "IL_0000: ldsfld TaleWorlds.Engine.IGameEntity TaleWorlds.Engine.EngineApplicationInterface::IGameEntity",
+      "IL_0005: ldarg.0",
+      "IL_0006: callvirt System.UIntPtr TaleWorlds.DotNet.NativeObject::get_Pointer()",
+      "IL_000b: ldarga.s localPosition",
+      "IL_000d: ldarga.s impulse",
+      "IL_000f: callvirt System.Void TaleWorlds.Engine.IGameEntity::ApplyLocalImpulseToDynamicBody(System.UIntPtr,TaleWorlds.Library.Vec3&,TaleWorlds.Library.Vec3&)",
+      "IL_0014: ret"
+    ]
+  },
+  {
+    "signature": "System.Void TaleWorlds.Engine.GameEntityPhysicsExtensions::ApplyLocalImpulseToDynamicBody(TaleWorlds.Engine.WeakGameEntity,TaleWorlds.Library.Vec3,TaleWorlds.Library.Vec3)",
+    "parameters": [
+      {
+        "type": "TaleWorlds.Engine.WeakGameEntity",
+        "name": "gameEntity"
+      },
+      {
+        "type": "TaleWorlds.Library.Vec3",
+        "name": "localPosition"
+      },
+      {
+        "type": "TaleWorlds.Library.Vec3",
+        "name": "impulse"
+      }
+    ],
+    "body": [
+      "IL_0000: ldsfld TaleWorlds.Engine.IGameEntity TaleWorlds.Engine.EngineApplicationInterface::IGameEntity",
+      "IL_0005: ldarga.s gameEntity",
+      "IL_0007: call System.UIntPtr TaleWorlds.Engine.WeakGameEntity::get_Pointer()",
+      "IL_000c: ldarga.s localPosition",
+      "IL_000e: ldarga.s impulse",
+      "IL_0010: callvirt System.Void TaleWorlds.Engine.IGameEntity::ApplyLocalImpulseToDynamicBody(System.UIntPtr,TaleWorlds.Library.Vec3&,TaleWorlds.Library.Vec3&)",
+      "IL_0015: ret"
+    ]
+  },
+  {
+    "signature": "System.Void TaleWorlds.Engine.GameEntityPhysicsExtensions::SetPhysicsMoveToBatched(TaleWorlds.Engine.GameEntity,System.Boolean)",
+    "parameters": [
+      {
+        "type": "TaleWorlds.Engine.GameEntity",
+        "name": "gameEntity"
+      },
+      {
+        "type": "System.Boolean",
+        "name": "value"
+      }
+    ],
+    "body": [
+      "IL_0000: ldsfld TaleWorlds.Engine.IGameEntity TaleWorlds.Engine.EngineApplicationInterface::IGameEntity",
+      "IL_0005: ldarg.0",
+      "IL_0006: callvirt System.UIntPtr TaleWorlds.DotNet.NativeObject::get_Pointer()",
+      "IL_000b: ldarg.1",
+      "IL_000c: callvirt System.Void TaleWorlds.Engine.IGameEntity::SetPhysicsMoveToBatched(System.UIntPtr,System.Boolean)",
+      "IL_0011: ret"
+    ]
+  },
+  {
+    "signature": "System.Void TaleWorlds.Engine.GameEntityPhysicsExtensions::SetPhysicsMoveToBatched(TaleWorlds.Engine.WeakGameEntity,System.Boolean)",
+    "parameters": [
+      {
+        "type": "TaleWorlds.Engine.WeakGameEntity",
+        "name": "gameEntity"
+      },
+      {
+        "type": "System.Boolean",
+        "name": "value"
+      }
+    ],
+    "body": [
+      "IL_0000: ldsfld TaleWorlds.Engine.IGameEntity TaleWorlds.Engine.EngineApplicationInterface::IGameEntity",
+      "IL_0005: ldarga.s gameEntity",
+      "IL_0007: call System.UIntPtr TaleWorlds.Engine.WeakGameEntity::get_Pointer()",
+      "IL_000c: ldarg.1",
+      "IL_000d: callvirt System.Void TaleWorlds.Engine.IGameEntity::SetPhysicsMoveToBatched(System.UIntPtr,System.Boolean)",
+      "IL_0012: ret"
+    ]
+  },
+  {
+    "signature": "System.Void TaleWorlds.Engine.GameEntityPhysicsExtensions::SetMassAndUpdateInertiaAndCenterOfMass(TaleWorlds.Engine.GameEntity,System.Single)",
+    "parameters": [
+      {
+        "type": "TaleWorlds.Engine.GameEntity",
+        "name": "gameEntity"
+      },
+      {
+        "type": "System.Single",
+        "name": "mass"
+      }
+    ],
+    "body": [
+      "IL_0000: ldsfld TaleWorlds.Engine.IGameEntity TaleWorlds.Engine.EngineApplicationInterface::IGameEntity",
+      "IL_0005: ldarg.0",
+      "IL_0006: callvirt System.UIntPtr TaleWorlds.DotNet.NativeObject::get_Pointer()",
+      "IL_000b: ldarg.1",
+      "IL_000c: callvirt System.Void TaleWorlds.Engine.IGameEntity::SetMassAndUpdateInertiaAndCenterOfMass(System.UIntPtr,System.Single)",
+      "IL_0011: ret"
+    ]
+  },
+  {
+    "signature": "System.Void TaleWorlds.Engine.GameEntityPhysicsExtensions::SetMassAndUpdateInertiaAndCenterOfMass(TaleWorlds.Engine.WeakGameEntity,System.Single)",
+    "parameters": [
+      {
+        "type": "TaleWorlds.Engine.WeakGameEntity",
+        "name": "gameEntity"
+      },
+      {
+        "type": "System.Single",
+        "name": "mass"
+      }
+    ],
+    "body": [
+      "IL_0000: ldsfld TaleWorlds.Engine.IGameEntity TaleWorlds.Engine.EngineApplicationInterface::IGameEntity",
+      "IL_0005: ldarga.s gameEntity",
+      "IL_0007: call System.UIntPtr TaleWorlds.Engine.WeakGameEntity::get_Pointer()",
+      "IL_000c: ldarg.1",
+      "IL_000d: callvirt System.Void TaleWorlds.Engine.IGameEntity::SetMassAndUpdateInertiaAndCenterOfMass(System.UIntPtr,System.Single)",
+      "IL_0012: ret"
+    ]
+  },
+  {
+    "signature": "System.Void TaleWorlds.Engine.GameEntityPhysicsExtensions::SetCenterOfMass(TaleWorlds.Engine.GameEntity,TaleWorlds.Library.Vec3)",
+    "parameters": [
+      {
+        "type": "TaleWorlds.Engine.GameEntity",
+        "name": "gameEntity"
+      },
+      {
+        "type": "TaleWorlds.Library.Vec3",
+        "name": "localCenterOfMass"
+      }
+    ],
+    "body": [
+      "IL_0000: ldsfld TaleWorlds.Engine.IGameEntity TaleWorlds.Engine.EngineApplicationInterface::IGameEntity",
+      "IL_0005: ldarg.0",
+      "IL_0006: callvirt System.UIntPtr TaleWorlds.DotNet.NativeObject::get_Pointer()",
+      "IL_000b: ldarga.s localCenterOfMass",
+      "IL_000d: callvirt System.Void TaleWorlds.Engine.IGameEntity::SetCenterOfMass(System.UIntPtr,TaleWorlds.Library.Vec3&)",
+      "IL_0012: ret"
+    ]
+  },
+  {
+    "signature": "System.Void TaleWorlds.Engine.GameEntityPhysicsExtensions::SetCenterOfMass(TaleWorlds.Engine.WeakGameEntity,TaleWorlds.Library.Vec3)",
+    "parameters": [
+      {
+        "type": "TaleWorlds.Engine.WeakGameEntity",
+        "name": "gameEntity"
+      },
+      {
+        "type": "TaleWorlds.Library.Vec3",
+        "name": "centerOfMass"
+      }
+    ],
+    "body": [
+      "IL_0000: ldsfld TaleWorlds.Engine.IGameEntity TaleWorlds.Engine.EngineApplicationInterface::IGameEntity",
+      "IL_0005: ldarga.s gameEntity",
+      "IL_0007: call System.UIntPtr TaleWorlds.Engine.WeakGameEntity::get_Pointer()",
+      "IL_000c: ldarga.s centerOfMass",
+      "IL_000e: callvirt System.Void TaleWorlds.Engine.IGameEntity::SetCenterOfMass(System.UIntPtr,TaleWorlds.Library.Vec3&)",
+      "IL_0013: ret"
+    ]
+  },
+  {
+    "signature": "System.Void TaleWorlds.Engine.GameEntityPhysicsExtensions::SetMassSpaceInertia(TaleWorlds.Engine.GameEntity,TaleWorlds.Library.Vec3)",
+    "parameters": [
+      {
+        "type": "TaleWorlds.Engine.GameEntity",
+        "name": "gameEntity"
+      },
+      {
+        "type": "TaleWorlds.Library.Vec3",
+        "name": "inertia"
+      }
+    ],
+    "body": [
+      "IL_0000: ldsfld TaleWorlds.Engine.IGameEntity TaleWorlds.Engine.EngineApplicationInterface::IGameEntity",
+      "IL_0005: ldarg.0",
+      "IL_0006: callvirt System.UIntPtr TaleWorlds.DotNet.NativeObject::get_Pointer()",
+      "IL_000b: ldarga.s inertia",
+      "IL_000d: callvirt System.Void TaleWorlds.Engine.IGameEntity::SetMassSpaceInertia(System.UIntPtr,TaleWorlds.Library.Vec3&)",
+      "IL_0012: ret"
+    ]
+  },
+  {
+    "signature": "System.Void TaleWorlds.Engine.GameEntityPhysicsExtensions::SetMassSpaceInertia(TaleWorlds.Engine.WeakGameEntity,TaleWorlds.Library.Vec3)",
+    "parameters": [
+      {
+        "type": "TaleWorlds.Engine.WeakGameEntity",
+        "name": "gameEntity"
+      },
+      {
+        "type": "TaleWorlds.Library.Vec3",
+        "name": "inertia"
+      }
+    ],
+    "body": [
+      "IL_0000: ldsfld TaleWorlds.Engine.IGameEntity TaleWorlds.Engine.EngineApplicationInterface::IGameEntity",
+      "IL_0005: ldarga.s gameEntity",
+      "IL_0007: call System.UIntPtr TaleWorlds.Engine.WeakGameEntity::get_Pointer()",
+      "IL_000c: ldarga.s inertia",
+      "IL_000e: callvirt System.Void TaleWorlds.Engine.IGameEntity::SetMassSpaceInertia(System.UIntPtr,TaleWorlds.Library.Vec3&)",
+      "IL_0013: ret"
+    ]
+  },
+  {
+    "signature": "System.Void TaleWorlds.Engine.GameEntityPhysicsExtensions::SetDamping(TaleWorlds.Engine.GameEntity,System.Single,System.Single)",
+    "parameters": [
+      {
+        "type": "TaleWorlds.Engine.GameEntity",
+        "name": "gameEntity"
+      },
+      {
+        "type": "System.Single",
+        "name": "linearDamping"
+      },
+      {
+        "type": "System.Single",
+        "name": "angularDamping"
+      }
+    ],
+    "body": [
+      "IL_0000: ldsfld TaleWorlds.Engine.IGameEntity TaleWorlds.Engine.EngineApplicationInterface::IGameEntity",
+      "IL_0005: ldarg.0",
+      "IL_0006: callvirt System.UIntPtr TaleWorlds.DotNet.NativeObject::get_Pointer()",
+      "IL_000b: ldarg.1",
+      "IL_000c: ldarg.2",
+      "IL_000d: callvirt System.Void TaleWorlds.Engine.IGameEntity::SetDamping(System.UIntPtr,System.Single,System.Single)",
+      "IL_0012: ret"
+    ]
+  },
+  {
+    "signature": "System.Void TaleWorlds.Engine.GameEntityPhysicsExtensions::SetDamping(TaleWorlds.Engine.WeakGameEntity,System.Single,System.Single)",
+    "parameters": [
+      {
+        "type": "TaleWorlds.Engine.WeakGameEntity",
+        "name": "gameEntity"
+      },
+      {
+        "type": "System.Single",
+        "name": "linearDamping"
+      },
+      {
+        "type": "System.Single",
+        "name": "angularDamping"
+      }
+    ],
+    "body": [
+      "IL_0000: ldsfld TaleWorlds.Engine.IGameEntity TaleWorlds.Engine.EngineApplicationInterface::IGameEntity",
+      "IL_0005: ldarga.s gameEntity",
+      "IL_0007: call System.UIntPtr TaleWorlds.Engine.WeakGameEntity::get_Pointer()",
+      "IL_000c: ldarg.1",
+      "IL_000d: ldarg.2",
+      "IL_000e: callvirt System.Void TaleWorlds.Engine.IGameEntity::SetDamping(System.UIntPtr,System.Single,System.Single)",
+      "IL_0013: ret"
+    ]
+  },
+  {
+    "signature": "System.Void TaleWorlds.Engine.GameEntityPhysicsExtensions::SetDampingMT(TaleWorlds.Engine.GameEntity,System.Single,System.Single)",
+    "parameters": [
+      {
+        "type": "TaleWorlds.Engine.GameEntity",
+        "name": "gameEntity"
+      },
+      {
+        "type": "System.Single",
+        "name": "linearDamping"
+      },
+      {
+        "type": "System.Single",
+        "name": "angularDamping"
+      }
+    ],
+    "body": [
+      "IL_0000: ldsfld TaleWorlds.Engine.IGameEntity TaleWorlds.Engine.EngineApplicationInterface::IGameEntity",
+      "IL_0005: ldarg.0",
+      "IL_0006: callvirt System.UIntPtr TaleWorlds.DotNet.NativeObject::get_Pointer()",
+      "IL_000b: ldarg.1",
+      "IL_000c: ldarg.2",
+      "IL_000d: callvirt System.Void TaleWorlds.Engine.IGameEntity::SetDamping(System.UIntPtr,System.Single,System.Single)",
+      "IL_0012: ret"
+    ]
+  },
+  {
+    "signature": "System.Void TaleWorlds.Engine.GameEntityPhysicsExtensions::SetDampingMT(TaleWorlds.Engine.WeakGameEntity,System.Single,System.Single)",
+    "parameters": [
+      {
+        "type": "TaleWorlds.Engine.WeakGameEntity",
+        "name": "gameEntity"
+      },
+      {
+        "type": "System.Single",
+        "name": "linearDamping"
+      },
+      {
+        "type": "System.Single",
+        "name": "angularDamping"
+      }
+    ],
+    "body": [
+      "IL_0000: ldsfld TaleWorlds.Engine.IGameEntity TaleWorlds.Engine.EngineApplicationInterface::IGameEntity",
+      "IL_0005: ldarga.s gameEntity",
+      "IL_0007: call System.UIntPtr TaleWorlds.Engine.WeakGameEntity::get_Pointer()",
+      "IL_000c: ldarg.1",
+      "IL_000d: ldarg.2",
+      "IL_000e: callvirt System.Void TaleWorlds.Engine.IGameEntity::SetDamping(System.UIntPtr,System.Single,System.Single)",
+      "IL_0013: ret"
+    ]
+  },
+  {
+    "signature": "System.Void TaleWorlds.Engine.GameEntityPhysicsExtensions::SetLinearVelocity(TaleWorlds.Engine.GameEntity,TaleWorlds.Library.Vec3)",
+    "parameters": [
+      {
+        "type": "TaleWorlds.Engine.GameEntity",
+        "name": "gameEntity"
+      },
+      {
+        "type": "TaleWorlds.Library.Vec3",
+        "name": "newLinearVelocity"
+      }
+    ],
+    "body": [
+      "IL_0000: ldsfld TaleWorlds.Engine.IGameEntity TaleWorlds.Engine.EngineApplicationInterface::IGameEntity",
+      "IL_0005: ldarg.0",
+      "IL_0006: callvirt System.UIntPtr TaleWorlds.DotNet.NativeObject::get_Pointer()",
+      "IL_000b: ldarg.1",
+      "IL_000c: callvirt System.Void TaleWorlds.Engine.IGameEntity::SetLinearVelocity(System.UIntPtr,TaleWorlds.Library.Vec3)",
+      "IL_0011: ret"
+    ]
+  },
+  {
+    "signature": "System.Void TaleWorlds.Engine.GameEntityPhysicsExtensions::SetLinearVelocity(TaleWorlds.Engine.WeakGameEntity,TaleWorlds.Library.Vec3)",
+    "parameters": [
+      {
+        "type": "TaleWorlds.Engine.WeakGameEntity",
+        "name": "gameEntity"
+      },
+      {
+        "type": "TaleWorlds.Library.Vec3",
+        "name": "newLinearVelocity"
+      }
+    ],
+    "body": [
+      "IL_0000: ldsfld TaleWorlds.Engine.IGameEntity TaleWorlds.Engine.EngineApplicationInterface::IGameEntity",
+      "IL_0005: ldarga.s gameEntity",
+      "IL_0007: call System.UIntPtr TaleWorlds.Engine.WeakGameEntity::get_Pointer()",
+      "IL_000c: ldarg.1",
+      "IL_000d: callvirt System.Void TaleWorlds.Engine.IGameEntity::SetLinearVelocity(System.UIntPtr,TaleWorlds.Library.Vec3)",
+      "IL_0012: ret"
+    ]
+  },
+  {
+    "signature": "System.Void TaleWorlds.Engine.GameEntityPhysicsExtensions::SetAngularVelocity(TaleWorlds.Engine.GameEntity,TaleWorlds.Library.Vec3)",
+    "parameters": [
+      {
+        "type": "TaleWorlds.Engine.GameEntity",
+        "name": "gameEntity"
+      },
+      {
+        "type": "TaleWorlds.Library.Vec3",
+        "name": "newAngularVelocity"
+      }
+    ],
+    "body": [
+      "IL_0000: ldsfld TaleWorlds.Engine.IGameEntity TaleWorlds.Engine.EngineApplicationInterface::IGameEntity",
+      "IL_0005: ldarg.0",
+      "IL_0006: callvirt System.UIntPtr TaleWorlds.DotNet.NativeObject::get_Pointer()",
+      "IL_000b: ldarga.s newAngularVelocity",
+      "IL_000d: callvirt System.Void TaleWorlds.Engine.IGameEntity::SetAngularVelocity(System.UIntPtr,TaleWorlds.Library.Vec3& modreq(System.Runtime.InteropServices.InAttribute))",
+      "IL_0012: ret"
+    ]
+  },
+  {
+    "signature": "System.Void TaleWorlds.Engine.GameEntityPhysicsExtensions::SetAngularVelocity(TaleWorlds.Engine.WeakGameEntity,TaleWorlds.Library.Vec3)",
+    "parameters": [
+      {
+        "type": "TaleWorlds.Engine.WeakGameEntity",
+        "name": "gameEntity"
+      },
+      {
+        "type": "TaleWorlds.Library.Vec3",
+        "name": "newAngularVelocity"
+      }
+    ],
+    "body": [
+      "IL_0000: ldsfld TaleWorlds.Engine.IGameEntity TaleWorlds.Engine.EngineApplicationInterface::IGameEntity",
+      "IL_0005: ldarga.s gameEntity",
+      "IL_0007: call System.UIntPtr TaleWorlds.Engine.WeakGameEntity::get_Pointer()",
+      "IL_000c: ldarga.s newAngularVelocity",
+      "IL_000e: callvirt System.Void TaleWorlds.Engine.IGameEntity::SetAngularVelocity(System.UIntPtr,TaleWorlds.Library.Vec3& modreq(System.Runtime.InteropServices.InAttribute))",
+      "IL_0013: ret"
+    ]
+  }
+]

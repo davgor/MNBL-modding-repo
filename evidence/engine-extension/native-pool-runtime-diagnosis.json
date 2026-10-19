@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "status": "failed-native-renderer-page-table-corruption",
+  "runId": "3fb8d6e5-dc48-48fb-9eaa-6191000c6760",
+  "runtimeVerified": false,
+  "exhaustionVerified": false,
+  "teardownVerified": false,
+  "visibleSoldierCountVerified": false,
+  "restoredOriginalFiles": true,
+  "lastReportedAgents": 2041,
+  "lastReportedMaxIndex": 2040,
+  "sourceSha256": "2a5e0e0b15513ebb7052d747a621b82c50ee834553eba283b33bbbc33766e12a",
+  "patchedSha256": "e70ede2449bd6d43153570590df371a64eceef587e6d061fe2da26bcf2a0e621",
+  "evidence": [
+    {
+      "path": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\evidence\\engine-extension\\native-pool-run-r7\\runtime-receipt.json",
+      "sha256": "45ce366dd65a3d4a14ac8b0714710b826f0c167f300167a19043898cc26280f2"
+    },
+    {
+      "path": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\evidence\\engine-extension\\native-pool-run-r7\\probe-result.json",
+      "sha256": "4f654fd10f366636d08a27698009801199f54b59312ab01c6e21df00dbbcae38"
+    },
+    {
+      "path": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\evidence\\engine-extension\\native-pool-run-r7\\diagnostic-abort.json",
+      "sha256": "9ef23d5cfae9fae957e2725b12645cb76b110a7ff315142487ac8910ec1ebcd2"
+    },
+    {
+      "path": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\evidence\\engine-extension\\native-pool-run-r7\\native-threads-134366944844276357-50028.json",
+      "sha256": "b0f36e594abec7333e460b4e121c6d37da1c0b2199ec067ac814f82b3a439135"
+    },
+    {
+      "path": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\evidence\\engine-extension\\native-pool-run-r7\\native-threads-134366944844276357-24972.json",
+      "sha256": "34b85f66155dc3ac1b453de5077be13bf78bb1b1f21075fee981494a963b95f3"
+    },
+    {
+      "path": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\evidence\\engine-extension\\native-pool-run-r7\\native-object-memory-46760.json",
+      "sha256": "c6fee6ff1357419817b6504376cd4ae22c702b049cbe67187b8f9abb1342686e"
+    }
+  ],
+  "observations": [
+    "15 worker threads sampled twice remain at Native RVA88744/88747/88749, each gains approximately30 CPU seconds in31 wallseconds.",
+    "All145 captured threads resumed; no target-memory writes or injection.",
+    "Wait byte is container+109, observed0x40, within qword pointer at+108. Table geometry is32 pointers starting+8, then32 readiness flags at+108.",
+    "Native reserve code uses2048 dwords per page, yielding65536 nominal elements. Page32 pointer aliases readiness flags. Adjacent container count observed75656.",
+    "Original installed files restored and original native hash verified after terminating only the owned stalled process."
+  ],
+  "inferences": [
+    "Out-of-range page publication corrupted readiness flags; exact publication history and all renderer buffer ownership paths require continued static review."
+  ],
+  "remaining": [
+    "Repair renderer buffer addressing, allocation, upload, reset and destruction with bounded reservations before another trial.",
+    "Complete4080 allocation, allocator exhaustion,64slot reuse,combat and asynchronous teardown with normal process exit.",
+    "Rendering performance and exact onscreen soldier count remain unverified.",
+    "401 static decode bytes remain open outside patched function groups."
+  ]
+}

@@ -1,0 +1,1329 @@
+{
+ "schema": "mnbl.evidence.navigation-routes",
+ "version": 2,
+ "ticket": "MMR-38",
+ "inputs": {
+  "run": "evidence/runtime/in-game/world_navigation-42984.json",
+  "runSha256": "ff2bb7acf6f753b0a4407f42ca50ea3bd1988824b54b462b1413b2eaece22071",
+  "pid": 42984,
+  "run2": "evidence/runtime/in-game/world_navigation-42956.json",
+  "run2Sha256": "2e8a52c8930f4f0a64d05925372b29d5cc253249a58f2bc9e59c41d1ed20c6ac",
+  "offline": "evidence/world/navigation-contract.json",
+  "offlineSha256": "80b283165a27b68bcd4df578025886f938c7fc132532e216ecc47c0e69ba7070"
+ },
+ "checks": [
+  {
+   "name": "the probe completed every step and left no staging job",
+   "passed": true,
+   "detail": "status ok, worlds ['A', 'A (engine fault: Bridge faces disabled)', 'A (warm)', 'B', 'fixture', 'fixture (engine fault: Bridge faces disabled)']"
+  },
+  {
+   "name": "in game, the installed War Sails navigation model equals the MMR-17 campaign calibration",
+   "passed": true,
+   "detail": "{\"Default\": [\"Mountain 7\", \"Lake 8\", \"Water 10\", \"River 11\", \"Canyon 13\", \"RuralArea 14\", \"CoastalSea 18\", \"OpenSea 19\", \"Cliff 21\", \"NonNavigableRiver 22\", \"LandRestriction 23\", \"SeaRestriction 24\", \"UnderBridge 25\"], \"Naval\": [\"Plain 1\", \"Desert 2\", \"Snow 3\", \"Forest 4\", \"Steppe 5\", \"Fording 6\", \"Mountain 7\", \"Canyon 13\", \"RuralArea 14\", \"Swamp 15\", \"Dune 16\", \"Bridge 17\", \"Beach 20\", \"Cliff 21\", \"NonNavigableRiver 22\"], \"All\": [\"Mountain 7\", \"Canyon 13\", \"RuralArea 14\", \"Cliff 21\", \"NonNavigableRiver 22\"]}"
+  },
+  {
+   "name": "invalid snaps and unrealized required routes refuse world A in Prepare, before anything is encoded or installed, naming source ids",
+   "passed": true,
+   "detail": "fault:snap-sea: navigation.snap_refused village mnbl_1609fb72_v_000b8059fa ['mnbl_1609fb72_v_000b8059fa', 'hamlet-node-12583']; fault:snap-component: navigation.snap_refused village mnbl_1609fb72_v_000b8059fa ['mnbl_1609fb72_v_000b8059fa', 'hamlet-node-12583']; fault:no-bridges: navigation.group_not_realized group 3 ['road 8 crossing 0', 'road 8 crossing 1', 'mnbl_1609fb72_v_f679f2b4e1'], navigation.bridge_missing road 8 crossing 0 ['road 8 crossing 0'], navigation.bridge_missing road 8 crossing 1 ['road 8 crossing 1']"
+  },
+  {
+   "name": "fixture: the engine read the built navmesh face for face (count, TerrainType histogram, every face centre inside a built face of its type) with the installed region map",
+   "passed": true,
+   "detail": "16452 faces {\"Bridge\": 8, \"CoastalSea\": 2338, \"Lake\": 18, \"Mountain\": 116, \"OpenSea\": 3850, \"Plain\": 9974, \"River\": 140, \"UnderBridge\": 8}; land region ['Plain 1', 'Desert 2', 'Snow 3', 'Forest 4', 'Steppe 5', 'Fording 6', 'Swamp 15', 'Dune 16', 'Bridge 17', 'Beach 20']"
+  },
+  {
+   "name": "fixture (engine fault: Bridge faces disabled): the engine read the built navmesh face for face (count, TerrainType histogram, every face centre inside a built face of its type) with the installed region map",
+   "passed": true,
+   "detail": "16452 faces {\"Bridge\": 8, \"CoastalSea\": 2338, \"Lake\": 18, \"Mountain\": 116, \"OpenSea\": 3850, \"Plain\": 9974, \"River\": 140, \"UnderBridge\": 8}; land region ['Plain 1', 'Desert 2', 'Snow 3', 'Forest 4', 'Steppe 5', 'Fording 6', 'Swamp 15', 'Dune 16', 'Bridge 17', 'Beach 20']"
+  },
+  {
+   "name": "A: the engine read the built navmesh face for face (count, TerrainType histogram, every face centre inside a built face of its type) with the installed region map",
+   "passed": true,
+   "detail": "16422 faces {\"Bridge\": 4, \"CoastalSea\": 5488, \"Lake\": 118, \"Mountain\": 982, \"OpenSea\": 5926, \"Plain\": 3830, \"River\": 70, \"UnderBridge\": 4}; land region ['Plain 1', 'Desert 2', 'Snow 3', 'Forest 4', 'Steppe 5', 'Fording 6', 'Swamp 15', 'Dune 16', 'Bridge 17', 'Beach 20']"
+  },
+  {
+   "name": "A (engine fault: Bridge faces disabled): the engine read the built navmesh face for face (count, TerrainType histogram, every face centre inside a built face of its type) with the installed region map",
+   "passed": true,
+   "detail": "16422 faces {\"Bridge\": 4, \"CoastalSea\": 5488, \"Lake\": 118, \"Mountain\": 982, \"OpenSea\": 5926, \"Plain\": 3830, \"River\": 70, \"UnderBridge\": 4}; land region ['Plain 1', 'Desert 2', 'Snow 3', 'Forest 4', 'Steppe 5', 'Fording 6', 'Swamp 15', 'Dune 16', 'Bridge 17', 'Beach 20']"
+  },
+  {
+   "name": "B: the engine read the built navmesh face for face (count, TerrainType histogram, every face centre inside a built face of its type) with the installed region map",
+   "passed": true,
+   "detail": "16704 faces {\"Bridge\": 34, \"CoastalSea\": 3972, \"Lake\": 1066, \"Mountain\": 912, \"OpenSea\": 2662, \"Plain\": 7758, \"River\": 266, \"UnderBridge\": 34}; land region ['Plain 1', 'Desert 2', 'Snow 3', 'Forest 4', 'Steppe 5', 'Fording 6', 'Swamp 15', 'Dune 16', 'Bridge 17', 'Beach 20']"
+  },
+  {
+   "name": "A (warm): the engine read the built navmesh face for face (count, TerrainType histogram, every face centre inside a built face of its type) with the installed region map",
+   "passed": true,
+   "detail": "16422 faces {\"Bridge\": 4, \"CoastalSea\": 5488, \"Lake\": 118, \"Mountain\": 982, \"OpenSea\": 5926, \"Plain\": 3830, \"River\": 70, \"UnderBridge\": 4}; land region ['Plain 1', 'Desert 2', 'Snow 3', 'Forest 4', 'Steppe 5', 'Fording 6', 'Swamp 15', 'Dune 16', 'Bridge 17', 'Beach 20']"
+  },
+  {
+   "name": "A: the engine route matrix agrees with the intended topology: 826 routes (91 forbidden or sanity, 367 reverse), 393 face checks; the report is persisted and the gate allows activation",
+   "passed": true,
+   "detail": "by check {'villageRoute': 430, 'portFace': 60, 'portGate': 90, 'bridge': 4, 'landRoute': 66, 'seaRoute': 20, 'coastTransition': 42, 'forbidden': 89, 'transition': 23, 'sanity': 2}; by type {'Default': 613, 'All': 158, 'Naval': 55}; disagreements []"
+  },
+  {
+   "name": "A: the matrix covers land, sea and transition routes (ports and coasts) for every navigation capability (Default, Naval, All), allowed and forbidden, and no forbidden route found a path in any periodic image",
+   "passed": true,
+   "detail": "kinds ['bridge', 'coastTransition', 'forbidden', 'landRoute', 'portFace', 'portGate', 'sanity', 'seaRoute', 'transition', 'villageRoute']"
+  },
+  {
+   "name": "A: every expected route's engine path is within 1.25 x the mesh's own shortest path + half a cell (no detour, no wrong bridge)",
+   "passed": true,
+   "detail": "735 routes; worst ratio 1.138"
+  },
+  {
+   "name": "A: no sampled engine path leaves its domain (0.25-unit samples; no unintended shortcut)",
+   "passed": true,
+   "detail": "735 sampled routes"
+  },
+  {
+   "name": "A: region switches counted from the engine's cost: every port and coast transition and every port-to-gate path has exactly one, every All route between groups at least two; every port-to-gate path is within 12.5 units",
+   "passed": true,
+   "detail": "max port-gate length 8.125 over 30 ports; 102 transitions; 23 group routes"
+  },
+  {
+   "name": "A: every bridge crossing route crosses its deck's Bridge face, and every under-bridge route (where the water runs straight through a deck cell) crosses its UnderBridge face",
+   "passed": true,
+   "detail": "4 crossing routes, 0 under routes"
+  },
+  {
+   "name": "A: town gates, ports and kept castles lie on one engine island (MMR-28 islands; weak: the mesh is one connected piece, the members' All connectivity is the static check and the All routes)",
+   "passed": true,
+   "detail": "{\"meshComponentsSeen\": 1, \"engineIslandsSeen\": 1, \"memberIslands\": 1, \"problems\": []}"
+  },
+  {
+   "name": "B: the engine route matrix agrees with the intended topology: 1118 routes (176 forbidden or sanity, 478 reverse), 586 face checks; the report is persisted and the gate allows activation",
+   "passed": true,
+   "detail": "by check {'villageRoute': 610, 'portFace': 50, 'portGate': 75, 'bridge': 36, 'landRoute': 130, 'seamTransition': 4, 'coastTransition': 18, 'forbidden': 174, 'transition': 19, 'sanity': 2}; by type {'Default': 885, 'All': 126, 'Naval': 107}; disagreements []"
+  },
+  {
+   "name": "B: the matrix covers land, sea and transition routes (ports and coasts) for every navigation capability (Default, Naval, All), allowed and forbidden, and no forbidden route found a path in any periodic image",
+   "passed": true,
+   "detail": "kinds ['bridge', 'coastTransition', 'forbidden', 'landRoute', 'portFace', 'portGate', 'sanity', 'seamTransition', 'transition', 'villageRoute']"
+  },
+  {
+   "name": "B: every expected route's engine path is within 1.25 x the mesh's own shortest path + half a cell (no detour, no wrong bridge)",
+   "passed": true,
+   "detail": "942 routes; worst ratio 1.125"
+  },
+  {
+   "name": "B: no sampled engine path leaves its domain (0.25-unit samples; no unintended shortcut)",
+   "passed": true,
+   "detail": "942 sampled routes"
+  },
+  {
+   "name": "B: region switches counted from the engine's cost: every port and coast transition and every port-to-gate path has exactly one, every All route between groups at least two; every port-to-gate path is within 12.5 units",
+   "passed": true,
+   "detail": "max port-gate length 11.250 over 25 ports; 72 transitions; 19 group routes"
+  },
+  {
+   "name": "B: every bridge crossing route crosses its deck's Bridge face, and every under-bridge route (where the water runs straight through a deck cell) crosses its UnderBridge face",
+   "passed": true,
+   "detail": "36 crossing routes, 0 under routes"
+  },
+  {
+   "name": "B: town gates, ports and kept castles lie on one engine island (MMR-28 islands; weak: the mesh is one connected piece, the members' All connectivity is the static check and the All routes)",
+   "passed": true,
+   "detail": "{\"meshComponentsSeen\": 1, \"engineIslandsSeen\": 1, \"memberIslands\": 1, \"problems\": []}"
+  },
+  {
+   "name": "fixture: every designed expectation agrees in the engine",
+   "passed": true,
+   "detail": "45 routes, 23 faces"
+  },
+  {
+   "name": "fixture: the MMR-17 barrier, lake and narrow-channel cases, restated, pass on production navigation (a static mountain wall detours within [direct+4, 3*direct] cells, a closed ring refuses, the enclosed lake refuses the sea, the one-cell channel carries ships and refuses land)",
+   "passed": true,
+   "detail": "landAroundWall_Default reachable 108.588; landAroundWall_Default (back) reachable 108.588; landIntoClosedRing_Default forbidden None; landIntoClosedRing_Default (back) forbidden None; landIntoClosedRing_All forbidden None; landAroundLake_Default reachable 45.694; landAroundLake_Default (back) reachable 45.694; lakeShoreToLake_All reachable 18.75; seaToEnclosedLake_Naval forbidden None; landToLake_Default forbidden None; seaThroughChannel_Naval reachable 112.5; seaThroughChannel_Naval (back) reachable 112.5; landToOtherLandmass_Default forbidden None; landToOtherLandmass_Default (back) forbidden None; landToOtherLandmass_All reachable 31.25; landToOtherLandmass_All (back) reachable 31.25"
+  },
+  {
+   "name": "fixture: bridges (one cell and two cells across x, one cell across y) carry land routes over their Bridge faces while ships pass under on their UnderBridge faces; a river is crossed only at a bridge",
+   "passed": true,
+   "detail": "bridge1Crossing_Default 25; bridge1Crossing_Default (back) 25; bridge1Under_Naval 37.5; bridge1Under_Naval (back) 37.5; bridge2Crossing_Default 31.25; bridge2Crossing_Default (back) 31.25; bridge2Under_Naval 50; bridge2Under_Naval (back) 50; bridge3Crossing_Default 25; bridge3Crossing_Default (back) 25; bridge3Under_Naval 50; bridge3Under_Naval (back) 50; riverNoShortcut_Default 81.288; riverNoShortcut_Default (back) 81.288; riverFromSea_Naval 162.5; riverFromSea_Naval (back) 162.5"
+  },
+  {
+   "name": "fixture: land and sea routes cross the interior terrain chunk lines (x=800, y=800) and the periodic seam (x=400, x=1200) in both directions without detour (one lattice: no stitching)",
+   "passed": true,
+   "detail": "landAcrossTileRow_Default ['y=800']; landAcrossTileRow_Default (back) ['y=800']; landAcrossTileColumn_Default ['x=800']; landAcrossTileColumn_Default (back) ['x=800']; seaAcrossTileRow_Naval ['y=800']; seaAcrossTileRow_Naval (back) ['y=800']; seaAcrossTileColumn_Naval ['x=800']; seaAcrossTileColumn_Naval (back) ['x=800']; landAcrossSeam_Default ['x=1200']; landAcrossSeam_Default (back) ['x=400']; seaAcrossSeam_Naval ['x=1200']; seaAcrossSeam_Naval (back) ['x=400']"
+  },
+  {
+   "name": "fixture: no face beyond the pole lines (canonical and strip), strip images carry their canonical cell's terrain type",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "name": "in game, with Bridge faces disabled in the fixture, every land crossing fails while every under-bridge sea route still passes (the layers are independent); the faulted report is refused and not persisted",
+   "passed": true,
+   "detail": "crossings [False, False, False, False, False, False]; under [True, True, True, True, True, True]"
+  },
+  {
+   "name": "with Bridge faces disabled in loaded world A, the engine routes over the bridges fail and the gate refuses activation, naming the crossings and the settlements that depend on them; the faulted report is not persisted",
+   "passed": true,
+   "detail": "villageRoute mnbl_1609fb72_v_f679f2b4e1 ['mnbl_1609fb72_v_f679f2b4e1', 'hamlet-node-5736', 'mnbl_1609fb72_t_266d733fa8', 'surface-city-2-5610-hill_dwarf']; villageRoute mnbl_1609fb72_v_f679f2b4e1 (back) ['mnbl_1609fb72_v_f679f2b4e1', 'hamlet-node-5736', 'mnbl_1609fb72_t_266d733fa8', 'surface-city-2-5610-hill_dwarf']; bridge crossing road 8 crossing 0 ['road 8 crossing 0']; bridge crossing road 8 crossing 0 (back) ['road 8 crossing 0']; bridge crossing road 8 crossing 1 ['road 8 crossing 1']; bridge crossing road 8 crossing 1 (back) ['road 8 crossing 1']"
+  },
+  {
+   "name": "the semantic report is stable in one process: warm world A reproduces cold A's report",
+   "passed": true,
+   "detail": "e5029f1d20b061b5b991acce7237ea690530794052aeb0da9071fdfba96dc62d"
+  },
+  {
+   "name": "the semantic reports of the fixture, A and B are identical across two game processes on the same module",
+   "passed": true,
+   "detail": "{\"fixture\": true, \"A\": true, \"B\": true}"
+  },
+  {
+   "name": "reports are bound to the world content id, the navmesh hash, the policy hash and the validator version, and carry no native face index",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "name": "offline navigation contract passed",
+   "passed": true,
+   "detail": "36/36"
+  }
+ ],
+ "passed": 34,
+ "total": 34,
+ "worlds": {
+  "fixture": {
+   "sceneName": "mnbl_world_f596b58cdcfc1879_c57f419e8a61",
+   "worldContentId": "f596b58cdcfc18798542fdef5a4d9c9f6d84abddca1425af8d0b87f521191d2d",
+   "variant": "fixture",
+   "navmeshSha256": "58763f94c783e9f471dad8584d9d8347101097136dd743c7cd63574d07efd928",
+   "reportSha256": "d424bd7c6cdb0cd0e55e0a9eb4e92b0ff48bb156244c072599cb8ddd984193b3",
+   "activatable": true,
+   "gate": "activation allowed",
+   "persisted": true,
+   "faces": 16452,
+   "facesByTerrainType": {
+    "Bridge": 8,
+    "CoastalSea": 2338,
+    "Lake": 18,
+    "Mountain": 116,
+    "OpenSea": 3850,
+    "Plain": 9974,
+    "River": 140,
+    "UnderBridge": 8
+   },
+   "cellSemantics": {
+    "domain land, water -, cost plain, passage open -> Plain": 4957,
+    "domain none, water -, cost mountain, passage impassable -> Mountain": 58,
+    "domain sea, water coastalSea, cost -, passage open -> CoastalSea": 1169,
+    "domain sea, water lake, cost -, passage open -> Lake": 9,
+    "domain sea, water openSea, cost -, passage open -> OpenSea": 1925,
+    "domain sea, water river, cost -, passage open -> River": 70,
+    "domain sea, water river, cost -, passage underBridge -> UnderBridge": 4
+   },
+   "bridges": 3,
+   "summary": {
+    "faceChecks": 23,
+    "facesAgree": 23,
+    "routeChecks": 45,
+    "routesAgree": 44,
+    "reachableRoutes": 37,
+    "forbiddenRoutes": 8,
+    "diagnostics": 0
+   },
+   "tileLinesCrossed": {
+    "x=1200": 2,
+    "x=400": 2,
+    "x=800": 4,
+    "y=800": 7
+   },
+   "validationSeconds": 0.2182602,
+   "snaps": {
+    "kept": 0,
+    "moved": 0,
+    "refused": 0,
+    "separated": 0,
+    "portsPlaced": 0,
+    "maxDistance": 0,
+    "maxPortPlacement": 0
+   },
+   "navigationSetup": {
+    "model": "NavalDLC.GameComponents.NavalPartyNavigationModel over TaleWorlds.CampaignSystem.GameComponents.DefaultPartyNavigationModel",
+    "disabledBeforeRead": [
+     "Mountain 7 (0)",
+     "Canyon 13 (0)",
+     "RuralArea 14 (0)",
+     "Cliff 21 (0)",
+     "NonNavigableRiver 22 (0)"
+    ],
+    "landRegion": [
+     "Plain 1",
+     "Desert 2",
+     "Snow 3",
+     "Forest 4",
+     "Steppe 5",
+     "Fording 6",
+     "Swamp 15",
+     "Dune 16",
+     "Bridge 17",
+     "Beach 20"
+    ],
+    "regionMapEqualsModel": true
+   }
+  },
+  "fixture (engine fault: Bridge faces disabled)": {
+   "sceneName": "mnbl_world_f596b58cdcfc1879_c57f419e8a61",
+   "worldContentId": "f596b58cdcfc18798542fdef5a4d9c9f6d84abddca1425af8d0b87f521191d2d",
+   "variant": "fixture",
+   "navmeshSha256": "58763f94c783e9f471dad8584d9d8347101097136dd743c7cd63574d07efd928",
+   "reportSha256": "cbc6bc106a2e9df41783c81c8168226db8d40f66942f7af9c591758a23454de2",
+   "activatable": false,
+   "gate": "activation refused",
+   "persisted": false,
+   "faces": 16452,
+   "facesByTerrainType": {
+    "Bridge": 8,
+    "CoastalSea": 2338,
+    "Lake": 18,
+    "Mountain": 116,
+    "OpenSea": 3850,
+    "Plain": 9974,
+    "River": 140,
+    "UnderBridge": 8
+   },
+   "cellSemantics": {
+    "domain land, water -, cost plain, passage open -> Plain": 4957,
+    "domain none, water -, cost mountain, passage impassable -> Mountain": 58,
+    "domain sea, water coastalSea, cost -, passage open -> CoastalSea": 1169,
+    "domain sea, water lake, cost -, passage open -> Lake": 9,
+    "domain sea, water openSea, cost -, passage open -> OpenSea": 1925,
+    "domain sea, water river, cost -, passage open -> River": 70,
+    "domain sea, water river, cost -, passage underBridge -> UnderBridge": 4
+   },
+   "bridges": 3,
+   "summary": {
+    "faceChecks": 23,
+    "facesAgree": 23,
+    "routeChecks": 45,
+    "routesAgree": 36,
+    "reachableRoutes": 37,
+    "forbiddenRoutes": 8,
+    "diagnostics": 8
+   },
+   "tileLinesCrossed": {
+    "x=1200": 2,
+    "x=400": 2,
+    "x=800": 4,
+    "y=800": 7
+   },
+   "validationSeconds": 0.2403931,
+   "snaps": {
+    "kept": 0,
+    "moved": 0,
+    "refused": 0,
+    "separated": 0,
+    "portsPlaced": 0,
+    "maxDistance": 0,
+    "maxPortPlacement": 0
+   },
+   "navigationSetup": {
+    "model": "NavalDLC.GameComponents.NavalPartyNavigationModel over TaleWorlds.CampaignSystem.GameComponents.DefaultPartyNavigationModel",
+    "disabledBeforeRead": [
+     "Mountain 7 (0)",
+     "Canyon 13 (0)",
+     "RuralArea 14 (0)",
+     "Cliff 21 (0)",
+     "NonNavigableRiver 22 (0)"
+    ],
+    "landRegion": [
+     "Plain 1",
+     "Desert 2",
+     "Snow 3",
+     "Forest 4",
+     "Steppe 5",
+     "Fording 6",
+     "Swamp 15",
+     "Dune 16",
+     "Bridge 17",
+     "Beach 20"
+    ],
+    "regionMapEqualsModel": true
+   }
+  },
+  "A": {
+   "sceneName": "mnbl_world_f596b58cdcfc1879_95b0227fdd0f",
+   "worldContentId": "f596b58cdcfc18798542fdef5a4d9c9f6d84abddca1425af8d0b87f521191d2d",
+   "variant": "production",
+   "navmeshSha256": "ac9a499dfe946f4b832416eee1949429498842f7ce8c198b42a732d58203ba15",
+   "reportSha256": "e5029f1d20b061b5b991acce7237ea690530794052aeb0da9071fdfba96dc62d",
+   "activatable": true,
+   "gate": "activation allowed",
+   "persisted": true,
+   "faces": 16422,
+   "facesByTerrainType": {
+    "Bridge": 4,
+    "CoastalSea": 5488,
+    "Lake": 118,
+    "Mountain": 982,
+    "OpenSea": 5926,
+    "Plain": 3830,
+    "River": 70,
+    "UnderBridge": 4
+   },
+   "cellSemantics": {
+    "domain land, water -, cost plain, passage open -> Plain": 1898,
+    "domain none, water -, cost mountain, passage impassable -> Mountain": 491,
+    "domain sea, water coastalSea, cost -, passage open -> CoastalSea": 2744,
+    "domain sea, water lake, cost -, passage open -> Lake": 59,
+    "domain sea, water openSea, cost -, passage open -> OpenSea": 2963,
+    "domain sea, water river, cost -, passage open -> River": 35,
+    "domain sea, water river, cost -, passage underBridge -> UnderBridge": 2
+   },
+   "bridges": 2,
+   "summary": {
+    "faceChecks": 393,
+    "facesAgree": 393,
+    "routeChecks": 826,
+    "routesAgree": 826,
+    "reachableRoutes": 735,
+    "forbiddenRoutes": 91,
+    "diagnostics": 0
+   },
+   "tileLinesCrossed": {
+    "x=1200": 5,
+    "x=800": 24,
+    "y=800": 53
+   },
+   "validationSeconds": 0.6146992,
+   "snaps": {
+    "kept": 356,
+    "moved": 0,
+    "refused": 0,
+    "separated": 2,
+    "portsPlaced": 30,
+    "maxDistance": 0,
+    "maxPortPlacement": 3.9775
+   },
+   "navigationSetup": {
+    "model": "NavalDLC.GameComponents.NavalPartyNavigationModel over TaleWorlds.CampaignSystem.GameComponents.DefaultPartyNavigationModel",
+    "disabledBeforeRead": [
+     "Mountain 7 (0)",
+     "Canyon 13 (0)",
+     "RuralArea 14 (0)",
+     "Cliff 21 (0)",
+     "NonNavigableRiver 22 (0)"
+    ],
+    "landRegion": [
+     "Plain 1",
+     "Desert 2",
+     "Snow 3",
+     "Forest 4",
+     "Steppe 5",
+     "Fording 6",
+     "Swamp 15",
+     "Dune 16",
+     "Bridge 17",
+     "Beach 20"
+    ],
+    "regionMapEqualsModel": true
+   }
+  },
+  "A (engine fault: Bridge faces disabled)": {
+   "sceneName": "mnbl_world_f596b58cdcfc1879_95b0227fdd0f",
+   "worldContentId": "f596b58cdcfc18798542fdef5a4d9c9f6d84abddca1425af8d0b87f521191d2d",
+   "variant": "production",
+   "navmeshSha256": "ac9a499dfe946f4b832416eee1949429498842f7ce8c198b42a732d58203ba15",
+   "reportSha256": "7565fff65333e3419a306982a30f5ed27e5cb5c654e46c3347f06387ecae4643",
+   "activatable": false,
+   "gate": "activation refused",
+   "persisted": false,
+   "faces": 16422,
+   "facesByTerrainType": {
+    "Bridge": 4,
+    "CoastalSea": 5488,
+    "Lake": 118,
+    "Mountain": 982,
+    "OpenSea": 5926,
+    "Plain": 3830,
+    "River": 70,
+    "UnderBridge": 4
+   },
+   "cellSemantics": {
+    "domain land, water -, cost plain, passage open -> Plain": 1898,
+    "domain none, water -, cost mountain, passage impassable -> Mountain": 491,
+    "domain sea, water coastalSea, cost -, passage open -> CoastalSea": 2744,
+    "domain sea, water lake, cost -, passage open -> Lake": 59,
+    "domain sea, water openSea, cost -, passage open -> OpenSea": 2963,
+    "domain sea, water river, cost -, passage open -> River": 35,
+    "domain sea, water river, cost -, passage underBridge -> UnderBridge": 2
+   },
+   "bridges": 2,
+   "summary": {
+    "faceChecks": 393,
+    "facesAgree": 393,
+    "routeChecks": 826,
+    "routesAgree": 820,
+    "reachableRoutes": 735,
+    "forbiddenRoutes": 91,
+    "diagnostics": 6
+   },
+   "tileLinesCrossed": {
+    "x=1200": 5,
+    "x=800": 24,
+    "y=800": 53
+   },
+   "validationSeconds": 0.7930801,
+   "snaps": {
+    "kept": 356,
+    "moved": 0,
+    "refused": 0,
+    "separated": 2,
+    "portsPlaced": 30,
+    "maxDistance": 0,
+    "maxPortPlacement": 3.9775
+   },
+   "navigationSetup": {
+    "model": "NavalDLC.GameComponents.NavalPartyNavigationModel over TaleWorlds.CampaignSystem.GameComponents.DefaultPartyNavigationModel",
+    "disabledBeforeRead": [
+     "Mountain 7 (0)",
+     "Canyon 13 (0)",
+     "RuralArea 14 (0)",
+     "Cliff 21 (0)",
+     "NonNavigableRiver 22 (0)"
+    ],
+    "landRegion": [
+     "Plain 1",
+     "Desert 2",
+     "Snow 3",
+     "Forest 4",
+     "Steppe 5",
+     "Fording 6",
+     "Swamp 15",
+     "Dune 16",
+     "Bridge 17",
+     "Beach 20"
+    ],
+    "regionMapEqualsModel": true
+   }
+  },
+  "B": {
+   "sceneName": "mnbl_world_f63c6841085725e2_7622a2206520",
+   "worldContentId": "f63c6841085725e2c437b7d5d087a52cf4dc7d5d8fe3e2d583d46cba6a775550",
+   "variant": "production",
+   "navmeshSha256": "8cf1a20aa47aebb5e0281d4bf4dce7ba41639ab66f0c47d4855110242ad76a85",
+   "reportSha256": "1bf67f7b5f6b494a636419bc9d6ef25af4310d5f1f9a43baa741e4e3481b9cd9",
+   "activatable": true,
+   "gate": "activation allowed",
+   "persisted": true,
+   "faces": 16704,
+   "facesByTerrainType": {
+    "Bridge": 34,
+    "CoastalSea": 3972,
+    "Lake": 1066,
+    "Mountain": 912,
+    "OpenSea": 2662,
+    "Plain": 7758,
+    "River": 266,
+    "UnderBridge": 34
+   },
+   "cellSemantics": {
+    "domain land, water -, cost plain, passage open -> Plain": 3736,
+    "domain none, water -, cost mountain, passage impassable -> Mountain": 456,
+    "domain sea, water coastalSea, cost -, passage open -> CoastalSea": 1986,
+    "domain sea, water lake, cost -, passage open -> Lake": 533,
+    "domain sea, water lake, cost -, passage underBridge -> UnderBridge": 5,
+    "domain sea, water openSea, cost -, passage open -> OpenSea": 1331,
+    "domain sea, water river, cost -, passage open -> River": 133,
+    "domain sea, water river, cost -, passage underBridge -> UnderBridge": 12
+   },
+   "bridges": 17,
+   "summary": {
+    "faceChecks": 586,
+    "facesAgree": 586,
+    "routeChecks": 1118,
+    "routesAgree": 1118,
+    "reachableRoutes": 942,
+    "forbiddenRoutes": 176,
+    "diagnostics": 0
+   },
+   "tileLinesCrossed": {
+    "x=1200": 12,
+    "x=400": 15,
+    "x=800": 21,
+    "y=800": 71
+   },
+   "validationSeconds": 1.3910753,
+   "snaps": {
+    "kept": 447,
+    "moved": 0,
+    "refused": 0,
+    "separated": 6,
+    "portsPlaced": 25,
+    "maxDistance": 0,
+    "maxPortPlacement": 3.9775
+   },
+   "navigationSetup": {
+    "model": "NavalDLC.GameComponents.NavalPartyNavigationModel over TaleWorlds.CampaignSystem.GameComponents.DefaultPartyNavigationModel",
+    "disabledBeforeRead": [
+     "Mountain 7 (0)",
+     "Canyon 13 (0)",
+     "RuralArea 14 (0)",
+     "Cliff 21 (0)",
+     "NonNavigableRiver 22 (0)"
+    ],
+    "landRegion": [
+     "Plain 1",
+     "Desert 2",
+     "Snow 3",
+     "Forest 4",
+     "Steppe 5",
+     "Fording 6",
+     "Swamp 15",
+     "Dune 16",
+     "Bridge 17",
+     "Beach 20"
+    ],
+    "regionMapEqualsModel": true
+   }
+  },
+  "A (warm)": {
+   "sceneName": "mnbl_world_f596b58cdcfc1879_95b0227fdd0f",
+   "worldContentId": "f596b58cdcfc18798542fdef5a4d9c9f6d84abddca1425af8d0b87f521191d2d",
+   "variant": "production",
+   "navmeshSha256": "ac9a499dfe946f4b832416eee1949429498842f7ce8c198b42a732d58203ba15",
+   "reportSha256": "e5029f1d20b061b5b991acce7237ea690530794052aeb0da9071fdfba96dc62d",
+   "activatable": true,
+   "gate": "activation allowed",
+   "persisted": true,
+   "faces": 16422,
+   "facesByTerrainType": {
+    "Bridge": 4,
+    "CoastalSea": 5488,
+    "Lake": 118,
+    "Mountain": 982,
+    "OpenSea": 5926,
+    "Plain": 3830,
+    "River": 70,
+    "UnderBridge": 4
+   },
+   "cellSemantics": {
+    "domain land, water -, cost plain, passage open -> Plain": 1898,
+    "domain none, water -, cost mountain, passage impassable -> Mountain": 491,
+    "domain sea, water coastalSea, cost -, passage open -> CoastalSea": 2744,
+    "domain sea, water lake, cost -, passage open -> Lake": 59,
+    "domain sea, water openSea, cost -, passage open -> OpenSea": 2963,
+    "domain sea, water river, cost -, passage open -> River": 35,
+    "domain sea, water river, cost -, passage underBridge -> UnderBridge": 2
+   },
+   "bridges": 2,
+   "summary": {
+    "faceChecks": 393,
+    "facesAgree": 393,
+    "routeChecks": 826,
+    "routesAgree": 826,
+    "reachableRoutes": 735,
+    "forbiddenRoutes": 91,
+    "diagnostics": 0
+   },
+   "tileLinesCrossed": {
+    "x=1200": 5,
+    "x=800": 24,
+    "y=800": 53
+   },
+   "validationSeconds": 0.6971138,
+   "snaps": {
+    "kept": 356,
+    "moved": 0,
+    "refused": 0,
+    "separated": 2,
+    "portsPlaced": 30,
+    "maxDistance": 0,
+    "maxPortPlacement": 3.9775
+   },
+   "navigationSetup": {
+    "model": "NavalDLC.GameComponents.NavalPartyNavigationModel over TaleWorlds.CampaignSystem.GameComponents.DefaultPartyNavigationModel",
+    "disabledBeforeRead": [
+     "Mountain 7 (0)",
+     "Canyon 13 (0)",
+     "RuralArea 14 (0)",
+     "Cliff 21 (0)",
+     "NonNavigableRiver 22 (0)"
+    ],
+    "landRegion": [
+     "Plain 1",
+     "Desert 2",
+     "Snow 3",
+     "Forest 4",
+     "Steppe 5",
+     "Fording 6",
+     "Swamp 15",
+     "Dune 16",
+     "Bridge 17",
+     "Beach 20"
+    ],
+    "regionMapEqualsModel": true
+   }
+  }
+ },
+ "fixtureRoutes": {
+  "landAroundWall_Default": {
+   "type": "Default",
+   "expected": "reachable",
+   "found": true,
+   "pathLength": 108.588,
+   "meshShortestPath": 110.436,
+   "regionSwitches": 0,
+   "crosses": [],
+   "agrees": true,
+   "gating": true
+  },
+  "landAroundWall_Default (back)": {
+   "type": "Default",
+   "expected": "reachable",
+   "found": true,
+   "pathLength": 108.588,
+   "meshShortestPath": 110.719,
+   "regionSwitches": 0,
+   "crosses": [
+    "y=800"
+   ],
+   "agrees": true,
+   "gating": true
+  },
+  "landIntoClosedRing_Default": {
+   "type": "Default",
+   "expected": "forbidden",
+   "found": false,
+   "pathLength": null,
+   "meshShortestPath": null,
+   "regionSwitches": -1,
+   "crosses": [],
+   "agrees": true,
+   "gating": true
+  },
+  "landIntoClosedRing_Default (back)": {
+   "type": "Default",
+   "expected": "forbidden",
+   "found": false,
+   "pathLength": null,
+   "meshShortestPath": null,
+   "regionSwitches": -1,
+   "crosses": [],
+   "agrees": true,
+   "gating": true
+  },
+  "landIntoClosedRing_All": {
+   "type": "All",
+   "expected": "forbidden",
+   "found": false,
+   "pathLength": null,
+   "meshShortestPath": null,
+   "regionSwitches": -1,
+   "crosses": [],
+   "agrees": true,
+   "gating": true
+  },
+  "landIntoClosedRing_noExclusions (observed: pre-read disable)": {
+   "type": "All",
+   "expected": "forbidden",
+   "found": true,
+   "pathLength": 43.75,
+   "meshShortestPath": null,
+   "regionSwitches": 2,
+   "crosses": [],
+   "agrees": false,
+   "gating": false
+  },
+  "landAroundLake_Default": {
+   "type": "Default",
+   "expected": "reachable",
+   "found": true,
+   "pathLength": 45.694,
+   "meshShortestPath": 45.267,
+   "regionSwitches": 0,
+   "crosses": [],
+   "agrees": true,
+   "gating": true
+  },
+  "landAroundLake_Default (back)": {
+   "type": "Default",
+   "expected": "reachable",
+   "found": true,
+   "pathLength": 45.694,
+   "meshShortestPath": 45.267,
+   "regionSwitches": 0,
+   "crosses": [],
+   "agrees": true,
+   "gating": true
+  },
+  "lakeShoreToLake_All": {
+   "type": "All",
+   "expected": "reachable",
+   "found": true,
+   "pathLength": 18.75,
+   "meshShortestPath": 18.75,
+   "regionSwitches": 1,
+   "crosses": [],
+   "agrees": true,
+   "gating": true
+  },
+  "seaToEnclosedLake_Naval": {
+   "type": "Naval",
+   "expected": "forbidden",
+   "found": false,
+   "pathLength": null,
+   "meshShortestPath": null,
+   "regionSwitches": -1,
+   "crosses": [],
+   "agrees": true,
+   "gating": true
+  },
+  "landToLake_Default": {
+   "type": "Default",
+   "expected": "forbidden",
+   "found": false,
+   "pathLength": null,
+   "meshShortestPath": null,
+   "regionSwitches": -1,
+   "crosses": [],
+   "agrees": true,
+   "gating": true
+  },
+  "seaThroughChannel_Naval": {
+   "type": "Naval",
+   "expected": "reachable",
+   "found": true,
+   "pathLength": 112.5,
+   "meshShortestPath": 112.5,
+   "regionSwitches": 0,
+   "crosses": [
+    "y=800"
+   ],
+   "agrees": true,
+   "gating": true
+  },
+  "seaThroughChannel_Naval (back)": {
+   "type": "Naval",
+   "expected": "reachable",
+   "found": true,
+   "pathLength": 112.5,
+   "meshShortestPath": 112.5,
+   "regionSwitches": 0,
+   "crosses": [
+    "y=800"
+   ],
+   "agrees": true,
+   "gating": true
+  },
+  "landToOtherLandmass_Default": {
+   "type": "Default",
+   "expected": "forbidden",
+   "found": false,
+   "pathLength": null,
+   "meshShortestPath": null,
+   "regionSwitches": -1,
+   "crosses": [],
+   "agrees": true,
+   "gating": true
+  },
+  "landToOtherLandmass_Default (back)": {
+   "type": "Default",
+   "expected": "forbidden",
+   "found": false,
+   "pathLength": null,
+   "meshShortestPath": null,
+   "regionSwitches": -1,
+   "crosses": [],
+   "agrees": true,
+   "gating": true
+  },
+  "landToOtherLandmass_All": {
+   "type": "All",
+   "expected": "reachable",
+   "found": true,
+   "pathLength": 31.25,
+   "meshShortestPath": 31.25,
+   "regionSwitches": 2,
+   "crosses": [],
+   "agrees": true,
+   "gating": true
+  },
+  "landToOtherLandmass_All (back)": {
+   "type": "All",
+   "expected": "reachable",
+   "found": true,
+   "pathLength": 31.25,
+   "meshShortestPath": 31.25,
+   "regionSwitches": 2,
+   "crosses": [],
+   "agrees": true,
+   "gating": true
+  },
+  "bridge1Crossing_Default": {
+   "type": "Default",
+   "expected": "reachable",
+   "found": true,
+   "pathLength": 25,
+   "meshShortestPath": 25,
+   "regionSwitches": 0,
+   "crosses": [],
+   "agrees": true,
+   "gating": true
+  },
+  "bridge1Crossing_Default (back)": {
+   "type": "Default",
+   "expected": "reachable",
+   "found": true,
+   "pathLength": 25,
+   "meshShortestPath": 25,
+   "regionSwitches": 0,
+   "crosses": [],
+   "agrees": true,
+   "gating": true
+  },
+  "bridge1Under_Naval": {
+   "type": "Naval",
+   "expected": "reachable",
+   "found": true,
+   "pathLength": 37.5,
+   "meshShortestPath": 37.5,
+   "regionSwitches": 0,
+   "crosses": [],
+   "agrees": true,
+   "gating": true
+  },
+  "bridge1Under_Naval (back)": {
+   "type": "Naval",
+   "expected": "reachable",
+   "found": true,
+   "pathLength": 37.5,
+   "meshShortestPath": 37.5,
+   "regionSwitches": 0,
+   "crosses": [],
+   "agrees": true,
+   "gating": true
+  },
+  "bridge2Crossing_Default": {
+   "type": "Default",
+   "expected": "reachable",
+   "found": true,
+   "pathLength": 31.25,
+   "meshShortestPath": 31.25,
+   "regionSwitches": 0,
+   "crosses": [],
+   "agrees": true,
+   "gating": true
+  },
+  "bridge2Crossing_Default (back)": {
+   "type": "Default",
+   "expected": "reachable",
+   "found": true,
+   "pathLength": 31.25,
+   "meshShortestPath": 31.25,
+   "regionSwitches": 0,
+   "crosses": [],
+   "agrees": true,
+   "gating": true
+  },
+  "bridge2Under_Naval": {
+   "type": "Naval",
+   "expected": "reachable",
+   "found": true,
+   "pathLength": 50,
+   "meshShortestPath": 50,
+   "regionSwitches": 0,
+   "crosses": [],
+   "agrees": true,
+   "gating": true
+  },
+  "bridge2Under_Naval (back)": {
+   "type": "Naval",
+   "expected": "reachable",
+   "found": true,
+   "pathLength": 50,
+   "meshShortestPath": 50,
+   "regionSwitches": 0,
+   "crosses": [],
+   "agrees": true,
+   "gating": true
+  },
+  "bridge3Crossing_Default": {
+   "type": "Default",
+   "expected": "reachable",
+   "found": true,
+   "pathLength": 25,
+   "meshShortestPath": 25,
+   "regionSwitches": 0,
+   "crosses": [],
+   "agrees": true,
+   "gating": true
+  },
+  "bridge3Crossing_Default (back)": {
+   "type": "Default",
+   "expected": "reachable",
+   "found": true,
+   "pathLength": 25,
+   "meshShortestPath": 25,
+   "regionSwitches": 0,
+   "crosses": [],
+   "agrees": true,
+   "gating": true
+  },
+  "bridge3Under_Naval": {
+   "type": "Naval",
+   "expected": "reachable",
+   "found": true,
+   "pathLength": 50,
+   "meshShortestPath": 50,
+   "regionSwitches": 0,
+   "crosses": [],
+   "agrees": true,
+   "gating": true
+  },
+  "bridge3Under_Naval (back)": {
+   "type": "Naval",
+   "expected": "reachable",
+   "found": true,
+   "pathLength": 50,
+   "meshShortestPath": 50,
+   "regionSwitches": 0,
+   "crosses": [],
+   "agrees": true,
+   "gating": true
+  },
+  "riverNoShortcut_Default": {
+   "type": "Default",
+   "expected": "reachable",
+   "found": true,
+   "pathLength": 81.288,
+   "meshShortestPath": 81.723,
+   "regionSwitches": 0,
+   "crosses": [],
+   "agrees": true,
+   "gating": true
+  },
+  "riverNoShortcut_Default (back)": {
+   "type": "Default",
+   "expected": "reachable",
+   "found": true,
+   "pathLength": 81.288,
+   "meshShortestPath": 81.723,
+   "regionSwitches": 0,
+   "crosses": [],
+   "agrees": true,
+   "gating": true
+  },
+  "riverFromSea_Naval": {
+   "type": "Naval",
+   "expected": "reachable",
+   "found": true,
+   "pathLength": 162.5,
+   "meshShortestPath": 162.5,
+   "regionSwitches": 0,
+   "crosses": [],
+   "agrees": true,
+   "gating": true
+  },
+  "riverFromSea_Naval (back)": {
+   "type": "Naval",
+   "expected": "reachable",
+   "found": true,
+   "pathLength": 162.5,
+   "meshShortestPath": 162.5,
+   "regionSwitches": 0,
+   "crosses": [],
+   "agrees": true,
+   "gating": true
+  },
+  "landAcrossTileRow_Default": {
+   "type": "Default",
+   "expected": "reachable",
+   "found": true,
+   "pathLength": 50,
+   "meshShortestPath": 50,
+   "regionSwitches": 0,
+   "crosses": [
+    "y=800"
+   ],
+   "agrees": true,
+   "gating": true
+  },
+  "landAcrossTileRow_Default (back)": {
+   "type": "Default",
+   "expected": "reachable",
+   "found": true,
+   "pathLength": 50,
+   "meshShortestPath": 50,
+   "regionSwitches": 0,
+   "crosses": [
+    "y=800"
+   ],
+   "agrees": true,
+   "gating": true
+  },
+  "landAcrossTileColumn_Default": {
+   "type": "Default",
+   "expected": "reachable",
+   "found": true,
+   "pathLength": 50,
+   "meshShortestPath": 50,
+   "regionSwitches": 0,
+   "crosses": [
+    "x=800"
+   ],
+   "agrees": true,
+   "gating": true
+  },
+  "landAcrossTileColumn_Default (back)": {
+   "type": "Default",
+   "expected": "reachable",
+   "found": true,
+   "pathLength": 50,
+   "meshShortestPath": 50,
+   "regionSwitches": 0,
+   "crosses": [
+    "x=800"
+   ],
+   "agrees": true,
+   "gating": true
+  },
+  "seaAcrossTileRow_Naval": {
+   "type": "Naval",
+   "expected": "reachable",
+   "found": true,
+   "pathLength": 50,
+   "meshShortestPath": 50,
+   "regionSwitches": 0,
+   "crosses": [
+    "y=800"
+   ],
+   "agrees": true,
+   "gating": true
+  },
+  "seaAcrossTileRow_Naval (back)": {
+   "type": "Naval",
+   "expected": "reachable",
+   "found": true,
+   "pathLength": 50,
+   "meshShortestPath": 50,
+   "regionSwitches": 0,
+   "crosses": [
+    "y=800"
+   ],
+   "agrees": true,
+   "gating": true
+  },
+  "seaAcrossTileColumn_Naval": {
+   "type": "Naval",
+   "expected": "reachable",
+   "found": true,
+   "pathLength": 75,
+   "meshShortestPath": 75,
+   "regionSwitches": 0,
+   "crosses": [
+    "x=800"
+   ],
+   "agrees": true,
+   "gating": true
+  },
+  "seaAcrossTileColumn_Naval (back)": {
+   "type": "Naval",
+   "expected": "reachable",
+   "found": true,
+   "pathLength": 75,
+   "meshShortestPath": 75,
+   "regionSwitches": 0,
+   "crosses": [
+    "x=800"
+   ],
+   "agrees": true,
+   "gating": true
+  },
+  "landAcrossSeam_Default": {
+   "type": "Default",
+   "expected": "reachable",
+   "found": true,
+   "pathLength": 50,
+   "meshShortestPath": 50,
+   "regionSwitches": 0,
+   "crosses": [
+    "x=1200"
+   ],
+   "agrees": true,
+   "gating": true
+  },
+  "landAcrossSeam_Default (back)": {
+   "type": "Default",
+   "expected": "reachable",
+   "found": true,
+   "pathLength": 50,
+   "meshShortestPath": 50,
+   "regionSwitches": 0,
+   "crosses": [
+    "x=400"
+   ],
+   "agrees": true,
+   "gating": true
+  },
+  "seaAcrossSeam_Naval": {
+   "type": "Naval",
+   "expected": "reachable",
+   "found": true,
+   "pathLength": 50,
+   "meshShortestPath": 50,
+   "regionSwitches": 0,
+   "crosses": [
+    "x=1200"
+   ],
+   "agrees": true,
+   "gating": true
+  },
+  "seaAcrossSeam_Naval (back)": {
+   "type": "Naval",
+   "expected": "reachable",
+   "found": true,
+   "pathLength": 50,
+   "meshShortestPath": 50,
+   "regionSwitches": 0,
+   "crosses": [
+    "x=400"
+   ],
+   "agrees": true,
+   "gating": true
+  }
+ },
+ "staticFaults": {
+  "fault:snap-sea": [
+   {
+    "code": "navigation.snap_refused",
+    "subject": "village mnbl_1609fb72_v_000b8059fa",
+    "detail": "the requested point lies in a sea cell; no land of component 19 within 3.125 units (a snap ends only in its own domain and component)",
+    "sourceIds": [
+     "mnbl_1609fb72_v_000b8059fa",
+     "hamlet-node-12583"
+    ]
+   }
+  ],
+  "fault:snap-component": [
+   {
+    "code": "navigation.snap_refused",
+    "subject": "village mnbl_1609fb72_v_000b8059fa",
+    "detail": "the requested point lies in land component 3, not its own 19; no land of component 19 within 3.125 units (a snap ends only in its own domain and component)",
+    "sourceIds": [
+     "mnbl_1609fb72_v_000b8059fa",
+     "hamlet-node-12583"
+    ]
+   }
+  ],
+  "fault:no-bridges": [
+   {
+    "code": "navigation.group_not_realized",
+    "subject": "group 3",
+    "detail": "the group's land is 2 separate Default components (a joining bridge is not realized)",
+    "sourceIds": [
+     "road 8 crossing 0",
+     "road 8 crossing 1",
+     "mnbl_1609fb72_v_f679f2b4e1"
+    ]
+   },
+   {
+    "code": "navigation.bridge_missing",
+    "subject": "road 8 crossing 0",
+    "detail": "the travel graph requires a bridge here and the navmesh has no deck for it",
+    "sourceIds": [
+     "road 8 crossing 0"
+    ]
+   },
+   {
+    "code": "navigation.bridge_missing",
+    "subject": "road 8 crossing 1",
+    "detail": "the travel graph requires a bridge here and the navmesh has no deck for it",
+    "sourceIds": [
+     "road 8 crossing 1"
+    ]
+   },
+   {
+    "code": "navigation.route_not_realized",
+    "subject": "villageRoute mnbl_1609fb72_v_f679f2b4e1",
+    "detail": "Default navigation cannot reach the target on the built mesh",
+    "sourceIds": [
+     "mnbl_1609fb72_v_f679f2b4e1",
+     "hamlet-node-5736",
+     "mnbl_1609fb72_t_266d733fa8",
+     "surface-city-2-5610-hill_dwarf"
+    ]
+   },
+   {
+    "code": "navigation.route_not_realized",
+    "subject": "villageRoute mnbl_1609fb72_v_f679f2b4e1 (back)",
+    "detail": "Default navigation cannot reach the target on the built mesh",
+    "sourceIds": [
+     "mnbl_1609fb72_v_f679f2b4e1",
+     "hamlet-node-5736",
+     "mnbl_1609fb72_t_266d733fa8",
+     "surface-city-2-5610-hill_dwarf"
+    ]
+   }
+  ]
+ },
+ "engineFault": [
+  {
+   "code": "navigation.engine_route_failed",
+   "subject": "villageRoute mnbl_1609fb72_v_f679f2b4e1",
+   "detail": "Default: no path; no path distance",
+   "sourceIds": [
+    "mnbl_1609fb72_v_f679f2b4e1",
+    "hamlet-node-5736",
+    "mnbl_1609fb72_t_266d733fa8",
+    "surface-city-2-5610-hill_dwarf"
+   ]
+  },
+  {
+   "code": "navigation.engine_route_failed",
+   "subject": "villageRoute mnbl_1609fb72_v_f679f2b4e1 (back)",
+   "detail": "Default: no path; no path distance",
+   "sourceIds": [
+    "mnbl_1609fb72_v_f679f2b4e1",
+    "hamlet-node-5736",
+    "mnbl_1609fb72_t_266d733fa8",
+    "surface-city-2-5610-hill_dwarf"
+   ]
+  },
+  {
+   "code": "navigation.engine_route_failed",
+   "subject": "bridge crossing road 8 crossing 0",
+   "detail": "Default: no path; no path distance",
+   "sourceIds": [
+    "road 8 crossing 0"
+   ]
+  },
+  {
+   "code": "navigation.engine_route_failed",
+   "subject": "bridge crossing road 8 crossing 0 (back)",
+   "detail": "Default: no path; no path distance",
+   "sourceIds": [
+    "road 8 crossing 0"
+   ]
+  },
+  {
+   "code": "navigation.engine_route_failed",
+   "subject": "bridge crossing road 8 crossing 1",
+   "detail": "Default: no path; no path distance",
+   "sourceIds": [
+    "road 8 crossing 1"
+   ]
+  },
+  {
+   "code": "navigation.engine_route_failed",
+   "subject": "bridge crossing road 8 crossing 1 (back)",
+   "detail": "Default: no path; no path distance",
+   "sourceIds": [
+    "road 8 crossing 1"
+   ]
+  }
+ ],
+ "observations": {
+  "preReadDisable": "With no excluded faces, a path entered the mountain-ringed pocket (found True); the pre-read disable calls returned ['Mountain 7 (0)', 'Canyon 13 (0)', 'RuralArea 14 (0)', 'Cliff 21 (0)', 'NonNavigableRiver 22 (0)']: the installed SandBox MapScene.Load order (disable the faces invalid for every type, then read) does not disable faces read afterwards. Every path query excludes the invalid types explicitly, as the campaign does, so routing is unaffected.",
+  "engineDistance": "Scene.GetPathDistanceBetweenAIFaces returns a cost: the path length plus the region switch cost (50) per embark or disembark; lengths and envelopes are measured on the returned path and switches counted from the difference.",
+  "islands": "Every world's mesh is one connected piece and the engine reports one island; the fixture's mountain-closed pocket (a separate All component) shares it, so FaceIslandIndex is not All connectivity.",
+  "cornerHops": {
+   "A": [],
+   "B": []
+  },
+  "cornerHopsNote": "All routes between groups whose land touches only diagonally embark and disembark at one vertex (two region switches, a zero-length sea leg). They are accepted as All connectivity (both groups touch the same water there, as MMR-28's basins model it); whether a moving party executes such a leg is observed only once compiled worlds are activated (MMR-45)."
+ }
+}

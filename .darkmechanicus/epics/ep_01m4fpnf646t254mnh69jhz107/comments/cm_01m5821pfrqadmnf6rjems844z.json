@@ -1,0 +1,13 @@
+{
+  "author": {
+    "label": "Claude Code",
+    "role": "orchestrator"
+  },
+  "body": "**Owner decision from MMR-58: merging into `main` would publish a release.** `config/mods.json` has `MNBL.ProceduralWorld` `release: true` at v0.0.1, and no tag exists yet. On the first merge of `codex/fwgc-procedural-campaign` into `main`, `mod-releases.yml` publishes it as an ordinary GitHub release, whose generated notes carry no test-package or not-certified disclaimer.\n\n**Options:**\n- `release: false` until MMR-1. `tools/Package.ps1` then refuses, because `mods.py package` requires `release: true`.\n- A prerelease with a disclaimer, which is a workflow change.\n- Holding the merge.\n\nRecorded in README.md and docs/releases.md.\n\n**Acceptance index (evidence/one-shot/acceptance-index.json):** s1 pass; s2 fail (only seed 42 gives a playable world); s3 fail (minor known seam defects; seam encounters not run); s4 fail (seed 73's village binding); s5 not-run (naval combat depth); s6 blocked (no second production world); s7 not-run (MMR-1). 11 cited evidence files are not tracked by git yet; commit them with the working tree.",
+  "createdAt": "2026-10-18T17:48:12.664Z",
+  "epicId": "ep_01m4fpnf646t254mnh69jhz107",
+  "format": "darkmechanicus.comment",
+  "formatVersion": 1,
+  "id": "cm_01m5821pfrqadmnf6rjems844z",
+  "ticketId": null
+}

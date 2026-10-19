@@ -1,0 +1,45 @@
+{
+  "testSha256": "8ef0e945e422bad4caf720b971e8824b95fa86771e26a9e61008cb132bcb1e4c",
+  "runnerSha256": "db86d483899766d5c639af9eafcbcf5932f3bf36ee4f232caa29bebc6d9169e8",
+  "cases": [
+    {
+      "originalRestored": true,
+      "passed": true,
+      "failure": "System.Management.Automation.RuntimeException: Another unclaimed probe request exists.",
+      "mockLaunches": 0,
+      "scenario": "preexisting-request"
+    },
+    {
+      "originalRestored": true,
+      "passed": true,
+      "failure": "System.Management.Automation.RuntimeException: Injected interrupted deployment copy.",
+      "mockLaunches": 0,
+      "scenario": "partial-copy"
+    },
+    {
+      "originalRestored": true,
+      "passed": true,
+      "failure": "System.Management.Automation.MethodInvocationException: Exception calling \"Refresh\" with \"0\" argument(s): \"Injected cleanup Refresh failure.\"\r\n ---> System.Management.Automation.RuntimeException: Injected cleanup Refresh failure.\r\n ---> System.Management.Automation.RuntimeException: Injected cleanup Refresh failure.\r\n   --- End of inner exception stack trace ---\r\n   at System.Management.Automation.ExceptionHandlingOps.CheckActionPreference(FunctionContext funcContext, Exception exception)\r\n   at System.Management.Automation.Interpreter.ActionCallInstruction`2.Run(InterpretedFrame frame)\r\n   at System.Management.Automation.Interpreter.EnterTryCatchFinallyInstruction.Run(InterpretedFrame frame)\r\n   at System.Management.Automation.Interpreter.EnterTryCatchFinallyInstruction.Run(InterpretedFrame frame)\r\n   at System.Management.Automation.Interpreter.Interpreter.Run(InterpretedFrame frame)\r\n   at System.Management.Automation.Interpreter.LightLambda.RunVoid1[T0](T0 arg0)\r\n   at System.Management.Automation.ScriptBlock.InvokeWithPipeImpl(ScriptBlockClauseToInvoke clauseToInvoke, Boolean createLocalScope, Dictionary`2 functionsToDefine, List`1 variablesToDefine, ErrorHandlingBehavior errorHandlingBehavior, Object dollarUnder, Object input, Object scriptThis, Pipe outputPipe, InvocationInfo invocationInfo, Object[] args)\r\n   at System.Management.Automation.ScriptBlock.InvokeWithPipe(Boolean useLocalScope, ErrorHandlingBehavior errorHandlingBehavior, Object dollarUnder, Object input, Object scriptThis, Pipe outputPipe, InvocationInfo invocationInfo, Boolean propagateAllExceptionsToTop, List`1 variablesToDefine, Dictionary`2 functionsToDefine, Object[] args)\r\n   at System.Management.Automation.ScriptBlock.DoInvokeReturnAsIs(Boolean useLocalScope, ErrorHandlingBehavior errorHandlingBehavior, Object dollarUnder, Object input, Object scriptThis, Object[] args)\r\n   at System.Management.Automation.PSScriptMethod.InvokeScript(String methodName, ScriptBlock script, Object this, Object[] arguments)\r\n   --- End of inner exception stack trace ---\r\n   at System.Management.Automation.ExceptionHandlingOps.CheckActionPreference(FunctionContext funcContext, Exception exception)\r\n   at System.Management.Automation.Interpreter.ActionCallInstruction`2.Run(InterpretedFrame frame)\r\n   at System.Management.Automation.Interpreter.EnterTryCatchFinallyInstruction.Run(InterpretedFrame frame)\r\n   at System.Management.Automation.Interpreter.EnterTryCatchFinallyInstruction.Run(InterpretedFrame frame)",
+      "mockLaunches": 1,
+      "scenario": "cleanup-throw"
+    },
+    {
+      "originalRestored": true,
+      "passed": true,
+      "failure": "System.Management.Automation.RuntimeException: Probe result belongs to another run; refusing stale PID result.",
+      "mockLaunches": 1,
+      "scenario": "stale-result"
+    },
+    {
+      "originalRestored": true,
+      "passed": true,
+      "failure": null,
+      "mockLaunches": 1,
+      "scenario": "success-after-wait"
+    }
+  ],
+  "status": "passed",
+  "gameExecuted": false,
+  "installedFilesTouched": false,
+  "fixtureDirectory": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\build\\battle-scale\\runner-failure-tests-c0b09410f22741a7b34c4d361b60cc73"
+}

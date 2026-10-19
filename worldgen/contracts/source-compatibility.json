@@ -1,0 +1,115 @@
+{
+  "schema": "mnbl.source-compatibility",
+  "version": 1,
+  "producer_lock": "worldgen/producer.lock.json",
+  "note": "Versions the campaign compiler consumes from the pinned FWGC++ producer (commit ec5d1c10); heroes (realms and people) is pinned since MMR-27. Observed in that producer's split exports at sizes 129/257/513, seed 42. generator_version is descriptive metadata, not a build fingerprint. Unknown optional members are skipped; a missing or unsupported required member fails before any game file is written.",
+  "root": {
+    "schema": "fwg.world",
+    "schema_version": 2,
+    "completed_stage": 16,
+    "split_version": 1,
+    "scene_version": 1,
+    "topology_type": "sphere",
+    "duplicate_seam": true
+  },
+  "blocks": {
+    "settlements": [
+      16
+    ],
+    "humans": [
+      10
+    ],
+    "heroes": [
+      6
+    ],
+    "civilizations": [
+      3
+    ],
+    "roads": [
+      1
+    ],
+    "water": [
+      1
+    ],
+    "climate": [
+      1
+    ],
+    "terrain": [
+      6
+    ],
+    "key_locations": [
+      2
+    ],
+    "city_plans": [
+      8
+    ],
+    "hamlet_plans": [
+      3
+    ],
+    "castle_plans": [
+      3
+    ],
+    "key_location_plans": [
+      1
+    ]
+  },
+  "plan_file_versions": {
+    "city": 8,
+    "hamlet": 3,
+    "castle": 3,
+    "key_location": 1
+  },
+  "required_systems": [
+    "water",
+    "climate",
+    "terrain_labels",
+    "settlements",
+    "roads",
+    "humans",
+    "heroes",
+    "city_plans",
+    "hamlet_plans",
+    "castle_plans",
+    "world_scene",
+    "key_locations",
+    "key_location_plans"
+  ],
+  "required_layers": [
+    "height",
+    "land",
+    "biome",
+    "landform",
+    "slope",
+    "temperature",
+    "moisture",
+    "water_depth",
+    "water_type",
+    "river",
+    "surface",
+    "civilization_region",
+    "culture_region"
+  ],
+  "tolerances": {
+    "seam": 1e-09,
+    "pole": 1e-09,
+    "note": "Absolute. FWGC++ writes the seam column and pole rows by exact copy (grid.cpp; tests use exact equality); every layer of the pinned producer's exports at 129/257/513/1025 shows 0 difference."
+  },
+  "limits": {
+    "max_side": 1025,
+    "max_records": 200000,
+    "max_plan_files": 100000,
+    "max_plan_bytes": 67108864,
+    "max_retained_bytes": 16777216,
+    "note": "max_retained_bytes caps what the reader keeps after streaming (record strings at length+32, structs, positions); the pinned producer's exports retain 0.70-0.81 MB at sizes 129-1025. The tokenizer separately caps open-object keys at 16 MiB, tokens at 1 MiB and nesting at 64. Worst-case peak working set is therefore about 11 MB of process baseline plus these budgets, plus 8*side^2 bytes per materialized layer held."
+  },
+  "integral_layers": [
+    "land",
+    "biome",
+    "landform",
+    "water_type",
+    "river",
+    "civilization_region",
+    "culture_region"
+  ],
+  "integral_layers_note": "Categorical layers: every sample must be integer-valued (FWGC++ writes integer codes as shortest round-trip doubles)."
+}

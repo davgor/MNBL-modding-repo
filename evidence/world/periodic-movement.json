@@ -1,0 +1,2385 @@
+{
+  "schema": "mnbl.evidence.periodic-movement",
+  "version": 1,
+  "ticket": "MMR-65",
+  "generated": "2026-10-16T16:19:32+00:00",
+  "sources": {
+    "run": {
+      "file": "evidence/runtime/in-game/generated_campaign-14144.json",
+      "sha256": "1cfb8ab6729ed8915912c31c121713ca2f7fdd2b995d93a1edeae8c0c703a97e",
+      "processId": 14144,
+      "status": "ok",
+      "moduleSha256": "30b2c63eebcaea0ccf661eb1969005583d74b81ad9296983867a059e9ead496d",
+      "args": {
+        "navigationProbe": 0,
+        "movementProbe": 1,
+        "holdSeconds": 3,
+        "placement": "C:\\Users\\davgo\\Documents\\GitHub\\MNBL-modding-repo\\build\\research-wrap63\\fixture-c\\placement.json",
+        "worldCount": 1,
+        "gameplayDays": 0,
+        "culture": "empire",
+        "missionProbe": 0,
+        "wrapProbe": 1,
+        "seed": 405570,
+        "townPrototype": "town_EN2",
+        "heroTemplate": "spc_legion_of_the_betrayed_leader_0",
+        "villagePrototype": "village_EN1_3"
+      }
+    },
+    "offline": {
+      "file": "evidence/world/periodic-movement-tests.json",
+      "sha256": "2c5752e35f5ebe1483a4a4e5caaca7bfd6ecafb4d5264b6d730c2d6146f55dd1",
+      "checks": 85,
+      "failures": 0
+    },
+    "audit": {
+      "file": "evidence/world/periodic-consumers.tsv",
+      "sha256": "a5be5787b7dafc2800139c32054698c45f3e42eacadfc445a1145a818271df47",
+      "rows": 1280
+    },
+    "history": [
+      {
+        "file": "evidence/runtime/in-game/generated_campaign-19852.json",
+        "sha256": "e0353c11c02f424b1ee4cdd94603bc491b26df6460818c79afbd7da253c48bb5",
+        "status": "running"
+      },
+      {
+        "file": "evidence/runtime/in-game/generated_campaign-13332.json",
+        "sha256": "5fea1d643afaecad5b2c4d5c592aa1435df4672fb19e8f5166fcbfae6b5a1076",
+        "status": "error"
+      },
+      {
+        "file": "evidence/runtime/in-game/generated_campaign-30656.json",
+        "sha256": "d78639c3943e7a7205e19db3241481a09fed6aa7513c49957bce22fdbf69099f",
+        "status": "error"
+      }
+    ]
+  },
+  "audit": {
+    "rowsByDisposition": {
+      "callee-patched": 65,
+      "covered": 182,
+      "exact": 8,
+      "generic": 5,
+      "inactive": 91,
+      "mission": 569,
+      "periodic": 124,
+      "recompile": 27,
+      "view": 209
+    },
+    "callSitesByDisposition": {
+      "callee-patched": 130,
+      "covered": 223,
+      "exact": 8,
+      "generic": 8,
+      "inactive": 114,
+      "mission": 820,
+      "periodic": 161,
+      "recompile": 28,
+      "view": 268
+    },
+    "rule": "every Distance, DistanceSquared and subtraction of CampaignVec2/Vec2, every direct LocatorGrid search and every point-around-position call in the installed campaign assemblies; dispositions from tools/periodic/build_spatial_table.py"
+  },
+  "spatialTable": {
+    "methods": 98,
+    "replacedCalls": 161,
+    "recompiledCallers": 27,
+    "unresolved": [],
+    "mismatched": [],
+    "orphanRecompiles": [],
+    "scannedAssemblies": [
+      {
+        "assembly": "TaleWorlds.CampaignSystem",
+        "sha256": "1f8e33e2ed73e6ec653d7629180afb70649ddc6e5bd1657a802a264efda1c3ae",
+        "installed": "1f8e33e2ed73e6ec653d7629180afb70649ddc6e5bd1657a802a264efda1c3ae"
+      },
+      {
+        "assembly": "TaleWorlds.CampaignSystem.ViewModelCollection",
+        "sha256": "5d817a46456d07b5e4382a870795fd9f8d6f11b4707a91d8a8b5d5cd50e762a5",
+        "installed": "5d817a46456d07b5e4382a870795fd9f8d6f11b4707a91d8a8b5d5cd50e762a5"
+      },
+      {
+        "assembly": "NavalDLC",
+        "sha256": "146e16de9ac242ef63047cc337c858ffaf24a7b153f7bd7e18f1ccca1d268a94",
+        "installed": "146e16de9ac242ef63047cc337c858ffaf24a7b153f7bd7e18f1ccca1d268a94"
+      },
+      {
+        "assembly": "NavalDLC.View",
+        "sha256": "4d074b0558467b534e06aa132c5b9ade0c0e431007a42a754fe61e39674fab8b",
+        "installed": "4d074b0558467b534e06aa132c5b9ade0c0e431007a42a754fe61e39674fab8b"
+      },
+      {
+        "assembly": "SandBox",
+        "sha256": "587c6e94c425745c1478f632f3b66226ff8298666cb27e8e6d9a62488df5956a",
+        "installed": "587c6e94c425745c1478f632f3b66226ff8298666cb27e8e6d9a62488df5956a"
+      },
+      {
+        "assembly": "SandBox.View",
+        "sha256": "c7360e71da06799a0cb6c00c4a0cfab5877621197ba25101433ac28654d169e2",
+        "installed": "c7360e71da06799a0cb6c00c4a0cfab5877621197ba25101433ac28654d169e2"
+      },
+      {
+        "assembly": "StoryMode",
+        "sha256": "cc205186bca26ea04197c543f06bfd14ec7ca8a94b559a3a2753921c4bb27ef0",
+        "installed": "cc205186bca26ea04197c543f06bfd14ec7ca8a94b559a3a2753921c4bb27ef0"
+      }
+    ],
+    "staleAssemblies": []
+  },
+  "movement": {
+    "failures": [],
+    "exceptionsThrown": [],
+    "towns": {
+      "east": [
+        1134.375,
+        1128.125
+      ],
+      "west": [
+        409.375,
+        1121.875
+      ],
+      "eastPort": [
+        1134.375,
+        1134.375
+      ],
+      "westPort": [
+        409.375,
+        1128.125
+      ]
+    },
+    "patches": {
+      "tableEntries": 125,
+      "patched": 98,
+      "recompiledCallers": 27,
+      "callsReplaced": 161,
+      "periodicPatchEntries": 20,
+      "patchError": null
+    },
+    "radiusQuery": {
+      "placed": [
+        {
+          "party": "CharacterObject_906_party_1",
+          "position": [
+            1192,
+            1124.625
+          ]
+        },
+        {
+          "party": "CharacterObject_907_party_1",
+          "position": [
+            1197,
+            1124.625
+          ]
+        },
+        {
+          "party": "mnbl_00063042_ruler_2_party_1",
+          "position": [
+            403,
+            1124.625
+          ]
+        },
+        {
+          "party": "CharacterObject_908_party_1",
+          "position": [
+            408,
+            1124.625
+          ]
+        }
+      ],
+      "queries": [
+        {
+          "query": "canonical centre east of the seam",
+          "centre": [
+            1198.5,
+            1124.625
+          ],
+          "radius": 10,
+          "found": [
+            "CharacterObject_906_party_1",
+            "CharacterObject_907_party_1",
+            "mnbl_00063042_ruler_2_party_1",
+            "CharacterObject_908_party_1"
+          ],
+          "foundOnce": true,
+          "withinPeriodicRadius": [
+            "CharacterObject_906_party_1",
+            "CharacterObject_907_party_1",
+            "mnbl_00063042_ruler_2_party_1",
+            "CharacterObject_908_party_1"
+          ],
+          "matchesPeriodicRadius": true,
+          "othersFound": 2
+        },
+        {
+          "query": "centre in the east strip",
+          "centre": [
+            1201.5,
+            1124.625
+          ],
+          "radius": 10,
+          "found": [
+            "CharacterObject_906_party_1",
+            "CharacterObject_907_party_1",
+            "mnbl_00063042_ruler_2_party_1",
+            "CharacterObject_908_party_1"
+          ],
+          "foundOnce": true,
+          "withinPeriodicRadius": [
+            "CharacterObject_906_party_1",
+            "CharacterObject_907_party_1",
+            "mnbl_00063042_ruler_2_party_1",
+            "CharacterObject_908_party_1"
+          ],
+          "matchesPeriodicRadius": true,
+          "othersFound": 4
+        },
+        {
+          "query": "canonical centre west of the seam",
+          "centre": [
+            401.5,
+            1124.625
+          ],
+          "radius": 10,
+          "found": [
+            "mnbl_00063042_ruler_2_party_1",
+            "CharacterObject_908_party_1",
+            "CharacterObject_906_party_1",
+            "CharacterObject_907_party_1"
+          ],
+          "foundOnce": true,
+          "withinPeriodicRadius": [
+            "CharacterObject_906_party_1",
+            "CharacterObject_907_party_1",
+            "mnbl_00063042_ruler_2_party_1",
+            "CharacterObject_908_party_1"
+          ],
+          "matchesPeriodicRadius": true,
+          "othersFound": 4
+        },
+        {
+          "query": "centre in the middle",
+          "centre": [
+            800,
+            1124.625
+          ],
+          "radius": 10,
+          "found": [],
+          "foundOnce": true,
+          "withinPeriodicRadius": [],
+          "matchesPeriodicRadius": true,
+          "othersFound": 0
+        }
+      ],
+      "directGrid": {
+        "centre": [
+          1198.5,
+          1124.625
+        ],
+        "radius": 13.2173138,
+        "found": [
+          "mnbl_00063042_town_2"
+        ]
+      },
+      "directPartyGrid": {
+        "centre": [
+          401.5,
+          1124.625
+        ],
+        "radius": 10,
+        "found": [
+          "mnbl_00063042_ruler_2_party_1",
+          "CharacterObject_908_party_1",
+          "CharacterObject_906_party_1",
+          "CharacterObject_907_party_1"
+        ],
+        "othersFound": 4
+      },
+      "closestSettlementToHero": {
+        "hero": "CharacterObject_907",
+        "at": [
+          1197,
+          1124.625
+        ],
+        "answer": "mnbl_00063042_town_2",
+        "periodicNearest": "mnbl_00063042_town_2"
+      }
+    },
+    "sectionsRun": "all",
+    "reinforcement": {
+      "failures": [],
+      "setup": {
+        "joiningRadius": 3,
+        "battle": [
+          1199.4,
+          1124.625
+        ],
+        "enemy": "CharacterObject_906_party_1",
+        "acrossSeam": {
+          "party": "CharacterObject_907_party_1",
+          "position": [
+            400.4,
+            1124.625
+          ],
+          "periodicDistance": 0.9999695,
+          "planarDistance": 799
+        },
+        "outside": {
+          "party": "CharacterObject_909_party_1",
+          "periodicDistance": 8.400024
+        },
+        "warDeclared": true,
+        "synthetic": "war declared on the kingdom; three of its lord parties placed: the enemy beside the player, one across the seam within the joining radius, one outside it"
+      },
+      "involved": [
+        {
+          "party": "CharacterObject_906_party_1",
+          "side": "Defender"
+        },
+        {
+          "party": "CharacterObject_907_party_1",
+          "side": "Defender"
+        },
+        {
+          "party": "player_party",
+          "side": "Attacker"
+        }
+      ],
+      "locatorAroundBattle": [
+        "CharacterObject_906_party_1",
+        "player_party",
+        "CharacterObject_907_party_1"
+      ],
+      "acrossJoinedEnemySide": true,
+      "outsideInABattle": false,
+      "afterCleanup": {
+        "encounter": false,
+        "playerMapEvent": false
+      }
+    },
+    "pursuit": {
+      "failures": [],
+      "setup": {
+        "target": "CharacterObject_908_party_1",
+        "pursuer": "CharacterObject_906_party_1",
+        "targetStart": [
+          1197,
+          1106.125
+        ],
+        "pursuerStart": [
+          1175,
+          1106.125
+        ],
+        "targetGoal": [
+          460,
+          1106.125
+        ],
+        "warDeclared": true,
+        "targetExtraTroops": 111,
+        "targetSpeed": 1.38944,
+        "pursuerSpeed": 1.81795931
+      },
+      "pursuerTravel": {
+        "leg": "AI pursuit across the seam",
+        "party": "CharacterObject_906_party_1",
+        "arrived": true,
+        "realSeconds": 14.95957999999996,
+        "campaignDays": 0.7508643507026136,
+        "start": [
+          1175,
+          1106.125
+        ],
+        "end": [
+          431.611633,
+          1106.01685
+        ],
+        "traveledPeriodic": 56.6116333,
+        "maxStepPeriodic": 0.06436169147491455,
+        "maxPlanarResidual": 0.06436169,
+        "rebases": 1,
+        "rebaseEvents": [
+          {
+            "fromX": 1200.01306,
+            "toX": 400.013062,
+            "y": 1106.09448,
+            "shift": -800,
+            "pathPoints": 1,
+            "cameraFields": null
+          }
+        ],
+        "nonCanonicalSamples": 0,
+        "maxNonCanonicalRun": 0,
+        "canonicalThroughout": true,
+        "track": [
+          [
+            1175,
+            1106.125,
+            775,
+            0
+          ],
+          [
+            1175.31482,
+            1106.125,
+            775.3148,
+            0
+          ],
+          [
+            1175.75745,
+            1106.125,
+            775.757446,
+            0
+          ],
+          [
+            1176.19922,
+            1106.125,
+            776.1992,
+            0
+          ],
+          [
+            1176.64087,
+            1106.125,
+            776.640869,
+            0
+          ],
+          [
+            1177.02039,
+            1106.125,
+            777.0204,
+            0
+          ],
+          [
+            1177.46191,
+            1106.125,
+            777.4619,
+            0
+          ],
+          [
+            1177.84119,
+            1106.125,
+            777.8412,
+            0
+          ],
+          [
+            1178.28357,
+            1106.125,
+            778.283569,
+            0
+          ],
+          [
+            1178.72546,
+            1106.125,
+            778.725464,
+            0
+          ],
+          [
+            1179.16821,
+            1106.125,
+            779.1682,
+            0
+          ],
+          [
+            1179.61,
+            1106.125,
+            779.61,
+            0
+          ],
+          "... 125 more"
+        ]
+      },
+      "intercepted": true,
+      "routeAtSeam": {
+        "party": "CharacterObject_906_party_1",
+        "position": [
+          1180.05249,
+          1106.125
+        ],
+        "canonical": true,
+        "atSea": false,
+        "navigationCapability": "Default",
+        "desiredNavigation": "Default",
+        "transitionInProgress": false,
+        "transitionEnd": null,
+        "segments": 1,
+        "pathLength": 19.965456,
+        "seamCrossings": [
+          {
+            "segment": 0,
+            "direction": "east",
+            "from": [
+              1180.05249,
+              1106.125
+            ],
+            "to": [
+              1200.018,
+              1106.11523
+            ]
+          }
+        ],
+        "longestSegment": 19.965456,
+        "rebases": 0
+      },
+      "heldElsewhere": [
+        "mnbl_00063042_ruler_1_party_1",
+        "mnbl_00063042_ruler_2_party_1",
+        "CharacterObject_907_party_1",
+        "CharacterObject_909_party_1"
+      ],
+      "targetCrossed": true,
+      "interception": {
+        "position": [
+          431.611633,
+          1106.01685
+        ],
+        "canonical": true,
+        "parties": [
+          "CharacterObject_908_party_1",
+          "CharacterObject_906_party_1"
+        ],
+        "logicalX": 31.6116333
+      },
+      "distanceSamples": [
+        22,
+        21.86023,
+        21.605835,
+        21.3515625,
+        21.0974121,
+        20.8430176,
+        20.5885029,
+        20.3341084,
+        20.0798359,
+        19.8255348,
+        19.5713234,
+        19.3164711,
+        19.0623226,
+        18.8078976,
+        18.553627,
+        18.2991734,
+        18.0446262,
+        17.7905979,
+        17.5362644,
+        17.2819,
+        17.0275974,
+        16.7733555,
+        16.5191746,
+        16.26475,
+        16.0103245,
+        15.7556257,
+        15.5012922,
+        15.2471113,
+        14.9925642,
+        14.7384443,
+        14.4838066,
+        14.2298393,
+        13.975811,
+        13.7217522,
+        13.467145,
+        13.212781,
+        12.9582033,
+        12.704175,
+        12.449934,
+        12.1956005,
+        11.9411144,
+        11.686964,
+        11.4322653,
+        11.1775961,
+        10.92311,
+        10.6681671,
+        10.413559,
+        10.1591043,
+        9.904405,
+        9.64985752,
+        9.395098,
+        9.14049,
+        8.892077,
+        8.667926,
+        8.443897,
+        8.219594,
+        7.995412,
+        7.773519,
+        7.55174875,
+        7.330039,
+        7.10845137,
+        6.88658953,
+        6.66481924,
+        6.44304848,
+        6.22140026,
+        5.99972,
+        5.777948,
+        5.556145,
+        5.334556,
+        5.11257029,
+        4.89092,
+        4.66942263,
+        4.447498,
+        4.22593927,
+        4.004167,
+        3.78254771,
+        3.560745,
+        3.33906412,
+        3.11753631,
+        2.89555049
+      ],
+      "finalDistance": 0.478639573,
+      "after": [
+        {
+          "party": "CharacterObject_908_party_1",
+          "position": [
+            432.090271,
+            1106.0155
+          ],
+          "face": "Plain",
+          "atSea": false,
+          "domainConsistent": true,
+          "canonical": true
+        }
+      ],
+      "trackGrid": {
+        "centre": [
+          1199,
+          1106.125
+        ],
+        "radius": 15,
+        "laid": [
+          [
+            1196,
+            1106.125
+          ],
+          [
+            404,
+            1106.125
+          ]
+        ],
+        "tracksInWorld": 37,
+        "found": 12,
+        "withinPeriodicRadius": 12,
+        "foundAcrossSeam": 9,
+        "foundOnce": true,
+        "missed": 0,
+        "extra": 0
+      }
+    },
+    "army": {
+      "failures": [],
+      "rivalLordsHeld": [
+        "mnbl_00063042_ruler_2_party_1",
+        "CharacterObject_908_party_1"
+      ],
+      "setup": {
+        "kingdom": "mnbl_00063042_kingdom_1",
+        "leader": "CharacterObject_907_party_1",
+        "members": [
+          "CharacterObject_909_party_1",
+          "CharacterObject_910_party_1"
+        ],
+        "attached": [
+          true,
+          true
+        ],
+        "armyType": "Patrolling",
+        "atSea": [
+          false,
+          false,
+          false
+        ],
+        "start": [
+          1180,
+          1124.625
+        ],
+        "synthetic": "the army formed 20 units before the seam on a land row; objective the destination town, gathering marked started with every member attached; war declared on the rival kingdom when needed (an army without an active war disbands)"
+      },
+      "waitingForMembers": false,
+      "leaderTravel": {
+        "leg": "army east->west across the seam",
+        "party": "CharacterObject_907_party_1",
+        "arrived": true,
+        "realSeconds": 13.473733400000015,
+        "campaignDays": 0.676837726845406,
+        "start": [
+          1180,
+          1124.625
+        ],
+        "end": [
+          418.555878,
+          1124.625
+        ],
+        "traveledPeriodic": 38.5558777,
+        "maxStepPeriodic": 0.1053466796875,
+        "maxPlanarResidual": 0.10534668,
+        "rebases": 1,
+        "rebaseEvents": [
+          {
+            "fromX": 1200.04407,
+            "toX": 400.044067,
+            "y": 1124.625,
+            "shift": -800,
+            "pathPoints": 1,
+            "cameraFields": null
+          }
+        ],
+        "nonCanonicalSamples": 0,
+        "maxNonCanonicalRun": 0,
+        "canonicalThroughout": true,
+        "track": [
+          [
+            1180,
+            1124.625,
+            780,
+            0
+          ],
+          [
+            1180.26917,
+            1124.625,
+            780.269165,
+            0
+          ],
+          [
+            1180.454,
+            1124.625,
+            780.454,
+            0
+          ],
+          [
+            1180.63843,
+            1124.625,
+            780.6384,
+            0
+          ],
+          [
+            1180.82458,
+            1124.625,
+            780.8246,
+            0
+          ],
+          [
+            1181.04883,
+            1124.625,
+            781.0488,
+            0
+          ],
+          [
+            1181.27283,
+            1124.625,
+            781.2728,
+            0
+          ],
+          [
+            1181.49683,
+            1124.625,
+            781.4968,
+            0
+          ],
+          [
+            1181.72119,
+            1124.625,
+            781.7212,
+            0
+          ],
+          [
+            1181.94531,
+            1124.625,
+            781.9453,
+            0
+          ],
+          [
+            1182.19153,
+            1124.625,
+            782.1915,
+            0
+          ],
+          [
+            1182.49377,
+            1124.625,
+            782.4938,
+            0
+          ],
+          "... 111 more"
+        ]
+      },
+      "maxMemberSpread": 0,
+      "detachedSamples": 0,
+      "transitionSamples": 0,
+      "routeAtSeam": {
+        "party": "CharacterObject_907_party_1",
+        "position": [
+          1180.10535,
+          1124.625
+        ],
+        "canonical": true,
+        "atSea": false,
+        "navigationCapability": "All",
+        "desiredNavigation": "Default",
+        "transitionInProgress": false,
+        "transitionEnd": null,
+        "segments": 1,
+        "pathLength": 39.8946533,
+        "seamCrossings": [
+          {
+            "segment": 0,
+            "direction": "east",
+            "from": [
+              1180.10535,
+              1124.625
+            ],
+            "to": [
+              1220,
+              1124.625
+            ]
+          }
+        ],
+        "longestSegment": 39.8946533,
+        "rebases": 0
+      },
+      "leaderBattle": null,
+      "memberRebases": {
+        "CharacterObject_909_party_1": 1,
+        "CharacterObject_910_party_1": 1
+      },
+      "after": [
+        {
+          "party": "CharacterObject_907_party_1",
+          "position": [
+            418.555878,
+            1124.625
+          ],
+          "face": "Plain",
+          "atSea": false,
+          "domainConsistent": true,
+          "canonical": true
+        },
+        {
+          "party": "CharacterObject_909_party_1",
+          "position": [
+            418.555878,
+            1124.625
+          ],
+          "face": "Plain",
+          "atSea": false,
+          "domainConsistent": true,
+          "canonical": true
+        },
+        {
+          "party": "CharacterObject_910_party_1",
+          "position": [
+            418.555878,
+            1124.625
+          ],
+          "face": "Plain",
+          "atSea": false,
+          "domainConsistent": true,
+          "canonical": true
+        }
+      ],
+      "armyStillActive": true,
+      "dispersalReasons": []
+    },
+    "fleet": {
+      "failures": [],
+      "rivalLordsHeld": [
+        "mnbl_00063042_ruler_2_party_1",
+        "CharacterObject_908_party_1"
+      ],
+      "setup": {
+        "kingdom": "mnbl_00063042_kingdom_1",
+        "leader": "CharacterObject_907_party_1",
+        "members": [
+          "CharacterObject_909_party_1",
+          "CharacterObject_910_party_1"
+        ],
+        "attached": [
+          true,
+          true
+        ],
+        "armyType": "Patrolling",
+        "atSea": [
+          true,
+          true,
+          true
+        ],
+        "start": [
+          1134.375,
+          1134.375
+        ],
+        "synthetic": "a culture ship and a skeletal crew granted to each lord; the fleet formed at the east seam port; objective the destination town, gathering marked started with every member attached; war declared on the rival kingdom when needed (an army without an active war disbands)"
+      },
+      "waitingForMembers": false,
+      "leaderTravel": {
+        "leg": "fleet east->west across the seam",
+        "party": "CharacterObject_907_party_1",
+        "arrived": true,
+        "realSeconds": 26.558602900000096,
+        "campaignDays": 1.3311318425985519,
+        "start": [
+          1134.375,
+          1134.375
+        ],
+        "end": [
+          407.066772,
+          1129.01782
+        ],
+        "traveledPeriodic": 73.25318,
+        "maxStepPeriodic": 0.13890749216079712,
+        "maxPlanarResidual": 0.138907492,
+        "rebases": 1,
+        "rebaseEvents": [
+          {
+            "fromX": 1200.03857,
+            "toX": 400.038574,
+            "y": 1131.73511,
+            "shift": -800,
+            "pathPoints": 2,
+            "cameraFields": null
+          }
+        ],
+        "nonCanonicalSamples": 0,
+        "maxNonCanonicalRun": 0,
+        "canonicalThroughout": true,
+        "track": [
+          [
+            1134.375,
+            1134.375,
+            734.375,
+            1
+          ],
+          [
+            1134.68469,
+            1134.36255,
+            734.6847,
+            1
+          ],
+          [
+            1134.86328,
+            1134.35522,
+            734.8633,
+            1
+          ],
+          [
+            1135.072,
+            1134.34668,
+            735.072,
+            1
+          ],
+          [
+            1135.28052,
+            1134.33813,
+            735.2805,
+            1
+          ],
+          [
+            1135.48926,
+            1134.32959,
+            735.489258,
+            1
+          ],
+          [
+            1135.69775,
+            1134.321,
+            735.697754,
+            1
+          ],
+          [
+            1135.87683,
+            1134.31372,
+            735.876831,
+            1
+          ],
+          [
+            1136.08582,
+            1134.30518,
+            736.0858,
+            1
+          ],
+          [
+            1136.29431,
+            1134.29663,
+            736.2943,
+            1
+          ],
+          [
+            1136.47339,
+            1134.28931,
+            736.4734,
+            1
+          ],
+          [
+            1136.65247,
+            1134.282,
+            736.652466,
+            1
+          ],
+          "... 230 more"
+        ]
+      },
+      "maxMemberSpread": 0,
+      "detachedSamples": 0,
+      "transitionSamples": 0,
+      "routeAtSeam": {
+        "party": "CharacterObject_907_party_1",
+        "position": [
+          1134.49426,
+          1134.37024
+        ],
+        "canonical": true,
+        "atSea": true,
+        "navigationCapability": "All",
+        "desiredNavigation": "Naval",
+        "transitionInProgress": false,
+        "transitionEnd": null,
+        "segments": 2,
+        "pathLength": 75.60955,
+        "seamCrossings": [
+          {
+            "segment": 0,
+            "direction": "east",
+            "from": [
+              1134.49426,
+              1134.37024
+            ],
+            "to": [
+              1200,
+              1131.75
+            ]
+          }
+        ],
+        "longestSegment": 65.55812,
+        "rebases": 1
+      },
+      "leaderBattle": null,
+      "memberRebases": {
+        "CharacterObject_909_party_1": 1,
+        "CharacterObject_910_party_1": 1
+      },
+      "after": [
+        {
+          "party": "CharacterObject_907_party_1",
+          "position": [
+            407.066772,
+            1129.01782
+          ],
+          "face": "CoastalSea",
+          "atSea": true,
+          "domainConsistent": true,
+          "canonical": true
+        },
+        {
+          "party": "CharacterObject_909_party_1",
+          "position": [
+            407.066772,
+            1129.01782
+          ],
+          "face": "CoastalSea",
+          "atSea": true,
+          "domainConsistent": true,
+          "canonical": true
+        },
+        {
+          "party": "CharacterObject_910_party_1",
+          "position": [
+            407.066772,
+            1129.01782
+          ],
+          "face": "CoastalSea",
+          "atSea": true,
+          "domainConsistent": true,
+          "canonical": true
+        }
+      ],
+      "armyStillActive": true,
+      "dispersalReasons": []
+    },
+    "cancellation": {
+      "failures": [],
+      "legs": [
+        {
+          "leg": "player toward the west town, cancelled before the seam",
+          "party": "player_party",
+          "arrived": true,
+          "realSeconds": 21.737550300000066,
+          "campaignDays": 1.090062571762246,
+          "start": [
+            1134.375,
+            1128.125
+          ],
+          "end": [
+            1197.03345,
+            1122.45679
+          ],
+          "traveledPeriodic": 63.0821571,
+          "maxStepPeriodic": 0.1554691344499588,
+          "maxPlanarResidual": 0.155469134,
+          "rebases": 0,
+          "rebaseEvents": [],
+          "nonCanonicalSamples": 0,
+          "maxNonCanonicalRun": 0,
+          "canonicalThroughout": true,
+          "cameraFrameMaxDistance": 32.24141797755063,
+          "track": [
+            [
+              1134.375,
+              1128.125,
+              734.375,
+              0
+            ],
+            [
+              1134.7583,
+              1128.04114,
+              734.7583,
+              0
+            ],
+            [
+              1135.02368,
+              1127.983,
+              735.0237,
+              0
+            ],
+            [
+              1135.28943,
+              1127.9248,
+              735.2894,
+              0
+            ],
+            [
+              1135.55542,
+              1127.86658,
+              735.5554,
+              0
+            ],
+            [
+              1135.82068,
+              1127.80847,
+              735.8207,
+              0
+            ],
+            [
+              1136.04846,
+              1127.75854,
+              736.048462,
+              0
+            ],
+            [
+              1136.31445,
+              1127.70032,
+              736.314453,
+              0
+            ],
+            [
+              1136.54236,
+              1127.65027,
+              736.542358,
+              0
+            ],
+            [
+              1136.793,
+              1127.59534,
+              736.792969,
+              0
+            ],
+            [
+              1137.138,
+              1127.51978,
+              737.137939,
+              0
+            ],
+            [
+              1137.48279,
+              1127.44421,
+              737.4828,
+              0
+            ],
+            "... 186 more"
+          ],
+          "afterHold": {
+            "party": "player_party",
+            "position": [
+              1197.03345,
+              1122.45679
+            ],
+            "face": "Plain",
+            "atSea": false,
+            "domainConsistent": true,
+            "canonical": true
+          },
+          "driftWhileHeld": 0
+        },
+        {
+          "leg": "player back to the east town after cancelled before the seam",
+          "party": "player_party",
+          "arrived": true,
+          "realSeconds": 21.299726400000054,
+          "campaignDays": 1.0649837280070642,
+          "start": [
+            1197.03345,
+            1122.45679
+          ],
+          "end": [
+            1135.40808,
+            1127.09192
+          ],
+          "traveledPeriodic": 62.54394,
+          "maxStepPeriodic": 0.08357110619544983,
+          "maxPlanarResidual": 0.0835711062,
+          "rebases": 0,
+          "rebaseEvents": [],
+          "nonCanonicalSamples": 0,
+          "maxNonCanonicalRun": 0,
+          "canonicalThroughout": true,
+          "cameraFrameMaxDistance": 32.41942008778265,
+          "track": [
+            [
+              1197.03345,
+              1122.45679,
+              797.033447,
+              0
+            ],
+            [
+              1196.67957,
+              1122.47217,
+              796.679565,
+              0
+            ],
+            [
+              1196.3761,
+              1122.48535,
+              796.3761,
+              0
+            ],
+            [
+              1196.02222,
+              1122.50073,
+              796.0222,
+              0
+            ],
+            [
+              1195.71851,
+              1122.51392,
+              795.7185,
+              0
+            ],
+            [
+              1195.36414,
+              1122.5293,
+              795.364136,
+              0
+            ],
+            [
+              1195.01013,
+              1122.54468,
+              795.010132,
+              0
+            ],
+            [
+              1194.65588,
+              1122.56,
+              794.6559,
+              0
+            ],
+            [
+              1194.302,
+              1122.57544,
+              794.302,
+              0
+            ],
+            [
+              1193.99817,
+              1122.58862,
+              793.998169,
+              0
+            ],
+            [
+              1193.64429,
+              1122.604,
+              793.6443,
+              0
+            ],
+            [
+              1193.34,
+              1122.61719,
+              793.339966,
+              0
+            ],
+            "... 183 more"
+          ],
+          "after": {
+            "party": "player_party",
+            "position": [
+              1135.40808,
+              1127.09192
+            ],
+            "face": "Plain",
+            "atSea": false,
+            "domainConsistent": true,
+            "canonical": true
+          }
+        },
+        {
+          "leg": "player toward the west town, cancelled after the seam",
+          "party": "player_party",
+          "arrived": true,
+          "realSeconds": 22.237713600000006,
+          "campaignDays": 1.1149877094867406,
+          "start": [
+            1135.40808,
+            1127.09192
+          ],
+          "end": [
+            401.020477,
+            1122.26733
+          ],
+          "traveledPeriodic": 65.86456,
+          "maxStepPeriodic": 0.1984153389930725,
+          "maxPlanarResidual": 0.198415339,
+          "rebases": 1,
+          "rebaseEvents": [
+            {
+              "fromX": 1200.00085,
+              "toX": 400.000854,
+              "y": 1122.31567,
+              "shift": -800,
+              "pathPoints": 2,
+              "cameraFields": [
+                "_cameraTarget",
+                "_cameraFrame",
+                "<IdealCameraTarget>k__BackingField"
+              ]
+            }
+          ],
+          "nonCanonicalSamples": 0,
+          "maxNonCanonicalRun": 0,
+          "canonicalThroughout": true,
+          "cameraFrameMaxDistance": 32.192644082271535,
+          "track": [
+            [
+              1135.40808,
+              1127.09192,
+              735.4081,
+              0
+            ],
+            [
+              1135.91,
+              1127.00964,
+              735.910034,
+              0
+            ],
+            [
+              1136.2113,
+              1126.96033,
+              736.2113,
+              0
+            ],
+            [
+              1136.51282,
+              1126.91089,
+              736.5128,
+              0
+            ],
+            [
+              1136.86414,
+              1126.85339,
+              736.864136,
+              0
+            ],
+            [
+              1137.216,
+              1126.79578,
+              737.215942,
+              0
+            ],
+            [
+              1137.51746,
+              1126.74646,
+              737.517456,
+              0
+            ],
+            [
+              1137.86853,
+              1126.689,
+              737.8685,
+              0
+            ],
+            [
+              1138.16968,
+              1126.63965,
+              738.1697,
+              0
+            ],
+            [
+              1138.52075,
+              1126.58215,
+              738.520752,
+              0
+            ],
+            [
+              1138.8219,
+              1126.53284,
+              738.8219,
+              0
+            ],
+            [
+              1139.12317,
+              1126.48328,
+              739.123169,
+              0
+            ],
+            "... 193 more"
+          ],
+          "afterHold": {
+            "party": "player_party",
+            "position": [
+              401.020477,
+              1122.26733
+            ],
+            "face": "Plain",
+            "atSea": false,
+            "domainConsistent": true,
+            "canonical": true
+          },
+          "driftWhileHeld": 0
+        },
+        {
+          "leg": "player back to the east town after cancelled after the seam",
+          "party": "player_party",
+          "arrived": true,
+          "realSeconds": 22.433280800000034,
+          "campaignDays": 1.1216546134237433,
+          "start": [
+            401.020477,
+            1122.26733
+          ],
+          "end": [
+            1135.42725,
+            1127.07275
+          ],
+          "traveledPeriodic": 66.50777,
+          "maxStepPeriodic": 0.05388294905424118,
+          "maxPlanarResidual": 0.05388295,
+          "rebases": 1,
+          "rebaseEvents": [
+            {
+              "fromX": 399.949036,
+              "toX": 1199.949,
+              "y": 1122.31348,
+              "shift": 799.999939,
+              "pathPoints": 2,
+              "cameraFields": [
+                "_cameraTarget",
+                "_cameraFrame",
+                "<IdealCameraTarget>k__BackingField"
+              ]
+            }
+          ],
+          "nonCanonicalSamples": 0,
+          "maxNonCanonicalRun": 0,
+          "canonicalThroughout": true,
+          "cameraFrameMaxDistance": 32.42089418697166,
+          "track": [
+            [
+              401.020477,
+              1122.26733,
+              1.02047729,
+              0
+            ],
+            [
+              400.663422,
+              1122.28271,
+              0.663421631,
+              0
+            ],
+            [
+              400.3061,
+              1122.2981,
+              0.3060913,
+              0
+            ],
+            [
+              1199.949,
+              1122.31348,
+              799.949,
+              0
+            ],
+            [
+              1199.64038,
+              1122.32678,
+              799.6404,
+              0
+            ],
+            [
+              1199.28711,
+              1122.342,
+              799.2871,
+              0
+            ],
+            [
+              1198.98108,
+              1122.35522,
+              798.9811,
+              0
+            ],
+            [
+              1198.67456,
+              1122.36841,
+              798.674561,
+              0
+            ],
+            [
+              1198.31787,
+              1122.38379,
+              798.3179,
+              0
+            ],
+            [
+              1198.01208,
+              1122.397,
+              798.0121,
+              0
+            ],
+            [
+              1197.65515,
+              1122.41235,
+              797.655151,
+              0
+            ],
+            [
+              1197.34863,
+              1122.42554,
+              797.348633,
+              0
+            ],
+            "... 194 more"
+          ],
+          "after": {
+            "party": "player_party",
+            "position": [
+              1135.42725,
+              1127.07275
+            ],
+            "face": "Plain",
+            "atSea": false,
+            "domainConsistent": true,
+            "canonical": true
+          }
+        }
+      ]
+    },
+    "ports": {
+      "failures": [],
+      "setup": {
+        "ship": "mnbl_00063042_ruler_1_party_1",
+        "peaceMadeForTheSection": false
+      },
+      "legs": [
+        {
+          "leg": "AI ship east port -> west port (entering)",
+          "party": "mnbl_00063042_ruler_1_party_1",
+          "arrived": true,
+          "realSeconds": 25.07258999999999,
+          "campaignDays": 1.256779259259929,
+          "start": [
+            1134.375,
+            1134.375
+          ],
+          "end": [
+            409.375,
+            1121.875
+          ],
+          "traveledPeriodic": 81.92641,
+          "maxStepPeriodic": 6.279880523681641,
+          "maxPlanarResidual": 6.27988052,
+          "rebases": 1,
+          "rebaseEvents": [
+            {
+              "fromX": 1200.0166,
+              "toX": 400.0166,
+              "y": 1131.74365,
+              "shift": -800,
+              "pathPoints": 2,
+              "cameraFields": null
+            }
+          ],
+          "nonCanonicalSamples": 0,
+          "maxNonCanonicalRun": 0,
+          "canonicalThroughout": true,
+          "track": [
+            [
+              1134.375,
+              1134.375,
+              734.375,
+              1
+            ],
+            [
+              1134.89172,
+              1134.35413,
+              734.8917,
+              1
+            ],
+            [
+              1135.24829,
+              1134.3396,
+              735.2483,
+              1
+            ],
+            [
+              1135.55371,
+              1134.32715,
+              735.5537,
+              1
+            ],
+            [
+              1135.91052,
+              1134.31262,
+              735.9105,
+              1
+            ],
+            [
+              1136.216,
+              1134.30017,
+              736.215942,
+              1
+            ],
+            [
+              1136.5719,
+              1134.28564,
+              736.5719,
+              1
+            ],
+            [
+              1136.87781,
+              1134.27319,
+              736.8778,
+              1
+            ],
+            [
+              1137.23389,
+              1134.25867,
+              737.2339,
+              1
+            ],
+            [
+              1137.53992,
+              1134.24634,
+              737.5399,
+              1
+            ],
+            [
+              1137.84119,
+              1134.23438,
+              737.8412,
+              1
+            ],
+            [
+              1138.19263,
+              1134.22058,
+              738.1926,
+              1
+            ],
+            "... 218 more"
+          ],
+          "entered": true,
+          "routeAtSeam": {
+            "party": "mnbl_00063042_ruler_1_party_1",
+            "position": [
+              1134.57861,
+              1134.36682
+            ],
+            "canonical": true,
+            "atSea": true,
+            "navigationCapability": "All",
+            "desiredNavigation": "Naval",
+            "transitionInProgress": false,
+            "transitionEnd": null,
+            "segments": 2,
+            "pathLength": 75.52513,
+            "seamCrossings": [
+              {
+                "segment": 0,
+                "direction": "east",
+                "from": [
+                  1134.57861,
+                  1134.36682
+                ],
+                "to": [
+                  1200,
+                  1131.75
+                ]
+              }
+            ],
+            "longestSegment": 65.4737,
+            "rebases": 6
+          },
+          "maxStepBeforeEntry": 0.203777477,
+          "entrySnap": "entering moves the party from the port to the settlement (6.25 units)",
+          "after": {
+            "party": "mnbl_00063042_ruler_1_party_1",
+            "position": [
+              409.375,
+              1128.125
+            ],
+            "face": "CoastalSea",
+            "atSea": true,
+            "domainConsistent": true,
+            "canonical": true
+          }
+        },
+        {
+          "leg": "AI ship west port -> east port (entering)",
+          "party": "mnbl_00063042_ruler_1_party_1",
+          "arrived": true,
+          "realSeconds": 24.886517299999923,
+          "campaignDays": 1.2474869733850937,
+          "start": [
+            409.375,
+            1128.125
+          ],
+          "end": [
+            1134.375,
+            1128.125
+          ],
+          "traveledPeriodic": 81.9234543,
+          "maxStepPeriodic": 6.248154640197754,
+          "maxPlanarResidual": 6.24815464,
+          "rebases": 1,
+          "rebaseEvents": [
+            {
+              "fromX": 399.9956,
+              "toX": 1199.99561,
+              "y": 1131.75012,
+              "shift": 800,
+              "pathPoints": 2,
+              "cameraFields": null
+            }
+          ],
+          "nonCanonicalSamples": 0,
+          "maxNonCanonicalRun": 0,
+          "canonicalThroughout": true,
+          "track": [
+            [
+              409.375,
+              1128.125,
+              9.375,
+              1
+            ],
+            [
+              408.886322,
+              1128.314,
+              8.886322,
+              1
+            ],
+            [
+              408.551819,
+              1128.44348,
+              8.551819,
+              1
+            ],
+            [
+              408.2174,
+              1128.57275,
+              8.217407,
+              1
+            ],
+            [
+              407.9305,
+              1128.68372,
+              7.93051147,
+              1
+            ],
+            [
+              407.596039,
+              1128.81287,
+              7.596039,
+              1
+            ],
+            [
+              407.308868,
+              1128.92371,
+              7.30886841,
+              1
+            ],
+            [
+              406.9747,
+              1129.05286,
+              6.974701,
+              1
+            ],
+            [
+              406.688019,
+              1129.1637,
+              6.688019,
+              1
+            ],
+            [
+              406.400818,
+              1129.27478,
+              6.400818,
+              1
+            ],
+            [
+              406.066559,
+              1129.404,
+              6.066559,
+              1
+            ],
+            [
+              405.7797,
+              1129.515,
+              5.7796936,
+              1
+            ],
+            "... 216 more"
+          ],
+          "entered": true,
+          "routeAtSeam": {
+            "party": "mnbl_00063042_ruler_1_party_1",
+            "position": [
+              409.173859,
+              1128.20276
+            ],
+            "canonical": true,
+            "atSea": true,
+            "navigationCapability": "All",
+            "desiredNavigation": "Naval",
+            "transitionInProgress": false,
+            "transitionEnd": null,
+            "segments": 2,
+            "pathLength": 75.51327,
+            "seamCrossings": [
+              {
+                "segment": 1,
+                "direction": "west",
+                "from": [
+                  400,
+                  1131.75
+                ],
+                "to": [
+                  334.375,
+                  1134.375
+                ]
+              }
+            ],
+            "longestSegment": 65.67748,
+            "rebases": 7
+          },
+          "maxStepBeforeEntry": 0.2156485,
+          "entrySnap": "entering moves the party from the port to the settlement (6.25 units)",
+          "after": {
+            "party": "mnbl_00063042_ruler_1_party_1",
+            "position": [
+              1134.375,
+              1134.375
+            ],
+            "face": "CoastalSea",
+            "atSea": true,
+            "domainConsistent": true,
+            "canonical": true
+          }
+        }
+      ]
+    },
+    "circumnavigation": {
+      "failures": [],
+      "legs": [
+        {
+          "leg": "east leg 1",
+          "party": "mnbl_00063042_ruler_2_party_1",
+          "targetX": 550,
+          "routeCost": 250.406876,
+          "arrived": true,
+          "realSeconds": 78.81354429999988,
+          "campaignDays": 3.943844196750433,
+          "start": [
+            1100,
+            1156.25
+          ],
+          "end": [
+            547.5006,
+            1156.25
+          ],
+          "traveledPeriodic": 247.50061,
+          "maxStepPeriodic": 0.2147216796875,
+          "maxPlanarResidual": 0.21472168,
+          "rebases": 1,
+          "rebaseEvents": [
+            {
+              "fromX": 1200.05017,
+              "toX": 400.050171,
+              "y": 1156.25,
+              "shift": -800,
+              "pathPoints": 1,
+              "cameraFields": null
+            }
+          ],
+          "nonCanonicalSamples": 0,
+          "maxNonCanonicalRun": 0,
+          "canonicalThroughout": true,
+          "track": [
+            [
+              1100,
+              1156.25,
+              700,
+              1
+            ],
+            [
+              1100.56287,
+              1156.25,
+              700.562866,
+              1
+            ],
+            [
+              1100.92834,
+              1156.25,
+              700.928345,
+              1
+            ],
+            [
+              1101.29382,
+              1156.25,
+              701.2938,
+              1
+            ],
+            [
+              1101.65955,
+              1156.25,
+              701.659546,
+              1
+            ],
+            [
+              1102.02478,
+              1156.25,
+              702.0248,
+              1
+            ],
+            [
+              1102.3385,
+              1156.25,
+              702.3385,
+              1
+            ],
+            [
+              1102.65173,
+              1156.25,
+              702.651733,
+              1
+            ],
+            [
+              1103.01685,
+              1156.25,
+              703.016846,
+              1
+            ],
+            [
+              1103.3302,
+              1156.25,
+              703.3302,
+              1
+            ],
+            [
+              1103.69556,
+              1156.25,
+              703.695557,
+              1
+            ],
+            [
+              1104.00928,
+              1156.25,
+              704.0093,
+              1
+            ],
+            "... 708 more"
+          ],
+          "logicalAdvanceEast": 247.50061
+        },
+        {
+          "leg": "east leg 2",
+          "party": "mnbl_00063042_ruler_2_party_1",
+          "targetX": 800,
+          "routeCost": 252.906265,
+          "arrived": true,
+          "realSeconds": 79.46989179999991,
+          "campaignDays": 3.9766103321890114,
+          "start": [
+            547.5006,
+            1156.25
+          ],
+          "end": [
+            797.5235,
+            1156.25
+          ],
+          "traveledPeriodic": 250.022888,
+          "maxStepPeriodic": 0.206787109375,
+          "maxPlanarResidual": 0.206787109,
+          "rebases": 0,
+          "rebaseEvents": [],
+          "nonCanonicalSamples": 0,
+          "maxNonCanonicalRun": 0,
+          "canonicalThroughout": true,
+          "track": [
+            [
+              547.5006,
+              1156.25,
+              147.50061,
+              1
+            ],
+            [
+              548.0238,
+              1156.25,
+              148.0238,
+              1
+            ],
+            [
+              548.338,
+              1156.25,
+              148.338013,
+              1
+            ],
+            [
+              548.6524,
+              1156.25,
+              148.6524,
+              1
+            ],
+            [
+              549.0183,
+              1156.25,
+              149.018311,
+              1
+            ],
+            [
+              549.3331,
+              1156.25,
+              149.33313,
+              1
+            ],
+            [
+              549.698853,
+              1156.25,
+              149.698853,
+              1
+            ],
+            [
+              550.0134,
+              1156.25,
+              150.013428,
+              1
+            ],
+            [
+              550.3794,
+              1156.25,
+              150.3794,
+              1
+            ],
+            [
+              550.6937,
+              1156.25,
+              150.693726,
+              1
+            ],
+            [
+              551.0083,
+              1156.25,
+              151.0083,
+              1
+            ],
+            [
+              551.37384,
+              1156.25,
+              151.37384,
+              1
+            ],
+            "... 715 more"
+          ],
+          "logicalAdvanceEast": 250.022888
+        },
+        {
+          "leg": "east leg 3",
+          "party": "mnbl_00063042_ruler_2_party_1",
+          "targetX": 1050,
+          "routeCost": 252.4765,
+          "arrived": true,
+          "realSeconds": 79.55000449999989,
+          "campaignDays": 3.9806884178105975,
+          "start": [
+            797.5235,
+            1156.25
+          ],
+          "end": [
+            1047.541,
+            1156.54431
+          ],
+          "traveledPeriodic": 250.591248,
+          "maxStepPeriodic": 0.20973925292491913,
+          "maxPlanarResidual": 0.209739253,
+          "rebases": 0,
+          "rebaseEvents": [],
+          "nonCanonicalSamples": 0,
+          "maxNonCanonicalRun": 0,
+          "canonicalThroughout": true,
+          "track": [
+            [
+              797.5235,
+              1156.25,
+              397.5235,
+              1
+            ],
+            [
+              798.041565,
+              1156.27893,
+              398.041565,
+              1
+            ],
+            [
+              798.4092,
+              1156.29944,
+              398.40918,
+              1
+            ],
+            [
+              798.776367,
+              1156.32,
+              398.776367,
+              1
+            ],
+            [
+              799.091553,
+              1156.33752,
+              399.091553,
+              1
+            ],
+            [
+              799.4067,
+              1156.3551,
+              399.406677,
+              1
+            ],
+            [
+              799.721741,
+              1156.37268,
+              399.721741,
+              1
+            ],
+            [
+              800.0887,
+              1156.39319,
+              400.088684,
+              1
+            ],
+            [
+              800.456238,
+              1156.4137,
+              400.456238,
+              1
+            ],
+            [
+              800.823669,
+              1156.4342,
+              400.823669,
+              1
+            ],
+            [
+              801.1388,
+              1156.45178,
+              401.1388,
+              1
+            ],
+            [
+              801.506,
+              1156.47229,
+              401.505981,
+              1
+            ],
+            "... 716 more"
+          ],
+          "logicalAdvanceEast": 250.017517
+        },
+        {
+          "leg": "east leg 4",
+          "party": "mnbl_00063042_ruler_2_party_1",
+          "targetX": 500,
+          "routeCost": 252.866028,
+          "arrived": true,
+          "realSeconds": 79.3011317999999,
+          "campaignDays": 3.9682330868090503,
+          "start": [
+            1047.541,
+            1156.54431
+          ],
+          "end": [
+            497.534515,
+            1156.25293
+          ],
+          "traveledPeriodic": 249.993515,
+          "maxStepPeriodic": 0.20874038338661194,
+          "maxPlanarResidual": 0.208740383,
+          "rebases": 1,
+          "rebaseEvents": [
+            {
+              "fromX": 1200.01367,
+              "toX": 400.013672,
+              "y": 1156.36633,
+              "shift": -800,
+              "pathPoints": 1,
+              "cameraFields": null
+            }
+          ],
+          "nonCanonicalSamples": 0,
+          "maxNonCanonicalRun": 0,
+          "canonicalThroughout": true,
+          "track": [
+            [
+              1047.541,
+              1156.54431,
+              647.541,
+              1
+            ],
+            [
+              1048.05981,
+              1156.5437,
+              648.0598,
+              1
+            ],
+            [
+              1048.4248,
+              1156.54346,
+              648.4248,
+              1
+            ],
+            [
+              1048.738,
+              1156.54321,
+              648.738037,
+              1
+            ],
+            [
+              1049.10376,
+              1156.54285,
+              649.10376,
+              1
+            ],
+            [
+              1049.4165,
+              1156.54285,
+              649.4165,
+              1
+            ],
+            [
+              1049.73,
+              1156.54248,
+              649.73,
+              1
+            ],
+            [
+              1050.04333,
+              1156.54211,
+              650.043335,
+              1
+            ],
+            [
+              1050.40991,
+              1156.54175,
+              650.4099,
+              1
+            ],
+            [
+              1050.725,
+              1156.54126,
+              650.725,
+              1
+            ],
+            [
+              1051.09253,
+              1156.54065,
+              651.0925,
+              1
+            ],
+            [
+              1051.46008,
+              1156.54,
+              651.4601,
+              1
+            ],
+            "... 713 more"
+          ],
+          "logicalAdvanceEast": 249.9935
+        }
+      ],
+      "transitionSamples": 0,
+      "seaRowY": 1156.25,
+      "crossings": 2,
+      "traveled": 998.1083,
+      "eastwardLogicalAdvance": 997.534546,
+      "campaignHours": 380.86502480553463,
+      "after": {
+        "party": "mnbl_00063042_ruler_2_party_1",
+        "position": [
+          497.534515,
+          1156.25293
+        ],
+        "face": "CoastalSea",
+        "atSea": true,
+        "domainConsistent": true,
+        "canonical": true
+      },
+      "routeCostAfterCrossings": {
+        "to": "mnbl_00063042_town_1 (port)",
+        "afterCrossings": 165.026657,
+        "freshState": 165.026657,
+        "faceAfter": 94878,
+        "faceFresh": 94878,
+        "fromPortBack": 165.026657
+      }
+    },
+    "createdLords": [
+      "CharacterObject_906_party_1",
+      "CharacterObject_907_party_1",
+      "CharacterObject_908_party_1",
+      "CharacterObject_909_party_1",
+      "CharacterObject_910_party_1"
+    ],
+    "provisionedGrain": {
+      "player_party": 300,
+      "CharacterObject_906_party_1": 300,
+      "CharacterObject_907_party_1": 900,
+      "CharacterObject_908_party_1": 300,
+      "CharacterObject_909_party_1": 900,
+      "CharacterObject_910_party_1": 300
+    },
+    "counters": {
+      "gridImagePasses": 15,
+      "locatorImagePasses": 48040,
+      "rebases": 173,
+      "canonicalPlacements": 97
+    },
+    "nonCanonicalPartiesAtEnd": []
+  },
+  "wrapRegression": {
+    "checks": {
+      "settlementsCanonical": true,
+      "displayCopiesWithoutIdentity": true,
+      "landRoutesShortThroughSeam": true,
+      "seaRoutesShortThroughSeam": true,
+      "distanceModelPeriodic": true,
+      "tieDeterministic": true,
+      "allTravelLegsRun": true,
+      "travelLegsCrossShort": true,
+      "partyDistancesPeriodic": true,
+      "locatorFindsAcrossSeam": true,
+      "interactionRangeAcrossSeam": true,
+      "visibleAcrossSeam": true,
+      "engineEncounterAcrossSeam": true,
+      "mapEventAtParties": true,
+      "encounterDirectionPeriodic": true,
+      "battleEnteredAndReturned": true,
+      "stripClickStoresCanonical": true,
+      "stripClickTravelsShort": true,
+      "cameraFollowsAcrossSeam": true,
+      "saveNearSeamCanonical": true,
+      "patchesApplied": true,
+      "noNonCanonicalPartiesAtEnd": true,
+      "noFailures": true
+    },
+    "passed": true,
+    "failures": [],
+    "patches": 20,
+    "expectedPatches": 20
+  },
+  "failures": {
+    "movement": [],
+    "wrap": [],
+    "offline": 0
+  }
+}

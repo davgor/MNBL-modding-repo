@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "status": "passed-isolated-native-element-callback-integration",
+  "createdAtUtc": "2026-10-17T18:21:15.009015+00:00",
+  "sources": {
+    "src/MNBL.AgentStorage/NativeElementFactory.hpp": "50a28d26a76edc95b5e059b4e036c936cddd8679b10719215b7b4201e146420d",
+    "src/MNBL.AgentStorage/AgentDomainStorage.hpp": "c5d9ee96a5109438fdfff03287ee8f8a32130835212afef47f2b2044638b5274",
+    "src/MNBL.AgentStorage/StableAgentStorage.hpp": "34555749bbfdf9ad318a02aea660f36cfe57ee9183e856df48c216ebf8503458",
+    "tests/AgentStorage/native_element_factory_tests.cpp": "088e66be2b293a26cbe0a636c34eb5861df6cb9a807a4a39763ccfe4a3828a2d",
+    "tools/battle-scale/prepare_native_element_harness.py": "f56d45f49d6848f5daccada2c1f9cb20d7f6cd7e2760c96e513acddb68fff61a",
+    "tools/battle-scale/Test-NativeElementFactory.cmd": "c556b34d56440de86662983c4400118e852cabade42b0876a939ee1e3effdd0c",
+    "tools/battle-scale/verify_native_element_factory.py": "835ca9410c986fe96902db80fc1bae10c44df6a209035dd11d133de2c62a6483",
+    "evidence/engine-extension/native-live-pool-growth-contract.json": "c99ca69958b3ed9d316510e53c1d7c04adf4d4e6aa73275e81382c7ce09f5363"
+  },
+  "outputs": {
+    "build/agent-storage/native_element_factory_tests.exe": "f36808f8b1a605d061fea0efc4195cf5a9a49e32c5fbc65f88d851ce475caf32",
+    "build/agent-storage/native_element_factory_asan.exe": "da1763e8ea097282714bcfffd937aacd96ce83e02122190d43e48cc911440ea7",
+    "build/agent-storage/native_element_machine_code.hpp": "75c5a69d27cbd706cc93fa50b5dec8f268caa51007aef75bb6e47c1c958ba9ae",
+    "evidence/engine-extension/native-element-companion-replay.json": "fa777eb1264f4202aba932bbabe1d156effa4ccf1fa30f43f307b48b7332be98"
+  },
+  "exitCode": 0,
+  "stdout": "{\"companionCases\": 4, \"originalInstructions\": 107, \"mappedPages\": 8}\nnative_element_factory_tests.cpp\nPASS native element factory: original companion initializers;2 poison patterns;2040->4080->6120;75 failure positions;partial constructor cleanup;5 invalid bindings;stable addresses;teardown. Agent ctor/dtor synthetic.\nnative_element_factory_tests.cpp\nPASS native element factory: original companion initializers;2 poison patterns;2040->4080->6120;75 failure positions;partial constructor cleanup;5 invalid bindings;stable addresses;teardown. Agent ctor/dtor synthetic.\n",
+  "stderr": "",
+  "checks": [
+    "Original230 and2c8 constructor bytes execute in isolated Windows process with original read-only constants and wrapper unwind metadata.",
+    "Both optimized and ASAN builds pass full-byte companion comparison for two poison patterns, including fields intentionally untouched by native initialization.",
+    "Stable five-pool growth2040->4080->6120 executes per-destination constructors and inactive header writes.",
+    "All75 constructor failure positions in three appended blocks retain earlier capacity and addresses; retry succeeds and completed Agent test objects are destroyed exactly once in reverse order.",
+    "Partially constructed Agent test object cleans its own resource and is not destroyed again by storage.",
+    "All five missing binding/owner cases are rejected. Alignment is16 for Agent/230 and8 for each2c8 record."
+  ],
+  "limitations": [
+    "Main Agent constructor/destructor are synthetic test functions, not live Bannerlord objects.",
+    "Caller must supply verified initialized native bindings and retain factory/runtime owner through every storage lease.",
+    "Production module binding, native allocator/reset metadata, active removal and whole-engine lifetime barrier remain incomplete.",
+    "ASAN instruments the C++ harness, not copied native machine instructions; the separate emulation validates their bounded writes.",
+    "No game launch, installed-file change or patch approval."
+  ],
+  "gameLaunched": false,
+  "enginePatchApproved": false
+}
