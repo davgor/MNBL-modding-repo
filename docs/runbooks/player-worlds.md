@@ -51,7 +51,8 @@ The tests start the game with a module list directly, so the launcher itself was
   - The generator now repairs towns it cannot place or reach (moving them, carving a pass, or giving an island town a coast port) instead of rejecting the whole world. Of seeds 42 to 73, 19 of 32 give a world at the first attempt, and each of those 19 passed the activation's checks offline. A seed gets three attempts, the later ones from seeds derived from it.
   - In the game, **seeds 42 and 73 were played end to end**: generation, the campaign, land and sea play and saves.
   - **Seed 43 generates and starts a campaign** (2026-10-19). Before that day's fixes its world was refused after generation: the in-game navigation check judged one sea route too far out of its way, and a check at the wrap-around edge of the map was left unanswered.
-  - **Seeds 56 and 67 were refused** in the game after generation: a port lay slightly too far from its town's gate (2026-10-19, open). The offline checks don't cover this yet. When a world is refused, the game shows the error with its code and an offer to generate again; nothing is left behind.
+  - **Seeds 56 and 67 generate and start a campaign** (2026-10-19). Before that day's fix they were refused after generation: a port lay slightly too far from its town's gate. A port town's gate now turns toward its port when it has to.
+  - When a world is refused, the game shows the error with its code and an offer to generate again; nothing is left behind.
   - When every attempt fails, the game shows "No playable world for this seed", with an offer to try another.
 
 ## The world you get

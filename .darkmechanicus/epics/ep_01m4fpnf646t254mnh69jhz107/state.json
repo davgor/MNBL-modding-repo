@@ -4,17 +4,58 @@
     "repository": null,
     "startCommit": "b844ceafcd5a718c9550179b78c0bbaab723e82d"
   },
-  "completedAt": null,
+  "completedAt": "2026-10-19T23:45:33.651Z",
   "createdAt": "2026-10-09T06:47:31.268Z",
   "epicId": "ep_01m4fpnf646t254mnh69jhz107",
   "format": "darkmechanicus.epic-state",
   "formatVersion": 1,
-  "generation": 113,
-  "outcome": null,
+  "generation": 115,
+  "outcome": {
+    "recordedAt": "2026-10-19T23:45:33.651Z",
+    "runId": "rn_01m4h4jk5wssr7x79xjmrp8ypg",
+    "successCriteria": [
+      {
+        "criterionId": "s1",
+        "met": true,
+        "note": "fwg.exe 564c2629 from FWGC++ ec5d1c10, Bannerlord v1.4.8.119303 and War Sails v1.2.8.119303 are pinned and verified, and the Modding Kit is identified. Any other generator binary is refused before launch. The UCRT pin was renewed after the Windows update replaced ucrtbase.dll; the producer contract's preflight passes again, and no world content id changed."
+      },
+      {
+        "criterionId": "s2",
+        "met": true,
+        "note": "Owner's judgement asked. New Procedural Campaign generates a chosen-seed world inside the running game, with progress, cancel, errors, preview and Start Campaign; no editor, publishing or restart. Offline, 19 of seeds 42-73 are accepted at one attempt and all 19 pass the activation's checks; a request gets 3 attempts. In game, seeds 42 and 73 were played. Seed 43's world was refused at runtime navigation (one sea route 1.29 x the mesh's shortest path) with its error code and a Generate-again action. Not every seed plays."
+      },
+      {
+        "criterionId": "s3",
+        "met": true,
+        "note": "Owner's judgement asked. A flat map wrapping east to west, used consistently by terrain, routes, distances (105 audited methods transpiled periodic), encounters, camera/picking and saves:\n- seam land travel, pursuit and fleets with save and load on A;\n- camera, picking, tracks, town menu and the wrap budget on B;\n- sailing and a pirate encounter across the seam.\nA and B differ in geography and routes and both play. Three presentation limits remain near the cut: the hero behaviour text, siege machines drawn on the settlement's side only, and routes that leave the terrain."
+      },
+      {
+        "criterionId": "s4",
+        "met": true,
+        "note": "Generated towns, villages, castles, factions, clans and heroes form a coherent Sandbox campaign with no Calradia objects:\n- trade, recruitment, ownership and wars (soak);\n- 14/14 land mission cases on A and B, each returning to the same world.\nB initializes in game, and all 19 offline-accepted worlds pass the activation's managed stages."
+      },
+      {
+        "criterionId": "s5",
+        "met": true,
+        "note": "The final naval run passes 117/117 checks and 15/15 cases: ports, shipyard, fleets, embarking, port and island voyages, drop-off and coastal landing, blockade and anchor, pirate battles (one across the seam), a seaborne raid and defeat. Navigation caches are built once per world and reused by every load. Fleets survive save and cold load. Boarding, ship damage, battles fought to the end and blockade battles are listed as not exercised."
+      },
+      {
+        "criterionId": "s6",
+        "met": true,
+        "note": "Two production campaigns, A (f596b58c) and B (f63c6841), are saved, alternately loaded in one process and after a cold restart, and resumed equal to their saves (matrix 38/38 and 20/20), with no cross-world callbacks. Torn, missing-world, other-build, incompatible-schema and missing-DLC saves, a corrupted manifest and an isolated damaged copy of the world data are all refused before simulation."
+      },
+      {
+        "criterionId": "s7",
+        "met": true,
+        "note": "The clean local package e20f2667 completes the one-shot scenario. It records the build, package, world, save and request identities, the results, timings and limitations (evidence/one-shot/one-shot-run.json, docs/one-shot-acceptance.md). The failures that day's earlier runs observed were fixed before the final run and are recorded there. Clean install passes 27/27 and the offline suites 46/46."
+      }
+    ],
+    "summary": "The epic delivers an in-game procedural campaign system for Bannerlord with War Sails. From New Campaign the player chooses a seed and generates a world inside the running game, with progress, cancel and errors. The world becomes a Sandbox campaign with its own terrain, settlements, kingdoms, clans, heroes, economy and land and sea routes, on a flat map that wraps east to west. Saves stay bound to their world and are refused safely when the world is missing or mismatched.\n\nThe final one-shot acceptance passes on the clean local package e20f2667 with two production worlds, A (seed 42) and B (seed 73). The clean-install lifecycle passes 27/27 and the offline suites 46/46.\n\nTwo criteria rest on the owner's judgement, stated in their notes:\n- s2: chosen seeds generally play, not every one. Seed 43 is refused at runtime navigation with a clean error.\n- s3: three presentation limits remain near the cut.\n\nBroad seed certification, long soaks and performance targets are deferred, as the epic allows. The package is a local test package, not release-certified."
+  },
   "provenance": null,
-  "status": "in_progress",
+  "status": "completed",
   "ticketStatuses": {
-    "tk_01m4fpnf64s6r96g13ymz26760": "in_progress",
+    "tk_01m4fpnf64s6r96g13ymz26760": "completed",
     "tk_01m4fqfbgj0dw7e2xyf0gp4jz7": "backlog",
     "tk_01m4fqfbgj79dd1nx4zpqpmmpn": "backlog",
     "tk_01m4fqfbgjj1xcrgj9awyfgbqg": "backlog",
@@ -82,5 +123,5 @@
     "tk_01m4fr2f4ketqh6dd1jd7yt95j": "completed"
   },
   "title": "FWGC++ procedural Bannerlord campaigns with War Sails",
-  "updatedAt": "2026-10-18T17:49:15.329Z"
+  "updatedAt": "2026-10-19T23:45:33.701Z"
 }

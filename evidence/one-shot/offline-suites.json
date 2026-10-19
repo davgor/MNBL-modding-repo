@@ -2,8 +2,8 @@
     "schema":  "mnbl.offline-suites",
     "version":  1,
     "ticket":  "MMR-1",
-    "utc":  "2026-10-19T12:53:44.8099233Z",
-    "commit":  "7c56032ce44924dd5c3e593c33e00b93b6ba1fb7",
+    "utc":  "2026-10-19T22:25:10.9014302Z",
+    "commit":  "6d34cef12aed416550732885abec19ff539fe76b",
     "bundles":  {
                     "A":  "f596b58cdcfc18798542fdef5a4d9c9f6d84abddca1425af8d0b87f521191d2d",
                     "B":  "f63c6841085725e2c437b7d5d087a52cf4dc7d5d8fe3e2d583d46cba6a775550"
@@ -18,7 +18,7 @@
                                         "command":  "powershell.exe -NoProfile -ExecutionPolicy Bypass -File <user>\\Documents\\GitHub\\MNBL-modding-repo\\tools\\Test-ApiPins.ps1 -VerifyBuild",
                                         "exitCode":  0,
                                         "passed":  true,
-                                        "seconds":  0.9,
+                                        "seconds":  4.1,
                                         "lastLines":  [
                                                           "PASS: exact runtime API pins verified (31 files)"
                                                       ]
@@ -27,24 +27,24 @@
                                            "command":  "powershell.exe -NoProfile -ExecutionPolicy Bypass -File <user>\\Documents\\GitHub\\MNBL-modding-repo\\tools\\Test-Activation.ps1",
                                            "exitCode":  0,
                                            "passed":  true,
-                                           "seconds":  3.3,
+                                           "seconds":  3.4,
                                            "lastLines":  [
                                                              "ok    activation after quarantine: the receipt is the v1 contract, verifies against its runtime-derived record and is rebuilt byte for byte from the journal",
                                                              "ok    receipt: a receipt whose runtime-derived record was altered does not verify",
                                                              "240/240 checks passed",
-                                                             "Activation harness receipt: <user>\\Documents\\GitHub\\MNBL-modding-repo\\build\\research-activation45\\test-36c06f65489444ccbde4c4283365b026/receipt.json"
+                                                             "Activation harness receipt: <user>\\Documents\\GitHub\\MNBL-modding-repo\\build\\research-activation45\\test-27687684f22548a69d53fda40c57ce53/receipt.json"
                                                          ]
                                        },
                    "Test-GenerationJob":  {
                                               "command":  "powershell.exe -NoProfile -ExecutionPolicy Bypass -File <user>\\Documents\\GitHub\\MNBL-modding-repo\\tools\\Test-GenerationJob.ps1",
                                               "exitCode":  0,
                                               "passed":  true,
-                                              "seconds":  4,
+                                              "seconds":  4.1,
                                               "lastLines":  [
                                                                 "19/19 checks passed",
                                                                 "ok    worldbridge --new-request --seed-source: --seed 7 alone is explicit, --seed-source random records random, explicit stays explicit; --seed-source with --random, or any other value, is refused (explicitDefault exit 0 explicit; random exit 0 random; explicit exit 0 explicit; randomWithRandom exit 2 ; unknown exit 2 )",
                                                                 "ok    every job input the production stages write is embedded from the repository file at the path the job writes it to, keeping the layout policies resolve their calibration receipts in (14: producer.lock.json, producer-seed-width.json, source-compatibility.json, product-policy.json, world-quality.json, projection.json, terrain-materials.json, campaign-content.json, culture-presentations.json, playability.json, terrain-import.json, axis-sea-datum-calibration.json, naval-transitions.json, runtime-api-lock.json)",
-                                                                "Generation job harness receipt: <user>\\Documents\\GitHub\\MNBL-modding-repo\\build\\research-job44\\test-9191633831e44035a16649fb97d56682/receipt.json"
+                                                                "Generation job harness receipt: <user>\\Documents\\GitHub\\MNBL-modding-repo\\build\\research-job44\\test-ef4ce02a18bf4e67bba1ee6abe1db7a4/receipt.json"
                                                             ]
                                           },
                    "Test-EarlyBinding":  {
@@ -56,7 +56,7 @@
                                                                "ok    save check: game data that does not inflate is refused",
                                                                "ok    save check: a file it cannot read (held without sharing) is unchecked, never torn",
                                                                "58/58 checks passed",
-                                                               "Early binding harness receipt: <user>\\Documents\\GitHub\\MNBL-modding-repo\\build\\research-binding62\\test-b17a9f65f9ac4de3bbe307170d27b6a1/receipt.json"
+                                                               "Early binding harness receipt: <user>\\Documents\\GitHub\\MNBL-modding-repo\\build\\research-binding62\\test-75e4f5548002495782de55d653fc1f26/receipt.json"
                                                            ]
                                          },
                    "Test-SaveBinding":  {
@@ -68,7 +68,7 @@
                                                               "ok    a crash mid-import leaves staging the startup cleanup removes and a temporary save file the next import removes; the import then completes",
                                                               "ok    c2/c3 (regression guard): the source\u0027s immutable content is unchanged throughout, and the target holds it byte for byte",
                                                               "77/77 checks passed",
-                                                              "Save binding harness receipt: <user>\\Documents\\GitHub\\MNBL-modding-repo\\build\\save-binding48\\test-19453473385f454c852e7bb6e0520fb2/receipt.json"
+                                                              "Save binding harness receipt: <user>\\Documents\\GitHub\\MNBL-modding-repo\\build\\save-binding48\\test-3fe7f0f886214970b110cf6075831503/receipt.json"
                                                           ]
                                         },
                    "Test-WorldLoader":  {
@@ -80,7 +80,7 @@
                                                               "ok    lifetime scope: tracking a name again replaces it",
                                                               "ok    lifetime scope: a tracked static needs a name and a count",
                                                               "42/42 checks passed",
-                                                              "World loader harness receipt: <user>\\Documents\\GitHub\\MNBL-modding-repo\\build\\world-loader49\\test-c3d2de12b5a743e196a9ddf2f546d1b4/receipt.json"
+                                                              "World loader harness receipt: <user>\\Documents\\GitHub\\MNBL-modding-repo\\build\\world-loader49\\test-446eecbaf19a44c7ab4c2e38ddb1605c/receipt.json"
                                                           ]
                                         },
                    "Test-AutorunCleanup":  {
@@ -92,7 +92,7 @@
                                                                  "PASS natural-completion-finished-work -\u003e ok",
                                                                  "PASS iterator-exception-cleanup -\u003e error",
                                                                  "PASS 128 assertions; actual host/context sources, managed doubles only.",
-                                                                 "Managed cleanup evidence: <user>\\Documents\\GitHub\\MNBL-modding-repo\\build\\research-cleanup15\\run-217d0115724f4bd0bae4370f368d7aea"
+                                                                 "Managed cleanup evidence: <user>\\Documents\\GitHub\\MNBL-modding-repo\\build\\research-cleanup15\\run-1f3f7b394f2a4d608de68f3ec87ccc05"
                                                              ]
                                            },
                    "Test-Heightfield":  {
@@ -110,17 +110,17 @@
                                                          "passed":  true,
                                                          "seconds":  1.5,
                                                          "lastLines":  [
-                                                                           "src\\MNBL.ProceduralWorld\\Campaign\\VillageBinding.cs(63,120): info CS9236: Compiling requires binding the lambda expression at least 100 times. Consider declaring the lambda expression with explicit parameter types, or if the containing method call is generic, consider using explicit type arguments.",
+                                                                           "src\\MNBL.ProceduralWorld\\Campaign\\GeneratedCampaignInitializer.cs(126,102): info CS9236: Compiling requires binding the lambda expression at least 100 times. Consider declaring the lambda expression with explicit parameter types, or if the containing method call is generic, consider using explicit type arguments.",
                                                                            "src\\MNBL.ProceduralWorld\\Campaign\\SettlementFactory.cs(619,93): info CS9236: Compiling requires binding the lambda expression at least 100 times. Consider declaring the lambda expression with explicit parameter types, or if the containing method call is generic, consider using explicit type arguments.",
                                                                            "PASS 60 managed dataset checks; no registry/native code executed.",
-                                                                           "Dataset harness receipt: <user>\\Documents\\GitHub\\MNBL-modding-repo\\build\\research-bootstrap18\\test-41f35189551b4f2584b0c1ff9053c5e8/receipt.json"
+                                                                           "Dataset harness receipt: <user>\\Documents\\GitHub\\MNBL-modding-repo\\build\\research-bootstrap18\\test-43e6683b068240efb91b84996a71071f/receipt.json"
                                                                        ]
                                                      },
                    "Test-Doctor":  {
                                        "command":  "powershell.exe -NoProfile -ExecutionPolicy Bypass -File <user>\\Documents\\GitHub\\MNBL-modding-repo\\tools\\Test-Doctor.ps1",
                                        "exitCode":  0,
                                        "passed":  true,
-                                       "seconds":  0.9,
+                                       "seconds":  1,
                                        "lastLines":  [
                                                          "PASS: incomplete Steam download and missing NavalDLC rejected with exact paths.",
                                                          "PASS: missing, unknown, actual DLC association, unrelated/numeric-ID false positives, pending/invalid depot, standalone manifest, malformed manifest; runtime never claimed."
@@ -130,36 +130,36 @@
                                            "command":  "powershell.exe -NoProfile -ExecutionPolicy Bypass -File <user>\\Documents\\GitHub\\MNBL-modding-repo\\tools\\Test-Deployment.ps1",
                                            "exitCode":  0,
                                            "passed":  true,
-                                           "seconds":  7.9,
+                                           "seconds":  7.3,
                                            "lastLines":  [
                                                              "PASS: missing resolved compiler reference refused",
                                                              "PASS: junction destination refused before copy",
                                                              "PASS: installed API and official descriptors unchanged",
-                                                             "Fixture retained for inspection: <user>\\AppData\\Local\\Temp\\mnbl-deploy-test-487f14ceebd64e2fbcb0625ee6449a7d"
+                                                             "Fixture retained for inspection: <user>\\AppData\\Local\\Temp\\mnbl-deploy-test-7d2ea941f3544f588029ccd8a915b0dc"
                                                          ]
                                        },
                    "Test-CampaignRegistry":  {
                                                  "command":  "powershell.exe -NoProfile -ExecutionPolicy Bypass -File <user>\\Documents\\GitHub\\MNBL-modding-repo\\tools\\Test-CampaignRegistry.ps1 -Bundle build/research-bundle29/bundles/f596b58cdcfc18798542fdef5a4d9c9f6d84abddca1425af8d0b87f521191d2d",
                                                  "exitCode":  0,
                                                  "passed":  true,
-                                                 "seconds":  1.2,
+                                                 "seconds":  4,
                                                  "lastLines":  [
                                                                    "ok    a repeated compiler record is a duplicate identity",
                                                                    "ok    a record whose town is missing has an unresolved world reference",
                                                                    "59/59 checks passed",
-                                                                   "Registry harness receipt: <user>\\Documents\\GitHub\\MNBL-modding-repo\\build\\research-registry30\\test-6cee77eaeab343f2ab1c4523a9b6f094/receipt.json"
+                                                                   "Registry harness receipt: <user>\\Documents\\GitHub\\MNBL-modding-repo\\build\\research-registry30\\test-2043aba9bf764202b0fd790648258ce4/receipt.json"
                                                                ]
                                              },
                    "Test-Characters":  {
                                            "command":  "powershell.exe -NoProfile -ExecutionPolicy Bypass -File <user>\\Documents\\GitHub\\MNBL-modding-repo\\tools\\Test-Characters.ps1 -Bundle build/research-bundle29/bundles/f596b58cdcfc18798542fdef5a4d9c9f6d84abddca1425af8d0b87f521191d2d",
                                            "exitCode":  0,
                                            "passed":  true,
-                                           "seconds":  8.9,
+                                           "seconds":  9.1,
                                            "lastLines":  [
                                                              "ok    the roster policy\u0027s engine numbers were read from the TaleWorlds.CampaignSystem assembly config/runtime-api-lock.json pins (1f8e33e2ed73), which Build.ps1 verifies against the installed game",
                                                              "ok    the world presents through exactly the 7 character-creation cultures, and each has player, mother and father creation equipment rosters and a creation body property",
                                                              "19/19 checks passed",
-                                                             "Character harness receipt: <user>\\Documents\\GitHub\\MNBL-modding-repo\\build\\research-heroes32\\test-84fc3ae673df4719881f11d0d478ea19/receipt.json"
+                                                             "Character harness receipt: <user>\\Documents\\GitHub\\MNBL-modding-repo\\build\\research-heroes32\\test-56ec619e2f484e48b3da838d56a0a19b/receipt.json"
                                                          ]
                                        },
                    "Test-Factions":  {
@@ -171,7 +171,7 @@
                                                            "ok    a realm with no town is dissolved with all 1 of its lords unaffiliated and its castles and clan recorded for C03/C04 (or refused under the refuse policy); no other banner changes",
                                                            "ok    a kingdom whose ruler is not in the compiler graph is refused",
                                                            "29/29 checks passed",
-                                                           "Faction harness receipt: <user>\\Documents\\GitHub\\MNBL-modding-repo\\build\\research-factions31\\test-e104c1f21e7647b08d709a261ecf6475/receipt.json"
+                                                           "Faction harness receipt: <user>\\Documents\\GitHub\\MNBL-modding-repo\\build\\research-factions31\\test-72af242f8ad6483b877468a94911460a/receipt.json"
                                                        ]
                                      },
                    "Test-Settlements":  {
@@ -183,67 +183,67 @@
                                                               "ok    building twice, or from reordered records, gives the same intents (fccb18a1f2c2) and XML",
                                                               "ok    each is refused: a culture without a castle prototype, a town owned by no clan intent, a village bound across land groups, a remote village beyond the engine trade limit, villages per fief outside the balance band, a town without a population estimate and a town below the food minimum (castle prototype: refused | is not a clan intent: refused | bound across land groups: refused | beyond the engine trade limit: refused | outside the band: refused | has no population estimate: refused | food supply: refused)",
                                                               "22/22 checks passed",
-                                                              "Settlement harness receipt: <user>\\Documents\\GitHub\\MNBL-modding-repo\\build\\research-settlements33\\test-c6a867af6490432887c108a706cc0d7e/receipt.json"
+                                                              "Settlement harness receipt: <user>\\Documents\\GitHub\\MNBL-modding-repo\\build\\research-settlements33\\test-6927c81991d94259a9c4847207a7b0e7/receipt.json"
                                                           ]
                                         },
                    "Test-SpawnPolicy":  {
                                             "command":  "powershell.exe -NoProfile -ExecutionPolicy Bypass -File <user>\\Documents\\GitHub\\MNBL-modding-repo\\tools\\Test-SpawnPolicy.ps1 -Bundle build/research-bundle29/bundles/f596b58cdcfc18798542fdef5a4d9c9f6d84abddca1425af8d0b87f521191d2d",
                                             "exitCode":  0,
                                             "passed":  true,
-                                            "seconds":  12.4,
+                                            "seconds":  12.5,
                                             "lastLines":  [
                                                               "ok    each is refused with an actionable reason: no town that can be a start, a missing installed retreat, a village spawn anchor moved onto a non-land cell, too few hideouts for the required bandit cultures (hideoutSpacing 1000), and every port in a closed basin (no town qualifies as a start: refused | retirement retreat is missing: refused | not passable land: refused | fewer hideouts than required cultures: refused | sea basin is not open: refused)",
                                                               "ok    every refusal carries quality codes from startup.json (quality.startup_policy, quality.startup_catalog, quality.startup_map, quality.startup_hideouts, quality.startup_retreat, quality.startup_no_start, quality.startup_unplaceable_spawn, quality.startup_plan): no town qualifies as a start -\u003e quality.startup_no_start (retryable); retirement retreat is missing -\u003e quality.startup_catalog (not retryable); fewer hideouts than required cultures -\u003e quality.startup_hideouts (retryable); sea basin is not open -\u003e quality.startup_no_start (retryable)",
                                                               "18/18 checks passed",
-                                                              "Spawn policy harness receipt: <user>\\Documents\\GitHub\\MNBL-modding-repo\\build\\research-startup34\\test-4b7d44cde2c9484ab89bcfccebfd97a1/receipt.json"
+                                                              "Spawn policy harness receipt: <user>\\Documents\\GitHub\\MNBL-modding-repo\\build\\research-startup34\\test-621c9c13c6004b8bb55dc46a2ffe8d68/receipt.json"
                                                           ]
                                         },
                    "Test-NavalContent":  {
                                              "command":  "powershell.exe -NoProfile -ExecutionPolicy Bypass -File <user>\\Documents\\GitHub\\MNBL-modding-repo\\tools\\Test-NavalContent.ps1 -Bundle build/research-bundle29/bundles/f596b58cdcfc18798542fdef5a4d9c9f6d84abddca1425af8d0b87f521191d2d",
                                              "exitCode":  0,
                                              "passed":  true,
-                                             "seconds":  5.5,
+                                             "seconds":  5.6,
                                              "lastLines":  [
                                                                "ok    building twice, or from reordered records, gives the same naval intents (a5ee4e630536) and documents",
                                                                "ok    each is refused with its quality code: a wrong policy version, a hull the shipyards need missing from the catalog, an island cut off from every open basin, a port moved onto land, a policy whose hull list disagrees with the catalog, and a harbour village whose harbour cell is land (quality.naval_policy: quality.naval_policy - not mnbl.naval-content version 1 | quality.naval_catalog: quality.naval_catalog - ship hull western_light_ship is not installed | quality.naval_unreachable_island: quality.naval_unreachable_island retryable - island land group 0 (17 towns) has no port or coast transition to an open basin | quality.naval_port: quality.naval_port retryable - port town mnbl_1609fb72_t_02135fe588\u0027s port (509.375, 240.625) is not water of any basin | quality.naval_policy: quality.naval_policy - naval-content.json lists culture empire\u0027s hulls as empire_medium_ship, central_light_ship, eastern_trade_ship, western_light_ship, eastern_heavy_ship, empire_trade_ship; the catalog has empire_heavy_ship, empire_medium_ship, central_light_ship, eastern_trade_ship, western_light_ship, eastern_heavy_ship, empire_trade_ship | quality.naval_port: quality.naval_port retryable - harbour village mnbl_1609fb72_v_d8fd470e06: its harbour cell is not water of any basin (the village\u0027s XML port would still give it HasPort))",
                                                                "15/15 checks passed",
-                                                               "Naval content harness receipt: <user>\\Documents\\GitHub\\MNBL-modding-repo\\build\\research-naval35\\test-7247c2f5dce34e8499fa5e01b5e07885/receipt.json"
+                                                               "Naval content harness receipt: <user>\\Documents\\GitHub\\MNBL-modding-repo\\build\\research-naval35\\test-28f3c76654844b71a8c467ce6215284d/receipt.json"
                                                            ]
                                          },
                    "Test-CompiledWorld":  {
                                               "command":  "powershell.exe -NoProfile -ExecutionPolicy Bypass -File <user>\\Documents\\GitHub\\MNBL-modding-repo\\tools\\Test-CompiledWorld.ps1 -Bundle build/research-bundle29/bundles/f596b58cdcfc18798542fdef5a4d9c9f6d84abddca1425af8d0b87f521191d2d",
                                               "exitCode":  0,
                                               "passed":  true,
-                                              "seconds":  5.3,
+                                              "seconds":  5.5,
                                               "lastLines":  [
                                                                 "ok    a layout without a settlement\u0027s placement, and a layout that is not activatable, are refused (The settlement layout places no position for 1 settlements (first mnbl_1609fb72_c_00a466803b). | The settlement layout is not activatable.)",
                                                                 "ok    a record moved off the layout (a castle gate by half a unit) is found: mnbl_1609fb72_c_00a466803b gate 165.0902,103.125 164.5902,103.125",
                                                                 "8/8 checks passed",
-                                                                "Compiled world harness receipt: <user>\\Documents\\GitHub\\MNBL-modding-repo\\build\\research-activation45\\compiled-0ab947d029c54f4f8e5f0c7b12d581c2/receipt.json"
+                                                                "Compiled world harness receipt: <user>\\Documents\\GitHub\\MNBL-modding-repo\\build\\research-activation45\\compiled-71a41aa5225e46b6a8c6e8f93f0ace07/receipt.json"
                                                             ]
                                           },
                    "Test-Compatibility":  {
                                               "command":  "powershell.exe -NoProfile -ExecutionPolicy Bypass -File <user>\\Documents\\GitHub\\MNBL-modding-repo\\tools\\Test-Compatibility.ps1 -Bundle build/research-bundle29/bundles/f596b58cdcfc18798542fdef5a4d9c9f6d84abddca1425af8d0b87f521191d2d",
                                               "exitCode":  0,
                                               "passed":  true,
-                                              "seconds":  1.5,
+                                              "seconds":  1.6,
                                               "lastLines":  [
                                                                 "ok    c3: no message of the module offers a migration",
                                                                 "ok    c3: a real bundle built for another game version is refused saying there is no migration (no tool offered)",
                                                                 "56/56 checks passed",
-                                                                "Compatibility harness receipt: <user>\\Documents\\GitHub\\MNBL-modding-repo\\build\\compatibility50\\test-c7fb788dbb3b4998ab83f33ad267d376/receipt.json"
+                                                                "Compatibility harness receipt: <user>\\Documents\\GitHub\\MNBL-modding-repo\\build\\compatibility50\\test-e8febfe2135a42c7bd24e8c596623ec2/receipt.json"
                                                             ]
                                           },
                    "Test-PeriodicCoordinates":  {
                                                     "command":  "powershell.exe -NoProfile -ExecutionPolicy Bypass -File <user>\\Documents\\GitHub\\MNBL-modding-repo\\tools\\Test-PeriodicCoordinates.ps1 -Bundle build/research-bundle29/bundles/f596b58cdcfc18798542fdef5a4d9c9f6d84abddca1425af8d0b87f521191d2d",
                                                     "exitCode":  0,
                                                     "passed":  true,
-                                                    "seconds":  1.5,
+                                                    "seconds":  1.9,
                                                     "lastLines":  [
                                                                       "ok    every recompiled caller (31) calls a table method or another recompiled caller",
                                                                       "ok    the consumer audit scanned exactly the installed campaign assemblies (7, SHA-256 equal)",
                                                                       "85/85 checks passed",
-                                                                      "Periodic coordinate harness receipt: <user>\\Documents\\GitHub\\MNBL-modding-repo\\build\\research-periodic64\\test-e10b9a32b62749b7b07bf7ead2e7dfb9/receipt.json"
+                                                                      "Periodic coordinate harness receipt: <user>\\Documents\\GitHub\\MNBL-modding-repo\\build\\research-periodic64\\test-1efc6619d5f4401db538cf6b8fcb4320/receipt.json"
                                                                   ]
                                                 },
                    "Test-WaterClimate":  {
@@ -255,103 +255,103 @@
                                                                "ok    every strip lake is a copy of a canonical lake one width away, at the same level, a copy cut by the terrain\u0027s edge at its whole twin\u0027s (4 strip copies, 0 cut by the edge)",
                                                                "ok    a generated scene carries the sea plane and one plane per lake body, each a War Sails water body",
                                                                "34/34 checks passed",
-                                                               "Water/climate harness receipt: <user>\\Documents\\GitHub\\MNBL-modding-repo\\build\\research-water39\\test-3850fd6abd55402eb4591eb93cca134b/receipt.json"
+                                                               "Water/climate harness receipt: <user>\\Documents\\GitHub\\MNBL-modding-repo\\build\\research-water39\\test-8d3a89698e4f4564829d4dcb2fd61648/receipt.json"
                                                            ]
                                          },
                    "Test-WorldDataBundle":  {
                                                 "command":  "powershell.exe -NoProfile -ExecutionPolicy Bypass -File <user>\\Documents\\GitHub\\MNBL-modding-repo\\tools\\Test-WorldDataBundle.ps1 -Bundle build/research-bundle29/bundles/f596b58cdcfc18798542fdef5a4d9c9f6d84abddca1425af8d0b87f521191d2d",
                                                 "exitCode":  0,
                                                 "passed":  true,
-                                                "seconds":  14.9,
+                                                "seconds":  14.5,
                                                 "lastLines":  [
                                                                   "ok    a hard-linked file",
                                                                   "ok    another directory name",
                                                                   "35/35 variants: all three validators agree with the expected verdict",
-                                                                  "World data bundle harness receipt: <user>\\Documents\\GitHub\\MNBL-modding-repo\\build\\research-bundle29\\managed-8c3d3bbec1f442edb3edf409c06bcd3d/receipt.json"
+                                                                  "World data bundle harness receipt: <user>\\Documents\\GitHub\\MNBL-modding-repo\\build\\research-bundle29\\managed-b4462e40a0ac4d80a8288d2f1eb9c860/receipt.json"
                                                               ]
                                             },
                    "Test-GraphValidation":  {
                                                 "command":  "powershell.exe -NoProfile -ExecutionPolicy Bypass -File <user>\\Documents\\GitHub\\MNBL-modding-repo\\tools\\Test-GraphValidation.ps1 -Bundle build/research-bundle29/bundles/f596b58cdcfc18798542fdef5a4d9c9f6d84abddca1425af8d0b87f521191d2d",
                                                 "exitCode":  0,
                                                 "passed":  true,
-                                                "seconds":  15.8,
+                                                "seconds":  16.7,
                                                 "lastLines":  [
                                                                   "ok    in-game fault class unexpected_vanilla on fixture world mnbl_00059043_ is refused with graph.unexpected_vanilla: 1 diagnostics: graph.unexpected_vanilla Settlement.town_EN1 Settlements: an installed Calradia Settlement is staged in the generated world",
                                                                   "ok    in-game fault class duplicate_id on fixture world mnbl_00059043_ is refused with graph.duplicate_id: 1 diagnostics: graph.duplicate_id Settlement.mnbl_00059043_town_1 Settlements: the same object is staged twice",
                                                                   "72/72 checks passed",
-                                                                  "Graph validation harness receipt: <user>\\Documents\\GitHub\\MNBL-modding-repo\\build\\research-graph36\\test-9cdf4ef99c824c3ab2aa386e7f586c47/receipt.json"
+                                                                  "Graph validation harness receipt: <user>\\Documents\\GitHub\\MNBL-modding-repo\\build\\research-graph36\\test-8694cd703bf2453cad419a1679ed017f/receipt.json"
                                                               ]
                                             },
                    "Test-EncounterResolver":  {
                                                   "command":  "powershell.exe -NoProfile -ExecutionPolicy Bypass -File <user>\\Documents\\GitHub\\MNBL-modding-repo\\tools\\Test-EncounterResolver.ps1 -BundleA build/research-bundle29/bundles/f596b58cdcfc18798542fdef5a4d9c9f6d84abddca1425af8d0b87f521191d2d -BundleB build/research-bundle37/bundles/f63c6841085725e2c437b7d5d087a52cf4dc7d5d8fe3e2d583d46cba6a775550",
                                                   "exitCode":  0,
                                                   "passed":  true,
-                                                  "seconds":  79.4,
+                                                  "seconds":  88.1,
                                                   "lastLines":  [
                                                                     "ok    seam fixture (80 x 16 cells, strip 20, period 40): every cell equals all its images, the first canonical column and its east image read the same patch with x = 0 (a block starts at the seam), and a seam-adjacent attacker and defender get the short-way direction (-0.447, -0.894)",
                                                                     "ok    mismatch: index 0 (no generated map: Calradia indexing would be silent), an index that resolves randomly (46 naval on CoastalSea: two scenes), an opened scene other than the patch\u0027s and an index no scene lists are each flagged; the patch\u0027s own scene agrees",
                                                                     "35/35 checks passed",
-                                                                    "Encounter resolver harness receipt: <user>\\Documents\\GitHub\\MNBL-modding-repo\\build\\research-missions42\\test-14953d688080436890ee5966e306a911/receipt.json"
+                                                                    "Encounter resolver harness receipt: <user>\\Documents\\GitHub\\MNBL-modding-repo\\build\\research-missions42\\test-0f9c0b72c2ea45729b9467185a3a1e57/receipt.json"
                                                                 ]
                                               },
                    "Test-Playability":  {
                                             "command":  "powershell.exe -NoProfile -ExecutionPolicy Bypass -File <user>\\Documents\\GitHub\\MNBL-modding-repo\\tools\\Test-Playability.ps1 -BundleA build/research-bundle29/bundles/f596b58cdcfc18798542fdef5a4d9c9f6d84abddca1425af8d0b87f521191d2d -BundleB build/research-bundle37/bundles/f63c6841085725e2c437b7d5d087a52cf4dc7d5d8fe3e2d583d46cba6a775550",
                                             "exitCode":  0,
                                             "passed":  true,
-                                            "seconds":  118.8,
+                                            "seconds":  124.5,
                                             "lastLines":  [
-                                                              "ok    B: a failed portGate host check fails its flag and the ports flag; failed settlement checks fail W05 and the ports flag; failed routes fail U03 and the report is not activatable; an unknown pending-runtime entry fails; a report made with engine faults is not activatable",
+                                                              "ok    a coast seamTransition host check resolves from its group\u0027s seam-column coastTransition rows (1 of 1 coastTransition routes of the group\u0027s seam transition agree); a group with none routed fails (no coastTransition route ran for the group\u0027s seam transition), as does a disagreeing row",
                                                               "ok    refusals: a fief across water for a landlocked kingdom (both ways), a village off its market\u0027s land, a fief whose landlocked owner cannot come back to a capital across water, a shipless kingdom with no foreign fief it can reach both ways, no player start; a clan with ships reaches across water (All) and a land neighbour on land (Default)",
-                                                              "24/24 checks passed",
-                                                              "Playability harness receipt: <user>\\Documents\\GitHub\\MNBL-modding-repo\\build\\research-playability41\\test-178e97aebd704fac80ebd38f1206ad7a/receipt.json"
+                                                              "25/25 checks passed",
+                                                              "Playability harness receipt: <user>\\Documents\\GitHub\\MNBL-modding-repo\\build\\research-playability41\\test-0dd228339df74fc78e44c2ff1373b386/receipt.json"
                                                           ]
                                         },
                    "Test-SettlementPlacement":  {
                                                     "command":  "powershell.exe -NoProfile -ExecutionPolicy Bypass -File <user>\\Documents\\GitHub\\MNBL-modding-repo\\tools\\Test-SettlementPlacement.ps1 -BundleA build/research-bundle29/bundles/f596b58cdcfc18798542fdef5a4d9c9f6d84abddca1425af8d0b87f521191d2d -BundleB build/research-bundle37/bundles/f63c6841085725e2c437b7d5d087a52cf4dc7d5d8fe3e2d583d46cba6a775550",
                                                     "exitCode":  0,
                                                     "passed":  true,
-                                                    "seconds":  47.2,
+                                                    "seconds":  48.4,
                                                     "lastLines":  [
                                                                       "ok    the settlement records take the layout\u0027s positions (centre, a fortification\u0027s gate, a port town\u0027s port, a harbour village\u0027s drop-off as its port); an unplaced settlement stays staged and is reported",
                                                                       "ok    a record that differs from the placement the scene was built from is found (a castle\u0027s gate moved half a unit), as is a record with no placement (MMR-45 refuses such a world)",
-                                                                      "52/52 checks passed",
-                                                                      "Settlement placement harness receipt: <user>\\Documents\\GitHub\\MNBL-modding-repo\\build\\research-settlements40\\test-fa4eb335b9d4479ab19f6dcc527e17e2/receipt.json"
+                                                                      "54/54 checks passed",
+                                                                      "Settlement placement harness receipt: <user>\\Documents\\GitHub\\MNBL-modding-repo\\build\\research-settlements40\\test-88c6848bcbfd49f7b448533798a41966/receipt.json"
                                                                   ]
                                                 },
                    "Test-WorldNavigation":  {
                                                 "command":  "powershell.exe -NoProfile -ExecutionPolicy Bypass -File <user>\\Documents\\GitHub\\MNBL-modding-repo\\tools\\Test-WorldNavigation.ps1 -BundleA build/research-bundle29/bundles/f596b58cdcfc18798542fdef5a4d9c9f6d84abddca1425af8d0b87f521191d2d -BundleB build/research-bundle37/bundles/f63c6841085725e2c437b7d5d087a52cf4dc7d5d8fe3e2d583d46cba6a775550",
                                                 "exitCode":  0,
                                                 "passed":  true,
-                                                "seconds":  281.9,
+                                                "seconds":  287.8,
                                                 "lastLines":  [
                                                                   "ok    the activation gate refuses a scene without a report, a report for another navmesh or policy, an edited or unreadable record, and a report made with injected faults; it passes an intact activatable report for the installed navmesh, and refuses a failing report naming its source ids",
                                                                   "ok    the content-addressed scene name changes with the navmesh (production and fixture navigation of one world are different scenes)",
-                                                                  "36/36 checks passed",
-                                                                  "Navigation contract harness receipt: <user>\\Documents\\GitHub\\MNBL-modding-repo\\build\\research-navigation38\\test-bcf40955451e4ae7b076980ed793614a/receipt.json"
+                                                                  "38/38 checks passed",
+                                                                  "Navigation contract harness receipt: <user>\\Documents\\GitHub\\MNBL-modding-repo\\build\\research-navigation38\\test-56cfa55169514463ab156acb0ac5cb7c/receipt.json"
                                                               ]
                                             },
                    "Test-WorldPreview":  {
                                              "command":  "powershell.exe -NoProfile -ExecutionPolicy Bypass -File <user>\\Documents\\GitHub\\MNBL-modding-repo\\tools\\Test-WorldPreview.ps1 -BundleA build/research-bundle29/bundles/f596b58cdcfc18798542fdef5a4d9c9f6d84abddca1425af8d0b87f521191d2d -BundleB build/research-bundle37/bundles/f63c6841085725e2c437b7d5d087a52cf4dc7d5d8fe3e2d583d46cba6a775550",
                                              "exitCode":  0,
                                              "passed":  true,
-                                             "seconds":  3.4,
+                                             "seconds":  3.5,
                                              "lastLines":  [
                                                                "ok    the two worlds give two different previews (A 99d5df3a9b21, B 59c46dd87c75): the preview is the world\u0027s, not a fixed picture",
                                                                "ok    labels: a short name is shown whole; the longest generated name (29 characters, \"Shtrandbrig (Age 2) Harbour 2\") is shortened to \"Shtrandbrig (Age…\"",
                                                                "16/16 checks passed",
-                                                               "World preview harness receipt: <user>\\Documents\\GitHub\\MNBL-modding-repo\\build\\research-preview46\\test-be9250d5ccb841d184dc8564e8ee4de3/receipt.json"
+                                                               "World preview harness receipt: <user>\\Documents\\GitHub\\MNBL-modding-repo\\build\\research-preview46\\test-5907f83c86d44859b358a2f2a4e78254/receipt.json"
                                                            ]
                                          },
                    "Test-WorldSetup":  {
                                            "command":  "powershell.exe -NoProfile -ExecutionPolicy Bypass -File <user>\\Documents\\GitHub\\MNBL-modding-repo\\tools\\Test-WorldSetup.ps1 -BundleA build/research-bundle29/bundles/f596b58cdcfc18798542fdef5a4d9c9f6d84abddca1425af8d0b87f521191d2d -BundleB build/research-bundle37/bundles/f63c6841085725e2c437b7d5d087a52cf4dc7d5d8fe3e2d583d46cba6a775550",
                                            "exitCode":  0,
                                            "passed":  true,
-                                           "seconds":  36.2,
+                                           "seconds":  36.5,
                                            "lastLines":  [
                                                              "ok    every binding and command of GUI/Prefabs/WorldSetup.xml (92) is a data-source property or method of its view model, the seed edit box is bound two-way with a length limit, Random World shows its key, and every navigation scope names a widget",
                                                              "ok    every binding and command of GUI/Prefabs/WorldPreview.xml (45) is a property or method of its view model or of its list\u0027s item view model; WorldSetup.xml uses it once with the setup\u0027s preview, draws the raster through WorldPreviewTextureProvider, and shows Start Campaign (Confirm\u0027s key, enabled only for a playable world) and New Seed (Randomize\u0027s key) in place of Generate while the preview is shown",
                                                              "29/29 checks passed",
-                                                             "World setup harness receipt: <user>\\Documents\\GitHub\\MNBL-modding-repo\\build\\research-setup43\\test-0073a7cf277b42d2bf696b3cb3ec1a0d/receipt.json"
+                                                             "World setup harness receipt: <user>\\Documents\\GitHub\\MNBL-modding-repo\\build\\research-setup43\\test-d805662ddd3b4d4c890dd2388db5add6/receipt.json"
                                                          ]
                                        },
                    "Test-WorldSurface":  {
@@ -363,38 +363,38 @@
                                                                "ok    the resource ledger releases latest first, each once, records a failing release without skipping the rest, hands a resource another owner releases to that owner (not recorded as released), and refuses holding a resource twice",
                                                                "ok    scene names are content-addressed (mnbl_world_f596b58cdcfc1879_daad98f5073a: the same world and encoder give the same name, any other world, encoder or template another; only that exact form is the scene store\u0027s, never a fixture slot such as mnbl_world_a), and no world generation begins while a campaign map is live",
                                                                "24/24 checks passed",
-                                                               "Surface contract harness receipt: <user>\\Documents\\GitHub\\MNBL-modding-repo\\build\\research-surface37\\test-17f6a1adb5bb4ecea257cf69fbd9c7cd/receipt.json"
+                                                               "Surface contract harness receipt: <user>\\Documents\\GitHub\\MNBL-modding-repo\\build\\research-surface37\\test-905f6998cf79407187b524a3bcfb2c59/receipt.json"
                                                            ]
                                          },
                    "Test-Recovery":  {
                                          "command":  "powershell.exe -NoProfile -ExecutionPolicy Bypass -File <user>\\Documents\\GitHub\\MNBL-modding-repo\\tools\\Test-Recovery.ps1 -BundleA build/research-bundle29/bundles/f596b58cdcfc18798542fdef5a4d9c9f6d84abddca1425af8d0b87f521191d2d",
                                          "exitCode":  0,
                                          "passed":  true,
-                                         "seconds":  5.9,
+                                         "seconds":  6,
                                          "lastLines":  [
                                                            "ok    store inspection reads each save\u0027s world binding from its header (no game): a save whose package and bundle are present is loadable, one whose bundle is missing is not, a save of no generated world is left out and a torn header is reported; each bundle lists the saves and activations that reference it",
                                                            "ok    a present but damaged bundle is reported corrupt on the saves and activations that use it (not missing), its save is not loadable, and the bundle still lists the save that references it",
                                                            "10/10 checks passed",
-                                                           "Recovery harness receipt: <user>\\Documents\\GitHub\\MNBL-modding-repo\\build\\research-recovery47\\test-bc8598b854d948538987d9022d2fcf30/receipt.json"
+                                                           "Recovery harness receipt: <user>\\Documents\\GitHub\\MNBL-modding-repo\\build\\research-recovery47\\test-b43876bb57a04327ac71ad266db2696e/receipt.json"
                                                        ]
                                      },
                    "Test-GenerationProbe":  {
                                                 "command":  "powershell.exe -NoProfile -ExecutionPolicy Bypass -File <user>\\Documents\\GitHub\\MNBL-modding-repo\\tools\\Test-GenerationProbe.ps1",
                                                 "exitCode":  0,
                                                 "passed":  true,
-                                                "seconds":  28.2,
+                                                "seconds":  27.7,
                                                 "lastLines":  [
-                                                                  "CHECK normal: diagnostic_failed <user>\\Documents\\GitHub\\MNBL-modding-repo\\build\\research-generator15\\harness-31bc2563c82746afbf44999712871929\\owned jobs\\jobs\\7ad494d038d54104a1671467f4aa5ec8",
-                                                                  "CHECK normal: diagnostic_failed <user>\\Documents\\GitHub\\MNBL-modding-repo\\build\\research-generator15\\harness-31bc2563c82746afbf44999712871929\\owned jobs\\jobs\\094e589e49ce4af8b3e609551f5c84d2",
+                                                                  "CHECK normal: diagnostic_failed <user>\\Documents\\GitHub\\MNBL-modding-repo\\build\\research-generator15\\harness-c1abbdc4bf7745f297b0df2f0d1f5d8a\\owned jobs\\jobs\\1f92b00ed5374e519e7b5b8938f9523a",
+                                                                  "CHECK normal: diagnostic_failed <user>\\Documents\\GitHub\\MNBL-modding-repo\\build\\research-generator15\\harness-c1abbdc4bf7745f297b0df2f0d1f5d8a\\owned jobs\\jobs\\5e4a30d4615047b59f1c258e57c61a61",
                                                                   "PASS: two seeds, structured refusal, controlled abort, producer/reader/pre-cancellation, process closure, nonempty output, copied-binary mismatch, malformed failure, Windows argv roundtrip, preserved marker.",
-                                                                  "Standalone harness evidence: <user>\\Documents\\GitHub\\MNBL-modding-repo\\build\\research-generator15\\harness-31bc2563c82746afbf44999712871929"
+                                                                  "Standalone harness evidence: <user>\\Documents\\GitHub\\MNBL-modding-repo\\build\\research-generator15\\harness-c1abbdc4bf7745f297b0df2f0d1f5d8a"
                                                               ]
                                             },
                    "Test-ProducerProcess":  {
                                                 "command":  "powershell.exe -NoProfile -ExecutionPolicy Bypass -File <user>\\Documents\\GitHub\\MNBL-modding-repo\\tools\\Test-ProducerProcess.ps1",
                                                 "exitCode":  0,
                                                 "passed":  true,
-                                                "seconds":  119,
+                                                "seconds":  120.1,
                                                 "lastLines":  [
                                                                   "PASS: producer process contract; evidence/fwg/producer-process-contract.json"
                                                               ]
@@ -403,7 +403,7 @@
                                              "command":  "powershell.exe -NoProfile -ExecutionPolicy Bypass -File <user>\\Documents\\GitHub\\MNBL-modding-repo\\tools\\Test-SourceReader.ps1",
                                              "exitCode":  0,
                                              "passed":  true,
-                                             "seconds":  113.2,
+                                             "seconds":  115.6,
                                              "lastLines":  [
                                                                "Source reader evidence: passed=True PASSED 142/142 source contract checks -\u003e <user>\\Documents\\GitHub\\MNBL-modding-repo\\evidence\\fwg\\source-reader.json"
                                                            ]
@@ -421,12 +421,12 @@
                                                    "command":  "powershell.exe -NoProfile -ExecutionPolicy Bypass -File <user>\\Documents\\GitHub\\MNBL-modding-repo\\tools\\Test-WorldBridgeSurface.ps1",
                                                    "exitCode":  0,
                                                    "passed":  true,
-                                                   "seconds":  70.4,
+                                                   "seconds":  71,
                                                    "lastLines":  [
-                                                                     "C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\MSBuild\\Microsoft\\VC\\v170\\Microsoft.CppBuild.targets(548,5): warning MSB8029: The Intermediate directory or Output directory cannot reside under the Temporary directory as it could lead to issues with incremental build. [<user>\\AppData\\Local\\Temp\\mnbl-worldbridge-surface-25223b05779744c48c054829f8ea8fc0\\compiler\\ALL_BUILD.vcxproj]",
+                                                                     "C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\MSBuild\\Microsoft\\VC\\v170\\Microsoft.CppBuild.targets(548,5): warning MSB8029: The Intermediate directory or Output directory cannot reside under the Temporary directory as it could lead to issues with incremental build. [<user>\\AppData\\Local\\Temp\\mnbl-worldbridge-surface-88bf27a581874cf1b3005e1c375c20ed\\compiler\\ALL_BUILD.vcxproj]",
                                                                      "  Building Custom Rule <user>/Documents/GitHub/MNBL-modding-repo/src/WorldBridge/CMakeLists.txt",
-                                                                     "PASS: 10220 assertions, 6 fully decoded bundles; <user>\\AppData\\Local\\Temp\\mnbl-worldbridge-surface-25223b05779744c48c054829f8ea8fc0\\cases\\checks.json",
-                                                                     "Surface build/test receipt: <user>\\AppData\\Local\\Temp\\mnbl-worldbridge-surface-25223b05779744c48c054829f8ea8fc0/build-receipt.json"
+                                                                     "PASS: 10220 assertions, 6 fully decoded bundles; <user>\\AppData\\Local\\Temp\\mnbl-worldbridge-surface-88bf27a581874cf1b3005e1c375c20ed\\cases\\checks.json",
+                                                                     "Surface build/test receipt: <user>\\AppData\\Local\\Temp\\mnbl-worldbridge-surface-88bf27a581874cf1b3005e1c375c20ed/build-receipt.json"
                                                                  ]
                                                },
                    "Test-PackagePaths":  {
@@ -466,7 +466,7 @@
                                               "command":  "powershell.exe -NoProfile -ExecutionPolicy Bypass -File <user>\\Documents\\GitHub\\MNBL-modding-repo\\tools\\Test-NavalMissions.ps1",
                                               "exitCode":  0,
                                               "passed":  true,
-                                              "seconds":  0.3,
+                                              "seconds":  0.4,
                                               "lastLines":  [
                                                                 "   PASS raid-main-agent-down: reintroduced (raid-main-agent-down), raid fails on \"the raid won\"",
                                                                 "   PASS defeat-with-reserves: reintroduced (defeat-without-capture), naval.defeat fails on \"taken prisoner by\"",
@@ -478,10 +478,10 @@
                                          "command":  "python -m unittest discover -s tests/ci",
                                          "exitCode":  0,
                                          "passed":  true,
-                                         "seconds":  2.9,
+                                         "seconds":  3.1,
                                          "lastLines":  [
                                                            "----------------------------------------------------------------------",
-                                                           "Ran 8 tests in 2.746s",
+                                                           "Ran 10 tests in 2.869s",
                                                            "System.Management.Automation.RemoteException",
                                                            "OK"
                                                        ]
@@ -520,22 +520,22 @@
                                        "command":  "python tests/test_terrain_bin.py",
                                        "exitCode":  0,
                                        "passed":  true,
-                                       "seconds":  16.6,
+                                       "seconds":  17.6,
                                        "lastLines":  [
                                                          "System.Management.Automation.RemoteException",
                                                          "OK",
                                                          "",
-                                                         "  installed terrain.bin: 507 files, 507 identical, 0 failed"
+                                                         "  installed terrain.bin: 506 files, 506 identical, 0 failed"
                                                      ]
                                    },
                    "navmesh.bin":  {
                                        "command":  "python tests/test_navmesh_bin.py",
                                        "exitCode":  0,
                                        "passed":  true,
-                                       "seconds":  1.6,
+                                       "seconds":  1.7,
                                        "lastLines":  [
                                                          "----------------------------------------------------------------------",
-                                                         "Ran 18 tests in 1.504s",
+                                                         "Ran 18 tests in 1.544s",
                                                          "System.Management.Automation.RemoteException",
                                                          "OK"
                                                      ]

@@ -56,6 +56,12 @@ namespace MNBL.ProceduralWorld.Automation
             var main = MobileParty.MainParty;
             var cleared = new Dictionary<string, object>(); context.Outputs["cleared"] = cleared;
             TwoWorldMatrixProbe.ClearEncounter(cleared);
+            // Other parties ignore the player for the whole test, as the soak's visit and the matrix's world A do: an encounter's meeting
+            // conversation freezes the map (2026-10-19, run 29168: looters met the one-man party during the first leg, and every later check
+            // saw a still camera). Diagnostic setup, recorded.
+            var shelter = CampaignTime.HoursFromNow(24 * 30);
+            main.IgnoreByOtherPartiesTill(shelter);
+            cleared["playerIgnoredByOtherPartiesUntilDays"] = shelter.ToDays;
             if (main.CurrentSettlement != null) { cleared["leftSettlement"] = main.CurrentSettlement.StringId; LeaveSettlementAction.ApplyForParty(main); }
             TwoWorldMatrixProbe.ExitMenu(cleared);
             yield return TwoWorldMatrixProbe.Frames(10);

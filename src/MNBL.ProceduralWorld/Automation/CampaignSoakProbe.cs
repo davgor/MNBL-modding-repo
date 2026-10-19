@@ -201,35 +201,54 @@ namespace MNBL.ProceduralWorld.Automation
             var towns = Settlement.All.Where(s => s.IsTown && s.StringId.StartsWith(prefix, StringComparison.Ordinal)).OrderBy(s => s.StringId, StringComparer.Ordinal).ToList();
             var home = towns.OrderBy(s => Distance(from, s.GatePosition.ToVec2())).First();
             var model = campaign.Models.MapDistanceModel;
-            var reachable = towns.Where(s => s != home).Select(s => new { Town = s, Distance = model.GetDistance(home, s, false, false, MobileParty.NavigationType.Default) })
-                .Where(x => x.Distance > 0 && x.Distance < 1e6f && !float.IsNaN(x.Distance)).OrderBy(x => x.Distance).ThenBy(x => x.Town.StringId, StringComparer.Ordinal).ToList();
             visit["startTown"] = home.StringId; visit["startDistance"] = Distance(from, home.GatePosition.ToVec2());
-            visit["reachableTowns"] = reachable.Count;
-            var offering = reachable.Where(x => Offered(campaign, x.Town) > 0 && Affordable(x.Town) != null).ToList();
-            visit["skippedNearer"] = reachable.TakeWhile(x => offering.Count == 0 || x.Town != offering[0].Town)
-                .Select(x => x.Town.StringId + " (" + Offered(campaign, x.Town) + " volunteers offered" + (Affordable(x.Town) == null ? ", no affordable trade good" : "") + ")").Take(10).ToList();
-            if (offering.Count == 0) { soak.Expect(false, "A.visit", "a town reachable by land from " + home.StringId + " offers the player a volunteer and an affordable trade good"); yield break; }
-            var town = offering[0].Town;
-            visit["town"] = town.StringId; visit["landDistance"] = offering[0].Distance; visit["volunteersOffered"] = Offered(campaign, town); visit["startHours"] = CampaignTime.Now.ToHours;
-            visit["encounterBefore"] = PlayerEncounter.Current != null; visit["settlementBefore"] = main.CurrentSettlement == null ? null : main.CurrentSettlement.StringId;
-            main.SetMoveGoToSettlement(town, MobileParty.NavigationType.Default, false);
-            DiagnosticSandboxBootstrap.Run(campaign, CampaignTimeControlMode.UnstoppableFastForward);
-            double start = context.Seconds;
-            while (main.CurrentSettlement != town && PlayerEncounter.Current == null && context.Seconds - start < 240)
+            // The volunteers a town offered when it was chosen can be gone when the party arrives: lords who pass through recruit them (run
+            // 50632: 10 offered at the start, none 8.7 hours later). Then the party goes on from there to the nearest other town that offers
+            // one, as a player would, at most 3 towns; each emptied town is recorded.
+            var gone = new List<object>(); visit["volunteersGoneOnArrival"] = gone;
+            var left = home; var visited = new HashSet<Settlement> { home };
+            Settlement town = null; MapState map = null; bool arrived = false;
+            for (int attempt = 0; attempt < 3; attempt++)
             {
-                if (campaign.TimeControlMode == CampaignTimeControlMode.Stop && PlayerEncounter.Current == null) { InformationManager.HideInquiry(); DiagnosticSandboxBootstrap.Run(campaign, CampaignTimeControlMode.UnstoppableFastForward); }
-                yield return null;
+                var origin = left;
+                var reachable = towns.Where(s => !visited.Contains(s)).Select(s => new { Town = s, Distance = model.GetDistance(origin, s, false, false, MobileParty.NavigationType.Default) })
+                    .Where(x => x.Distance > 0 && x.Distance < 1e6f && !float.IsNaN(x.Distance)).OrderBy(x => x.Distance).ThenBy(x => x.Town.StringId, StringComparer.Ordinal).ToList();
+                var offering = reachable.Where(x => Offered(campaign, x.Town) > 0 && Affordable(x.Town) != null).ToList();
+                if (attempt == 0)
+                {
+                    visit["reachableTowns"] = reachable.Count;
+                    visit["skippedNearer"] = reachable.TakeWhile(x => offering.Count == 0 || x.Town != offering[0].Town)
+                        .Select(x => x.Town.StringId + " (" + Offered(campaign, x.Town) + " volunteers offered" + (Affordable(x.Town) == null ? ", no affordable trade good" : "") + ")").Take(10).ToList();
+                }
+                if (offering.Count == 0) { soak.Expect(false, "A.visit", "a town reachable by land from " + left.StringId + " offers the player a volunteer and an affordable trade good"); yield break; }
+                town = offering[0].Town; visited.Add(town);
+                visit["town"] = town.StringId; visit["landDistance"] = offering[0].Distance; visit["volunteersOffered"] = Offered(campaign, town); visit["startHours"] = CampaignTime.Now.ToHours;
+                visit["encounterBefore"] = PlayerEncounter.Current != null; visit["settlementBefore"] = main.CurrentSettlement == null ? null : main.CurrentSettlement.StringId;
+                main.SetMoveGoToSettlement(town, MobileParty.NavigationType.Default, false);
+                DiagnosticSandboxBootstrap.Run(campaign, CampaignTimeControlMode.UnstoppableFastForward);
+                double start = context.Seconds;
+                while (main.CurrentSettlement != town && PlayerEncounter.Current == null && context.Seconds - start < 240)
+                {
+                    if (campaign.TimeControlMode == CampaignTimeControlMode.Stop && PlayerEncounter.Current == null) { InformationManager.HideInquiry(); DiagnosticSandboxBootstrap.Run(campaign, CampaignTimeControlMode.UnstoppableFastForward); }
+                    yield return null;
+                }
+                DiagnosticSandboxBootstrap.Pause(campaign);
+                yield return TwoWorldMatrixProbe.Frames(10);
+                map = Game.Current.GameStateManager.ActiveState as MapState;
+                visit["travelHours"] = CampaignTime.Now.ToHours - (double)visit["startHours"]; visit["travelSeconds"] = context.Seconds - start;
+                visit["inSettlement"] = main.CurrentSettlement == null ? null : main.CurrentSettlement.StringId;
+                visit["encounterSettlement"] = PlayerEncounter.EncounterSettlement == null ? null : PlayerEncounter.EncounterSettlement.StringId;
+                visit["menu"] = map == null || map.MenuContext == null || map.MenuContext.GameMenu == null ? null : map.MenuContext.GameMenu.StringId;
+                arrived = main.CurrentSettlement == town && PlayerEncounter.EncounterSettlement == town;
+                if (!arrived || Offered(campaign, town) > 0 || attempt == 2) break;
+                gone.Add(new Dictionary<string, object> { ["town"] = town.StringId, ["offeredAtChoice"] = visit["volunteersOffered"], ["travelHours"] = visit["travelHours"] });
+                try { PlayerEncounter.LeaveSettlement(); PlayerEncounter.Finish(true); }
+                catch (Exception error) { gone.Add("leaving " + town.StringId + ": " + error.GetType().Name + ": " + error.Message); }
+                yield return TwoWorldMatrixProbe.Frames(10);
+                left = town;
             }
-            DiagnosticSandboxBootstrap.Pause(campaign);
-            yield return TwoWorldMatrixProbe.Frames(10);
-            var map = Game.Current.GameStateManager.ActiveState as MapState;
-            visit["travelHours"] = CampaignTime.Now.ToHours - (double)visit["startHours"]; visit["travelSeconds"] = context.Seconds - start;
-            visit["inSettlement"] = main.CurrentSettlement == null ? null : main.CurrentSettlement.StringId;
-            visit["encounterSettlement"] = PlayerEncounter.EncounterSettlement == null ? null : PlayerEncounter.EncounterSettlement.StringId;
-            visit["menu"] = map == null || map.MenuContext == null || map.MenuContext.GameMenu == null ? null : map.MenuContext.GameMenu.StringId;
-            bool arrived = main.CurrentSettlement == town && PlayerEncounter.EncounterSettlement == town;
-            soak.Expect(arrived && Equals(visit["menu"], "town") && (double)visit["travelHours"] > 0, "A.visit", "the player's party travelled " + F((double)visit["travelHours"]) + " h from " + home.StringId + " to "
-                + town.StringId + " and the engine opened its settlement encounter (menu " + visit["menu"] + ")");
+            soak.Expect(arrived && Equals(visit["menu"], "town") && (double)visit["travelHours"] > 0, "A.visit", "the player's party travelled " + F((double)visit["travelHours"]) + " h from " + left.StringId + " to "
+                + town.StringId + " and the engine opened its settlement encounter (menu " + visit["menu"] + ")" + (gone.Count > 0 ? "; " + gone.Count + " town(s) on the way had no volunteer left" : ""));
             if (!arrived) yield break;
             visit["trade"] = Trade(soak, town);
             visit["recruitment"] = Recruit(soak, campaign, town);

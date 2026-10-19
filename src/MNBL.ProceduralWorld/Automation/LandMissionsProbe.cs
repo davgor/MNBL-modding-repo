@@ -794,7 +794,9 @@ namespace MNBL.ProceduralWorld.Automation
         internal static void ReturnTo(State st, Dictionary<string, object> row, List<string> failures, Vec2 expected, string reason, double bound = -1, bool atSea = false)
         {
             var main = MobileParty.MainParty;
-            double moved = main.Position.ToVec2().Distance(expected);
+            // Across the periodic seam, as RuntimeMissionProbe.CompareReturn measures it.
+            var periodic = PeriodicWorld.Current;
+            double moved = periodic == null ? main.Position.ToVec2().Distance(expected) : periodic.Distance(main.Position.ToVec2(), expected);
             if (bound < 0) bound = st.Rule("returnBoundLand");
             row["returnExpected"] = new Dictionary<string, object> { ["position"] = new[] { expected.X, expected.Y }, ["reason"] = reason };
             row["returnDisplacement"] = moved; row["returnBound"] = bound;

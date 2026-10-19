@@ -1,5 +1,5 @@
 {
-  "activeSprintId": "sp_01m4fpnf64qct7tw9sds5jevby",
+  "activeSprintId": null,
   "attempts": [
     {
       "createdAt": "2026-10-09T20:20:40.287Z",
@@ -8815,23 +8815,438 @@
     },
     {
       "createdAt": "2026-10-18T17:49:15.318Z",
-      "decidedAt": null,
-      "decision": null,
-      "evidence": null,
+      "decidedAt": "2026-10-19T03:32:53.163Z",
+      "decision": {
+        "decidedBy": "Claude Code",
+        "notes": "Accepted as the sprint's final result with its unmet criteria identified, which sprint exit criterion x1 allows (\"or the final result explicitly identifies unmet criteria\"). The one-shot scenario fails by the epic's rule (observed failures kept failed); see docs/one-shot-acceptance.md and evidence/one-shot/acceptance-index.json. Requested by the owner at the checkpoint.",
+        "outcome": "accepted",
+        "reasons": []
+      },
+      "evidence": {
+        "checks": [
+          {
+            "detail": "Step 1 fail (UCRT pin), 2 fail (field.rock), 3 fail (route.island), 4 fail (navigation caches rebuilt on a load; seam camera, picking and sailing not run), 5 blocked, 6 blocked; sequence checks pass (install alone, official files and 107 saves unchanged, development module and store restored).",
+            "name": "one-shot scenario on the clean package (tools/Test-OneShot.ps1)",
+            "status": "failed"
+          },
+          {
+            "detail": "naval_missions 7368 (9/9) and land_missions 11472 (13/13) from mnbl_probe52_A_designated on the development install; the sequence used mnbl_oneshot_A_designated.",
+            "name": "reruns of the two failed probes on the same build",
+            "status": "passed"
+          },
+          {
+            "detail": "45/46; Test-ProducerProcess preflight ucrtbase_matches_lock fails after a Windows update replaced ucrtbase.dll (KB5127647/KB5127648); its CTest 9/9 and all generation outcomes pass.",
+            "name": "offline suites (tools/Test-OfflineSuites.ps1)",
+            "status": "failed"
+          },
+          {
+            "detail": "87 evidence files hashed and tracked; statuses consistent; s1 fail, s2 fail, s3 fail, s4 fail, s5 fail, s6 blocked, s7 fail.",
+            "name": "acceptance index build",
+            "status": "passed"
+          },
+          {
+            "detail": "One read-only reviewer: no blockers, 5 major and 8 minor findings, fixed or disclosed (cache rebuild recorded as fail, rerun wording, UCRT in step 1, stale identities, s4/s5 observations, request identities, path scrubbing, orchestrator hardening).",
+            "name": "independent review",
+            "status": "passed"
+          }
+        ],
+        "criteria": [
+          {
+            "criterionId": "c1",
+            "met": true,
+            "note": ""
+          },
+          {
+            "criterionId": "c2",
+            "met": false,
+            "note": "UCRT drift after a Windows update; re-pin is an owner decision."
+          },
+          {
+            "criterionId": "c3",
+            "met": true,
+            "note": ""
+          },
+          {
+            "criterionId": "c4",
+            "met": true,
+            "note": ""
+          },
+          {
+            "criterionId": "c5",
+            "met": true,
+            "note": ""
+          },
+          {
+            "criterionId": "c6",
+            "met": true,
+            "note": ""
+          },
+          {
+            "criterionId": "c7",
+            "met": false,
+            "note": "Developer menu removed; flow re-ran through the setup screen."
+          },
+          {
+            "criterionId": "c8",
+            "met": false,
+            "note": "In-game evidence from an earlier build, not re-run."
+          },
+          {
+            "criterionId": "c9",
+            "met": false,
+            "note": "Fixture probes not re-run."
+          },
+          {
+            "criterionId": "c10",
+            "met": false,
+            "note": "Producer contract preflight fails on the UCRT drift."
+          },
+          {
+            "criterionId": "c11",
+            "met": false,
+            "note": "In-game evidence from an earlier build, not re-run."
+          },
+          {
+            "criterionId": "c12",
+            "met": true,
+            "note": ""
+          },
+          {
+            "criterionId": "c13",
+            "met": false,
+            "note": "Test-GenerationIdentity not run (rewrites a build input)."
+          },
+          {
+            "criterionId": "c14",
+            "met": false,
+            "note": "Not re-run."
+          },
+          {
+            "criterionId": "c15",
+            "met": false,
+            "note": "Fixture probe not re-run."
+          },
+          {
+            "criterionId": "c16",
+            "met": false,
+            "note": "Fixture probe not re-run."
+          },
+          {
+            "criterionId": "c17",
+            "met": false,
+            "note": "Fixture probes not re-run."
+          },
+          {
+            "criterionId": "c19",
+            "met": true,
+            "note": ""
+          },
+          {
+            "criterionId": "c20",
+            "met": true,
+            "note": ""
+          },
+          {
+            "criterionId": "c21",
+            "met": true,
+            "note": ""
+          },
+          {
+            "criterionId": "c22",
+            "met": true,
+            "note": ""
+          },
+          {
+            "criterionId": "c23",
+            "met": true,
+            "note": ""
+          },
+          {
+            "criterionId": "c24",
+            "met": false,
+            "note": "Fixture probe not re-run."
+          },
+          {
+            "criterionId": "c25",
+            "met": true,
+            "note": ""
+          },
+          {
+            "criterionId": "c26",
+            "met": true,
+            "note": ""
+          },
+          {
+            "criterionId": "c27",
+            "met": true,
+            "note": ""
+          },
+          {
+            "criterionId": "c28",
+            "met": false,
+            "note": "Fixture probe not re-run."
+          },
+          {
+            "criterionId": "c29",
+            "met": false,
+            "note": "Fixture probe not re-run."
+          },
+          {
+            "criterionId": "c30",
+            "met": false,
+            "note": "Fixture probe not re-run."
+          },
+          {
+            "criterionId": "c31",
+            "met": true,
+            "note": ""
+          },
+          {
+            "criterionId": "c32",
+            "met": true,
+            "note": ""
+          },
+          {
+            "criterionId": "c33",
+            "met": true,
+            "note": ""
+          },
+          {
+            "criterionId": "c34",
+            "met": false,
+            "note": "Fixture probes not re-run."
+          },
+          {
+            "criterionId": "c35",
+            "met": true,
+            "note": ""
+          },
+          {
+            "criterionId": "c36",
+            "met": true,
+            "note": ""
+          },
+          {
+            "criterionId": "c37",
+            "met": false,
+            "note": "Seam camera and picking not re-run."
+          },
+          {
+            "criterionId": "c38",
+            "met": true,
+            "note": ""
+          },
+          {
+            "criterionId": "c39",
+            "met": false,
+            "note": "Navigation caches rebuilt on a load in the one-shot run."
+          },
+          {
+            "criterionId": "c40",
+            "met": true,
+            "note": ""
+          },
+          {
+            "criterionId": "c41",
+            "met": true,
+            "note": ""
+          },
+          {
+            "criterionId": "c42",
+            "met": true,
+            "note": ""
+          },
+          {
+            "criterionId": "c43",
+            "met": true,
+            "note": ""
+          },
+          {
+            "criterionId": "c44",
+            "met": true,
+            "note": ""
+          },
+          {
+            "criterionId": "c45",
+            "met": true,
+            "note": ""
+          },
+          {
+            "criterionId": "c46",
+            "met": false,
+            "note": "In-game recovery run not repeated."
+          },
+          {
+            "criterionId": "c47",
+            "met": true,
+            "note": ""
+          },
+          {
+            "criterionId": "c48",
+            "met": true,
+            "note": ""
+          },
+          {
+            "criterionId": "c49",
+            "met": true,
+            "note": ""
+          },
+          {
+            "criterionId": "c50",
+            "met": true,
+            "note": ""
+          },
+          {
+            "criterionId": "c51",
+            "met": false,
+            "note": "Observed failure: field.rock."
+          },
+          {
+            "criterionId": "c52",
+            "met": false,
+            "note": "Observed failure: island voyage."
+          },
+          {
+            "criterionId": "c55",
+            "met": false,
+            "note": "Measurements file not refreshed."
+          },
+          {
+            "criterionId": "c56",
+            "met": false,
+            "note": "Lifecycle evidence is for the previous package."
+          },
+          {
+            "criterionId": "c57",
+            "met": true,
+            "note": ""
+          },
+          {
+            "criterionId": "c58",
+            "met": true,
+            "note": "The scenario ran once and every step is recorded."
+          }
+        ],
+        "notes": "This is the sprint's acceptance node and the planned human handoff. Accepting it is the owner's decision. The required scenario has observed failures (fail by the epic's rule), and several covered tickets' in-game evidence is from earlier builds. Open owner decisions are on the epic: copied culture text, the VC++ runtime, read-only installs, ANSI user names, release on merge, and the UCRT re-pin."
+      },
       "failure": null,
       "fencingToken": 1,
       "id": "at_01m5823knpjd7ffgm736317b14",
+      "increment": {
+        "base": {
+          "commit": "b844ceafcd5a718c9550179b78c0bbaab723e82d",
+          "kind": "epic_start"
+        },
+        "branch": "codex/fwgc-procedural-campaign",
+        "checks": [
+          {
+            "detail": "Names the epic branch codex/fwgc-procedural-campaign.",
+            "name": "Epic branch",
+            "status": "passed"
+          },
+          {
+            "detail": "Commit 7c56032 exists.",
+            "name": "Commit exists",
+            "status": "passed"
+          },
+          {
+            "detail": "Commit 7c56032 has one parent, 55576ca.",
+            "name": "One parent",
+            "status": "passed"
+          },
+          {
+            "detail": "Commit 7c56032 is reachable from codex/fwgc-procedural-campaign.",
+            "name": "On the epic branch",
+            "status": "passed"
+          },
+          {
+            "detail": "Commit 7c56032 comes after the epic's start commit b844cea.",
+            "name": "After the base commit",
+            "status": "passed"
+          },
+          {
+            "detail": "No accepted work ticket of this sprint recorded a commit hash, so there is nothing to compare.",
+            "name": "Squashed, not merged",
+            "status": "skipped"
+          }
+        ],
+        "commit": "7c56032ce44924dd5c3e593c33e00b93b6ba1fb7",
+        "parent": "55576ca8d94c12d414b8c1b1d1547cbf8f8e9e6b",
+        "passed": true,
+        "reasons": [],
+        "verifiedAt": "2026-10-19T02:19:06.675Z"
+      },
       "kind": "work",
       "number": 1,
-      "outputs": null,
+      "outputs": {
+        "artifacts": [
+          {
+            "hash": "sha256:ed63d689da10e7c58369bdc6ed1938d8484d0cc5abb4633b06177601132e52aa",
+            "label": "Local package (git-ignored)",
+            "location": "artifacts/release/MNBL.ProceduralWorld-v0.0.1.zip",
+            "remoteOnly": false
+          },
+          {
+            "hash": null,
+            "label": "One-shot run verdict",
+            "location": "evidence/one-shot/one-shot-run.json",
+            "remoteOnly": false
+          },
+          {
+            "hash": null,
+            "label": "Acceptance index",
+            "location": "evidence/one-shot/acceptance-index.json",
+            "remoteOnly": false
+          },
+          {
+            "hash": null,
+            "label": "Offline suites",
+            "location": "evidence/one-shot/offline-suites.json",
+            "remoteOnly": false
+          },
+          {
+            "hash": null,
+            "label": "Final report",
+            "location": "docs/one-shot-acceptance.md",
+            "remoteOnly": false
+          }
+        ],
+        "branch": "codex/fwgc-procedural-campaign",
+        "changedFiles": [
+          "src/MNBL.ProceduralWorld/Automation/TwoWorldMatrixProbe.cs",
+          "src/MNBL.ProceduralWorld/Automation/LandMissionsProbe.cs",
+          "src/MNBL.ProceduralWorld/Automation/CampaignSoakProbe.cs",
+          "tools/Test-OneShot.ps1",
+          "tools/summarize_one_shot.py",
+          "tools/Test-OfflineSuites.ps1",
+          "tools/Test-Deployment.ps1",
+          "tools/build_acceptance_index.py",
+          "evidence/one-shot/one-shot-run.json",
+          "evidence/one-shot/offline-suites.json",
+          "evidence/one-shot/producer-process-contract-20261019.json",
+          "evidence/one-shot/ucrt-drift.json",
+          "evidence/one-shot/acceptance-index.json",
+          "evidence/release/package-manifest.json",
+          "evidence/runtime/build-api-inputs.json",
+          "evidence/fwg/source-reader.json",
+          "evidence/fwg/travel-gate.json",
+          "docs/one-shot-acceptance.md",
+          "docs/runbooks/development.md",
+          "README.md"
+        ],
+        "commits": [
+          "7c56032ce44924dd5c3e593c33e00b93b6ba1fb7"
+        ],
+        "summary": "The one-shot acceptance scenario ran once on the clean local package (ed63d689, assembly bc323534), with the development module and store aside, the store fresh and the battle-scale lock held, through tools/Test-OneShot.ps1. Graded by tools/summarize_one_shot.py into evidence/one-shot/one-shot-run.json and recorded in evidence/one-shot/acceptance-index.json (s7, finalScenario). Report: docs/one-shot-acceptance.md.\n\nRESULT: the scenario FAILS (observed failures stay failed).\n- Step 1 fail: every in-game check passed (identities, world A from New Campaign, culture, character creation, play, full globe, preview-vs-campaign identities); the producer's pinned UCRT no longer matches the system after a Windows update.\n- Step 2 fail: travel, trade and recruitment passed; 12 of 13 land cases passed; field.rock had a third AI party join the battle.\n- Step 3 fail: the island voyage turned back to its start town, and the later cases cascaded.\n- Step 4 fail: the seam crossing on land, the AI pursuit and the fleet across the seam passed with save and load; the navigation caches were rebuilt on a load although they existed; camera, picking and sailing at the seam on a generated world were not run.\n- Step 5 blocked: A saved with mutable state and loaded in the same process and after a cold restart, equal to its save, no generator on load; B (seed 73) generated in the same process and differs; B cannot be activated.\n- Step 6 blocked: cancellation, invalid-copy refusals, unchanged hashes and no orphan producer passed; cross-world callbacks need B; a separate test root was not run.\n- Both land and naval failures did not reproduce in reruns on the same build from another designated save (7368, 11472); intermittent vs state-dependent is not established.\n\nOffline suites (tools/Test-OfflineSuites.ps1): 45/46; Test-ProducerProcess fails only the UCRT preflight (evidence/one-shot/ucrt-drift.json).\n\nFixed on the way: Test-Deployment's fixture (missing surface template files since MMR-57); eight raw harness inputs restored after the evidence cleanup.\n\nProbe change: fixtureB=false for land_missions, campaign_soak and two_world_matrix (the fixture second world is recorded blocked; the default behaviour is unchanged).\n\nOne independent read-only review; all its findings fixed or disclosed.\n\nThe package is a local test package, not release-certified."
+      },
       "reconciledAt": null,
       "revisionId": "rv_01m4xazdg471p8ggry5yynj8ye",
-      "state": "running",
-      "submittedAt": null,
+      "state": "accepted",
+      "submittedAt": "2026-10-19T02:19:06.850Z",
       "supersededAt": null,
       "ticketContentHash": "sha256:2c5c238dace1f7ccee0feb822c0297e71b59abb933e5e78e7aa52331904e3afe",
       "ticketId": "tk_01m4fpnf64s6r96g13ymz26760",
-      "updatedAt": "2026-10-18T19:14:06.227Z",
+      "updatedAt": "2026-10-19T03:32:53.163Z",
       "worker": {
         "catalogRevision": null,
         "effort": "medium",
@@ -8843,9 +9258,19 @@
       }
     }
   ],
-  "checkpoints": [],
+  "checkpoints": [
+    {
+      "decidedAt": "2026-10-19T23:45:33.650Z",
+      "decidedBy": "ss_01m55nzedtdvht0hdwxecrsp49",
+      "id": "ck_01m5b8wqyj95yy2vpm7dc53tx2",
+      "outcome": "completed",
+      "policy": "human",
+      "reportId": "rp_01m5a3s9vn218my86k8ryq69hw",
+      "sprintId": "sp_01m4fpnf64qct7tw9sds5jevby"
+    }
+  ],
   "createdAt": "2026-10-09T20:09:51.548Z",
-  "endedAt": null,
+  "endedAt": "2026-10-19T23:45:33.650Z",
   "epicId": "ep_01m4fpnf646t254mnh69jhz107",
   "format": "darkmechanicus.run",
   "formatVersion": 1,
@@ -8857,11 +9282,656 @@
   "number": 1,
   "ownerMachineId": "mc_01m4fpatkne38c3mr69f73rygk",
   "pauseReason": null,
-  "reports": [],
+  "reports": [
+    {
+      "content": {
+        "accepted": [
+          "MMR-9 Inventory the installed game, kit, DLC and build toolchain",
+          "MMR-10 Rebuild and register a pinned FWGC++ executable",
+          "MMR-11 Freeze world presentation and campaign-content contracts",
+          "MMR-12 Create the isolated runtime module and reproducible build skeleton",
+          "MMR-13 Record a vanilla land and War Sails gameplay baseline",
+          "MMR-14 Trace runtime terrain, navigation, bootstrap and load extension points",
+          "MMR-15 Launch FWGC++ from an in-game generation probe",
+          "MMR-16 Prove runtime terrain rendering, height queries and picking",
+          "MMR-18 Prove generated campaign objects register before initialization",
+          "MMR-22 Pin and supervise the FWGC++ producer and worldbridge toolchain",
+          "MMR-17 Prove generated land and War Sails routes on runtime geometry",
+          "MMR-23 Implement a bounded streaming reader for FWGC++ split-world documents",
+          "MMR-24 Make each New Campaign generation reproducible, distinct and resumable",
+          "MMR-59 Prove generated flow, weather and naval native systems can rebind at runtime",
+          "MMR-60 Prove generated terrain survives land and naval mission transitions",
+          "MMR-63 Prove periodic east/west world travel, camera behavior and save identity",
+          "MMR-19 Prove generated-world save identity survives a cold restart",
+          "MMR-21 Select the runtime backend and record provisional limits",
+          "MMR-25 Resolve campaign world presentation and a reversible coordinate transform",
+          "MMR-26 Compile campaign terrain and material masks",
+          "MMR-27 Compile stable campaign settlements, factions and population semantics",
+          "MMR-28 Compile static land, sea and port candidates",
+          "MMR-30 Implement campaign-scoped identities and ordered object registration",
+          "MMR-29 Publish immutable data bundles",
+          "MMR-31 Map generated cultures, realms and clans into campaign factions",
+          "MMR-32 Generate heroes, families, troop rosters and recruit templates",
+          "MMR-33 Instantiate towns, villages, castles and a generated economy",
+          "MMR-34 Replace vanilla startup, spawn and behavior assumptions",
+          "MMR-35 Compile generated ports, fleets and naval faction records",
+          "MMR-36 Validate the entire generated campaign graph before activation",
+          "MMR-37 Implement the runtime surface and map-query backend",
+          "MMR-38 Realize and validate typed land and naval navigation",
+          "MMR-39 Attach naval water, flow and climate systems",
+          "MMR-64 Implement canonical periodic coordinates and distance contracts",
+          "MMR-65 Implement seam-crossing route execution and periodic spatial queries",
+          "MMR-66 Implement wrapped camera, render copies and map interaction",
+          "MMR-40 Place generated settlement entities, gates, ports and blockade geometry",
+          "MMR-41 Build per-world distance caches and seal playability evidence",
+          "MMR-42 Resolve mission scenes and terrain context from the generated map",
+          "MMR-43 Add the procedural-world setup screen to New Campaign",
+          "MMR-44 Implement the transactional generation job and engine-thread scheduler",
+          "MMR-62 Promote the early save binding and world-reference index",
+          "MMR-45 Commit the generated world and bootstrap the campaign atomically",
+          "MMR-46 Provide world preview, validation feedback and regeneration",
+          "MMR-47 Add recoverable errors, world inspection and staging cleanup",
+          "MMR-48 Persist immutable world definitions beside mutable campaign saves",
+          "MMR-49 Restore worlds before deserialization and isolate repeated sessions",
+          "MMR-50 Enforce version compatibility and explicit save migration boundaries",
+          "MMR-51 Exercise generated campaign gameplay in the bounded first test",
+          "MMR-52 Verify land missions and settlement interactions across biomes",
+          "MMR-53 Verify naval gameplay, raids, blockades and mission outcomes",
+          "MMR-56 Measure the first-test profile and A/B seed differentiation",
+          "MMR-57 Package the runtime module and validate a clean installed build",
+          "MMR-58 Document the tested local package and one-shot evidence",
+          "MMR-1 Run the final one-shot campaign acceptance (accepted with its unmet criteria identified)"
+        ],
+        "blocked": [
+          "One-shot steps 5 and 6: saving and loading a second production-generated world, and cross-world callbacks. Only seed 42 activates: most seeds fail the quality gate, and seed 73 previews but is refused at the village binding.",
+          "Land battle classes that world A lacks (steppe, wetland), which need world B."
+        ],
+        "changes": {
+          "commits": [
+            "dd7d116 big ole init",
+            "d4209f3 pause",
+            "8924746 Expand .gitignore and stop tracking raw probe dumps",
+            "030edaa next \"minor\" bundle of changes",
+            "44ea401 next updates",
+            "1f98bad some cleanup",
+            "b50f1ac Add per-mod GitHub release pipeline",
+            "ec27e81 few updates",
+            "55576ca mega epic just about done",
+            "7c56032 MMR-1: run the one-shot acceptance on the clean package and record it (sprint increment)"
+          ],
+          "files": [
+            "src/MNBL.ProceduralWorld/** (180 files)",
+            "src/WorldBridge/** (59 files)",
+            "Modules/MNBL.ProceduralWorld/** (6 files)",
+            "worldgen/** (contracts 17, policies 21, templates 9, calibration 3, profiles, fixtures, validation, producer.lock.json)",
+            "tests/** (Campaign, Generation, Persistence, Runtime, UI, World, ci, Python format and lock tests)",
+            "tools/** (build, deploy, package, probe launch and collect, about 50 Test-*.ps1 harnesses and orchestrators, about 45 summarize_*.py, scenebin, ci)",
+            "docs/** (one document per ticket, runbooks/development.md, runbooks/player-worlds.md, one-shot-acceptance.md, packaging.md, releases.md, decisions)",
+            "evidence/** (baseline 19, fwg 85, runtime 86, world 25, persistence 19, generation 13, ui 7, gameplay 6, release 3, campaign 3, one-shot 5)",
+            "config/** (mods.json, runtime-api-lock.json, ci-references.json), tools.lock.json, .github/workflows/**, README.md"
+          ]
+        },
+        "checks": [
+          {
+            "detail": "Steps 1-4 fail, 5-6 blocked; the sequence's own checks (install alone, official files and 107 saves unchanged, development environment restored) pass.",
+            "name": "one-shot scenario on the clean package (MMR-1)",
+            "status": "failed"
+          },
+          {
+            "detail": "45/46 (tools/Test-OfflineSuites.ps1); only the UCRT preflight fails.",
+            "name": "offline suites on the integrated sources",
+            "status": "failed"
+          },
+          {
+            "detail": "27/27 on package f70b44c0: install alone, disable, remove, reinstall, read-only (unsupported by design, fails cleanly).",
+            "name": "clean-install lifecycle (MMR-57)",
+            "status": "passed"
+          },
+          {
+            "detail": "7c56032, one squashed commit on the epic branch after the start commit (server-verified).",
+            "name": "sprint increment",
+            "status": "passed"
+          },
+          {
+            "detail": "evidence/one-shot/acceptance-index.json: 87 hashed evidence files; s1-s7 with pass/fail/blocked/not-run per aspect; deferred certification listed separately.",
+            "name": "acceptance index",
+            "status": "passed"
+          }
+        ],
+        "epicOutcome": {
+          "successCriteria": [
+            {
+              "criterionId": "s1",
+              "met": false,
+              "note": "The pinned FWGC++ build, game, War Sails and Modding Kit are identified and verified, and the stale binary is refused. Since a Windows update, the producer's pinned UCRT no longer matches the system (evidence/one-shot/ucrt-drift.json)."
+            },
+            {
+              "criterionId": "s2",
+              "met": false,
+              "note": "In-game generation from New Campaign with progress, cancel, errors and preview works without an editor, publishing or a restart. Only seed 42 gives a playable world; seed 73 previews but is refused at Start Campaign."
+            },
+            {
+              "criterionId": "s3",
+              "met": false,
+              "note": "The flat wrapping map, periodic coordinates, routes and seam travel on land with save and load work on world A. Known seam defects remain (planar UI lists, a missed storm tick), the caches were rebuilt on a load, and seam camera, picking and naval encounters on a generated world were not run."
+            },
+            {
+              "criterionId": "s4",
+              "met": false,
+              "note": "A coherent generated Sandbox campaign with no Calradia objects works on world A (trade, recruitment, wars, ownership, missions). Seed 73's villages cannot be bound, and a land battle failed once in the one-shot."
+            },
+            {
+              "criterionId": "s5",
+              "met": false,
+              "note": "War Sails ports, fleets, routes, caches, voyages, blockade, raid and a pirate encounter work on world A. In the one-shot the island voyage turned back once, and the caches were rebuilt on a load. Boarding, ship damage, battles fought to the end and blockade battles were not run."
+            },
+            {
+              "criterionId": "s6",
+              "met": false,
+              "note": "Blocked. Save binding, cold-restart loads and refusals before simulation work for world A and the MMR-19 fixture world, but two production-generated worlds cannot be tested because only seed 42 activates."
+            },
+            {
+              "criterionId": "s7",
+              "met": false,
+              "note": "The clean package ran the one-shot scenario, and identities, results, timings and limitations are recorded, but observed failures keep it failed (docs/one-shot-acceptance.md)."
+            }
+          ],
+          "summary": "The epic delivered an in-game procedural campaign system that works end to end for seed 42 on a clean local package: generation from New Campaign, a generated Sandbox campaign with War Sails, a wrapping flat map, and world-bound saves. It did not meet its success criteria as written. Only one production seed activates, so the second-world requirements are blocked. The final one-shot run observed failures (UCRT pin drift; one land battle and one naval voyage, neither reproduced from another save; a navigation-cache rebuild on load). Seam camera, picking and naval play on a generated world were not run. Every unmet criterion is identified in evidence/one-shot/acceptance-index.json; deferred certification is listed there as not run. The local test package is not release-certified."
+        },
+        "exitCriteria": [
+          {
+            "criterionId": "x1",
+            "met": true,
+            "note": "Met through its stated alternative: the final result explicitly identifies the unmet criteria. Not every implementation ticket has current in-game evidence for the integrated build, and the clean package did not complete the A/B scenario (observed failures in steps 1-4, second-world steps blocked). Each item is listed per criterion in evidence/one-shot/acceptance-index.json, in MMR-1's acceptance and in docs/one-shot-acceptance.md."
+          },
+          {
+            "criterionId": "x2",
+            "met": true,
+            "note": "The acceptance index gives each epic outcome and each one-shot step pass/fail/blocked/not-run, and lists deferred certification (seed corpus, runtime-world sweep, long soaks, endurance, all-season, resolution/performance, production targets) once and separately. README, the runbooks and the report call no skipped mandatory feature complete, and the package is never labelled release-certified."
+          }
+        ],
+        "failed": [
+          "One-shot step 1: the producer's pinned UCRT no longer matches the system after Windows updates KB5127647/KB5127648; every in-game check passed.",
+          "One-shot step 2: land_missions field.rock had a third AI party join the battle. A rerun from another designated save passed; intermittent or state-dependent is not established.",
+          "One-shot step 3: naval_missions route.island turned back to its start town, and five later cases cascaded. A rerun from another designated save passed.",
+          "One-shot step 4: the navigation caches were rebuilt on the matrix's same-process load although they existed (a second cache key was read on the cold load).",
+          "Offline suites 45/46: Test-ProducerProcess fails the UCRT preflight only."
+        ],
+        "followUps": [
+          {
+            "body": "Repair unplaceable or unreachable towns instead of rejecting whole worlds (map epic 2's MMR-251), and fix seed 73's village binding (towns with 6-8 villages, towns and castles with none). Then re-run the two-world steps on two production worlds.",
+            "title": "Make more seeds produce a playable world"
+          },
+          {
+            "body": "Rerun land_missions and naval_missions from the kept mnbl_oneshot_A_designated save and its store (build/mmr1/one-shot-saves, build/mmr1/one-shot-store-20261019003951) to separate intermittent from state-dependent. field.rock: let the probe isolate the battle from joining parties. route.island: find why the voyage re-targeted to Korpor.",
+            "title": "Trace the intermittent land and naval failures"
+          },
+          {
+            "body": "In the one-shot run the matrix's same-process load rebuilt the caches (397 s, key 2a603033) and the cold load read another key (175479b6) after the scene was re-encoded.",
+            "title": "Investigate the navigation-cache rebuild on load"
+          },
+          {
+            "body": "So far these ran only on the MMR-63/66 periodic fixture.",
+            "title": "Drive camera, picking and naval play at the seam on a generated world"
+          },
+          {
+            "body": "The fixture-based probes of MMR-16/17/18/19/30/33/34/35/39/59/60/63/66 and MMR-47's recovery run, plus the clean-install lifecycle on the current package.",
+            "title": "Re-run the stale in-game evidence on the current build"
+          },
+          {
+            "body": "Copied culture text, the VC++ runtime (static build or declared), read-only installs, ANSI user names, release-on-merge gating, and the UCRT re-pin.",
+            "title": "Owner decisions before any public release"
+          }
+        ],
+        "retro": {
+          "actions": [
+            "Make generated worlds the default test subject: probes should take a world or save argument and never require fixtures that are not in the package.",
+            "Keep one offline suite runner (tools/Test-OfflineSuites.ps1) in CI or a pre-acceptance gate, so failures surface when they happen.",
+            "Track evidence currency per build: re-run in-game probes on each package build, or mark evidence stale automatically.",
+            "Add an environment-drift check (UCRT, engine DLLs) to Doctor and the build preflight.",
+            "Before cleaning evidence, check which raw files the harnesses and scenario files reference by name (now listed in docs/runbooks/development.md)."
+          ],
+          "delivered": [
+            {
+              "demo": "Main menu > New Procedural Campaign: seed 42, Generate, preview, Start Campaign, character creation with the world's cultures.",
+              "evidence": "evidence/runtime/world-setup.json; one-shot runs 23796 and 29176 (evidence/one-shot/one-shot-run.json)",
+              "ticket": "tk_01m4fqfbgkgj055h5hvwmbzma8"
+            },
+            {
+              "demo": "Start Campaign commits the generated world and enters a Sandbox campaign on its map (358 settlements on world A).",
+              "evidence": "evidence/generation/activation-matrix.json; one-shot step 1",
+              "ticket": "tk_01m4fqfbgknga8wqn5seq3j94d"
+            },
+            {
+              "demo": "Save world A with changed state, cold-restart, load: equal to its save over 1,006 parties, no generator started.",
+              "evidence": "evidence/persistence/two-world-matrix.json; one-shot runs 35948 and 31404",
+              "ticket": "tk_01m4fqfbgkz61vc2vqzb3vhggb"
+            },
+            {
+              "demo": "Buy a ship, sail port to port and to an island, blockade, pirate battle, seaborne raid on world A.",
+              "evidence": "evidence/gameplay/naval-scenarios.json (104/104); one-shot run 48692 (failed) and rerun 7368 (9/9)",
+              "ticket": "tk_01m4fqfbgm6fz7za27erzb4tzv"
+            },
+            {
+              "demo": "Extract the zip into Modules, enable with Harmony and War Sails, generate and play; disable, remove and reinstall keep saves.",
+              "evidence": "evidence/release/clean-install.json (27/27), evidence/release/package-manifest.json, docs/packaging.md",
+              "ticket": "tk_01m4fqfbgmgdqahamt65ejaxz7"
+            },
+            {
+              "demo": "README plus the developer and player runbooks.",
+              "evidence": "README.md, docs/runbooks/development.md, docs/runbooks/player-worlds.md",
+              "ticket": "tk_01m4fqfbgmbwtnjnqcfsmpm90r"
+            },
+            {
+              "demo": "tools/Test-OneShot.ps1 on the clean package; grade with tools/summarize_one_shot.py.",
+              "evidence": "docs/one-shot-acceptance.md, evidence/one-shot/one-shot-run.json, evidence/one-shot/acceptance-index.json",
+              "ticket": "tk_01m4fpnf64s6r96g13ymz26760"
+            }
+          ],
+          "discoveries": [
+            {
+              "body": "The matrix's same-process load rebuilt them (397 s); the cold load read a second key after the scene was re-encoded.",
+              "ticket": "tk_01m4fqfbgkqzt9n8x2a4fcs4wz",
+              "title": "Navigation caches rebuilt on a load despite existing caches"
+            },
+            {
+              "body": "Observed once on a freshly prepared campaign; it did not reproduce from another save.",
+              "ticket": "tk_01m4fqfbgm6fz7za27erzb4tzv",
+              "title": "Naval island voyage can turn back to the start town"
+            },
+            {
+              "body": "The probe's two-party check fails when an AI lord joins.",
+              "ticket": "tk_01m4fqfbgmkdbp3b70wcgxsrrh",
+              "title": "Land field battles can be joined by third parties"
+            },
+            {
+              "body": "The preflight check ucrtbase_matches_lock now fails; re-pinning is an owner decision.",
+              "ticket": "tk_01m4fqfbgk0r8zqdf1537xw3s4",
+              "title": "Producer pinned UCRT drift after Windows updates"
+            },
+            {
+              "body": "MNBL.ProceduralWorld is release: true at v0.0.1, so the first merge into main publishes an ordinary release without a disclaimer.",
+              "ticket": "tk_01m4fqfbgmbwtnjnqcfsmpm90r",
+              "title": "Release on merge"
+            },
+            {
+              "body": "The missing-world refusal names tools/Transfer-WorldSave.ps1, a repository tool.",
+              "ticket": "tk_01m4fqfbgky0m5dnh669pqa1fk",
+              "title": "Load refusals point players to a tool the package lacks"
+            }
+          ],
+          "leftovers": [],
+          "tierFit": [
+            {
+              "note": "Sized medium; it needed a runtime template-derivation design, three clean-install sequences and an ACL investigation.",
+              "ticket": "tk_01m4fqfbgmgdqahamt65ejaxz7",
+              "verdict": "undersized"
+            },
+            {
+              "note": "Sized small with low effort; it was a full-repository audit with an evidence index and runbooks.",
+              "ticket": "tk_01m4fqfbgmbwtnjnqcfsmpm90r",
+              "verdict": "undersized"
+            },
+            {
+              "note": "Sized medium; the integrated session needed new tooling, probe options, a long sequence, reruns and offline-suite fixes.",
+              "ticket": "tk_01m4fpnf64s6r96g13ymz26760",
+              "verdict": "undersized"
+            },
+            {
+              "note": "Medium; the load path, guards and two-world matrix spanned many hours of in-game runs.",
+              "ticket": "tk_01m4fqfbgkz61vc2vqzb3vhggb",
+              "verdict": "undersized"
+            },
+            {
+              "note": "Medium; one profile probe and the budget derivation.",
+              "ticket": "tk_01m4fqfbgmw4wvsvp7fy58y1xk",
+              "verdict": "right_sized"
+            },
+            {
+              "note": "Medium; the naval scenarios fitted, with one review and one confirming run.",
+              "ticket": "tk_01m4fqfbgm6fz7za27erzb4tzv",
+              "verdict": "right_sized"
+            }
+          ],
+          "wentPoorly": [
+            "Only one production seed activates. The quality gate rejects whole worlds, so the second-world requirements stayed blocked all sprint and fixtures stood in.",
+            "Many probes depend on development fixtures and scene slots, so they cannot run on the package. The final acceptance had to add options and could not refresh their evidence.",
+            "Every ticket's in-game evidence was on its own build. Nothing kept the evidence current, and MMR-1 found most of it stale.",
+            "Long in-game sequences cost hours, through navigation-cache rebuilds (about 6.5 minutes per world per build), probe hangs and orchestrator stalls.",
+            "Environment drift (a Windows UCRT update) silently broke a pinned check until the final suite run.",
+            "The evidence cleanup moved raw files that harnesses read, which broke offline suites until they were restored."
+          ],
+          "wentWell": [
+            "Proving every engine capability as an executable probe first (R01-R10) kept the backend choice grounded; no static map was substituted.",
+            "Content-addressed, immutable world bundles plus save headers bound saves reliably: refusals happen before deserialization, and cold restarts reproduce the save exactly.",
+            "One independent read-only review per ticket, with fixes in one batch, caught real defects every time (read-only denial semantics, overstated claims, stale evidence).",
+            "The shared-installation discipline (lock, process checks, owned-PID-only stops, swap and undo in finally) let long in-game sequences run beside the Battle Scale work without collisions."
+          ]
+        },
+        "risks": [
+          "Merging codex/fwgc-procedural-campaign into main publishes MNBL.ProceduralWorld v0.0.1 as an ordinary GitHub release (release: true, no tag), with no test-package disclaimer.",
+          "Only seed 42 makes a playable world; a player choosing seeds will mostly be refused.",
+          "The first start of each world, and the first start or load after a module update, freezes the game for about 6.4 minutes; an unexpected cache rebuild on a load was observed.",
+          "The assembly embeds about 1,051 copied official culture strings (open legal and product decision).",
+          "The producer's pinned UCRT drifted with a Windows update; re-pinning changes worldgen/producer.lock.json, a world input.",
+          "The native executables need the VC++ 2015-2022 x64 runtime, which the game does not ship.",
+          "Read-only installations and Windows user names outside the ANSI code page cannot generate worlds.",
+          "Many in-game probes depend on development fixtures (MMR-19 and MMR-63 worlds, scene slots) and cannot run on the package."
+        ],
+        "summary": "Sprint 1 implemented the whole procedural campaign in one pass. All 54 required tickets and the acceptance node MMR-1 are accepted; the increment is 7c56032 on codex/fwgc-procedural-campaign.\n\nWhat works on the clean local package (MNBL.ProceduralWorld-v0.0.1.zip, ed63d689):\n- New Procedural Campaign generates a world from a seed inside the running game, with progress, cancel, errors and a preview.\n- The world becomes a Sandbox campaign with generated terrain, settlements, kingdoms, clans, heroes and an economy.\n- Land and War Sails play, an east/west wrapping map, and saves bound to their world with refusals before simulation.\n\nWhat the final one-shot run (MMR-1, docs/one-shot-acceptance.md) found:\n- Step 1 fail (pinned UCRT); steps 2, 3 and 4 fail; steps 5 and 6 blocked.\n- Observed failures: a land battle joined by a third party; a naval island voyage that turned back; the navigation caches rebuilt on one load.\n- Only seed 42 makes a playable world, so every second-world step is blocked.\n- A Windows update replaced ucrtbase.dll after the producer's runtime was pinned.\n\nEpic outcome: s1-s5 and s7 not met, s6 blocked. Every unmet criterion is identified in evidence/one-shot/acceptance-index.json. The package is a local test package, not release-certified."
+      },
+      "contentHash": "sha256:63aa61301fbaec22f0a0520a0f52a3e9401cdcc1260eaba117f46df520e58a64",
+      "createdAt": "2026-10-19T03:34:34.670Z",
+      "id": "rp_01m593kbxen1acd1py9aww5x9n",
+      "reportRevision": 1,
+      "sprintId": "sp_01m4fpnf64qct7tw9sds5jevby",
+      "submittedBy": "Claude Code"
+    },
+    {
+      "content": {
+        "accepted": [
+          "MMR-9 Inventory the installed game, kit, DLC and build toolchain",
+          "MMR-10 Rebuild and register a pinned FWGC++ executable",
+          "MMR-11 Freeze world presentation and campaign-content contracts",
+          "MMR-12 Create the isolated runtime module and reproducible build skeleton",
+          "MMR-13 Record a vanilla land and War Sails gameplay baseline",
+          "MMR-14 Trace runtime terrain, navigation, bootstrap and load extension points",
+          "MMR-15 Launch FWGC++ from an in-game generation probe",
+          "MMR-16 Prove runtime terrain rendering, height queries and picking",
+          "MMR-18 Prove generated campaign objects register before initialization",
+          "MMR-22 Pin and supervise the FWGC++ producer and worldbridge toolchain",
+          "MMR-17 Prove generated land and War Sails routes on runtime geometry",
+          "MMR-23 Implement a bounded streaming reader for FWGC++ split-world documents",
+          "MMR-24 Make each New Campaign generation reproducible, distinct and resumable",
+          "MMR-59 Prove generated flow, weather and naval native systems can rebind at runtime",
+          "MMR-60 Prove generated terrain survives land and naval mission transitions",
+          "MMR-63 Prove periodic east/west world travel, camera behavior and save identity",
+          "MMR-19 Prove generated-world save identity survives a cold restart",
+          "MMR-21 Select the runtime backend and record provisional limits",
+          "MMR-25 Resolve campaign world presentation and a reversible coordinate transform",
+          "MMR-26 Compile campaign terrain and material masks",
+          "MMR-27 Compile stable campaign settlements, factions and population semantics",
+          "MMR-28 Compile static land, sea and port candidates",
+          "MMR-30 Implement campaign-scoped identities and ordered object registration",
+          "MMR-29 Publish immutable data bundles",
+          "MMR-31 Map generated cultures, realms and clans into campaign factions",
+          "MMR-32 Generate heroes, families, troop rosters and recruit templates",
+          "MMR-33 Instantiate towns, villages, castles and a generated economy",
+          "MMR-34 Replace vanilla startup, spawn and behavior assumptions",
+          "MMR-35 Compile generated ports, fleets and naval faction records",
+          "MMR-36 Validate the entire generated campaign graph before activation",
+          "MMR-37 Implement the runtime surface and map-query backend",
+          "MMR-38 Realize and validate typed land and naval navigation",
+          "MMR-39 Attach naval water, flow and climate systems",
+          "MMR-64 Implement canonical periodic coordinates and distance contracts",
+          "MMR-65 Implement seam-crossing route execution and periodic spatial queries",
+          "MMR-66 Implement wrapped camera, render copies and map interaction",
+          "MMR-40 Place generated settlement entities, gates, ports and blockade geometry",
+          "MMR-41 Build per-world distance caches and seal playability evidence",
+          "MMR-42 Resolve mission scenes and terrain context from the generated map",
+          "MMR-43 Add the procedural-world setup screen to New Campaign",
+          "MMR-44 Implement the transactional generation job and engine-thread scheduler",
+          "MMR-62 Promote the early save binding and world-reference index",
+          "MMR-45 Commit the generated world and bootstrap the campaign atomically",
+          "MMR-46 Provide world preview, validation feedback and regeneration",
+          "MMR-47 Add recoverable errors, world inspection and staging cleanup",
+          "MMR-48 Persist immutable world definitions beside mutable campaign saves",
+          "MMR-49 Restore worlds before deserialization and isolate repeated sessions",
+          "MMR-50 Enforce version compatibility and explicit save migration boundaries",
+          "MMR-51 Exercise generated campaign gameplay in the bounded first test",
+          "MMR-52 Verify land missions and settlement interactions across biomes",
+          "MMR-53 Verify naval gameplay, raids, blockades and mission outcomes",
+          "MMR-56 Measure the first-test profile and A/B seed differentiation",
+          "MMR-57 Package the runtime module and validate a clean installed build",
+          "MMR-58 Document the tested local package and one-shot evidence",
+          "MMR-1 Run the final one-shot campaign acceptance (re-run 2026-10-19 after the owner-requested fixes: every step passes on package e20f2667)"
+        ],
+        "blocked": [],
+        "changes": {
+          "commits": [
+            "7c56032 MMR-1: run the one-shot acceptance on the clean package and record it (sprint increment)",
+            "(uncommitted) the owner-requested fixes of 2026-10-19, about 90 files, waiting for the owner's commit approval"
+          ],
+          "files": [
+            "src/WorldBridge/src/travel_graph.cpp, port_compiler.cpp, include/worldbridge/travel_graph.hpp, tests/travel_graph_tests.cpp:\n  - town repairs (coast port, mountain join, move);\n  - port pairs skip deck cells and must fit the engine port envelope (path bound);\n  - one deck per cell;\n  - harbour role dropped for sea_node_not_navigable and closed_basin harbours;\n  - trade-distance village exclusion;\n  - 88 travel checks",
+            "src/MNBL.ProceduralWorld/World: RuntimeNavigationBuilder (unplaceable settlements), NavigationValidator (coast seam transitions), WorldSurface (landmarks), GeneratedWaterSystem (edge-cut lake copies), PeriodicMapPresentation (hideout copy children, settlement hover/selection prefix), WorldNavigationCache (key)",
+            "src/MNBL.ProceduralWorld/Campaign: VillageBinding (step 5 evening out), GeneratedSpawnModel and NavalContentFactory (unplaceable settlements)",
+            "src/MNBL.ProceduralWorld/CampaignBootstrap: PeriodicSpatialTable (regenerated: 105 methods, the views read as distances), DiagnosticSandboxBootstrap (ICampaignTicker)",
+            "src/MNBL.ProceduralWorld/Automation and Diagnostics: the SeamPresentationProbe (new), the naval seam cases and the raid kill fix, the land isolation and seed B, the matrix production B and the AI battle setup, the compat isolated copy, the mission world identity, and the periodic presentation probe on generated worlds",
+            "tools: Test-OneShot.ps1, Test-NavigationSweep.ps1 (new), summarize_one_shot/seed_yield (new)/travel/two_world_matrix/naval_missions/clean_install inputs, build_acceptance_index.py, periodic/build_spatial_table.py",
+            "tests: World/NavigationSweep.cs (new), PeriodicCoordinateTests, WaterClimateTests, PlayabilityTests, Campaign/NavalContentTests, SettlementTests, Runtime NavalScenarios.json (raid-main-agent-down) and test_naval_regressions.py, fixtures/naval-missions-39772.json (new)",
+            "worldgen: producer.lock.json (UCRT pin), contracts ports.schema.json and travel-graph.schema.json, validation/first-test-measurements.json; tools.lock.json",
+            "evidence: one-shot (one-shot-run, offline-suites, acceptance-index), world (seed-yield new, periodic-consumers), gameplay (land, naval), persistence (two-world-matrix, compat-matrix), release (clean-install, package-manifest), runtime (periodic-coordinates-tests, build-api-inputs), fwg (producer-process-contract, travel-gate, source-reader, water-climate-review)",
+            "docs: one-shot-acceptance, travel-graph, settlements, periodic-presentation, periodic-movement, water-climate, runtime-navigation, runtime-backend-decision, naval-missions, land-missions, playability, packaging, campaign-behavior-compatibility, runbooks/player-worlds; README.md"
+          ]
+        },
+        "checks": [
+          {
+            "detail": "Package e20f2667: steps 1-6 and the sequence pass, every aspect. The runs were profile 40412, identities 50244, naval 39772 (117/117), land 18492 (163/163), soak 20424, matrix create 43576 (38/38) and cold 44704 (20/20), seam 44028 and compat 49820 (13/13).",
+            "name": "one-shot scenario on the clean package (MMR-1)",
+            "status": "passed"
+          },
+          {
+            "detail": "46/46 (tools/Test-OfflineSuites.ps1, 2026-10-19 12:53 UTC).",
+            "name": "offline suites on the integrated sources",
+            "status": "passed"
+          },
+          {
+            "detail": "27/27 on e20f2667 (install 31240, reload 50880, read-only 25652, with the disabled and removed boots).",
+            "name": "clean-install lifecycle on the final package",
+            "status": "passed"
+          },
+          {
+            "detail": "19 of 32 accepted at one attempt, and all 19 pass settlements, the stand-in navigation and the activation harnesses. Bundles reproduced byte for byte by the shipped worldbridge 2bfdbb9d (evidence/world/seed-yield.json). World A f596b58c and B f63c6841 are unchanged.",
+            "name": "offline seed sweep (seeds 42-73)",
+            "status": "passed"
+          },
+          {
+            "detail": "ctest 9/9; travel_graph_tests 88/88; summarize_travel's independent re-derivation of world A passes every world check.",
+            "name": "worldbridge CTest and travel checks",
+            "status": "passed"
+          },
+          {
+            "detail": "7c56032, one squashed commit on the epic branch (server-verified). The 2026-10-19 fixes are not committed yet.",
+            "name": "sprint increment",
+            "status": "passed"
+          },
+          {
+            "detail": "evidence/one-shot/acceptance-index.json: s1-s7 pass over 82 hashed evidence files. Each criterion's notExercised lists play the criterion does not name; deferred certification is listed separately.",
+            "name": "acceptance index",
+            "status": "passed"
+          }
+        ],
+        "epicOutcome": {
+          "successCriteria": [
+            {
+              "criterionId": "s1",
+              "met": true,
+              "note": "fwg.exe 564c2629 from FWGC++ ec5d1c10, Bannerlord v1.4.8.119303 and War Sails v1.2.8.119303 are pinned and verified, and the Modding Kit is identified. Any other generator binary is refused before launch. The UCRT pin was renewed after the Windows update replaced ucrtbase.dll; the producer contract's preflight passes again, and no world content id changed."
+            },
+            {
+              "criterionId": "s2",
+              "met": true,
+              "note": "Owner's judgement asked. New Procedural Campaign generates a chosen-seed world inside the running game, with progress, cancel, errors, preview and Start Campaign; no editor, publishing or restart. Offline, 19 of seeds 42-73 are accepted at one attempt and all 19 pass the activation's checks; a request gets 3 attempts. In game, seeds 42 and 73 were played. Seed 43's world was refused at runtime navigation (one sea route 1.29 x the mesh's shortest path) with its error code and a Generate-again action. Not every seed plays."
+            },
+            {
+              "criterionId": "s3",
+              "met": true,
+              "note": "Owner's judgement asked. A flat map wrapping east to west, used consistently by terrain, routes, distances (105 audited methods transpiled periodic), encounters, camera/picking and saves:\n- seam land travel, pursuit and fleets with save and load on A;\n- camera, picking, tracks, town menu and the wrap budget on B;\n- sailing and a pirate encounter across the seam.\nA and B differ in geography and routes and both play. Three presentation limits remain near the cut: the hero behaviour text, siege machines drawn on the settlement's side only, and routes that leave the terrain."
+            },
+            {
+              "criterionId": "s4",
+              "met": true,
+              "note": "Generated towns, villages, castles, factions, clans and heroes form a coherent Sandbox campaign with no Calradia objects:\n- trade, recruitment, ownership and wars (soak);\n- 14/14 land mission cases on A and B, each returning to the same world.\nB initializes in game, and all 19 offline-accepted worlds pass the activation's managed stages."
+            },
+            {
+              "criterionId": "s5",
+              "met": true,
+              "note": "The final naval run passes 117/117 checks and 15/15 cases: ports, shipyard, fleets, embarking, port and island voyages, drop-off and coastal landing, blockade and anchor, pirate battles (one across the seam), a seaborne raid and defeat. Navigation caches are built once per world and reused by every load. Fleets survive save and cold load. Boarding, ship damage, battles fought to the end and blockade battles are listed as not exercised."
+            },
+            {
+              "criterionId": "s6",
+              "met": true,
+              "note": "Two production campaigns, A (f596b58c) and B (f63c6841), are saved, alternately loaded in one process and after a cold restart, and resumed equal to their saves (matrix 38/38 and 20/20), with no cross-world callbacks. Torn, missing-world, other-build, incompatible-schema and missing-DLC saves, a corrupted manifest and an isolated damaged copy of the world data are all refused before simulation."
+            },
+            {
+              "criterionId": "s7",
+              "met": true,
+              "note": "The clean local package e20f2667 completes the one-shot scenario. It records the build, package, world, save and request identities, the results, timings and limitations (evidence/one-shot/one-shot-run.json, docs/one-shot-acceptance.md). The failures that day's earlier runs observed were fixed before the final run and are recorded there. Clean install passes 27/27 and the offline suites 46/46."
+            }
+          ],
+          "summary": "The epic delivers an in-game procedural campaign system for Bannerlord with War Sails. From New Campaign the player chooses a seed and generates a world inside the running game, with progress, cancel and errors. The world becomes a Sandbox campaign with its own terrain, settlements, kingdoms, clans, heroes, economy and land and sea routes, on a flat map that wraps east to west. Saves stay bound to their world and are refused safely when the world is missing or mismatched.\n\nThe final one-shot acceptance passes on the clean local package e20f2667 with two production worlds, A (seed 42) and B (seed 73). The clean-install lifecycle passes 27/27 and the offline suites 46/46.\n\nTwo criteria rest on the owner's judgement, stated in their notes:\n- s2: chosen seeds generally play, not every one. Seed 43 is refused at runtime navigation with a clean error.\n- s3: three presentation limits remain near the cut.\n\nBroad seed certification, long soaks and performance targets are deferred, as the epic allows. The package is a local test package, not release-certified."
+        },
+        "exitCriteria": [
+          {
+            "criterionId": "x1",
+            "met": true,
+            "note": "The clean local package completes the specified A/B land/naval/wrap/save/recovery scenario: the final one-shot run passes on e20f2667, every step and aspect. Not every ticket's in-game evidence is from this build. The acceptance index's buildCurrency says which evidence the final run re-ran (player flow, land and naval play, the seam on A and B, the two-world matrix, refusals, clean install, offline suites) and which stays from earlier builds."
+          },
+          {
+            "criterionId": "x2",
+            "met": true,
+            "note": "The acceptance index separates each criterion's graded aspects (pass/fail/blocked/not-run), the play no run exercised (notExercised), and deferred certification (seed corpus, runtime-world sweep, long soaks, endurance, all-season, resolution/performance, production targets), listed once as not run. The two judgement calls (s2, s3) are stated as such. No skipped mandatory feature is called complete, and the package is never labelled release-certified."
+          }
+        ],
+        "failed": [],
+        "followUps": [
+          {
+            "body": "The in-game navigation validator refused seed 43's attempt world (one All route across the seam is 1.29 x the mesh's shortest path, against 1.25). Find out whether engine pathing, the placement across the seam or the gate is at fault. Or let a runtime-refused attempt fall through to the next derived seed. The evidence is in build/seed43-ingame.",
+            "title": "Engine sea-route detour refusing seed 43's world"
+          },
+          {
+            "body": "Activate the other 17 offline-accepted seeds in game; the offline sweep can't see engine detours.",
+            "title": "Runtime-world sweep"
+          },
+          {
+            "body": "The named presentation limits of s3 (docs/periodic-presentation.md, Limits).",
+            "title": "Siege machines on the display copies, and the hero behaviour text near the cut"
+          },
+          {
+            "body": "Commit 030edaa edited the doc whose hash naval-transitions.json pins, so summarize_travel's evidenceHashes check fails. Restore the pinned bytes and move the newer text to its own doc; the calibration file is a world input.",
+            "title": "Calibration pin drift of docs/formats/navmesh-bin.md"
+          },
+          {
+            "body": "Copied culture text, the VC++ runtime, read-only installs, ANSI user names and release-on-merge gating.",
+            "title": "Owner decisions before any public release"
+          }
+        ],
+        "retro": {
+          "actions": [
+            "Treat every Harmony target type's static initializer as a hazard: check for .cctor before adding view types to an early-applied patch set.",
+            "Make probe setups deterministic wherever they rely on AI or physics outcomes.",
+            "Run the offline seed sweep (generation, bundle, settlements, navigation, harnesses) before every package that changes the bridge or activation.",
+            "Add an in-game runtime-world sweep for the accepted seeds, since the offline stand-in cannot see engine detours."
+          ],
+          "delivered": [
+            {
+              "demo": "tools/Test-OneShot.ps1 -Zip artifacts/release/MNBL.ProceduralWorld-v0.0.1.zip on e20f2667, then python tools/summarize_one_shot.py: every step passes on A and B.",
+              "evidence": "evidence/one-shot/one-shot-run.json, docs/one-shot-acceptance.md, evidence/one-shot/acceptance-index.json",
+              "ticket": "tk_01m4fpnf64s6r96g13ymz26760"
+            },
+            {
+              "demo": "An offline seed sweep: worldbridge --generate per seed, --bundle, then tools/Test-NavigationSweep.ps1 and the activation harnesses: 19/32 accepted, all offline-activatable.",
+              "evidence": "evidence/world/seed-yield.json, docs/travel-graph.md (Town repairs, Yield)",
+              "ticket": "tk_01m4fqfbgkk2fmgh12sbyxsjy7"
+            },
+            {
+              "demo": "seam_presentation on world B's save: display copies, camera, picking, tracks and a town menu across the seam.",
+              "evidence": "one-shot run 44028 (evidence/one-shot/one-shot-run.json step 4)",
+              "ticket": "tk_01m4fr2f4ketqh6dd1jd7yt95j"
+            },
+            {
+              "demo": "The two-world matrix with production world B: create, same-process loads, cold restart.",
+              "evidence": "evidence/persistence/two-world-matrix.json (43576, 44704)",
+              "ticket": "tk_01m4fqfbgkz61vc2vqzb3vhggb"
+            },
+            {
+              "demo": "tools/Test-CleanInstall.ps1 on e20f2667: install, disable, remove, reinstall, read-only.",
+              "evidence": "evidence/release/clean-install.json (27/27)",
+              "ticket": "tk_01m4fqfbgmgdqahamt65ejaxz7"
+            }
+          ],
+          "discoveries": [
+            {
+              "body": "Seed 43's world: one All route across the seam is 1.29 x the mesh's shortest path in the engine; the stand-in measures true shortest paths. A runtime refusal ends the job.",
+              "ticket": "tk_01m4fqfbgk5jah5w52dg2xvre2",
+              "title": "Runtime navigation can refuse a world the offline stand-in accepts"
+            },
+            {
+              "body": "Its type initializer reads GameTexts before they exist; the hero behaviour text stays planar.",
+              "ticket": "tk_01m4fr2f4jhzd3swbxzj3161xf",
+              "title": "Patching CampaignUIHelper at world activation breaks character creation"
+            },
+            {
+              "body": "Navigation input, the spawn CellMap and the naval group count indexed missing cells or points (12 of 17 other accepted worlds).",
+              "ticket": "tk_01m4fqfbgk5jah5w52dg2xvre2",
+              "title": "Unplaceable excluded villages crashed three runtime readers"
+            },
+            {
+              "body": "11 of 17 other accepted worlds; the bridge now drops the harbour role.",
+              "ticket": "tk_01m4fqfbgkdsrnhxytt4xafgwd",
+              "title": "Harbour villages on closed basins refused naval content"
+            },
+            {
+              "body": "Commit 030edaa changed a doc pinned by hash in the calibration, a world input.",
+              "ticket": "tk_01m4fqfbgk3hy3ak115n8w83gp",
+              "title": "A navmesh-bin.md docs edit broke the calibration pin"
+            }
+          ],
+          "leftovers": [],
+          "tierFit": [
+            {
+              "note": "Sized medium; the acceptance needed a second round of fixes across the bridge, the runtime and the probes, three one-shot sequences and an offline seed sweep.",
+              "ticket": "tk_01m4fpnf64s6r96g13ymz26760",
+              "verdict": "undersized"
+            },
+            {
+              "note": "The static travel graph needed town repairs and engine-routable port pairs to make most seeds playable.",
+              "ticket": "tk_01m4fqfbgkk2fmgh12sbyxsjy7",
+              "verdict": "undersized"
+            },
+            {
+              "note": "Sized medium; it needed a template-derivation design, several clean-install sequences and an ACL investigation.",
+              "ticket": "tk_01m4fqfbgmgdqahamt65ejaxz7",
+              "verdict": "undersized"
+            }
+          ],
+          "wentPoorly": [
+            "The first report's criteria were mostly unmet because only one seed activated; fixing that needed bridge-level town repairs that should have been part of MMR-28's design.",
+            "A Harmony patch of a UI class ran its type initializer too early and broke character creation. Offline harnesses cannot see that; only the in-game run did.",
+            "Probe expectations left to chance (an AI battle's outcome, a main agent surviving the landing) failed the matrix and naval runs; each needed a deterministic setup.",
+            "The offline stand-in navigation cannot predict engine path detours, so seed 43's world passed offline and was refused in game."
+          ],
+          "wentWell": [
+            "Proving every engine capability as an executable probe first kept the backend grounded; no static map was substituted.",
+            "Content-addressed world bundles let every bridge change be checked against world A byte for byte (f596b58c stayed identical through every fix).",
+            "The offline seed sweep (generation, bundle, settlements, stand-in navigation, activation harnesses) found five classes of activation refusal on worlds other than A and B, each fixed and confirmed without a game launch.",
+            "One full one-shot run per package, stopped early on a failure, then fix everything and confirm once, kept the in-game cost to three sequences in the day."
+          ]
+        },
+        "risks": [
+          "The fixes of 2026-10-19 are uncommitted; the package e20f2667 was built from that working tree (the one-shot records sourceTreeClean false).",
+          "Not every seed plays: seed 43's world was refused in game at runtime navigation, which the offline stand-in cannot predict. A runtime refusal ends the job instead of trying the next derived seed.",
+          "Merging codex/fwgc-procedural-campaign into main publishes MNBL.ProceduralWorld v0.0.1 as an ordinary GitHub release (release: true, no tag), with no test-package disclaimer.",
+          "The first start of each world, and the first start or load after a module update, blocks the game for about 6.5 minutes.",
+          "The assembly embeds about 1,051 copied official culture strings (open legal and product decision).",
+          "The native executables need the VC++ 2015-2022 x64 runtime; read-only installations and Windows user names outside the ANSI code page cannot generate worlds.",
+          "Saves made with an older worldbridge become not-rebuildable once their scene folder is gone (MMR-50 policy); the shipped bridge changed every scene name."
+        ],
+        "summary": "Sprint 1 implemented the whole procedural campaign in one pass. All 54 required tickets and the acceptance node MMR-1 are accepted; the increment is 7c56032 on codex/fwgc-procedural-campaign. After the first report the owner asked for the unmet criteria to be fixed in code, outside new tickets; that work is uncommitted on the epic branch and waits for the owner's commit approval.\n\nResult: the final one-shot run (tools/Test-OneShot.ps1) passes every step and every aspect on the clean local package MNBL.ProceduralWorld-v0.0.1.zip e20f2667, on world A (seed 42) and world B (seed 73, now a production world). The clean-install sequence passes 27/27 on the same package and the offline suites pass 46/46. The acceptance index records s1-s7 pass (evidence/one-shot/acceptance-index.json; docs/one-shot-acceptance.md).\n\nWhat changed since the first report:\n- The producer's UCRT pin was renewed after the Windows update.\n- The bridge repairs towns instead of rejecting worlds, gives ports only to engine-routable pairs, and drops unusable harbour roles. Seeds 42-73 went from 1 to 19 of 32 accepted, all 19 offline-activatable.\n- Runtime fixes:\n  - unplaceable villages no longer crash activation;\n  - B's village binding is evened out;\n  - edge-cut lake copies follow their twin;\n  - more UI distance consumers are periodic.\n- New in-game coverage: seam presentation on a generated world, naval seam cases, production world B in the land and matrix steps, and an isolated damaged-copy refusal.\n\nTwo criteria rest on the owner's judgement, stated in their notes: s2 (seed 43 is refused at runtime navigation) and s3 (three named presentation limits near the cut). The package is a local test package, not release-certified."
+      },
+      "contentHash": "sha256:3f8d5b597a145e0babc9abb01e1f0b662e7bd036aab6a0764e2e12a13295f2bb",
+      "createdAt": "2026-10-19T12:57:03.605Z",
+      "id": "rp_01m5a3s9vn218my86k8ryq69hw",
+      "reportRevision": 2,
+      "sprintId": "sp_01m4fpnf64qct7tw9sds5jevby",
+      "submittedBy": "Claude Code"
+    }
+  ],
   "revisionId": "rv_01m4xazdg471p8ggry5yynj8ye",
   "runId": "rn_01m4h4jk5wssr7x79xjmrp8ypg",
   "skillVersion": "1.5.1",
   "startedAt": "2026-10-09T20:09:51.549Z",
-  "state": "running",
-  "updatedAt": "2026-10-14T13:53:18.961Z"
+  "state": "completed",
+  "updatedAt": "2026-10-19T23:45:33.650Z"
 }

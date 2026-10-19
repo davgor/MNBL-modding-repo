@@ -433,8 +433,13 @@ namespace MNBL.ProceduralWorld.Diagnostics
             var after = (Dictionary<string, object>)row["after"];
             var mission = row.ContainsKey("mission") ? (Dictionary<string, object>)row["mission"] : null;
             var b = (float[])before["position"]; var a = (float[])after["position"];
-            double moved = Math.Sqrt((a[0] - b[0]) * (a[0] - b[0]) + (a[1] - b[1]) * (a[1] - b[1]));
+            // Across the periodic seam: the return can push the party over the seam line, where its x wraps by the world's width (2026-10-19:
+            // the pirate.seam case, 799.039 planar for a move of about 0.96).
+            double planar = Math.Sqrt((a[0] - b[0]) * (a[0] - b[0]) + (a[1] - b[1]) * (a[1] - b[1]));
+            var periodic = PeriodicWorld.Current;
+            double moved = periodic == null ? planar : periodic.Distance(new Vec2(b[0], b[1]), new Vec2(a[0], a[1]));
             row["returnDisplacement"] = moved;
+            if (periodic != null) row["returnDisplacementPlanar"] = planar;
             // The vanilla return (MobileParty.TeleportPartyToOutSideOfEncounterRadius) moves the party up to 1.25 x the
             // encounter radius: land 0.5 -> 0.625, NavalDLC naval 1.5 -> 1.875.
             double bound = (naval ? 1.875 : 0.625) + 0.01;

@@ -790,7 +790,10 @@ namespace MNBL.ProceduralWorld.Automation
             double start = context.Seconds;
             while (context.Seconds - start < 8)
             {
-                try { if (PlayerEncounter.Current != null) PlayerEncounter.Finish(true); } catch (Exception) { }
+                // An encounter's meeting menu opens a map conversation: ended first, then the encounter, as world A's run does. Finishing the
+                // encounter under the opening conversation crashed the game natively (2026-10-19: looters met the player after B's load,
+                // runs 30760 and 20984).
+                ClearEncounter(after);
                 if (Campaign.Current.TimeControlMode == CampaignTimeControlMode.Stop) Campaign.Current.TimeControlMode = CampaignTimeControlMode.UnstoppablePlay;
                 yield return null;
             }

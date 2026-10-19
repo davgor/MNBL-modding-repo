@@ -489,8 +489,11 @@ namespace MNBL.ProceduralWorld.Diagnostics
             var main = MobileParty.MainParty;
             float y = WorldWrapProbe.LandRow(town2.Position.Y, world.MaxX - 3, world.MaxX - 1, world.OriginX + 1);
             if (float.IsNaN(y)) { failures.Add("No land row through the seam."); yield break; }
-            main.Position = new CampaignVec2(new Vec2(world.MaxX - 3, y), true);
+            // Placed and held before the order, as the wraps' legs are (an order like the last one keeps the old path: run 46732).
+            main.Position = new CampaignVec2(new Vec2(world.MaxX - 3, y), true); main.SetMoveModeHold();
             PeriodicMapCameraView.Call("TeleportCameraToMainParty");
+            var placed = SettleOnParty(context);
+            while (placed.MoveNext()) yield return placed.Current;
             main.SetMoveGoToSettlement(town2, MobileParty.NavigationType.Default, false);
             var record = new Dictionary<string, object> { ["leg"] = "player into the west town across the seam", ["party"] = main.StringId }; row["travel"] = record;
             var steps = WorldWrapProbe.Travel(context, boot, world, main, () => main.CurrentSettlement == town2, 60, record);
@@ -578,8 +581,13 @@ namespace MNBL.ProceduralWorld.Diagnostics
             }
             row["cameraWraps"] = PeriodicMapCameraView.Rebases - rebasesBefore;
             var crossings = new List<object>(); row["partyCrossings"] = crossings;
-            main.Position = town1.GatePosition;
+            // Placed and held, as the follow legs are: without the hold, a move order to the point the party was last sent to keeps the old
+            // path, planned from where the party stood before (2026-10-19, run 46732: the fast move had gone to town2; the leg's path ran
+            // 781 units straight from town1's gate and the party never moved).
+            main.Position = town1.GatePosition; main.SetMoveModeHold();
             PeriodicMapCameraView.Call("TeleportCameraToMainParty");
+            var placed = SettleOnParty(context);
+            while (placed.MoveNext()) yield return placed.Current;
             foreach (var town in new[] { town2, town1 })
             {
                 var record = new Dictionary<string, object> { ["leg"] = "player to " + town.StringId, ["party"] = main.StringId }; crossings.Add(record);

@@ -2,9 +2,10 @@
 # pinned framework and game assemblies (as tools/Test-WorldNavigation.ps1 does) and runs every bundle under -Root (or the -Bundle paths)
 # through the navigation build, the static plan and the validator over the managed stand-in engine, as activation runs them, then the
 # playability validator's host-check and transition flags from that report (World/RuntimePlayabilityValidator.cs, with the sources it
-# compiles with in tools/Test-Playability.ps1; 2026-10-19: seed 43's world passed the sweep and failed a seam flag in game). No game.
-# Writes <Out>/navigation-sweep.jsonl.
-param([string]$Root, [string[]]$Bundle, [string]$Out, [string]$GameRoot = 'D:\SteamLibrary\steamapps\common\Mount & Blade II Bannerlord')
+# compiles with in tools/Test-Playability.ps1; 2026-10-19: seed 43's world passed the sweep and failed a seam flag in game), and the
+# settlement placement activation resolves after the plan (seeds 56 and 67 passed and were refused there in game). -PlacementOnly skips
+# the validator and the flags (seconds per bundle instead of minutes). No game. Writes <Out>/navigation-sweep.jsonl.
+param([string]$Root, [string[]]$Bundle, [string]$Out, [string]$GameRoot = 'D:\SteamLibrary\steamapps\common\Mount & Blade II Bannerlord', [switch]$PlacementOnly)
 $ErrorActionPreference = 'Stop'
 $repo = Split-Path $PSScriptRoot
 if (-not $Out) { $Out = Join-Path $repo ('build/navigation-sweep/' + [Guid]::NewGuid().ToString('N')) }
@@ -39,7 +40,7 @@ foreach ($name in @('TaleWorlds.Core')) {
 $exe = Join-Path $Out 'NavigationSweep.exe'
 & $csc /nologo /noconfig /nostdlib+ /target:exe /platform:x64 /langversion:7.3 /warnaserror "/out:$exe" @references @($sources | ForEach-Object { Join-Path $repo $_ })
 if ($LASTEXITCODE) { throw 'Navigation sweep compilation failed' }
-& $exe $repo $GameRoot (Join-Path $Out 'navigation-sweep.jsonl') @paths
+& $exe $repo $GameRoot (Join-Path $Out 'navigation-sweep.jsonl') @(if ($PlacementOnly) { '--placement-only' }) @paths
 $failed = $LASTEXITCODE
 Write-Output "navigation sweep: $(Join-Path $Out 'navigation-sweep.jsonl')"
 if ($failed) { exit 1 }

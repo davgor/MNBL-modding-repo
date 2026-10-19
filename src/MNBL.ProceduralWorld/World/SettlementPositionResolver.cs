@@ -239,7 +239,8 @@ namespace MNBL.ProceduralWorld.Surface
     //   gate         towns and castles: the installed gate distance from the centre, facing the road to the nearest connected settlement,
     //                turned in policy steps (then shrunk by quarters) until it stands on passable land of the centre's component, within the
     //                slope limit and clear of every other settlement's centre and markers; where no candidate meets the slope limit
-    //                (generated terrain is far steeper than Calradia's) the least steep valid one is taken and reported
+    //                (generated terrain is far steeper than Calradia's) the least steep valid one is taken and reported; a port town's gate
+    //                that leaves its port beyond the port-to-gate limit turns on until the port is within it (unchanged otherwise)
     //   markers      towns and castles: the outer gate, siege camps, siege engines, ram and towers at the installed medians in the gate frame,
     //                each adjusted the same way
     //   walls        towns and castles: two breachable wall sections per wall level and four wall engines per wall level at their installed
@@ -337,6 +338,23 @@ namespace MNBL.ProceduralWorld.Surface
                     double road = RoadAngle(site, plan, centres, ground, out r.GateRule);
                     Dictionary<string, int> why;
                     var gate = Place(r.Centre, road, new[] { policy.GateDistance, 0 }, q => landOk(q, true), ground, policy, out why);
+                    // A port town's gate keeps its port within the travel graph's port-to-gate limit. The navigation places the port toward the
+                    // town's point (the centre), and the bridge bounds it from there; the gate stands GateDistance further, facing its road, so a
+                    // road inland can put it beyond the limit (2026-10-19: 10 towns of 8 of the 19 swept worlds, ports 11.25 from the centre and
+                    // 12.5-13.8 from the gate, seeds 56 and 67 refused in game). Then the gate turns in the same steps until its port is within
+                    // the limit; a gate that already keeps it is unchanged. When none does, the gate stays and the port is refused below.
+                    var portForGate = site.HasPort && plan != null ? plan.Point("port:" + site.Id) : null;
+                    double portGateLimit = plan == null ? 0 : plan.Build.Input.MaxPortGateUnits;
+                    if (gate != null && portForGate != null && portForGate.Resolved != null && Distance(ground, gate.Logical, portForGate.Resolved) > portGateLimit)
+                    {
+                        Dictionary<string, int> whyPort;
+                        var toward = Place(r.Centre, road, new[] { policy.GateDistance, 0 }, q => {
+                            string reason = landOk(q, false);
+                            if (reason == null && Distance(ground, q, portForGate.Resolved) > portGateLimit) reason = "beyond its port's port-to-gate limit";
+                            if (reason == null && ground.Slope(q[0], q[1]) > policy.MaxMarkerSlope) reason = "steep";
+                            return reason; }, ground, policy, out whyPort);
+                        if (toward != null) { gate = toward; r.GateRule = r.GateRule + "; turned to keep its port within " + portGateLimit; }
+                    }
                     if (gate == null) problem("settlement.gate_unplaced", site.Id, "no gate position within " + policy.GateDistance + " of the centre stands on passable land of component " + land + ", clear of other settlements (" + Reasons(why) + ")", true);
                     else
                     {

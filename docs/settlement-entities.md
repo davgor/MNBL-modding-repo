@@ -53,6 +53,12 @@ The settlement records are bound to the same layout (`SettlementFactory.ApplyRes
 - It must stand on passable land (not mountain) of the centre's land component, within 35 degrees of slope, at least 0.5 from every other settlement's centre and every marker already placed for another settlement.
 - Candidates turn about the centre in 22.5-degree steps, then shrink toward it by quarters.
 - Where no candidate meets the slope limit, the least steep valid one is taken, reported, and named in the gate's rule. Generated terrain is far steeper than Calradia's: pad slopes reach 60 to 70 degrees at the 99th percentile on worlds A and B.
+- **A port town's gate keeps its port within the port-to-gate limit** (12.5, 2026-10-19).
+  - The navigation places the port toward the town's point, the centre, and the bridge bounds the port from there. The gate stands 2.597 further out, facing its road, so an inland road can put it beyond the limit.
+  - When the road-facing gate is beyond the limit, the same candidates are searched again, and the first that keeps the port within the limit is taken. The gate's rule then says "turned to keep its port within 12.5".
+  - A gate that already keeps its port is unchanged, so worlds A and B keep their layouts (`bc3004a4…`, `6b84dc44…`).
+  - When no candidate keeps the port, the gate faces its road and the port is refused (`settlement.port_far`).
+  - Before this, 10 towns in 8 of the 19 swept worlds were refused (ports 11.25 from the centre, 12.5–13.8 from the gate), among them seeds 56 and 67 in game.
 
 **Gate-frame markers (towns and castles).** The outer gate (`main_map_castle_gate`), siege camps (`map_camp_area_1/2`), siege engines 0 to 3, ram and two towers. Each is placed at its installed offset in the gate frame, then adjusted like the gate.
 

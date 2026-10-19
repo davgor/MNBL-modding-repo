@@ -280,6 +280,45 @@ internal static class SettlementPlacementTests
         Check(shipsDry.Basin(arcTown.ArcStart[0], arcTown.ArcStart[1]) == transitionBasin && shipsDry.Basin(arcTown.ArcEnd[0], arcTown.ArcEnd[1]) == transitionBasin
             && (refit.ArcStart == null || (SettlementPositionResolver.Distance(groundA, refit.ArcStart, arcTown.ArcStart) > 1e-6 && refit.ArcShips.All(q => shipsDry.Basin(q[0], q[1]) == transitionBasin))),
             "an arc whose two ends are on water but whose ships are not is rejected (every ship is checked, not only the ends): " + (refit.ArcStart == null ? "no arc fits" : "another arc with every ship on water is chosen (turn " + refit.ArcTurns + (refit.ArcMirrored ? ", mirrored" : "") + ", kept " + refit.ArcScale + ")"));
+        // A port town's gate keeps its port within the travel graph's port-to-gate limit (2026-10-19: 10 towns of 8 swept worlds had ports
+        // 11.25 from the centre and 12.5-13.8 from a gate facing an inland road; seeds 56 and 67 were refused in game). On world A a port moved
+        // to water of its basin within reach of some gate but beyond the limit from the road-facing gate turns the gate; a port no gate can
+        // keep within the limit is still refused, the gate left facing its road.
+        double limit = planA.Build.Input.MaxPortGateUnits;
+        double[] reachable = null, unreachable = null; ResolvedSettlement turnTown = null; var searched = new List<string>();
+        foreach (var t in layoutA.Settlements.Where(r => r.Site.HasPort && r.Gate != null && r.Port != null))
+        {
+            int portBasin = inputA.Transitions.First(x => x.Kind == "port" && x.Town == t.Site.Id).Basin;
+            // Water of the port's basin around the centre: the first point the predicate (distance from the centre, from the gate) accepts.
+            Func<Func<double, double, bool>, double[]> water = accept => {
+                for (double radius = 0.5; radius <= 17; radius += 0.25)
+                    for (int k = 0; k < 72; k++)
+                    {
+                        double a = k * Math.PI / 36; var q = new[] { t.Centre[0] + radius * Math.Cos(a), t.Centre[1] + radius * Math.Sin(a) };
+                        if (q[1] <= 0 || q[1] >= groundA.Height || groundA.Basin(q[0], q[1]) != portBasin) continue;
+                        if (accept(SettlementPositionResolver.Distance(groundA, t.Centre, q), SettlementPositionResolver.Distance(groundA, t.Gate, q))) return q;
+                    }
+                return null; };
+            // Within reach: beyond the limit from the road-facing gate, at most a unit inside it from the centre, as the swept worlds' ports
+            // (11.25); a gate turned toward it keeps it.
+            reachable = water((fromCentre, fromGate) => fromGate > limit && fromCentre <= limit - 1);
+            // Out of reach: beyond the limit from every gate position (each stands at most GateDistance from the centre).
+            unreachable = water((fromCentre, fromGate) => fromCentre > limit + policy.GateDistance + 0.1);
+            searched.Add(t.Site.Id.Substring(t.Site.Id.Length - 4) + (reachable != null ? " r" : " -") + (unreachable != null ? "u" : "-"));
+            if (reachable != null && unreachable != null) { turnTown = t; break; }
+        }
+        Check(turnTown != null, "world A has a port town with water of its port's basin both within and beyond any gate's reach of the limit (for the gate-turn cases; " + String.Join(", ", searched) + ")");
+        if (turnTown != null)
+        {
+            var turned = Mutate(planA, "port:" + turnTown.Site.Id, reachable, () => resolve(groundA, planA, sitesA)).Find(turnTown.Site.Id);
+            var tooFarLayout = Mutate(planA, "port:" + turnTown.Site.Id, unreachable, () => resolve(groundA, planA, sitesA));
+            var tooFar = tooFarLayout.Find(turnTown.Site.Id);
+            Check(turned.Gate != null && SettlementPositionResolver.Distance(groundA, turned.Gate, reachable) <= limit && turned.GateRule.Contains("turned to keep its port within")
+                && SettlementPositionResolver.Distance(groundA, turned.Centre, turned.Gate) <= policy.GateDistance + 1e-9
+                && tooFarLayout.Problems.Any(p => p.Refusal && p.Code == "settlement.port_far" && p.Subject == turnTown.Site.Id) && SettlementPositionResolver.Distance(groundA, tooFar.Gate, turnTown.Gate) < 1e-9,
+                "a port beyond the limit from " + turnTown.Site.Id + "'s road-facing gate turns the gate (" + (turned.GateRule ?? "") + ", " + SettlementPositionResolver.Distance(groundA, turned.Gate, reachable).ToString("0.###", CultureInfo.InvariantCulture)
+                + " from its port); a port no gate keeps within " + limit + " is refused (port_far), the gate facing its road");
+        }
         var harbour = sitesA.First(s => s.Harbour);
         var harbourCell = harbour.HarbourCell; var villageCell = inputA.Settlements.First(s => s.Id == harbour.Id);
         harbour.HarbourCell = new[] { villageCell.Row, villageCell.Col };
