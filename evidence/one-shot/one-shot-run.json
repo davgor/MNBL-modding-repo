@@ -1,0 +1,527 @@
+{
+ "schema": "mnbl.one-shot-run",
+ "version": 1,
+ "ticket": "MMR-1",
+ "raw": "build/mmr1/one-shot-raw.json",
+ "startedUtc": "2026-10-19T00:02:03.5730739Z",
+ "finishedUtc": "2026-10-19T00:39:55.0614184Z",
+ "status": "fail",
+ "summary": {
+  "1": "fail",
+  "2": "fail",
+  "3": "fail",
+  "4": "fail",
+  "5": "blocked",
+  "6": "blocked",
+  "sequence": "pass"
+ },
+ "steps": [
+  {
+   "step": "1",
+   "text": "Verify pinned producer/game/DLC identities; from the actual New Campaign screen generate A, select a generated culture, finish character creation and enter play; confirm full-globe coverage and source-derived faction/settlement identities.",
+   "status": "fail",
+   "aspects": [
+    {
+     "aspect": "the package installed alone, matching its manifest, no development receipt",
+     "status": "pass",
+     "note": "11 files; the development module and store were moved aside",
+     "runs": []
+    },
+    {
+     "aspect": "the running module, fwg.exe and worldbridge.exe are the package's and the pins",
+     "status": "pass",
+     "note": "module bc3235345ea2, producer 564c2629b5b9, worldbridge 776c160626d0; game v1.4.8.119303, War Sails v1.2.8.119303",
+     "runs": [
+      "step1 profile"
+     ]
+    },
+    {
+     "aspect": "the producer's pinned runtime (ucrtbase.dll) matches this installation",
+     "status": "fail",
+     "note": "the producer process contract's preflight (evidence/one-shot/producer-process-contract-20261019.json) fails ['ucrtbase_matches_lock']: a Windows update replaced the system UCRT after the pin (evidence/one-shot/ucrt-drift.json). The in-game generation path does not check it; world A's content id is the accepted one",
+     "runs": []
+    },
+    {
+     "aspect": "world A generated from the New Campaign screen, its culture chosen, character creation finished, the map entered, saved and loaded",
+     "status": "pass",
+     "note": "seed 42: generated in 37.4 s, content id f596b58cdcfc1879; the map after 403.4 s (navigation caches built); save mnbl_probe56_A_23796, loaded in 15.0 s",
+     "runs": [
+      "step1 profile"
+     ]
+    },
+    {
+     "aspect": "source-derived identities: every preview settlement and kingdom matches the live campaign; creation lists exactly the world's cultures",
+     "status": "pass",
+     "note": "new_campaign_flow, world A",
+     "runs": [
+      "step1 identities"
+     ]
+    },
+    {
+     "aspect": "full-globe coverage",
+     "status": "pass",
+     "note": "every cell of world A's periodic 128 x 64 grid is classified from the generated globe (8192 cells: {\"land\": 1898, \"mountain\": 491, \"sea\": 5707, \"lake\": 59, \"river\": 37})",
+     "runs": [
+      "step1 profile"
+     ]
+    }
+   ]
+  },
+  {
+   "step": "2",
+   "text": "Travel on land, enter a generated settlement, trade/recruit, enter one land mission and return to the same world.",
+   "status": "fail",
+   "aspects": [
+    {
+     "aspect": "travel by land to a generated town, trade and recruit there, leave; a day of campaign stays coherent",
+     "status": "pass",
+     "note": "campaign_soak world A (trade and recruitment through the screens' logic, not the screens)",
+     "runs": [
+      "step2 visit"
+     ]
+    },
+    {
+     "aspect": "land missions and settlement interactions, returning to the map each time",
+     "status": "fail",
+     "note": "step2 land: [\"field.rock: the battle's parties are not exactly the player's and the enemy's: mnbl_1609fb72_h_2a88e6219a_party_1, mnbl_1609fb72_h_8aa832e36f_party_1, player_party\"] | rerun on the same build (land_missions-11472.json, from mnbl_probe52_A_designated rather than mnbl_oneshot_A_designated): passed; the failure did not reproduce from that save, so whether it is intermittent or depends on the campaign state is not established",
+     "runs": [
+      "step2 land"
+     ]
+    },
+    {
+     "aspect": "land missions needing a battle class world A lacks",
+     "status": "blocked",
+     "note": "needs a second activatable world: only seed 42 activates (seed 73 is refused at the village binding), and MMR-19's fixture world is not in the package (world A lacks ['steppe', 'wetland'])",
+     "runs": [
+      "step2 land"
+     ]
+    },
+    {
+     "aspect": "the same world after a mission (world identity re-checked)",
+     "status": "not-run",
+     "note": "the mission cases check position, land or sea, navigation and camera on return; the world identity is checked at the load only",
+     "runs": [
+      "step2 land"
+     ]
+    }
+   ]
+  },
+  {
+   "step": "3",
+   "text": "Reach a generated operational port, embark, sail to another valid destination, enter/return from a naval encounter and disembark; the seaborne raid, blockade and anchor scenario.",
+   "status": "fail",
+   "aspects": [
+    {
+     "aspect": "ship purchase, port and island voyages, drop-off and coastal landing, blockade and anchor, pirate battle (retreat), seaborne raid, defeat with the raft",
+     "status": "fail",
+     "note": "step3 naval: ['route.island: InvalidOperationException: the party did not arrive at mnbl_1609fb72_t_7efe6a0c96 (at town)', 'blockade: InvalidOperationException: the party is not on land with a fleet (the previous step did not finish)', 'dropoff: InvalidOperationException: the fleet is not docked at mnbl_1609fb72_t_7efe6a0c96 (the previous step did not finish)', 'pirate.battle: InvalidOperationException: the party is not at sea with its fleet (the previous step did not finish)', 'raid: InvalidOperationException: the party is not at sea with its fleet (the previous step did not finish)', 'naval.defeat: InvalidOperationException: the party is not at sea with its fleet (the previous step did not finish)'] | rerun on the same build (naval_missions-7368.json, from mnbl_probe52_A_designated rather than mnbl_oneshot_A_designated): passed; the failure did not reproduce from that save, so whether it is intermittent or depends on the campaign state is not established",
+     "runs": [
+      "step3 naval"
+     ]
+    }
+   ]
+  },
+  {
+   "step": "4",
+   "text": "East/west crossing for player and AI on land and sea, route execution, nearby-party encounter/visibility, distance caches, camera and picking.",
+   "status": "fail",
+   "aspects": [
+    {
+     "aspect": "the player crosses the seam on land, an AI party pursues across it, a fleet is called across it and an anchored fleet stays by it; all survive save and load",
+     "status": "pass",
+     "note": "two_world_matrix create, world A",
+     "runs": [
+      "step4-5 create"
+     ]
+    },
+    {
+     "aspect": "the navigation caches built once and reused for the generated world",
+     "status": "fail",
+     "note": "cache keys read: ['175479b6', '2a603033']; built in: ['step1 profile', 'step4-5 create'] (expected: only A's first start). The matrix's same-process load built them again although they existed (its load took 397 s); the cold load after its scene was swept and re-encoded read another key (34.9 s). Cause not identified. | rerun on the same build (naval_missions-7368.json, from mnbl_probe52_A_designated rather than mnbl_oneshot_A_designated): passed; the failure did not reproduce from that save, so whether it is intermittent or depends on the campaign state is not established | rerun on the same build (land_missions-11472.json, from mnbl_probe52_A_designated rather than mnbl_oneshot_A_designated): passed; the failure did not reproduce from that save, so whether it is intermittent or depends on the campaign state is not established",
+     "runs": [
+      "step1 profile",
+      "step1 identities",
+      "step3 prepare",
+      "step3 naval",
+      "step2 land",
+      "step2 visit",
+      "step4-5 create",
+      "step5 cold",
+      "step6 refusals"
+     ]
+    },
+    {
+     "aspect": "camera and picking across the seam on the generated world; the player and an AI party sailing across it; a naval encounter at the seam",
+     "status": "not-run",
+     "note": "no probe drives these on world A (camera and picking were shown on the periodic fixture, MMR-66)",
+     "runs": []
+    }
+   ]
+  },
+  {
+   "step": "5",
+   "text": "Save A with mutable state; generate B in the same process and note the difference; save B, cold-restart, load A then B; ordinary loads must not launch FWGC++.",
+   "status": "blocked",
+   "aspects": [
+    {
+     "aspect": "A saved with mutable ownership, party, prisoner, siege, ship and anchor state, loaded in the same process and equal to its save",
+     "status": "pass",
+     "note": "two_world_matrix create",
+     "runs": [
+      "step4-5 create"
+     ]
+    },
+    {
+     "aspect": "after a cold restart, A loads (scene swept and re-encoded) equal to its save, and no generator process starts during the load",
+     "status": "pass",
+     "note": "two_world_matrix cold",
+     "runs": [
+      "step5 cold"
+     ]
+    },
+    {
+     "aspect": "B (seed 73) generated in the same process as A, with different geography and routes",
+     "status": "pass",
+     "note": "B generated in 56.3 s, content id f63c6841085725e2; land cells A 2389 vs B 4192, coastlines differ",
+     "runs": [
+      "step1 profile"
+     ]
+    },
+    {
+     "aspect": "save B, load B after the cold restart, B's landmarks, ownership, parties, ships and anchors",
+     "status": "blocked",
+     "note": "needs a second activatable world: only seed 42 activates (seed 73 is refused at the village binding), and MMR-19's fixture world is not in the package",
+     "runs": []
+    }
+   ]
+  },
+  {
+   "step": "6",
+   "text": "Cancel another generation and load an isolated invalid copy of world data; usable-menu recovery, unchanged original hashes, no orphan producer or cross-world callbacks.",
+   "status": "blocked",
+   "aspects": [
+    {
+     "aspect": "a second generation cancelled through the setup screen (New Seed, then Back): interrupted, the committed world unchanged",
+     "status": "pass",
+     "note": "new_campaign_flow",
+     "runs": [
+      "step1 identities"
+     ]
+    },
+    {
+     "aspect": "invalid copies of A's save (torn, missing world, other build) and a Continue into a missing world refused before anything loads; A's package and bundle unchanged",
+     "status": "pass",
+     "note": "two_world_matrix create, refusals ['fromRunningGame', 'missing-bundle', 'other-game-version', 'torn', 'worldUnchanged']",
+     "runs": [
+      "step4-5 create"
+     ]
+    },
+    {
+     "aspect": "more invalid copies (incompatible schema and build, missing DLC, corrupted manifest hash) refused; A's save, package and bundle unchanged",
+     "status": "pass",
+     "note": "compat_matrix",
+     "runs": [
+      "step6 refusals"
+     ]
+    },
+    {
+     "aspect": "no generator process left after any run",
+     "status": "pass",
+     "note": "fwg and worldbridge after every run: none",
+     "runs": [
+      "step1 profile",
+      "step1 identities",
+      "step3 prepare",
+      "step3 naval",
+      "step2 land",
+      "step2 visit",
+      "step4-5 create",
+      "step5 cold",
+      "step6 refusals"
+     ]
+    },
+    {
+     "aspect": "the world bundles unchanged through the matrix, refusal and cold-load runs",
+     "status": "pass",
+     "note": "store snapshots before and after the two_world_matrix and compat_matrix runs",
+     "runs": []
+    },
+    {
+     "aspect": "an invalid copy of world data loaded from a separate test root",
+     "status": "not-run",
+     "note": "the store and save paths are fixed (SubModule.Store); the invalid copies are written beside the originals and removed",
+     "runs": []
+    },
+    {
+     "aspect": "no cross-world callbacks",
+     "status": "blocked",
+     "note": "needs a second activatable world: only seed 42 activates (seed 73 is refused at the village binding), and MMR-19's fixture world is not in the package",
+     "runs": []
+    }
+   ]
+  },
+  {
+   "step": "sequence",
+   "text": "The sequence itself: the installation and the development environment.",
+   "status": "pass",
+   "aspects": [
+    {
+     "aspect": "the official module descriptors and engine binaries unchanged",
+     "status": "pass",
+     "note": "snapshots before and after",
+     "runs": []
+    },
+    {
+     "aspect": "every save from before the sequence unchanged",
+     "status": "pass",
+     "note": "107 saves",
+     "runs": []
+    },
+    {
+     "aspect": "the development module and store put back",
+     "status": "pass",
+     "note": "{'development module restored': True, 'development store restored': True}",
+     "runs": []
+    }
+   ]
+  }
+ ],
+ "runs": {
+  "step1 profile": {
+   "probe": "first_test_profile",
+   "pid": 23796,
+   "status": "ok",
+   "ok": true,
+   "failures": [],
+   "error": null,
+   "stopped": null,
+   "seconds": 690.4,
+   "generatorProcessesAfter": [],
+   "result": "evidence/runtime/in-game/first_test_profile-23796.json",
+   "resultSha256": "769cec316941141eb32a443620deeaaf4dd255a51c766208d1ff56735c2562e0"
+  },
+  "step1 identities": {
+   "probe": "new_campaign_flow",
+   "pid": 29176,
+   "status": "ok",
+   "ok": true,
+   "failures": [],
+   "error": null,
+   "stopped": null,
+   "seconds": 180.1,
+   "generatorProcessesAfter": [],
+   "result": "evidence/runtime/in-game/new_campaign_flow-29176.json",
+   "resultSha256": "19226c53d6d3f4fe70cbcc8f5c1ba642a8e586f39cfdf2942702de1c358c496d"
+  },
+  "step3 prepare": {
+   "probe": "land_missions",
+   "pid": 42980,
+   "status": "ok",
+   "ok": true,
+   "failures": [],
+   "error": null,
+   "stopped": null,
+   "seconds": 105.1,
+   "generatorProcessesAfter": [],
+   "result": "evidence/runtime/in-game/land_missions-42980.json",
+   "resultSha256": "5ec3d1cb314325597a255caf7ddc56acedd479063d47517bd025308bffe5351b"
+  },
+  "step3 naval": {
+   "probe": "naval_missions",
+   "pid": 48692,
+   "status": "error",
+   "ok": false,
+   "failures": [
+    "route.island: InvalidOperationException: the party did not arrive at mnbl_1609fb72_t_7efe6a0c96 (at town)",
+    "blockade: InvalidOperationException: the party is not on land with a fleet (the previous step did not finish)",
+    "dropoff: InvalidOperationException: the fleet is not docked at mnbl_1609fb72_t_7efe6a0c96 (the previous step did not finish)",
+    "pirate.battle: InvalidOperationException: the party is not at sea with its fleet (the previous step did not finish)",
+    "raid: InvalidOperationException: the party is not at sea with its fleet (the previous step did not finish)",
+    "naval.defeat: InvalidOperationException: the party is not at sea with its fleet (the previous step did not finish)"
+   ],
+   "error": "System.InvalidOperationException: Naval expectations failed: route.island: InvalidOperationException: the party did not arrive at mnbl_1609fb72_t_7efe6a0c96 (at town); blockade: InvalidOperationException: the party is not on land with a fleet (the previous step did not finish); dropoff: InvalidOperationException: the fleet is not docked at mnbl_1609fb72_t_7efe6a0c96 (the previous step did not finish); pirate.battle: InvalidOperationException: the party is not at sea with its fleet (the previous step did not finish); raid: InvalidOperationException: the party is not at sea with its fleet (the previous step did not finish); naval.defeat: InvalidOperationException: the party is not at sea with its fleet (the previous step did not finish)\r\n   at MNBL.ProceduralWorld.Automation.NavalMissionsProbe.<Body>d__2.MoveNext()\r\n   at MNBL.ProceduralWorld.Automation.TwoWorldMatrixProbe.<Nested>d__1.MoveNext()\r\n   at MNBL.ProceduralWorld.Automation.AutorunHost.Step()",
+   "stopped": null,
+   "seconds": 120.1,
+   "generatorProcessesAfter": [],
+   "result": "evidence/runtime/in-game/naval_missions-48692.json",
+   "resultSha256": "f112d310df8bda0293884c2a03df1d7cd876b76e2902eee71a17bc529a0b5043"
+  },
+  "step2 land": {
+   "probe": "land_missions",
+   "pid": 29368,
+   "status": "error",
+   "ok": false,
+   "failures": [
+    "field.rock: the battle's parties are not exactly the player's and the enemy's: mnbl_1609fb72_h_2a88e6219a_party_1, mnbl_1609fb72_h_8aa832e36f_party_1, player_party"
+   ],
+   "error": "System.InvalidOperationException: Land mission expectations failed: field.rock: the battle's parties are not exactly the player's and the enemy's: mnbl_1609fb72_h_2a88e6219a_party_1, mnbl_1609fb72_h_8aa832e36f_party_1, player_party\r\n   at MNBL.ProceduralWorld.Automation.LandMissionsProbe.<Body>d__2.MoveNext()\r\n   at MNBL.ProceduralWorld.Automation.TwoWorldMatrixProbe.<Nested>d__1.MoveNext()\r\n   at MNBL.ProceduralWorld.Automation.AutorunHost.Step()",
+   "stopped": null,
+   "seconds": 270.1,
+   "generatorProcessesAfter": [],
+   "result": "evidence/runtime/in-game/land_missions-29368.json",
+   "resultSha256": "2869d111957c8aa1df55979c6947814fabab372aefd930993de7cdfd77a66a9a"
+  },
+  "step2 visit": {
+   "probe": "campaign_soak",
+   "pid": 37128,
+   "status": "ok",
+   "ok": true,
+   "failures": [],
+   "error": null,
+   "stopped": null,
+   "seconds": 135.1,
+   "generatorProcessesAfter": [],
+   "result": "evidence/runtime/in-game/campaign_soak-37128.json",
+   "resultSha256": "523f2e5c4b4cff477970ea5f7cf9aa2e2285682721d511df9e5e8d86fad50a85"
+  },
+  "step4-5 create": {
+   "probe": "two_world_matrix",
+   "pid": 35948,
+   "status": "ok",
+   "ok": true,
+   "failures": [],
+   "error": null,
+   "stopped": null,
+   "seconds": 540.3,
+   "generatorProcessesAfter": [],
+   "result": "evidence/runtime/in-game/two_world_matrix-35948.json",
+   "resultSha256": "bf711bdb117f9fb7a6a6619471f776dd2a9190f5132784b5e80aecf008abf93d"
+  },
+  "step5 cold": {
+   "probe": "two_world_matrix",
+   "pid": 31404,
+   "status": "ok",
+   "ok": true,
+   "failures": [],
+   "error": null,
+   "stopped": null,
+   "seconds": 90.1,
+   "generatorProcessesAfter": [],
+   "result": "evidence/runtime/in-game/two_world_matrix-31404.json",
+   "resultSha256": "e90831016bdc7fae4bd1e763a1df0bf63470d736044b22a65348cacc422efe56"
+  },
+  "step6 refusals": {
+   "probe": "compat_matrix",
+   "pid": 31460,
+   "status": "ok",
+   "ok": true,
+   "failures": [],
+   "error": null,
+   "stopped": null,
+   "seconds": 75.1,
+   "generatorProcessesAfter": [],
+   "result": "evidence/runtime/in-game/compat_matrix-31460.json",
+   "resultSha256": "c15b3cfc58afca0bef19d18956ecf21a90125debd05c6df233c22cb7674fdafd"
+  }
+ },
+ "reruns": [
+  {
+   "of": "step3 naval",
+   "result": "evidence/runtime/in-game/naval_missions-7368.json",
+   "why": "the island voyage turned back to the start town in the sequence; rerun on the same build (bc323534) on the development install, from the repository scenario file and its designated save mnbl_probe52_A_designated (the sequence used mnbl_oneshot_A_designated)",
+   "ok": true,
+   "failures": [],
+   "loadedSave": "mnbl_probe52_A_designated",
+   "package": "mnbl_1609fb72-c31327cad6a3",
+   "scenarioSha256": "cd3e992f2ec432f5f82a55af3627cdcc04596d41b1987e6382fe6093189c9a4c",
+   "sequenceRun": {
+    "loadedSave": "mnbl_oneshot_A_designated",
+    "package": "mnbl_1609fb72-ea44b28bf116",
+    "scenarioSha256": "369f88d79a2d2cb704b03c6b79f0e1c3e8e14840cdf8d274bee141f5f32c8061"
+   },
+   "resultSha256": "cf26153d9ee99d5ab24fecaf44bf5e857d265c487445e68f7d3036c18446ddae"
+  },
+  {
+   "of": "step2 land",
+   "result": "evidence/runtime/in-game/land_missions-11472.json",
+   "why": "field.rock had a third party join the battle in the sequence; rerun on the same build (bc323534) on the development install, fixtureB=false, from mnbl_probe52_A_designated (the sequence used mnbl_oneshot_A_designated)",
+   "ok": true,
+   "failures": [],
+   "loadedSave": "mnbl_probe52_A_designated",
+   "package": "mnbl_1609fb72-c31327cad6a3",
+   "scenarioSha256": "41f3990ccd7ba086d31d92ef29150595df3bc21df396b87c567266352510242d",
+   "sequenceRun": {
+    "loadedSave": "mnbl_oneshot_A_designated",
+    "package": "mnbl_1609fb72-ea44b28bf116",
+    "scenarioSha256": "c95ec1d1e74017c2e342a056d683a164b51b1fb7cdf7d7ea0bc523d530fbbac8"
+   },
+   "resultSha256": "d74fcdcf685a9b82465abc53ce25ffc46efeb36a8e08730b9d58cd925dc7ceb3"
+  }
+ ],
+ "identities": {
+  "commit": "55576ca8d94c12d414b8c1b1d1547cbf8f8e9e6b",
+  "sourceTreeClean": false,
+  "package": {
+   "sha256": "ed63d689da10e7c58369bdc6ed1938d8484d0cc5abb4633b06177601132e52aa",
+   "moduleAssemblySha256": "bc3235345ea22aebd5eb1bc72e78620f863753816a68cf9b3c520b4f76ee2249",
+   "worldbridgeSha256": "776c160626d029e6c9b911472db1a1e7d7992c5f51188259b81fd864e654fe34",
+   "manifestSource": {
+    "commit": "55576ca8d94c12d414b8c1b1d1547cbf8f8e9e6b",
+    "ownedFilesUncommitted": true
+   }
+  },
+  "producerSha256": "564c2629b5b92d49e52cd466a5a1aaa9339380464207ddcae669dd487d2f695e",
+  "game": "v1.4.8.119303",
+  "navalDlc": "v1.2.8.119303",
+  "worlds": {
+   "A": {
+    "seed": 42,
+    "worldContentId": "f596b58cdcfc18798542fdef5a4d9c9f6d84abddca1425af8d0b87f521191d2d",
+    "save": "mnbl_probe56_A_23796",
+    "binding": {
+     "worldId": "mnbl_1609fb72",
+     "package": "mnbl_1609fb72-ea44b28bf116",
+     "instance": "b5d026f0e91240569431bf15e0436ead",
+     "contentId": "f596b58cdcfc18798542fdef5a4d9c9f6d84abddca1425af8d0b87f521191d2d"
+    },
+    "scene": "mnbl_world_f596b58cdcfc1879_171df43a3a14",
+    "seconds": {
+     "generate": 37.431356199999996,
+     "mapAfterStart": 403.3974019,
+     "load": 14.98951939999995
+    }
+   },
+   "B": {
+    "seed": 73,
+    "worldContentId": "f63c6841085725e2c437b7d5d087a52cf4dc7d5d8fe3e2d583d46cba6a775550",
+    "activated": false,
+    "seconds": {
+     "generate": 56.30853130000003
+    }
+   }
+  },
+  "request": {
+   "jobA": "011f15646dac4741a61512cdbdeb9648",
+   "jobB": "57ed6a1c8d114ea683067acc143d2b0a",
+   "recipeVersion": 3,
+   "overrides": {
+    "phase": 16,
+    "size": 129
+   },
+   "qualityAttempts": 3
+  },
+  "campaigns": {
+   "profile": "b5d026f0e91240569431bf15e0436ead",
+   "matrix": "adbbc58f9e974cdb9886f9188e3ec832",
+   "designated": "41790581dbad4b56b06d392ac68bb45d"
+  },
+  "matrixSave": "mnbl_probe49_A_35948",
+  "designatedSave": "mnbl_oneshot_A_designated",
+  "navigationCaches": {
+   "keys": [
+    "175479b6",
+    "2a603033"
+   ],
+   "builtIn": [
+    "step1 profile",
+    "step4-5 create"
+   ],
+   "loadSeconds": {
+    "profile same-process": 14.98951939999995,
+    "matrix same-process": 397.05132849999995,
+    "matrix cold": 34.8555487
+   }
+  }
+ },
+ "sequenceError": null
+}

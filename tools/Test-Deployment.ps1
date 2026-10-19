@@ -34,6 +34,11 @@ Copy-FixtureFile "$repo/tools/Deploy-Dev.ps1" "$fixtureRepo/tools/Deploy-Dev.ps1
 foreach ($path in @('build/module/MNBL.ProceduralWorld.dll','build/worldbridge/Release/worldbridge.exe','build/producer/apps/Release/fwg.exe')) {
     Copy-FixtureFile (Join-Path $repo $path) (Join-Path $fixtureRepo $path)
 }
+# MMR-57: the deploy also copies the module's own surface template files.
+$templateFiles = @('terrain.bin','navmesh.bin','template-recipe.json')
+foreach ($name in $templateFiles) {
+    Copy-FixtureFile "$repo/Modules/MNBL.ProceduralWorld/SurfaceTemplate/$name" "$fixtureRepo/Modules/MNBL.ProceduralWorld/SurfaceTemplate/$name"
+}
 foreach ($inputFile in $officialBefore | Where-Object { $_.scope -ne 'framework' }) {
     Copy-FixtureFile $inputFile.resolvedPath (Join-Path $fixtureGame $inputFile.path)
 }
@@ -56,12 +61,12 @@ $deploy = "$fixtureRepo/tools/Deploy-Dev.ps1"
 $fixtureBefore = @(Get-ChildItem $fixture -Recurse -File | ForEach-Object { [pscustomobject]@{path=$_.FullName;sha256=Get-MnblHash $_.FullName} })
 $dry = & $deploy -GameRoot $fixtureGame -DryRun | ConvertFrom-Json
 $guiFiles = @(Get-ChildItem -LiteralPath "$repo/Modules/MNBL.ProceduralWorld/GUI" -Recurse -File -ErrorAction SilentlyContinue).Count
-if (!$dry.dryRun -or $dry.files.Count -ne (4 + $guiFiles) -or $dry.target -ne "$fixtureGame\Modules\MNBL.ProceduralWorld" -or (Test-Path -LiteralPath $dry.target)) {
+if (!$dry.dryRun -or $dry.files.Count -ne (4 + $templateFiles.Count + $guiFiles) -or $dry.target -ne "$fixtureGame\Modules\MNBL.ProceduralWorld" -or (Test-Path -LiteralPath $dry.target)) {
     throw 'Dry run mutated destination, ignored non-default root, or returned incorrect manifest'
 }
 $fixtureAfter = @(Get-ChildItem $fixture -Recurse -File | ForEach-Object { [pscustomobject]@{path=$_.FullName;sha256=Get-MnblHash $_.FullName} })
 Assert-MnblSameInputs $fixtureBefore $fixtureAfter 'Dry-run filesystem'
-Write-Output "PASS: non-default-root dry run is read-only and lists the four owned outputs and $guiFiles GUI prefab file(s)"
+Write-Output "PASS: non-default-root dry run is read-only and lists the four owned outputs, the $($templateFiles.Count) surface template files and $guiFiles GUI prefab file(s)"
 
 $dllRelative = 'bin/Win64_Shipping_Client/TaleWorlds.CampaignSystem.dll'
 $dll = Join-Path $fixtureGame $dllRelative

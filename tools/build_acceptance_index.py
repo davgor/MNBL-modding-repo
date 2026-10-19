@@ -28,7 +28,7 @@ def A(name, status, evidence, note=''):
 
 CRITERIA = [
     {'id': 's1', 'text': 'A pinned FWGC++ build and version-matched Bannerlord/Modding Kit/War Sails setup are reproducibly identified and verified; the existing stale generator binary is not accepted as installation evidence.',
-     'status': 'pass',
+     'status': 'fail',
      'aspects': [
          A('the producer is pinned and its build verified', 'pass',
            ['tools.lock.json', 'worldgen/producer.lock.json', 'evidence/fwg/build.log', 'evidence/fwg/ctest.log', 'evidence/fwg/producer-verification.json', 'evidence/fwg/producer-process-contract.json'],
@@ -44,7 +44,10 @@ CRITERIA = [
            'Identified by its Steam depot 4456490 and manifest 1015157637537524692 and one editor session that opened and rendered the War Sails map (2026-10-13; the record is an inspection, so it says ticketAccepted false). No build or player step uses it. Not re-checked since.'),
          A('generation is reproducible', 'pass',
            ['evidence/fwg/generation-identity.json', 'evidence/fwg/source-reader.json'],
-           'MMR-24 75/75 identity and retry checks; MMR-23 120/120 source contract checks.'),
+           'MMR-24 75/75 identity and retry checks; MMR-23 120/120 source contract checks (re-run 2026-10-19).'),
+         A('the producer\'s pinned runtime matches this installation', 'fail',
+           ['evidence/one-shot/producer-process-contract-20261019.json', 'evidence/one-shot/ucrt-drift.json'],
+           'Re-run 2026-10-19 (MMR-1): the producer process contract\'s preflight fails ucrtbase_matches_lock. A Windows update (KB5127647/KB5127648, 2026-10-13/14) replaced C:\\Windows\\System32\\ucrtbase.dll (now 10.0.26100.9711) after the pin, so the pinned UCRT hash 5c52e3a3... no longer matches the system\'s dedb7611.... fwg.exe still matches its pin, the contract\'s CTest passes 9/9 and every generation outcome behaves, and in-game generation ran. Re-pinning changes worldgen/producer.lock.json, a world input: an owner decision. MMR-22\'s accepted run (evidence/fwg/producer-process-contract.json) passed before the update.'),
      ]},
     {'id': 's2', 'text': "Bannerlord's New Campaign flow generates a fresh chosen-seed world locally with progress/cancel/error handling, without a player running an external editor, publishing a module or restarting the game.",
      'status': 'fail',
@@ -115,9 +118,12 @@ CRITERIA = [
          A('every generated world initializes', 'fail',
            ['worldgen/fixtures/acceptance-seeds.json', 'evidence/fwg/world-loading-review.md'],
            'Seed 73 generates and previews, but its campaign is refused at activation: the village binding leaves towns with 6-8 villages and towns and castles with none. Recorded in reviewed evidence; no run artifact of the refused start is in the repository.'),
+         A('land missions on the current package (MMR-1)', 'fail',
+           ['evidence/one-shot/one-shot-run.json'],
+           'One-shot run 29368: 12 of 13 world-A cases passed; field.rock failed its own check that the battle has exactly the player\'s and the enemy\'s parties (an AI lord\'s party joined; the mission opened and returned). Rerun 11472 on the same build, from another designated save, passed every case; intermittent or state-dependent is not established.'),
      ]},
     {'id': 's5', 'text': 'War Sails ports, fleets, embarkation, land/sea routes, navigation types and required distance caches operate on the generated world; naval travel and naval encounters are tested.',
-     'status': 'not-run',
+     'status': 'fail',
      'aspects': [
          A('ports, fleets and naval faction records', 'pass',
            ['evidence/fwg/naval.json', 'evidence/runtime/naval-content.json'], 'MMR-35: 15 offline checks; in-game run 21180 on the fixture world.'),
@@ -133,6 +139,12 @@ CRITERIA = [
            'Not exercised: boarding, crew reinforcement, ship damage in battle, a naval battle won by fighting, a blockade battle or an AI blockade, straits narrower than 8.5, pirate-initiated encounters (the player was ignored), port visits.'),
          A('fleets survive save and load', 'pass',
            ['evidence/persistence/two-world-matrix.json'], 'Embarked and post-battle fleets survive save and load (MMR-49).'),
+         A('naval play on the current package (MMR-1)', 'fail',
+           ['evidence/one-shot/one-shot-run.json'],
+           'One-shot run 48692: the shipyard purchase, port voyage and repair passed; the island voyage (Korpor to Frosrin) landed after about 9 h and walked back to Korpor, so the blockade, drop-off, pirate battle, raid and defeat cases (each starting where the previous one ends) failed after it. Rerun 7368 on the same build, from another designated save, passed all 9 cases; intermittent or state-dependent is not established.'),
+         A('the navigation caches reused across loads on the current package (MMR-1)', 'fail',
+           ['evidence/one-shot/one-shot-run.json'],
+           'The one-shot run built the caches at A\'s first start (key 2a603033...), then built them again in the matrix\'s same-process load (397 s) although they existed; the cold load after its scene was re-encoded read another key (175479b6..., 34.9 s). Cause not identified.'),
      ]},
     {'id': 's6', 'text': 'Two campaigns with different world identities can be saved, alternately loaded after a cold restart, and resumed with correct terrain, objects and navigation; missing or mismatched worlds fail safely before simulation.',
      'status': 'blocked',
@@ -154,18 +166,25 @@ CRITERIA = [
            'The second campaign of every two-world test is the MMR-19 fixture world (mnbl_00059042, seed 364610, no bundle), because only seed 42 activates (s2, s4). Blocked by those failures, not by an unsupported capability.'),
      ]},
     {'id': 's7', 'text': 'A clean local package completes the specified one-shot acceptance scenario and records exact build/request/world/save identities, observed results, timings and limitations. Broad seed certification, long simulation soaks and production performance targets are follow-up. Any observed correctness failure in the required scenario remains failed.',
-     'status': 'not-run',
+     'status': 'fail',
      'aspects': [
-         A('the clean local package', 'pass',
+         A('the clean local package (MMR-57)', 'pass',
            ['evidence/release/package-manifest-f70b44c0.json', 'evidence/release/clean-install.json'],
-           'MNBL.ProceduralWorld-v0.0.1.zip f70b44c0... (assembly a61d6dc7...), 11 files; clean install 27/27. Built from a working tree with uncommitted changes (ownedFilesUncommitted). It is a local test package, not release-certified.'),
+           'MNBL.ProceduralWorld-v0.0.1.zip f70b44c0... (assembly a61d6dc7...), 11 files; clean install 27/27 (install, disable, remove, reinstall, read-only). It is a local test package, not release-certified.'),
          A('the current package passes its audits', 'pass',
            ['evidence/release/package-manifest.json'],
-           'Rebuilt after the developer menu entries were removed (2026-10-18): b06d222a... (assembly c2200e51...); worldbridge and fwg unchanged; 0 of 30,170 game files identical, 36 embedded resources, template files are the module\'s own.'),
-         A('the current package through the clean-install sequence', 'not-run', [],
-           'The menu-cleanup package has not been installed alone and exercised; MMR-1 runs on it.'),
-         A('the one-shot acceptance scenario on that package', 'not-run', [],
-           'MMR-1 runs it and adds its identities, results, timings and limitations here.'),
+           'ed63d689... (assembly bc323534...), rebuilt after the developer menu entries were removed and the probes gained fixtureB (2026-10-19); worldbridge and fwg unchanged; 0 of 30,170 game files identical, 36 embedded resources, template files are the module\'s own. Built from commit 55576ca plus the MMR-1 changes, which the MMR-1 commit records.'),
+         A('the current package installed alone, with the development module and store unavailable', 'pass',
+           ['evidence/one-shot/one-shot-run.json'],
+           'MMR-1\'s sequence: the package extracted alone matches its manifest (11 files, no development receipt), the store started empty, the battle-scale lock held; the official files, the 107 earlier saves and the development module and store were unchanged or put back. (The cited run file records the scenario\'s overall fail; this aspect is its "sequence" step, which passed.)'),
+         A('the current package through the disable, remove, reinstall and read-only sequence', 'not-run', [],
+           'MMR-57\'s sequence ran on f70b44c0; it was not repeated on ed63d689 (the changes since are the menu entries and probe options).'),
+         A('the one-shot acceptance scenario on the current package (MMR-1)', 'fail',
+           ['evidence/one-shot/one-shot-run.json'],
+           'Run 2026-10-19, tools/Test-OneShot.ps1 (docs/one-shot-acceptance.md): step 1 fail (everything passed except the producer\'s pinned UCRT, which a Windows update replaced); step 2 fail (land_missions field.rock: a third AI party joined the battle); step 3 fail (naval_missions: the island voyage turned back to its start town, the later cases cascaded); step 4 fail (the navigation caches were rebuilt on a load although they existed; camera, picking, sea crossing and a naval encounter at the seam on world A not run); step 5 blocked (no second activatable world; A\'s save, same-process and cold loads passed); step 6 blocked (cross-world callbacks need B; the refusals, hashes and orphan checks passed). The land and naval failures did not reproduce in reruns on the same build from another designated save (11472, 7368); whether they are intermittent or depend on the campaign state is not established.'),
+         A('the established offline suites on the integrated sources', 'fail',
+           ['evidence/one-shot/offline-suites.json'],
+           'tools/Test-OfflineSuites.ps1: 45 of 46 pass (every csc harness, the bridge and package path suites, the scenario checks, the Python tests). Test-ProducerProcess fails one preflight check, ucrtbase_matches_lock: a Windows update (KB5127647/KB5127648, 2026-10-13/14) replaced C:\\Windows\\System32\\ucrtbase.dll after the producer\'s runtime was pinned, so the pinned UCRT hash no longer matches the system\'s. Its CTest (9/9) and every generation outcome pass, and in-game generation ran. Re-pinning changes worldgen/producer.lock.json, a world input: an owner decision. Test-GenerationIdentity not run (it rewrites an embedded build input).'),
      ]},
 ]
 
@@ -192,8 +211,9 @@ IDENTITIES = {
     'harmony': 'Bannerlord.Harmony v2.4.2 (Steam Workshop 2859188632)',
     'producer': {'fwg.exe': '564c2629b5b92d49e52cd466a5a1aaa9339380464207ddcae669dd487d2f695e', 'fwgcppCommit': 'ec5d1c10f5ae4c32fdcef092d23ad7d51e2a30de'},
     'worldbridge': '776c160626d029e6c9b911472db1a1e7d7992c5f51188259b81fd864e654fe34 (package, MMR-49, MMR-56)',
-    'package': {'archive': 'MNBL.ProceduralWorld-v0.0.1.zip', 'sha256': 'b06d222abd87d4f3606281785ad4f7f726bbbb647b3548a07e1d280b48fa8f9c',
-                'moduleAssemblySha256': 'c2200e515fc2781db3500fa3b79a1a802c09eab52a66f1e33f02f43b4852e742', 'releaseCertified': False,
+    'package': {'archive': 'MNBL.ProceduralWorld-v0.0.1.zip', 'sha256': 'ed63d689da10e7c58369bdc6ed1938d8484d0cc5abb4633b06177601132e52aa',
+                'moduleAssemblySha256': 'bc3235345ea22aebd5eb1bc72e78620f863753816a68cf9b3c520b4f76ee2249', 'releaseCertified': False,
+                'oneShotTested': True,
                 'cleanInstallTested': {'sha256': 'f70b44c0879d4389fced8c16e61ea5fb331995ae862acdd8bfe1ddf8d86b314f',
                                        'moduleAssemblySha256': 'a61d6dc78ed37c0198191e728b2711af866875706ab744a61acf1b8290a1a4e0'}},
     'worlds': {
@@ -208,8 +228,9 @@ IDENTITIES = {
 
 BUILD_CURRENCY = ('No single module build ran every piece of evidence: each ticket\'s in-game runs used the module assembly of its own '
                   'build (for example MMR-49 4ed3b966..., MMR-51 fcae6eea..., MMR-53 3003e293..., MMR-56 e10a2e69...), and only the MMR-57 '
-                  'clean-install runs used the packaged assembly a61d6dc7.... The one-shot scenario on the package (MMR-1) is the run that '
-                  'puts them on one build.')
+                  'clean-install runs used the packaged assembly a61d6dc7.... The one-shot scenario (MMR-1, 2026-10-19) re-ran the player flow, '
+                  'land and naval play, the seam and save matrix and the refusals on one build, the package assembly bc323534..., and the '
+                  'offline suites on its sources; the remaining in-game evidence is from earlier builds.')
 
 
 def sha(path):
@@ -260,6 +281,13 @@ DESIGNED = {
 }
 
 
+# A passing aspect that cites one part of a file whose overall verdict is graded by another aspect (criterion, aspect, path).
+DESIGNED_ASPECTS = {
+    ('s7', 'the current package installed alone, with the development module and store unavailable', 'evidence/one-shot/one-shot-run.json'):
+        'this aspect is the run\'s "sequence" step (the installation, the snapshots, the restore), which passed; the run\'s overall fail is the one-shot aspect\'s',
+}
+
+
 def failing_fields(rec):
     bad = []
     for k, v in (rec or {}).items():
@@ -273,6 +301,18 @@ def failing_fields(rec):
 def tracked(rel):
     run = subprocess.run(['git', 'ls-files', '--error-unmatch', rel], cwd=REPO, capture_output=True, text=True)
     return run.returncode == 0
+
+
+def final_scenario():
+    """MMR-1's one-shot run, as tools/summarize_one_shot.py graded it."""
+    path = os.path.join(REPO, 'evidence', 'one-shot', 'one-shot-run.json')
+    if not os.path.exists(path):
+        return {'status': 'not-run', 'owner': 'MMR-1'}
+    with open(path, encoding='utf-8-sig') as f:
+        run = json.load(f)
+    return {'status': run.get('status'), 'owner': 'MMR-1', 'run': 'evidence/one-shot/one-shot-run.json', 'startedUtc': run.get('startedUtc'),
+            'finishedUtc': run.get('finishedUtc'), 'steps': run.get('summary'), 'identities': run.get('identities'),
+            'reruns': [{k: r.get(k) for k in ('of', 'result', 'ok')} for r in run.get('reruns') or []]}
 
 
 def aggregate(aspects):
@@ -308,6 +348,8 @@ def main():
             if a['status'] != 'pass':
                 continue
             for e in a['evidence']:
+                if (c['id'], a['aspect'], e['path']) in DESIGNED_ASPECTS:
+                    continue
                 for field in failing_fields(e.get('recorded')):
                     if (e['path'], field) not in DESIGNED:
                         problems.append('%s "%s": %s records %s = %r' % (c['id'], a['aspect'], e['path'], field, e['recorded'][field]))
@@ -331,8 +373,9 @@ def main():
         'identities': IDENTITIES,
         'buildCurrency': BUILD_CURRENCY,
         'evidenceFiles': {'count': len(files), 'untracked': [e['path'] for e in files if not e.get('trackedByGit')]},
-        'designedFailuresInPassingEvidence': [{'path': p, 'field': f, 'why': why} for (p, f), why in sorted(DESIGNED.items())],
-        'finalScenario': {'status': 'not-run', 'owner': 'MMR-1'},
+        'designedFailuresInPassingEvidence': [{'path': p, 'field': f, 'why': why} for (p, f), why in sorted(DESIGNED.items())]
+                                             + [{'criterion': c, 'aspect': a, 'path': p, 'why': why} for (c, a, p), why in sorted(DESIGNED_ASPECTS.items())],
+        'finalScenario': final_scenario(),
     }
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     with open(OUT, 'w', encoding='utf-8', newline='\n') as f:

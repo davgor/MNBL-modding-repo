@@ -77,8 +77,10 @@ namespace MNBL.ProceduralWorld.Automation
                 .Concat(new[] { "seeds", "culture", "observeHours", "afterDiagnosticHours", "movedFraction" }.Where(k => !planA.ContainsKey(k)).Select(k => "worlds.A." + k))
                 .Concat(new[] { "fixtureSeed", "fixturePlacement", "catalogReceipt", "observeHours", "movedFraction" }.Where(k => !planB.ContainsKey(k)).Select(k => "worlds.B." + k)).ToList();
             if (missing.Count > 0) throw new InvalidOperationException("The scenario file lacks " + String.Join(", ", missing));
+            // fixtureB=false (a package-only installation, which holds no fixture world): world B is recorded as blocked and not started.
+            bool fixtureB = context.Bool("fixtureB", true);
             string placement = Path.Combine(repo, (string)planB["fixturePlacement"]), receipt = Path.Combine(repo, (string)planB["catalogReceipt"]);
-            foreach (var file in new[] { placement, receipt }) if (!File.Exists(file)) throw new InvalidOperationException("World B's input is missing: " + file);
+            if (fixtureB) foreach (var file in new[] { placement, receipt }) if (!File.Exists(file)) throw new InvalidOperationException("World B's input is missing: " + file);
             context.Outputs["scope"] = "MMR-51: generated campaign gameplay on worlds A and B (the bounded first test).";
             context.Outputs["scenarioFile"] = new Dictionary<string, object> { ["schema"] = plan["schema"], ["sha256"] = GeneratedWorldPackage.Sha256(bytes) };
             context.Outputs["rules"] = soak.Rules;
@@ -129,6 +131,14 @@ namespace MNBL.ProceduralWorld.Automation
             baseline("after world A ended");
 
             // ---- world B: MMR-19's fixture world, its placement and catalog receipt named by the scenario file (relative to the repository).
+            if (!fixtureB)
+            {
+                results["B"] = TwoWorldMatrixProbe.BlockedFixture();
+                context.Outputs["completed"] = true;
+                context.Checkpoint();
+                if (soak.Failures.Count > 0) throw new InvalidOperationException("Campaign soak expectations failed: " + String.Join("; ", soak.Failures.Take(12)));
+                yield break;
+            }
             context.Args["fixtureSeed"] = planB["fixtureSeed"];
             context.Args["fixturePlacement"] = placement;
             context.Args["catalogReceipt"] = receipt;

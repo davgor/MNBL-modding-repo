@@ -196,6 +196,7 @@ Results and limits are in [../packaging.md](../packaging.md). A local package is
 | Engine logs | `C:\ProgramData\Mount and Blade II Bannerlord\logs\rgl_log_<pid>.txt`. The engine keeps only a few, so copy the ones you need right after a run |
 | Build outputs | `build/` (ignored): `module/`, `worldbridge/`, `producer/`, `release/` |
 | Evidence summaries | `evidence/**`; one-shot index `evidence/one-shot/acceptance-index.json` (`python tools/build_acceptance_index.py`) |
+| Raw run outputs | `evidence/runtime/in-game/` (git-ignored). Eight of them are inputs that the offline harnesses and the scenario files name, so keep them when clearing the folder: `baseline_combat-27112`, `campaign_catalog-10212`, `first_test_profile-35468`, `generated_campaign-21284`, `-2248`, `-4768`, `generation_job-30220`, `runtime_surface-32896` (`.json`) |
 | Inspect and transfer worlds | `tools/Inspect-World.ps1` (read-only); `tools/Transfer-WorldSave.ps1 -Action export|verify|import` |
 
 ## Known tooling gaps

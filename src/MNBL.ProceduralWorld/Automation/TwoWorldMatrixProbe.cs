@@ -94,8 +94,13 @@ namespace MNBL.ProceduralWorld.Automation
                 Baseline(context, st, "after world A ended");
                 // World B: MMR-19's fixture world (seed 364610), a second distinct world: the production generator yields no second activatable
                 // world today (seeds 43-72 refused by its quality gate, MMR-37; 73 refused by the campaign's village binding at activation).
-                yield return CreateFixtureWorld(context, st, "B");
-                Baseline(context, st, "after world B ended");
+                // fixtureB=false (a package-only installation, which holds no fixture world): B is recorded as blocked and every B step skipped.
+                if (context.Bool("fixtureB", true))
+                {
+                    yield return CreateFixtureWorld(context, st, "B");
+                    Baseline(context, st, "after world B ended");
+                }
+                else st.Worlds["B"] = BlockedFixture();
                 yield return LoadWorld(context, st, "A", "same process, through Continue", true);
                 yield return LoadWorld(context, st, "B", "same process, from inside A", false);
                 yield return Refusals(context, st);
@@ -153,6 +158,21 @@ namespace MNBL.ProceduralWorld.Automation
             context.Outputs["completed"] = true;
             context.Checkpoint();
             if (st.Failures.Count > 0) throw new InvalidOperationException("Two-world matrix expectations failed: " + String.Join("; ", st.Failures.Take(12)));
+        }
+
+        // A probe's second world when it cannot run here (fixtureB=false).
+        internal const string FixtureBlockedReason = "not run (fixtureB=false): the production generator activates only seed 42 (seed 73 is refused at the village binding), and MMR-19's fixture world is not part of the package";
+
+        internal static Dictionary<string, object> BlockedFixture()
+        {
+            return new Dictionary<string, object> { ["blocked"] = FixtureBlockedReason };
+        }
+
+        private static bool Blocked(Dictionary<string, object> world)
+        {
+            if (world == null) return true;
+            var created = world.ContainsKey("fromCreate") ? world["fromCreate"] as Dictionary<string, object> : world;
+            return world.ContainsKey("blocked") || created == null || created.ContainsKey("blocked");
         }
 
         // ---------------------------------------------------------------- baseline
@@ -511,11 +531,12 @@ namespace MNBL.ProceduralWorld.Automation
         private static IEnumerator LoadWorld(ProbeContext context, State st, string key, string how, bool viaContinue)
         {
             var world = (Dictionary<string, object>)st.Worlds[key];
+            if (Blocked(world)) { world["load"] = new Dictionary<string, object> { ["how"] = how, ["blocked"] = FixtureBlockedReason }; yield break; }
             var created = world.ContainsKey("fromCreate") ? (Dictionary<string, object>)world["fromCreate"] : world;
             string other = key == "A" ? "B" : "A";
-            var otherWorld = (Dictionary<string, object>)st.Worlds[other];
-            var otherCreated = otherWorld.ContainsKey("fromCreate") ? (Dictionary<string, object>)otherWorld["fromCreate"] : otherWorld;
-            string save = (string)created["save"], prefix = (string)created["prefix"], otherPrefix = (string)otherCreated["prefix"];
+            var otherWorld = st.Worlds.ContainsKey(other) ? (Dictionary<string, object>)st.Worlds[other] : null;
+            var otherCreated = Blocked(otherWorld) ? null : otherWorld.ContainsKey("fromCreate") ? (Dictionary<string, object>)otherWorld["fromCreate"] : otherWorld;
+            string save = (string)created["save"], prefix = (string)created["prefix"], otherPrefix = otherCreated == null ? null : (string)otherCreated["prefix"];
             var load = new Dictionary<string, object> { ["how"] = how, ["fromRunningGame"] = Game.Current != null };
             world["load"] = load;
             var info = MBSaveLoad.GetSaveFileWithName(save);
@@ -562,7 +583,8 @@ namespace MNBL.ProceduralWorld.Automation
             load["controlDrift"] = created.ContainsKey("controlDrift") ? created["controlDrift"] : null;
             st.Expect(differences.Count == 0 && retargets.Count <= Math.Max(2, compared / 50), "world " + key + " (" + how + "): the loaded campaign equals its save (time, parties and fleets, anchors, settlements, prisoners, relations, player)"
                 + (differences.Count == 0 ? "" : ": " + String.Join("; ", differences.Take(5))) + " (" + retargets.Count + " AI retargets of " + compared + " parties)");
-            var mine = WorldSnapshot.Objects(prefix); var theirs = WorldSnapshot.Objects(otherPrefix);
+            var mine = WorldSnapshot.Objects(prefix);
+            var theirs = otherPrefix == null ? new Dictionary<string, object>() : WorldSnapshot.Objects(otherPrefix);
             load["objects"] = mine; load["otherWorldObjects"] = theirs;
             var scene = loader.Report.ContainsKey("scene") ? (string)loader.Report["scene"] : null;
             load["frame"] = PeriodicWorld.Current == null ? null : PeriodicWorld.Current.Coordinates.FrameIdentity;
@@ -935,7 +957,9 @@ namespace MNBL.ProceduralWorld.Automation
             foreach (var kv in st.Worlds)
             {
                 var created = (Dictionary<string, object>)((Dictionary<string, object>)kv.Value)["fromCreate"];
-                foreach (var name in new[] { created["save"] as string, created["initialSave"] as string }.Where(n => n != null))
+                object saveName, initialSave;
+                created.TryGetValue("save", out saveName); created.TryGetValue("initialSave", out initialSave);
+                foreach (var name in new[] { saveName as string, initialSave as string }.Where(n => n != null))
                 {
                     try { deleted[name] = SaveBindingRuntime.Store.Saves.Delete(name) && SaveBindingRuntime.Store.Saves.Read(name) == null; }
                     catch (Exception error) { deleted[name] = error.Message; }

@@ -159,11 +159,15 @@ namespace MNBL.ProceduralWorld.Automation
                 var lacking = st.RuleList("battleClasses").Where(c => !candidates.ByClass.ContainsKey(c)).ToList();
                 if (candidates.Crossing == null) lacking.Add("crossing");
                 context.Outputs["lackingInA"] = lacking;
-                if (lacking.Count > 0) yield return WorldB(st, plan, path, lacking);
+                // fixtureB=false (a package-only installation, which holds no fixture world): B's cases are recorded as blocked, and world A
+                // stays loaded for the hideout.
+                bool runB = lacking.Count > 0 && context.Bool("fixtureB", true);
+                if (runB) yield return WorldB(st, plan, path, lacking);
+                else if (lacking.Count > 0) context.Outputs["worldB"] = new Dictionary<string, object> { ["for"] = lacking, ["blocked"] = TwoWorldMatrixProbe.FixtureBlockedReason };
                 // The hideout last: the game hung at its boss conversation twice (runs 25280 and 17928), and a hang loses only what follows.
                 // After world B, world A's designated save is loaded again for it.
                 bool hideoutReady = true;
-                if (lacking.Count > 0)
+                if (runB)
                 {
                     var reload = new Dictionary<string, object>(); context.Outputs["reloadForHideout"] = reload;
                     yield return LoadDesignated(st, reload);
