@@ -1,0 +1,458 @@
+{
+  "baseRevisionId": null,
+  "bundle": {
+    "edges": [
+      {
+        "from": "tk_01m57wbrk3fmd58dnrk46mxgnt",
+        "to": "tk_01m57wbrm1m9m79m3qz3q472h6"
+      }
+    ],
+    "epic": {
+      "intent": "Give each of the 12 FWGC++ peoples its own troops, civilians, clothing, settlement scenes and buildings, with troops and civilians on their people's Bannerlord race.\n\nToday generated lords, clans and notables carry their people's culture, while troops, scenes, buildings and clothing still come from the borrowed vanilla presentation culture (`worldgen/policies/culture-presentations.json`). The user accepted that for now and asked for this separate epic on 2026-10-15 (peoples-epic comment cm_01m51aqjmdx8pv1210epc69eyq). The character overhaul confirmed it as decision D10 (a) on 2026-10-18: this epic owns troop and civilian race.\n\n## Scope\n\n- **Troop and civilian race.** Every spawn path below gives its characters the race of the people that owns the settlement, clan or region, each checked by an in-game census:\n  1. volunteers recruited from `Culture.BasicTroop` and `EliteBasicTroop`;\n  2. upgrade targets through the whole troop tree;\n  3. militia;\n  4. garrisons;\n  5. caravans (guards and caravan master);\n  6. villagers (villager parties and village LocationCharacters);\n  7. bandits (hideouts in a people's region, or a recorded rule if bandits stay culture-based);\n  8. town LocationCharacters (townsfolk, merchants, guards).\n- **Per-people content.** Troop trees, civilian characters, clothing, settlement scenes and buildings for each people, or a sharing rule the user approves (for example hill and frosthold dwarf on dwarf content).\n- **Not in scope.** Notables and wanderers created after campaign start stay with the character overhaul (ep_01m4gbx49w72je0ezgjcfkxtjx, MMR-219, D10 (a)), as do the player, heroes, lords, companions and children.\n\n## Why per-people templates\n\n- Every spawn path keys on the presentation culture, and 4 of the 7 presentation cultures (empire, vlandia, battania, nord) serve two races, so a culture-level swap cannot give the right race.\n- Single-player ignores `AgentBuildData.Race`, so troops and civilians need per-people CharacterObject templates with Race set.\n- Source: docs/research/character-overhaul-dd2-redteam.md (D10 and §4).\n\n## Consumes (not rebuilt here)\n\n- **Character overhaul** (ep_01m4gbx49w72je0ezgjcfkxtjx, saved revision 3): the appearance record and its race field (MMR-169, MMR-172); the five Bannerlord races human, elf, dwarf, gnome and tidekin (D14) with their skins and monsters (MMR-219, races module MNBL.CharacterOverhaul.Races); the equipment fits for the race bodies, gnome and tidekin included (MMR-227); the population distributions (MMR-174, MMR-179); and the creator host contract ICharacterEditorHost (MMR-178 a7).\n- **Peoples epic** (ep_01m513vch3mz0md6eqybvt1nmh): the people registry (MMR-204, `worldgen/policies/peoples.json`), the people cultures (MMR-207) and the world's people identity (MMR-209).\n\nImplementation sprints need those accepted; the sprint-1 investigation does not.\n\n## Assets\n\nCharacter assets inherited from the overhaul may carry `dd2-derived` lineage (overhaul D2) until the clean-replacement epic (ep_01m57w9twf9yywa7wshwcyw42r) lands. New assets made here record their lineage in the same register, `assets/character-overhaul/manifests/asset-lineage.json`. While any shipped asset is dd2-derived, this content ships only in private builds; a public or Workshop release waits for the clean-replacement epic.\n\n## Working rules\n\n- One live game round per sprint, inside its acceptance node. Work tickets never launch the game; they write fail-soft probe steps instead. Editor imports run under the shared-install CLAIM/RELEASE protocol.\n- Per-ticket checks: it compiles, existing suites pass, and targeted assertions cover new pure logic. One review pass for the epic, before its last live round. No hash ceremonies or evidence receipts.\n- The shared game install is claimed (CLAIM/OK/RELEASE) with the other sessions before any deploy or launch.\n\n## Plan shape\n\nSkeleton: success criteria plus one sprint of investigation. Its checkpoint gets the spawn-path map, the per-people content proposal and the contract with the overhaul and peoples epics. The user picks the content table there, and the implementation sprints are planned from it.\n\nSaved in Backlog; no run is started.",
+      "ownerRole": null,
+      "successCriteria": [
+        {
+          "id": "s1",
+          "text": "In a generated campaign, an in-game census finds that every volunteer recruited at a people-owned settlement (Culture.BasicTroop and EliteBasicTroop) is a troop of that people with that people's race."
+        },
+        {
+          "id": "s2",
+          "text": "Every troop keeps its people and race through every upgrade in its tree; a census over all upgrade targets finds no troop that changes people or race."
+        },
+        {
+          "id": "s3",
+          "text": "Every militia agent spawned for a people-owned settlement has that people's race (census)."
+        },
+        {
+          "id": "s4",
+          "text": "Every garrison member of a people-owned settlement has that people's race (census)."
+        },
+        {
+          "id": "s5",
+          "text": "Every caravan guard and caravan master of a people's clan has that people's race (census)."
+        },
+        {
+          "id": "s6",
+          "text": "Every villager-party member and village LocationCharacter of a people-owned village has that people's race (census)."
+        },
+        {
+          "id": "s7",
+          "text": "Every bandit-party member from a hideout in a people's region has that people's race, or bandits follow a rule the user approved and the census matches it."
+        },
+        {
+          "id": "s8",
+          "text": "Every townsperson, merchant and guard LocationCharacter in a people-owned town scene has that people's race (census)."
+        },
+        {
+          "id": "s9",
+          "text": "Each of the 12 peoples has its own troop tree, civilian characters, clothing, settlement scenes and buildings, or a user-approved sharing rule names whose content it uses; the chosen content table is recorded in the plan."
+        },
+        {
+          "id": "s10",
+          "text": "The character overhaul's behaviour for the player, heroes and post-start notables and wanderers is unchanged; vanilla Sandbox and StoryMode are unchanged; the FWGC epic's campaign coherence and naval probes and the peoples epic's start and save checks still pass."
+        },
+        {
+          "id": "s11",
+          "text": "Per-people troops and civilians survive save, cold restart and load, and loading a save made before this epic behaves as documented."
+        },
+        {
+          "id": "s12",
+          "text": "Every asset this epic ships has a lineage record in assets/character-overhaul/manifests/asset-lineage.json; while any is dd2-derived, no public or Workshop release of this content happens before the clean-replacement epic (ep_01m57w9twf9yywa7wshwcyw42r) completes."
+        }
+      ],
+      "title": "Per-people content: troops, civilians, scenes, buildings and clothing for the 12 FWGC++ peoples"
+    },
+    "formatVersion": 1,
+    "policies": {
+      "leaseSeconds": 900,
+      "maxConcurrency": null,
+      "onTicketFailure": "continue_independent",
+      "retryLimit": 3
+    },
+    "rationale": "Skeleton plan, as the user asked: success criteria plus one sprint of investigation. Content scope (which peoples get their own troop trees, scenes, buildings and clothing, and which share) is a user decision, so it is proposed in sprint 1 and chosen at its checkpoint; implementation sprints are planned from that choice.\n\nParallelism: the spawn-path map, the content proposal and the contract start together; the census probe steps need the spawn-path map. The acceptance node runs the sprint's one live round.\n\nCross-epic: Dark Mechanicus 'requires' edges are scoped to one epic, so upstream readiness (overhaul MMR-169, MMR-172, MMR-174, MMR-178, MMR-179, MMR-219, MMR-227; peoples MMR-204, MMR-207, MMR-209) becomes entry criteria on the implementation sprints, written from the contract ticket's list.\n\nLean verification per the user's rule: one live round per sprint, no game launch in work tickets, one review pass per epic, no hash ceremonies.",
+    "relations": [],
+    "sprints": [
+      {
+        "checkpoint": {
+          "mode": "human"
+        },
+        "concurrencyCap": null,
+        "entryCriteria": [
+          {
+            "id": "n1",
+            "text": "Planning has been saved; execution starts only through the authorized Dark Mechanicus workflow on a recorded feature branch."
+          }
+        ],
+        "exitCriteria": [
+          {
+            "id": "x1",
+            "text": "docs/per-people/spawn-paths.md maps each of the eight spawn paths with its installed call site, the culture or template it reads and a substitution point."
+          },
+          {
+            "id": "x2",
+            "text": "The per-people content proposal and the cross-epic contract are written, and the user's choice of content table is recorded in the epic intent."
+          },
+          {
+            "id": "x3",
+            "text": "The baseline census ran in the sprint's one live round and its result is attached."
+          }
+        ],
+        "goal": "Investigate: map the eight troop and civilian spawn paths on v1.4.8, propose the per-people content table and fix the contract with the character overhaul and peoples epics. One live round runs the baseline census.",
+        "id": "sp_01m57wahw7cgenpbf7etwpxzg0",
+        "ordinal": 1,
+        "ticketIds": [
+          "tk_01m57wbrk3fmd58dnrk46mxgnt",
+          "tk_01m57wbrm0nb6mdep2nfmt54yt",
+          "tk_01m57wbrm1svrvm0ggc5tstkkh",
+          "tk_01m57wbrm1m9m79m3qz3q472h6",
+          "tk_01m57wahw7f2cfzzwe8tdggqc7"
+        ]
+      }
+    ],
+    "tickets": [
+      {
+        "acceptanceCriteria": [
+          {
+            "covers": "tk_01m57wbrk3fmd58dnrk46mxgnt",
+            "id": "c1",
+            "text": "The spawn-path map covers all eight paths with their v1.4.8 call sites and substitution points."
+          },
+          {
+            "covers": "tk_01m57wbrm0nb6mdep2nfmt54yt",
+            "id": "c2",
+            "text": "The content proposal covers all 12 peoples, and the user's content-table choice is recorded in the epic intent."
+          },
+          {
+            "covers": "tk_01m57wbrm1svrvm0ggc5tstkkh",
+            "id": "c3",
+            "text": "The contract names every consumed upstream artifact and the upstream tickets each implementation sprint waits for."
+          },
+          {
+            "covers": "tk_01m57wbrm1m9m79m3qz3q472h6",
+            "id": "c4",
+            "text": "The census ran on the fixed seed in the one live round, and its per-path counts of culture, template and race are attached as the baseline."
+          }
+        ],
+        "body": "The sprint's one live round.\n\n1. CLAIM the shared install with the other sessions; refuse while any Bannerlord or Watchdog process you did not start exists.\n2. Run the census probe steps once. Fix any probe defect in one batch and rerun once only if needed.\n3. RELEASE, restoring every deployed file.\n4. Present the spawn-path map, the content proposal and the contract at the checkpoint. Record the user's content-table choice in the epic intent; the planner then adds the implementation sprints.\n\nRead the current project Definition of Done and report every configured check truthfully.",
+        "capability": {
+          "constraints": {
+            "dataLocation": null,
+            "environments": [],
+            "maxCostUsd": null,
+            "maxDurationMinutes": null
+          },
+          "context": {
+            "estimatedInputTokens": null,
+            "requiredArtifacts": []
+          },
+          "modalities": [
+            "text",
+            "images"
+          ],
+          "preferences": {
+            "autonomy": null,
+            "cost": null,
+            "latency": null,
+            "modelOverride": null,
+            "quality": null
+          },
+          "reasoning": {
+            "effort": "medium",
+            "level": "multi_step",
+            "rationale": "One live census round plus checkpoint preparation."
+          },
+          "skills": [
+            "bannerlord-campaign",
+            "review"
+          ],
+          "tools": [
+            "repo_read",
+            "repo_write",
+            "shell",
+            "test_execution"
+          ],
+          "workType": "testing"
+        },
+        "expectedArtifacts": [],
+        "id": "tk_01m57wahw7f2cfzzwe8tdggqc7",
+        "key": "MMR-269",
+        "kind": "acceptance",
+        "optional": false,
+        "priority": "high",
+        "references": [],
+        "size": "small",
+        "tags": [
+          "per-people",
+          "acceptance"
+        ],
+        "title": "Run the baseline census and present the content choice"
+      },
+      {
+        "acceptanceCriteria": [
+          {
+            "id": "a1",
+            "text": "docs/per-people/spawn-paths.md lists all eight spawn paths, each with its v1.4.8 call site, the culture or template field it reads and a proposed substitution point."
+          }
+        ],
+        "body": "Static only: ildasm or REA over the pinned v1.4.8 DLLs, no game launch.\n\nFor each path record the installed call site, which culture or template it reads, and the narrowest point where a per-people template can be substituted (model override, campaign behaviour or Harmony patch):\n\n1. volunteers (`Culture.BasicTroop`, `EliteBasicTroop`);\n2. upgrade targets;\n3. militia;\n4. garrisons;\n5. caravans (guards and caravan master);\n6. villagers (villager parties and village LocationCharacters);\n7. bandits;\n8. town LocationCharacters (townsfolk, merchants, guards).\n\nNote how each path meets the overhaul's population system (MMR-174, MMR-179) and the peoples epic's people cultures (MMR-207, MMR-209). Start from what the character-overhaul red team already traced (docs/research/character-overhaul-dd2-redteam.md, D10 and §4.1) instead of re-deriving it.\n\nChecks: the document covers all eight paths; no game launch.",
+        "capability": {
+          "constraints": {
+            "dataLocation": null,
+            "environments": [],
+            "maxCostUsd": null,
+            "maxDurationMinutes": null
+          },
+          "context": {
+            "estimatedInputTokens": null,
+            "requiredArtifacts": []
+          },
+          "modalities": [
+            "text"
+          ],
+          "preferences": {
+            "autonomy": null,
+            "cost": null,
+            "latency": null,
+            "modelOverride": null,
+            "quality": null
+          },
+          "reasoning": {
+            "effort": "medium",
+            "level": "multi_step",
+            "rationale": "Static trace of eight installed spawn paths."
+          },
+          "skills": [
+            "csharp",
+            "bannerlord-campaign",
+            "reverse-engineering"
+          ],
+          "tools": [
+            "repo_read",
+            "repo_write",
+            "shell"
+          ],
+          "workType": "investigation"
+        },
+        "expectedArtifacts": [
+          "docs/per-people/spawn-paths.md"
+        ],
+        "id": "tk_01m57wbrk3fmd58dnrk46mxgnt",
+        "key": "MMR-270",
+        "optional": false,
+        "priority": "high",
+        "references": [
+          {
+            "hash": null,
+            "kind": "file",
+            "label": "Character overhaul red team (D10, §4.1)",
+            "location": "docs/research/character-overhaul-dd2-redteam.md",
+            "remoteOnly": false
+          },
+          {
+            "hash": null,
+            "kind": "file",
+            "label": "Culture presentation policy",
+            "location": "worldgen/policies/culture-presentations.json",
+            "remoteOnly": false
+          }
+        ],
+        "size": "small",
+        "tags": [
+          "per-people",
+          "investigation"
+        ],
+        "title": "Map the eight troop and civilian spawn paths on v1.4.8"
+      },
+      {
+        "acceptanceCriteria": [
+          {
+            "id": "a1",
+            "text": "docs/per-people/content-proposal.md has one row per people (12), naming its own content or the people whose content it shares, with asset counts and art route, ready for the user's choice."
+          }
+        ],
+        "body": "Inventory what each presentation culture supplies today (troop tree, civilian characters, clothing, settlement scenes, buildings) and which peoples borrow it (`worldgen/policies/culture-presentations.json`, the people registry of peoples MMR-204).\n\nPropose, per people, either its own content or a sharing rule (for example hill and frosthold dwarf on dwarf content), with:\n- rough asset counts;\n- the art route (overhaul D2: dd2-derived development assets with lineage, then the clean-replacement epic ep_01m57w9twf9yywa7wshwcyw42r);\n- whether the overhaul's race-body equipment fits (MMR-227) cover its clothing.\n\nThe user picks the table at the sprint checkpoint. Desk work; no game launch.",
+        "capability": {
+          "constraints": {
+            "dataLocation": null,
+            "environments": [],
+            "maxCostUsd": null,
+            "maxDurationMinutes": null
+          },
+          "context": {
+            "estimatedInputTokens": null,
+            "requiredArtifacts": []
+          },
+          "modalities": [
+            "text"
+          ],
+          "preferences": {
+            "autonomy": null,
+            "cost": null,
+            "latency": null,
+            "modelOverride": null,
+            "quality": null
+          },
+          "reasoning": {
+            "effort": "medium",
+            "level": "multi_step",
+            "rationale": "Content inventory and a scoped proposal for a user decision."
+          },
+          "skills": [
+            "bannerlord-campaign",
+            "data-design"
+          ],
+          "tools": [
+            "repo_read",
+            "repo_write",
+            "shell"
+          ],
+          "workType": "investigation"
+        },
+        "expectedArtifacts": [
+          "docs/per-people/content-proposal.md"
+        ],
+        "id": "tk_01m57wbrm0nb6mdep2nfmt54yt",
+        "key": "MMR-271",
+        "optional": false,
+        "priority": "high",
+        "references": [],
+        "size": "small",
+        "tags": [
+          "per-people",
+          "investigation",
+          "design"
+        ],
+        "title": "Propose the per-people content table"
+      },
+      {
+        "acceptanceCriteria": [
+          {
+            "id": "a1",
+            "text": "docs/per-people/contract.md names every consumed upstream artifact with its epic and ticket, the proposed template naming and registry fields, the precedence rule, and the upstream tickets each implementation sprint waits for."
+          }
+        ],
+        "body": "Write how this epic consumes, without rebuilding:\n- from the character overhaul (ep_01m4gbx49w72je0ezgjcfkxtjx): the appearance record and its race field (MMR-169, MMR-172), the five races' skins and monsters (human, elf, dwarf, gnome, tidekin; D14, MMR-219), the race-body equipment fits including gnome and tidekin (MMR-227), the population distributions (MMR-174, MMR-179) and ICharacterEditorHost (MMR-178 a7);\n- from the peoples epic (ep_01m513vch3mz0md6eqybvt1nmh): the people registry (MMR-204), the people cultures (MMR-207) and the world's people identity (MMR-209).\n\nPropose the per-people troop and civilian template naming (for example `mnbl_people_<id>_<troop>`), the registry fields a people needs for its troop tree and civilians, and the precedence between this epic's templates and the overhaul's population records. List the upstream tickets each implementation sprint must wait for. Desk work; no game launch.",
+        "capability": {
+          "constraints": {
+            "dataLocation": null,
+            "environments": [],
+            "maxCostUsd": null,
+            "maxDurationMinutes": null
+          },
+          "context": {
+            "estimatedInputTokens": null,
+            "requiredArtifacts": []
+          },
+          "modalities": [
+            "text"
+          ],
+          "preferences": {
+            "autonomy": null,
+            "cost": null,
+            "latency": null,
+            "modelOverride": null,
+            "quality": null
+          },
+          "reasoning": {
+            "effort": "medium",
+            "level": "multi_step",
+            "rationale": "Cross-epic data contract over three plans."
+          },
+          "skills": [
+            "data-design",
+            "bannerlord-campaign"
+          ],
+          "tools": [
+            "repo_read",
+            "repo_write"
+          ],
+          "workType": "architecture"
+        },
+        "expectedArtifacts": [
+          "docs/per-people/contract.md"
+        ],
+        "id": "tk_01m57wbrm1svrvm0ggc5tstkkh",
+        "key": "MMR-272",
+        "optional": false,
+        "priority": "high",
+        "references": [],
+        "size": "small",
+        "tags": [
+          "per-people",
+          "contract"
+        ],
+        "title": "Fix the contract with the character overhaul and peoples epics"
+      },
+      {
+        "acceptanceCriteria": [
+          {
+            "id": "a1",
+            "text": "Fail-soft census probe steps cover all eight spawn paths on a fixed seed, compile and are desk-checked."
+          }
+        ],
+        "body": "Write fail-soft probe steps, reusing the autorun probes (`GeneratedCampaignBootProbe`, `DiagnosticSandboxBootstrap`), that census a generated world on a fixed seed across the eight spawn paths: for each path, the characters spawned with their culture, template and race. Today every path is expected on its presentation-culture race; the run proves the probe and gives the baseline later sprints compare against.\n\nProbes dismiss Bannerlord Safe Mode and crash dialogs automatically, and every party gets grain if campaign time runs for days. Desk-check the steps; the sprint's acceptance node runs them. No game launch here.\n\nChecks: it compiles; existing suites pass.",
+        "capability": {
+          "constraints": {
+            "dataLocation": null,
+            "environments": [],
+            "maxCostUsd": null,
+            "maxDurationMinutes": null
+          },
+          "context": {
+            "estimatedInputTokens": null,
+            "requiredArtifacts": []
+          },
+          "modalities": [
+            "text"
+          ],
+          "preferences": {
+            "autonomy": null,
+            "cost": null,
+            "latency": null,
+            "modelOverride": null,
+            "quality": null
+          },
+          "reasoning": {
+            "effort": "medium",
+            "level": "multi_step",
+            "rationale": "Probe steps across eight spawn paths, run later in the live round."
+          },
+          "skills": [
+            "csharp",
+            "bannerlord-campaign",
+            "test-automation"
+          ],
+          "tools": [
+            "repo_read",
+            "repo_write",
+            "shell",
+            "test_execution"
+          ],
+          "workType": "testing"
+        },
+        "expectedArtifacts": [
+          "src/MNBL.ProceduralWorld/Automation/ (census probe steps)"
+        ],
+        "id": "tk_01m57wbrm1m9m79m3qz3q472h6",
+        "key": "MMR-273",
+        "optional": false,
+        "priority": "normal",
+        "references": [],
+        "size": "small",
+        "tags": [
+          "per-people",
+          "probe"
+        ],
+        "title": "Write the baseline census probe steps"
+      }
+    ]
+  },
+  "contentHash": "sha256:59b50b0f8c8576ecbcd753397d1f41e70480379b5c80bdc8c3fb848fdc58443c",
+  "createdAt": "2026-10-19T23:49:43.547Z",
+  "epicId": "ep_01m57wahw75cdqaykjmmxwettx",
+  "format": "darkmechanicus.plan-snapshot",
+  "formatVersion": 1,
+  "number": 1,
+  "revisionId": "rv_01m5b94bzv66rjcq6310pgraa4",
+  "savedAt": "2026-10-19T23:49:43.547Z"
+}

@@ -1,0 +1,430 @@
+{
+  "baseRevisionId": null,
+  "bundle": {
+    "edges": [],
+    "epic": {
+      "intent": "Replace every development asset whose lineage is `dd2-derived` with a reference-only clean remake, so the character overhaul and everything built on it can be released publicly. This is the future pre-release epic named by the character overhaul's decisions D2 and D15 (ep_01m4gbx49w72je0ezgjcfkxtjx, saved revision 3, decided 2026-10-18).\n\n## Background\n\n- **D2.** During development, character assets may be AI remakes built on locally extracted DD2 meshes, rigs and textures. Every asset records its lineage, `dd2-derived` (with its DD2 source path) or `clean`, in the register `assets/character-overhaul/manifests/asset-lineage.json` (overhaul MMR-168). The user accepted the copyright risk for the development phase only.\n- **D15.** Art sources and editor-built packages, dd2-derived included, are Git LFS objects in the private repository.\n- **Gate.** The overhaul's package check (MMR-200 a5) refuses any public or Workshop publish while any packaged asset is dd2-derived.\n\n## Scope\n\n1. **Replace.** For every register entry with lineage `dd2-derived`, make a reference-only clean remake: a CC0 base such as MPFB, matched to DD2 measurements, rig tables and renders, with no DD2 vertices or pixels as input. Record it as `clean` with its inputs. Repeat until the MMR-200 lineage gate reports no dd2-derived asset.\n2. **Purge history.** Then rewrite the Git LFS history so no reachable commit references a dd2-derived object, or make the public release from a fresh public repository whose history never held one. The user picks the route.\n3. **Gate releases.** Any Steam Workshop release and the overhaul bundle release depend on this epic.\n\nThis covers the overhaul's assets and every asset that downstream epics inherited or derived from them (Pawn Honor Guard ep_01m4gbt20bt35fw8yrxmq9p5c7 and per-people content ep_01m57wahw75cdqaykjmmxwettx).\n\nReplacements keep the stable option ids and catalog entries of the assets they replace, so saves, presets and population records keep working.\n\n## Working rules\n\n- One live game round per sprint, inside its acceptance node. Work tickets never launch the game; editor imports run under the shared-install CLAIM/RELEASE protocol.\n- Per-ticket checks: it compiles, existing suites pass, and targeted assertions cover new pure logic. One review pass for the epic, before its last live round. No hash ceremonies or evidence receipts.\n- The user's visual verdict at each checkpoint is the quality gate, as in the overhaul (D1, D2).\n\n## Plan shape\n\nSkeleton: success criteria plus one sprint of investigation. The replacement batches are planned at its checkpoint from the register inventory and the clean-pipeline benchmark. It can start once the overhaul's lineage register and benchmark head pair exist; the user decides when.\n\nSaved in Backlog; no run is started.",
+      "ownerRole": null,
+      "successCriteria": [
+        {
+          "id": "s1",
+          "text": "assets/character-overhaul/manifests/asset-lineage.json lists no asset with lineage dd2-derived, and the overhaul's package gate (MMR-200 a5) accepts a public target for both MNBL.CharacterOverhaul and MNBL.CharacterOverhaul.Races."
+        },
+        {
+          "id": "s2",
+          "text": "Every replaced asset is recorded clean with its inputs (the CC0 base and its licence, plus the DD2 measurements, rig tables and renders used as reference). An automated check confirms that no DD2 mesh, rig or texture file is an input to any clean asset (no input under DD2-modding-repo/local, none matching an extracted-DD2 hash) and that no DD2 render is baked, projected or traced into one."
+        },
+        {
+          "id": "s3",
+          "text": "Clean replacements meet the overhaul's frozen quality rubric by the user's visual verdict in a live round, and keep the replaced assets' stable option ids, so existing saves, presets and population records load without appearance drift."
+        },
+        {
+          "id": "s4",
+          "text": "Assets that the Pawn Honor Guard and per-people content epics inherited or derived from dd2-derived assets are replaced too, or excluded from those epics' public packages."
+        },
+        {
+          "id": "s5",
+          "text": "The public release source holds no dd2-derived object: either the rewritten LFS history has no reachable commit referencing an object that a dd2-derived register entry ever pointed to, or the public release comes from a fresh public repository whose history never held one. A scan of every reachable LFS pointer proves it."
+        },
+        {
+          "id": "s6",
+          "text": "Workshop and overhaul-bundle release paths (config/mods.json, tools/ci/mods.py, .github/workflows/mod-releases.yml) stay refused until s1 and s5 hold, and pass once they do."
+        }
+      ],
+      "title": "Clean-room replacement of dd2-derived character assets before public release"
+    },
+    "formatVersion": 1,
+    "policies": {
+      "leaseSeconds": 900,
+      "maxConcurrency": null,
+      "onTicketFailure": "continue_independent",
+      "retryLimit": 3
+    },
+    "rationale": "Skeleton plan, as the user asked: success criteria plus one sprint of investigation. The replacement work scales with the register, which does not exist yet, so batches are planned at the sprint-1 checkpoint from the inventory and the clean-pipeline benchmark.\n\nThe benchmark comes first because it answers the main risk: whether a reference-only clean remake reaches the quality of the dd2-derived pair the user already approved. The history route is a user decision with repository-wide impact, so sprint 1 only compares the routes; nothing is rewritten until the user picks one.\n\nParallelism: all four work tickets are independent. Cross-epic readiness (overhaul MMR-168 and MMR-264) is sprint-1 entry criterion n2, since 'requires' edges are scoped to one epic.\n\nLean verification per the user's rule: one live round per sprint, no game launch in work tickets, one review pass per epic, no hash ceremonies.",
+    "relations": [],
+    "sprints": [
+      {
+        "checkpoint": {
+          "mode": "human"
+        },
+        "concurrencyCap": null,
+        "entryCriteria": [
+          {
+            "id": "n1",
+            "text": "Planning has been saved; execution starts only through the authorized Dark Mechanicus workflow on a recorded feature branch."
+          },
+          {
+            "id": "n2",
+            "text": "The overhaul's lineage register (MMR-168, assets/character-overhaul/manifests/asset-lineage.json) and its MMR-264 benchmark head pair exist."
+          }
+        ],
+        "exitCriteria": [
+          {
+            "id": "x1",
+            "text": "Every dd2-derived register entry is assigned to a proposed replacement batch."
+          },
+          {
+            "id": "x2",
+            "text": "The clean benchmark head pair has the user's visual verdict against the dd2-derived pair, and the provenance check runs in tools/ci/mods.py check."
+          },
+          {
+            "id": "x3",
+            "text": "The user's choice of history route (LFS rewrite or fresh public repository) is recorded in the epic intent."
+          }
+        ],
+        "goal": "Investigate: inventory the dd2-derived register into replacement batches, prove the clean pipeline on the benchmark head pair, add the clean-input provenance check and choose the history route. One live round shows the clean pair beside the dd2-derived pair for the user's verdict.",
+        "id": "sp_01m57w9twk0kxb0z8ye5ktc7sv",
+        "ordinal": 1,
+        "ticketIds": [
+          "tk_01m57wczb8afnk6gnb3xtbqvks",
+          "tk_01m57wczbvv7kercpmkdsnn84h",
+          "tk_01m57wczbvqhkgdheaw1xf2k2h",
+          "tk_01m57wczbv4kgkmynw2a51ptap",
+          "tk_01m57w9twk0v127xyhq7wbqw2j"
+        ]
+      }
+    ],
+    "tickets": [
+      {
+        "acceptanceCriteria": [
+          {
+            "covers": "tk_01m57wczb8afnk6gnb3xtbqvks",
+            "id": "c1",
+            "text": "The inventory assigns every dd2-derived register entry to exactly one proposed batch."
+          },
+          {
+            "covers": "tk_01m57wczbvv7kercpmkdsnn84h",
+            "id": "c2",
+            "text": "The clean and dd2-derived head pairs were rendered side by side in the creator and in a mission at close and mid distance, and the user's verdict is recorded in the epic intent."
+          },
+          {
+            "covers": "tk_01m57wczbvqhkgdheaw1xf2k2h",
+            "id": "c3",
+            "text": "The provenance check runs in tools/ci/mods.py check and its targeted tests pass."
+          },
+          {
+            "covers": "tk_01m57wczbv4kgkmynw2a51ptap",
+            "id": "c4",
+            "text": "The user's choice of history route is recorded in the epic intent."
+          }
+        ],
+        "body": "The sprint's one live round.\n\n1. CLAIM the shared install with the other sessions; refuse while any Bannerlord or Watchdog process you did not start exists.\n2. Run the benchmark's side-by-side probe steps. Fix any defect in one batch and rerun once only if needed.\n3. RELEASE, restoring every deployed file.\n4. The user judges the clean pair against the dd2-derived pair and picks the history route; record both in the epic intent. The planner then adds the replacement batches as later sprints.\n\nRead the current project Definition of Done and report every configured check truthfully.",
+        "capability": {
+          "constraints": {
+            "dataLocation": null,
+            "environments": [],
+            "maxCostUsd": null,
+            "maxDurationMinutes": null
+          },
+          "context": {
+            "estimatedInputTokens": null,
+            "requiredArtifacts": []
+          },
+          "modalities": [
+            "text",
+            "images"
+          ],
+          "preferences": {
+            "autonomy": null,
+            "cost": null,
+            "latency": null,
+            "modelOverride": null,
+            "quality": null
+          },
+          "reasoning": {
+            "effort": "medium",
+            "level": "multi_step",
+            "rationale": "One live render round plus checkpoint preparation."
+          },
+          "skills": [
+            "review",
+            "bannerlord-modding"
+          ],
+          "tools": [
+            "repo_read",
+            "repo_write",
+            "shell",
+            "test_execution"
+          ],
+          "workType": "testing"
+        },
+        "expectedArtifacts": [],
+        "id": "tk_01m57w9twk0v127xyhq7wbqw2j",
+        "key": "MMR-268",
+        "kind": "acceptance",
+        "optional": false,
+        "priority": "high",
+        "references": [],
+        "size": "small",
+        "tags": [
+          "clean-replacement",
+          "acceptance"
+        ],
+        "title": "Run the clean-pipeline benchmark and present the replacement plan"
+      },
+      {
+        "acceptanceCriteria": [
+          {
+            "id": "a1",
+            "text": "docs/clean-replacement/inventory.md covers every dd2-derived register entry exactly once, grouped into proposed batches with their reference inputs and CC0 base."
+          }
+        ],
+        "body": "Read assets/character-overhaul/manifests/asset-lineage.json, plus the lineage records of any downstream epic (Pawn Honor Guard, per-people content). Group every dd2-derived entry by family: heads, eyes and mouth, hair, facial hair, skin and markings, bodies, race assets, equipment refits.\n\nFor each family record its count and size, the DD2 reference it needs (measurements, rig tables, renders), a CC0 base candidate such as MPFB, and its dependencies (for example heads before hair fits). Propose medium-or-smaller batches with explicit entry ids. Desk work; no game launch.",
+        "capability": {
+          "constraints": {
+            "dataLocation": null,
+            "environments": [],
+            "maxCostUsd": null,
+            "maxDurationMinutes": null
+          },
+          "context": {
+            "estimatedInputTokens": null,
+            "requiredArtifacts": []
+          },
+          "modalities": [
+            "text"
+          ],
+          "preferences": {
+            "autonomy": null,
+            "cost": null,
+            "latency": null,
+            "modelOverride": null,
+            "quality": null
+          },
+          "reasoning": {
+            "effort": "medium",
+            "level": "multi_step",
+            "rationale": "Inventory and batch planning over the lineage register."
+          },
+          "skills": [
+            "asset-pipeline",
+            "data-design"
+          ],
+          "tools": [
+            "repo_read",
+            "repo_write",
+            "shell"
+          ],
+          "workType": "investigation"
+        },
+        "expectedArtifacts": [
+          "docs/clean-replacement/inventory.md"
+        ],
+        "id": "tk_01m57wczb8afnk6gnb3xtbqvks",
+        "key": "MMR-274",
+        "optional": false,
+        "priority": "high",
+        "references": [
+          {
+            "hash": null,
+            "kind": "file",
+            "label": "Asset lineage register (overhaul MMR-168)",
+            "location": "assets/character-overhaul/manifests/asset-lineage.json",
+            "remoteOnly": false
+          }
+        ],
+        "size": "small",
+        "tags": [
+          "clean-replacement",
+          "investigation"
+        ],
+        "title": "Inventory the dd2-derived assets and plan replacement batches"
+      },
+      {
+        "acceptanceCriteria": [
+          {
+            "id": "a1",
+            "text": "A clean head pair with lineage clean and recorded inputs exists, imports in the editor and keeps the option ids of the pair it replaces; the side-by-side probe steps are desk-checked."
+          }
+        ],
+        "body": "Remake the overhaul's MMR-264 benchmark adult male and female head pair clean: an MPFB (CC0) base, shaped to DD2 measurements and rig tables, textured without DD2 pixels, with DD2 renders used only as visual reference. Keep the stable option ids of the dd2-derived pair it replaces, and record its lineage as clean with its inputs.\n\nImport through the editor under CLAIM/RELEASE. Write fail-soft probe steps that render both pairs side by side in the creator and in a mission at close and mid distance, and desk-check them; the acceptance node runs them for the user's verdict. No game launch here.\n\nChecks: it compiles; existing suites pass.",
+        "capability": {
+          "constraints": {
+            "dataLocation": null,
+            "environments": [],
+            "maxCostUsd": null,
+            "maxDurationMinutes": null
+          },
+          "context": {
+            "estimatedInputTokens": null,
+            "requiredArtifacts": []
+          },
+          "modalities": [
+            "text",
+            "images"
+          ],
+          "preferences": {
+            "autonomy": null,
+            "cost": null,
+            "latency": null,
+            "modelOverride": null,
+            "quality": null
+          },
+          "reasoning": {
+            "effort": "high",
+            "level": "deep",
+            "rationale": "Proves the reference-only clean route reaches the dd2-derived benchmark's quality."
+          },
+          "skills": [
+            "blender",
+            "asset-pipeline",
+            "bannerlord-modding"
+          ],
+          "tools": [
+            "repo_read",
+            "repo_write",
+            "shell"
+          ],
+          "workType": "implementation"
+        },
+        "expectedArtifacts": [
+          "assets/character-overhaul/source/heads/clean-benchmark/",
+          "evidence/clean-replacement/benchmark-pair.json"
+        ],
+        "id": "tk_01m57wczbvv7kercpmkdsnn84h",
+        "key": "MMR-275",
+        "optional": false,
+        "priority": "critical",
+        "references": [],
+        "size": "medium",
+        "tags": [
+          "clean-replacement",
+          "benchmark",
+          "art-assets"
+        ],
+        "title": "Benchmark the clean pipeline on the player head pair"
+      },
+      {
+        "acceptanceCriteria": [
+          {
+            "id": "a1",
+            "text": "The provenance check fails on each synthetic bad input (DD2 path, DD2 hash, render used as texture) and passes a valid clean entry; existing suites pass."
+          }
+        ],
+        "body": "Extend the lineage tooling (overhaul MMR-168) so each clean entry records its inputs: file, licence and role (base or reference). Add a check to tools/ci/mods.py check that fails when a clean asset lists:\n- an input under DD2-modding-repo/local;\n- an input matching an extracted-DD2 hash (in the local pre-push hook, as in overhaul MMR-157 a5, since the hosted runner has no DD2 files);\n- a reference render used as a texture or projection source.\n\nChecks: targeted no-game tests for each failure and for a passing entry; existing suites pass.",
+        "capability": {
+          "constraints": {
+            "dataLocation": null,
+            "environments": [],
+            "maxCostUsd": null,
+            "maxDurationMinutes": null
+          },
+          "context": {
+            "estimatedInputTokens": null,
+            "requiredArtifacts": []
+          },
+          "modalities": [
+            "text"
+          ],
+          "preferences": {
+            "autonomy": null,
+            "cost": null,
+            "latency": null,
+            "modelOverride": null,
+            "quality": null
+          },
+          "reasoning": {
+            "effort": "medium",
+            "level": "multi_step",
+            "rationale": "Small extension of existing lineage tooling with targeted tests."
+          },
+          "skills": [
+            "python",
+            "ci"
+          ],
+          "tools": [
+            "repo_read",
+            "repo_write",
+            "shell",
+            "test_execution"
+          ],
+          "workType": "implementation"
+        },
+        "expectedArtifacts": [
+          "tools/ci/mods.py",
+          "tests/ci/test_clean_provenance.py"
+        ],
+        "id": "tk_01m57wczbvqhkgdheaw1xf2k2h",
+        "key": "MMR-276",
+        "optional": false,
+        "priority": "high",
+        "references": [],
+        "size": "small",
+        "tags": [
+          "clean-replacement",
+          "tooling"
+        ],
+        "title": "Add the clean-input provenance check"
+      },
+      {
+        "acceptanceCriteria": [
+          {
+            "id": "a1",
+            "text": "docs/clean-replacement/history-route.md compares both routes with their verification scan and impact, and recommends one for the user's decision."
+          }
+        ],
+        "body": "Compare two routes:\n- (a) rewrite the private repository's Git LFS history to drop every dd2-derived object (git lfs migrate or git filter-repo), with its effect on branches, worktrees, other sessions, open PRs and releases;\n- (b) a fresh public repository seeded from a clean tree.\n\nFor each, cover how it is verified (scan every reachable LFS pointer against the objects that dd2-derived register entries ever pointed to), the LFS quota, and the release workflow changes (.github/workflows/mod-releases.yml, config/mods.json). Recommend one; the user decides at the checkpoint. Desk work; nothing is rewritten in this sprint.",
+        "capability": {
+          "constraints": {
+            "dataLocation": null,
+            "environments": [],
+            "maxCostUsd": null,
+            "maxDurationMinutes": null
+          },
+          "context": {
+            "estimatedInputTokens": null,
+            "requiredArtifacts": []
+          },
+          "modalities": [
+            "text"
+          ],
+          "preferences": {
+            "autonomy": null,
+            "cost": null,
+            "latency": null,
+            "modelOverride": null,
+            "quality": null
+          },
+          "reasoning": {
+            "effort": "medium",
+            "level": "multi_step",
+            "rationale": "Git history and release-pipeline trade-off for a user decision."
+          },
+          "skills": [
+            "git",
+            "ci"
+          ],
+          "tools": [
+            "repo_read",
+            "repo_write",
+            "shell"
+          ],
+          "workType": "investigation"
+        },
+        "expectedArtifacts": [
+          "docs/clean-replacement/history-route.md"
+        ],
+        "id": "tk_01m57wczbv4kgkmynw2a51ptap",
+        "key": "MMR-277",
+        "optional": false,
+        "priority": "normal",
+        "references": [],
+        "size": "small",
+        "tags": [
+          "clean-replacement",
+          "release",
+          "investigation"
+        ],
+        "title": "Choose the history route for the public release"
+      }
+    ]
+  },
+  "contentHash": "sha256:c1b924aa819f2f7818d1d50fde432cb43bc332aa1b396affcf49c5b4931257ba",
+  "createdAt": "2026-10-19T23:49:40.533Z",
+  "epicId": "ep_01m57w9twf9yywa7wshwcyw42r",
+  "format": "darkmechanicus.plan-snapshot",
+  "formatVersion": 1,
+  "number": 1,
+  "revisionId": "rv_01m5b9491nhrfgj7y184wr07mb",
+  "savedAt": "2026-10-19T23:49:40.533Z"
+}
