@@ -34,27 +34,29 @@ namespace MNBL.ProceduralWorld.Surface
             public string[] Cross, Expect = new string[0];
         }
 
-        private static void Fill(TravelCells t, int r0, int r1, int c0, int c1, byte k)
+        // The fixture's land is all one land face (the policy's default land face group; MMR-254's biome faces are a compiled world's).
+        private static void Fill(TravelCells t, int r0, int r1, int c0, int c1, byte k, byte landType)
         {
-            for (int r = r0; r <= r1; r++) for (int c = c0; c <= c1; c++) t.Classes[t.Index(r, c)] = k;
+            for (int r = r0; r <= r1; r++) for (int c = c0; c <= c1; c++) { int i = t.Index(r, c); t.Classes[i] = k; t.LandTypes[i] = k == TravelCells.Land ? landType : (byte)0; t.Flags[i] = 0; }
         }
 
         public static NavigationInput Build(NavigationInput production, NavigationPolicy policy)
         {
             var t = production.Cells.Clone();
             if (t.Rows != 64 || t.Cols != 128) throw new InvalidDataException("The navigation fixture is designed for a 64 x 128 cell globe, not " + t.Rows + " x " + t.Cols + ".");
-            for (int i = 0; i < t.Classes.Length; i++) t.Classes[i] = TravelCells.Sea;
-            Fill(t, 8, 55, 16, 111, TravelCells.Land);        // mainland M
-            Fill(t, 8, 55, 90, 90, TravelCells.River);        // river R1: north coast to south coast
-            Fill(t, 44, 48, 91, 91, TravelCells.River);       //   two cells wide at rows 44-48
-            Fill(t, 36, 36, 91, 111, TravelCells.River);      // river R2: from R1 to the east coast
-            Fill(t, 20, 32, 40, 41, TravelCells.Mountain);    // barrier wall, two cells thick, open at both ends
-            Fill(t, 44, 52, 24, 32, TravelCells.Mountain);    // closed mountain ring...
-            Fill(t, 45, 51, 25, 31, TravelCells.Land);        //   ...around a land pocket
-            Fill(t, 12, 14, 66, 68, TravelCells.Lake);        // enclosed 3 x 3 lake ringed by land
-            Fill(t, 18, 30, 113, 117, TravelCells.Land);      // island I behind the one-cell channel at column 112
-            Fill(t, 20, 44, 120, 127, TravelCells.Land);      // continent S across the periodic seam
-            Fill(t, 20, 44, 0, 8, TravelCells.Land);
+            byte plain = (byte)TerrainTypes.Id(production.FaceGroupNames["land"]);
+            Fill(t, 0, t.Rows - 1, 0, t.Cols - 1, TravelCells.Sea, plain);
+            Fill(t, 8, 55, 16, 111, TravelCells.Land, plain);        // mainland M
+            Fill(t, 8, 55, 90, 90, TravelCells.River, plain);        // river R1: north coast to south coast
+            Fill(t, 44, 48, 91, 91, TravelCells.River, plain);       //   two cells wide at rows 44-48
+            Fill(t, 36, 36, 91, 111, TravelCells.River, plain);      // river R2: from R1 to the east coast
+            Fill(t, 20, 32, 40, 41, TravelCells.Mountain, plain);    // barrier wall, two cells thick, open at both ends
+            Fill(t, 44, 52, 24, 32, TravelCells.Mountain, plain);    // closed mountain ring...
+            Fill(t, 45, 51, 25, 31, TravelCells.Land, plain);        //   ...around a land pocket
+            Fill(t, 12, 14, 66, 68, TravelCells.Lake, plain);        // enclosed 3 x 3 lake ringed by land
+            Fill(t, 18, 30, 113, 117, TravelCells.Land, plain);      // island I behind the one-cell channel at column 112
+            Fill(t, 20, 44, 120, 127, TravelCells.Land, plain);      // continent S across the periodic seam
+            Fill(t, 20, 44, 0, 8, TravelCells.Land, plain);
             t.OpenSea = t.ComputeOpenSea(production.OpenSeaCells);
             var land = t.Label(k => k == TravelCells.Land);
             Func<int, int, int> L = (r, c) => land[t.Index(r, c)];
@@ -65,7 +67,7 @@ namespace MNBL.ProceduralWorld.Surface
             input.Crossings.Add(new CrossingRecord { Subject = "fixture bridge 2 (two cells, x)", Kind = "river", Cells = new List<int[]> { new[] { 46, 90 }, new[] { 46, 91 } }, LandA = L(46, 89), LandB = L(46, 92) });
             input.Crossings.Add(new CrossingRecord { Subject = "fixture bridge 3 (one cell, y)", Kind = "river", Cells = new List<int[]> { new[] { 36, 100 } }, LandA = L(35, 100), LandB = L(37, 100) });
             input.FixtureChecks = Checks(production, policy);
-            input.InputsSha256 = Json.Sha(String.Join("\n", new[] { "mnbl.navigation-fixture/1", Json.Sha(t.Classes), Json.Sha(t.OpenSea), policy.Sha256, production.Surface.InputsSha256 }));
+            input.InputsSha256 = Json.Sha(String.Join("\n", new[] { "mnbl.navigation-fixture/1", Json.Sha(t.Classes), Json.Sha(t.OpenSea), Json.Sha(t.LandTypes), policy.Sha256, production.Surface.InputsSha256 }));
             return input;
         }
 

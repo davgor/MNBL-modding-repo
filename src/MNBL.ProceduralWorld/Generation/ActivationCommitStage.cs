@@ -117,11 +117,14 @@ namespace MNBL.ProceduralWorld.Generation
         {
             allowed = reservedSaveName;
             if (harmony != null) return;
+            // MMR-284: located by signature before anything is patched (PatchSignatureException names the patch).
+            var handler = typeof(SaveHandler).FullName;
+            var saveAs = MNBL.ProceduralWorld.CampaignRegistry.PatchSignatures.Method(handler, "SaveAs");
+            var refused = new[] { "QuickSaveCurrentGame", "SignalAutoSave", "ForceAutoSave" }.Select(name => MNBL.ProceduralWorld.CampaignRegistry.PatchSignatures.Method(handler, name)).ToList();
             harmony = new Harmony(HarmonyId);
-            var handler = typeof(SaveHandler);
-            harmony.Patch(handler.GetMethod("SaveAs"), prefix: new HarmonyMethod(typeof(ActivationSaveBlock), nameof(SaveAsPrefix)));
-            foreach (var name in new[] { "QuickSaveCurrentGame", "SignalAutoSave", "ForceAutoSave" })
-                harmony.Patch(handler.GetMethod(name), prefix: new HarmonyMethod(typeof(ActivationSaveBlock), nameof(RefusePrefix)));
+            harmony.Patch(saveAs, prefix: new HarmonyMethod(typeof(ActivationSaveBlock), nameof(SaveAsPrefix)));
+            foreach (var method in refused)
+                harmony.Patch(method, prefix: new HarmonyMethod(typeof(ActivationSaveBlock), nameof(RefusePrefix)));
         }
 
         public static void End()
@@ -304,22 +307,37 @@ namespace MNBL.ProceduralWorld.Generation
                 ["encoder"] = prepared.Encoder == null ? null : prepared.Encoder.Where(kv => kv.Key == "role" || kv.Key == "executableHash" || kv.Key == "exitCode").ToDictionary(kv => kv.Key, kv => kv.Value) };
         }
 
-        // ---- BuildWorld: the campaign graph from the bundle, against the pinned installed catalog, validated whole ----
+        // ---- BuildWorld: the campaign graph from the bundle, against the live installed catalog checked by the reduced pin, validated whole ----
         // MMR-49: WorldReconstruction, shared with the load (GeneratedWorldLoader), so a world is rebuilt the same way it was activated.
+        // MMR-283: the catalog the world is built from is frozen into its package (PromotePackage), and the battle table the campaign will
+        // load is checked here, before the campaign starts and its navigation caches are built.
         private void BuildWorld(ActivationStep step)
         {
-            byte[] pinBytes;
-            var catalog = WorldReconstruction.Catalog((label, work) => job.Engine(label, work), out pinBytes);
-            var world = WorldReconstruction.Build(bundle, layout, coordinates, prepared.Surface, catalog, pinBytes);
-            Dataset = world.Dataset; synthesis = world.Synthesis; climate = world.Climate; terrainContext = world.TerrainContext;
+            catalog = WorldReconstruction.LiveCatalog((label, work) => job.Engine(label, work));
+            var battle = job.Engine("the battle table", () => GeneratedBattleTerrain.CheckModuleTables());
+            if (!battle.Ok) throw new ContentConflictException(new List<CatalogPin.Conflict> { ContentCompatibility.BattleConflict(battle) });
+            // MMR-247: the report inside the persisted record (the record itself has no build, so the map dressing found no bridges and failed).
+            var navigationReport = NavigationGate.ReadAt(NavigationGate.ReportPath(SubModule.Store, prepared.SceneName), prepared.SceneName);
+            if ((string)navigationReport["reportSha256"] != job.Get<string>("navigationReportSha256")) throw new InvalidDataException("The persisted navigation report is not the one this job made.");
+            var world = WorldReconstruction.Build(bundle, layout, coordinates, prepared.Surface, catalog, navigationReport);
+            Dataset = world.Dataset; synthesis = world.Synthesis; climate = world.Climate; terrainContext = world.TerrainContext; dressing = world.Dressing; roads = world.Roads; overlay = world.Overlay; mutation = world.Mutation;
+            step.Detail["mapDressing"] = dressing.Record();
+            step.Detail["magicGround"] = MagicGround.Plan(overlay.Current, MNBL.ProceduralWorld.World.RoadsPolicy.Installed().Magic).Record();
             step.Evidence["C07"] = Dataset.Graph.Sha256;
             step.Note = Dataset.WorldId + ": " + Dataset.Declared.Count + " declared objects, graph " + Dataset.Graph.Sha256.Substring(0, 12);
-            step.Detail["dataset"] = Dataset.Record(); step.Detail["catalogPinSha256"] = world.CatalogSha256; step.Detail["catalogDocuments"] = world.CatalogDocuments;
+            step.Detail["dataset"] = Dataset.Record(); step.Detail["catalogPinSha256"] = WorldReconstruction.InstalledPin().Sha256; step.Detail["catalogSha256"] = world.CatalogSha256;
+            step.Detail["catalogDocuments"] = world.CatalogDocuments; step.Detail["battleTable"] = battle.Record();
             step.Detail["climate"] = new SortedDictionary<string, object>(StringComparer.Ordinal) { ["identity"] = synthesis.Identity, ["windSha256"] = synthesis.WindSha256,
-                ["precipitationSha256"] = synthesis.PrecipitationSha256, ["colorGradeSha256"] = synthesis.ColorGradeSha256 };
+                ["precipitationSha256"] = synthesis.PrecipitationSha256, ["colorGradeSha256"] = synthesis.ColorGradeSha256, ["snowTextureSha256"] = synthesis.SnowTextureSha256,
+                ["snowRoute"] = synthesis.SnowRoute, ["snowTextureName"] = synthesis.SnowTextureName, ["windBands"] = synthesis.Record["windBands"], ["seed"] = synthesis.Record["seed"] };
             step.Detail["policies"] = Dataset.Graph.PolicyIdentity;
         }
         private Func<double, double, GeneratedBattleTerrain.TerrainContext> terrainContext;
+        private MapDressingPlan dressing;
+        private WorldSurfaceOverlay overlay;   // MMR-260
+        private MutationModel.Context mutation;   // MMR-261
+        private MNBL.ProceduralWorld.World.RoadSpeed.Cells roads;
+        private WorldReconstruction.Frozen catalog;
         private const double PublishLimitSeconds = 600;
         private ActivationSaveGuard saveGuard;
 
@@ -371,8 +389,12 @@ namespace MNBL.ProceduralWorld.Generation
                 ["defaultReferencesSha256"] = CampaignGraphValidator.InventorySha256(Dataset.Defaults), ["layoutSha256"] = layout["layoutSha256"], ["declared"] = Dataset.Declared.Count,
                 ["suppliesStartup"] = true, ["navalLandlocked"] = Dataset.NavalPlan.Landlocked.Cast<object>().ToList(), ["creationCultures"] = Dataset.CreationCultures.Cast<object>().ToList(),
                 ["worldContentId"] = request.WorldContentId };
+            // MMR-258: the looks the scene was built from (looks/), beside the frozen catalog, so a re-encode after a game patch is the same scene.
+            var extra = WorldReconstruction.PackageFiles(catalog);
+            if (prepared.Looks == null) throw new InvalidDataException("The prepared world kept no settlement looks for its package.");
+            foreach (var kv in prepared.Looks.Files()) extra[kv.Key] = kv.Value;
             package = GeneratedWorldPackage.Write(Dataset.WorldId, scene, job.Get<uint>("attemptSeed"), placementPath, documents,
-                MNBL.ProceduralWorld.Diagnostics.GenerationProbe.Hash(typeof(SubModule).Assembly.Location), fingerprint);
+                MNBL.ProceduralWorld.Diagnostics.GenerationProbe.Hash(typeof(SubModule).Assembly.Location), fingerprint, extra);
             packageCreated = !before.Contains(package.Directory);
             // The save binding names the bundle (its contentId): it stays published with the world.
             bundleDisowned = job.Disown("bundle " + request.WorldContentId);
@@ -394,6 +416,10 @@ namespace MNBL.ProceduralWorld.Generation
             stage.Manager = job.Engine("start the new game", () =>
             {
                 GeneratedBattleTerrain.ContextSources[scene] = terrainContext;
+                MNBL.ProceduralWorld.World.MapDressingRuntime.Plans[scene] = dressing;
+                MNBL.ProceduralWorld.World.MagicGroundRuntime.Overlays[scene] = overlay;
+                if (mutation != null) WorldMutationBehavior.Contexts[scene] = mutation;   // MMR-261
+                GeneratedPartySpeedModel.RoadSources[scene] = roads;
                 return stage.Start(start);
             });
             var watch = System.Diagnostics.Stopwatch.StartNew();
@@ -404,6 +430,9 @@ namespace MNBL.ProceduralWorld.Generation
                 Thread.Sleep(250);
             }
             if (progress == "withdrawn") throw new CommitWithdrawn("The player left before the campaign started.");
+            // MMR-283: a registration refused for missing engine defaults names them (they exist only inside a game, so no earlier check can).
+            if (progress != "map" && Registration.DefaultsMissing.Count > 0)
+                throw new ContentConflictException(Registration.DefaultsMissing.Select(d => new CatalogPin.Conflict { Kind = CatalogPin.Missing, Key = d, Detail = "an engine default the world references" }).ToList());
             if (progress != "map") throw new InvalidOperationException("The new game failed: " + progress);
             // No save of the campaign until the activation commits: the host's guard replaces the save manager (autosave off) until then.
             job.Engine("install the save guard", () =>
@@ -435,6 +464,13 @@ namespace MNBL.ProceduralWorld.Generation
         {
             var problems = new List<string>();
             var live = job.Engine("post-build checks", () => LiveChecks(problems));
+            // MMR-262: a battle map the loaded battle table refused is named as a content conflict (module and scene), as the loader does; the
+            // problems name Preflight's error if the active modules' tables do not show the loss.
+            if (battleTableRefused)
+            {
+                var conflict = job.Engine("the battle table", () => { var table = GeneratedBattleTerrain.CheckModuleTables(); return table.Ok ? null : ContentCompatibility.BattleConflict(table); });
+                if (conflict != null) throw new ContentConflictException(new List<CatalogPin.Conflict> { conflict });
+            }
             if (problems.Count > 0) throw new InvalidDataException("The live campaign failed " + problems.Count + " post-build checks: " + String.Join("; ", problems.Take(8)));
             Func<object, string> sha = o => CompiledWorldDataset.Sha256(new UTF8Encoding(false).GetBytes(Json.Serialize(o)));
             step.Evidence["W03"] = sha(new SortedDictionary<string, object>(StringComparer.Ordinal) { ["climateIdentity"] = synthesis.Identity, ["weather"] = live["weather"], ["sceneName"] = prepared.SceneName,
@@ -446,6 +482,7 @@ namespace MNBL.ProceduralWorld.Generation
             foreach (var kv in live) step.Detail[kv.Key] = kv.Value;
         }
 
+        private bool battleTableRefused;   // LiveChecks: the battle map's failed record carries the table's coverage loss (PostBuildBattleMap.Refused)
         private SortedDictionary<string, object> LiveChecks(List<string> problems)
         {
             var live = new SortedDictionary<string, object>(StringComparer.Ordinal);
@@ -493,23 +530,19 @@ namespace MNBL.ProceduralWorld.Generation
             if (caches == null || (string)caches["status"] != "registered" || cacheRecord == null) problems.Add("the navigation caches are not registered");
             live["navigationCacheKey"] = cacheRecord == null ? null : cacheRecord.ContainsKey("keySha256") ? cacheRecord["keySha256"] : null;
             live["navigationCacheStatus"] = cacheRecord == null ? null : cacheRecord.ContainsKey("status") ? cacheRecord["status"] : null;
+            // MMR-262: Install's report or MMR-283's failed records (Preflight's, Guarded's), read null-safely (PostBuildBattleMap); a failed
+            // record's problem names its error, and a battle table that refused the map is a content conflict (PostBuild).
             var battle = supportReport.ContainsKey("battleSceneSelection") ? supportReport["battleSceneSelection"] as Dictionary<string, object> : null;
-            if (battle == null || (string)battle["status"] != "installed" || !Equals(battle["navigationSetsMatchCatalogue"], true)) problems.Add("the battle map is not installed against the catalogue");
-            if (battle != null && !Convert.ToString(battle["terrainContextSource"], CultureInfo.InvariantCulture).Contains("masks")) problems.Add("the battle map has no terrain context from the world's masks");
-            Func<string, object> b = key => battle != null && battle.ContainsKey(key) ? battle[key] : null;
-            // GeneratedEncounterResolver's record counts the cells where every land party finds one scene (landDeterministic of landCells) and
-            // the sea terrain checks that find one naval scene (seaDeterministic of seaTerrainChecks).
-            Func<string, long> n = key => b(key) == null ? -1 : Convert.ToInt64(b(key), CultureInfo.InvariantCulture);
-            if (battle != null && (n("landDeterministic") != n("landCells") || n("seaDeterministic") != n("seaTerrainChecks") || n("landCells") <= 0))
-                problems.Add("the battle map does not give every party one scene (land " + n("landDeterministic") + " of " + n("landCells") + ", sea " + n("seaDeterministic") + " of " + n("seaTerrainChecks") + ")");
-            live["battleMap"] = battle == null ? null : new SortedDictionary<string, object>(StringComparer.Ordinal) { ["status"] = battle["status"], ["terrainContextSource"] = battle["terrainContextSource"],
-                ["sceneTableSha256"] = b("sceneTableSha256"), ["inventorySha256"] = b("inventorySha256"), ["catalogueSha256"] = b("catalogueSha256"), ["mapSha256"] = b("sha256"),
-                ["landCells"] = b("landCells"), ["landDeterministic"] = b("landDeterministic"), ["seaTerrainChecks"] = b("seaTerrainChecks"), ["seaDeterministic"] = b("seaDeterministic") };
+            object afterLoad; supportReport.TryGetValue("afterLoadFailure", out afterLoad);
+            live["battleMap"] = PostBuildBattleMap.Check(battle, afterLoad, problems);
+            battleTableRefused = PostBuildBattleMap.Refused(battle);
             var weather = supportReport.ContainsKey("generatedWeather") ? supportReport["generatedWeather"] as Dictionary<string, object> : null;
             if (weather == null || (string)weather["status"] != "prepared" || (string)weather["windSha256"] != synthesis.WindSha256 || (string)weather["precipitationSha256"] != synthesis.PrecipitationSha256)
                 problems.Add("the live map's weather is not the world's climate");
             live["weather"] = weather == null ? null : new SortedDictionary<string, object>(StringComparer.Ordinal) { ["status"] = weather["status"], ["windSha256"] = weather["windSha256"],
                 ["precipitationSha256"] = weather["precipitationSha256"], ["colorGrade"] = weather["colorGrade"] };
+            // MMR-256: the map load's snow texture and season-threshold row (GeneratedMapAtmosphere; the threshold appears on the first tick).
+            live["climateVisuals"] = supportReport.ContainsKey("climateVisuals") ? supportReport["climateVisuals"] : null;
             var catalogue = MNBL.ProceduralWorld.Missions.MissionScenes.Installed();
             var contractLocations = new HashSet<string>(new[] { "center", "lordshall", "port", "village_center", "hideout_center" }, StringComparer.Ordinal);
             int sceneSettlements = 0, sceneProblems = 0;
@@ -598,7 +631,8 @@ namespace MNBL.ProceduralWorld.Generation
                 case ActivationBoundary.StartCampaign:
                     // Also the failing boundary's own leftovers: a game that started (or failed to start), registered objects, the terrain context.
                     try { EndGame(); }
-                    finally { job.Engine("remove the terrain context", () => { ActivationSaveBlock.End(); return GeneratedBattleTerrain.ContextSources.Remove(prepared.SceneName); }); saveGuard = null; }
+                    finally { job.Engine("remove the terrain context", () => { ActivationSaveBlock.End(); MNBL.ProceduralWorld.World.MapDressingRuntime.Plans.Remove(prepared.SceneName); MNBL.ProceduralWorld.World.MagicGroundRuntime.Overlays.Remove(prepared.SceneName); WorldMutationBehavior.Contexts.Remove(prepared.SceneName); GeneratedPartySpeedModel.RoadSources.Remove(prepared.SceneName);
+                        return GeneratedBattleTerrain.ContextSources.Remove(prepared.SceneName); }); saveGuard = null; }
                     break;
                 case ActivationBoundary.BindIdentity:
                     if (identity != null) job.Engine("unbind the world identity", () => { if (stage.Manager != null && stage.Manager.Identity != null) stage.Manager.Identity.Entries.Clear(); return true; });

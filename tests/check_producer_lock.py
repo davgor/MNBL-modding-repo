@@ -49,6 +49,13 @@ def main(argv=None):
     for name in ('buildLog', 'ctestLog', 'verification'):
         entry = lock['acceptedEvidence'][name]
         check(sha(REPO / entry['path']) == entry['sha256'], 'accepted evidence ' + name)
+    # MMR-261 (RT-37): the pinned build is in the producer archive, kept in the module by its hash, with the lock's apply command.
+    archive = json.loads((REPO / 'worldgen/producer-archive.json').read_text(encoding='utf-8'))
+    kept = [b for b in archive['builds'] if b['sha256'] == producer['sha256']]
+    check(len(kept) == 1 and kept[0]['sourceCommit'] == producer['sourceCommit'] and kept[0]['apply'] == producer['commands']['apply'], 'pinned build listed in the producer archive with the apply command')
+    for build in archive['builds']:
+        path = REPO / 'Modules/MNBL.ProceduralWorld' / build['path']
+        check(path.is_file() and sha(path) == build['sha256'], 'archived producer ' + build['sha256'][:12] + ' present with its bytes')
     cache = (REPO / 'build/producer/CMakeCache.txt').read_text(encoding='utf-8', errors='replace')
     version = '.'.join(line.split('=', 1)[1] for line in cache.splitlines()
                        if line.split(':', 1)[0] in ('CMAKE_CACHE_MAJOR_VERSION', 'CMAKE_CACHE_MINOR_VERSION', 'CMAKE_CACHE_PATCH_VERSION'))

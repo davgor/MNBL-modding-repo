@@ -16,7 +16,8 @@ namespace MNBL.ProceduralWorld.CampaignRegistry
     //   * a start per creation culture (every culture character creation can offer, startup.json starts.creationCultures), re-emitted
     //     as CultureObject.StartingPoint so no installed Calradia start point survives: a port town with food, notables and a sea
     //     destination in the same open basin, else the fallback rule;
-    //   * hideouts across the world (the installed BanditSpawnCampaignBehavior spawns bandits only around hideouts);
+    //   * hideouts across the world (the installed BanditSpawnCampaignBehavior spawns bandits only around hideouts), each with a bandit
+    //     culture weighted by its nearest town's culture and by its cell's ground (biome, coast; MMR-287, RT-28);
     //   * the installed land bandit clans, re-created with their installed ids as world aliases (installed code finds them by id) and a
     //     generated hideout as home;
     //   * the retirement retreat, re-created with its installed ids as a world alias (RetirementCampaignBehavior finds it by id and
@@ -39,6 +40,9 @@ namespace MNBL.ProceduralWorld.CampaignRegistry
         }
 
         public sealed class HeroPlan { public string Id, Uid, Template, Settlement, Name, Occupation; public int Age; }
+        // MMR-287: what a hideout's bandit culture was drawn from: its cell's natural biome, whether the cell is on the coast, its nearest town's
+        // culture and the mixed weights (normalized, summing to 1).
+        public sealed class HideoutGround { public string Biome, TownCulture; public bool Coast; public SortedDictionary<string, double> Weights; }
         public sealed class RelationPlan { public string A, B; public int Value; }
 
         // What GeneratedStartupBehavior instantiates at new game.
@@ -55,6 +59,7 @@ namespace MNBL.ProceduralWorld.CampaignRegistry
             public List<SettlementFactory.SettlementIntent> Hideouts = new List<SettlementFactory.SettlementIntent>();
             public SortedDictionary<string, string> HideoutTowns = new SortedDictionary<string, string>(StringComparer.Ordinal);   // hideout -> nearest town
             public SortedDictionary<string, string> BanditHomes = new SortedDictionary<string, string>(StringComparer.Ordinal);    // clan -> hideout
+            public SortedDictionary<string, HideoutGround> HideoutGrounds = new SortedDictionary<string, HideoutGround>(StringComparer.Ordinal);   // hideout -> its draw (MMR-287)
             public double RetreatX, RetreatY;
             public string RetreatCulture;
             public List<GeneratedSpawnModel.Anchor> Anchors = new List<GeneratedSpawnModel.Anchor>();
@@ -112,9 +117,11 @@ namespace MNBL.ProceduralWorld.CampaignRegistry
             foreach (var name in new[] { "hideouts", "starts" }) streams[name] = Int(Obj(policy, "streams"), name);
         }
 
+        // biomeAt: the natural biome (terrain-materials.json core name) at a logical campaign position, or null (CellBiomes reads it from the bundle).
         public Result Build(IDictionary<string, object> travel, IDictionary<string, object> ports, byte[] cellsBin, FactionFactory.Result factions,
-                            HeroFactory.Result heroes, SettlementFactory.Result world)
+                            HeroFactory.Result heroes, SettlementFactory.Result world, Func<double, double, string> biomeAt)
         {
+            if (biomeAt == null) throw new ArgumentNullException("biomeAt");
             var result = new Result { WorldPrefix = world.WorldPrefix };
             prefix = world.WorldPrefix;
             if (Text(policy, "schema") != "mnbl.startup" || Int(policy, "version") != 1) Problem(CodePolicy, "not mnbl.startup version 1");
@@ -126,7 +133,7 @@ namespace MNBL.ProceduralWorld.CampaignRegistry
             double spacing = towns.Count < 2 ? 0 : towns.Average(t => towns.Where(u => u != t).Min(u => map.Distance(t.X, t.Y, u.X, u.Y)));
             var townGroups = new HashSet<int>(towns.Select(t => map.Group(t.GateX, t.GateY)).Where(g => g >= 0));
 
-            Hideouts(result, map, towns, fixed_, spacing);
+            Hideouts(result, map, towns, fixed_, spacing, biomeAt);
             BanditClans(result);
             Retreat(result, map, towns, fixed_);
             Starts(result, travel, ports, map, towns, heroes, world);
@@ -148,9 +155,10 @@ namespace MNBL.ProceduralWorld.CampaignRegistry
         }
 
         // Hideouts: the installed density per town, shared over the land groups with towns; passable cells away from settlements and
-        // other hideouts in stream order; the bandit culture from the installed weights of the nearest town's culture.
+        // other hideouts in stream order; the bandit culture drawn from GroundWeights: the installed weights of the nearest town's culture
+        // mixed with the cell's biome and coast weights (hideouts.biome, MMR-287).
         private void Hideouts(Result result, GeneratedSpawnModel.CellMap map, List<SettlementFactory.SettlementIntent> towns,
-                              List<SettlementFactory.SettlementIntent> fixed_, double spacing)
+                              List<SettlementFactory.SettlementIntent> fixed_, double spacing, Func<double, double, string> biomeAt)
         {
             var p = Obj(policy, "hideouts");
             int total = (int)Math.Round(Double(p, "perTown") * towns.Count, MidpointRounding.AwayFromZero);
@@ -182,11 +190,13 @@ namespace MNBL.ProceduralWorld.CampaignRegistry
                     var town = g.OrderBy(t => map.Distance(c.X, c.Y, t.X, t.Y)).ThenBy(t => t.Id, StringComparer.Ordinal).First();
                     string uid = "hideout:cell:" + c.Row.ToString(CultureInfo.InvariantCulture) + ":" + c.Col.ToString(CultureInfo.InvariantCulture);
                     string id = prefix + "o_" + Sha256("mnbl.stable-id/1\nhideout\n" + uid).Substring(0, 10);
-                    var cultureWeights = Obj(weights, town.Culture ?? "") ?? pooled;
-                    string bandit = Weighted("hideouts", "culture:" + uid, cultureWeights);
+                    var ground = new HideoutGround { Biome = biomeAt(c.X, c.Y), TownCulture = town.Culture, Coast = map.Near(c.Row, c.Col, (int)Double(Obj(p, "biome"), "coastCells"), "sea") };
+                    ground.Weights = GroundWeights(Obj(weights, town.Culture ?? "") ?? pooled, Obj(p, "biome"), ground.Biome, ground.Coast);
+                    string bandit = WeightedReal("hideouts", "culture:" + uid, ground.Weights);
                     var h = settlements.Hideout(id, "Hideout", bandit, c.X, c.Y);
-                    h.Uid = uid; h.LandGroup = g.Key; h.Provenance = "MMR-34 hideout: cell (" + c.Row + ", " + c.Col + "), nearest town " + town.Id + " (" + town.Culture + ")";
-                    result.Hideouts.Add(h); result.HideoutTowns[id] = town.Id;
+                    h.Uid = uid; h.LandGroup = g.Key;
+                    h.Provenance = "MMR-34 hideout: cell (" + c.Row + ", " + c.Col + "), nearest town " + town.Id + " (" + town.Culture + "), ground " + (ground.Biome ?? "unknown") + (ground.Coast ? " on the coast" : "");
+                    result.Hideouts.Add(h); result.HideoutTowns[id] = town.Id; result.HideoutGrounds[id] = ground;
                     placed.Add(new KeyValuePair<double, double>(c.X, c.Y)); made++;
                 }
                 if (made < share[g.Key]) result.Notes.Add("land group " + g.Key + " (" + g.Count() + " towns) holds " + made + " of its " + share[g.Key] + " hideouts: no " + (made == 0 ? "" : "other ") +
@@ -197,7 +207,7 @@ namespace MNBL.ProceduralWorld.CampaignRegistry
             foreach (var missing in List(p, "requiredCultures").Cast<string>().Where(c => !result.Hideouts.Any(h => h.Culture == c)).ToList())
             {
                 var donor = result.Hideouts.Where(h => result.Hideouts.Count(o => o.Culture == h.Culture) > 1)
-                    .OrderByDescending(h => { var w = Obj(weights, towns.First(t => t.Id == result.HideoutTowns[h.Id]).Culture ?? "") ?? pooled; object v; return w.TryGetValue(missing, out v) ? Convert.ToInt32(v, CultureInfo.InvariantCulture) : 0; })
+                    .OrderByDescending(h => { double v; return result.HideoutGrounds[h.Id].Weights.TryGetValue(missing, out v) ? v : 0; })
                     .ThenBy(h => Stream("hideouts", "cover:" + missing + ":" + h.Uid, 0)).FirstOrDefault();
                 if (donor == null) { Problem(CodeHideouts, "no hideout can take the required bandit culture " + missing + ": fewer hideouts than required cultures"); continue; }
                 var replaced = settlements.Hideout(donor.Id, "Hideout", missing, donor.X, donor.Y);
@@ -377,6 +387,78 @@ namespace MNBL.ProceduralWorld.CampaignRegistry
                 for (int i = 0; i < 8; i++) value = (value << 8) | bytes[i];
                 return value;
             }
+        }
+
+        // MMR-287 (RT-28): a hideout's bandit culture weights, (1 - share) x its nearest town culture's cultureWeights + share x the ground's:
+        // biomeWeights of its cell's natural biome, plus coastWeight for coastCulture on a coast cell, each part normalized to 1. A ground
+        // with no weights (a biome the policy does not list, off the coast) leaves the town's weights alone.
+        internal static SortedDictionary<string, double> GroundWeights(IDictionary<string, object> town, IDictionary<string, object> biome, string biomeName, bool coast)
+        {
+            Func<IDictionary<string, double>, SortedDictionary<string, double>> normalized = w =>
+            {
+                double sum = w.Values.Where(v => v > 0).Sum();
+                var n = new SortedDictionary<string, double>(StringComparer.Ordinal);
+                if (sum > 0) foreach (var kv in w.Where(kv => kv.Value > 0)) n[kv.Key] = kv.Value / sum;
+                return n;
+            };
+            var townPart = normalized((town ?? new Dictionary<string, object>()).ToDictionary(kv => kv.Key, kv => Convert.ToDouble(kv.Value, CultureInfo.InvariantCulture)));
+            var groundRaw = new Dictionary<string, double>(StringComparer.Ordinal);
+            var listed = Obj(Obj(biome, "biomeWeights"), biomeName ?? "");
+            if (listed != null) foreach (var kv in listed) groundRaw[kv.Key] = Convert.ToDouble(kv.Value, CultureInfo.InvariantCulture);
+            if (coast)
+            {
+                string culture = Text(biome, "coastCulture");
+                double extra = Double(biome, "coastWeight");
+                double have; groundRaw[culture] = (groundRaw.TryGetValue(culture, out have) ? have : 0) + extra;
+            }
+            var groundPart = normalized(groundRaw);
+            if (groundPart.Count == 0) return townPart;
+            if (townPart.Count == 0) return groundPart;
+            double share = Double(biome, "share");
+            var mixed = new SortedDictionary<string, double>(StringComparer.Ordinal);
+            foreach (var key in townPart.Keys.Union(groundPart.Keys))
+            {
+                double t, g;
+                double v = (1 - share) * (townPart.TryGetValue(key, out t) ? t : 0) + share * (groundPart.TryGetValue(key, out g) ? g : 0);
+                if (v > 0) mixed[key] = v;
+            }
+            return mixed;
+        }
+
+        // A draw over real weights (ordinal key order): the stream value's top 53 bits as a unit fraction of the total.
+        private string WeightedReal(string stream, string entity, IDictionary<string, double> weights)
+        {
+            var items = weights.Where(w => w.Value > 0).OrderBy(w => w.Key, StringComparer.Ordinal).ToList();
+            double total = items.Sum(w => w.Value);
+            if (items.Count == 0 || !(total > 0)) { Problem(CodePolicy, "no weights for " + entity); return null; }
+            double roll = (Stream(stream, entity, 0) >> 11) / (double)(1UL << 53) * total;
+            foreach (var w in items) { if (roll < w.Value) return w.Key; roll -= w.Value; }
+            return items.Last().Key;
+        }
+
+        // MMR-287: the natural biome of a logical campaign position, read from the bundle's masks.bin biome plane (MNBLMK01, plane 0, the
+        // terrain-materials.json biome ids of the bundle's own policy) at the sample nearest its physical position (physical = logical +
+        // (strip, poleMargin), projection.json periodicLayout), clamped to the domain like WorldSurface.BiomeAt.
+        public static Func<double, double, string> CellBiomes(byte[] masks, string projectionJson, string materialsJson)
+        {
+            var json = new JavaScriptSerializer { MaxJsonLength = Int32.MaxValue };
+            var projection = (IDictionary<string, object>)json.DeserializeObject(projectionJson.TrimStart('\uFEFF'));
+            var materials = (IDictionary<string, object>)json.DeserializeObject(materialsJson.TrimStart('\uFEFF'));
+            if (masks == null || masks.Length < 12 || Encoding.ASCII.GetString(masks, 0, 8) != "MNBLMK01") throw new ArgumentException("masks.bin is not MNBLMK01");
+            int side = (int)BitConverter.ToUInt32(masks, 8);
+            if (side < 2 || masks.Length != 12 + 4L * side * side) throw new ArgumentException("masks.bin does not hold 4 planes of " + side + " x " + side + " samples");
+            var layout = Obj(projection, "periodicLayout");
+            double width = Double(layout, "physicalWidth"), strip = Double(layout, "strip"), poleMargin = Double(layout, "poleMargin");
+            if (!(width > 0)) throw new ArgumentException("projection.json has no periodicLayout.physicalWidth");
+            double spacing = width / (side - 1);
+            var names = new Dictionary<int, string>();
+            foreach (var b in List(materials, "biomes").OfType<IDictionary<string, object>>()) names[Convert.ToInt32(b["id"], CultureInfo.InvariantCulture)] = Text(b, "core");
+            return (x, y) =>
+            {
+                int c = (int)Math.Max(0, Math.Min(side - 1, Math.Round((x + strip) / spacing))), r = (int)Math.Max(0, Math.Min(side - 1, Math.Round((y + poleMargin) / spacing)));
+                string name;
+                return names.TryGetValue(masks[12 + r * side + c], out name) ? name : null;
+            };
         }
 
         private string Weighted(string stream, string entity, IDictionary<string, object> weights)

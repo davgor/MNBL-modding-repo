@@ -153,6 +153,36 @@ class ModsTests(unittest.TestCase):
                 mods.package(self.repo.root, 'MNBL.A', stage, self.repo.root / 'dist')
             (stage / 'bin/Win64_Shipping_Client' / official).unlink()
 
+    def test_own_asset_packs_ship_and_other_tpac_files_are_refused(self):
+        stage = self.repo.root / 'stage'
+        (stage / 'bin/Win64_Shipping_Client').mkdir(parents=True)
+        (stage / 'AssetPackages').mkdir()
+        (stage / 'SubModule.xml').write_text(submodule('MNBL.A', 'v0.1.0'), encoding='utf-8')
+        (stage / 'bin/Win64_Shipping_Client/MNBL.A.dll').write_bytes(b'dll')
+        (stage / 'AssetPackages/pack0.tpac').write_bytes(b'pack')
+        self.repo.registry([{'id': 'MNBL.A', 'release': True, 'build': 'tools/ci/Build-A.ps1', 'owns': ['Modules/MNBL.A/', 'src/MNBL.A/'],
+                             'package': {'files': ['SubModule.xml', 'bin/Win64_Shipping_Client/MNBL.A.dll', 'AssetPackages/*.tpac'],
+                                         'provenance': {'SubModule.xml': 'repository', 'bin/*': 'built', 'AssetPackages/*.tpac': 'published packs'}}},
+                            {'id': 'MNBL.Probe', 'release': False, 'reason': 'test probe', 'owns': ['Modules/MNBL.Probe/']}])
+        with redirect_stdout(io.StringIO()):
+            result = mods.package(self.repo.root, 'MNBL.A', stage, self.repo.root / 'dist')
+        with zipfile.ZipFile(result['zip']) as archive:
+            self.assertIn('MNBL.A/AssetPackages/pack0.tpac', archive.namelist())
+        manifest = json.loads(Path(result['manifest']).read_text(encoding='utf-8'))
+        self.assertEqual({f['path']: f['provenance'] for f in manifest['files']}['AssetPackages/pack0.tpac'], 'published packs')
+        # A .tpac anywhere else is still refused by its name, even under a block that allows and traces every file.
+        self.repo.registry([{'id': 'MNBL.A', 'release': True, 'build': 'tools/ci/Build-A.ps1', 'owns': ['Modules/MNBL.A/', 'src/MNBL.A/'],
+                             'package': {'files': ['*'], 'provenance': {'*': 'any'}}},
+                            {'id': 'MNBL.Probe', 'release': False, 'reason': 'test probe', 'owns': ['Modules/MNBL.Probe/']}])
+        for stray in ('pack0.tpac', 'Assets/pack0.tpac', 'bin/Win64_Shipping_Client/pack0.tpac'):
+            (stage / stray).parent.mkdir(parents=True, exist_ok=True)
+            (stage / stray).write_bytes(b'pack')
+            with self.assertRaisesRegex(mods.CheckError, f'{stray} is named like an official'):
+                mods.package(self.repo.root, 'MNBL.A', stage, self.repo.root / 'dist')
+            (stage / stray).unlink()
+        with self.assertRaisesRegex(mods.CheckError, 'AssetPackages/pack0.tpac is named like an official'):   # no package block: no exemption
+            mods.package_rows({'id': 'MNBL.A'}, stage, sorted(path for path in stage.rglob('*') if path.is_file()))
+
 
 if __name__ == '__main__':
     unittest.main()

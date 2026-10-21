@@ -38,7 +38,7 @@ namespace MNBL.ProceduralWorld.Automation
     // periodic seam pairs; one native entity/terrain selection; the IMapScene interface map.
     internal static class WorldSurfaceProbe
     {
-        private static readonly WorldDataBundle.HostProfile Host = new WorldDataBundle.HostProfile("v1.4.8.119303", "v1.2.8.119303", new[] { "R01", "R02", "R03", "R04", "R05", "R06", "R07", "R08", "R09", "R10" });
+        private static readonly WorldDataBundle.HostProfile Host = new WorldDataBundle.HostProfile("v1.4.8.119303", "v1.2.8.119303", WorldDataBundle.HostCapabilities);
 
         internal static IEnumerator Run(ProbeContext context)
         {
@@ -397,7 +397,8 @@ namespace MNBL.ProceduralWorld.Automation
         internal static Dictionary<string, object> Settlements(RuntimeWorld world, PreparedSurface prepared) { return SettlementEntityChecks.Run(world, prepared); }
 
         // MMR-39: the encoded scene's water bodies (GeneratedWaterSystem): the sea plane on the datum over the whole terrain and one plane per
-        // lake at its level; a ray down at a lake sample meets its lake's plane; and no colour-grade manager.
+        // lake at its level; a ray down at a lake sample meets its lake's plane; and no colour-grade manager. MMR-256: the snow texture the
+        // scene's terrain names is the world's and was loaded before the read (whether the engine resolves it by name is recorded).
         internal static Dictionary<string, object> Water(RuntimeWorld world, PreparedSurface prepared)
         {
             var failures = new List<string>();
@@ -437,9 +438,16 @@ namespace MNBL.ProceduralWorld.Automation
             report["lakesPlaced"] = placed; report["lakeRayHits"] = rayHits;
             if (placed != prepared.Lakes.Count) failures.Add((prepared.Lakes.Count - placed) + " lake planes are missing or misplaced.");
             if (rayHits != prepared.Lakes.Count) failures.Add((prepared.Lakes.Count - rayHits) + " rays at lake samples did not meet the lake plane.");
-            // A production scene carries no colour-grade manager (its Init would read Calradia's grid; MMR-45 adds it with the generated grid).
+            // A production scene carries no colour-grade manager (its Init would read Calradia's grid natively; the campaign map's grade and
+            // season threshold are GeneratedMapAtmosphere's, MMR-256).
             report["colorGradeManager"] = scene.GetFirstEntityWithScriptComponent("MapColorGradeManager") != null;
             if ((bool)report["colorGradeManager"]) failures.Add("The production scene carries a colour-grade manager.");
+            var snow = world.SnowTexture;
+            report["snowTexture"] = snow; report["snowTextureExpected"] = prepared.SnowTextureName;
+            object named = null, status = null;
+            if (snow != null) { snow.TryGetValue("name", out named); snow.TryGetValue("status", out status); }
+            if (!Equals(named as string, prepared.SnowTextureName)) failures.Add("The scene names the snow texture " + (named ?? "none") + ", not the world's " + (prepared.SnowTextureName ?? "none") + ".");
+            else if (prepared.SnowTextureName != null && !Equals(status, "loaded")) failures.Add("The world's snow texture was not loaded before the read: " + status + ".");
             report["passed"] = failures.Count == 0;
             return report;
         }

@@ -44,13 +44,16 @@ internal static class NavalContentTests
 
     private static void Run(string bundleDir, string repo, string outJson)
     {
-        var host = new WorldDataBundle.HostProfile("v1.4.8.119303", "v1.2.8.119303", new[] { "R01", "R02", "R03", "R04", "R05", "R06", "R07", "R08", "R09", "R10" });
+        var host = new WorldDataBundle.HostProfile("v1.4.8.119303", "v1.2.8.119303", WorldDataBundle.HostCapabilities);
         var bundle = WorldDataBundle.Open(bundleDir, host);
         Func<string, IDictionary<string, object>> read = path => Parse(new UTF8Encoding(false).GetString(bundle.ReadVerified(path)));
         var campaign = read("compiled/campaign/campaign.json"); var idMap = read("compiled/campaign/id-map.json");
         var travel = read("compiled/travel/travel-graph.json"); var ports = read("compiled/travel/ports.json");
         var cells = bundle.ReadVerified("compiled/travel/cells.bin");
+        var biomes = GeneratedCampaignInitializer.CellBiomes(bundle.ReadVerified("compiled/terrain/masks.bin"), new UTF8Encoding(false).GetString(bundle.ReadVerified("compiled/terrain/projection.json")),
+            new UTF8Encoding(false).GetString(bundle.ReadVerified("policies/terrain-materials.json")));
         var rosters = Load(Path.Combine(repo, "worldgen/policies/rosters.json"));
+        var population = Load(Path.Combine(repo, "worldgen/policies/population.json"));
         var economy = Load(Path.Combine(repo, "worldgen/policies/economy.json"));
         var startup = Load(Path.Combine(repo, "worldgen/policies/startup.json"));
         var naval = Load(Path.Combine(repo, "worldgen/policies/naval-content.json"));
@@ -73,19 +76,19 @@ internal static class NavalContentTests
         var defaultsRun = Load(Path.Combine(repo, S(O(rosters, "provenance"), "defaultReferences")));
         var defaults = L(O(Records(O(defaultsRun, "outputs"), "worlds").First(), "registration"), "verifiedLiveDefaultReferences");
         var resolver = new CharacterTemplateResolver(catalog, defaults, O(rosters, "troops"));
-        Func<IDictionary<string, object>, FactionFactory.Result> factionsOf = c => FactionFactory.Build(c, idMap, Load(Path.Combine(repo, "worldgen/policies/factions.json")), Load(Path.Combine(repo, "worldgen/policies/culture-presentations.json")), templates);
+        Func<IDictionary<string, object>, FactionFactory.Result> factionsOf = c => FactionFactory.Build(c, idMap, Load(Path.Combine(repo, "worldgen/policies/factions.json")), Load(Path.Combine(repo, "worldgen/policies/culture-presentations.json")), templates, Load(Path.Combine(repo, "worldgen/policies/population.json")));
         Func<IDictionary<string, object>, IDictionary<string, object>, IDictionary<string, object>, IDictionary<string, object>, XmlDocument, NavalContentFactory.Result> buildWith = (c, t, pr, policy, hulls) => {
-            var f = factionsOf(c); var h = HeroFactory.Build(c, idMap, f, rosters, resolver);
+            var f = factionsOf(c); var h = HeroFactory.Build(c, idMap, f, rosters, resolver, population);
             var sf = new SettlementFactory(economy, prototypes, catalog["Settlements"], resolver.Exists);
             var w = sf.Build(c, t, pr, f, h, NavalContentFactory.ShipyardLevels(policy, pr));
-            var st = new GeneratedCampaignInitializer(startup, sf, catalog["Settlements"], catalog["Factions"], catalog["SPCultures"]).Build(t, pr, cells, f, h, w);
+            var st = new GeneratedCampaignInitializer(startup, sf, catalog["Settlements"], catalog["Factions"], catalog["SPCultures"]).Build(t, pr, cells, f, h, w, biomes);
             return new NavalContentFactory(policy, catalog["Factions"], catalog["SPCultures"], hulls, catalog["MissionShips"], catalog["ShipSlots"], catalog["partyTemplates"]).Build(c, t, pr, cells, f, w, st); };
         Func<IDictionary<string, object>, IDictionary<string, object>, IDictionary<string, object>, NavalContentFactory.Result> build = (c, t, policy) => buildWith(c, t, ports, policy, catalog["ShipHulls"]);
-        var factions = factionsOf(campaign); var heroes = HeroFactory.Build(campaign, idMap, factions, rosters, resolver);
+        var factions = factionsOf(campaign); var heroes = HeroFactory.Build(campaign, idMap, factions, rosters, resolver, population);
         var factory = new SettlementFactory(economy, prototypes, catalog["Settlements"], resolver.Exists);
         var levels = NavalContentFactory.ShipyardLevels(naval, ports);
         var world = factory.Build(campaign, travel, ports, factions, heroes, levels);
-        var startupResult = new GeneratedCampaignInitializer(startup, factory, catalog["Settlements"], catalog["Factions"], catalog["SPCultures"]).Build(travel, ports, cells, factions, heroes, world);
+        var startupResult = new GeneratedCampaignInitializer(startup, factory, catalog["Settlements"], catalog["Factions"], catalog["SPCultures"]).Build(travel, ports, cells, factions, heroes, world, biomes);
         var r = new NavalContentFactory(naval, catalog["Factions"], catalog["SPCultures"], catalog["ShipHulls"], catalog["MissionShips"], catalog["ShipSlots"], catalog["partyTemplates"])
             .Build(campaign, travel, ports, cells, factions, world, startupResult);
         var land = new GeneratedSpawnModel.CellMap(O(travel, "grid"), cells, new[] { "land" }, Records(travel, "settlements"));
@@ -170,7 +173,7 @@ internal static class NavalContentTests
               "all " + harbours.Count + " harbour villages get a drop-off intent at their port, water of an open basin within the installed envelope (" + Math.Round(envelope, 2) + "); a harbour village whose port fails that refuses the world (below), since its XML port would still give it HasPort");
         // Roles: coastal versus landlocked kingdoms and clans.
         var kingdoms = r.Roles.Where(x => x.Kind == "kingdom").ToList(); var clans = r.Roles.Where(x => x.Kind == "clan").ToList();
-        Check(kingdoms.Count == factions.Kingdoms.Count && clans.Count == factions.Clans.Count &&
+        Check(kingdoms.Count == factions.Kingdoms.Count && clans.Count == factions.AllClans.Count() &&
               kingdoms.All(k => k.Naval == r.Facilities.Any(f => f.Open && factions.Kingdoms.First(x => x.Id == k.Id).Towns.Contains(f.Town)) && !String.IsNullOrEmpty(k.Reason)) &&
               clans.All(c => c.Naval == !r.Plan.Landlocked.Contains(c.Id) && (c.Naval == r.Facilities.Any(f => f.Open && f.LandGroup == c.LandGroup && c.LandGroup >= 0))),
               "naval roles: " + kingdoms.Count(k => k.Naval) + " coastal and " + kingdoms.Count(k => !k.Naval) + " landlocked kingdoms (" + String.Join("; ", kingdoms.Where(k => !k.Naval).GroupBy(k => Regex.Replace(k.Reason, "[0-9]+", "N")).Select(g => g.Count() + " " + g.Key)) +
@@ -182,7 +185,7 @@ internal static class NavalContentTests
         var islands = Records(travel, "groups").Where(g => Convert.ToInt32(g["towns"]) > 0 && Convert.ToInt32(g["id"]) != main).ToList();
         var settledIslands = Records(travel, "groups").Where(g => settledGroups.Contains(Convert.ToInt32(g["id"])) && Convert.ToInt32(g["id"]) != main).ToList();
         var openIds = new HashSet<int>(basins.Where(b => (bool)b.Value["open"]).Select(b => b.Key));
-        Check(islands.Count > 0 && islands.All(g => Records(travel, "transitions").Any(t => Convert.ToInt32(t["group"]) == Convert.ToInt32(g["id"]) && openIds.Contains(Convert.ToInt32(t["basin"])))) &&
+        Check(islands.All(g => Records(travel, "transitions").Any(t => Convert.ToInt32(t["group"]) == Convert.ToInt32(g["id"]) && openIds.Contains(Convert.ToInt32(t["basin"])))) &&
               r.Diagnostics.Count(d => d.Kind == "island") == settledIslands.Count,
               "every one of the " + islands.Count + " island land groups with towns has a candidate naval transition to an open basin, and all " + settledIslands.Count + " groups with a settlement are diagnosed (" +
               String.Join("; ", r.Diagnostics.Where(d => d.Kind == "island").Select(d => d.Subject + ": " + d.Reason.Split(';')[1].Trim())) + ")");
@@ -230,33 +233,43 @@ internal static class NavalContentTests
               "the world with its startup and naval records plans through the MMR-30 registry with no problem, the hero family forward references included (two-pass since MMR-45) (" + planProblems.Count + (planProblems.Count == 0 ? "" : ": " + String.Join("; ", planProblems.Take(3))) + ")");
         // c3 (offline part) and the compiler slots.
         var owned = Records(campaign, "ports").SelectMany(p => Records(p, "slots").Where(s => S(s, "owner") == "MMR-35").Select(s => S(p, "town") + ":" + S(s, "name"))).ToList();
-        Check(owned.Count == 60 && owned.All(k => r.Slots.Any(s => s.Town + ":" + s.Name == k && !String.IsNullOrEmpty(s.Value))) && r.Slots.Count == owned.Count,
+        Check(owned.Count == 2 * Records(campaign, "ports").Count() && owned.All(k => r.Slots.Any(s => s.Town + ":" + s.Name == k && !String.IsNullOrEmpty(s.Value))) && r.Slots.Count == owned.Count,
               "all " + owned.Count + " MMR-35 compiler slots (navalFacility and shipyardAndFleet of each port) are resolved");
 
         // Determinism and refusals.
         var again = build(campaign, travel, naval);
-        var shuffled = Copy(campaign); foreach (var key in new[] { "towns", "castles", "villages", "heroes", "kingdoms", "clans", "ports" }) shuffled[key] = ((IEnumerable)shuffled[key]).Cast<object>().Reverse().ToArray();
+        var shuffled = Copy(campaign); foreach (var key in new[] { "towns", "castles", "villages", "heroes", "kingdoms", "houses", "ports" }) shuffled[key] = ((IEnumerable)shuffled[key]).Cast<object>().Reverse().ToArray();
         Check(again.IntentsSha256 == r.IntentsSha256 && build(shuffled, travel, naval).IntentsSha256 == r.IntentsSha256 && again.Documents.Select(d => d.Value.OuterXml).SequenceEqual(r.Documents.Select(d => d.Value.OuterXml)),
               "building twice, or from reordered records, gives the same naval intents (" + r.IntentsSha256.Substring(0, 12) + ") and documents");
         var badPolicy = Copy(naval); badPolicy["version"] = 2;
         var noHull = (XmlDocument)catalog["ShipHulls"].CloneNode(true);
         var firstUsed = r.Facilities.SelectMany(f => f.Hulls).First();
         ((XmlElement)noHull.DocumentElement.SelectSingleNode("ShipHull[@id='" + firstUsed + "']")).SetAttribute("id", firstUsed + "_missing");
-        // An island group without transitions, and a port moved onto land (the chosen candidate's sea point on its land point).
-        var cutIsland = Copy(travel); var island = Convert.ToInt32(islands.First()["id"]);
-        cutIsland["transitions"] = Records(cutIsland, "transitions").Where(t => Convert.ToInt32(t["group"]) != island).ToArray();
+        // An island group without transitions (only where an island group has towns: the factory refuses only those), and a port moved
+        // onto land (the chosen candidate's sea point on its land point).
+        IDictionary<string, object> cutIsland = null;
+        if (islands.Count > 0)
+        {
+            cutIsland = Copy(travel); var island = Convert.ToInt32(islands.First()["id"]);
+            cutIsland["transitions"] = Records(cutIsland, "transitions").Where(t => Convert.ToInt32(t["group"]) != island).ToArray();
+        }
         var landPort = Copy(ports); var moved = Records(landPort, "ports").First(p => p.ContainsKey("chosen") && p["chosen"] != null);
         O(moved, "chosen")["seaPoint"] = O(moved, "chosen")["landPoint"];
         var disagree = Copy(naval); var empireHulls = O(O(O(disagree, "hulls"), "cultures"), "empire"); empireHulls.Remove(empireHulls.Keys.First());
         var dryHarbour = Copy(ports);
         var harbourCandidate = Records(dryHarbour, "ports").SelectMany(p => Records(p, "candidates")).First(c => S(c, "village") != null && c.ContainsKey("harbourCell") && c.ContainsKey("landCell"));
         harbourCandidate["harbourCell"] = harbourCandidate["landCell"];
-        var refusals = new[] { Refused(() => build(campaign, travel, badPolicy)), Refused(() => buildWith(campaign, travel, ports, naval, noHull)), Refused(() => build(campaign, cutIsland, naval)), Refused(() => buildWith(campaign, travel, landPort, naval, catalog["ShipHulls"])),
-                               Refused(() => build(campaign, travel, disagree)), Refused(() => buildWith(campaign, travel, dryHarbour, naval, catalog["ShipHulls"])) };
-        var expectedCodes = new[] { "quality.naval_policy", "quality.naval_catalog", "quality.naval_unreachable_island", "quality.naval_port", "quality.naval_policy", "quality.naval_port" };
-        var expectedRetry = new[] { false, false, true, true, false, true };
+        var refusals = new List<NavalContentFactory.NavalException>(); var expectedCodes = new List<string>(); var expectedRetry = new List<bool>(); var refusedCases = new List<string>();
+        Action<string, Func<object>, string, bool> refuse = (what, make, code, retry) => { refusedCases.Add(what); refusals.Add(Refused(make)); expectedCodes.Add(code); expectedRetry.Add(retry); };
+        refuse("a wrong policy version", () => build(campaign, travel, badPolicy), "quality.naval_policy", false);
+        refuse("a hull the shipyards need missing from the catalog", () => buildWith(campaign, travel, ports, naval, noHull), "quality.naval_catalog", false);
+        if (cutIsland != null) refuse("an island cut off from every open basin", () => build(campaign, cutIsland, naval), "quality.naval_unreachable_island", true);
+        refuse("a port moved onto land", () => buildWith(campaign, travel, landPort, naval, catalog["ShipHulls"]), "quality.naval_port", true);
+        refuse("a policy whose hull list disagrees with the catalog", () => build(campaign, travel, disagree), "quality.naval_policy", false);
+        refuse("a harbour village whose harbour cell is land", () => buildWith(campaign, travel, dryHarbour, naval, catalog["ShipHulls"]), "quality.naval_port", true);
         Check(refusals.Select((e, i) => e != null && e.Codes.Contains(expectedCodes[i]) && (e.Codes.Count == 1 ? e.Retryable == expectedRetry[i] : true)).All(x => x),
-              "each is refused with its quality code: a wrong policy version, a hull the shipyards need missing from the catalog, an island cut off from every open basin, a port moved onto land, a policy whose hull list disagrees with the catalog, and a harbour village whose harbour cell is land (" +
+              "each is refused with its quality code: " + String.Join(", ", refusedCases.Take(refusedCases.Count - 1)) + ", and " + refusedCases.Last() +
+              (cutIsland != null ? "" : " (no island land group has towns, so there is no island to cut off)") + " (" +
               String.Join(" | ", refusals.Select((e, i) => expectedCodes[i] + ": " + (e == null ? "NOT refused" : String.Join(",", e.Codes) + (e.Retryable ? " retryable" : "") + " - " + e.Problems.First()))) + ")");
 
         var evidence = new SortedDictionary<string, object>(StringComparer.Ordinal) {

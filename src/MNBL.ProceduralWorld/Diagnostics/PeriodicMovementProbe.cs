@@ -342,7 +342,11 @@ namespace MNBL.ProceduralWorld.Diagnostics
             target.SetMoveGoToPoint(goal, MobileParty.NavigationType.Default);
             pursuer.SetMoveEngageParty(target, MobileParty.NavigationType.Default);
             row["setup"] = new Dictionary<string, object> { ["target"] = target.StringId, ["pursuer"] = pursuer.StringId, ["targetStart"] = Point(target.Position), ["pursuerStart"] = Point(pursuer.Position),
-                ["targetGoal"] = Point(goal), ["warDeclared"] = declared, ["targetExtraTroops"] = extra, ["targetSpeed"] = target.Speed, ["pursuerSpeed"] = pursuer.Speed };
+                ["targetGoal"] = Point(goal), ["warDeclared"] = declared, ["targetExtraTroops"] = extra, ["targetSpeed"] = target.Speed, ["pursuerSpeed"] = pursuer.Speed,
+                ["targetFace"] = Face(world, target, failures, "pursuit start")["face"], ["pursuerFace"] = Face(world, pursuer, failures, "pursuit start")["face"] };
+            // MMR-254: land speed is no longer one value (terrain, road and road-deck terms): the interception needs the pursuer faster where
+            // both start, which the extra troops give on any one face type.
+            if (!(pursuer.Speed > target.Speed)) failures.Add("The pursuer (" + pursuer.Speed + ") is not faster than the target (" + target.Speed + ") at the start.");
             var record = new Dictionary<string, object> { ["leg"] = "AI pursuit across the seam", ["party"] = pursuer.StringId }; row["pursuerTravel"] = record;
             int targetRebasesBefore = PeriodicSeam.Events.Count(e => e.Party == target.StringId);
             var distances = new List<float>();

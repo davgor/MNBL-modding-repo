@@ -32,6 +32,8 @@ namespace MNBL.ProceduralWorld.Automation
                 case "world_surface": return WorldSurfaceProbe.Run(context);
                 case "world_navigation": return WorldNavigationProbe.Run(context);
                 case "route_trace": return RouteTraceProbe.Run(context);
+                case "map_epic2": return MapEpic2Probe.Run(context);
+                case "map2_acceptance": return Map2AcceptanceProbe.Run(context);
                 case "world_setup": return WorldSetupProbe.Run(context);
                 case "new_campaign_flow": return NewCampaignFlowProbe.Run(context);
                 case "world_recovery": return WorldRecoveryProbe.Run(context);
@@ -70,7 +72,7 @@ namespace MNBL.ProceduralWorld.Automation
                     int seed = Seed(parameter, 0);
                     return ScreenProbe(context, () => new HeightfieldProbeScreen(seed), null, 240);
                 }
-                default: throw new ArgumentException("Unknown probe id '" + id + "'. Known: noop, capabilities, generation_job, world_activation, scene_query, scene_sequence, native_render, runtime_surface, world_surface, world_navigation, world_setup, new_campaign_flow, world_recovery, save_binding, two_world_matrix, seam_presentation, compat_matrix, campaign_soak, land_missions, naval_missions, first_test_profile, clean_install, sandbox_boot, campaign_catalog, generated_campaign, generated_save_load, save_recovery, baseline_scenario, baseline_load, baseline_combat, surface, nav, generate:<seed>, render:<seed>, ray:<seed>, grid:<seed>.");
+                default: throw new ArgumentException("Unknown probe id '" + id + "'. Known: noop, capabilities, generation_job, world_activation, scene_query, scene_sequence, native_render, runtime_surface, world_surface, world_navigation, map_epic2, map2_acceptance, world_setup, new_campaign_flow, world_recovery, save_binding, two_world_matrix, seam_presentation, compat_matrix, campaign_soak, land_missions, naval_missions, first_test_profile, clean_install, sandbox_boot, campaign_catalog, generated_campaign, generated_save_load, save_recovery, baseline_scenario, baseline_load, baseline_combat, surface, nav, generate:<seed>, render:<seed>, ray:<seed>, grid:<seed>.");
             }
         }
 

@@ -14,7 +14,7 @@ namespace MNBL.ProceduralWorld.Automation
     // (route_trace; bundle=<dir> routes=<id substring>). Prepare -> Install -> Construct as the generation job's validation does; no campaign.
     internal static class RouteTraceProbe
     {
-        private static readonly WorldDataBundle.HostProfile Host = new WorldDataBundle.HostProfile("v1.4.8.119303", "v1.2.8.119303", new[] { "R01", "R02", "R03", "R04", "R05", "R06", "R07", "R08", "R09", "R10" });
+        private static readonly WorldDataBundle.HostProfile Host = new WorldDataBundle.HostProfile("v1.4.8.119303", "v1.2.8.119303", WorldDataBundle.HostCapabilities);
 
         internal static IEnumerator Run(ProbeContext context)
         {

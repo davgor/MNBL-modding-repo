@@ -8,7 +8,7 @@ New-Item -ItemType Directory -Path $out | Out-Null
 $csc='C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/MSBuild/Current/Bin/Roslyn/csc.exe'
 $sources=@('src/MNBL.ProceduralWorld/Campaign/CampaignIdentity.cs','src/MNBL.ProceduralWorld/Campaign/FactionFactory.cs','src/MNBL.ProceduralWorld/Campaign/CharacterTemplateResolver.cs','src/MNBL.ProceduralWorld/Campaign/HeroFactory.cs','src/MNBL.ProceduralWorld/CampaignBootstrap/WorldDataBundle.cs','tests/Campaign/CharacterTests.cs')
 $templates=@(Get-ChildItem -LiteralPath (Join-Path $repo 'worldgen/templates/cultures') -Filter *.json|Sort-Object Name|ForEach-Object { 'worldgen/templates/cultures/'+$_.Name })
-$inputs=@(($sources+@('tools/Test-Characters.ps1','worldgen/policies/factions.json','worldgen/policies/rosters.json','worldgen/policies/culture-presentations.json')+$templates)|ForEach-Object { @{path=$_;sha256=(Get-FileHash -LiteralPath (Join-Path $repo $_)).Hash.ToLowerInvariant()} })
+$inputs=@(($sources+@('tools/Test-Characters.ps1','worldgen/policies/factions.json','worldgen/policies/rosters.json','worldgen/policies/culture-presentations.json','worldgen/policies/population.json')+$templates)|ForEach-Object { @{path=$_;sha256=(Get-FileHash -LiteralPath (Join-Path $repo $_)).Hash.ToLowerInvariant()} })
 $lock=Get-Content "$repo/config/runtime-api-lock.json" -Raw|ConvertFrom-Json
 $references=@()
 foreach($name in @('mscorlib','System','System.Core','System.Xml','System.Web.Extensions')){

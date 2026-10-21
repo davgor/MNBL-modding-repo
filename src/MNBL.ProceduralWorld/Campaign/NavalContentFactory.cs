@@ -310,7 +310,7 @@ namespace MNBL.ProceduralWorld.CampaignRegistry
                 r.Reason = r.Naval ? r.Ports.Count + " port towns on open basins" : k.Towns.Count == 0 ? "the kingdom holds no town" : "none of its " + k.Towns.Count + " towns is a port town";
                 result.Roles.Add(r);
             }
-            foreach (var c in factions.Clans.OrderBy(c => c.Id, StringComparer.Ordinal))
+            foreach (var c in factions.AllClans.OrderBy(c => c.Id, StringComparer.Ordinal))
             {
                 var r = new Role { Id = c.Id, Kind = "clan" };
                 SettlementFactory.SettlementIntent home;

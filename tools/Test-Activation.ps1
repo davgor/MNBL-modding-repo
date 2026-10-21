@@ -10,7 +10,8 @@ $out=Join-Path $repo ('build/research-activation45/test-'+[Guid]::NewGuid().ToSt
 New-Item -ItemType Directory -Path $out | Out-Null
 $csc='C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/MSBuild/Current/Bin/Roslyn/csc.exe'
 $sources=@('src/MNBL.ProceduralWorld/Generation/WorldActivationTransaction.cs','src/MNBL.ProceduralWorld/Persistence/WorldBinding.cs','src/MNBL.ProceduralWorld/Persistence/DurableFile.cs',
-    'src/MNBL.ProceduralWorld/Persistence/EarlyWorldBindingStore.cs','src/MNBL.ProceduralWorld/Persistence/SaveJournal.cs','tests/Generation/ActivationFailureTests.cs')
+    'src/MNBL.ProceduralWorld/Persistence/EarlyWorldBindingStore.cs','src/MNBL.ProceduralWorld/Persistence/SaveJournal.cs','src/MNBL.ProceduralWorld/Generation/PostBuildBattleMap.cs',
+    'tests/Generation/ActivationFailureTests.cs')
 $data=@('tools/Test-Activation.ps1')
 $inputs=@(($sources+$data)|ForEach-Object { @{path=$_;sha256=(Get-FileHash -LiteralPath (Join-Path $repo $_)).Hash.ToLowerInvariant()} })
 $lock=Get-Content "$repo/config/runtime-api-lock.json" -Raw|ConvertFrom-Json

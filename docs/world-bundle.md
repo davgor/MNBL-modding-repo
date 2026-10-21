@@ -14,7 +14,7 @@ worldbridge --bundle SPLIT --contract worldgen/contracts/source-compatibility.js
   --projection-policy worldgen/policies/projection.json --materials worldgen/policies/terrain-materials.json \
   --import worldgen/calibration/terrain-import/terrain-import.json --content worldgen/policies/campaign-content.json \
   --cultures worldgen/policies/culture-presentations.json --playability worldgen/policies/playability.json \
-  --producer-lock worldgen/producer.lock.json --runtime-lock config/runtime-api-lock.json [--recipe REQUEST.json] \
+  --shaping worldgen/policies/terrain-shaping.json --population worldgen/policies/population.json --producer-lock worldgen/producer.lock.json --runtime-lock config/runtime-api-lock.json --recipe REQUEST.json \
   --root BUNDLE_ROOT --diagnostics DIAGNOSTICS_DIR
 worldbridge --inspect-bundle BUNDLE_ROOT/<worldContentId>
 ```
@@ -26,6 +26,8 @@ worldbridge --inspect-bundle BUNDLE_ROOT/<worldContentId>
 
 Every outcome is also written to `DIAGNOSTICS_DIR/bundle-<random>.json`, with timings and absolute inputs, outside the bundle.
 
+**`source/request.json` (MMR-261).** `--recipe` is required: the attempt's request (the exact file `fwg generate --request` took) is stored in the bundle as `source/request.json`, a required file, so `fwg apply` can regenerate the world during play from the bundle alone (`docs/magic-ground.md` "Live mutation"). The split may not hold a file of that name. Like every content file it is covered by the WorldContentId; the manifest's `source.recipe.sha256` is its hash.
+
 `--inspect-bundle` validates without Bannerlord and prints the identity and summary as canonical JSON. `state` is `DATA_READY` only for a valid bundle; otherwise it is `sealed-but-invalid` or `unsealed`. It exits 0 if the bundle is valid and 2 if not. A trailing separator on the directory is accepted.
 
 ## Layout and identity
@@ -33,7 +35,9 @@ Every outcome is also written to `DIAGNOSTICS_DIR/bundle-<random>.json`, with ti
 ```
 BUNDLE_ROOT/<worldContentId>/
   source/      the producer split, byte for byte (world.json, scene.json, plans/...)
-  compiled/    terrain/{heightfield,masks,weights,height-q16}.bin, terrain/projection.json,
+  compiled/    terrain/{heightfield,masks,weights,height-q16}.bin (the shaped 513 surface, MMR-278; weights.bin v2 MNBLWT02, one alpha
+               plane per layerSet slot, MMR-255), terrain/flora.bin (map trees, FLR2, MMR-255),
+               terrain/navigation-{heightfield,masks}.bin (the travel compile), terrain/shaping.json, terrain/projection.json,
                campaign/{id-map,campaign}.json, travel/{travel-graph,ports}.json, travel/cells.bin,
                validation.json, compatibility.json
   policies/    every input policy, contract and calibration, as <name>.json
@@ -44,14 +48,14 @@ BUNDLE_ROOT/<worldContentId>/
 - **WorldContentId** is `identity::world_content` over `source/`, `compiled/` and `policies/`. It is the SHA-256 of `mnbl.world-content-id/1\n` followed by the lines `<path>\t<bytes>\t<sha256>\n`, sorted by UTF-8 bytes, with paths spelled with `/` exactly as in the inventory. It is also the directory name.
   - Identical content gives the same id, whoever compiles it.
   - The MMR-24 attempt-level id is the same algorithm over the producer world only (`source/`), so the two ids differ by design: a bundle id also covers what the compiler made.
-- **compiled/compatibility.json** (`mnbl.bundle-compatibility`) names the game and War Sails versions (from the runtime lock) and the required runtime capabilities (R02–R05, R08–R10).
+- **compiled/compatibility.json** (`mnbl.bundle-compatibility`) names the game and War Sails versions (from the runtime lock: the build this MNBL release was made against) and the required runtime capabilities (R02–R05, R08–R10). MMR-284: the versions are diagnostics; a host checks only that they, and its own builds, are at or above the release's minimum.
   - Because it is content, the WorldContentId covers compatibility. A game or War Sails update compiles the same world to a new bundle, never to a reuse of one with stale versions.
   - The manifest repeats both, and every validator checks that the two agree.
 - **The manifest** carries:
   - the schema version, the WorldContentId and its algorithm;
   - the producer lock, binary, commit and generator version;
   - the bridge version and binary hash;
-  - the recipe hash and seed, or null outside a generation;
+  - the recipe hash and seed (the recipe itself is `source/request.json`, MMR-261);
   - every policy hash;
   - the engine versions, the runtime lock hash and the editor (none);
   - the required capabilities;
@@ -103,13 +107,13 @@ worldbridge `validate`, the C# host and `summarize_bundle.verify_bundle` apply t
 - **Hashes:** every policy, and the validation report (which must say `travelStatus: ok`), match the hashes the manifest names.
 - **Compatibility:** the manifest's engine versions and capabilities equal `compiled/compatibility.json`.
 
-worldbridge also cross-checks the travel outputs against the compiled files beside them. The C# host also checks compatibility against the host. `tools/test_bundle_parity.py` runs 35 variants through all three validators, and they agree on every verdict. The variants are damaged, resealed (a manifest edit with `DATA_READY` rewritten to match), linked, renamed or pretty-printed bundles.
+worldbridge also cross-checks the travel outputs against the compiled files beside them, and checks city preservation (MMR-251): the split's `settlements.sites` (streamed from `source/world.json`), its `settlements.founding.placed_cities`, the compiled towns, the id-map's towns and the travel graph's towns are one count and one uid set ([travel-graph.md](travel-graph.md), "City preservation"). The C# host also checks compatibility against the host. `tools/test_bundle_parity.py` runs 35 variants through all three validators, and they agree on every verdict. The variants are damaged, resealed (a manifest edit with `DATA_READY` rewritten to match), linked, renamed or pretty-printed bundles.
 
 ## Host verification (C#)
 
 `WorldDataBundle.Open(directory, host)` runs before any resource is constructed from a bundle. It is pure managed code with no TaleWorlds types, so the tests run it without the game.
-- It applies the rules above. Then it checks that `compiled/compatibility.json` names the installed game and War Sails versions and only capabilities the host provides.
-- It never throws for a damaged bundle. Every problem is collected into one `RejectedException`, with a message that says what to do: restore an intact copy, install the matching versions, or update MNBL. No migration is offered (MMR-50, `docs/save-compatibility.md`).
+- It applies the rules above. Then it checks that `compiled/compatibility.json` names game and War Sails builds at or above this release's minimum, that the host's are too (`SupportedBuilds`; MMR-284: no maximum, so a newer host opens the bundle), and only capabilities the host provides. `tools/summarize_bundle.py` applies the same minimum.
+- It never throws for a damaged bundle. Every problem is collected into one `RejectedException`, with a message that says what to do: restore an intact copy, install at least the minimum versions, or update MNBL. No migration is offered (MMR-50, `docs/save-compatibility.md`).
 - `ReadVerified(path)` checks a file's hash again when it is read.
 - The caller supplies the installed versions and capabilities. No construction path consumes the class yet; the runtime surface and the generation job wire it in (MMR-37, MMR-44).
 

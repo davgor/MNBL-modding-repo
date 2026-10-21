@@ -264,6 +264,11 @@ other ids (0, 1, 2, …), which have mission meanings and are outside the scope 
 - Keep land and sea faces edge-connected along coasts.
 - Overlapping bridge and under-bridge faces are allowed.
 
+**What generated worlds paint** (`RuntimeNavigationBuilder`, `docs/runtime-navigation.md`): land faces carry the shared biome table's face of their
+cell (map epic 2, MMR-254: Plain 1, Desert 2, Snow 3, Forest 4, Steppe 5, Swamp 15; never Dune, Beach or Fording), mountains 7, sea 18/19,
+lake 8, river 11, bridge decks 17 over 25. Every land face group is Default-valid, in the land region and Naval-invalid, so the land domain and
+the coasts are the same whatever the biome; the calibration's `faceGroups` lists each id the travel compiler may write.
+
 ## 6. Validation executed
 
 | check | command | result |

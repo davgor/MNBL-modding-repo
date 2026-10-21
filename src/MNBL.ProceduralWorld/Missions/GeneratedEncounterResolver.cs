@@ -22,17 +22,27 @@ namespace MNBL.ProceduralWorld.Missions
     // a ship on each sampled sea terrain finds exactly one naval scene. Among those, the index prefers the cell's geography:
     //   land   the scene class of the cell's biome (compiled worlds: masks.bin) or, without one, of its land face terrain (MissionScenes classes:
     //          open, woodland, steppe, rock, cold, desert, wetland -> Plain, Steppe, Desert, Swamp scenes, with a forest-density or TerrainTypes
-    //          preference and fallback terrains); Forest, Snow and Mountain have no battle scenes of their own and borrow by these rules;
+    //          preference and fallback terrains); Forest, Snow and Mountain have no battle scenes of their own and borrow by these rules; a
+    //          forest-density preference takes every listed density (MMR-254, RT-25: woodland is High and Low, not High alone);
     //   relief the cell's landform (Mountain / ridge, Valley) prefers, within the class, scenes whose ground shows it (Mountain/Canyon, River/Water);
     //   sea    a naval scene of each sampled sea terrain itself (CoastalSea, OpenSea, River, UnderBridge); Lake and Water, which have none, take an
-    //          index naming one naval scene only (preferring CoastalSea), which the engine then uses whatever the terrain.
-    // Cells around a settlement's gate or port (Robust) take, where installed, an index every naval-valid terrain resolves deterministically,
-    // since naval map events at a settlement (blockades, sally-outs) read the patch at the main party, which may stand on land there.
+    //          index naming one naval scene only (preferring CoastalSea), which the engine then uses whatever the terrain. A cell with land keeps
+    //          its class's land scene wherever an index of the class's terrain resolves its sea deterministically (MMR-254, RT-24), before it
+    //          borrows a fallback terrain's land scene. MMR-247: never a class index that names no naval scene: the engine then picks a random
+    //          naval scene of the terrain under the party (12 CoastalSea, 11 River, 5 UnderBridge, 2 OpenSea scenes), which the activation's
+    //          PostBuild check and the mismatch guard refuse. No installed Desert index names a naval scene and no Swamp index a River or
+    //          UnderBridge one, so desert coasts and banks and wetland banks borrow (desert: Steppe, then Plain; wetland: Plain).
+    // Cells around a port town's gate, centre or port (Robust; MMR-254, RT-24: only port settlements, GeneratedBattleTerrain) take, where
+    // installed, an index every naval-valid terrain resolves deterministically, since naval map events at a port (blockades, sally-outs) read
+    // the patch at the main party, which may stand on land there.
     // The pick among the preferred indices is a stable hash of the world and the cell's 16-cell block (blocks counted in canonical columns on
     // a periodic world, so a strip cell equals its canonical cell and a block boundary falls on the seam).
+    // MMR-283: the resolver works over the table the game loads, whatever scene packs add to it. CoverageLoss compares it with the catalogue's
+    // own table: a live table that still serves every geography the catalogue's does is absorbed (the battle map is rebuilt against it), one
+    // that loses any is refused before a world's navigation caches are built, naming the scenes and modules that changed.
     internal sealed class BattleTable
     {
-        public sealed class Row { public string Id; public bool Naval; public int Terrain; public int[] MapIndices; public string ForestDensity; public string[] TerrainTypes; }
+        public sealed class Row { public string Id, Module; public bool Naval; public int Terrain; public int[] MapIndices; public string ForestDensity; public string[] TerrainTypes; }
         public sealed class Expected { public string Scene, Rule; public bool Deterministic; public string[] Candidates; }
 
         private readonly Dictionary<int, List<Row>> land = new Dictionary<int, List<Row>>(), naval = new Dictionary<int, List<Row>>();
@@ -70,8 +80,44 @@ namespace MNBL.ProceduralWorld.Missions
 
         public static BattleTable FromCatalogue(MissionScenes m)
         {
-            return new BattleTable(m.Battle.Select(b => new Row { Id = b.Id, Naval = b.Naval, Terrain = m.TerrainIds[b.Terrain], MapIndices = b.MapIndices, ForestDensity = b.ForestDensity, TerrainTypes = b.TerrainTypes }),
+            return new BattleTable(m.Battle.Select(b => new Row { Id = b.Id, Module = b.Module, Naval = b.Naval, Terrain = m.TerrainIds[b.Terrain], MapIndices = b.MapIndices, ForestDensity = b.ForestDensity, TerrainTypes = b.TerrainTypes }),
                                    t => m.TerrainNames[t]);
+        }
+
+        // MMR-283: the table a campaign will load, read at the main menu as Campaign.InitializeScenes reads it (installed IL): every active
+        // module's ModuleData/sp_battle_scenes.xml, in active-module order (module id, file path), each SPBattleScenes child a row
+        // (map_indices comma separated, is_naval, terrain and forest_density by enum name, TerrainType children by name). A row naming a
+        // terrain the catalogue does not know is a problem (module, scene), and is left out.
+        public static BattleTable FromModuleFiles(IEnumerable<KeyValuePair<string, string>> files, MissionScenes m, List<KeyValuePair<string, string>> problems)
+        {
+            var rows = new List<Row>();
+            foreach (var file in files)
+            {
+                var doc = new System.Xml.XmlDocument { XmlResolver = null };
+                using (var reader = System.Xml.XmlReader.Create(file.Value, new System.Xml.XmlReaderSettings { DtdProcessing = System.Xml.DtdProcessing.Prohibit, XmlResolver = null })) doc.Load(reader);
+                if (doc.DocumentElement == null || doc.DocumentElement.Name != "SPBattleScenes") { problems.Add(new KeyValuePair<string, string>(file.Key, "its sp_battle_scenes.xml has no SPBattleScenes root")); continue; }
+                foreach (var e in doc.DocumentElement.ChildNodes.OfType<System.Xml.XmlElement>())
+                {
+                    int terrain;
+                    if (!m.TerrainIds.TryGetValue(e.GetAttribute("terrain"), out terrain)) { problems.Add(new KeyValuePair<string, string>(file.Key, e.GetAttribute("id") + " names the unknown terrain '" + e.GetAttribute("terrain") + "'")); continue; }
+                    int index; var indices = new List<int>();
+                    foreach (var part in e.GetAttribute("map_indices").Replace(" ", "").Split(','))
+                        if (part.Length > 0) { if (Int32.TryParse(part, NumberStyles.Integer, CultureInfo.InvariantCulture, out index)) indices.Add(index); else problems.Add(new KeyValuePair<string, string>(file.Key, e.GetAttribute("id") + " has the map index '" + part + "'")); }
+                    rows.Add(new Row { Id = e.GetAttribute("id"), Module = file.Key, Naval = String.Equals(e.GetAttribute("is_naval"), "true", StringComparison.OrdinalIgnoreCase), Terrain = terrain,
+                        MapIndices = indices.ToArray(), ForestDensity = e.HasAttribute("forest_density") ? e.GetAttribute("forest_density") : null,
+                        TerrainTypes = e.SelectNodes("descendant::TerrainType").OfType<System.Xml.XmlElement>().Select(t => t.GetAttribute("name")).ToArray() });
+                }
+            }
+            return new BattleTable(rows, t => m.TerrainNames[t]);
+        }
+
+        // MMR-283: the rows of this table that are not the other table's (new scenes, or a scene whose kind, terrain, indices, forest density or
+        // ground changed), and the other's rows this one lacks. Id, module.
+        public List<Row> ChangedFrom(BattleTable other)
+        {
+            Func<Row, string> text = r => r.Id + "|" + r.Naval + "|" + r.Terrain + "|" + (r.ForestDensity ?? "") + "|" + String.Join(",", (r.TerrainTypes ?? new string[0]).OrderBy(t => t, StringComparer.Ordinal)) + "|" + String.Join(",", (r.MapIndices ?? new int[0]).OrderBy(i => i));
+            var theirs = new HashSet<string>(other.Rows.Select(text), StringComparer.Ordinal);
+            return Rows.Where(r => !theirs.Contains(text(r))).ToList();
         }
 
         public IEnumerable<int> Indices { get { return land.Keys.Concat(naval.Keys).Distinct().Where(i => i >= 1 && i <= 255).OrderBy(i => i); } }
@@ -114,13 +160,53 @@ namespace MNBL.ProceduralWorld.Missions
         public Row NavalRow(int index, string scene) { List<Row> l; return naval.TryGetValue(index, out l) ? l.FirstOrDefault(r => r.Id == scene) : null; }
     }
 
+    // MMR-283: a loaded (or about to be loaded) battle table against the catalogue: absorbed when it serves every geography the catalogue's
+    // table serves (Lost empty), else refused before any navigation cache is built. Changed: its rows that are not the catalogue's (added or
+    // edited scenes, with their modules); Removed: the catalogue's rows it lacks. The setup screen, the activation, the loader and the map's
+    // AfterLoad run this one check.
+    internal sealed class BattleTableCheck
+    {
+        public GeneratedEncounterResolver Resolver;
+        public List<string> Lost = new List<string>();
+        public List<BattleTable.Row> Changed = new List<BattleTable.Row>(), Removed = new List<BattleTable.Row>();
+        public List<KeyValuePair<string, string>> FileProblems = new List<KeyValuePair<string, string>>();   // module, problem
+        public bool Ok { get { return Lost.Count == 0 && FileProblems.Count == 0; } }
+
+        public static BattleTableCheck Of(MissionScenes catalogue, BattleTable table, IEnumerable<KeyValuePair<string, string>> fileProblems = null)
+        {
+            var reference = BattleTable.FromCatalogue(catalogue);
+            var check = new BattleTableCheck { Resolver = new GeneratedEncounterResolver(catalogue, table) };
+            if (fileProblems != null) check.FileProblems.AddRange(fileProblems);
+            if (!check.Resolver.TableIsCatalogues) check.Lost = check.Resolver.CoverageLoss(new GeneratedEncounterResolver(catalogue, reference));
+            check.Changed = table.ChangedFrom(reference);
+            check.Removed = reference.ChangedFrom(table);
+            return check;
+        }
+
+        // The scene and module a refusal names: the first file problem's, else the first changed scene with a module, else the first removed one.
+        public KeyValuePair<string, string> Culprit()
+        {
+            if (FileProblems.Count > 0) return new KeyValuePair<string, string>(FileProblems[0].Value, FileProblems[0].Key);
+            var row = Changed.FirstOrDefault(r => r.Module != null) ?? Changed.FirstOrDefault() ?? Removed.FirstOrDefault();
+            return row == null ? new KeyValuePair<string, string>(null, null) : new KeyValuePair<string, string>(row.Id, Changed.Contains(row) ? row.Module : null);
+        }
+
+        public Dictionary<string, object> Record()
+        {
+            return new Dictionary<string, object> { ["ok"] = Ok, ["tableIsCatalogues"] = Resolver.TableIsCatalogues, ["sceneTableSha256"] = Resolver.Table.Sha256,
+                ["lost"] = Lost.Take(20).ToList(), ["lostCount"] = Lost.Count, ["changed"] = Changed.Select(r => r.Id + (r.Module == null ? "" : " (" + r.Module + ")")).Take(20).ToList(),
+                ["changedCount"] = Changed.Count, ["removed"] = Removed.Select(r => r.Id).Take(20).ToList(), ["fileProblems"] = FileProblems.Select(p => p.Key + ": " + p.Value).ToList() };
+        }
+    }
+
     // One battle-map cell's samples: the terrain of each land-valid, naval-valid and blocked face found (centre first), the biome and landform at
-    // its centre (null without them), and whether it lies at a settlement's gate or port (Robust).
+    // its centre (null without them), and whether it lies at a settlement's gate or port (Robust). ClassOverride (MMR-283's patch hook) names
+    // the cell's scene class outright, ahead of its biome and face terrain: a live mutation cell's class (faceClass of its remapped type, MMR-260).
     internal sealed class CellSamples
     {
         public readonly List<int> Land = new List<int>(), Sea = new List<int>(), Blocked = new List<int>();
         public int? CentreLand, CentreBlocked;
-        public string Biome, Landform;
+        public string Biome, Landform, ClassOverride;
         public bool Robust;
     }
 
@@ -147,12 +233,11 @@ namespace MNBL.ProceduralWorld.Missions
         private readonly int coastal;
         private const string PreferredSeaTier = "class land + own sea";
 
-        // table: the battle table the game has loaded (in game, from GameSceneDataManager); it must be the catalogue's, inventory included.
+        // table: the battle table the game loads (in game, from GameSceneDataManager; at the main menu, the active modules' files). MMR-283: any
+        // table is taken (scene packs add scenes); CoverageLoss says whether it still serves every geography the catalogue's table does.
         public GeneratedEncounterResolver(MissionScenes catalogue, BattleTable table)
         {
             Catalogue = catalogue; Table = table;
-            if (table.Sha256 != catalogue.TableSha256) throw new InvalidOperationException("The loaded battle scene table (" + table.Sha256 + ") is not the catalogue's (" + catalogue.TableSha256 + "): refusing to select scenes from another table.");
-            if (table.InventorySha256 != catalogue.InventorySha256) throw new InvalidOperationException("The loaded battle scenes' forest density or ground (" + table.InventorySha256 + ") differ from the catalogue's (" + catalogue.InventorySha256 + ").");
             indices = table.Indices.ToList();
             coastal = catalogue.TerrainIds["CoastalSea"];
             navalTerrains = catalogue.NavalTerrains.Select(t => catalogue.TerrainIds[t]).ToArray();
@@ -164,15 +249,9 @@ namespace MNBL.ProceduralWorld.Missions
                 var all = ofTerrain(c.Terrain);
                 List<int> preferred;
                 if (c.ForestDensity != null)
-                {
-                    // Forest density in priority order: the first value any of the terrain's scenes has (High before Low).
-                    preferred = new List<int>();
-                    foreach (var density in c.ForestDensity)
-                    {
-                        preferred = all.Where(i => String.Equals(scene(i).ForestDensity, density, StringComparison.OrdinalIgnoreCase)).ToList();
-                        if (preferred.Count > 0) break;
-                    }
-                }
+                    // MMR-254 (RT-25): every listed forest density (woodland: High and Low), so forest battles away from water are not one or
+                    // two maps.
+                    preferred = all.Where(i => c.ForestDensity.Any(d => String.Equals(scene(i).ForestDensity, d, StringComparison.OrdinalIgnoreCase))).ToList();
                 else if (c.TerrainTypes != null) preferred = all.Where(i => (scene(i).TerrainTypes ?? new string[0]).Any(x => c.TerrainTypes.Contains(x, StringComparer.Ordinal))).ToList();
                 else preferred = all;
                 landByClass[c.Name] = all; preferredByClass[c.Name] = preferred;
@@ -185,9 +264,46 @@ namespace MNBL.ProceduralWorld.Missions
         public List<int> LandCandidates(string cls, bool preferred) { return (preferred ? preferredByClass : landByClass)[cls]; }
         public IEnumerable<int> RobustIndices { get { return robust.OrderBy(i => i); } }
 
+        public bool TableIsCatalogues { get { return Table.Sha256 == Catalogue.TableSha256 && Table.InventorySha256 == Catalogue.InventorySha256; } }
+
+        // MMR-283: every cell kind a party can stand in (each scene class, with land or without, alone or with each sea terrain and each pair
+        // of them, at a settlement or not) that the reference resolver (the catalogue's own table) resolves deterministically and this one
+        // does not. Empty when this table serves every geography the catalogue's does; a scene pack that only adds scenes is then absorbed.
+        public List<string> CoverageLoss(GeneratedEncounterResolver reference)
+        {
+            var lost = new List<string>();
+            var sea = Catalogue.NavalTerrains.Select(t => Catalogue.TerrainIds[t]).OrderBy(t => t).ToList();
+            var sets = new List<List<int>> { new List<int>() };
+            for (int i = 0; i < sea.Count; i++) { sets.Add(new List<int> { sea[i] }); for (int j = i + 1; j < sea.Count; j++) sets.Add(new List<int> { sea[i], sea[j] }); }
+            foreach (var cls in Catalogue.Classes.Keys.OrderBy(k => k, StringComparer.Ordinal))
+                foreach (var set in sets)
+                    foreach (bool hasLand in new[] { true, false })
+                    {
+                        if (!hasLand && set.Count == 0) continue;
+                        foreach (bool settlement in new[] { false, true })
+                            if (reference.Resolves(cls, hasLand, set, settlement) && !Resolves(cls, hasLand, set, settlement))
+                                lost.Add(cls + (hasLand ? " land" : "") + (set.Count > 0 ? " + " + String.Join("/", set.Select(Name)) : "") + (settlement ? " at a settlement" : ""));
+                    }
+            return lost;
+        }
+
+        private bool Resolves(string cls, bool hasLand, List<int> sea, bool settlement)
+        {
+            var s = new CellSamples { ClassOverride = cls, Robust = settlement };
+            if (hasLand) { int t = Catalogue.TerrainIds[Catalogue.Classes[cls].Terrain]; s.Land.Add(t); s.CentreLand = t; }
+            s.Sea.AddRange(sea);
+            try
+            {
+                var c = Choose(s, "mnbl_coverage", 0, 0);
+                return (!hasLand || c.LandScene != null) && sea.All(t => c.Naval[t] != null) && (!settlement || c.Robust);
+            }
+            catch (Exception error) when (error is InvalidOperationException || error is DivideByZeroException || error is KeyNotFoundException) { return false; }
+        }
+
         public string ClassOf(CellSamples s)
         {
             string cls;
+            if (s.ClassOverride != null && Catalogue.Classes.ContainsKey(s.ClassOverride)) return s.ClassOverride;
             if (s.Biome != null && Catalogue.BiomeClass.TryGetValue(s.Biome, out cls)) return cls;
             int? t = s.CentreLand ?? (s.Land.Count > 0 ? (int?)s.Land[0] : null) ?? s.CentreBlocked ?? (s.Blocked.Count > 0 ? (int?)s.Blocked[0] : null);
             string name;
@@ -268,9 +384,14 @@ namespace MNBL.ProceduralWorld.Missions
             var tiers = new List<KeyValuePair<string, Func<int, bool>>> {
                 new KeyValuePair<string, Func<int, bool>>(PreferredSeaTier, i => classPreferred.Contains(i) && exactSea(i) && coastalSubstitute(i)),
                 new KeyValuePair<string, Func<int, bool>>("class terrain land + own sea", i => classAll.Contains(i) && exactSea(i) && coastalSubstitute(i)) };
-            foreach (var f in fallbackByClass[cls]) { var set = new HashSet<int>(f.Value); tiers.Add(new KeyValuePair<string, Func<int, bool>>("fallback " + f.Key + " land + own sea", i => set.Contains(i) && exactSea(i) && coastalSubstitute(i))); }
-            tiers.Add(new KeyValuePair<string, Func<int, bool>>("any land + own sea", i => Table.UniqueLand(i) != null && exactSea(i) && coastalSubstitute(i)));
-            tiers.Add(new KeyValuePair<string, Func<int, bool>>("class terrain land + any deterministic sea", i => classAll.Contains(i) && anySea(i)));
+            var borrowed = new List<KeyValuePair<string, Func<int, bool>>>();
+            foreach (var f in fallbackByClass[cls]) { var set = new HashSet<int>(f.Value); borrowed.Add(new KeyValuePair<string, Func<int, bool>>("fallback " + f.Key + " land + own sea", i => set.Contains(i) && exactSea(i) && coastalSubstitute(i))); }
+            borrowed.Add(new KeyValuePair<string, Func<int, bool>>("any land + own sea", i => Table.UniqueLand(i) != null && exactSea(i) && coastalSubstitute(i)));
+            var classLand = new KeyValuePair<string, Func<int, bool>>("class terrain land + any deterministic sea", i => classAll.Contains(i) && anySea(i));
+            // MMR-254 (RT-24): a cell with land keeps its class's land scene before it borrows another terrain's: the class's indices with any
+            // deterministic sea come before the borrowed own-sea tiers.
+            if (hasLand) { tiers.Add(classLand); tiers.AddRange(borrowed); }
+            else { tiers.AddRange(borrowed); tiers.Add(classLand); }
             foreach (var f in fallbackByClass[cls]) { var set = new HashSet<int>(f.Value); tiers.Add(new KeyValuePair<string, Func<int, bool>>("fallback " + f.Key + " land + any deterministic sea", i => set.Contains(i) && anySea(i))); }
             tiers.Add(new KeyValuePair<string, Func<int, bool>>("any land + any deterministic sea", i => Table.UniqueLand(i) != null && anySea(i)));
             if (!hasLand) tiers.Add(new KeyValuePair<string, Func<int, bool>>("naval only (no land sampled)", anySea));
@@ -337,12 +458,77 @@ namespace MNBL.ProceduralWorld.Missions
             map.Sha256 = MissionScenes.Sha(map.Bytes);
             return map;
         }
+
+        // MMR-283: what one world's battle map is made from, so later tickets add to it rather than rewrite it: the cells a settlement's ring
+        // covers (MMR-254: port settlements only, filled by GeneratedBattleTerrain.Install), and patches applied in order to a cell's samples
+        // before its choice (MMR-260's mutation cells through CellSamples.ClassOverride; MMR-254's woodland is the resolver's own preference). Keys and patches are in canonical cells, so whatever a patch
+        // changes reaches every strip image of the cell.
+        public sealed class MapRequest
+        {
+            public int Width { get; set; } public int Height { get; set; } public int OriginCell { get; set; } public int PeriodCells { get; set; }
+            public bool Periodic { get; set; } public string WorldId { get; set; }
+            public Func<int, int, CellSamples> Sample { get; set; }   // the samples of physical column cx (canonical on a periodic world), row y
+            public readonly HashSet<long> SettlementCells = new HashSet<long>();
+            public readonly List<Action<int, int, CellSamples>> Patches = new List<Action<int, int, CellSamples>>();
+            public static long Key(int lx, int y) { return (long)y * 1000003 + lx; }
+        }
+
+        // The battle map of a request against this resolver's table (the loaded one): every cell sampled, ringed and patched, then chosen.
+        public Map Rebuild(MapRequest q)
+        {
+            return Build(q.Width, q.Height, q.OriginCell, q.PeriodCells, q.Periodic, q.WorldId, (cx, y) => Cell(q, cx, y));
+        }
+
+        // Chooses the given canonical cells again (a cell whose patch changed) and writes every physical image of each: the canonical column
+        // and, on a periodic world, each strip copy. Returns the images written. The map's census counters are left as built.
+        public int RebuildCells(Map map, MapRequest q, IEnumerable<long> keys)
+        {
+            int written = 0;
+            foreach (long key in keys.Distinct())
+            {
+                int y = (int)(key / 1000003), lx = (int)(key % 1000003);
+                if (y < 0 || y >= map.Height || lx < 0 || lx >= (q.Periodic ? q.PeriodCells : map.Width)) throw new ArgumentOutOfRangeException("keys", "cell " + lx + "," + y + " is not on the map");
+                var c = Choose(Cell(q, q.Periodic ? q.OriginCell + lx : lx, y), q.WorldId, lx / Catalogue.BlockSize, y / Catalogue.BlockSize);
+                map.Choices[key] = c;
+                for (int x = 0; x < map.Width; x++)
+                {
+                    if ((q.Periodic ? CanonicalColumn(x, q.OriginCell, q.PeriodCells) : x) != lx) continue;
+                    int at = 2 * (y * map.Width + x);
+                    map.Bytes[at] = (byte)c.Index;
+                    map.Bytes[at + 1] = (byte)((lx % Catalogue.BlockSize) | ((y % Catalogue.BlockSize) << 4));
+                    written++;
+                }
+            }
+            map.Sha256 = MissionScenes.Sha(map.Bytes);
+            return written;
+        }
+
+        private static CellSamples Cell(MapRequest q, int cx, int y)
+        {
+            var s = q.Sample(cx, y);
+            int lx = q.Periodic ? cx - q.OriginCell : cx;
+            s.Robust = q.SettlementCells.Contains(MapRequest.Key(lx, y));
+            foreach (var patch in q.Patches) patch(lx, y, s);
+            return s;
+        }
+
+        // MMR-283: a battle map install that never throws (GeneratedMapScene.AfterLoad is an engine callback: an exception escaping it ends or
+        // hangs the game). The install's report, or a failed one with the error, traced.
+        public static Dictionary<string, object> Guarded(Func<Dictionary<string, object>> install, Action<string> trace)
+        {
+            try { return install(); }
+            catch (Exception error)
+            {
+                try { trace("generated_battle_terrain_failed:" + error.ToString().Replace("\r", "").Replace("\n", " | ")); } catch (Exception) { }
+                return new Dictionary<string, object> { ["status"] = "failed", ["error"] = error.GetType().Name + ": " + error.Message };
+            }
+        }
         private static void Count(IDictionary<string, int> d, string key) { int n; d.TryGetValue(key ?? "", out n); d[key ?? ""] = n + 1; }
 
         public Dictionary<string, object> Record(Map map)
         {
             return new Dictionary<string, object> {
-                ["catalogueSha256"] = Catalogue.Sha256, ["sceneTableSha256"] = Table.Sha256, ["inventorySha256"] = Table.InventorySha256, ["width"] = map.Width, ["height"] = map.Height, ["sha256"] = map.Sha256,
+                ["catalogueSha256"] = Catalogue.Sha256, ["sceneTableSha256"] = Table.Sha256, ["inventorySha256"] = Table.InventorySha256, ["tableIsCatalogues"] = TableIsCatalogues, ["width"] = map.Width, ["height"] = map.Height, ["sha256"] = map.Sha256,
                 ["cellsByGeography"] = map.Keys, ["cellsByClass"] = map.Classes, ["cellsByTier"] = map.Tiers, ["cellsByBiome"] = map.Biomes, ["cellsByLandform"] = map.Landforms, ["scenesByCells"] = map.Scenes,
                 ["seaTouchingCells"] = map.SeaTouching, ["unreachableCells"] = map.Unreachable, ["cellsWithoutFaces"] = map.NoFace, ["preferredCells"] = map.Preferred, ["reliefCells"] = map.Relief,
                 ["settlementCells"] = map.RobustCells, ["settlementCellsRobust"] = map.Robust, ["robustIndices"] = robust.Count,

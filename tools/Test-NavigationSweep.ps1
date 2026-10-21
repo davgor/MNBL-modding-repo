@@ -18,7 +18,7 @@ $csc = 'C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/MSBuild/C
 $sources = @('src/MNBL.ProceduralWorld/World/RuntimeNavigationBuilder.cs', 'src/MNBL.ProceduralWorld/World/NavigationValidator.cs', 'src/MNBL.ProceduralWorld/World/NavigationFixtures.cs',
     'src/MNBL.ProceduralWorld/World/WorldSurface.cs', 'src/MNBL.ProceduralWorld/World/WorldLifetime.cs', 'src/MNBL.ProceduralWorld/World/PeriodicWorldCoordinates.cs', 'src/MNBL.ProceduralWorld/World/PeriodicDistanceModel.cs',
     'src/MNBL.ProceduralWorld/CampaignBootstrap/WorldDataBundle.cs', 'src/MNBL.ProceduralWorld/World/RuntimePlayabilityValidator.cs', 'src/MNBL.ProceduralWorld/World/NavigationCacheKey.cs',
-    'src/MNBL.ProceduralWorld/Persistence/DurableFile.cs', 'src/MNBL.ProceduralWorld/World/SettlementPositionResolver.cs', 'src/MNBL.ProceduralWorld/World/SettlementEntityFactory.cs',
+    'src/MNBL.ProceduralWorld/Persistence/DurableFile.cs', 'src/MNBL.ProceduralWorld/World/SettlementPositionResolver.cs', 'src/MNBL.ProceduralWorld/World/SettlementEntityFactory.cs','src/MNBL.ProceduralWorld/World/SettlementLooks.cs','src/MNBL.ProceduralWorld/World/SettlementEntityRules.cs','src/MNBL.ProceduralWorld/World/Map2Policies.cs',
     'src/MNBL.ProceduralWorld/Campaign/CampaignIdentity.cs', 'src/MNBL.ProceduralWorld/Campaign/FactionFactory.cs', 'src/MNBL.ProceduralWorld/Campaign/CharacterTemplateResolver.cs',
     'src/MNBL.ProceduralWorld/Campaign/HeroFactory.cs', 'src/MNBL.ProceduralWorld/Campaign/SettlementFactory.cs', 'src/MNBL.ProceduralWorld/Campaign/VillageBinding.cs',
     'src/MNBL.ProceduralWorld/Missions/MissionScenes.cs', 'src/MNBL.ProceduralWorld/Campaign/RegistrationPlan.cs', 'tests/World/NavigationSweep.cs')

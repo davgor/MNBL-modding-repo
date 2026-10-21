@@ -40,7 +40,7 @@ internal static class CompatibilityTests
     private static Dictionary<string, string> Build(string game = "v1.4.8.119303", string naval = "v1.2.8.119303", string producer = "000000000000")
     {
         return new Dictionary<string, string> { ["contract"] = SaveBindingContract.Contract, ["module"] = "v0.0.1.0", ["moduleAssemblySha256"] = new string('a', 64), ["game"] = game, ["naval"] = naval,
-            ["backend"] = "mnbl.runtime-world-backend/R07; producerLock " + producer, ["navigationCache"] = "mnbl.navigation-cache-key/1; adapter mmr41/1", ["saveIds"] = "7910000/v1", ["worldIdentity"] = WorldBinding.IdentitySchema };
+            ["backend"] = "mnbl.runtime-world-backend/R07; producerLock " + producer, ["navigationCache"] = "mnbl.navigation-cache-key/1; adapter mmr41/1", ["saveIds"] = "7910000/v2", ["worldIdentity"] = WorldBinding.IdentitySchema };
     }
 
     private static readonly string Instance = new string('c', 32), Content = new string('b', 64), Manifest = new string('a', 64);
@@ -102,13 +102,23 @@ internal static class CompatibilityTests
         var noDlcLoader = LoadPolicy.Compatibility(Build(), Build(naval: "absent"), null);
         Check(Refused(noDlc, LoadPolicy.IncompatibleBuild, "War Sails v1.2.8.119303, which is not installed") && noDlcLoader != null && noDlcLoader.Detail.Contains("which is not installed"),
             "missing DLC: a War Sails save on a game without War Sails is refused (incompatible-build) saying so, by the policy and the loader alike");
-        Check(Refused(Decide(f => f.SavedBuild["naval"] = "v1.3.0.120000"), LoadPolicy.IncompatibleBuild, "naval: saved v1.3.0.120000"), "unsupported: a save needing a War Sails version that is not installed");
+        Check(Refused(Decide(f => f.SavedBuild["naval"] = "v1.2.7.0"), LoadPolicy.IncompatibleBuild, "naval: saved v1.2.7.0, below the minimum"), "unsupported: a save of a War Sails build below the minimum (MMR-284)");
+        // MMR-284: no maximum. An older build at or above the minimum and builds newer than any known at release are verified, not refused.
+        var newer = Decide(f => { f.SavedBuild["naval"] = "v1.3.0.120000"; f.RunningBuild["game"] = "v1.5.0.150000"; f.RunningBuild["naval"] = "v1.3.0.120000"; });
+        var older = Decide(f => f.SavedBuild["game"] = "v1.4.8.100000");
+        Check(newer.Class == WorldCompatibilityPolicy.Supported && newer.Rows.Any(r => r.Component == "build game" && r.Verdict == WorldCompatibilityPolicy.Verified && r.Detail.Contains("supported build"))
+              && older.Class == WorldCompatibilityPolicy.Supported && older.Rows.Any(r => r.Component == "build game" && r.Verdict == WorldCompatibilityPolicy.Verified),
+            "supported: a save of an older build at or above the minimum, and a game and War Sails newer than any known at release (verified at load: the catalog and the patch signatures)");
+        var below = Decide(f => f.SavedBuild["game"] = "v1.4.7.118000");
+        var belowLoader = LoadPolicy.Compatibility(new Dictionary<string, string>(Facts().SavedBuild) { ["game"] = "v1.4.7.118000" }, Build(), null);
+        Check(Refused(below, LoadPolicy.IncompatibleBuild, "below the minimum") && belowLoader != null && belowLoader.Text.StartsWith("{=mnbl_load_build_saved_old}", StringComparison.Ordinal),
+            "unsupported: a save of a game build below the minimum, by the policy and the loader alike (the loader's message localizable)");
         Check(Refused(Decide(f => f.PackagePresent = false), LoadPolicy.MissingWorld), "unsupported: no world package (missing-world)");
         Check(Refused(Decide(f => f.PackageProblems = new List<string> { "world.json does not hash to the binding's manifest hash" }), LoadPolicy.DamagedWorld, "does not hash"), "unsupported: a package whose hash is not the binding's (damaged-world)");
         var noBundle = Decide(f => f.BundlePresent = false);
         Check(Refused(noBundle, LoadPolicy.MissingWorld, "never regenerated from its seed") && noBundle.Refusal.Detail.Contains("not a cache miss"),
             "unsupported: a missing data bundle is a missing world, not a cache miss, and the world is never regenerated from its seed");
-        Check(Refused(Decide(f => f.BundleProblems = new List<string> { "built for Bannerlord v1.4.7.1, installed v1.4.8.119303" }), LoadPolicy.IncompatibleBuild), "unsupported: a bundle built for another game version (incompatible-build)");
+        Check(Refused(Decide(f => f.BundleProblems = new List<string> { "built for Bannerlord v1.4.7.1, below the minimum v1.4.8 this MNBL release supports" }), LoadPolicy.IncompatibleBuild), "unsupported: a bundle built for a game below the minimum (incompatible-build)");
         Check(Refused(Decide(f => f.BundleProblems = new List<string> { "compiled/terrain/heightfield.bin does not have its listed hash" }), LoadPolicy.DamagedWorld), "unsupported: a bundle whose bytes changed (damaged-world)");
         Check(Refused(Decide(f => f.BundleProblems = new List<string> { "missing bundle " + Content }), LoadPolicy.MissingWorld), "unsupported: OpenForSave's missing bundle is missing (MMR-49 run 11568)");
         Check(Refused(Decide(f => f.Header = "unknown"), LoadPolicy.Unavailable) && Refused(Decide(f => f.Header = "torn"), LoadPolicy.DamagedSave) && Refused(Decide(f => f.Header = "absent"), LoadPolicy.DamagedSave),
@@ -117,7 +127,7 @@ internal static class CompatibilityTests
               && Refused(Decide(f => f.Binding.Instance = "not-an-instance"), LoadPolicy.DamagedSave) && Refused(Decide(f => { f.Generated = false; f.Binding = null; }), LoadPolicy.NotGenerated),
             "unsupported: a malformed binding, torn game data or an invalid campaign instance (damaged-save); no binding (not-generated)");
         Check(Refused(Decide(f => { f.SavedBuild["game"] = "v1.4.7.1"; f.BundlePresent = false; }), LoadPolicy.IncompatibleBuild),
-            "precedence: the build is checked before the world, as the loader does (another game version with a missing bundle refuses as incompatible-build)");
+            "precedence: the build is checked before the world, as the loader does (a game below the minimum with a missing bundle refuses as incompatible-build)");
         Check(Refused(Decide(f => { f.SavedBuild["game"] = "v1.4.7.1"; f.Binding.Instance = null; }), LoadPolicy.IncompatibleBuild),
             "precedence: the build is checked before the campaign instance, as the loader does (review m1)");
         Check(Refused(Decide(f => f.BodyWhole = null), LoadPolicy.Unavailable), "unsupported: game data another program holds is not damage (save-unavailable), as the loader decides (review M4)");
@@ -132,7 +142,7 @@ internal static class CompatibilityTests
         var legacyLoader = LoadPolicy.LegacyCompatibility(new Dictionary<string, string> { ["game"] = "v1.4.7.1", ["naval"] = "v1.2.8.119303" }, Build(), null);
         Check(legacy("v1.4.8.119303", "v1.2.8.119303").Class == WorldCompatibilityPolicy.Supported && Refused(legacy("v1.4.7.1", "v1.2.8.119303"), LoadPolicy.IncompatibleBuild, "from the header")
               && legacyLoader != null && legacyLoader.Code == LoadPolicy.IncompatibleBuild && LoadPolicy.LegacyCompatibility(new Dictionary<string, string> { ["game"] = "v1.4.8.119303", ["naval"] = "v1.2.8.119303" }, Build(), null) == null,
-            "a save made before MMR-48: its header's game version is compared (supported when equal, incompatible-build otherwise), by the policy and the loader alike (review m6)");
+            "a save made before MMR-48: its header's game version is checked against the minimum (supported at or above it, incompatible-build below), by the policy and the loader alike (review m6)");
         Check(Refused(Decide(f => { f.SavedBuild = new Dictionary<string, string>(); f.LegacyBuild = new Dictionary<string, string> { ["game"] = "v1.4.8.119303", ["naval"] = "v1.2.8.119303" }; f.RunningBuild["naval"] = "absent"; }), LoadPolicy.IncompatibleBuild, "which is not installed")
               && LoadPolicy.LegacyBuild(new Dictionary<string, string> { ["ApplicationVersion"] = "v1.4.8.119303" })["naval"] == "absent",
             "a save made before MMR-48 with War Sails, on a game without it: refused saying War Sails is not installed; a header without Module_NavalDLC was made without it");
@@ -198,6 +208,18 @@ internal static class CompatibilityTests
         var d2 = decide();
         Check(d2.Class == WorldCompatibilityPolicy.Rebuildable && Row(d2, "scene") == WorldCompatibilityPolicy.Rebuild && Row(d2, "report navigation.json") == WorldCompatibilityPolicy.Rebuild,
             "from files: the scene and reports swept, the activation's copies kept: rebuildable (re-encoded, restored)");
+        // MMR-282: the scene gone from the module (a module update) with its copy in the per-user scene archive.
+        string archived = Path.Combine(store, "world-scenes", scene);
+        Directory.CreateDirectory(archived);
+        foreach (var f in sceneFiles) File.WriteAllBytes(Path.Combine(archived, f.Key), f.Value);
+        var d3 = decide();
+        var sceneRow = d3.Rows.First(r => r.Component == "scene");
+        Check(d3.Class == WorldCompatibilityPolicy.Rebuildable && sceneRow.Verdict == WorldCompatibilityPolicy.Rebuild && !sceneRow.Conditional && sceneRow.Detail.Contains("scene archive")
+              && !d3.Rows.First(r => r.Component == "report settlement-layout.json").Detail.Contains("re-derived"),
+            "from files (MMR-282): a scene gone from the module whose archived copy is the package's: rebuildable without the encoder (copied back at load, the layout not re-derived)");
+        File.WriteAllBytes(Path.Combine(archived, "terrain.bin"), new byte[] { 9 });
+        Check(decide().Rows.First(r => r.Component == "scene").Detail.Contains("re-encoded"), "from files (MMR-282): an archived copy that is not the package's is not used (the scene is re-encoded instead)");
+        Directory.Delete(archived, true);
         File.Delete(WorldSaveTransfer.EvidencePath(store, Instance, "navigation.json"));
         Check(Refused(decide(), LoadPolicy.NotRebuildable, "navigation.json"), "from files: swept and the navigation report not kept: unsupported (not-rebuildable)");
         File.AppendAllText(Path.Combine(package, "placement.json"), " ");
@@ -232,8 +254,11 @@ internal static class CompatibilityTests
             var same = WorldCompatibilityPolicy.Evaluate(f);
             Check(binding != null && same.Class == WorldCompatibilityPolicy.Supported, "previous save " + name + ": readable by this build, supported (" + (saved.Count == 0 ? "no build keys: verified at load" : "its build keys") + ")");
             var f2 = Facts(); f2.Binding = binding; f2.SavedBuild = saved; f2.LegacyBuild = LoadPolicy.LegacyBuild(metadata);
-            f2.RunningBuild = saved.Count > 0 ? new Dictionary<string, string>(saved) : Build(); f2.RunningBuild["game"] = "v1.4.9.999999";
-            Check(Refused(WorldCompatibilityPolicy.Evaluate(f2), LoadPolicy.IncompatibleBuild), "previous save " + name + ": refused by a build for another game version" + (saved.Count == 0 ? " (compared from its header)" : ""));
+            f2.RunningBuild = saved.Count > 0 ? new Dictionary<string, string>(saved) : Build(); f2.RunningBuild["game"] = "v1.4.7.1";
+            Check(Refused(WorldCompatibilityPolicy.Evaluate(f2), LoadPolicy.IncompatibleBuild), "previous save " + name + ": refused on a game below the minimum" + (saved.Count == 0 ? " (compared from its header)" : ""));
+            var f3 = Facts(); f3.Binding = binding; f3.SavedBuild = saved; f3.LegacyBuild = LoadPolicy.LegacyBuild(metadata);
+            f3.RunningBuild = saved.Count > 0 ? new Dictionary<string, string>(saved) : Build(); f3.RunningBuild["game"] = "v1.4.9.999999";
+            Check(WorldCompatibilityPolicy.Evaluate(f3).Class == WorldCompatibilityPolicy.Supported, "previous save " + name + ": supported on a newer game (MMR-284: no maximum; verified at load)");
         }
     }
 
@@ -254,11 +279,11 @@ internal static class CompatibilityTests
         {
             string root = Path.GetDirectoryName(Path.GetFullPath(bundleDir).TrimEnd(Path.DirectorySeparatorChar)), id = Path.GetFileName(Path.GetFullPath(bundleDir).TrimEnd(Path.DirectorySeparatorChar));
             WorldDataBundle.OpenForSave(root, new Dictionary<string, string> { ["schema"] = WorldDataBundle.SaveIdentitySchema, ["worldContentId"] = id },
-                new WorldDataBundle.HostProfile("v1.4.9.999999", "v1.2.8.119303", new[] { "R01", "R02", "R03", "R04", "R05", "R06", "R07", "R08", "R09", "R10" }));
+                new WorldDataBundle.HostProfile("v1.4.7.1", "v1.2.8.119303", WorldDataBundle.HostCapabilities));
         }
         catch (WorldDataBundle.RejectedException error) { message = error.Message; }
         Check(message != null && message.Contains("built for") && message.Contains("there is no migration") && !offers.IsMatch(message),
-            "c3: a real bundle built for another game version is refused saying there is no migration (no tool offered)");
+            "c3: a real bundle on a game below the minimum is refused saying there is no migration (no tool offered)");
     }
 
     // ---- helpers

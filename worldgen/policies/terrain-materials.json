@@ -1,22 +1,73 @@
 {
   "schema": "mnbl.terrain-materials",
-  "version": 1,
-  "channels": ["grass", "rock_k"],
+  "version": 2,
   "biomes": [
-    {"id": 0, "core": "ocean", "rock": 200, "note": "sea floor below the datum: rocky bed"},
-    {"id": 1, "core": "tundra", "rock": 60},
-    {"id": 2, "core": "desert", "rock": 110, "note": "no sand material in the proven template; partial rock stands in"},
-    {"id": 3, "core": "grassland", "rock": 0},
-    {"id": 4, "core": "forest", "rock": 0},
-    {"id": 5, "core": "exposed_rock", "rock": 255},
-    {"id": 6, "core": "snow", "rock": 40, "note": "no snow material in the proven template; winter snow physics comes from the template's grass layer"},
-    {"id": 7, "core": "rainforest", "rock": 0},
-    {"id": 8, "core": "lake", "rock": 120, "note": "lake bed"},
-    {"id": 13, "core": "marsh", "rock": 0},
-    {"id": 15, "core": "boreal_forest", "rock": 20},
-    {"id": 16, "core": "cold_tundra", "rock": 90},
-    {"id": 17, "core": "land_ice", "rock": 140, "note": "no ice material in the proven template"}
+    {"id": 0, "core": "ocean", "water": true, "terrainType": null, "layers": {"riverbed": 0.5, "sand": 0.5}, "battleClass": "open", "colourGrade": null, "snow": "seasonal", "note": "sea floor below the datum: rocky bed; no face (sea cells take their naval group)"},
+    {"id": 1, "core": "tundra", "water": false, "terrainType": "Snow", "layers": {"cold_steppe": 0.5, "tundra_moss": 0.5}, "battleClass": "cold", "colourGrade": 120, "snow": "seasonal", "note": "tombstoned label, never generated"},
+    {"id": 2, "core": "desert", "water": false, "terrainType": "Desert", "layers": {"sand": 0.6, "arid_soil": 0.4}, "battleClass": "desert", "colourGrade": 20, "snow": "seasonal"},
+    {"id": 3, "core": "grassland", "water": false, "terrainType": "Plain", "layers": {"grass": 0.7, "steppe": 0.3}, "battleClass": "open", "colourGrade": 40, "colourGradeWet": 60, "snow": "seasonal", "note": "moisture splits grass (wet) from steppe (dry), rules.moisture"},
+    {"id": 4, "core": "forest", "water": false, "terrainType": "Forest", "layers": {"forest_floor": 0.8, "grass": 0.2}, "battleClass": "woodland", "colourGrade": 60, "snow": "seasonal"},
+    {"id": 5, "core": "exposed_rock", "water": false, "terrainType": "Steppe", "layers": {"mountain_rock": 0.6, "rock": 0.25, "cold_steppe": 0.15}, "battleClass": "rock", "colourGrade": 80, "snow": "seasonal", "note": "open and dry: Steppe keeps Pathfinder and WaterDiviner"},
+    {"id": 6, "core": "snow", "water": false, "terrainType": "Snow", "layers": {"permanent_snow": 1.0}, "battleClass": "cold", "colourGrade": 120, "snow": "permanent", "note": "tombstoned label, never generated"},
+    {"id": 7, "core": "rainforest", "water": false, "terrainType": "Forest", "layers": {"rainforest_floor": 0.8, "mud": 0.2}, "battleClass": "woodland", "colourGrade": 140, "snow": "seasonal"},
+    {"id": 8, "core": "lake", "water": true, "terrainType": null, "layers": {"riverbed": 0.7, "mud": 0.3}, "battleClass": "open", "colourGrade": null, "snow": "seasonal", "note": "lake bed; no face (lake cells take the Lake group)"},
+    {"id": 13, "core": "marsh", "water": false, "terrainType": "Swamp", "layers": {"mud": 0.7, "grass": 0.3}, "battleClass": "wetland", "colourGrade": 100, "snow": "seasonal"},
+    {"id": 15, "core": "boreal_forest", "water": false, "terrainType": "Forest", "layers": {"forest_floor": 0.6, "tundra_moss": 0.4}, "battleClass": "woodland", "colourGrade": 120, "snow": "seasonal"},
+    {"id": 16, "core": "cold_tundra", "water": false, "terrainType": "Steppe", "layers": {"cold_steppe": 0.5, "tundra_moss": 0.5}, "battleClass": "cold", "colourGrade": 120, "snow": "seasonal", "note": "Snow face and permanent snow only where permanentWhite holds (12 snow months)"},
+    {"id": 17, "core": "land_ice", "water": false, "terrainType": "Snow", "layers": {"permanent_snow": 1.0}, "battleClass": "cold", "colourGrade": 120, "snow": "permanent"}
   ],
+  "layerSet": [
+    {"slot": 0, "name": "grass", "diffuse": "ground_grass_b_d", "normal": "ground_grass_b_n", "specular": "ground_grass_b_s", "height": "ground_grass_b_h", "scale": 15, "tint": {"mode": 0, "colour": [1, 1, 1]}, "physics": "grass", "optional": false, "use": "base, full weight everywhere; flora stripped"},
+    {"slot": 1, "name": "steppe", "diffuse": "ground_drygrass_a_d", "normal": "ground_drygrass_a_n", "specular": "ground_drygrass_a_s", "height": "ground_drygrass_a_h", "scale": 15, "tint": {"mode": 0, "colour": [1, 1, 1]}, "physics": "grass", "optional": false, "use": "dry grassland"},
+    {"slot": 2, "name": "cold_steppe", "diffuse": "ground_drygrass_b_d", "normal": "ground_drygrass_b_n", "specular": "ground_drygrass_b_s", "height": "ground_drygrass_b_h", "scale": 15, "tint": {"mode": 0, "colour": [1, 1, 1]}, "physics": "grass", "optional": false, "use": "cold tundra, exposed-rock skirts"},
+    {"slot": 3, "name": "tundra_moss", "diffuse": "ground_nord_grass_a_d", "normal": "ground_nord_grass_a_n", "specular": "ground_nord_grass_a_s", "height": "ground_nord_grass_a_h", "scale": 15, "tint": {"mode": 0, "colour": [1, 1, 1]}, "physics": "grass", "optional": false, "use": "boreal and tundra floor (NavalDLC pack)"},
+    {"slot": 4, "name": "forest_floor", "diffuse": "ground_forest_b_d", "normal": "ground_forest_b_n", "specular": "ground_forest_b_s", "height": "ground_forest_b_h", "scale": 15, "tint": {"mode": 0, "colour": [1, 1, 1]}, "physics": "soil", "optional": false, "use": "forest and boreal forest"},
+    {"slot": 5, "name": "rainforest_floor", "diffuse": "forest_a_d", "normal": "forest_a_n", "specular": "forest_a_s", "height": "forest_a_h", "scale": 15, "tint": {"mode": 0, "colour": [1, 1, 1]}, "physics": "soil", "optional": true, "use": "rainforest"},
+    {"slot": 6, "name": "sand", "diffuse": "desert_floor_a", "normal": "desert_floor_a_n", "specular": "desert_floor_a_s", "height": "desert_floor_a_h", "scale": 15, "tint": {"mode": 0, "colour": [1, 1, 1]}, "physics": "sand", "optional": false, "use": "desert"},
+    {"slot": 7, "name": "arid_soil", "diffuse": "desert_floor_c_d", "normal": "desert_floor_c_n", "specular": "desert_floor_c_s", "height": "desert_floor_c_h", "scale": 15, "tint": {"mode": 0, "colour": [1, 1, 1]}, "physics": "sand", "optional": false, "use": "desert margins"},
+    {"slot": 8, "name": "mud", "diffuse": "ground_mud_b_d", "normal": "ground_mud_b_n", "specular": "ground_mud_b_s", "height": "ground_mud_b_h", "scale": 15, "tint": {"mode": 0, "colour": [1, 1, 1]}, "physics": "mud", "optional": false, "use": "marsh, rainforest wet ground, lake beds"},
+    {"slot": 9, "name": "beach", "diffuse": "ground_beach_a_d", "normal": "ground_beach_a_n", "specular": "none", "height": "ground_beach_a_h", "scale": 15, "tint": {"mode": 0, "colour": [1, 1, 1]}, "physics": "sand", "optional": true, "use": "non-rocky coast band (ground_beach_a_s exists but is not flagged for_terrain)"},
+    {"slot": 10, "name": "riverbed", "diffuse": "ground_pebbles_a_d", "normal": "ground_pebbles_a_n", "specular": "ground_pebbles_a_s", "height": "ground_pebbles_a_h", "scale": 15, "tint": {"mode": 0, "colour": [1, 1, 1]}, "physics": "stone", "optional": false, "use": "river and lake edges: the water-edge treatment for MMR-285"},
+    {"slot": 11, "name": "rock", "diffuse": "rock_k_d", "normal": "rock_k_n", "specular": "rock_k_s", "height": "none", "scale": 20, "tint": {"mode": 0, "colour": [1, 1, 1]}, "physics": "stone", "optional": false, "use": "slope rock (the proven rock_k layer)"},
+    {"slot": 12, "name": "mountain_rock", "diffuse": "cliff_b_d", "normal": "cliff_b_n", "specular": "cliff_b_s", "height": "cliff_b_h", "scale": 20, "tint": {"mode": 0, "colour": [1, 1, 1]}, "physics": "stone", "optional": false, "use": "exposed rock and the mountain landform"},
+    {"slot": 13, "name": "desert_rock", "diffuse": "stone_desert_a_d", "normal": "stone_desert_a_n", "specular": "stone_desert_a_s", "height": "stone_desert_a_h", "scale": 20, "tint": {"mode": 0, "colour": [1, 1, 1]}, "physics": "stone", "optional": true, "use": "slope rock in desert"},
+    {"slot": 14, "name": "permanent_snow", "diffuse": "snow_a_d", "normal": "snow_a_n", "specular": "snow_a_s", "height": "snow_a_h", "scale": 15, "tint": {"mode": 0, "colour": [1, 1, 1]}, "physics": "snow", "optional": false, "use": "permanent white only (permanentWhite); seasonal snow is the dynamic snow texture"}
+  ],
+  "rules": {
+    "kernelSamples": 2,
+    "slopeLayer": "rock",
+    "desertSlopeLayer": "desert_rock",
+    "mountainLandform": "Mountain / ridge",
+    "mountainLayer": "mountain_rock",
+    "mountainShare": 0.5,
+    "moisture": {"biome": "grassland", "wetLayer": "grass", "dryLayer": "steppe", "split": 0.5, "band": 0.25},
+    "coast": {"layer": "beach", "rockyLayer": "rock", "samples": 1},
+    "waterEdge": {"layer": "riverbed", "samples": 1, "intents": ["lake", "river"]},
+    "iceCap": {"layer": "permanent_snow", "threshold": 0.5},
+    "temperature": {"coldLayer": "cold_steppe", "belowC": 2}
+  },
+  "permanentWhite": {"biomes": ["land_ice", "snow"], "snowMonths": 12, "snowThreshold": 0.5, "layer": "permanent_snow", "terrainType": "Snow"},
+  "alpha": {"rule": "overInverse", "smoothBlendAmount": 1, "minByte": 3, "slopeTransparency": false},
+  "flora": {
+    "biomes": {
+      "forest": {"layer": "forest_floor", "kinds": [{"name": "worldmap_tree_beech_01", "variations": 1, "weight": 0.6}, {"name": "map_spruce_mix", "variations": 3, "weight": 0.4}]},
+      "boreal_forest": {"layer": "forest_floor", "kinds": [{"name": "map_spruce_mix", "variations": 3, "weight": 1}]},
+      "rainforest": {"layer": "rainforest_floor", "kinds": [{"name": "worldmap_tree_beech_01", "variations": 1, "weight": 0.5}, {"name": "worldmap_tree_acacia_01", "variations": 1, "weight": 0.5}]}
+    },
+    "density": 3.6,
+    "scale": [0.18, 0.32],
+    "clearance": {"padMargin": 1, "coastSamples": 1, "slopeShare": 0, "roads": true},
+    "maxTrees": 88000
+  },
+  "mutation": {
+    "landValid": ["Plain", "Desert", "Snow", "Forest", "Steppe", "Swamp"],
+    "schools": {"fire": "Desert", "water": "Swamp", "earth": "Steppe", "air": "Plain", "weave": "Forest", "radiant": "Plain", "umbral": "Forest", "infernal": "Desert"},
+    "coreOverrides": {"water": {"cold_tundra": "Snow", "land_ice": "Snow", "boreal_forest": "Snow"}},
+    "hiddenLooks": {"blood": "infernal", "void": "umbral", "rot": "water", "eldritch": "weave"},
+    "generatedVariants": "visual",
+    "battleClass": "faceClass",
+    "thresholds": {"source": "world.json", "threshold": "magic.mutation_threshold", "dominance": "magic.dominance_margin"}
+  },
   "waterTypes": [
     {"code": 0, "name": "land", "intent": "land"},
     {"code": 1, "name": "ocean", "intent": "ocean"},
@@ -34,7 +85,7 @@
   ],
   "intents": {"land": 0, "ocean": 1, "lake": 2, "river": 3},
   "riverOverridesLand": true,
-  "slopeRock": {"start": 0.6, "full": 1.2},
+  "slopeRock": {"start": 0.3, "full": 0.6},
   "coastEpsilon": 0.05,
-  "notes": "Material weights for the two layers the proven terrain template provides (MMR-16: grass base at full weight, rock_k painted over it). The rock weight of a sample is max(the biome's rock, the slope rule round-half-even(clamp((slope - start) / (full - start), 0, 1) * 255)), where slope is the output grid's central-difference gradient in world units, as the encoder computes it. Every exported biome id must appear here with the same core name, and every water_type, river and landform code must be listed; anything else fails. coastEpsilon (world units) keeps the compiled coastline coherent with the sea datum: ocean samples are lowered to at most -coastEpsilon and land samples raised to at least +coastEpsilon, which survives 16-bit quantization and the engine's 0.03 truncation toward zero. Lakes are left as compiled. Version 1 ignores layers.biome_variant (magical variants): materials follow the natural biome only."
+  "notes": "The shared biome table (MMR-248, docs/biome-presentation.md). One row per exported biome drives the navmesh face type (terrainType; playability.json cells.landFaceGroups must name the same type, which the travel compiler checks), the terrain layer mix (layers, fractions over layerSet names summing to 1), the battle class (battleClass; mission-scenes.json biomeClass must agree), the colour grade (colourGrade; colourGradeWet for grassland at or above rules.moisture.split; null for water, which takes the temperature band of climate-flow.json) and the snow treatment (seasonal: the dynamic snow texture follows the FWGC++ snow season; permanent: the permanent_snow layer and the Snow face all year). permanentWhite is the one mask for permanent white: its biomes (land_ice; snow is a tombstoned label) plus every land sample with snowMonths months of snow at or above snowThreshold; the same mask gives the Snow face. mutation is the live-mutation remap: a school retypes a mutated land face only within landValid (never Dune, Bridge, Fording, Beach, water or Mountain; passability never changes), coreOverrides refine a school per natural biome, hidden schools reuse a visible school's look and type (hiddenLooks), generated magic variants are visual only, and a mutated cell's battle class is mission-scenes.json faceClass[remapped type]; the thresholds are read per world from world.json. layerSet is the 15-slot template layer set (slot 15 free), composited from the highest slot down, with installed texture names verified against the installed packs (tools/check_layer_textures.py): full-colour textures only (MMR-249: the pale *_mainmap textures are not plain layers), scale the tile size in map units (15-20 suits biome layers; 5 reads as noise), tint the albedo factor (mode 1 adds, mode 2 only darkens). tools/scenebin/make_surface_template.py generates the template's material layers from it (no flora meshes, the same layer in every season, every layer flag off). rules are the target-fraction rules the layer compile applies (src/WorldBridge/src/terrain_layers.cpp, docs/terrain-compiler.md \"Layers\"): the biome row with the moisture split (the row's wet share at split, 1 at split + band, 0 at split - band), kernel smoothing within land or water, then cold, mountain, slope (slopeRock ramp; desertSlopeLayer on a Desert face), coast (rockyLayer by rocky_coast), water edge, ice cap and permanent white. alpha converts fractions to the stored bytes with the over-compositing inverse a_k = f_k / (f_0 + ... + f_k) (MMR-249: alpha-over, weight linear in the byte divided by smoothBlendAmount; slope transparency off). flora plants map trees (flora.bin) on the listed biomes: density per square unit at full flora-layer weight, scale range, clearances and a maxTrees cap that thins the density (MMR-247, acc4 V4: density 3.6 puts the planted trees per occupied 10-unit cell at the installed Main_map's quantiles, just under them; 0.45 left forests nearly bare after the flora-layer share, coast, pad and road clearances; maxTrees 88,000 is the count MMR-249 measured in game). slopeRock is scaled with projection.json verticalScale (0.01 -> 0.005 halves 0.6/1.2 to 0.3/0.6). Every exported biome id must appear here with the same core name, and every water_type, river and landform code must be listed; anything else fails. coastEpsilon (world units) keeps the compiled coastline coherent with the sea datum: ocean samples are lowered to at most -coastEpsilon and land samples raised to at least +coastEpsilon, which survives 16-bit quantization and the engine's 0.03 truncation toward zero. Lakes are left as compiled."
 }

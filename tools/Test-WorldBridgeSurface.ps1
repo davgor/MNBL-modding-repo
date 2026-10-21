@@ -6,9 +6,14 @@ param(
 )
 $ErrorActionPreference = 'Stop'
 $repo = Split-Path $PSScriptRoot
-if (!$Template) { $Template = Join-Path $repo 'build/slots/mnbl_world_b' }
 $scratch = Join-Path ([IO.Path]::GetTempPath()) ('mnbl-worldbridge-surface-' + [guid]::NewGuid().ToString('N'))
-$sourceFiles = @('src/WorldBridge/main.cpp','src/WorldBridge/surface.cpp','src/WorldBridge/surface.hpp','src/WorldBridge/CMakeLists.txt','tests/WorldBridgeSurfaceTests.py','tools/Test-WorldBridgeSurface.ps1','tools/scenebin/terrain_bin.py','tools/scenebin/navmesh_bin.py','tools/scenebin/build_slot.py')
+# MMR-255: the tracked surface template (tools/scenebin/make_surface_template.py), materialized from the installed official scene.
+if (!$Template) {
+    $Template = Join-Path $scratch 'template'
+    & $Python -B "$repo/tools/scenebin/make_surface_template.py" --materialize $Template
+    if ($LASTEXITCODE) { throw 'Surface template materialization failed' }
+}
+$sourceFiles = @('src/WorldBridge/main.cpp','src/WorldBridge/surface.cpp','src/WorldBridge/surface.hpp','src/WorldBridge/CMakeLists.txt','tests/WorldBridgeSurfaceTests.py','tools/Test-WorldBridgeSurface.ps1','tools/scenebin/terrain_bin.py','tools/scenebin/navmesh_bin.py','tools/scenebin/build_slot.py','tools/scenebin/make_surface_template.py','tools/terrain_layers.py')
 $inputs = @($sourceFiles | ForEach-Object { @{path=$_;sha256=(Get-FileHash -LiteralPath (Join-Path $repo $_)).Hash} })
 & $CMake -S (Join-Path $repo 'src/WorldBridge') -B "$scratch/compiler" -G 'Visual Studio 17 2022' -A x64
 if ($LASTEXITCODE) { throw 'Surface CMake configure failed' }

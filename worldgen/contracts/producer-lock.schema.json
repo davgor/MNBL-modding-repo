@@ -24,11 +24,12 @@
         "helpSha256": {"$ref": "#/$defs/sha256"},
         "commands": {
           "type": "object",
-          "required": ["generate", "capabilities", "help"],
+          "required": ["generate", "capabilities", "help", "apply"],
           "properties": {
             "generate": {"$ref": "#/$defs/argv", "allOf": [{"contains": {"const": "{request}"}}, {"contains": {"const": "{split}"}}]},
             "capabilities": {"$ref": "#/$defs/argv", "contains": {"const": "{output}"}},
-            "help": {"$ref": "#/$defs/argv"}
+            "help": {"$ref": "#/$defs/argv"},
+            "apply": {"$ref": "#/$defs/argv", "allOf": [{"contains": {"const": "{request}"}}, {"contains": {"const": "{operations}"}}, {"contains": {"const": "{delta}"}}]}
           }
         }
       }

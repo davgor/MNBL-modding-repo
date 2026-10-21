@@ -50,7 +50,8 @@ def main():
     policy = od(
         ('schema', 'mnbl.rosters'), ('version', 1),
         ('notes', 'MMR-32 heroes and rosters (docs/heroes.md). Owners: HeroFactory and CharacterTemplateResolver (src/MNBL.ProceduralWorld/Campaign/). '
-                  'Lords and their synthesized families are XML heroes (NPCCharacters + Heroes) for the MMR-30 registry; notables and companions are '
+                  'Lords (the planned members of campaign.json v2 houses, mercenary companies and outlaw clans, their minors and dead parents, MMR-279/280) '
+                  'are XML heroes (NPCCharacters + Heroes) for the MMR-30 registry; notables and companions are '
                   'runtime creation intents, because the installed engine creates them through HeroCreator at new game (MMR-34 replaces the vanilla '
                   'spawns and instantiates these with HeroCreator.CreateSpecialHero(template, settlement, null, null, age) and SetName, keeping the '
                   'intent id in its own map: the engine mints the StringId). Body ranges, equipment, skills and troops are installed templates; '
@@ -58,37 +59,37 @@ def main():
         ('streams', od(
             ('rule', 'value(stream, version, world prefix, entity, draw) = first 8 bytes of sha256("mnbl.hero-stream/1\\n" + stream + "\\n" + version + "\\n" + '
                      'prefix + "\\n" + entity + "\\n" + draw), big-endian. Each purpose has its own stream; re-versioning one changes what it draws and '
-                     'what is derived from that: a notable\'s or companion\'s sex follows its template, a synthesized name follows the sex, a family '
-                     'follows the ages. Ownership, occupations and clans use no stream.'),
-            ('templates', 1), ('ages', 1), ('sex', 1), ('names', 1), ('family', 1), ('companions', 1), ('bodies', 1))),
+                     'what is derived from that: a notable\'s sex follows its template and a synthesized name follows the sex. Ownership, occupations, clans, '
+                     'kin, lord ages and sexes (campaign.json v2) use no stream; lord personalities use population.json\'s traits stream.'),
+            ('templates', 1), ('ages', 1), ('names', 1), ('bodies', 1))),
         ('occupations', od(
             ('engine', od(('Lord', 3), ('Wanderer', 16), ('Artisan', 17), ('Merchant', 18), ('Preacher', 19), ('Headman', 20), ('GangLeader', 21), ('RuralNotable', 22))),
             ('engineSource', 'TaleWorlds.CampaignSystem.Occupation enum literals (installed IL)'),
             ('fromCompiler', od(('Lord', 'Lord'), ('Merchant', 'Merchant'), ('Headman', 'Headman'), ('Preacher', 'Preacher'), ('GangLeader', 'GangLeader'), ('Wanderer', 'Wanderer'))))),
         ('lords', od(
             ('templates', 'the presentation culture\'s lord_templates (installed is_template Lord NPCCharacters), one drawn from the templates stream; the hero keeps '
-                          'the template\'s body range (face key template), skill set and traits, and takes the world\'s id, name, culture, age and sex'),
+                          'the template\'s body range (face key template), skill set and its traits other than the personality ones, and takes the world\'s id, name, '
+                          'culture, age and sex (campaign.json v2 age and female, FWGC++ sex and mapped age). Its personality traits (Mercy, Valor, Honor, Generosity, '
+                          'Calculating) are never copied from the template: each XML hero draws one vector of population.json lordTraits.joint, weighted by count, '
+                          'from the population traits stream seeded by its hero id (RT-05)'),
             ('equipment', 'no installed lord template is female and their rosters carry men\'s gear, so a man wears the template\'s equipment sets and a woman '
                           'one battle and one civilian roster of her culture flagged IsLordTemplate and IsFemaleTemplate (never child or teenager), from the '
                           'templates stream. Every worn item must exist, fit its slot and be usable by the wearer\'s sex'),
             ('bodies', 'an XML hero gets an explicit body: HeroBodies (in game) draws it with BodyProperties.GetRandomBodyProperties(race 0, sex, the '
                        'template\'s body range, the range\'s hair/beard/tattoo tags, seed from the bodies stream). Hero.Deserialize otherwise gives every '
                        'hero of a template the range minimum'),
-            ('bound', 'the source lords are MMR-27\'s lord records (sovereign or regent per realm, castellans, pretenders, founders), never one per person of a '
-                      'population; with relatives, XML heroes number at most source lords + families.maxPerClan per clan'),
-            ('ages', od(('sovereign', [35, 62]), ('regent', [40, 66]), ('pretender', [22, 45]), ('castellan', [28, 56]), ('founder', [25, 50]))),
+            ('bound', 'the XML lords are exactly the Lords campaign.json v2 plans (its census counts them): no lord, spouse or heir is synthesized here'),
             ('minimumAge', 20),
-            ('femaleShare', 0.25),
             ('race', 'every hero uses the installed human body; the source raceId is kept as metadata (custom skeletons are out of scope)'))),
-        ('families', od(
-            ('rule', 'every clan leader of at least minimumLeaderAge gets one synthesized spouse of the opposite sex, in the leader\'s clan; each couple gets 0..maxChildren '
-                     'children (family stream), in the clan, with father and mother set. Spouse links are written on both heroes. Synthesized relatives are '
-                     'adapter-synthesized, never FWGC++ facts'),
-            ('minimumLeaderAge', 25), ('spouseAgeGap', [-8, 6]), ('spouseMinimumAge', 20), ('maxChildren', 2),
-            ('childAge', 'adult heirs: uniform in [18, min(min(father age, mother age) - 18, 30)]; a couple whose upper bound is below 18 has no heir'),
-            ('childFemaleShare', 0.5),
-            ('names', 'the presentation culture\'s installed male_names / female_names, drawn from the names stream'),
-            ('maxPerClan', 3))),
+        ('kin', od(
+            ('rule', 'campaign.json v2 plans every family link (MMR-279): spouse on both heroes, father and mother. A dead parent (alive false) is an XML hero of its house '
+                     'with alive="false", outside the census and every party and lord rule. A planned minor is accepted only with both parents set'),
+            ('adultAge', 18), ('teenagerAge', 14),
+            ('minors', 'a minor keeps its template\'s body range (HeroBodies ages it) and wears a battle roster of its culture\'s lord rosters for its sex and, as civilian '
+                       'equipment, the culture\'s noble child roster below teenagerAge or teenager roster from it (IsLordTemplate with IsChildEquipmentTemplate or '
+                       'IsTeenagerEquipmentTemplate), as the engine\'s child generator dresses its children'),
+            ('census', 'the instantiated houses, adult lords, minors, dead parents, company and outlaw members and wanderers equal the campaign.json v2 census; a '
+                       'mismatch refuses the build'))),
         ('notables', od(
             ('targets', od(('town', od(('Merchant', 2), ('GangLeader', 2), ('Artisan', 1))), ('village', od(('Headman', 1), ('RuralNotable', 2))))),
             ('targetsSource', 'DefaultNotableSpawnModel.GetTargetNotableCountForSettlement (installed IL); NotablesCampaignBehavior.SpawnNotablesAtGameStart '
@@ -100,13 +101,12 @@ def main():
             ('templates', 'the settlement culture\'s notable_templates of that occupation; the template decides the sex'),
             ('synthesizedName', '{name} of {settlement}'))),
         ('companions', od(
-            ('factor', 0.6), ('factorSource', 'CompanionsCampaignBehavior.OnNewGameCreated: for (i = 0; (float)i < 0.6f * Town.AllTowns.Count; i++) (installed IL); '
-                                              '0.6f * 45 = 27.000002, so 28 companions at 45 towns'),
-            ('rule', 'as many source wanderers as that loop creates companions become companions, chosen by companions-stream rank of their uid; the rest '
-                     'are not instantiated (disposition bounded). None is synthesized: the source supplies more than the bound'),
-            ('ages', [23, 34]), ('agesSource', 'CompanionsCampaignBehavior.CreateCompanionAndAddToSettlement: HeroComesOfAge (18) + 5 + MBRandom.RandomInt(12)'),
+            ('rule', 'the companions are campaign.json v2 wanderers[] (MMR-279), exactly W = census.wanderers of them, the smallest integer not below the float32 '
+                     'product 0.6f x towns (CompanionsCampaignBehavior.OnNewGameCreated, installed IL; RT-04). Each keeps its FWGC++ sex and planned age and an '
+                     'epithet in its name; none is synthesized here'),
             ('home', 'a town of the companion\'s presentation culture (templates stream), else any town'),
-            ('templates', 'the presentation culture\'s is_template Wanderer NPCCharacters; the template decides the sex'))),
+            ('templates', 'MMR-287\'s backstory-safe pool (population.json wanderers, WandererPool): the culture\'s safe is_template Wanderer NPCCharacters of the '
+                          'wanderer\'s sex, least used first, else its fallback culture\'s (recorded)'))),
         ('troops', od(
             ('characterRoots', ['basic_troop', 'elite_basic_troop', 'melee_militia_troop', 'ranged_militia_troop', 'melee_elite_militia_troop', 'ranged_elite_militia_troop',
                                 'militia_veteran_archer', 'caravan_master', 'caravan_guard', 'prison_guard', 'guard', 'tournament_master', 'villager', 'basic_mercenary_troops',

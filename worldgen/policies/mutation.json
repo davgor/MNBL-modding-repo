@@ -1,0 +1,16 @@
+{
+  "schema": "mnbl.mutation",
+  "version": 1,
+  "notes": "MMR-261 (docs/magic-ground.md 'Live mutation'; findings section 7; RT-37): the runtime landscape mutation. Module-embedded, not a compiler input and not in the re-pin chain. A MagicEvent {school, settlement, strength} adds strength to the (settlement, school) residue at the next daily batch; a residue at or above residueThreshold emits one LeylineEdit at the capital rule's site (the FWGC++ capital of the event settlement's member realm while its kingdom holds it, else the ruling house's home, else the event settlement) and drops by the threshold. The first edit at a site plants a key point of firstIntensity; each later one raises it by intensityStep up to maxIntensity. All values are starting values (MMR-247's balance pass).",
+  "schools": ["weave", "umbral", "infernal", "radiant", "fire", "water", "earth", "air"],
+  "residueThreshold": 10.0,
+  "castStrength": 10.0,
+  "firstIntensity": 4,
+  "intensityStep": 1,
+  "maxIntensity": 4,
+  "maxNodes": 128,
+  "maxPending": 32,
+  "nodeIdPrefix": "mnbl-cast",
+  "applyTimeoutSeconds": 120,
+  "cells": "variantChanged"
+}

@@ -1,0 +1,5718 @@
+{
+ "decisions": {
+  "magicGroundDelivery": {
+   "choice": "A",
+   "text": "One runtime decal overlay for all magic ground (generated variants and live mutations). No school terrain layers in the template.",
+   "evidence": [
+    "Entity-less scene decals render over generated relief (run 23716 d1: 16 decals across the hill flank, 48% of their boxes changed).",
+    "SetFactor1 tints a vanilla decal material per instance (run 6284 v3: 1,610 sampled magenta pixels), so one published stamp set can carry several schools.",
+    "Creation and removal are cheap: 7,500 decals in 4.3 ms, removed in 4.7 ms, re-created identically (run 23716 recreated200 vs count200).",
+    "Frame time held the 60 fps cap with 7,500 decals in view (p95 17.6 ms); main-thread cost is about 0.36 us per decal per frame (0.46 ms at 0, 3.19 ms at 7,500).",
+    "B does not fit the 15-slot budget: 8 school layers beside 9-10 biome layers exceed 15, and baked layers cannot change at run time, so mutations need decals anyway."
+   ],
+   "conditions": [
+    "Runtime-made textures do not render on decals (Material.CreateCopy + SetTexture(DiffuseMap, Texture.CreateFromByteArray) drew nothing, with or without CheckAndRegisterToDecalSet). MMR-259's school textures must be published as module decal materials (precedent: NavalDLC's own decal_water_foam, created at run time with Material.GetFromResource).",
+    "Keep the in-view total under about 5,000 decals (about 2 ms of main thread); stamp about one decal per source cell (world A: 1,784 mutated land cells)."
+   ]
+  },
+  "decalTechnique": {
+   "choice": "Entity-less scene decals",
+   "text": "decal = Decal.CreateDecal(null); decal.SetMaterial(Material.GetFromResource(<published decal material>)); scene.AddDecalInstance(decal, \"editor_set\", true); decal.SetIsVisible(true); decal.SetVectorArgument(atlas scale u, scale v, offset u, offset v); decal.Frame = <world frame whose rotation columns are scaled by the half extents; box [-1,1]^3, projected along local z>; optional decal.SetFactor1(ARGB tint). Remove with scene.RemoveDecalInstance(decal, \"editor_set\"). Scene created with DecalAtlasGroup.Worldmap (as SandBox.MapScene).",
+   "rejected": [
+    "GameEntity + AddComponent(Decal) renders only after decal.CheckAndRegisterToDecalSet() (run 23716 d3 drew nothing; run 6284 v4 with the call drew). Usable, but an entity per decal buys nothing.",
+    "Mesh decal fallback (Mesh.CreateMeshWithMaterial(decal material) on a [-1,1]^3 box): drew nothing (run 23716 d4).",
+    "Runtime textures on a material copy: drew nothing (run 23716 d2, run 6284 v1). Material.CreateCopy alone works (run 6284 v2)."
+   ]
+  },
+  "terrain513": {
+   "choice": "go",
+   "text": "Level-7 terrain (513 samples, 4 x 4 nodes of 128 cells) written by our encoder (tools/scenebin/terrain_bin.py) reads in 0.13 s, is ready in 0.9 s with the same shader work as level 6, renders without seams or artefacts, and holds the 60 fps cap with main-thread time equal to level 6 (0.52 vs 0.52 ms at the mountain view). terrain.bin 302 KB.",
+   "caveat": "GPU cost above the 60 fps cap is unmeasured on this machine; the C++ surface encoder still caps at 64 cells per node and must be extended by MMR-278."
+  },
+  "mapTrees": {
+   "choice": "go",
+   "text": "Map trees placed through flora.bin render: 88,000 instances (map_spruce_mix, worldmap_tree_beech_01, worldmap_tree_acacia_01; scale 0.18-0.32) loaded (Scene.GetFloraInstanceCount 88,000), read well at camera distance 38, and fade with distance per the kind's view_distance. Frame time held the cap; the overview costs about 0.24 ms more main thread than the same scene without trees.",
+   "format": "FLR2: u32 payload bytes, u32 count, then per tree u32 name length, name, u32 flora_variation index, 16 f32 (rows: rotation x scale, then x y z 1), 4 f32 colour (1,1,1,1). Read from the installed Main_map flora.bin (69,500 trees) and written by tools/scenebin/build_probe_slots.py flora_bin()."
+  }
+ },
+ "answers": {
+  "1_layers": {
+   "compositing": "Alpha-over, front to back from slot 15 down to slot 0 (slot 0 opaque), linear in the stored weight: the measured ratio is affine in w with residual under 1.5% (band A, plain colour ramp) and a higher slot fully covers a lower one (band B: green at w = 0.5 over the magenta ramp keeps green constant to 0.4%, magenta enters at half strength). The shader divides by smooth_blend_amount (1.0 here). Weights at or below 2/255 draw nothing (shader threshold 0.01).",
+   "heightBlend": "Only with use_transparency_of_ground_slope = true: the layer stays invisible until w is about 0.6 and then rises steeply to full at w = 1 (band C). Without the flag the ramp is linear (band D). MMR-255: leave the flag off and convert target fractions with the over-compositing inverse a_k = f_k / (f_0 + ... + f_k).",
+   "perSeasonMasks": "Inert in practice: MBMapScene.SetSeasonTimeFactor(1) and Scene.SetWinterTimeFactor(1) produced byte-identical images, so neither the per-season node masks (layer 1 removed from the winter mask in half the nodes) nor the per-season layer variants switch at run time. Write identical masks and identical variants for all four seasons; the seasonal look has to come from dynamic snow.",
+   "loadAndCompile": "Scene.Read 0.04-0.17 s; ready to render about 1 s after Read for 2, 6 and 15 layers per node and for level 6 and level 7. Each scene compiles its own terrain shader (6-9 pbr_terrain / pbr_terrain_gbuffer permutations, 'Missing shader from sack' then compile_shader in the engine log), finished inside that second.",
+   "frameCost": "Every view held the 60 fps cap (mean 16.67 ms, p95 at most 17.9 ms) for 2, 6 and 15 layers per node. The cap is outside the game's settings (docs/first-test-profile.md); Utilities.SetForceVsync(false) did not lift it, so GPU cost above the cap is unmeasured. Main-thread time per frame: 0.39-0.56 ms for 2, 6 and 15 layers (no layer-count trend)."
+  },
+  "2_scale": {
+   "tileSize": "A layer's scale is its tile size in map units: scale 5 repeats every 5.03 units, scale 20 every 20.0 units (top-down autocorrelation in x and y).",
+   "pxPerUnitAt38": "37.0 px per map unit at the screen centre on the 1,024-px-tall probe window (vertical FOV 0.698 rad, distance 38, elevation 0.635 rad); in general 0.0362 x screen height per unit, about 39 at 1080p. The camera model matches the measured tile periods to under 1%.",
+   "guidance": "At distance 38 the screen spans about 58 x 37 units. Scale 5 reads as uniform noise; scale 15-20 shows the texture with 2-4 repeats across the screen. A 2048 texture at scale 20 gives about 100 texels per unit against 37 screen px: identity must come from macro colour, not detail inside the tile."
+  },
+  "3_decals": "See decisions.decalTechnique and decisions.magicGroundDelivery. Entity-less path decals follow relief (hill flank, slopes up to about 40 degrees). Cost: 200 / 1,000 / 3,000 / 7,500 decals in view all held the cap; main-thread time 0.46 / 0.84 / 1.59 / 3.19 ms. Removal returns the image exactly to the decal-free baseline; re-creation reproduces the earlier image.",
+  "4_dynamicSnow": {
+   "flag": "use_dynamic_weather_effects=\"true\" alone does nothing visible. With dynamic_flowmap_texture_name=\"main_map_snow_flowmap\" (vanilla Main_map's pair) the terrain snows from that texture.",
+   "seasonResponse": "MBMapScene.SetTerrainDynamicParams(scene, (x, 0.65, 0)) drives the season threshold on the application thread: x = 0.55 (summer) against x = -0.1 (winter) changes the four quadrants by 7-55 grey levels; the shader's grad = smoothstep(x - 0.65, x + 0.65, R).",
+   "setDynamicSnowTexture": "Scene.SetDynamicSnowTexture after Read has no visible effect (runtime RGBA pattern in R, G or A, a B water mask, and the vanilla main_map_snow_flowmap all gave identical images). Calling it before Read hangs the engine (run 26296). The shader samples the terrain's dynamic texture with v = 1 - y / size, R = snow threshold, B = water mask (source: terrain_pixel_functions.rsh).",
+   "channelAndOrientation": "Not settled in game: no runtime pattern reached the shader. By shader source: R channel, texture row 0 at the north edge (max y), column 0 at x = 0. The vanilla texture's snow lands mostly in the two northern quadrants of our terrain, consistent with row 0 = north.",
+   "templateWinterGrass": "Does not whiten the map: the template's winter grass variant (snow_b_d) never activates (see 1_layers.perSeasonMasks).",
+   "colorGradeManager": "A runtime MapColorGradeManager (GameEntity.CreateAndAddScriptComponent) hangs the engine in a non-map scene (run 23716; not responding, no CPU). Drive SetTerrainDynamicParams from our own per-tick code instead.",
+   "renderVersion": "terrain_render_version=\"1\" never reached ready to render (run 6284 hung in load). Do not set it.",
+   "openForMMR256": "A per-world snow mask needs a texture the terrain resolves by name at Read. Untested: registering a runtime texture by name (Texture.LoadTextureFromPath before Read; run 26296 hung on the earlier variant before reaching it). MMR-256 must prove that route in the acceptance build or fall back (permanent-white layer only, plus SetTerrainDynamicParams with no seasonal mask)."
+  },
+  "5_tints": {
+   "mode1": "Adds the colour to the layer albedo (desert_floor_a + (0.2, 0, 0): +0.075 linear red after lighting, other channels unchanged).",
+   "mode2": "Multiplies and saturates, so it only darkens ((1, 0.55, 0.55): lit ratios 1.00 / 0.70 / 0.72 with fog diluting).",
+   "fullColourTextures": "The full-colour battle textures read as their biome at map scale (desert_floor_a, desert_floor_c_d, ground_drygrass_a_d, forest_a_d, ground_mud_b_d, ground_beach_a_d, ground_nord_grass_a_d, rock_k_d, ice_a_d, snow_a_d). The *_mainmap textures (ground_grass_b_d_mainmap, ground_forest_b_d_main_map, main_map_mountains_d) are pale and blue-white without the vista colour multiply and should not be used as plain biome layers."
+  },
+  "6_terrainResolutionAndNormals": {
+   "level7": "See decisions.terrain513.",
+   "normals": "Normals from a [1,2,1]/4 x2 smoothed field are indistinguishable from Sobel on the raw field at level 6 (Laplacian energy 5.23 vs 5.23 on the oblique mountain view): the facets and spikes come from geometry, not from normals.",
+   "shapedField": "The shaped, half-vertical-scale level-7 field (150 samples despiked, masked [1,4,1]/6 low-pass) renders without spikes or blade ridges; land slope p95 39.6 degrees against 62.6 for the unshaped level 7 and 69.0 for today's level 6 (build/probe-slots/probe-slots.json worldA)."
+  },
+  "r1_mapTrees": "See decisions.mapTrees."
+ },
+ "procedure": {
+  "runs": "Run 23716 (all items; hung at the last step, MapColorGradeManager, after every other step was recorded), confirming run 6284 (cost with SetForceVsync(false) and main-thread time, decal variants, snow variants; hung loading terrain_render_version=\"1\" after everything else was recorded), run 26296 (one snow route; hung on SetDynamicSnowTexture before Read, nothing recorded). The third run was spent on the new snow-texture blocker the confirming run found.",
+  "sharedInstall": "No battle-scale session was alive (orchestrator check), so there was nobody to CLAIM with. Before every deploy and launch: no Bannerlord, Bannerlord.Native or Watchdog process, and the battle-scale native-test.lock opened with FileShare.None. Only processes this ticket started were stopped (the three hung games and their Watchdog children).",
+  "installLeftAsFound": "Modules/MNBL.ProceduralWorld was backed up (132 files, SceneObj/mnbl_world_* left untouched), deployed from this worktree's build, and restored after the last run; a hash comparison of every file and folder found it identical (build/install-restore-verify.json in the worktree). The probe slots are gone.",
+  "dialogs": "Runs 6284 and 26296 opened on the Safe Mode prompt left by the previous killed run; the watcher answered No both times (evidence/runtime/in-game/map_epic2-<pid>.dialogs.log, git-ignored). No crash dialog appeared.",
+  "outsideTheModule": "The killed runs left engine_config.txt at safely_exited = 0 (it was 1 before: run 23716 started without the Safe Mode prompt); it was set back to 1. The engine's terrain shader caches for the probe scenes (C:/ProgramData/Mount and Blade II Bannerlord/Shaders/TerrainShaders/MNBL.ProceduralWorld/mnbl_probe_*) were deleted. Game logs (rgl_log_23716/6284/26296, watchdog logs) were left in place as ordinary logs.",
+  "nativeHashes": {
+   "TaleWorlds.Native.dll": "2a5e0e0b15513ebb7052d747a621b82c50ee834553eba283b33bbbc33766e12a",
+   "TaleWorlds.MountAndBlade.dll": "19387f31557ff840d14f378f6bbdf1d58fcff406ab9ff2294dfbb3e49a50b87e",
+   "note": "Identical before the first deploy and after the last run (both dated 2026-10-09 06:40 UTC)."
+  }
+ },
+ "schema": "mnbl.map-epic-2-probe",
+ "version": 1,
+ "ticket": "MMR-249",
+ "runs": [
+  {
+   "result": "evidence/runtime/in-game/map_epic2-23716.json",
+   "sha256": "1d826372af5f5eef3c612e30e0fde49d8c5f3f1c8f35fce1d17c32b962cfc7b5",
+   "pid": 23716,
+   "status": "running",
+   "final": false,
+   "error": null
+  },
+  {
+   "result": "evidence/runtime/in-game/map_epic2-6284.json",
+   "sha256": "4609d2b52841e79fd89943341ade75dd00b30f55c62c85951449115b583be7fe",
+   "pid": 6284,
+   "status": "running",
+   "final": false,
+   "error": null
+  },
+  {
+   "result": "evidence/runtime/in-game/map_epic2-26296.json",
+   "sha256": "cb11bf9daa1e9058c5de44afa6c9284726776b79819a2c59901ddedbe5b0989f",
+   "pid": 26296,
+   "status": "running",
+   "final": false,
+   "error": null,
+   "note": "no probe outputs were checkpointed (the process stopped before the first scene's checkpoint)"
+  }
+ ],
+ "environment": {
+  "threadId": 30,
+  "resolution": [
+   1600,
+   1024
+  ],
+  "applicationVersion": "v1.4.8.119303",
+  "frameLimiterWithSleep": false
+ },
+ "slots": {
+  "mnbl_probe_l2": {
+   "heightmapLevel": 6,
+   "samples": 257,
+   "layersPerNode": [
+    1,
+    2
+   ],
+   "floraInstances": 0,
+   "dynamicWeather": false
+  },
+  "mnbl_probe_l6": {
+   "heightmapLevel": 6,
+   "samples": 257,
+   "layersPerNode": [
+    6
+   ],
+   "floraInstances": 0,
+   "dynamicWeather": false
+  },
+  "mnbl_probe_l15": {
+   "heightmapLevel": 6,
+   "samples": 257,
+   "layersPerNode": [
+    15
+   ],
+   "floraInstances": 0,
+   "dynamicWeather": false
+  },
+  "mnbl_probe_forest": {
+   "heightmapLevel": 6,
+   "samples": 257,
+   "layersPerNode": [
+    1,
+    2
+   ],
+   "floraInstances": 88000,
+   "dynamicWeather": false
+  },
+  "mnbl_probe_snow": {
+   "heightmapLevel": 6,
+   "samples": 257,
+   "layersPerNode": [
+    1,
+    2
+   ],
+   "floraInstances": 0,
+   "dynamicWeather": true
+  },
+  "mnbl_probe_snowf": {
+   "heightmapLevel": 6,
+   "samples": 257,
+   "layersPerNode": [
+    1,
+    2
+   ],
+   "floraInstances": 0,
+   "dynamicWeather": " dynamic_flowmap_texture_name=\"main_map_snow_flowmap\""
+  },
+  "mnbl_probe_snowfr": {
+   "heightmapLevel": 6,
+   "samples": 257,
+   "layersPerNode": [
+    1,
+    2
+   ],
+   "floraInstances": 0,
+   "dynamicWeather": " terrain_render_version=\"1\" dynamic_flowmap_texture_name=\"main_map_snow_flowmap\""
+  },
+  "mnbl_probe_snowp": {
+   "heightmapLevel": 6,
+   "samples": 257,
+   "layersPerNode": [
+    1,
+    2
+   ],
+   "floraInstances": 0,
+   "dynamicWeather": " dynamic_flowmap_texture_name=\"mnbl_probe_snow_mask\""
+  },
+  "mnbl_probe_a6": {
+   "heightmapLevel": 6,
+   "samples": 257,
+   "layersPerNode": [
+    2
+   ],
+   "floraInstances": 0,
+   "dynamicWeather": false
+  },
+  "mnbl_probe_a6n": {
+   "heightmapLevel": 6,
+   "samples": 257,
+   "layersPerNode": [
+    2
+   ],
+   "floraInstances": 0,
+   "dynamicWeather": false
+  },
+  "mnbl_probe_a7": {
+   "heightmapLevel": 7,
+   "samples": 513,
+   "layersPerNode": [
+    2
+   ],
+   "floraInstances": 0,
+   "dynamicWeather": false
+  },
+  "mnbl_probe_a7s": {
+   "heightmapLevel": 7,
+   "samples": 513,
+   "layersPerNode": [
+    2
+   ],
+   "floraInstances": 0,
+   "dynamicWeather": false
+  }
+ },
+ "screenshots": [
+  {
+   "scene": "s01_l6",
+   "id": "overview",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s01_l6_overviewScreenshot.bmp",
+   "exists": true,
+   "sha256": "420606eaeb66cb12e0f215254ac94fe1f52682cde7d634acaed4288d0f90e857"
+  },
+  {
+   "scene": "s01_l6",
+   "id": "map38_flat",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s01_l6_map38_flatScreenshot.bmp",
+   "exists": true,
+   "sha256": "d3e01d8b51aed06628f96e4294a7ef2619d1bf30f7a8eb1a85a95dd9b695502c"
+  },
+  {
+   "scene": "s01_l6",
+   "id": "map38_hill",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s01_l6_map38_hillScreenshot.bmp",
+   "exists": true,
+   "sha256": "a5add5fc8e6159f9c3718352ec52b2f0d19e1f7b9d8f59d0bc4968d0478b5e49"
+  },
+  {
+   "scene": "s01_l6",
+   "id": "node11_topdown",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s01_l6_node11_topdownScreenshot.bmp",
+   "exists": true,
+   "sha256": "05047de31bb4fdbf06fbf298e29d7f389dfbdee5a5213b1c8508fc2b6b65b13f"
+  },
+  {
+   "scene": "s01_l6",
+   "id": "scale5_topdown",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s01_l6_scale5_topdownScreenshot.bmp",
+   "exists": true,
+   "sha256": "a21e2e7a7a3f78263e4cb54fad40092334bae337a513f1623ad12dd7221addb2"
+  },
+  {
+   "scene": "s01_l6",
+   "id": "scale20_topdown",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s01_l6_scale20_topdownScreenshot.bmp",
+   "exists": true,
+   "sha256": "de36b7c4b9cb35815ca48f89ab7016280b1af53a60c07fc704008eec511ed94f"
+  },
+  {
+   "scene": "s01_l6",
+   "id": "node01_topdown",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s01_l6_node01_topdownScreenshot.bmp",
+   "exists": true,
+   "sha256": "a422991648d881a9d53d011b738c13423a0ee3ddb0b56810f74a4c511281142e"
+  },
+  {
+   "scene": "s01_l6",
+   "id": "map38_stripes",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s01_l6_map38_stripesScreenshot.bmp",
+   "exists": true,
+   "sha256": "4d40e802ddc4ab27ae5b1403c0b598f9d8d8bc6815c8a6773c425e8b2f83e336"
+  },
+  {
+   "scene": "s01_l6",
+   "id": "map38_ramp",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s01_l6_map38_rampScreenshot.bmp",
+   "exists": true,
+   "sha256": "23667dbdf0c05eeb4398e39c9980cf3f16c99d8acdac89d471bfdd2d1e6cbcee"
+  },
+  {
+   "scene": "s01_l6",
+   "id": "season0_node11_topdown",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s01_l6_season0_node11_topdownScreenshot.bmp",
+   "exists": true,
+   "sha256": "a5ec03cb723f6a265d0b91f9253c5aafb2bc63b8b1c41e97c83a2e54cffd8e7c"
+  },
+  {
+   "scene": "s01_l6",
+   "id": "season0_overview",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s01_l6_season0_overviewScreenshot.bmp",
+   "exists": true,
+   "sha256": "420606eaeb66cb12e0f215254ac94fe1f52682cde7d634acaed4288d0f90e857"
+  },
+  {
+   "scene": "s01_l6",
+   "id": "seasonfactor1_node11_topdown",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s01_l6_seasonfactor1_node11_topdownScreenshot.bmp",
+   "exists": true,
+   "sha256": "05047de31bb4fdbf06fbf298e29d7f389dfbdee5a5213b1c8508fc2b6b65b13f"
+  },
+  {
+   "scene": "s01_l6",
+   "id": "seasonfactor1_overview",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s01_l6_seasonfactor1_overviewScreenshot.bmp",
+   "exists": true,
+   "sha256": "420606eaeb66cb12e0f215254ac94fe1f52682cde7d634acaed4288d0f90e857"
+  },
+  {
+   "scene": "s01_l6",
+   "id": "wintertime1_node11_topdown",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s01_l6_wintertime1_node11_topdownScreenshot.bmp",
+   "exists": true,
+   "sha256": "05047de31bb4fdbf06fbf298e29d7f389dfbdee5a5213b1c8508fc2b6b65b13f"
+  },
+  {
+   "scene": "s01_l6",
+   "id": "wintertime1_overview",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s01_l6_wintertime1_overviewScreenshot.bmp",
+   "exists": true,
+   "sha256": "420606eaeb66cb12e0f215254ac94fe1f52682cde7d634acaed4288d0f90e857"
+  },
+  {
+   "scene": "s01_l6",
+   "id": "reset_node11_topdown",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s01_l6_reset_node11_topdownScreenshot.bmp",
+   "exists": true,
+   "sha256": "05047de31bb4fdbf06fbf298e29d7f389dfbdee5a5213b1c8508fc2b6b65b13f"
+  },
+  {
+   "scene": "s02_l15",
+   "id": "overview",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s02_l15_overviewScreenshot.bmp",
+   "exists": true,
+   "sha256": "bdec5d36389241ec3698e36f1ca57dbd51a87447b1756384678f7e43ca5d7519"
+  },
+  {
+   "scene": "s02_l15",
+   "id": "map38_flat",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s02_l15_map38_flatScreenshot.bmp",
+   "exists": true,
+   "sha256": "64cb9f3b5c21449d260833b13f2925248ca36873669f55a3ec8c43e136cae787"
+  },
+  {
+   "scene": "s02_l15",
+   "id": "map38_hill",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s02_l15_map38_hillScreenshot.bmp",
+   "exists": true,
+   "sha256": "10635c1d1d54b319a865d8ac054c46c364a7e68cc223b5d4d913d20ab86da7bb"
+  },
+  {
+   "scene": "s02_l15",
+   "id": "node11_topdown",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s02_l15_node11_topdownScreenshot.bmp",
+   "exists": true,
+   "sha256": "6f8725edafcf4a6291434017d10031a9d25913bc1b15a0d08fad0ce61af2a2a7"
+  },
+  {
+   "scene": "s02_l15",
+   "id": "band01",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s02_l15_band01Screenshot.bmp",
+   "exists": true,
+   "sha256": "8d3a3fcd51a330fa2dcf59fa2a4a80f0e22380b67df95897d76014466e9b0a60"
+  },
+  {
+   "scene": "s02_l15",
+   "id": "band02",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s02_l15_band02Screenshot.bmp",
+   "exists": true,
+   "sha256": "6b6b2275bdcdff47660c2c8a040a5fe101713ff36a06154ab20f51653f5736a9"
+  },
+  {
+   "scene": "s02_l15",
+   "id": "band03",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s02_l15_band03Screenshot.bmp",
+   "exists": true,
+   "sha256": "54d049d1540893951ff438945ea301313251e3c7768f4047f232b4abd7bb7772"
+  },
+  {
+   "scene": "s02_l15",
+   "id": "band04",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s02_l15_band04Screenshot.bmp",
+   "exists": true,
+   "sha256": "5d4e592b7ec2bbd93acd440dc30c7b91c14aa7aa90b0afcc7b05ad02cda479a0"
+  },
+  {
+   "scene": "s02_l15",
+   "id": "band05",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s02_l15_band05Screenshot.bmp",
+   "exists": true,
+   "sha256": "e8b7e8a3504eca80c71f52ab3a989875b38157580b4636e7d306820c0f48f193"
+  },
+  {
+   "scene": "s02_l15",
+   "id": "band06",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s02_l15_band06Screenshot.bmp",
+   "exists": true,
+   "sha256": "34f5ade75470646bb1a5bfc4fe9c563638a03ed5f1616d145c2404064ed303e9"
+  },
+  {
+   "scene": "s02_l15",
+   "id": "band07",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s02_l15_band07Screenshot.bmp",
+   "exists": true,
+   "sha256": "ffa3aadb0ad0c0889ae36891af3c2e5513aceda021c34f5539490fb0757c19ec"
+  },
+  {
+   "scene": "s02_l15",
+   "id": "band08",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s02_l15_band08Screenshot.bmp",
+   "exists": true,
+   "sha256": "e522abb5082985623d31089d0a21a83fc73b0bc4fcec311ae9ba2850ec6bad7e"
+  },
+  {
+   "scene": "s02_l15",
+   "id": "band09",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s02_l15_band09Screenshot.bmp",
+   "exists": true,
+   "sha256": "02bad174c5cccc8923f9d9610b425e1d67ee3fc4b18e01513d1070ff00aff1c9"
+  },
+  {
+   "scene": "s02_l15",
+   "id": "band10",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s02_l15_band10Screenshot.bmp",
+   "exists": true,
+   "sha256": "fdccdf0a3b2c55ab9192977c4bdb60860b2e40162a07b35ecfccd14b5776c363"
+  },
+  {
+   "scene": "s02_l15",
+   "id": "band11",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s02_l15_band11Screenshot.bmp",
+   "exists": true,
+   "sha256": "6769b17059f0e3726520b8da608766a52670fceeaa155c843f5da88b30daeeb0"
+  },
+  {
+   "scene": "s02_l15",
+   "id": "band12",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s02_l15_band12Screenshot.bmp",
+   "exists": true,
+   "sha256": "d2ea60fcc0fb46ae92b27672dbd3ebc842e254ce83ff56ea8bc6368a4f92a761"
+  },
+  {
+   "scene": "s02_l15",
+   "id": "band13",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s02_l15_band13Screenshot.bmp",
+   "exists": true,
+   "sha256": "0852bdac33524ceab27bb2dad060d03e7e277713e983e9f0de6db7c82d7bba36"
+  },
+  {
+   "scene": "s02_l15",
+   "id": "band14",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s02_l15_band14Screenshot.bmp",
+   "exists": true,
+   "sha256": "1800db8db3d4c1a0e2929157118162f68f1ed6ba63518ee74b0fd13b0f8f48ed"
+  },
+  {
+   "scene": "s08_l2_decals",
+   "id": "d0_baseline",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s08_l2_decals_d0_baselineScreenshot.bmp",
+   "exists": true,
+   "sha256": "0ac8e153d6a7d4e08e15ce364afd8e68dff519870bd6931556d486473a50a918"
+  },
+  {
+   "scene": "s08_l2_decals",
+   "id": "d1_sceneDecals",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s08_l2_decals_d1_sceneDecalsScreenshot.bmp",
+   "exists": true,
+   "sha256": "6f48f630ab131f1154806ce12181bf2b86711fafd26b40c949771cb99fb8bbf9"
+  },
+  {
+   "scene": "s08_l2_decals",
+   "id": "d2_runtimeTexture",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s08_l2_decals_d2_runtimeTextureScreenshot.bmp",
+   "exists": true,
+   "sha256": "94995785dcb3ee568ff4b7234c24283d4cebdd51e03964caf2605c3371137e60"
+  },
+  {
+   "scene": "s08_l2_decals",
+   "id": "d3_entityDecals",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s08_l2_decals_d3_entityDecalsScreenshot.bmp",
+   "exists": true,
+   "sha256": "e3d9b8f23c62fc206e7e2b8e7a80bda6e60ecfba30578a1af4ce4a109d9a2579"
+  },
+  {
+   "scene": "s08_l2_decals",
+   "id": "d4_meshDecals",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s08_l2_decals_d4_meshDecalsScreenshot.bmp",
+   "exists": true,
+   "sha256": "5da2e5447da815a6f2cb1307839b185e1a6e30eb8ec9c34ab5781a0835b21419"
+  },
+  {
+   "scene": "s08_l2_decals",
+   "id": "count0",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s08_l2_decals_count0Screenshot.bmp",
+   "exists": true,
+   "sha256": "888035eb8f60e8d45b98cee310f84a8c73db46842fbc56bb369b33191db6b916"
+  },
+  {
+   "scene": "s08_l2_decals",
+   "id": "count200",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s08_l2_decals_count200Screenshot.bmp",
+   "exists": true,
+   "sha256": "5202462fac00e4a460548e7782c04e20f2ab851f20150f1c9f3d9d29b3c7c500"
+  },
+  {
+   "scene": "s08_l2_decals",
+   "id": "count1000",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s08_l2_decals_count1000Screenshot.bmp",
+   "exists": true,
+   "sha256": "de3db08c8496ba0e533a55413d6a02088a43f4ba4230db68a2062659ca19315b"
+  },
+  {
+   "scene": "s08_l2_decals",
+   "id": "count3000",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s08_l2_decals_count3000Screenshot.bmp",
+   "exists": true,
+   "sha256": "b6cee16b59d249830e8259ab04cfe05caaf507949c2760dff9fab75166e194cf"
+  },
+  {
+   "scene": "s08_l2_decals",
+   "id": "removed",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s08_l2_decals_removedScreenshot.bmp",
+   "exists": true,
+   "sha256": "70714e427fb6308b04674f71fd04a6eb018b869dd68a185c20d3e41a24c00e6f"
+  },
+  {
+   "scene": "s08_l2_decals",
+   "id": "recreated200",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s08_l2_decals_recreated200Screenshot.bmp",
+   "exists": true,
+   "sha256": "ea488e6327a58491ee0df3786c1f1bff09b8a38a84d268d66d3d99c4def315ff"
+  },
+  {
+   "scene": "s06_l2_decals2",
+   "id": "v0_baseline",
+   "path": "evidence/runtime/in-game/map_epic2-6284-s06_l2_decals2_v0_baselineScreenshot.bmp",
+   "exists": true,
+   "sha256": "66cda478cee5f1616580bfbeb50f17bf0e2c0f71b538d8176485dddfe465ba3e"
+  },
+  {
+   "scene": "s06_l2_decals2",
+   "id": "v1_copyTextureRegistered",
+   "path": "evidence/runtime/in-game/map_epic2-6284-s06_l2_decals2_v1_copyTextureRegisteredScreenshot.bmp",
+   "exists": true,
+   "sha256": "a394e764138199be42fcd88152095572e21aeda20a5b58beb296c759e5384fb2"
+  },
+  {
+   "scene": "s06_l2_decals2",
+   "id": "v2_copyPlain",
+   "path": "evidence/runtime/in-game/map_epic2-6284-s06_l2_decals2_v2_copyPlainScreenshot.bmp",
+   "exists": true,
+   "sha256": "9e57ac34bc87de6ecd46001e86d07e4fb3eec7aa7b772899ae9ac31888cfae7f"
+  },
+  {
+   "scene": "s06_l2_decals2",
+   "id": "v3_factorTint",
+   "path": "evidence/runtime/in-game/map_epic2-6284-s06_l2_decals2_v3_factorTintScreenshot.bmp",
+   "exists": true,
+   "sha256": "ba0a26de1087fd078f392842134b68bd87b73e314a5ecc01206bffc13745225e"
+  },
+  {
+   "scene": "s06_l2_decals2",
+   "id": "v4_entityRegistered",
+   "path": "evidence/runtime/in-game/map_epic2-6284-s06_l2_decals2_v4_entityRegisteredScreenshot.bmp",
+   "exists": true,
+   "sha256": "d19cede7851c36a3d77eb0746ebb4fcb3f9c5b67bfc422e1d6aead550bbe23ab"
+  },
+  {
+   "scene": "s06_l2_decals2",
+   "id": "v5_groundOverlays",
+   "path": "evidence/runtime/in-game/map_epic2-6284-s06_l2_decals2_v5_groundOverlaysScreenshot.bmp",
+   "exists": true,
+   "sha256": "8048c034a91810ae16065d540eb75cc47dedee3eefcb886dd6a0dd42af7399f4"
+  },
+  {
+   "scene": "s06_l2_decals2",
+   "id": "c7500",
+   "path": "evidence/runtime/in-game/map_epic2-6284-s06_l2_decals2_c7500Screenshot.bmp",
+   "exists": true,
+   "sha256": "384e2fccef69d13b975d705b5d5929e93013cdabd9217b8d644216ba67dbb6de"
+  },
+  {
+   "scene": "s07_snow_snow2",
+   "id": "inherent_summer_q_nw",
+   "path": "evidence/runtime/in-game/map_epic2-6284-s07_snow_snow2_inherent_summer_q_nwScreenshot.bmp",
+   "exists": true,
+   "sha256": "91e4e82bbc0693e45158a3f27338aed5014593c281d9d00e9551e8e49626fac0"
+  },
+  {
+   "scene": "s07_snow_snow2",
+   "id": "inherent_summer_q_ne",
+   "path": "evidence/runtime/in-game/map_epic2-6284-s07_snow_snow2_inherent_summer_q_neScreenshot.bmp",
+   "exists": true,
+   "sha256": "cf6952e5660f45ad7ac7d08ca4e5efbecbf8d1ac4c415e2ff5e9793cbbb3c08b"
+  },
+  {
+   "scene": "s07_snow_snow2",
+   "id": "inherent_summer_q_sw",
+   "path": "evidence/runtime/in-game/map_epic2-6284-s07_snow_snow2_inherent_summer_q_swScreenshot.bmp",
+   "exists": true,
+   "sha256": "eca3b363a3dddae12e6c70d9a19384a92bb614944802322b83fbcd93cde0d217"
+  },
+  {
+   "scene": "s07_snow_snow2",
+   "id": "inherent_summer_q_se",
+   "path": "evidence/runtime/in-game/map_epic2-6284-s07_snow_snow2_inherent_summer_q_seScreenshot.bmp",
+   "exists": true,
+   "sha256": "c69f71b03fcc89cacc0fc4f6a6a5b9a8159bcf8ee6a1673adc50072f2a1cf4d1"
+  },
+  {
+   "scene": "s07_snow_snow2",
+   "id": "inherent_winter_q_nw",
+   "path": "evidence/runtime/in-game/map_epic2-6284-s07_snow_snow2_inherent_winter_q_nwScreenshot.bmp",
+   "exists": true,
+   "sha256": "91e4e82bbc0693e45158a3f27338aed5014593c281d9d00e9551e8e49626fac0"
+  },
+  {
+   "scene": "s07_snow_snow2",
+   "id": "inherent_winter_q_ne",
+   "path": "evidence/runtime/in-game/map_epic2-6284-s07_snow_snow2_inherent_winter_q_neScreenshot.bmp",
+   "exists": true,
+   "sha256": "cf6952e5660f45ad7ac7d08ca4e5efbecbf8d1ac4c415e2ff5e9793cbbb3c08b"
+  },
+  {
+   "scene": "s07_snow_snow2",
+   "id": "inherent_winter_q_sw",
+   "path": "evidence/runtime/in-game/map_epic2-6284-s07_snow_snow2_inherent_winter_q_swScreenshot.bmp",
+   "exists": true,
+   "sha256": "eca3b363a3dddae12e6c70d9a19384a92bb614944802322b83fbcd93cde0d217"
+  },
+  {
+   "scene": "s07_snow_snow2",
+   "id": "inherent_winter_q_se",
+   "path": "evidence/runtime/in-game/map_epic2-6284-s07_snow_snow2_inherent_winter_q_seScreenshot.bmp",
+   "exists": true,
+   "sha256": "c69f71b03fcc89cacc0fc4f6a6a5b9a8159bcf8ee6a1673adc50072f2a1cf4d1"
+  },
+  {
+   "scene": "s07_snow_snow2",
+   "id": "inherent_winter_map38_nw",
+   "path": "evidence/runtime/in-game/map_epic2-6284-s07_snow_snow2_inherent_winter_map38_nwScreenshot.bmp",
+   "exists": true,
+   "sha256": "7348e0eb1a2d632708655da3afd4a3f6c5e6f5508834dfd0a1b2b209c28dbe30"
+  },
+  {
+   "scene": "s07_snow_snow2",
+   "id": "runtime_summer_q_nw",
+   "path": "evidence/runtime/in-game/map_epic2-6284-s07_snow_snow2_runtime_summer_q_nwScreenshot.bmp",
+   "exists": true,
+   "sha256": "91e4e82bbc0693e45158a3f27338aed5014593c281d9d00e9551e8e49626fac0"
+  },
+  {
+   "scene": "s07_snow_snow2",
+   "id": "runtime_summer_q_ne",
+   "path": "evidence/runtime/in-game/map_epic2-6284-s07_snow_snow2_runtime_summer_q_neScreenshot.bmp",
+   "exists": true,
+   "sha256": "cf6952e5660f45ad7ac7d08ca4e5efbecbf8d1ac4c415e2ff5e9793cbbb3c08b"
+  },
+  {
+   "scene": "s07_snow_snow2",
+   "id": "runtime_summer_q_sw",
+   "path": "evidence/runtime/in-game/map_epic2-6284-s07_snow_snow2_runtime_summer_q_swScreenshot.bmp",
+   "exists": true,
+   "sha256": "eca3b363a3dddae12e6c70d9a19384a92bb614944802322b83fbcd93cde0d217"
+  },
+  {
+   "scene": "s07_snow_snow2",
+   "id": "runtime_summer_q_se",
+   "path": "evidence/runtime/in-game/map_epic2-6284-s07_snow_snow2_runtime_summer_q_seScreenshot.bmp",
+   "exists": true,
+   "sha256": "c69f71b03fcc89cacc0fc4f6a6a5b9a8159bcf8ee6a1673adc50072f2a1cf4d1"
+  },
+  {
+   "scene": "s07_snow_snow2",
+   "id": "runtime_winter_q_nw",
+   "path": "evidence/runtime/in-game/map_epic2-6284-s07_snow_snow2_runtime_winter_q_nwScreenshot.bmp",
+   "exists": true,
+   "sha256": "91e4e82bbc0693e45158a3f27338aed5014593c281d9d00e9551e8e49626fac0"
+  },
+  {
+   "scene": "s07_snow_snow2",
+   "id": "runtime_winter_q_ne",
+   "path": "evidence/runtime/in-game/map_epic2-6284-s07_snow_snow2_runtime_winter_q_neScreenshot.bmp",
+   "exists": true,
+   "sha256": "cf6952e5660f45ad7ac7d08ca4e5efbecbf8d1ac4c415e2ff5e9793cbbb3c08b"
+  },
+  {
+   "scene": "s07_snow_snow2",
+   "id": "runtime_winter_q_sw",
+   "path": "evidence/runtime/in-game/map_epic2-6284-s07_snow_snow2_runtime_winter_q_swScreenshot.bmp",
+   "exists": true,
+   "sha256": "eca3b363a3dddae12e6c70d9a19384a92bb614944802322b83fbcd93cde0d217"
+  },
+  {
+   "scene": "s07_snow_snow2",
+   "id": "runtime_winter_q_se",
+   "path": "evidence/runtime/in-game/map_epic2-6284-s07_snow_snow2_runtime_winter_q_seScreenshot.bmp",
+   "exists": true,
+   "sha256": "c69f71b03fcc89cacc0fc4f6a6a5b9a8159bcf8ee6a1673adc50072f2a1cf4d1"
+  },
+  {
+   "scene": "s07_snow_snow2",
+   "id": "runtime_winter_map38_nw",
+   "path": "evidence/runtime/in-game/map_epic2-6284-s07_snow_snow2_runtime_winter_map38_nwScreenshot.bmp",
+   "exists": true,
+   "sha256": "7348e0eb1a2d632708655da3afd4a3f6c5e6f5508834dfd0a1b2b209c28dbe30"
+  },
+  {
+   "scene": "s07_snow_snow2",
+   "id": "green_winter_q_nw",
+   "path": "evidence/runtime/in-game/map_epic2-6284-s07_snow_snow2_green_winter_q_nwScreenshot.bmp",
+   "exists": true,
+   "sha256": "91e4e82bbc0693e45158a3f27338aed5014593c281d9d00e9551e8e49626fac0"
+  },
+  {
+   "scene": "s07_snow_snow2",
+   "id": "alpha_winter_q_nw",
+   "path": "evidence/runtime/in-game/map_epic2-6284-s07_snow_snow2_alpha_winter_q_nwScreenshot.bmp",
+   "exists": true,
+   "sha256": "91e4e82bbc0693e45158a3f27338aed5014593c281d9d00e9551e8e49626fac0"
+  },
+  {
+   "scene": "s07_snow_snow2",
+   "id": "bluewater_winter_q_nw",
+   "path": "evidence/runtime/in-game/map_epic2-6284-s07_snow_snow2_bluewater_winter_q_nwScreenshot.bmp",
+   "exists": true,
+   "sha256": "91e4e82bbc0693e45158a3f27338aed5014593c281d9d00e9551e8e49626fac0"
+  },
+  {
+   "scene": "s07_snow_snow2",
+   "id": "vanillaTexture_summer_q_nw",
+   "path": "evidence/runtime/in-game/map_epic2-6284-s07_snow_snow2_vanillaTexture_summer_q_nwScreenshot.bmp",
+   "exists": true,
+   "sha256": "91e4e82bbc0693e45158a3f27338aed5014593c281d9d00e9551e8e49626fac0"
+  },
+  {
+   "scene": "s07_snow_snow2",
+   "id": "vanillaTexture_winter_q_nw",
+   "path": "evidence/runtime/in-game/map_epic2-6284-s07_snow_snow2_vanillaTexture_winter_q_nwScreenshot.bmp",
+   "exists": true,
+   "sha256": "91e4e82bbc0693e45158a3f27338aed5014593c281d9d00e9551e8e49626fac0"
+  },
+  {
+   "scene": "s07_snow_snow2",
+   "id": "vanillaTexture_winter_q_ne",
+   "path": "evidence/runtime/in-game/map_epic2-6284-s07_snow_snow2_vanillaTexture_winter_q_neScreenshot.bmp",
+   "exists": true,
+   "sha256": "cf6952e5660f45ad7ac7d08ca4e5efbecbf8d1ac4c415e2ff5e9793cbbb3c08b"
+  },
+  {
+   "scene": "s07_snow_snow2",
+   "id": "vanillaTexture_winter_q_sw",
+   "path": "evidence/runtime/in-game/map_epic2-6284-s07_snow_snow2_vanillaTexture_winter_q_swScreenshot.bmp",
+   "exists": true,
+   "sha256": "eca3b363a3dddae12e6c70d9a19384a92bb614944802322b83fbcd93cde0d217"
+  },
+  {
+   "scene": "s07_snow_snow2",
+   "id": "vanillaTexture_winter_q_se",
+   "path": "evidence/runtime/in-game/map_epic2-6284-s07_snow_snow2_vanillaTexture_winter_q_seScreenshot.bmp",
+   "exists": true,
+   "sha256": "c69f71b03fcc89cacc0fc4f6a6a5b9a8159bcf8ee6a1673adc50072f2a1cf4d1"
+  },
+  {
+   "scene": "s07_snow_snow2",
+   "id": "vanillaTexture_winter_map38_nw",
+   "path": "evidence/runtime/in-game/map_epic2-6284-s07_snow_snow2_vanillaTexture_winter_map38_nwScreenshot.bmp",
+   "exists": true,
+   "sha256": "7348e0eb1a2d632708655da3afd4a3f6c5e6f5508834dfd0a1b2b209c28dbe30"
+  },
+  {
+   "scene": "s08_snowf_snow2",
+   "id": "inherent_summer_q_nw",
+   "path": "evidence/runtime/in-game/map_epic2-6284-s08_snowf_snow2_inherent_summer_q_nwScreenshot.bmp",
+   "exists": true,
+   "sha256": "41fbd9612303d779fa3c9311588517cb4c3ba0cdecb8b46ac6d5cfa64e0778cb"
+  },
+  {
+   "scene": "s08_snowf_snow2",
+   "id": "inherent_summer_q_ne",
+   "path": "evidence/runtime/in-game/map_epic2-6284-s08_snowf_snow2_inherent_summer_q_neScreenshot.bmp",
+   "exists": true,
+   "sha256": "14232f1385f135ed2a5b33d87dba3b18ca7ce0faf13bf1da199a6363fe350e2d"
+  },
+  {
+   "scene": "s08_snowf_snow2",
+   "id": "inherent_summer_q_sw",
+   "path": "evidence/runtime/in-game/map_epic2-6284-s08_snowf_snow2_inherent_summer_q_swScreenshot.bmp",
+   "exists": true,
+   "sha256": "eca3b363a3dddae12e6c70d9a19384a92bb614944802322b83fbcd93cde0d217"
+  },
+  {
+   "scene": "s08_snowf_snow2",
+   "id": "inherent_summer_q_se",
+   "path": "evidence/runtime/in-game/map_epic2-6284-s08_snowf_snow2_inherent_summer_q_seScreenshot.bmp",
+   "exists": true,
+   "sha256": "6cb7143b520fce67e7ba1544e9d97676ec67135801556e8e5011f8bfec38b568"
+  },
+  {
+   "scene": "s08_snowf_snow2",
+   "id": "inherent_winter_q_nw",
+   "path": "evidence/runtime/in-game/map_epic2-6284-s08_snowf_snow2_inherent_winter_q_nwScreenshot.bmp",
+   "exists": true,
+   "sha256": "b20e2cdfdce8482babf44c744859644bda49510bb83fc5164866c595744a35d4"
+  },
+  {
+   "scene": "s08_snowf_snow2",
+   "id": "inherent_winter_q_ne",
+   "path": "evidence/runtime/in-game/map_epic2-6284-s08_snowf_snow2_inherent_winter_q_neScreenshot.bmp",
+   "exists": true,
+   "sha256": "62cdff6f669b8855cfe48a68a5fea9b4a3edbbc96b37726ee9d47cdde4feaa4e"
+  },
+  {
+   "scene": "s08_snowf_snow2",
+   "id": "inherent_winter_q_sw",
+   "path": "evidence/runtime/in-game/map_epic2-6284-s08_snowf_snow2_inherent_winter_q_swScreenshot.bmp",
+   "exists": true,
+   "sha256": "ad183d4f09762363e567c4a43361699fadb8d74c13c99fdb787270b92387d75a"
+  },
+  {
+   "scene": "s08_snowf_snow2",
+   "id": "inherent_winter_q_se",
+   "path": "evidence/runtime/in-game/map_epic2-6284-s08_snowf_snow2_inherent_winter_q_seScreenshot.bmp",
+   "exists": true,
+   "sha256": "08a93a3953742d89b7f500af4da95e89869d46ded7819cede8480134268471e7"
+  },
+  {
+   "scene": "s08_snowf_snow2",
+   "id": "inherent_winter_map38_nw",
+   "path": "evidence/runtime/in-game/map_epic2-6284-s08_snowf_snow2_inherent_winter_map38_nwScreenshot.bmp",
+   "exists": true,
+   "sha256": "ab9cabbfd6f74143c1252b7b08fa0d96aa764d5c83a13fc02dc1927ce432b9db"
+  },
+  {
+   "scene": "s08_snowf_snow2",
+   "id": "runtime_summer_q_nw",
+   "path": "evidence/runtime/in-game/map_epic2-6284-s08_snowf_snow2_runtime_summer_q_nwScreenshot.bmp",
+   "exists": true,
+   "sha256": "41fbd9612303d779fa3c9311588517cb4c3ba0cdecb8b46ac6d5cfa64e0778cb"
+  },
+  {
+   "scene": "s08_snowf_snow2",
+   "id": "runtime_summer_q_ne",
+   "path": "evidence/runtime/in-game/map_epic2-6284-s08_snowf_snow2_runtime_summer_q_neScreenshot.bmp",
+   "exists": true,
+   "sha256": "14232f1385f135ed2a5b33d87dba3b18ca7ce0faf13bf1da199a6363fe350e2d"
+  },
+  {
+   "scene": "s08_snowf_snow2",
+   "id": "runtime_summer_q_sw",
+   "path": "evidence/runtime/in-game/map_epic2-6284-s08_snowf_snow2_runtime_summer_q_swScreenshot.bmp",
+   "exists": true,
+   "sha256": "eca3b363a3dddae12e6c70d9a19384a92bb614944802322b83fbcd93cde0d217"
+  },
+  {
+   "scene": "s08_snowf_snow2",
+   "id": "runtime_summer_q_se",
+   "path": "evidence/runtime/in-game/map_epic2-6284-s08_snowf_snow2_runtime_summer_q_seScreenshot.bmp",
+   "exists": true,
+   "sha256": "6cb7143b520fce67e7ba1544e9d97676ec67135801556e8e5011f8bfec38b568"
+  },
+  {
+   "scene": "s08_snowf_snow2",
+   "id": "runtime_winter_q_nw",
+   "path": "evidence/runtime/in-game/map_epic2-6284-s08_snowf_snow2_runtime_winter_q_nwScreenshot.bmp",
+   "exists": true,
+   "sha256": "b20e2cdfdce8482babf44c744859644bda49510bb83fc5164866c595744a35d4"
+  },
+  {
+   "scene": "s08_snowf_snow2",
+   "id": "runtime_winter_q_ne",
+   "path": "evidence/runtime/in-game/map_epic2-6284-s08_snowf_snow2_runtime_winter_q_neScreenshot.bmp",
+   "exists": true,
+   "sha256": "62cdff6f669b8855cfe48a68a5fea9b4a3edbbc96b37726ee9d47cdde4feaa4e"
+  },
+  {
+   "scene": "s08_snowf_snow2",
+   "id": "runtime_winter_q_sw",
+   "path": "evidence/runtime/in-game/map_epic2-6284-s08_snowf_snow2_runtime_winter_q_swScreenshot.bmp",
+   "exists": true,
+   "sha256": "ad183d4f09762363e567c4a43361699fadb8d74c13c99fdb787270b92387d75a"
+  },
+  {
+   "scene": "s08_snowf_snow2",
+   "id": "runtime_winter_q_se",
+   "path": "evidence/runtime/in-game/map_epic2-6284-s08_snowf_snow2_runtime_winter_q_seScreenshot.bmp",
+   "exists": true,
+   "sha256": "08a93a3953742d89b7f500af4da95e89869d46ded7819cede8480134268471e7"
+  },
+  {
+   "scene": "s08_snowf_snow2",
+   "id": "runtime_winter_map38_nw",
+   "path": "evidence/runtime/in-game/map_epic2-6284-s08_snowf_snow2_runtime_winter_map38_nwScreenshot.bmp",
+   "exists": true,
+   "sha256": "ab9cabbfd6f74143c1252b7b08fa0d96aa764d5c83a13fc02dc1927ce432b9db"
+  },
+  {
+   "scene": "s08_snowf_snow2",
+   "id": "green_winter_q_nw",
+   "path": "evidence/runtime/in-game/map_epic2-6284-s08_snowf_snow2_green_winter_q_nwScreenshot.bmp",
+   "exists": true,
+   "sha256": "b20e2cdfdce8482babf44c744859644bda49510bb83fc5164866c595744a35d4"
+  },
+  {
+   "scene": "s08_snowf_snow2",
+   "id": "alpha_winter_q_nw",
+   "path": "evidence/runtime/in-game/map_epic2-6284-s08_snowf_snow2_alpha_winter_q_nwScreenshot.bmp",
+   "exists": true,
+   "sha256": "b20e2cdfdce8482babf44c744859644bda49510bb83fc5164866c595744a35d4"
+  },
+  {
+   "scene": "s08_snowf_snow2",
+   "id": "bluewater_winter_q_nw",
+   "path": "evidence/runtime/in-game/map_epic2-6284-s08_snowf_snow2_bluewater_winter_q_nwScreenshot.bmp",
+   "exists": true,
+   "sha256": "b20e2cdfdce8482babf44c744859644bda49510bb83fc5164866c595744a35d4"
+  },
+  {
+   "scene": "s08_snowf_snow2",
+   "id": "vanillaTexture_summer_q_nw",
+   "path": "evidence/runtime/in-game/map_epic2-6284-s08_snowf_snow2_vanillaTexture_summer_q_nwScreenshot.bmp",
+   "exists": true,
+   "sha256": "41fbd9612303d779fa3c9311588517cb4c3ba0cdecb8b46ac6d5cfa64e0778cb"
+  },
+  {
+   "scene": "s08_snowf_snow2",
+   "id": "vanillaTexture_winter_q_nw",
+   "path": "evidence/runtime/in-game/map_epic2-6284-s08_snowf_snow2_vanillaTexture_winter_q_nwScreenshot.bmp",
+   "exists": true,
+   "sha256": "b20e2cdfdce8482babf44c744859644bda49510bb83fc5164866c595744a35d4"
+  },
+  {
+   "scene": "s08_snowf_snow2",
+   "id": "vanillaTexture_winter_q_ne",
+   "path": "evidence/runtime/in-game/map_epic2-6284-s08_snowf_snow2_vanillaTexture_winter_q_neScreenshot.bmp",
+   "exists": true,
+   "sha256": "62cdff6f669b8855cfe48a68a5fea9b4a3edbbc96b37726ee9d47cdde4feaa4e"
+  },
+  {
+   "scene": "s08_snowf_snow2",
+   "id": "vanillaTexture_winter_q_sw",
+   "path": "evidence/runtime/in-game/map_epic2-6284-s08_snowf_snow2_vanillaTexture_winter_q_swScreenshot.bmp",
+   "exists": true,
+   "sha256": "ad183d4f09762363e567c4a43361699fadb8d74c13c99fdb787270b92387d75a"
+  },
+  {
+   "scene": "s08_snowf_snow2",
+   "id": "vanillaTexture_winter_q_se",
+   "path": "evidence/runtime/in-game/map_epic2-6284-s08_snowf_snow2_vanillaTexture_winter_q_seScreenshot.bmp",
+   "exists": true,
+   "sha256": "08a93a3953742d89b7f500af4da95e89869d46ded7819cede8480134268471e7"
+  },
+  {
+   "scene": "s08_snowf_snow2",
+   "id": "vanillaTexture_winter_map38_nw",
+   "path": "evidence/runtime/in-game/map_epic2-6284-s08_snowf_snow2_vanillaTexture_winter_map38_nwScreenshot.bmp",
+   "exists": true,
+   "sha256": "ab9cabbfd6f74143c1252b7b08fa0d96aa764d5c83a13fc02dc1927ce432b9db"
+  },
+  {
+   "scene": "s09_snow",
+   "id": "baseline_snow_topdown",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s09_snow_baseline_snow_topdownScreenshot.bmp",
+   "exists": true,
+   "sha256": "d88cfc30823aaf57d950a0440a1cd7d211b7d1ea323594fd27d61a62a8a79d16"
+  },
+  {
+   "scene": "s09_snow",
+   "id": "baseline_map38_nw",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s09_snow_baseline_map38_nwScreenshot.bmp",
+   "exists": true,
+   "sha256": "47de864d89f37a6a2b12000f4e84951804ce43ff0cddd368b58e86bd8a895f09"
+  },
+  {
+   "scene": "s09_snow",
+   "id": "baseline_map38_hill",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s09_snow_baseline_map38_hillScreenshot.bmp",
+   "exists": true,
+   "sha256": "0197dee1e449125019cc36dd322f25e5fb9ac29355c698cedb7ffd66e61934c8"
+  },
+  {
+   "scene": "s09_snow",
+   "id": "season0_snow_topdown",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s09_snow_season0_snow_topdownScreenshot.bmp",
+   "exists": true,
+   "sha256": "d88cfc30823aaf57d950a0440a1cd7d211b7d1ea323594fd27d61a62a8a79d16"
+  },
+  {
+   "scene": "s09_snow",
+   "id": "season0_map38_nw",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s09_snow_season0_map38_nwScreenshot.bmp",
+   "exists": true,
+   "sha256": "facc6cf89438fbfcd6765f8765ace2fac7591de8f32ad068d5204cf6c90abd8b"
+  },
+  {
+   "scene": "s09_snow",
+   "id": "seasonfactor1_snow_topdown",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s09_snow_seasonfactor1_snow_topdownScreenshot.bmp",
+   "exists": true,
+   "sha256": "d88cfc30823aaf57d950a0440a1cd7d211b7d1ea323594fd27d61a62a8a79d16"
+  },
+  {
+   "scene": "s09_snow",
+   "id": "seasonfactor1_map38_nw",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s09_snow_seasonfactor1_map38_nwScreenshot.bmp",
+   "exists": true,
+   "sha256": "facc6cf89438fbfcd6765f8765ace2fac7591de8f32ad068d5204cf6c90abd8b"
+  },
+  {
+   "scene": "s09_snow",
+   "id": "wintertime1_snow_topdown",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s09_snow_wintertime1_snow_topdownScreenshot.bmp",
+   "exists": true,
+   "sha256": "d88cfc30823aaf57d950a0440a1cd7d211b7d1ea323594fd27d61a62a8a79d16"
+  },
+  {
+   "scene": "s09_snow",
+   "id": "wintertime1_map38_nw",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s09_snow_wintertime1_map38_nwScreenshot.bmp",
+   "exists": true,
+   "sha256": "facc6cf89438fbfcd6765f8765ace2fac7591de8f32ad068d5204cf6c90abd8b"
+  },
+  {
+   "scene": "s09_snow",
+   "id": "reset_snow_topdown",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s09_snow_reset_snow_topdownScreenshot.bmp",
+   "exists": true,
+   "sha256": "d88cfc30823aaf57d950a0440a1cd7d211b7d1ea323594fd27d61a62a8a79d16"
+  },
+  {
+   "scene": "s09_snow",
+   "id": "red_x0p550_snow_topdown",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s09_snow_red_x0p550_snow_topdownScreenshot.bmp",
+   "exists": true,
+   "sha256": "d88cfc30823aaf57d950a0440a1cd7d211b7d1ea323594fd27d61a62a8a79d16"
+  },
+  {
+   "scene": "s09_snow",
+   "id": "red_x0p225_snow_topdown",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s09_snow_red_x0p225_snow_topdownScreenshot.bmp",
+   "exists": true,
+   "sha256": "d88cfc30823aaf57d950a0440a1cd7d211b7d1ea323594fd27d61a62a8a79d16"
+  },
+  {
+   "scene": "s09_snow",
+   "id": "red_xm0p100_snow_topdown",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s09_snow_red_xm0p100_snow_topdownScreenshot.bmp",
+   "exists": true,
+   "sha256": "d88cfc30823aaf57d950a0440a1cd7d211b7d1ea323594fd27d61a62a8a79d16"
+  },
+  {
+   "scene": "s09_snow",
+   "id": "red_winter_map38_nw",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s09_snow_red_winter_map38_nwScreenshot.bmp",
+   "exists": true,
+   "sha256": "facc6cf89438fbfcd6765f8765ace2fac7591de8f32ad068d5204cf6c90abd8b"
+  },
+  {
+   "scene": "s09_snow",
+   "id": "red_winter_map38_se",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s09_snow_red_winter_map38_seScreenshot.bmp",
+   "exists": true,
+   "sha256": "0e2d32246cda0cc7dded4bc2d7f1330471c699e23f022414ced09d79c5042773"
+  },
+  {
+   "scene": "s09_snow",
+   "id": "red_winter_map38_hill",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s09_snow_red_winter_map38_hillScreenshot.bmp",
+   "exists": true,
+   "sha256": "1bf56b31f0d253086a94a388f7c1089d6a76ae1841bba7ea5457a8bd82a53aef"
+  },
+  {
+   "scene": "s09_snow",
+   "id": "green_snow_topdown",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s09_snow_green_snow_topdownScreenshot.bmp",
+   "exists": true,
+   "sha256": "d88cfc30823aaf57d950a0440a1cd7d211b7d1ea323594fd27d61a62a8a79d16"
+  },
+  {
+   "scene": "s09_snow",
+   "id": "alpha_snow_topdown",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s09_snow_alpha_snow_topdownScreenshot.bmp",
+   "exists": true,
+   "sha256": "d88cfc30823aaf57d950a0440a1cd7d211b7d1ea323594fd27d61a62a8a79d16"
+  },
+  {
+   "scene": "s09_snow",
+   "id": "bluewater_snow_topdown",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s09_snow_bluewater_snow_topdownScreenshot.bmp",
+   "exists": true,
+   "sha256": "d88cfc30823aaf57d950a0440a1cd7d211b7d1ea323594fd27d61a62a8a79d16"
+  },
+  {
+   "scene": "s09_snow",
+   "id": "forcedsnow_snow_topdown",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s09_snow_forcedsnow_snow_topdownScreenshot.bmp",
+   "exists": true,
+   "sha256": "d88cfc30823aaf57d950a0440a1cd7d211b7d1ea323594fd27d61a62a8a79d16"
+  },
+  {
+   "scene": "s09_snow",
+   "id": "forcedsnow_map38_nw",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s09_snow_forcedsnow_map38_nwScreenshot.bmp",
+   "exists": true,
+   "sha256": "cfea485148262c3396df5872386742f086fa543d158a1692153304f0e083cc40"
+  },
+  {
+   "scene": "s04_a6",
+   "id": "overview",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s04_a6_overviewScreenshot.bmp",
+   "exists": true,
+   "sha256": "3486e46ea7d9cfc499f22fd54fa49297d58babcdf9bb001bfe8b2d1e2bef3219"
+  },
+  {
+   "scene": "s04_a6",
+   "id": "map38_mountain",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s04_a6_map38_mountainScreenshot.bmp",
+   "exists": true,
+   "sha256": "8a3175d3d24216790d179c4a0229c19d5b593452110e829953f611df255e14c7"
+  },
+  {
+   "scene": "s04_a6",
+   "id": "map38_coast",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s04_a6_map38_coastScreenshot.bmp",
+   "exists": true,
+   "sha256": "a15a1a33a82be024720c075da6bd6db0a8608b5b1f6ab97d1f59e332ab21d08a"
+  },
+  {
+   "scene": "s04_a6",
+   "id": "mountain_oblique",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s04_a6_mountain_obliqueScreenshot.bmp",
+   "exists": true,
+   "sha256": "13848b70b71109260906b9cf272beb4fcc1f6c2276bd57d5f894dbfa0542d6b6"
+  },
+  {
+   "scene": "s05_a6n",
+   "id": "overview",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s05_a6n_overviewScreenshot.bmp",
+   "exists": true,
+   "sha256": "efff9d6b044ea99ff71f74aa645f48837ae78b71a8a5813053a774ae42ef1e4d"
+  },
+  {
+   "scene": "s05_a6n",
+   "id": "map38_mountain",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s05_a6n_map38_mountainScreenshot.bmp",
+   "exists": true,
+   "sha256": "88faf50b5b932d4ab18a27b9840e0080935b2f7c4a22e953776881b2a1db8614"
+  },
+  {
+   "scene": "s05_a6n",
+   "id": "map38_coast",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s05_a6n_map38_coastScreenshot.bmp",
+   "exists": true,
+   "sha256": "aa3b5e39650b20acdaf935d0458ba31f4e642de1fd2f5435da24c534b6281e58"
+  },
+  {
+   "scene": "s05_a6n",
+   "id": "mountain_oblique",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s05_a6n_mountain_obliqueScreenshot.bmp",
+   "exists": true,
+   "sha256": "8ccd36885ded8411160bdda5718b9a21f43c1658618a97fe857f87e0a56b49aa"
+  },
+  {
+   "scene": "s06_a7",
+   "id": "overview",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s06_a7_overviewScreenshot.bmp",
+   "exists": true,
+   "sha256": "d0c5ca8dfa784565445b1314ad3be36c061e09146df0c0cf09b7dc951a1e0250"
+  },
+  {
+   "scene": "s06_a7",
+   "id": "map38_mountain",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s06_a7_map38_mountainScreenshot.bmp",
+   "exists": true,
+   "sha256": "6976a5f8ed8cb25eb960a792c3ca5a992164ac3110b16ab48d553b58127f9af4"
+  },
+  {
+   "scene": "s06_a7",
+   "id": "map38_coast",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s06_a7_map38_coastScreenshot.bmp",
+   "exists": true,
+   "sha256": "2ac6f86642f8c20ebf08674f37f8937a474e9b78227f46c85f3b32e82b3a0bba"
+  },
+  {
+   "scene": "s06_a7",
+   "id": "mountain_oblique",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s06_a7_mountain_obliqueScreenshot.bmp",
+   "exists": true,
+   "sha256": "47a290079fc5caaeab5531e7108a4f4ca331ce8d0ecf8cb04311dfe47e352387"
+  },
+  {
+   "scene": "s07_a7s",
+   "id": "overview",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s07_a7s_overviewScreenshot.bmp",
+   "exists": true,
+   "sha256": "cbb13b29a04dac02f48388ca5902f2b2cd6eb5403ee5909fdb2271998f3441b4"
+  },
+  {
+   "scene": "s07_a7s",
+   "id": "map38_mountain",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s07_a7s_map38_mountainScreenshot.bmp",
+   "exists": true,
+   "sha256": "d5cc8ac440700b3def7a051a2b145ab9eae6c338c790a9069fa5945954582549"
+  },
+  {
+   "scene": "s07_a7s",
+   "id": "map38_coast",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s07_a7s_map38_coastScreenshot.bmp",
+   "exists": true,
+   "sha256": "74140920f8d6cf7cccb0c25b60e185d82b00f84df0b414b8aee22acbb0d72b92"
+  },
+  {
+   "scene": "s07_a7s",
+   "id": "mountain_oblique",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s07_a7s_mountain_obliqueScreenshot.bmp",
+   "exists": true,
+   "sha256": "ea68355df08c75bb647902f37a5a27b6afdbfd6666ee4789faa70d246dae2c55"
+  },
+  {
+   "scene": "s00_l2",
+   "id": "overview",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s00_l2_overviewScreenshot.bmp",
+   "exists": true,
+   "sha256": "97313e9a682899256b1963db57f06094acdffcdef0d937c5b0f3fe1108edfb90"
+  },
+  {
+   "scene": "s00_l2",
+   "id": "map38_flat",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s00_l2_map38_flatScreenshot.bmp",
+   "exists": true,
+   "sha256": "fb9ba700164226d43f0ce8d175d507cdcab89ee02f4e7147fb38e6b5f7085211"
+  },
+  {
+   "scene": "s00_l2",
+   "id": "map38_hill",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s00_l2_map38_hillScreenshot.bmp",
+   "exists": true,
+   "sha256": "2d9645211030613fa8785d4f8a2291bf837df988efad87f921056afbd6fdc325"
+  },
+  {
+   "scene": "s03_forest",
+   "id": "overview",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s03_forest_overviewScreenshot.bmp",
+   "exists": true,
+   "sha256": "02dd48ad7726252e241dfd88755b28c5b8eb08728f9eaf57c191bb8d1fc93bf7"
+  },
+  {
+   "scene": "s03_forest",
+   "id": "map38_flat",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s03_forest_map38_flatScreenshot.bmp",
+   "exists": true,
+   "sha256": "fb9ba700164226d43f0ce8d175d507cdcab89ee02f4e7147fb38e6b5f7085211"
+  },
+  {
+   "scene": "s03_forest",
+   "id": "map38_hill",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s03_forest_map38_hillScreenshot.bmp",
+   "exists": true,
+   "sha256": "b0cc0d0c520d74349d84c868d6a3212864afb4aa5907f12a93e42c2761afad1d"
+  },
+  {
+   "scene": "s03_forest",
+   "id": "map38_dense",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s03_forest_map38_denseScreenshot.bmp",
+   "exists": true,
+   "sha256": "32f07eb8878a724718bbfe65a2d38c7d87767612f662def1c25a54fd3c3c364c"
+  },
+  {
+   "scene": "s03_forest",
+   "id": "map38_sparse",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s03_forest_map38_sparseScreenshot.bmp",
+   "exists": true,
+   "sha256": "6196bccd7d8e1290c5f70ab87e2754d8949c437f078e94f0629ffe14fca007c6"
+  },
+  {
+   "scene": "s03_forest",
+   "id": "map38_edge",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s03_forest_map38_edgeScreenshot.bmp",
+   "exists": true,
+   "sha256": "e9071045bd4a745aab80a7bd58f26919ad5dfd6c3ee12fd8b3180098af6166dd"
+  },
+  {
+   "scene": "s03_forest",
+   "id": "forest_oblique",
+   "path": "evidence/runtime/in-game/map_epic2-23716-s03_forest_forest_obliqueScreenshot.bmp",
+   "exists": true,
+   "sha256": "aee04885430f3ecc537e317e97776f68a30a7c7b5599c5353e5a99746a45bf4c"
+  }
+ ],
+ "measurements": {
+  "scenes": {
+   "l2": {
+    "status": "ok",
+    "failure": null,
+    "load": {
+     "cpuMemoryMbBefore": 0,
+     "gpuMemoryMbBefore": 16003,
+     "readSeconds": 0.1154543,
+     "terrainNodes": [
+      4,
+      4
+     ],
+     "nodeSize": 400,
+     "terrainLayers": 4,
+     "terrainVersion": 1,
+     "optimizeSeconds": 0.0015712,
+     "created": true,
+     "readyAfterSeconds": 1.1529276,
+     "maxShaderCompilationsInProgress": 9,
+     "loadingState": "loading_finished",
+     "terrainMemory": 0,
+     "floraInstances": 0,
+     "floraRendererTextureUsage": 0,
+     "navMeshFaces": 2048,
+     "cpuMemoryMbReady": 0,
+     "gpuMemoryMbReady": 16003,
+     "centerHeight": 1.9799999,
+     "hillHeight": 51.9899979
+    },
+    "steps": [
+     {
+      "name": "load",
+      "status": "ok",
+      "error": null,
+      "seconds": 1.170969
+     },
+     {
+      "name": "frames_overview",
+      "status": "ok",
+      "error": null,
+      "seconds": 4.5126485
+     },
+     {
+      "name": "frames_map38_flat",
+      "status": "ok",
+      "error": null,
+      "seconds": 4.513516
+     },
+     {
+      "name": "frames_map38_hill",
+      "status": "ok",
+      "error": null,
+      "seconds": 4.5139561
+     },
+     {
+      "name": "shot_overview",
+      "status": "ok",
+      "error": null,
+      "seconds": 0.5946652999999991
+     },
+     {
+      "name": "shot_map38_flat",
+      "status": "ok",
+      "error": null,
+      "seconds": 0.5960922000000011
+     },
+     {
+      "name": "shot_map38_hill",
+      "status": "ok",
+      "error": null,
+      "seconds": 0.5945149999999995
+     }
+    ]
+   },
+   "l6": {
+    "status": "ok",
+    "failure": null,
+    "load": {
+     "cpuMemoryMbBefore": 0,
+     "gpuMemoryMbBefore": 16003,
+     "readSeconds": 0.0445772,
+     "terrainNodes": [
+      4,
+      4
+     ],
+     "nodeSize": 400,
+     "terrainLayers": 6,
+     "terrainVersion": 1,
+     "optimizeSeconds": 0.0005133,
+     "created": true,
+     "readyAfterSeconds": 1.0231148999999995,
+     "maxShaderCompilationsInProgress": 6,
+     "loadingState": "loading_finished",
+     "terrainMemory": 0,
+     "floraInstances": 0,
+     "floraRendererTextureUsage": 0,
+     "navMeshFaces": 2048,
+     "cpuMemoryMbReady": 0,
+     "gpuMemoryMbReady": 16003,
+     "centerHeight": 1.9799999,
+     "hillHeight": 51.9899979
+    },
+    "steps": [
+     {
+      "name": "load",
+      "status": "ok",
+      "error": null,
+      "seconds": 1.0360961999999994
+     },
+     {
+      "name": "frames_overview",
+      "status": "ok",
+      "error": null,
+      "seconds": 4.5131413999999985
+     },
+     {
+      "name": "frames_map38_flat",
+      "status": "ok",
+      "error": null,
+      "seconds": 4.511699700000001
+     },
+     {
+      "name": "frames_map38_hill",
+      "status": "ok",
+      "error": null,
+      "seconds": 4.513970700000002
+     },
+     {
+      "name": "shot_overview",
+      "status": "ok",
+      "error": null,
+      "seconds": 0.6117206999999993
+     },
+     {
+      "name": "shot_map38_flat",
+      "status": "ok",
+      "error": null,
+      "seconds": 0.594428200000003
+     },
+     {
+      "name": "shot_map38_hill",
+      "status": "ok",
+      "error": null,
+      "seconds": 0.5947917000000018
+     },
+     {
+      "name": "shot_node11_topdown",
+      "status": "ok",
+      "error": null,
+      "seconds": 0.5948677000000018
+     },
+     {
+      "name": "shot_scale5_topdown",
+      "status": "ok",
+      "error": null,
+      "seconds": 0.5959636999999987
+     },
+     {
+      "name": "shot_scale20_topdown",
+      "status": "ok",
+      "error": null,
+      "seconds": 0.5947829999999996
+     },
+     {
+      "name": "shot_node01_topdown",
+      "status": "ok",
+      "error": null,
+      "seconds": 0.5952961999999999
+     },
+     {
+      "name": "shot_map38_stripes",
+      "status": "ok",
+      "error": null,
+      "seconds": 0.5940033999999983
+     },
+     {
+      "name": "shot_map38_ramp",
+      "status": "ok",
+      "error": null,
+      "seconds": 0.5943480999999977
+     },
+     {
+      "name": "season_masks",
+      "status": "ok",
+      "error": null,
+      "seconds": 4.593612700000001
+     }
+    ]
+   },
+   "l15": {
+    "status": "ok",
+    "failure": null,
+    "load": {
+     "cpuMemoryMbBefore": 0,
+     "gpuMemoryMbBefore": 16003,
+     "readSeconds": 0.1329338,
+     "terrainNodes": [
+      4,
+      4
+     ],
+     "nodeSize": 400,
+     "terrainLayers": 15,
+     "terrainVersion": 1,
+     "optimizeSeconds": 0.0004888,
+     "created": true,
+     "readyAfterSeconds": 1.149762299999999,
+     "maxShaderCompilationsInProgress": 6,
+     "loadingState": "loading_finished",
+     "terrainMemory": 0,
+     "floraInstances": 0,
+     "floraRendererTextureUsage": 0,
+     "navMeshFaces": 2048,
+     "cpuMemoryMbReady": 0,
+     "gpuMemoryMbReady": 16003,
+     "centerHeight": 1.9799999,
+     "hillHeight": 51.9899979
+    },
+    "steps": [
+     {
+      "name": "load",
+      "status": "ok",
+      "error": null,
+      "seconds": 1.1623177000000027
+     },
+     {
+      "name": "frames_overview",
+      "status": "ok",
+      "error": null,
+      "seconds": 4.512466499999995
+     },
+     {
+      "name": "frames_map38_flat",
+      "status": "ok",
+      "error": null,
+      "seconds": 4.514519999999997
+     },
+     {
+      "name": "frames_map38_hill",
+      "status": "ok",
+      "error": null,
+      "seconds": 4.513306899999996
+     },
+     {
+      "name": "shot_overview",
+      "status": "ok",
+      "error": null,
+      "seconds": 0.5949189000000032
+     },
+     {
+      "name": "shot_map38_flat",
+      "status": "ok",
+      "error": null,
+      "seconds": 0.5971064999999953
+     },
+     {
+      "name": "shot_map38_hill",
+      "status": "ok",
+      "error": null,
+      "seconds": 0.5954176999999987
+     },
+     {
+      "name": "shot_node11_topdown",
+      "status": "ok",
+      "error": null,
+      "seconds": 0.6113964000000038
+     },
+     {
+      "name": "shot_band01",
+      "status": "ok",
+      "error": null,
+      "seconds": 0.5949661999999947
+     },
+     {
+      "name": "shot_band02",
+      "status": "ok",
+      "error": null,
+      "seconds": 0.5953866999999988
+     },
+     {
+      "name": "shot_band03",
+      "status": "ok",
+      "error": null,
+      "seconds": 0.5964230999999955
+     },
+     {
+      "name": "shot_band04",
+      "status": "ok",
+      "error": null,
+      "seconds": 0.6060843000000062
+     },
+     {
+      "name": "shot_band05",
+      "status": "ok",
+      "error": null,
+      "seconds": 0.5963377000000065
+     },
+     {
+      "name": "shot_band06",
+      "status": "ok",
+      "error": null,
+      "seconds": 0.5952929999999981
+     },
+     {
+      "name": "shot_band07",
+      "status": "ok",
+      "error": null,
+      "seconds": 0.5946275999999955
+     },
+     {
+      "name": "shot_band08",
+      "status": "ok",
+      "error": null,
+      "seconds": 0.6033994000000007
+     },
+     {
+      "name": "shot_band09",
+      "status": "ok",
+      "error": null,
+      "seconds": 0.5952003000000019
+     },
+     {
+      "name": "shot_band10",
+      "status": "ok",
+      "error": null,
+      "seconds": 0.6123362000000014
+     },
+     {
+      "name": "shot_band11",
+      "status": "ok",
+      "error": null,
+      "seconds": 0.5943399000000085
+     },
+     {
+      "name": "shot_band12",
+      "status": "ok",
+      "error": null,
+      "seconds": 0.5943214000000125
+     },
+     {
+      "name": "shot_band13",
+      "status": "ok",
+      "error": null,
+      "seconds": 0.6081724000000008
+     },
+     {
+      "name": "shot_band14",
+      "status": "ok",
+      "error": null,
+      "seconds": 0.594906800000004
+     }
+    ]
+   },
+   "forest": {
+    "status": "ok",
+    "failure": null,
+    "load": {
+     "cpuMemoryMbBefore": 0,
+     "gpuMemoryMbBefore": 16003,
+     "readSeconds": 0.1677709,
+     "terrainNodes": [
+      4,
+      4
+     ],
+     "nodeSize": 400,
+     "terrainLayers": 4,
+     "terrainVersion": 1,
+     "optimizeSeconds": 0.0012437,
+     "created": true,
+     "readyAfterSeconds": 1.0626093999999995,
+     "maxShaderCompilationsInProgress": 9,
+     "loadingState": "loading_finished",
+     "terrainMemory": 0,
+     "floraInstances": 88000,
+     "floraRendererTextureUsage": 0,
+     "navMeshFaces": 2048,
+     "cpuMemoryMbReady": 0,
+     "gpuMemoryMbReady": 16003,
+     "centerHeight": 1.9799999,
+     "hillHeight": 51.9899979
+    },
+    "steps": [
+     {
+      "name": "load",
+      "status": "ok",
+      "error": null,
+      "seconds": 1.0783873999999969
+     },
+     {
+      "name": "frames_overview",
+      "status": "ok",
+      "error": null,
+      "seconds": 4.5120311000000015
+     },
+     {
+      "name": "frames_map38_flat",
+      "status": "ok",
+      "error": null,
+      "seconds": 4.511454200000003
+     },
+     {
+      "name": "frames_map38_hill",
+      "status": "ok",
+      "error": null,
+      "seconds": 4.513494399999999
+     },
+     {
+      "name": "shot_overview",
+      "status": "ok",
+      "error": null,
+      "seconds": 0.5969507999999877
+     },
+     {
+      "name": "shot_map38_flat",
+      "status": "ok",
+      "error": null,
+      "seconds": 0.5955288999999908
+     },
+     {
+      "name": "shot_map38_hill",
+      "status": "ok",
+      "error": null,
+      "seconds": 0.5970970000000051
+     },
+     {
+      "name": "shot_map38_dense",
+      "status": "ok",
+      "error": null,
+      "seconds": 0.5946894000000071
+     },
+     {
+      "name": "shot_map38_sparse",
+      "status": "ok",
+      "error": null,
+      "seconds": 0.594782600000002
+     },
+     {
+      "name": "shot_map38_edge",
+      "status": "ok",
+      "error": null,
+      "seconds": 0.5942908999999901
+     },
+     {
+      "name": "shot_forest_oblique",
+      "status": "ok",
+      "error": null,
+      "seconds": 0.6115051999999963
+     }
+    ]
+   },
+   "a6": {
+    "status": "ok",
+    "failure": null,
+    "load": {
+     "cpuMemoryMbBefore": 0,
+     "gpuMemoryMbBefore": 16003,
+     "readSeconds": 0.0910651,
+     "terrainNodes": [
+      4,
+      4
+     ],
+     "nodeSize": 400,
+     "terrainLayers": 4,
+     "terrainVersion": 1,
+     "optimizeSeconds": 0.0008087,
+     "created": true,
+     "readyAfterSeconds": 1.0573192000000091,
+     "maxShaderCompilationsInProgress": 6,
+     "loadingState": "loading_finished",
+     "terrainMemory": 0,
+     "floraInstances": 0,
+     "floraRendererTextureUsage": 0,
+     "navMeshFaces": 2048,
+     "cpuMemoryMbReady": 0,
+     "gpuMemoryMbReady": 16003,
+     "centerHeight": -23.55,
+     "hillHeight": -14.94
+    },
+    "steps": [
+     {
+      "name": "load",
+      "status": "ok",
+      "error": null,
+      "seconds": 1.0726358999999945
+     },
+     {
+      "name": "frames_overview",
+      "status": "ok",
+      "error": null,
+      "seconds": 4.512863800000005
+     },
+     {
+      "name": "frames_map38_mountain",
+      "status": "ok",
+      "error": null,
+      "seconds": 4.5121927
+     },
+     {
+      "name": "frames_map38_coast",
+      "status": "ok",
+      "error": null,
+      "seconds": 4.513731899999996
+     },
+     {
+      "name": "shot_overview",
+      "status": "ok",
+      "error": null,
+      "seconds": 0.5956498000000039
+     },
+     {
+      "name": "shot_map38_mountain",
+      "status": "ok",
+      "error": null,
+      "seconds": 0.5968581000000057
+     },
+     {
+      "name": "shot_map38_coast",
+      "status": "ok",
+      "error": null,
+      "seconds": 0.5948478999999907
+     },
+     {
+      "name": "shot_mountain_oblique",
+      "status": "ok",
+      "error": null,
+      "seconds": 0.5960608000000036
+     }
+    ]
+   },
+   "a6n": {
+    "status": "ok",
+    "failure": null,
+    "load": {
+     "cpuMemoryMbBefore": 0,
+     "gpuMemoryMbBefore": 16003,
+     "readSeconds": 0.0952234,
+     "terrainNodes": [
+      4,
+      4
+     ],
+     "nodeSize": 400,
+     "terrainLayers": 4,
+     "terrainVersion": 1,
+     "optimizeSeconds": 0.0008051,
+     "created": true,
+     "readyAfterSeconds": 1.0570538000000056,
+     "maxShaderCompilationsInProgress": 6,
+     "loadingState": "loading_finished",
+     "terrainMemory": 0,
+     "floraInstances": 0,
+     "floraRendererTextureUsage": 0,
+     "navMeshFaces": 2048,
+     "cpuMemoryMbReady": 0,
+     "gpuMemoryMbReady": 16003,
+     "centerHeight": -23.55,
+     "hillHeight": -14.94
+    },
+    "steps": [
+     {
+      "name": "load",
+      "status": "ok",
+      "error": null,
+      "seconds": 1.071110399999995
+     },
+     {
+      "name": "frames_overview",
+      "status": "ok",
+      "error": null,
+      "seconds": 4.511275600000005
+     },
+     {
+      "name": "frames_map38_mountain",
+      "status": "ok",
+      "error": null,
+      "seconds": 4.512253099999995
+     },
+     {
+      "name": "frames_map38_coast",
+      "status": "ok",
+      "error": null,
+      "seconds": 4.515386199999995
+     },
+     {
+      "name": "shot_overview",
+      "status": "ok",
+      "error": null,
+      "seconds": 0.5958134999999913
+     },
+     {
+      "name": "shot_map38_mountain",
+      "status": "ok",
+      "error": null,
+      "seconds": 0.6028412999999944
+     },
+     {
+      "name": "shot_map38_coast",
+      "status": "ok",
+      "error": null,
+      "seconds": 0.5958173999999872
+     },
+     {
+      "name": "shot_mountain_oblique",
+      "status": "ok",
+      "error": null,
+      "seconds": 0.5957354999999893
+     }
+    ]
+   },
+   "a7": {
+    "status": "ok",
+    "failure": null,
+    "load": {
+     "cpuMemoryMbBefore": 0,
+     "gpuMemoryMbBefore": 16003,
+     "readSeconds": 0.13012369999999998,
+     "terrainNodes": [
+      4,
+      4
+     ],
+     "nodeSize": 400,
+     "terrainLayers": 4,
+     "terrainVersion": 1,
+     "optimizeSeconds": 0.0008064,
+     "created": true,
+     "readyAfterSeconds": 0.9044839999999965,
+     "maxShaderCompilationsInProgress": 6,
+     "loadingState": "loading_finished",
+     "terrainMemory": 0,
+     "floraInstances": 0,
+     "floraRendererTextureUsage": 0,
+     "navMeshFaces": 2048,
+     "cpuMemoryMbReady": 0,
+     "gpuMemoryMbReady": 16003,
+     "centerHeight": -22.4399986,
+     "hillHeight": -14.94
+    },
+    "steps": [
+     {
+      "name": "load",
+      "status": "ok",
+      "error": null,
+      "seconds": 0.9193698999999924
+     },
+     {
+      "name": "frames_overview",
+      "status": "ok",
+      "error": null,
+      "seconds": 4.5122617000000105
+     },
+     {
+      "name": "frames_map38_mountain",
+      "status": "ok",
+      "error": null,
+      "seconds": 4.510405399999996
+     },
+     {
+      "name": "frames_map38_coast",
+      "status": "ok",
+      "error": null,
+      "seconds": 4.5132759999999905
+     },
+     {
+      "name": "shot_overview",
+      "status": "ok",
+      "error": null,
+      "seconds": 0.5949016000000142
+     },
+     {
+      "name": "shot_map38_mountain",
+      "status": "ok",
+      "error": null,
+      "seconds": 0.596173599999986
+     },
+     {
+      "name": "shot_map38_coast",
+      "status": "ok",
+      "error": null,
+      "seconds": 0.5945524999999918
+     },
+     {
+      "name": "shot_mountain_oblique",
+      "status": "ok",
+      "error": null,
+      "seconds": 0.5965680000000191
+     }
+    ]
+   },
+   "a7s": {
+    "status": "ok",
+    "failure": null,
+    "load": {
+     "cpuMemoryMbBefore": 0,
+     "gpuMemoryMbBefore": 16003,
+     "readSeconds": 0.092648,
+     "terrainNodes": [
+      4,
+      4
+     ],
+     "nodeSize": 400,
+     "terrainLayers": 4,
+     "terrainVersion": 1,
+     "optimizeSeconds": 0.0008569,
+     "created": true,
+     "readyAfterSeconds": 1.074081299999989,
+     "maxShaderCompilationsInProgress": 6,
+     "loadingState": "loading_finished",
+     "terrainMemory": 0,
+     "floraInstances": 0,
+     "floraRendererTextureUsage": 0,
+     "navMeshFaces": 2048,
+     "cpuMemoryMbReady": 0,
+     "gpuMemoryMbReady": 16003,
+     "centerHeight": -11.2199993,
+     "hillHeight": -7.47
+    },
+    "steps": [
+     {
+      "name": "load",
+      "status": "ok",
+      "error": null,
+      "seconds": 1.0890310999999997
+     },
+     {
+      "name": "frames_overview",
+      "status": "ok",
+      "error": null,
+      "seconds": 4.51511579999999
+     },
+     {
+      "name": "frames_map38_mountain",
+      "status": "ok",
+      "error": null,
+      "seconds": 4.513414400000016
+     },
+     {
+      "name": "frames_map38_coast",
+      "status": "ok",
+      "error": null,
+      "seconds": 4.5136167
+     },
+     {
+      "name": "shot_overview",
+      "status": "ok",
+      "error": null,
+      "seconds": 0.6046149999999955
+     },
+     {
+      "name": "shot_map38_mountain",
+      "status": "ok",
+      "error": null,
+      "seconds": 0.5986638000000255
+     },
+     {
+      "name": "shot_map38_coast",
+      "status": "ok",
+      "error": null,
+      "seconds": 0.5974851999999942
+     },
+     {
+      "name": "shot_mountain_oblique",
+      "status": "ok",
+      "error": null,
+      "seconds": 0.5979576000000009
+     }
+    ]
+   },
+   "l2_decals": {
+    "status": "ok",
+    "failure": null,
+    "load": {
+     "cpuMemoryMbBefore": 0,
+     "gpuMemoryMbBefore": 16003,
+     "readSeconds": 0.0874522,
+     "terrainNodes": [
+      4,
+      4
+     ],
+     "nodeSize": 400,
+     "terrainLayers": 4,
+     "terrainVersion": 1,
+     "optimizeSeconds": 0.0007884,
+     "created": true,
+     "readyAfterSeconds": 0.75992549999998,
+     "maxShaderCompilationsInProgress": 0,
+     "loadingState": "loading_finished",
+     "terrainMemory": 0,
+     "floraInstances": 0,
+     "floraRendererTextureUsage": 0,
+     "navMeshFaces": 2048,
+     "cpuMemoryMbReady": 0,
+     "gpuMemoryMbReady": 16003,
+     "centerHeight": 1.9799999,
+     "hillHeight": 51.9899979
+    },
+    "steps": [
+     {
+      "name": "load",
+      "status": "ok",
+      "error": null,
+      "seconds": 0.7757445999999959
+     },
+     {
+      "name": "decal_techniques",
+      "status": "ok",
+      "error": null,
+      "seconds": 3.0135830000000112
+     },
+     {
+      "name": "decal_counts",
+      "status": "ok",
+      "error": null,
+      "seconds": 26.079256999999984
+     }
+    ]
+   },
+   "snow": {
+    "status": null,
+    "failure": null,
+    "load": {
+     "cpuMemoryMbBefore": 0,
+     "gpuMemoryMbBefore": 16003,
+     "readSeconds": 0.0940834,
+     "terrainNodes": [
+      4,
+      4
+     ],
+     "nodeSize": 400,
+     "terrainLayers": 4,
+     "terrainVersion": 1,
+     "optimizeSeconds": 0.0009416,
+     "created": true,
+     "readyAfterSeconds": 1.7365676999999948,
+     "maxShaderCompilationsInProgress": 9,
+     "loadingState": "loading_finished",
+     "terrainMemory": 0,
+     "floraInstances": 0,
+     "floraRendererTextureUsage": 0,
+     "navMeshFaces": 2048,
+     "cpuMemoryMbReady": 0,
+     "gpuMemoryMbReady": 16003,
+     "centerHeight": 1.9799999,
+     "hillHeight": 51.9899979
+    },
+    "steps": [
+     {
+      "name": "load",
+      "status": "ok",
+      "error": null,
+      "seconds": 1.7520264999999995
+     },
+     {
+      "name": "snow_baseline",
+      "status": "ok",
+      "error": null,
+      "seconds": 1.9469433000000151
+     },
+     {
+      "name": "season_switches",
+      "status": "ok",
+      "error": null,
+      "seconds": 4.596788099999998
+     },
+     {
+      "name": "dynamic_snow",
+      "status": "ok",
+      "error": null,
+      "seconds": 5.879443000000009
+     },
+     {
+      "name": "forced_snow",
+      "status": "ok",
+      "error": null,
+      "seconds": 1.3612659000000065
+     }
+    ]
+   },
+   "l2_costonly": {
+    "status": "ok",
+    "failure": null,
+    "load": {
+     "cpuMemoryMbBefore": 0,
+     "gpuMemoryMbBefore": 16003,
+     "readSeconds": 0.1052404,
+     "terrainNodes": [
+      4,
+      4
+     ],
+     "nodeSize": 400,
+     "terrainLayers": 4,
+     "terrainVersion": 1,
+     "optimizeSeconds": 0.0014577,
+     "created": true,
+     "readyAfterSeconds": 0.9502492999999999,
+     "maxShaderCompilationsInProgress": 0,
+     "loadingState": "loading_finished",
+     "terrainMemory": 0,
+     "floraInstances": 0,
+     "floraRendererTextureUsage": 0,
+     "navMeshFaces": 2048,
+     "cpuMemoryMbReady": 0,
+     "gpuMemoryMbReady": 16003,
+     "centerHeight": 1.9799999,
+     "hillHeight": 51.9899979
+    },
+    "steps": [
+     {
+      "name": "load",
+      "status": "ok",
+      "error": null,
+      "seconds": 0.9659233999999999
+     },
+     {
+      "name": "frames_overview",
+      "status": "ok",
+      "error": null,
+      "seconds": 4.68122
+     },
+     {
+      "name": "frames_map38_flat",
+      "status": "ok",
+      "error": null,
+      "seconds": 4.677861699999999
+     }
+    ]
+   },
+   "l6_costonly": {
+    "status": "ok",
+    "failure": null,
+    "load": {
+     "cpuMemoryMbBefore": 0,
+     "gpuMemoryMbBefore": 16003,
+     "readSeconds": 0.0387999,
+     "terrainNodes": [
+      4,
+      4
+     ],
+     "nodeSize": 400,
+     "terrainLayers": 6,
+     "terrainVersion": 1,
+     "optimizeSeconds": 0.0004925999999999999,
+     "created": true,
+     "readyAfterSeconds": 0.9301157,
+     "maxShaderCompilationsInProgress": 2,
+     "loadingState": "loading_finished",
+     "terrainMemory": 0,
+     "floraInstances": 0,
+     "floraRendererTextureUsage": 0,
+     "navMeshFaces": 2048,
+     "cpuMemoryMbReady": 0,
+     "gpuMemoryMbReady": 16003,
+     "centerHeight": 1.9799999,
+     "hillHeight": 51.9899979
+    },
+    "steps": [
+     {
+      "name": "load",
+      "status": "ok",
+      "error": null,
+      "seconds": 0.9460967
+     },
+     {
+      "name": "frames_overview",
+      "status": "ok",
+      "error": null,
+      "seconds": 4.6808111000000014
+     },
+     {
+      "name": "frames_map38_flat",
+      "status": "ok",
+      "error": null,
+      "seconds": 4.680404499999998
+     }
+    ]
+   },
+   "l15_costonly": {
+    "status": "ok",
+    "failure": null,
+    "load": {
+     "cpuMemoryMbBefore": 0,
+     "gpuMemoryMbBefore": 16003,
+     "readSeconds": 0.0889422,
+     "terrainNodes": [
+      4,
+      4
+     ],
+     "nodeSize": 400,
+     "terrainLayers": 15,
+     "terrainVersion": 1,
+     "optimizeSeconds": 0.000603,
+     "created": true,
+     "readyAfterSeconds": 0.9291955000000023,
+     "maxShaderCompilationsInProgress": 0,
+     "loadingState": "loading_finished",
+     "terrainMemory": 0,
+     "floraInstances": 0,
+     "floraRendererTextureUsage": 0,
+     "navMeshFaces": 2048,
+     "cpuMemoryMbReady": 0,
+     "gpuMemoryMbReady": 16003,
+     "centerHeight": 1.9799999,
+     "hillHeight": 51.9899979
+    },
+    "steps": [
+     {
+      "name": "load",
+      "status": "ok",
+      "error": null,
+      "seconds": 0.9427038000000003
+     },
+     {
+      "name": "frames_overview",
+      "status": "ok",
+      "error": null,
+      "seconds": 4.678577799999999
+     },
+     {
+      "name": "frames_map38_flat",
+      "status": "ok",
+      "error": null,
+      "seconds": 4.677977599999998
+     }
+    ]
+   },
+   "forest_costonly": {
+    "status": "ok",
+    "failure": null,
+    "load": {
+     "cpuMemoryMbBefore": 0,
+     "gpuMemoryMbBefore": 16003,
+     "readSeconds": 0.2166535,
+     "terrainNodes": [
+      4,
+      4
+     ],
+     "nodeSize": 400,
+     "terrainLayers": 4,
+     "terrainVersion": 1,
+     "optimizeSeconds": 0.0015133,
+     "created": true,
+     "readyAfterSeconds": 0.9454509999999985,
+     "maxShaderCompilationsInProgress": 0,
+     "loadingState": "loading_finished",
+     "terrainMemory": 0,
+     "floraInstances": 88000,
+     "floraRendererTextureUsage": 0,
+     "navMeshFaces": 2048,
+     "cpuMemoryMbReady": 0,
+     "gpuMemoryMbReady": 16003,
+     "centerHeight": 1.9799999,
+     "hillHeight": 51.9899979
+    },
+    "steps": [
+     {
+      "name": "load",
+      "status": "ok",
+      "error": null,
+      "seconds": 0.9600070999999986
+     },
+     {
+      "name": "frames_overview",
+      "status": "ok",
+      "error": null,
+      "seconds": 4.680234599999999
+     },
+     {
+      "name": "frames_map38_flat",
+      "status": "ok",
+      "error": null,
+      "seconds": 4.682863999999995
+     }
+    ]
+   },
+   "a6_costonly": {
+    "status": "ok",
+    "failure": null,
+    "load": {
+     "cpuMemoryMbBefore": 0,
+     "gpuMemoryMbBefore": 16003,
+     "readSeconds": 0.0961973,
+     "terrainNodes": [
+      4,
+      4
+     ],
+     "nodeSize": 400,
+     "terrainLayers": 4,
+     "terrainVersion": 1,
+     "optimizeSeconds": 0.0011621,
+     "created": true,
+     "readyAfterSeconds": 0.9342526000000007,
+     "maxShaderCompilationsInProgress": 0,
+     "loadingState": "loading_finished",
+     "terrainMemory": 0,
+     "floraInstances": 0,
+     "floraRendererTextureUsage": 0,
+     "navMeshFaces": 2048,
+     "cpuMemoryMbReady": 0,
+     "gpuMemoryMbReady": 16003,
+     "centerHeight": -23.55,
+     "hillHeight": -14.94
+    },
+    "steps": [
+     {
+      "name": "load",
+      "status": "ok",
+      "error": null,
+      "seconds": 0.949035699999996
+     },
+     {
+      "name": "frames_overview",
+      "status": "ok",
+      "error": null,
+      "seconds": 4.680630600000001
+     },
+     {
+      "name": "frames_map38_mountain",
+      "status": "ok",
+      "error": null,
+      "seconds": 4.680271400000002
+     }
+    ]
+   },
+   "a7_costonly": {
+    "status": "ok",
+    "failure": null,
+    "load": {
+     "cpuMemoryMbBefore": 0,
+     "gpuMemoryMbBefore": 16003,
+     "readSeconds": 0.10575939999999999,
+     "terrainNodes": [
+      4,
+      4
+     ],
+     "nodeSize": 400,
+     "terrainLayers": 4,
+     "terrainVersion": 1,
+     "optimizeSeconds": 0.0011715999999999999,
+     "created": true,
+     "readyAfterSeconds": 0.9391800999999944,
+     "maxShaderCompilationsInProgress": 0,
+     "loadingState": "loading_finished",
+     "terrainMemory": 0,
+     "floraInstances": 0,
+     "floraRendererTextureUsage": 0,
+     "navMeshFaces": 2048,
+     "cpuMemoryMbReady": 0,
+     "gpuMemoryMbReady": 16003,
+     "centerHeight": -22.4399986,
+     "hillHeight": -14.94
+    },
+    "steps": [
+     {
+      "name": "load",
+      "status": "ok",
+      "error": null,
+      "seconds": 0.953058299999995
+     },
+     {
+      "name": "frames_overview",
+      "status": "ok",
+      "error": null,
+      "seconds": 4.680579199999997
+     },
+     {
+      "name": "frames_map38_mountain",
+      "status": "ok",
+      "error": null,
+      "seconds": 4.678750300000004
+     }
+    ]
+   },
+   "l2_decals2": {
+    "status": "ok",
+    "failure": null,
+    "load": {
+     "cpuMemoryMbBefore": 0,
+     "gpuMemoryMbBefore": 16003,
+     "readSeconds": 0.10741809999999999,
+     "terrainNodes": [
+      4,
+      4
+     ],
+     "nodeSize": 400,
+     "terrainLayers": 4,
+     "terrainVersion": 1,
+     "optimizeSeconds": 0.0007281999999999999,
+     "created": true,
+     "readyAfterSeconds": 0.9242262000000068,
+     "maxShaderCompilationsInProgress": 0,
+     "loadingState": "loading_finished",
+     "terrainMemory": 0,
+     "floraInstances": 0,
+     "floraRendererTextureUsage": 0,
+     "navMeshFaces": 2048,
+     "cpuMemoryMbReady": 0,
+     "gpuMemoryMbReady": 16003,
+     "centerHeight": 1.9799999,
+     "hillHeight": 51.9899979
+    },
+    "steps": [
+     {
+      "name": "load",
+      "status": "ok",
+      "error": null,
+      "seconds": 0.939278200000004
+     },
+     {
+      "name": "decal_variants",
+      "status": "ok",
+      "error": null,
+      "seconds": 4.514283699999993
+     },
+     {
+      "name": "decal_counts2",
+      "status": "ok",
+      "error": null,
+      "seconds": 24.113720099999995
+     }
+    ]
+   },
+   "snow_snow2": {
+    "status": "ok",
+    "failure": null,
+    "load": {
+     "cpuMemoryMbBefore": 0,
+     "gpuMemoryMbBefore": 16003,
+     "readSeconds": 0.10100579999999999,
+     "terrainNodes": [
+      4,
+      4
+     ],
+     "nodeSize": 400,
+     "terrainLayers": 4,
+     "terrainVersion": 1,
+     "optimizeSeconds": 0.0012824,
+     "created": true,
+     "readyAfterSeconds": 1.0464683999999949,
+     "maxShaderCompilationsInProgress": 0,
+     "loadingState": "loading_finished",
+     "terrainMemory": 0,
+     "floraInstances": 0,
+     "floraRendererTextureUsage": 0,
+     "navMeshFaces": 2048,
+     "cpuMemoryMbReady": 0,
+     "gpuMemoryMbReady": 16003,
+     "centerHeight": 1.9799999,
+     "hillHeight": 51.9899979
+    },
+    "steps": [
+     {
+      "name": "load",
+      "status": "ok",
+      "error": null,
+      "seconds": 1.065039200000001
+     },
+     {
+      "name": "snow2_inherent",
+      "status": "ok",
+      "error": null,
+      "seconds": 6.9633635
+     },
+     {
+      "name": "snow2_runtime",
+      "status": "ok",
+      "error": null,
+      "seconds": 6.962151199999994
+     },
+     {
+      "name": "snow2_channels",
+      "status": "ok",
+      "error": null,
+      "seconds": 2.5611597999999987
+     },
+     {
+      "name": "snow2_vanilla_texture",
+      "status": "ok",
+      "error": null,
+      "seconds": 4.710207600000004
+     }
+    ]
+   },
+   "snowf_snow2": {
+    "status": "ok",
+    "failure": null,
+    "load": {
+     "cpuMemoryMbBefore": 0,
+     "gpuMemoryMbBefore": 16003,
+     "readSeconds": 0.0863229,
+     "terrainNodes": [
+      4,
+      4
+     ],
+     "nodeSize": 400,
+     "terrainLayers": 4,
+     "terrainVersion": 1,
+     "optimizeSeconds": 0.0013380999999999998,
+     "created": true,
+     "readyAfterSeconds": 1.8949925999999948,
+     "maxShaderCompilationsInProgress": 9,
+     "loadingState": "loading_finished",
+     "terrainMemory": 0,
+     "floraInstances": 0,
+     "floraRendererTextureUsage": 0,
+     "navMeshFaces": 2048,
+     "cpuMemoryMbReady": 0,
+     "gpuMemoryMbReady": 16003,
+     "centerHeight": 1.9799999,
+     "hillHeight": 51.9899979
+    },
+    "steps": [
+     {
+      "name": "load",
+      "status": "ok",
+      "error": null,
+      "seconds": 1.909214200000008
+     },
+     {
+      "name": "snow2_inherent",
+      "status": "ok",
+      "error": null,
+      "seconds": 7.195367099999999
+     },
+     {
+      "name": "snow2_runtime",
+      "status": "ok",
+      "error": null,
+      "seconds": 6.962227799999994
+     },
+     {
+      "name": "snow2_channels",
+      "status": "ok",
+      "error": null,
+      "seconds": 2.560528699999992
+     },
+     {
+      "name": "snow2_vanilla_texture",
+      "status": "ok",
+      "error": null,
+      "seconds": 4.711635199999989
+     }
+    ]
+   },
+   "snowfr_snow2": {
+    "status": null,
+    "failure": null,
+    "load": {
+     "cpuMemoryMbBefore": 0,
+     "gpuMemoryMbBefore": 16003,
+     "readSeconds": 0.0384186,
+     "terrainNodes": [
+      4,
+      4
+     ],
+     "nodeSize": 400,
+     "terrainLayers": 4,
+     "terrainVersion": 1,
+     "optimizeSeconds": 0.000529,
+     "created": true
+    },
+    "steps": []
+   }
+  },
+  "frames": [
+   {
+    "scene": "mnbl_probe_l2",
+    "label": "s00_l2",
+    "id": "overview",
+    "meanMs": 16.666,
+    "p95Ms": 16.84,
+    "maxMs": 17.225,
+    "rendererFps": 60.2765045,
+    "mainFps": 1494.54492,
+    "decals": null,
+    "gpuMemoryMb": 16003,
+    "cpuMemoryMb": 0,
+    "meanMainMs": null
+   },
+   {
+    "scene": "mnbl_probe_l2",
+    "label": "s00_l2",
+    "id": "map38_flat",
+    "meanMs": 16.666,
+    "p95Ms": 16.832,
+    "maxMs": 17.103,
+    "rendererFps": 60.2703,
+    "mainFps": 2587.9917,
+    "decals": null,
+    "gpuMemoryMb": 16003,
+    "cpuMemoryMb": 0,
+    "meanMainMs": null
+   },
+   {
+    "scene": "mnbl_probe_l2",
+    "label": "s00_l2",
+    "id": "map38_hill",
+    "meanMs": 16.666,
+    "p95Ms": 16.808,
+    "maxMs": 17.127,
+    "rendererFps": 60.242588,
+    "mainFps": 3064.66431,
+    "decals": null,
+    "gpuMemoryMb": 16003,
+    "cpuMemoryMb": 0,
+    "meanMainMs": null
+   },
+   {
+    "scene": "mnbl_probe_l6",
+    "label": "s01_l6",
+    "id": "overview",
+    "meanMs": 16.666,
+    "p95Ms": 16.854,
+    "maxMs": 17.183,
+    "rendererFps": 60.29547,
+    "mainFps": 2402.691,
+    "decals": null,
+    "gpuMemoryMb": 16003,
+    "cpuMemoryMb": 0,
+    "meanMainMs": null
+   },
+   {
+    "scene": "mnbl_probe_l6",
+    "label": "s01_l6",
+    "id": "map38_flat",
+    "meanMs": 16.667,
+    "p95Ms": 16.831,
+    "maxMs": 17.194,
+    "rendererFps": 60.2628822,
+    "mainFps": 1841.95984,
+    "decals": null,
+    "gpuMemoryMb": 16003,
+    "cpuMemoryMb": 0,
+    "meanMainMs": null
+   },
+   {
+    "scene": "mnbl_probe_l6",
+    "label": "s01_l6",
+    "id": "map38_hill",
+    "meanMs": 16.667,
+    "p95Ms": 16.853,
+    "maxMs": 17.175,
+    "rendererFps": 60.248436,
+    "mainFps": 2106.15,
+    "decals": null,
+    "gpuMemoryMb": 16003,
+    "cpuMemoryMb": 0,
+    "meanMainMs": null
+   },
+   {
+    "scene": "mnbl_probe_l15",
+    "label": "s02_l15",
+    "id": "overview",
+    "meanMs": 16.665,
+    "p95Ms": 16.84,
+    "maxMs": 17.337,
+    "rendererFps": 60.22627,
+    "mainFps": 2456.399,
+    "decals": null,
+    "gpuMemoryMb": 16003,
+    "cpuMemoryMb": 0,
+    "meanMainMs": null
+   },
+   {
+    "scene": "mnbl_probe_l15",
+    "label": "s02_l15",
+    "id": "map38_flat",
+    "meanMs": 16.666,
+    "p95Ms": 16.858,
+    "maxMs": 17.037,
+    "rendererFps": 60.2496338,
+    "mainFps": 1771.16541,
+    "decals": null,
+    "gpuMemoryMb": 16003,
+    "cpuMemoryMb": 0,
+    "meanMainMs": null
+   },
+   {
+    "scene": "mnbl_probe_l15",
+    "label": "s02_l15",
+    "id": "map38_hill",
+    "meanMs": 16.667,
+    "p95Ms": 16.87,
+    "maxMs": 17.214,
+    "rendererFps": 60.210804,
+    "mainFps": 2271.17871,
+    "decals": null,
+    "gpuMemoryMb": 16003,
+    "cpuMemoryMb": 0,
+    "meanMainMs": null
+   },
+   {
+    "scene": "mnbl_probe_forest",
+    "label": "s03_forest",
+    "id": "overview",
+    "meanMs": 16.667,
+    "p95Ms": 16.825,
+    "maxMs": 16.944,
+    "rendererFps": 60.2510567,
+    "mainFps": 1131.22168,
+    "decals": null,
+    "gpuMemoryMb": 16003,
+    "cpuMemoryMb": 0,
+    "meanMainMs": null
+   },
+   {
+    "scene": "mnbl_probe_forest",
+    "label": "s03_forest",
+    "id": "map38_flat",
+    "meanMs": 16.666,
+    "p95Ms": 16.833,
+    "maxMs": 16.927,
+    "rendererFps": 60.25413,
+    "mainFps": 2995.806,
+    "decals": null,
+    "gpuMemoryMb": 16003,
+    "cpuMemoryMb": 0,
+    "meanMainMs": null
+   },
+   {
+    "scene": "mnbl_probe_forest",
+    "label": "s03_forest",
+    "id": "map38_hill",
+    "meanMs": 16.666,
+    "p95Ms": 16.846,
+    "maxMs": 17.355,
+    "rendererFps": 60.2758827,
+    "mainFps": 1994.41565,
+    "decals": null,
+    "gpuMemoryMb": 16003,
+    "cpuMemoryMb": 0,
+    "meanMainMs": null
+   },
+   {
+    "scene": "mnbl_probe_a6",
+    "label": "s04_a6",
+    "id": "overview",
+    "meanMs": 16.665,
+    "p95Ms": 16.866,
+    "maxMs": 16.992,
+    "rendererFps": 60.22688,
+    "mainFps": 2194.42627,
+    "decals": null,
+    "gpuMemoryMb": 16003,
+    "cpuMemoryMb": 0,
+    "meanMainMs": null
+   },
+   {
+    "scene": "mnbl_probe_a6",
+    "label": "s04_a6",
+    "id": "map38_mountain",
+    "meanMs": 16.666,
+    "p95Ms": 16.836,
+    "maxMs": 17.073,
+    "rendererFps": 60.28103,
+    "mainFps": 2204.58545,
+    "decals": null,
+    "gpuMemoryMb": 16003,
+    "cpuMemoryMb": 0,
+    "meanMainMs": null
+   },
+   {
+    "scene": "mnbl_probe_a6",
+    "label": "s04_a6",
+    "id": "map38_coast",
+    "meanMs": 16.666,
+    "p95Ms": 16.831,
+    "maxMs": 17.11,
+    "rendererFps": 60.25004,
+    "mainFps": 1657.55017,
+    "decals": null,
+    "gpuMemoryMb": 16003,
+    "cpuMemoryMb": 0,
+    "meanMainMs": null
+   },
+   {
+    "scene": "mnbl_probe_a6n",
+    "label": "s05_a6n",
+    "id": "overview",
+    "meanMs": 16.666,
+    "p95Ms": 16.837,
+    "maxMs": 17.032,
+    "rendererFps": 60.2475929,
+    "mainFps": 1726.8175,
+    "decals": null,
+    "gpuMemoryMb": 16003,
+    "cpuMemoryMb": 0,
+    "meanMainMs": null
+   },
+   {
+    "scene": "mnbl_probe_a6n",
+    "label": "s05_a6n",
+    "id": "map38_mountain",
+    "meanMs": 16.666,
+    "p95Ms": 16.818,
+    "maxMs": 16.99,
+    "rendererFps": 60.23033,
+    "mainFps": 2261.93164,
+    "decals": null,
+    "gpuMemoryMb": 16003,
+    "cpuMemoryMb": 0,
+    "meanMainMs": null
+   },
+   {
+    "scene": "mnbl_probe_a6n",
+    "label": "s05_a6n",
+    "id": "map38_coast",
+    "meanMs": 16.667,
+    "p95Ms": 16.826,
+    "maxMs": 16.964,
+    "rendererFps": 60.23661,
+    "mainFps": 2229.15747,
+    "decals": null,
+    "gpuMemoryMb": 16003,
+    "cpuMemoryMb": 0,
+    "meanMainMs": null
+   },
+   {
+    "scene": "mnbl_probe_a7",
+    "label": "s06_a7",
+    "id": "overview",
+    "meanMs": 16.666,
+    "p95Ms": 16.829,
+    "maxMs": 17.049,
+    "rendererFps": 60.259346,
+    "mainFps": 1530.92468,
+    "decals": null,
+    "gpuMemoryMb": 16003,
+    "cpuMemoryMb": 0,
+    "meanMainMs": null
+   },
+   {
+    "scene": "mnbl_probe_a7",
+    "label": "s06_a7",
+    "id": "map38_mountain",
+    "meanMs": 16.666,
+    "p95Ms": 16.868,
+    "maxMs": 17.186,
+    "rendererFps": 60.2416725,
+    "mainFps": 2232.14282,
+    "decals": null,
+    "gpuMemoryMb": 16003,
+    "cpuMemoryMb": 0,
+    "meanMainMs": null
+   },
+   {
+    "scene": "mnbl_probe_a7",
+    "label": "s06_a7",
+    "id": "map38_coast",
+    "meanMs": 16.666,
+    "p95Ms": 16.829,
+    "maxMs": 16.926,
+    "rendererFps": 60.2566452,
+    "mainFps": 2084.20166,
+    "decals": null,
+    "gpuMemoryMb": 16003,
+    "cpuMemoryMb": 0,
+    "meanMainMs": null
+   },
+   {
+    "scene": "mnbl_probe_a7s",
+    "label": "s07_a7s",
+    "id": "overview",
+    "meanMs": 16.667,
+    "p95Ms": 16.861,
+    "maxMs": 17.061,
+    "rendererFps": 60.2731,
+    "mainFps": 1662.78687,
+    "decals": null,
+    "gpuMemoryMb": 16003,
+    "cpuMemoryMb": 0,
+    "meanMainMs": null
+   },
+   {
+    "scene": "mnbl_probe_a7s",
+    "label": "s07_a7s",
+    "id": "map38_mountain",
+    "meanMs": 16.666,
+    "p95Ms": 16.867,
+    "maxMs": 17.268,
+    "rendererFps": 60.2564163,
+    "mainFps": 2453.98779,
+    "decals": null,
+    "gpuMemoryMb": 16003,
+    "cpuMemoryMb": 0,
+    "meanMainMs": null
+   },
+   {
+    "scene": "mnbl_probe_a7s",
+    "label": "s07_a7s",
+    "id": "map38_coast",
+    "meanMs": 16.666,
+    "p95Ms": 16.849,
+    "maxMs": 16.981,
+    "rendererFps": 60.24677,
+    "mainFps": 2445.58569,
+    "decals": null,
+    "gpuMemoryMb": 16003,
+    "cpuMemoryMb": 0,
+    "meanMainMs": null
+   },
+   {
+    "scene": "mnbl_probe_l2",
+    "label": "s08_l2_decals",
+    "id": "count0",
+    "meanMs": 16.667,
+    "p95Ms": 17.005,
+    "maxMs": 17.251,
+    "rendererFps": 60.28685,
+    "mainFps": 2383.22217,
+    "decals": 0,
+    "gpuMemoryMb": 16003,
+    "cpuMemoryMb": 0,
+    "meanMainMs": null
+   },
+   {
+    "scene": "mnbl_probe_l2",
+    "label": "s08_l2_decals",
+    "id": "count200",
+    "meanMs": 16.666,
+    "p95Ms": 16.998,
+    "maxMs": 19.068,
+    "rendererFps": 60.27093,
+    "mainFps": 2201.67334,
+    "decals": 200,
+    "gpuMemoryMb": 16003,
+    "cpuMemoryMb": 0,
+    "meanMainMs": null
+   },
+   {
+    "scene": "mnbl_probe_l2",
+    "label": "s08_l2_decals",
+    "id": "count1000",
+    "meanMs": 16.666,
+    "p95Ms": 16.924,
+    "maxMs": 17.078,
+    "rendererFps": 60.3122063,
+    "mainFps": 1000.7005,
+    "decals": 1000,
+    "gpuMemoryMb": 16003,
+    "cpuMemoryMb": 0,
+    "meanMainMs": null
+   },
+   {
+    "scene": "mnbl_probe_l2",
+    "label": "s08_l2_decals",
+    "id": "count3000",
+    "meanMs": 16.666,
+    "p95Ms": 16.872,
+    "maxMs": 17.134,
+    "rendererFps": 60.449852,
+    "mainFps": 603.646,
+    "decals": 3000,
+    "gpuMemoryMb": 16003,
+    "cpuMemoryMb": 0,
+    "meanMainMs": null
+   },
+   {
+    "scene": "mnbl_probe_l2",
+    "label": "s08_l2_decals",
+    "id": "removed",
+    "meanMs": 16.667,
+    "p95Ms": 16.871,
+    "maxMs": 17.138,
+    "rendererFps": 60.2627029,
+    "mainFps": 1564.21082,
+    "decals": 0,
+    "gpuMemoryMb": 16003,
+    "cpuMemoryMb": 0,
+    "meanMainMs": null
+   },
+   {
+    "scene": "mnbl_probe_l2",
+    "label": "s00_l2_costonly",
+    "id": "overview",
+    "meanMs": 16.666,
+    "p95Ms": 17.001,
+    "maxMs": 17.515,
+    "rendererFps": 60.262394,
+    "mainFps": 1764.29077,
+    "decals": null,
+    "gpuMemoryMb": 16003,
+    "cpuMemoryMb": 0,
+    "meanMainMs": 0.5616
+   },
+   {
+    "scene": "mnbl_probe_l2",
+    "label": "s00_l2_costonly",
+    "id": "map38_flat",
+    "meanMs": 16.667,
+    "p95Ms": 16.824,
+    "maxMs": 17.845,
+    "rendererFps": 60.23119,
+    "mainFps": 2045.40808,
+    "decals": null,
+    "gpuMemoryMb": 16003,
+    "cpuMemoryMb": 0,
+    "meanMainMs": 0.4078
+   },
+   {
+    "scene": "mnbl_probe_l6",
+    "label": "s01_l6_costonly",
+    "id": "overview",
+    "meanMs": 16.666,
+    "p95Ms": 16.86,
+    "maxMs": 17.923,
+    "rendererFps": 60.28068,
+    "mainFps": 2949.85254,
+    "decals": null,
+    "gpuMemoryMb": 16003,
+    "cpuMemoryMb": 0,
+    "meanMainMs": 0.3933
+   },
+   {
+    "scene": "mnbl_probe_l6",
+    "label": "s01_l6_costonly",
+    "id": "map38_flat",
+    "meanMs": 16.666,
+    "p95Ms": 16.849,
+    "maxMs": 17.87,
+    "rendererFps": 60.19887,
+    "mainFps": 4214.075,
+    "decals": null,
+    "gpuMemoryMb": 16003,
+    "cpuMemoryMb": 0,
+    "meanMainMs": 0.3908
+   },
+   {
+    "scene": "mnbl_probe_l15",
+    "label": "s02_l15_costonly",
+    "id": "overview",
+    "meanMs": 16.662,
+    "p95Ms": 17.452,
+    "maxMs": 18.159,
+    "rendererFps": 60.2365723,
+    "mainFps": 2458.815,
+    "decals": null,
+    "gpuMemoryMb": 16003,
+    "cpuMemoryMb": 0,
+    "meanMainMs": 0.4454
+   },
+   {
+    "scene": "mnbl_probe_l15",
+    "label": "s02_l15_costonly",
+    "id": "map38_flat",
+    "meanMs": 16.667,
+    "p95Ms": 17.393,
+    "maxMs": 18.214,
+    "rendererFps": 60.2358475,
+    "mainFps": 2613.6958,
+    "decals": null,
+    "gpuMemoryMb": 16003,
+    "cpuMemoryMb": 0,
+    "meanMainMs": 0.4294
+   },
+   {
+    "scene": "mnbl_probe_forest",
+    "label": "s03_forest_costonly",
+    "id": "overview",
+    "meanMs": 16.666,
+    "p95Ms": 16.861,
+    "maxMs": 17.914,
+    "rendererFps": 60.2657623,
+    "mainFps": 1379.69092,
+    "decals": null,
+    "gpuMemoryMb": 16003,
+    "cpuMemoryMb": 0,
+    "meanMainMs": 0.7977
+   },
+   {
+    "scene": "mnbl_probe_forest",
+    "label": "s03_forest_costonly",
+    "id": "map38_flat",
+    "meanMs": 16.667,
+    "p95Ms": 16.91,
+    "maxMs": 17.904,
+    "rendererFps": 60.2382278,
+    "mainFps": 2272.211,
+    "decals": null,
+    "gpuMemoryMb": 16003,
+    "cpuMemoryMb": 0,
+    "meanMainMs": 0.4345
+   },
+   {
+    "scene": "mnbl_probe_a6",
+    "label": "s04_a6_costonly",
+    "id": "overview",
+    "meanMs": 16.667,
+    "p95Ms": 17.225,
+    "maxMs": 18.182,
+    "rendererFps": 60.25992,
+    "mainFps": 1597.189,
+    "decals": null,
+    "gpuMemoryMb": 16003,
+    "cpuMemoryMb": 0,
+    "meanMainMs": 0.636
+   },
+   {
+    "scene": "mnbl_probe_a6",
+    "label": "s04_a6_costonly",
+    "id": "map38_mountain",
+    "meanMs": 16.667,
+    "p95Ms": 17.722,
+    "maxMs": 18.228,
+    "rendererFps": 60.2391434,
+    "mainFps": 1709.98633,
+    "decals": null,
+    "gpuMemoryMb": 16003,
+    "cpuMemoryMb": 0,
+    "meanMainMs": 0.5246
+   },
+   {
+    "scene": "mnbl_probe_a7",
+    "label": "s05_a7_costonly",
+    "id": "overview",
+    "meanMs": 16.672,
+    "p95Ms": 17.71,
+    "maxMs": 18.321,
+    "rendererFps": 60.2929268,
+    "mainFps": 1334.75708,
+    "decals": null,
+    "gpuMemoryMb": 16003,
+    "cpuMemoryMb": 0,
+    "meanMainMs": 0.688
+   },
+   {
+    "scene": "mnbl_probe_a7",
+    "label": "s05_a7_costonly",
+    "id": "map38_mountain",
+    "meanMs": 16.666,
+    "p95Ms": 17.541,
+    "maxMs": 18.148,
+    "rendererFps": 60.24428,
+    "mainFps": 1842.63867,
+    "decals": null,
+    "gpuMemoryMb": 16003,
+    "cpuMemoryMb": 0,
+    "meanMainMs": 0.5205
+   },
+   {
+    "scene": "mnbl_probe_l2",
+    "label": "s06_l2_decals2",
+    "id": "c0",
+    "meanMs": 16.666,
+    "p95Ms": 17.613,
+    "maxMs": 18.028,
+    "rendererFps": 60.2454147,
+    "mainFps": 2237.13647,
+    "decals": 0,
+    "gpuMemoryMb": 16003,
+    "cpuMemoryMb": 0,
+    "meanMainMs": 0.4619
+   },
+   {
+    "scene": "mnbl_probe_l2",
+    "label": "s06_l2_decals2",
+    "id": "c1000",
+    "meanMs": 16.664,
+    "p95Ms": 17.696,
+    "maxMs": 18.168,
+    "rendererFps": 60.2429733,
+    "mainFps": 1288.32776,
+    "decals": 1000,
+    "gpuMemoryMb": 16003,
+    "cpuMemoryMb": 0,
+    "meanMainMs": 0.8428
+   },
+   {
+    "scene": "mnbl_probe_l2",
+    "label": "s06_l2_decals2",
+    "id": "c3000",
+    "meanMs": 16.672,
+    "p95Ms": 17.847,
+    "maxMs": 18.54,
+    "rendererFps": 60.37221,
+    "mainFps": 590.2491,
+    "decals": 3000,
+    "gpuMemoryMb": 16003,
+    "cpuMemoryMb": 0,
+    "meanMainMs": 1.588
+   },
+   {
+    "scene": "mnbl_probe_l2",
+    "label": "s06_l2_decals2",
+    "id": "c7500",
+    "meanMs": 16.667,
+    "p95Ms": 17.626,
+    "maxMs": 18.035,
+    "rendererFps": 61.02363,
+    "mainFps": 342.3485,
+    "decals": 7500,
+    "gpuMemoryMb": 16003,
+    "cpuMemoryMb": 0,
+    "meanMainMs": 3.1854
+   },
+   {
+    "scene": "mnbl_probe_l2",
+    "label": "s06_l2_decals2",
+    "id": "c0_after",
+    "meanMs": 16.667,
+    "p95Ms": 17.391,
+    "maxMs": 18.135,
+    "rendererFps": 60.224102,
+    "mainFps": 2229.15747,
+    "decals": 0,
+    "gpuMemoryMb": 16003,
+    "cpuMemoryMb": 0,
+    "meanMainMs": 0.4354
+   }
+  ],
+  "compositing": {
+   "bandA": [
+    {
+     "il": 9,
+     "w": 0.1875,
+     "rLin": 0.12788,
+     "bLin": 0.17792,
+     "alphaR": 0.3038
+    },
+    {
+     "il": 12,
+     "w": 0.25,
+     "rLin": 0.1521,
+     "bLin": 0.21296,
+     "alphaR": 0.3613
+    },
+    {
+     "il": 15,
+     "w": 0.3125,
+     "rLin": 0.17711,
+     "bLin": 0.24228,
+     "alphaR": 0.4208
+    },
+    {
+     "il": 18,
+     "w": 0.375,
+     "rLin": 0.19863,
+     "bLin": 0.27723,
+     "alphaR": 0.4719
+    },
+    {
+     "il": 21,
+     "w": 0.4375,
+     "rLin": 0.22458,
+     "bLin": 0.3124,
+     "alphaR": 0.5335
+    },
+    {
+     "il": 24,
+     "w": 0.5,
+     "rLin": 0.24574,
+     "bLin": 0.34309,
+     "alphaR": 0.5838
+    },
+    {
+     "il": 27,
+     "w": 0.5625,
+     "rLin": 0.27068,
+     "bLin": 0.37327,
+     "alphaR": 0.643
+    },
+    {
+     "il": 30,
+     "w": 0.625,
+     "rLin": 0.28883,
+     "bLin": 0.40198,
+     "alphaR": 0.6862
+    },
+    {
+     "il": 33,
+     "w": 0.6875,
+     "rLin": 0.31184,
+     "bLin": 0.43966,
+     "alphaR": 0.7408
+    },
+    {
+     "il": 36,
+     "w": 0.75,
+     "rLin": 0.33418,
+     "bLin": 0.46778,
+     "alphaR": 0.7939
+    },
+    {
+     "il": 39,
+     "w": 0.8125,
+     "rLin": 0.35762,
+     "bLin": 0.49102,
+     "alphaR": 0.8496
+    },
+    {
+     "il": 42,
+     "w": 0.875,
+     "rLin": 0.37628,
+     "bLin": 0.5104,
+     "alphaR": 0.8939
+    },
+    {
+     "il": 45,
+     "w": 0.9375,
+     "rLin": 0.39907,
+     "bLin": 0.55201,
+     "alphaR": 0.9481
+    },
+    {
+     "il": 48,
+     "w": 1.0,
+     "rLin": 0.42052,
+     "bLin": 0.58408,
+     "alphaR": 0.999
+    }
+   ],
+   "bandB": [
+    {
+     "il": 9,
+     "w": 0.1875,
+     "rLin": 0.09005,
+     "gLin": 0.25415
+    },
+    {
+     "il": 12,
+     "w": 0.25,
+     "rLin": 0.1013,
+     "gLin": 0.25415
+    },
+    {
+     "il": 15,
+     "w": 0.3125,
+     "rLin": 0.11444,
+     "gLin": 0.25415
+    },
+    {
+     "il": 18,
+     "w": 0.375,
+     "rLin": 0.12723,
+     "gLin": 0.25415
+    },
+    {
+     "il": 21,
+     "w": 0.4375,
+     "rLin": 0.13843,
+     "gLin": 0.25415
+    },
+    {
+     "il": 24,
+     "w": 0.5,
+     "rLin": 0.15174,
+     "gLin": 0.25415
+    },
+    {
+     "il": 27,
+     "w": 0.5625,
+     "rLin": 0.16203,
+     "gLin": 0.25415
+    },
+    {
+     "il": 30,
+     "w": 0.625,
+     "rLin": 0.17607,
+     "gLin": 0.25415
+    },
+    {
+     "il": 33,
+     "w": 0.6875,
+     "rLin": 0.18555,
+     "gLin": 0.25415
+    },
+    {
+     "il": 36,
+     "w": 0.75,
+     "rLin": 0.19849,
+     "gLin": 0.25415
+    },
+    {
+     "il": 39,
+     "w": 0.8125,
+     "rLin": 0.21166,
+     "gLin": 0.25415
+    },
+    {
+     "il": 42,
+     "w": 0.875,
+     "rLin": 0.22353,
+     "gLin": 0.25415
+    },
+    {
+     "il": 45,
+     "w": 0.9375,
+     "rLin": 0.23624,
+     "gLin": 0.25448
+    },
+    {
+     "il": 48,
+     "w": 1.0,
+     "rLin": 0.24354,
+     "gLin": 0.25512
+    }
+   ],
+   "bandAmaxAbsErrorVsLinear": 0.1163,
+   "bandBgreenSpread": 0.0038,
+   "orderFit": {
+    "higherIndexOnTopSse": 0.15548,
+    "lowerIndexOnTopSse": 0.78507
+   },
+   "fullMagentaLin": [
+    0.4209379206676644,
+    0.0634403974227048,
+    0.5840784178911638
+   ],
+   "fullBandBLin": [
+    0.24621749837096396,
+    0.25657795868875455,
+    0.34670405635502966
+   ]
+  },
+  "heightBlend": {
+   "slopeAlpha": {
+    "rows": [
+     {
+      "il": 9,
+      "w": 0.1875,
+      "ratio": 0.4645
+     },
+     {
+      "il": 12,
+      "w": 0.25,
+      "ratio": 0.4608
+     },
+     {
+      "il": 15,
+      "w": 0.3125,
+      "ratio": 0.4609
+     },
+     {
+      "il": 18,
+      "w": 0.375,
+      "ratio": 0.4596
+     },
+     {
+      "il": 21,
+      "w": 0.4375,
+      "ratio": 0.4537
+     },
+     {
+      "il": 24,
+      "w": 0.5,
+      "ratio": 0.4488
+     },
+     {
+      "il": 27,
+      "w": 0.5625,
+      "ratio": 0.4469
+     },
+     {
+      "il": 30,
+      "w": 0.625,
+      "ratio": 0.4569
+     },
+     {
+      "il": 33,
+      "w": 0.6875,
+      "ratio": 0.5293
+     },
+     {
+      "il": 36,
+      "w": 0.75,
+      "ratio": 0.6333
+     },
+     {
+      "il": 39,
+      "w": 0.8125,
+      "ratio": 0.7301
+     },
+     {
+      "il": 42,
+      "w": 0.875,
+      "ratio": 0.8153
+     },
+     {
+      "il": 45,
+      "w": 0.9375,
+      "ratio": 0.9055
+     },
+     {
+      "il": 48,
+      "w": 1.0,
+      "ratio": 0.9938
+     }
+    ],
+    "maxAbsErrorVsLinear": 0.277,
+    "fullLuminanceLin": 0.11434
+   },
+   "plain": {
+    "rows": [
+     {
+      "il": 9,
+      "w": 0.1875,
+      "ratio": 0.5473
+     },
+     {
+      "il": 12,
+      "w": 0.25,
+      "ratio": 0.5837
+     },
+     {
+      "il": 15,
+      "w": 0.3125,
+      "ratio": 0.6233
+     },
+     {
+      "il": 18,
+      "w": 0.375,
+      "ratio": 0.6575
+     },
+     {
+      "il": 21,
+      "w": 0.4375,
+      "ratio": 0.6946
+     },
+     {
+      "il": 24,
+      "w": 0.5,
+      "ratio": 0.7307
+     },
+     {
+      "il": 27,
+      "w": 0.5625,
+      "ratio": 0.7594
+     },
+     {
+      "il": 30,
+      "w": 0.625,
+      "ratio": 0.7908
+     },
+     {
+      "il": 33,
+      "w": 0.6875,
+      "ratio": 0.8288
+     },
+     {
+      "il": 36,
+      "w": 0.75,
+      "ratio": 0.8593
+     },
+     {
+      "il": 39,
+      "w": 0.8125,
+      "ratio": 0.8947
+     },
+     {
+      "il": 42,
+      "w": 0.875,
+      "ratio": 0.9248
+     },
+     {
+      "il": 45,
+      "w": 0.9375,
+      "ratio": 0.9545
+     },
+     {
+      "il": 48,
+      "w": 1.0,
+      "ratio": 0.9861
+     }
+    ],
+    "maxAbsErrorVsLinear": 0.3598,
+    "fullLuminanceLin": 0.12117
+   }
+  },
+  "stripes": {
+   "expectedPeriodUnits": 25.0,
+   "modelPxPerUnit": 2.5622,
+   "measuredPeriodPx": 60,
+   "correlation": 0.69,
+   "measuredPxPerUnit": 2.4
+  },
+  "tileSize": {
+   "scale5_topdown": {
+    "pxPerUnit": 10.3447,
+    "x": {
+     "periodPx": 52,
+     "correlation": 0.795,
+     "periodUnits": 5.027
+    },
+    "y": {
+     "periodPx": 52,
+     "correlation": 0.929,
+     "periodUnits": 5.027
+    }
+   },
+   "scale20_topdown": {
+    "pxPerUnit": 10.3447,
+    "x": {
+     "periodPx": 207,
+     "correlation": 0.987,
+     "periodUnits": 20.01
+    },
+    "y": {
+     "periodPx": 207,
+     "correlation": 0.989,
+     "periodUnits": 20.01
+    }
+   }
+  },
+  "map38": {
+   "pxPerUnitAtTarget": 37.019,
+   "resolution": [
+    1600,
+    1024
+   ],
+   "fovVertical": 0.69813168,
+   "distance": 38.0,
+   "elevationRad": 0.635
+  },
+  "seasonMasksL6": {
+   "season0_node11_topdown": {
+    "magentaBandAEvenNode11": 0.5496,
+    "meanLinLuminance": 0.13459
+   },
+   "seasonfactor1_node11_topdown": {
+    "magentaBandAEvenNode11": 0.5495,
+    "meanLinLuminance": 0.13459
+   },
+   "wintertime1_node11_topdown": {
+    "magentaBandAEvenNode11": 0.5495,
+    "meanLinLuminance": 0.13459
+   },
+   "reset_node11_topdown": {
+    "magentaBandAEvenNode11": 0.5495,
+    "meanLinLuminance": 0.13459
+   },
+   "season0_overview": {
+    "meanAbsDiffVsSeason0": 0.0
+   },
+   "seasonfactor1_overview": {
+    "meanAbsDiffVsSeason0": 0.0
+   },
+   "wintertime1_overview": {
+    "meanAbsDiffVsSeason0": 0.0
+   }
+  },
+  "gallery": {
+   "bands": [
+    {
+     "slot": 1,
+     "diffuse": "desert_floor_a",
+     "albedoMode": 0,
+     "meanLin": [
+      0.20295,
+      0.17966,
+      0.17637
+     ]
+    },
+    {
+     "slot": 2,
+     "diffuse": "desert_floor_c_d",
+     "albedoMode": 0,
+     "meanLin": [
+      0.23889,
+      0.20901,
+      0.20942
+     ]
+    },
+    {
+     "slot": 3,
+     "diffuse": "ground_drygrass_a_d",
+     "albedoMode": 0,
+     "meanLin": [
+      0.12228,
+      0.11738,
+      0.10964
+     ]
+    },
+    {
+     "slot": 4,
+     "diffuse": "ground_forest_b_d_main_map",
+     "albedoMode": 0,
+     "meanLin": [
+      0.28437,
+      0.28584,
+      0.37205
+     ]
+    },
+    {
+     "slot": 5,
+     "diffuse": "forest_a_d",
+     "albedoMode": 0,
+     "meanLin": [
+      0.09904,
+      0.09885,
+      0.08578
+     ]
+    },
+    {
+     "slot": 6,
+     "diffuse": "ground_mud_b_d",
+     "albedoMode": 0,
+     "meanLin": [
+      0.1228,
+      0.10344,
+      0.10351
+     ]
+    },
+    {
+     "slot": 7,
+     "diffuse": "ground_beach_a_d",
+     "albedoMode": 0,
+     "meanLin": [
+      0.17562,
+      0.16047,
+      0.17045
+     ]
+    },
+    {
+     "slot": 8,
+     "diffuse": "ground_nord_grass_a_d",
+     "albedoMode": 0,
+     "meanLin": [
+      0.07003,
+      0.08114,
+      0.06526
+     ]
+    },
+    {
+     "slot": 9,
+     "diffuse": "main_map_mountains_d",
+     "albedoMode": 0,
+     "meanLin": [
+      0.32678,
+      0.32413,
+      0.42486
+     ]
+    },
+    {
+     "slot": 10,
+     "diffuse": "rock_k_d",
+     "albedoMode": 0,
+     "meanLin": [
+      0.0933,
+      0.09937,
+      0.10155
+     ]
+    },
+    {
+     "slot": 11,
+     "diffuse": "ice_a_d",
+     "albedoMode": 0,
+     "meanLin": [
+      0.24624,
+      0.27821,
+      0.41266
+     ]
+    },
+    {
+     "slot": 12,
+     "diffuse": "snow_a_d",
+     "albedoMode": 0,
+     "meanLin": [
+      0.32797,
+      0.33655,
+      0.46238
+     ]
+    },
+    {
+     "slot": 13,
+     "diffuse": "desert_floor_a",
+     "albedoMode": 1,
+     "meanLin": [
+      0.27816,
+      0.17962,
+      0.17619
+     ]
+    },
+    {
+     "slot": 14,
+     "diffuse": "desert_floor_a",
+     "albedoMode": 2,
+     "meanLin": [
+      0.20258,
+      0.12621,
+      0.12725
+     ]
+    }
+   ],
+   "baseMeanLin": [
+    0.37031,
+    0.37579,
+    0.50008
+   ]
+  },
+  "tints": {
+   "mode1AddMinusUntinted": [
+    0.0752,
+    -0.0,
+    -0.0002
+   ],
+   "mode1Requested": [
+    0.2,
+    0.0,
+    0.0
+   ],
+   "mode2RatioToUntinted": [
+    0.9982,
+    0.7025,
+    0.7215
+   ],
+   "mode2Requested": [
+    1.0,
+    0.55,
+    0.55
+   ]
+  },
+  "decals": {
+   "materialShader": "decal",
+   "materialFound": true,
+   "d1": {
+    "technique": "Decal.CreateDecal(null) + SetMaterial + Scene.AddDecalInstance('editor_set') + Frame",
+    "count": 16,
+    "changedFraction": 0.4845,
+    "pixels": 140534
+   },
+   "d2": {
+    "technique": "Material.CreateCopy + SetTexture(DiffuseMap, Texture.CreateFromByteArray RGBA 64x64 magenta/cyan checker)",
+    "count": 4,
+    "changedFraction": 0.0,
+    "pixels": 30972,
+    "magentaPixels": 0,
+    "cyanPixels": 0
+   },
+   "d3": {
+    "technique": "GameEntity.CreateEmpty + AddComponent(Decal)",
+    "count": 6,
+    "changedFraction": 0.0,
+    "pixels": 107590
+   },
+   "d4": {
+    "technique": "Mesh.CreateMeshWithMaterial(decal material) box [-1,1]^3 on an entity",
+    "count": 6,
+    "changedFraction": null,
+    "pixels": 0
+   },
+   "counts": [
+    {
+     "scene": "mnbl_probe_l2",
+     "label": "s08_l2_decals",
+     "id": "count0",
+     "meanMs": 16.667,
+     "p95Ms": 17.005,
+     "maxMs": 17.251,
+     "rendererFps": 60.28685,
+     "mainFps": 2383.22217,
+     "decals": 0,
+     "gpuMemoryMb": 16003,
+     "cpuMemoryMb": 0,
+     "meanMainMs": null
+    },
+    {
+     "scene": "mnbl_probe_l2",
+     "label": "s08_l2_decals",
+     "id": "count200",
+     "meanMs": 16.666,
+     "p95Ms": 16.998,
+     "maxMs": 19.068,
+     "rendererFps": 60.27093,
+     "mainFps": 2201.67334,
+     "decals": 200,
+     "gpuMemoryMb": 16003,
+     "cpuMemoryMb": 0,
+     "meanMainMs": null
+    },
+    {
+     "scene": "mnbl_probe_l2",
+     "label": "s08_l2_decals",
+     "id": "count1000",
+     "meanMs": 16.666,
+     "p95Ms": 16.924,
+     "maxMs": 17.078,
+     "rendererFps": 60.3122063,
+     "mainFps": 1000.7005,
+     "decals": 1000,
+     "gpuMemoryMb": 16003,
+     "cpuMemoryMb": 0,
+     "meanMainMs": null
+    },
+    {
+     "scene": "mnbl_probe_l2",
+     "label": "s08_l2_decals",
+     "id": "count3000",
+     "meanMs": 16.666,
+     "p95Ms": 16.872,
+     "maxMs": 17.134,
+     "rendererFps": 60.449852,
+     "mainFps": 603.646,
+     "decals": 3000,
+     "gpuMemoryMb": 16003,
+     "cpuMemoryMb": 0,
+     "meanMainMs": null
+    },
+    {
+     "scene": "mnbl_probe_l2",
+     "label": "s08_l2_decals",
+     "id": "removed",
+     "meanMs": 16.667,
+     "p95Ms": 16.871,
+     "maxMs": 17.138,
+     "rendererFps": 60.2627029,
+     "mainFps": 1564.21082,
+     "decals": 0,
+     "gpuMemoryMb": 16003,
+     "cpuMemoryMb": 0,
+     "meanMainMs": null
+    }
+   ],
+   "removeMs": 1.2357,
+   "recreate200Ms": 0.2752,
+   "createRows": [
+    {
+     "decals": 200,
+     "createMs": 0.2056
+    },
+    {
+     "decals": 1000,
+     "createMs": 0.7239
+    },
+    {
+     "decals": 3000,
+     "createMs": 1.8168000000000002
+    }
+   ],
+   "removedVsCount0MeanAbsDiff": 0.189,
+   "recreated200VsCount200MeanAbsDiff": 0.196,
+   "count200VsCount0MeanAbsDiff": 0.507
+  },
+  "decals2": {
+   "variants": {
+    "v1_copyTextureRegistered": {
+     "changedPixels": 78
+    },
+    "v2_copyPlain": {
+     "changedPixels": 17421
+    },
+    "v3_factorTint": {
+     "changedPixels": 11313,
+     "magentaPixels": 1610
+    },
+    "v4_entityRegistered": {
+     "changedPixels": 8233
+    },
+    "v5_groundOverlays": {
+     "changedPixels": 12903
+    }
+   },
+   "record": {
+    "v5_materials": [
+     [
+      "decal_city_ground",
+      true
+     ],
+     [
+      "mainmap_decal_undervillage_desert",
+      true
+     ],
+     [
+      "mainmap_decal_undervillage",
+      true
+     ],
+     [
+      "mainmap_cracked_mud_a",
+      false
+     ]
+    ]
+   },
+   "counts": [
+    {
+     "scene": "mnbl_probe_l2",
+     "label": "s06_l2_decals2",
+     "id": "c0",
+     "meanMs": 16.666,
+     "p95Ms": 17.613,
+     "maxMs": 18.028,
+     "rendererFps": 60.2454147,
+     "mainFps": 2237.13647,
+     "decals": 0,
+     "gpuMemoryMb": 16003,
+     "cpuMemoryMb": 0,
+     "meanMainMs": 0.4619
+    },
+    {
+     "scene": "mnbl_probe_l2",
+     "label": "s06_l2_decals2",
+     "id": "c1000",
+     "meanMs": 16.664,
+     "p95Ms": 17.696,
+     "maxMs": 18.168,
+     "rendererFps": 60.2429733,
+     "mainFps": 1288.32776,
+     "decals": 1000,
+     "gpuMemoryMb": 16003,
+     "cpuMemoryMb": 0,
+     "meanMainMs": 0.8428
+    },
+    {
+     "scene": "mnbl_probe_l2",
+     "label": "s06_l2_decals2",
+     "id": "c3000",
+     "meanMs": 16.672,
+     "p95Ms": 17.847,
+     "maxMs": 18.54,
+     "rendererFps": 60.37221,
+     "mainFps": 590.2491,
+     "decals": 3000,
+     "gpuMemoryMb": 16003,
+     "cpuMemoryMb": 0,
+     "meanMainMs": 1.588
+    },
+    {
+     "scene": "mnbl_probe_l2",
+     "label": "s06_l2_decals2",
+     "id": "c7500",
+     "meanMs": 16.667,
+     "p95Ms": 17.626,
+     "maxMs": 18.035,
+     "rendererFps": 61.02363,
+     "mainFps": 342.3485,
+     "decals": 7500,
+     "gpuMemoryMb": 16003,
+     "cpuMemoryMb": 0,
+     "meanMainMs": 3.1854
+    },
+    {
+     "scene": "mnbl_probe_l2",
+     "label": "s06_l2_decals2",
+     "id": "c0_after",
+     "meanMs": 16.667,
+     "p95Ms": 17.391,
+     "maxMs": 18.135,
+     "rendererFps": 60.224102,
+     "mainFps": 2229.15747,
+     "decals": 0,
+     "gpuMemoryMb": 16003,
+     "cpuMemoryMb": 0,
+     "meanMainMs": 0.4354
+    }
+   ],
+   "create": {
+    "rows": [
+     {
+      "decals": 1000,
+      "createMs": 0.9527
+     },
+     {
+      "decals": 3000,
+      "createMs": 1.8236
+     },
+     {
+      "decals": 7500,
+      "createMs": 4.2621
+     }
+    ],
+    "remove7500Ms": 4.7085
+   }
+  },
+  "snow2": {
+   "snow_snow2": {
+    "status": "ok",
+    "steps": [
+     [
+      "load",
+      "ok"
+     ],
+     [
+      "snow2_inherent",
+      "ok"
+     ],
+     [
+      "snow2_runtime",
+      "ok"
+     ],
+     [
+      "snow2_channels",
+      "ok"
+     ],
+     [
+      "snow2_vanilla_texture",
+      "ok"
+     ]
+    ],
+    "load": {
+     "cpuMemoryMbBefore": 0,
+     "gpuMemoryMbBefore": 16003,
+     "readSeconds": 0.10100579999999999,
+     "terrainNodes": [
+      4,
+      4
+     ],
+     "nodeSize": 400,
+     "terrainLayers": 4,
+     "terrainVersion": 1,
+     "optimizeSeconds": 0.0012824,
+     "created": true,
+     "readyAfterSeconds": 1.0464683999999949,
+     "maxShaderCompilationsInProgress": 0,
+     "loadingState": "loading_finished",
+     "terrainMemory": 0,
+     "floraInstances": 0,
+     "floraRendererTextureUsage": 0,
+     "navMeshFaces": 2048,
+     "cpuMemoryMbReady": 0,
+     "gpuMemoryMbReady": 16003,
+     "centerHeight": 1.9799999,
+     "hillHeight": 51.9899979
+    },
+    "meanAbsDiffVsInherentSummer": {
+     "inherent_winter_q_nw": 0.0,
+     "inherent_winter_q_nw_white": 0.0,
+     "inherent_winter_q_ne": 0.0,
+     "inherent_winter_q_ne_white": 0.0,
+     "inherent_winter_q_sw": 0.0,
+     "inherent_winter_q_sw_white": 0.0,
+     "inherent_winter_q_se": 0.0,
+     "inherent_winter_q_se_white": 0.0,
+     "runtime_summer_q_nw": 0.0,
+     "runtime_summer_q_nw_white": 0.0,
+     "runtime_summer_q_ne": 0.0,
+     "runtime_summer_q_ne_white": 0.0,
+     "runtime_summer_q_sw": 0.0,
+     "runtime_summer_q_sw_white": 0.0,
+     "runtime_summer_q_se": 0.0,
+     "runtime_summer_q_se_white": 0.0,
+     "runtime_winter_q_nw": 0.0,
+     "runtime_winter_q_nw_white": 0.0,
+     "runtime_winter_q_ne": 0.0,
+     "runtime_winter_q_ne_white": 0.0,
+     "runtime_winter_q_sw": 0.0,
+     "runtime_winter_q_sw_white": 0.0,
+     "runtime_winter_q_se": 0.0,
+     "runtime_winter_q_se_white": 0.0,
+     "green_winter_q_nw": 0.0,
+     "green_winter_q_nw_white": 0.0,
+     "alpha_winter_q_nw": 0.0,
+     "alpha_winter_q_nw_white": 0.0,
+     "bluewater_winter_q_nw": 0.0,
+     "bluewater_winter_q_nw_white": 0.0,
+     "vanillaTexture_summer_q_nw": 0.0,
+     "vanillaTexture_summer_q_nw_white": 0.0,
+     "vanillaTexture_winter_q_nw": 0.0,
+     "vanillaTexture_winter_q_nw_white": 0.0,
+     "vanillaTexture_winter_q_ne": 0.0,
+     "vanillaTexture_winter_q_ne_white": 0.0,
+     "vanillaTexture_winter_q_sw": 0.0,
+     "vanillaTexture_winter_q_sw_white": 0.0,
+     "vanillaTexture_winter_q_se": 0.0,
+     "vanillaTexture_winter_q_se_white": 0.0
+    }
+   },
+   "snowf_snow2": {
+    "status": "ok",
+    "steps": [
+     [
+      "load",
+      "ok"
+     ],
+     [
+      "snow2_inherent",
+      "ok"
+     ],
+     [
+      "snow2_runtime",
+      "ok"
+     ],
+     [
+      "snow2_channels",
+      "ok"
+     ],
+     [
+      "snow2_vanilla_texture",
+      "ok"
+     ]
+    ],
+    "load": {
+     "cpuMemoryMbBefore": 0,
+     "gpuMemoryMbBefore": 16003,
+     "readSeconds": 0.0863229,
+     "terrainNodes": [
+      4,
+      4
+     ],
+     "nodeSize": 400,
+     "terrainLayers": 4,
+     "terrainVersion": 1,
+     "optimizeSeconds": 0.0013380999999999998,
+     "created": true,
+     "readyAfterSeconds": 1.8949925999999948,
+     "maxShaderCompilationsInProgress": 9,
+     "loadingState": "loading_finished",
+     "terrainMemory": 0,
+     "floraInstances": 0,
+     "floraRendererTextureUsage": 0,
+     "navMeshFaces": 2048,
+     "cpuMemoryMbReady": 0,
+     "gpuMemoryMbReady": 16003,
+     "centerHeight": 1.9799999,
+     "hillHeight": 51.9899979
+    },
+    "meanAbsDiffVsInherentSummer": {
+     "inherent_winter_q_nw": 15.569,
+     "inherent_winter_q_nw_white": 0.0,
+     "inherent_winter_q_ne": 55.071,
+     "inherent_winter_q_ne_white": 0.0,
+     "inherent_winter_q_sw": 6.89,
+     "inherent_winter_q_sw_white": 0.0,
+     "inherent_winter_q_se": 23.307,
+     "inherent_winter_q_se_white": 0.0175,
+     "runtime_summer_q_nw": 0.0,
+     "runtime_summer_q_nw_white": 0.0,
+     "runtime_summer_q_ne": 0.0,
+     "runtime_summer_q_ne_white": 0.0,
+     "runtime_summer_q_sw": 0.0,
+     "runtime_summer_q_sw_white": 0.0,
+     "runtime_summer_q_se": 0.0,
+     "runtime_summer_q_se_white": 0.0003,
+     "runtime_winter_q_nw": 15.569,
+     "runtime_winter_q_nw_white": 0.0,
+     "runtime_winter_q_ne": 55.071,
+     "runtime_winter_q_ne_white": 0.0,
+     "runtime_winter_q_sw": 6.89,
+     "runtime_winter_q_sw_white": 0.0,
+     "runtime_winter_q_se": 23.307,
+     "runtime_winter_q_se_white": 0.0175,
+     "green_winter_q_nw": 15.569,
+     "green_winter_q_nw_white": 0.0,
+     "alpha_winter_q_nw": 15.569,
+     "alpha_winter_q_nw_white": 0.0,
+     "bluewater_winter_q_nw": 15.569,
+     "bluewater_winter_q_nw_white": 0.0,
+     "vanillaTexture_summer_q_nw": 0.0,
+     "vanillaTexture_summer_q_nw_white": 0.0,
+     "vanillaTexture_winter_q_nw": 15.569,
+     "vanillaTexture_winter_q_nw_white": 0.0,
+     "vanillaTexture_winter_q_ne": 55.071,
+     "vanillaTexture_winter_q_ne_white": 0.0,
+     "vanillaTexture_winter_q_sw": 6.89,
+     "vanillaTexture_winter_q_sw_white": 0.0,
+     "vanillaTexture_winter_q_se": 23.307,
+     "vanillaTexture_winter_q_se_white": 0.0175
+    }
+   },
+   "snowfr_snow2": {
+    "status": null,
+    "steps": [],
+    "load": {
+     "cpuMemoryMbBefore": 0,
+     "gpuMemoryMbBefore": 16003,
+     "readSeconds": 0.0384186,
+     "terrainNodes": [
+      4,
+      4
+     ],
+     "nodeSize": 400,
+     "terrainLayers": 4,
+     "terrainVersion": 1,
+     "optimizeSeconds": 0.000529,
+     "created": true
+    },
+    "meanAbsDiffVsInherentSummer": {}
+   }
+  },
+  "snow": {
+   "dynamicSnow": "256x256 RGBA bytes, rows first: rows 0-127 x columns 0-127 = 255; rows 200-215 x columns 0-63 = 255; rows 128-255 x columns 128-255 = ramp 2(x-128)",
+   "threadId": 30,
+   "seasons": {
+    "seasonTimeFactorBefore": 0,
+    "winterTimeFactorBefore": 0,
+    "seasonTimeFactorSet": 1,
+    "winterTimeFactorSet": 1,
+    "seasonTimeFactorAfter": 0,
+    "winterTimeFactorAfter": 0
+   },
+   "baseline_snow_topdown": {
+    "NW": 0.0,
+    "NE": 0.0,
+    "SW": 0.0,
+    "SE": 0.0,
+    "barIfRowsAreNorthToSouth": 0.0,
+    "barIfRowsAreSouthToNorth": 0.0,
+    "barIfTransposed": 0.0,
+    "seRamp": [
+     {
+      "x": 840.0,
+      "rValue": 13,
+      "white": 0.0
+     },
+     {
+      "x": 887.5,
+      "rValue": 28,
+      "white": 0.0
+     },
+     {
+      "x": 935.0,
+      "rValue": 43,
+      "white": 0.0
+     },
+     {
+      "x": 982.5,
+      "rValue": 58,
+      "white": 0.0
+     },
+     {
+      "x": 1030.0,
+      "rValue": 73,
+      "white": 0.0
+     },
+     {
+      "x": 1077.5,
+      "rValue": 88,
+      "white": 0.0
+     },
+     {
+      "x": 1125.0,
+      "rValue": 104,
+      "white": 0.0
+     },
+     {
+      "x": 1172.5,
+      "rValue": 119,
+      "white": 0.0
+     },
+     {
+      "x": 1220.0,
+      "rValue": 134,
+      "white": 0.0
+     },
+     {
+      "x": 1267.5,
+      "rValue": 149,
+      "white": 0.0
+     },
+     {
+      "x": 1315.0,
+      "rValue": 164,
+      "white": 0.0
+     },
+     {
+      "x": 1362.5,
+      "rValue": 179,
+      "white": 0.0
+     },
+     {
+      "x": 1410.0,
+      "rValue": 194,
+      "white": 0.0
+     },
+     {
+      "x": 1457.5,
+      "rValue": 210,
+      "white": 0.0
+     },
+     {
+      "x": 1505.0,
+      "rValue": 225,
+      "white": 0.0
+     },
+     {
+      "x": 1552.5,
+      "rValue": 240,
+      "white": 0.0
+     }
+    ],
+    "seRampThresholdR": null,
+    "meanLinearLuminance": 0.07873
+   },
+   "season0_snow_topdown": {
+    "NW": 0.0,
+    "NE": 0.0,
+    "SW": 0.0,
+    "SE": 0.0,
+    "barIfRowsAreNorthToSouth": 0.0,
+    "barIfRowsAreSouthToNorth": 0.0,
+    "barIfTransposed": 0.0,
+    "seRamp": [
+     {
+      "x": 840.0,
+      "rValue": 13,
+      "white": 0.0
+     },
+     {
+      "x": 887.5,
+      "rValue": 28,
+      "white": 0.0
+     },
+     {
+      "x": 935.0,
+      "rValue": 43,
+      "white": 0.0
+     },
+     {
+      "x": 982.5,
+      "rValue": 58,
+      "white": 0.0
+     },
+     {
+      "x": 1030.0,
+      "rValue": 73,
+      "white": 0.0
+     },
+     {
+      "x": 1077.5,
+      "rValue": 88,
+      "white": 0.0
+     },
+     {
+      "x": 1125.0,
+      "rValue": 104,
+      "white": 0.0
+     },
+     {
+      "x": 1172.5,
+      "rValue": 119,
+      "white": 0.0
+     },
+     {
+      "x": 1220.0,
+      "rValue": 134,
+      "white": 0.0
+     },
+     {
+      "x": 1267.5,
+      "rValue": 149,
+      "white": 0.0
+     },
+     {
+      "x": 1315.0,
+      "rValue": 164,
+      "white": 0.0
+     },
+     {
+      "x": 1362.5,
+      "rValue": 179,
+      "white": 0.0
+     },
+     {
+      "x": 1410.0,
+      "rValue": 194,
+      "white": 0.0
+     },
+     {
+      "x": 1457.5,
+      "rValue": 210,
+      "white": 0.0
+     },
+     {
+      "x": 1505.0,
+      "rValue": 225,
+      "white": 0.0
+     },
+     {
+      "x": 1552.5,
+      "rValue": 240,
+      "white": 0.0
+     }
+    ],
+    "seRampThresholdR": null,
+    "meanLinearLuminance": 0.07873
+   },
+   "seasonfactor1_snow_topdown": {
+    "NW": 0.0,
+    "NE": 0.0,
+    "SW": 0.0,
+    "SE": 0.0,
+    "barIfRowsAreNorthToSouth": 0.0,
+    "barIfRowsAreSouthToNorth": 0.0,
+    "barIfTransposed": 0.0,
+    "seRamp": [
+     {
+      "x": 840.0,
+      "rValue": 13,
+      "white": 0.0
+     },
+     {
+      "x": 887.5,
+      "rValue": 28,
+      "white": 0.0
+     },
+     {
+      "x": 935.0,
+      "rValue": 43,
+      "white": 0.0
+     },
+     {
+      "x": 982.5,
+      "rValue": 58,
+      "white": 0.0
+     },
+     {
+      "x": 1030.0,
+      "rValue": 73,
+      "white": 0.0
+     },
+     {
+      "x": 1077.5,
+      "rValue": 88,
+      "white": 0.0
+     },
+     {
+      "x": 1125.0,
+      "rValue": 104,
+      "white": 0.0
+     },
+     {
+      "x": 1172.5,
+      "rValue": 119,
+      "white": 0.0
+     },
+     {
+      "x": 1220.0,
+      "rValue": 134,
+      "white": 0.0
+     },
+     {
+      "x": 1267.5,
+      "rValue": 149,
+      "white": 0.0
+     },
+     {
+      "x": 1315.0,
+      "rValue": 164,
+      "white": 0.0
+     },
+     {
+      "x": 1362.5,
+      "rValue": 179,
+      "white": 0.0
+     },
+     {
+      "x": 1410.0,
+      "rValue": 194,
+      "white": 0.0
+     },
+     {
+      "x": 1457.5,
+      "rValue": 210,
+      "white": 0.0
+     },
+     {
+      "x": 1505.0,
+      "rValue": 225,
+      "white": 0.0
+     },
+     {
+      "x": 1552.5,
+      "rValue": 240,
+      "white": 0.0
+     }
+    ],
+    "seRampThresholdR": null,
+    "meanLinearLuminance": 0.07873
+   },
+   "wintertime1_snow_topdown": {
+    "NW": 0.0,
+    "NE": 0.0,
+    "SW": 0.0,
+    "SE": 0.0,
+    "barIfRowsAreNorthToSouth": 0.0,
+    "barIfRowsAreSouthToNorth": 0.0,
+    "barIfTransposed": 0.0,
+    "seRamp": [
+     {
+      "x": 840.0,
+      "rValue": 13,
+      "white": 0.0
+     },
+     {
+      "x": 887.5,
+      "rValue": 28,
+      "white": 0.0
+     },
+     {
+      "x": 935.0,
+      "rValue": 43,
+      "white": 0.0
+     },
+     {
+      "x": 982.5,
+      "rValue": 58,
+      "white": 0.0
+     },
+     {
+      "x": 1030.0,
+      "rValue": 73,
+      "white": 0.0
+     },
+     {
+      "x": 1077.5,
+      "rValue": 88,
+      "white": 0.0
+     },
+     {
+      "x": 1125.0,
+      "rValue": 104,
+      "white": 0.0
+     },
+     {
+      "x": 1172.5,
+      "rValue": 119,
+      "white": 0.0
+     },
+     {
+      "x": 1220.0,
+      "rValue": 134,
+      "white": 0.0
+     },
+     {
+      "x": 1267.5,
+      "rValue": 149,
+      "white": 0.0
+     },
+     {
+      "x": 1315.0,
+      "rValue": 164,
+      "white": 0.0
+     },
+     {
+      "x": 1362.5,
+      "rValue": 179,
+      "white": 0.0
+     },
+     {
+      "x": 1410.0,
+      "rValue": 194,
+      "white": 0.0
+     },
+     {
+      "x": 1457.5,
+      "rValue": 210,
+      "white": 0.0
+     },
+     {
+      "x": 1505.0,
+      "rValue": 225,
+      "white": 0.0
+     },
+     {
+      "x": 1552.5,
+      "rValue": 240,
+      "white": 0.0
+     }
+    ],
+    "seRampThresholdR": null,
+    "meanLinearLuminance": 0.07873
+   },
+   "reset_snow_topdown": {
+    "NW": 0.0,
+    "NE": 0.0,
+    "SW": 0.0,
+    "SE": 0.0,
+    "barIfRowsAreNorthToSouth": 0.0,
+    "barIfRowsAreSouthToNorth": 0.0,
+    "barIfTransposed": 0.0,
+    "seRamp": [
+     {
+      "x": 840.0,
+      "rValue": 13,
+      "white": 0.0
+     },
+     {
+      "x": 887.5,
+      "rValue": 28,
+      "white": 0.0
+     },
+     {
+      "x": 935.0,
+      "rValue": 43,
+      "white": 0.0
+     },
+     {
+      "x": 982.5,
+      "rValue": 58,
+      "white": 0.0
+     },
+     {
+      "x": 1030.0,
+      "rValue": 73,
+      "white": 0.0
+     },
+     {
+      "x": 1077.5,
+      "rValue": 88,
+      "white": 0.0
+     },
+     {
+      "x": 1125.0,
+      "rValue": 104,
+      "white": 0.0
+     },
+     {
+      "x": 1172.5,
+      "rValue": 119,
+      "white": 0.0
+     },
+     {
+      "x": 1220.0,
+      "rValue": 134,
+      "white": 0.0
+     },
+     {
+      "x": 1267.5,
+      "rValue": 149,
+      "white": 0.0
+     },
+     {
+      "x": 1315.0,
+      "rValue": 164,
+      "white": 0.0
+     },
+     {
+      "x": 1362.5,
+      "rValue": 179,
+      "white": 0.0
+     },
+     {
+      "x": 1410.0,
+      "rValue": 194,
+      "white": 0.0
+     },
+     {
+      "x": 1457.5,
+      "rValue": 210,
+      "white": 0.0
+     },
+     {
+      "x": 1505.0,
+      "rValue": 225,
+      "white": 0.0
+     },
+     {
+      "x": 1552.5,
+      "rValue": 240,
+      "white": 0.0
+     }
+    ],
+    "seRampThresholdR": null,
+    "meanLinearLuminance": 0.07873
+   },
+   "red_x0p550_snow_topdown": {
+    "NW": 0.0,
+    "NE": 0.0,
+    "SW": 0.0,
+    "SE": 0.0,
+    "barIfRowsAreNorthToSouth": 0.0,
+    "barIfRowsAreSouthToNorth": 0.0,
+    "barIfTransposed": 0.0,
+    "seRamp": [
+     {
+      "x": 840.0,
+      "rValue": 13,
+      "white": 0.0
+     },
+     {
+      "x": 887.5,
+      "rValue": 28,
+      "white": 0.0
+     },
+     {
+      "x": 935.0,
+      "rValue": 43,
+      "white": 0.0
+     },
+     {
+      "x": 982.5,
+      "rValue": 58,
+      "white": 0.0
+     },
+     {
+      "x": 1030.0,
+      "rValue": 73,
+      "white": 0.0
+     },
+     {
+      "x": 1077.5,
+      "rValue": 88,
+      "white": 0.0
+     },
+     {
+      "x": 1125.0,
+      "rValue": 104,
+      "white": 0.0
+     },
+     {
+      "x": 1172.5,
+      "rValue": 119,
+      "white": 0.0
+     },
+     {
+      "x": 1220.0,
+      "rValue": 134,
+      "white": 0.0
+     },
+     {
+      "x": 1267.5,
+      "rValue": 149,
+      "white": 0.0
+     },
+     {
+      "x": 1315.0,
+      "rValue": 164,
+      "white": 0.0
+     },
+     {
+      "x": 1362.5,
+      "rValue": 179,
+      "white": 0.0
+     },
+     {
+      "x": 1410.0,
+      "rValue": 194,
+      "white": 0.0
+     },
+     {
+      "x": 1457.5,
+      "rValue": 210,
+      "white": 0.0
+     },
+     {
+      "x": 1505.0,
+      "rValue": 225,
+      "white": 0.0
+     },
+     {
+      "x": 1552.5,
+      "rValue": 240,
+      "white": 0.0
+     }
+    ],
+    "seRampThresholdR": null,
+    "meanLinearLuminance": 0.07873
+   },
+   "red_x0p225_snow_topdown": {
+    "NW": 0.0,
+    "NE": 0.0,
+    "SW": 0.0,
+    "SE": 0.0,
+    "barIfRowsAreNorthToSouth": 0.0,
+    "barIfRowsAreSouthToNorth": 0.0,
+    "barIfTransposed": 0.0,
+    "seRamp": [
+     {
+      "x": 840.0,
+      "rValue": 13,
+      "white": 0.0
+     },
+     {
+      "x": 887.5,
+      "rValue": 28,
+      "white": 0.0
+     },
+     {
+      "x": 935.0,
+      "rValue": 43,
+      "white": 0.0
+     },
+     {
+      "x": 982.5,
+      "rValue": 58,
+      "white": 0.0
+     },
+     {
+      "x": 1030.0,
+      "rValue": 73,
+      "white": 0.0
+     },
+     {
+      "x": 1077.5,
+      "rValue": 88,
+      "white": 0.0
+     },
+     {
+      "x": 1125.0,
+      "rValue": 104,
+      "white": 0.0
+     },
+     {
+      "x": 1172.5,
+      "rValue": 119,
+      "white": 0.0
+     },
+     {
+      "x": 1220.0,
+      "rValue": 134,
+      "white": 0.0
+     },
+     {
+      "x": 1267.5,
+      "rValue": 149,
+      "white": 0.0
+     },
+     {
+      "x": 1315.0,
+      "rValue": 164,
+      "white": 0.0
+     },
+     {
+      "x": 1362.5,
+      "rValue": 179,
+      "white": 0.0
+     },
+     {
+      "x": 1410.0,
+      "rValue": 194,
+      "white": 0.0
+     },
+     {
+      "x": 1457.5,
+      "rValue": 210,
+      "white": 0.0
+     },
+     {
+      "x": 1505.0,
+      "rValue": 225,
+      "white": 0.0
+     },
+     {
+      "x": 1552.5,
+      "rValue": 240,
+      "white": 0.0
+     }
+    ],
+    "seRampThresholdR": null,
+    "meanLinearLuminance": 0.07873
+   },
+   "red_xm0p100_snow_topdown": {
+    "NW": 0.0,
+    "NE": 0.0,
+    "SW": 0.0,
+    "SE": 0.0,
+    "barIfRowsAreNorthToSouth": 0.0,
+    "barIfRowsAreSouthToNorth": 0.0,
+    "barIfTransposed": 0.0,
+    "seRamp": [
+     {
+      "x": 840.0,
+      "rValue": 13,
+      "white": 0.0
+     },
+     {
+      "x": 887.5,
+      "rValue": 28,
+      "white": 0.0
+     },
+     {
+      "x": 935.0,
+      "rValue": 43,
+      "white": 0.0
+     },
+     {
+      "x": 982.5,
+      "rValue": 58,
+      "white": 0.0
+     },
+     {
+      "x": 1030.0,
+      "rValue": 73,
+      "white": 0.0
+     },
+     {
+      "x": 1077.5,
+      "rValue": 88,
+      "white": 0.0
+     },
+     {
+      "x": 1125.0,
+      "rValue": 104,
+      "white": 0.0
+     },
+     {
+      "x": 1172.5,
+      "rValue": 119,
+      "white": 0.0
+     },
+     {
+      "x": 1220.0,
+      "rValue": 134,
+      "white": 0.0
+     },
+     {
+      "x": 1267.5,
+      "rValue": 149,
+      "white": 0.0
+     },
+     {
+      "x": 1315.0,
+      "rValue": 164,
+      "white": 0.0
+     },
+     {
+      "x": 1362.5,
+      "rValue": 179,
+      "white": 0.0
+     },
+     {
+      "x": 1410.0,
+      "rValue": 194,
+      "white": 0.0
+     },
+     {
+      "x": 1457.5,
+      "rValue": 210,
+      "white": 0.0
+     },
+     {
+      "x": 1505.0,
+      "rValue": 225,
+      "white": 0.0
+     },
+     {
+      "x": 1552.5,
+      "rValue": 240,
+      "white": 0.0
+     }
+    ],
+    "seRampThresholdR": null,
+    "meanLinearLuminance": 0.07873
+   },
+   "green_snow_topdown": {
+    "NW": 0.0,
+    "NE": 0.0,
+    "SW": 0.0,
+    "SE": 0.0,
+    "barIfRowsAreNorthToSouth": 0.0,
+    "barIfRowsAreSouthToNorth": 0.0,
+    "barIfTransposed": 0.0,
+    "seRamp": [
+     {
+      "x": 840.0,
+      "rValue": 13,
+      "white": 0.0
+     },
+     {
+      "x": 887.5,
+      "rValue": 28,
+      "white": 0.0
+     },
+     {
+      "x": 935.0,
+      "rValue": 43,
+      "white": 0.0
+     },
+     {
+      "x": 982.5,
+      "rValue": 58,
+      "white": 0.0
+     },
+     {
+      "x": 1030.0,
+      "rValue": 73,
+      "white": 0.0
+     },
+     {
+      "x": 1077.5,
+      "rValue": 88,
+      "white": 0.0
+     },
+     {
+      "x": 1125.0,
+      "rValue": 104,
+      "white": 0.0
+     },
+     {
+      "x": 1172.5,
+      "rValue": 119,
+      "white": 0.0
+     },
+     {
+      "x": 1220.0,
+      "rValue": 134,
+      "white": 0.0
+     },
+     {
+      "x": 1267.5,
+      "rValue": 149,
+      "white": 0.0
+     },
+     {
+      "x": 1315.0,
+      "rValue": 164,
+      "white": 0.0
+     },
+     {
+      "x": 1362.5,
+      "rValue": 179,
+      "white": 0.0
+     },
+     {
+      "x": 1410.0,
+      "rValue": 194,
+      "white": 0.0
+     },
+     {
+      "x": 1457.5,
+      "rValue": 210,
+      "white": 0.0
+     },
+     {
+      "x": 1505.0,
+      "rValue": 225,
+      "white": 0.0
+     },
+     {
+      "x": 1552.5,
+      "rValue": 240,
+      "white": 0.0
+     }
+    ],
+    "seRampThresholdR": null,
+    "meanLinearLuminance": 0.07873
+   },
+   "alpha_snow_topdown": {
+    "NW": 0.0,
+    "NE": 0.0,
+    "SW": 0.0,
+    "SE": 0.0,
+    "barIfRowsAreNorthToSouth": 0.0,
+    "barIfRowsAreSouthToNorth": 0.0,
+    "barIfTransposed": 0.0,
+    "seRamp": [
+     {
+      "x": 840.0,
+      "rValue": 13,
+      "white": 0.0
+     },
+     {
+      "x": 887.5,
+      "rValue": 28,
+      "white": 0.0
+     },
+     {
+      "x": 935.0,
+      "rValue": 43,
+      "white": 0.0
+     },
+     {
+      "x": 982.5,
+      "rValue": 58,
+      "white": 0.0
+     },
+     {
+      "x": 1030.0,
+      "rValue": 73,
+      "white": 0.0
+     },
+     {
+      "x": 1077.5,
+      "rValue": 88,
+      "white": 0.0
+     },
+     {
+      "x": 1125.0,
+      "rValue": 104,
+      "white": 0.0
+     },
+     {
+      "x": 1172.5,
+      "rValue": 119,
+      "white": 0.0
+     },
+     {
+      "x": 1220.0,
+      "rValue": 134,
+      "white": 0.0
+     },
+     {
+      "x": 1267.5,
+      "rValue": 149,
+      "white": 0.0
+     },
+     {
+      "x": 1315.0,
+      "rValue": 164,
+      "white": 0.0
+     },
+     {
+      "x": 1362.5,
+      "rValue": 179,
+      "white": 0.0
+     },
+     {
+      "x": 1410.0,
+      "rValue": 194,
+      "white": 0.0
+     },
+     {
+      "x": 1457.5,
+      "rValue": 210,
+      "white": 0.0
+     },
+     {
+      "x": 1505.0,
+      "rValue": 225,
+      "white": 0.0
+     },
+     {
+      "x": 1552.5,
+      "rValue": 240,
+      "white": 0.0
+     }
+    ],
+    "seRampThresholdR": null,
+    "meanLinearLuminance": 0.07873
+   },
+   "bluewater_snow_topdown": {
+    "NW": 0.0,
+    "NE": 0.0,
+    "SW": 0.0,
+    "SE": 0.0,
+    "barIfRowsAreNorthToSouth": 0.0,
+    "barIfRowsAreSouthToNorth": 0.0,
+    "barIfTransposed": 0.0,
+    "seRamp": [
+     {
+      "x": 840.0,
+      "rValue": 13,
+      "white": 0.0
+     },
+     {
+      "x": 887.5,
+      "rValue": 28,
+      "white": 0.0
+     },
+     {
+      "x": 935.0,
+      "rValue": 43,
+      "white": 0.0
+     },
+     {
+      "x": 982.5,
+      "rValue": 58,
+      "white": 0.0
+     },
+     {
+      "x": 1030.0,
+      "rValue": 73,
+      "white": 0.0
+     },
+     {
+      "x": 1077.5,
+      "rValue": 88,
+      "white": 0.0
+     },
+     {
+      "x": 1125.0,
+      "rValue": 104,
+      "white": 0.0
+     },
+     {
+      "x": 1172.5,
+      "rValue": 119,
+      "white": 0.0
+     },
+     {
+      "x": 1220.0,
+      "rValue": 134,
+      "white": 0.0
+     },
+     {
+      "x": 1267.5,
+      "rValue": 149,
+      "white": 0.0
+     },
+     {
+      "x": 1315.0,
+      "rValue": 164,
+      "white": 0.0
+     },
+     {
+      "x": 1362.5,
+      "rValue": 179,
+      "white": 0.0
+     },
+     {
+      "x": 1410.0,
+      "rValue": 194,
+      "white": 0.0
+     },
+     {
+      "x": 1457.5,
+      "rValue": 210,
+      "white": 0.0
+     },
+     {
+      "x": 1505.0,
+      "rValue": 225,
+      "white": 0.0
+     },
+     {
+      "x": 1552.5,
+      "rValue": 240,
+      "white": 0.0
+     }
+    ],
+    "seRampThresholdR": null,
+    "meanLinearLuminance": 0.07873
+   },
+   "forcedsnow_snow_topdown": {
+    "NW": 0.0,
+    "NE": 0.0,
+    "SW": 0.0,
+    "SE": 0.0,
+    "barIfRowsAreNorthToSouth": 0.0,
+    "barIfRowsAreSouthToNorth": 0.0,
+    "barIfTransposed": 0.0,
+    "seRamp": [
+     {
+      "x": 840.0,
+      "rValue": 13,
+      "white": 0.0
+     },
+     {
+      "x": 887.5,
+      "rValue": 28,
+      "white": 0.0
+     },
+     {
+      "x": 935.0,
+      "rValue": 43,
+      "white": 0.0
+     },
+     {
+      "x": 982.5,
+      "rValue": 58,
+      "white": 0.0
+     },
+     {
+      "x": 1030.0,
+      "rValue": 73,
+      "white": 0.0
+     },
+     {
+      "x": 1077.5,
+      "rValue": 88,
+      "white": 0.0
+     },
+     {
+      "x": 1125.0,
+      "rValue": 104,
+      "white": 0.0
+     },
+     {
+      "x": 1172.5,
+      "rValue": 119,
+      "white": 0.0
+     },
+     {
+      "x": 1220.0,
+      "rValue": 134,
+      "white": 0.0
+     },
+     {
+      "x": 1267.5,
+      "rValue": 149,
+      "white": 0.0
+     },
+     {
+      "x": 1315.0,
+      "rValue": 164,
+      "white": 0.0
+     },
+     {
+      "x": 1362.5,
+      "rValue": 179,
+      "white": 0.0
+     },
+     {
+      "x": 1410.0,
+      "rValue": 194,
+      "white": 0.0
+     },
+     {
+      "x": 1457.5,
+      "rValue": 210,
+      "white": 0.0
+     },
+     {
+      "x": 1505.0,
+      "rValue": 225,
+      "white": 0.0
+     },
+     {
+      "x": 1552.5,
+      "rValue": 240,
+      "white": 0.0
+     }
+    ],
+    "seRampThresholdR": null,
+    "meanLinearLuminance": 0.07873
+   }
+  },
+  "worldAndForest": {
+   "a6": {
+    "load": {
+     "cpuMemoryMbBefore": 0,
+     "gpuMemoryMbBefore": 16003,
+     "readSeconds": 0.0910651,
+     "terrainNodes": [
+      4,
+      4
+     ],
+     "nodeSize": 400,
+     "terrainLayers": 4,
+     "terrainVersion": 1,
+     "optimizeSeconds": 0.0008087,
+     "created": true,
+     "readyAfterSeconds": 1.0573192000000091,
+     "maxShaderCompilationsInProgress": 6,
+     "loadingState": "loading_finished",
+     "terrainMemory": 0,
+     "floraInstances": 0,
+     "floraRendererTextureUsage": 0,
+     "navMeshFaces": 2048,
+     "cpuMemoryMbReady": 0,
+     "gpuMemoryMbReady": 16003,
+     "centerHeight": -23.55,
+     "hillHeight": -14.94
+    },
+    "laplacian": {
+     "map38_mountain": 14.41474,
+     "map38_coast": 14.2073,
+     "mountain_oblique": 5.23185
+    }
+   },
+   "a6n": {
+    "load": {
+     "cpuMemoryMbBefore": 0,
+     "gpuMemoryMbBefore": 16003,
+     "readSeconds": 0.0952234,
+     "terrainNodes": [
+      4,
+      4
+     ],
+     "nodeSize": 400,
+     "terrainLayers": 4,
+     "terrainVersion": 1,
+     "optimizeSeconds": 0.0008051,
+     "created": true,
+     "readyAfterSeconds": 1.0570538000000056,
+     "maxShaderCompilationsInProgress": 6,
+     "loadingState": "loading_finished",
+     "terrainMemory": 0,
+     "floraInstances": 0,
+     "floraRendererTextureUsage": 0,
+     "navMeshFaces": 2048,
+     "cpuMemoryMbReady": 0,
+     "gpuMemoryMbReady": 16003,
+     "centerHeight": -23.55,
+     "hillHeight": -14.94
+    },
+    "laplacian": {
+     "map38_mountain": 14.40541,
+     "map38_coast": 14.21144,
+     "mountain_oblique": 5.22641
+    }
+   },
+   "a7": {
+    "load": {
+     "cpuMemoryMbBefore": 0,
+     "gpuMemoryMbBefore": 16003,
+     "readSeconds": 0.13012369999999998,
+     "terrainNodes": [
+      4,
+      4
+     ],
+     "nodeSize": 400,
+     "terrainLayers": 4,
+     "terrainVersion": 1,
+     "optimizeSeconds": 0.0008064,
+     "created": true,
+     "readyAfterSeconds": 0.9044839999999965,
+     "maxShaderCompilationsInProgress": 6,
+     "loadingState": "loading_finished",
+     "terrainMemory": 0,
+     "floraInstances": 0,
+     "floraRendererTextureUsage": 0,
+     "navMeshFaces": 2048,
+     "cpuMemoryMbReady": 0,
+     "gpuMemoryMbReady": 16003,
+     "centerHeight": -22.4399986,
+     "hillHeight": -14.94
+    },
+    "laplacian": {
+     "map38_mountain": 14.73313,
+     "map38_coast": 15.65132,
+     "mountain_oblique": 5.61377
+    }
+   },
+   "a7s": {
+    "load": {
+     "cpuMemoryMbBefore": 0,
+     "gpuMemoryMbBefore": 16003,
+     "readSeconds": 0.092648,
+     "terrainNodes": [
+      4,
+      4
+     ],
+     "nodeSize": 400,
+     "terrainLayers": 4,
+     "terrainVersion": 1,
+     "optimizeSeconds": 0.0008569,
+     "created": true,
+     "readyAfterSeconds": 1.074081299999989,
+     "maxShaderCompilationsInProgress": 6,
+     "loadingState": "loading_finished",
+     "terrainMemory": 0,
+     "floraInstances": 0,
+     "floraRendererTextureUsage": 0,
+     "navMeshFaces": 2048,
+     "cpuMemoryMbReady": 0,
+     "gpuMemoryMbReady": 16003,
+     "centerHeight": -11.2199993,
+     "hillHeight": -7.47
+    },
+    "laplacian": {
+     "map38_mountain": 20.23471,
+     "map38_coast": 21.12973,
+     "mountain_oblique": 7.62737
+    }
+   },
+   "l2": {
+    "load": {
+     "cpuMemoryMbBefore": 0,
+     "gpuMemoryMbBefore": 16003,
+     "readSeconds": 0.1154543,
+     "terrainNodes": [
+      4,
+      4
+     ],
+     "nodeSize": 400,
+     "terrainLayers": 4,
+     "terrainVersion": 1,
+     "optimizeSeconds": 0.0015712,
+     "created": true,
+     "readyAfterSeconds": 1.1529276,
+     "maxShaderCompilationsInProgress": 9,
+     "loadingState": "loading_finished",
+     "terrainMemory": 0,
+     "floraInstances": 0,
+     "floraRendererTextureUsage": 0,
+     "navMeshFaces": 2048,
+     "cpuMemoryMbReady": 0,
+     "gpuMemoryMbReady": 16003,
+     "centerHeight": 1.9799999,
+     "hillHeight": 51.9899979
+    },
+    "laplacian": {
+     "map38_flat": 20.86295
+    }
+   },
+   "forest": {
+    "load": {
+     "cpuMemoryMbBefore": 0,
+     "gpuMemoryMbBefore": 16003,
+     "readSeconds": 0.1677709,
+     "terrainNodes": [
+      4,
+      4
+     ],
+     "nodeSize": 400,
+     "terrainLayers": 4,
+     "terrainVersion": 1,
+     "optimizeSeconds": 0.0012437,
+     "created": true,
+     "readyAfterSeconds": 1.0626093999999995,
+     "maxShaderCompilationsInProgress": 9,
+     "loadingState": "loading_finished",
+     "terrainMemory": 0,
+     "floraInstances": 88000,
+     "floraRendererTextureUsage": 0,
+     "navMeshFaces": 2048,
+     "cpuMemoryMbReady": 0,
+     "gpuMemoryMbReady": 16003,
+     "centerHeight": 1.9799999,
+     "hillHeight": 51.9899979
+    },
+    "laplacian": {
+     "map38_flat": 20.86295,
+     "map38_dense": 27.7282,
+     "forest_oblique": 3.86587
+    }
+   }
+  }
+ },
+ "nativeHashes": {
+  "before": {
+   "utc": "2026-10-20T00:35:06.4845000Z",
+   "TaleWorlds.Native.dll": {
+    "sha256": "2a5e0e0b15513ebb7052d747a621b82c50ee834553eba283b33bbbc33766e12a",
+    "bytes": 14185944,
+    "lastWriteUtc": "2026-10-09T06:40:34.7726202Z"
+   },
+   "TaleWorlds.MountAndBlade.dll": {
+    "sha256": "19387f31557ff840d14f378f6bbdf1d58fcff406ab9ff2294dfbb3e49a50b87e",
+    "bytes": 2600408,
+    "lastWriteUtc": "2026-10-09T06:40:34.7726202Z"
+   }
+  },
+  "afterLastRun": {
+   "TaleWorlds.Native.dll": "2a5e0e0b15513ebb7052d747a621b82c50ee834553eba283b33bbbc33766e12a",
+   "TaleWorlds.MountAndBlade.dll": "19387f31557ff840d14f378f6bbdf1d58fcff406ab9ff2294dfbb3e49a50b87e"
+  },
+  "unchanged": true
+ }
+}

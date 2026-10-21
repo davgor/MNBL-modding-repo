@@ -673,6 +673,135 @@
    }
   }
  },
+ "villageMix": {
+  "rule": "map epic 2 (MMR-252, RT-08): a coastal (harbour-capable) village draws a fishing type with probability coastalFishingShare, the installed share of fishing types among the installed villages with a port, else a non-fishing type of its class; every culture keeps a world-level floor of horse-ranch villages and wheat farms: at least max(1 when its installed pool has the type, floor(share x the generated villages of the culture)) of each, which VillagePool enforces and FoodPass never breaks",
+  "coastalFishingShare": 0.5,
+  "coastal": {
+   "aserai": {
+    "villages": 9,
+    "fishing": 5,
+    "share": 0.5556
+   },
+   "battania": {
+    "villages": 2,
+    "fishing": 0,
+    "share": 0.0
+   },
+   "empire": {
+    "villages": 22,
+    "fishing": 8,
+    "share": 0.3636
+   },
+   "khuzait": {
+    "villages": 5,
+    "fishing": 1,
+    "share": 0.2
+   },
+   "nord": {
+    "villages": 18,
+    "fishing": 12,
+    "share": 0.6667
+   },
+   "sturgia": {
+    "villages": 8,
+    "fishing": 8,
+    "share": 1.0
+   },
+   "vlandia": {
+    "villages": 8,
+    "fishing": 2,
+    "share": 0.25
+   }
+  },
+  "floors": {
+   "aserai": {
+    "villages": 40,
+    "horseRanch": 9,
+    "wheat": 9,
+    "horseRanchShare": 0.225,
+    "wheatShare": 0.225
+   },
+   "battania": {
+    "villages": 33,
+    "horseRanch": 2,
+    "wheat": 7,
+    "horseRanchShare": 0.0606,
+    "wheatShare": 0.2121
+   },
+   "empire": {
+    "villages": 97,
+    "horseRanch": 9,
+    "wheat": 24,
+    "horseRanchShare": 0.0928,
+    "wheatShare": 0.2474
+   },
+   "khuzait": {
+    "villages": 35,
+    "horseRanch": 7,
+    "wheat": 4,
+    "horseRanchShare": 0.2,
+    "wheatShare": 0.1143
+   },
+   "nord": {
+    "villages": 34,
+    "horseRanch": 0,
+    "wheat": 4,
+    "horseRanchShare": 0.0,
+    "wheatShare": 0.1176
+   },
+   "sturgia": {
+    "villages": 32,
+    "horseRanch": 3,
+    "wheat": 5,
+    "horseRanchShare": 0.0938,
+    "wheatShare": 0.1562
+   },
+   "vlandia": {
+    "villages": 36,
+    "horseRanch": 3,
+    "wheat": 6,
+    "horseRanchShare": 0.0833,
+    "wheatShare": 0.1667
+   }
+  }
+ },
+ "walls": {
+  "rule": "map epic 2 (MMR-258, RT-14): the initial wall level of a town or castle (the fortifications building) is drawn from the installed level counts of its prosperity tercile (towns small, medium, capital; castles low, middle, high, by castle prosperity), weighted by count, from the settlement stream; not every wall starts at level 1",
+  "towns": {
+   "small": {
+    "1": 14,
+    "2": 3,
+    "3": 2
+   },
+   "medium": {
+    "1": 12,
+    "2": 5,
+    "3": 2
+   },
+   "capital": {
+    "1": 12,
+    "2": 6,
+    "3": 1
+   }
+  },
+  "castles": {
+   "low": {
+    "1": 12,
+    "2": 11,
+    "3": 2
+   },
+   "middle": {
+    "1": 16,
+    "2": 7,
+    "3": 2
+   },
+   "high": {
+    "1": 14,
+    "2": 7,
+    "3": 5
+   }
+  }
+ },
  "buildings": {
   "rule": "towns take the median installed building levels of their prosperity tercile (small, medium, capital); castles the median castle levels; a port town adds building_shipyard at the median installed port-town level, an inland town never has one",
   "towns": {
@@ -735,10 +864,9 @@
   "shipyard": 1
  },
  "binding": {
-  "rule": "in order: (1) every village starts at the compiler's bound town; (2) a village farther from its bound settlement than distance.preferredRatio x the world's town spacing is rebound to the nearest town or castle of its land group within that limit, one of its own kingdom first, else of any kingdom; with none it binds to the nearest town or castle of its land group (remote) and must stay within distance.engineTradeRatio x spacing; (3) each castle of a town, in id order, takes its nearest remaining village of that town within the limit and of its land group in turn, until it has castleVillages or the town is down to townMinimum; (4) a castle still below castleVillages takes a village within the limit and of its land group from the towns of its kingdom with more than townMinimum, from the town with the most villages first, then the nearest. A castle without a village, a town without one, a remote village beyond the engine limit, and a castle village with no town of its kingdom within the engine limit (its trade bound) are problems",
+  "rule": "map epic 2 (MMR-252): the travel compiler's village quota binds exactly townVillages villages to every town and castleVillages to every castle (campaign.json v2 bound, boundKind, sourceTown and villageQuota; playability.json villages; docs/travel-graph.md \"Village quota\"), and the binding passes it through. A village farther from its bound settlement than distance.preferredRatio x the world's town spacing is remote and must stay within distance.engineTradeRatio x spacing. A town or castle without exactly its count (none at all crashes SnareTheWealthyIssueQuest, incident_the_quiet_life and incident_wages_of_war_and_diseases), a remote village beyond the engine limit, and a castle village with no town of its kingdom within the engine limit (its trade bound) are problems",
   "castleVillages": 2,
-  "townMinimum": 2,
-  "townMaximum": 5,
+  "townVillages": 3,
   "distance": {
    "rule": "spacing: the mean periodic distance from each town to its nearest town in the generated world; preferredRatio = installedMaxRatio x tolerance; engineTradeRatio: the engine trade-binds a castle's village to a town within 3 x the average distance between the closest two towns (DefaultVillageTradeModel.TradeBoundDistanceLimitAsDays, installed IL)",
    "installedSpacing": 66.88,
@@ -758,11 +886,11 @@
    ],
    "castlesWithTwo": 74,
    "castles": 76,
-   "note": "townMaximum is the installed maximum plus one: a generated world has fewer castles per town to take villages (installed 1.33)"
+   "note": "the installed counts are only roughly 3 and 2 (castles per town 1.33); the exact 3/2 rule is the owner's (map epic 2), and its trade-area cost is recorded by MMR-247"
   }
  },
  "balance": {
-  "rule": "a generated world's villages per fief and hearth per fief stay within band x the installed values, and every town and castle within the binding counts (a town the source gave fewer than townMinimum villages is reported, not refused)",
+  "rule": "a generated world's villages per fief and hearth per fief stay within band x the installed values, and every town and castle has exactly its binding count",
   "band": [
    0.75,
    1.5
@@ -834,7 +962,8 @@
   "town": "The {kind} of {name}, in the {realm}.",
   "castle": "The castle of {name}, in the {realm}.",
   "village": "The village of {name}, near {bound}.",
-  "hideout": "An outlaw hideout in the wilds."
+  "hideout": "An outlaw hideout in the wilds.",
+  "sourceNote": " Its old records name it {source}."
  },
  "hideouts": {
   "rule": "SettlementFactory builds a hideout from a placed specification (bandit culture, position) with a prototype of that bandit culture; placing hideouts across a world is MMR-34's (bandits and hideouts)",

@@ -232,6 +232,20 @@ class BuilderTests(unittest.TestCase):
         self.assertEqual(xml.count("<node "), self.nx * self.ny)
         self.assertIn('name="heightmap_level" value="5"', xml)
 
+    def test_normal_heights_change_only_normals(self):
+        # MMR-249: NRML may come from a second (e.g. smoothed) field; HGHT and WGHT stay those of heights_2d.
+        grid = [[(r * 7 % 5) * 1.5 + c * 0.25 for c in range(17)] for r in range(17)]
+        flat = [[1.0] * 17 for _ in range(17)]
+        plain, _ = tb.build_terrain(grid, 1, 1, 64.0)
+        other, _ = tb.build_terrain(grid, 1, 1, 64.0, normal_heights=flat)
+        a, b = tb.parse(plain), tb.parse(other)
+        self.assertEqual(a.section("HGHT").chunks(), b.section("HGHT").chunks())
+        self.assertNotEqual(a.section("NRML").chunks(), b.section("NRML").chunks())
+        n = tb.decode_normals(b.nodes()[0].normal_png)
+        self.assertTrue(all(abs(x) < 0.02 and abs(y) < 0.02 for x, y, _ in n))  # a flat field's normals point straight up
+        with self.assertRaises(ValueError):
+            tb.build_terrain(grid, 1, 1, 64.0, normal_heights=[[0.0] * 5] * 5)
+
 
 @unittest.skipUnless(HAVE_GAME, "Bannerlord install not found (set MNBL_GAME_DIR)")
 class InstalledFileTests(unittest.TestCase):

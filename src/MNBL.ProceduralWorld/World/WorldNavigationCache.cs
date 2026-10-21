@@ -155,6 +155,23 @@ namespace MNBL.ProceduralWorld.Surface
             return record;
         }
 
+        // MMR-282: every published cache's manifest (folder name, parsed manifest; null when unreadable), for the loader's forecast.
+        public static List<KeyValuePair<string, IDictionary<string, object>>> PublishedManifests()
+        {
+            var rows = new List<KeyValuePair<string, IDictionary<string, object>>>();
+            if (!Directory.Exists(Root())) return rows;
+            foreach (var dir in Directory.GetDirectories(Root()))
+            {
+                string name = Path.GetFileName(dir);
+                if (name.IndexOf('-') >= 0) continue;   // staging, discard and verify folders
+                IDictionary<string, object> manifest = null;
+                try { manifest = NavigationCacheStore.ParseManifest(File.ReadAllText(Path.Combine(dir, "manifest.json"))); }
+                catch (Exception) { manifest = null; }
+                rows.Add(new KeyValuePair<string, IDictionary<string, object>>(name, manifest));
+            }
+            return rows;
+        }
+
         // The key the campaign would give now: compared with the registered key once the campaign has started (War Sails' wrapper has set the
         // drop-off ports by then), so a position that changed after the caches were acquired is seen.
         public static string KeyNow(GeneratedMapScene map, string sceneName, string worldId)
@@ -319,30 +336,11 @@ namespace MNBL.ProceduralWorld.Surface
         }
 
         private static string moduleSha;
-        private static string ModuleSha256()
+        // MMR-282: also what the loader's forecast compares a published cache's manifest with (CacheForecast).
+        internal static string ModuleSha256()
         {
             if (moduleSha == null) moduleSha = NavigationCacheKey.Sha(File.ReadAllBytes(typeof(WorldNavigationCache).Assembly.Location));
             return moduleSha;
-        }
-
-        // RuntimeWorldBackend.Sweep: staging, discard and verify folders left by an earlier process, and the caches of world scenes the sweep
-        // removed (a later process regenerates them).
-        public static List<string> Sweep(ICollection<string> sweptScenes)
-        {
-            var removed = new List<string>(); string root = Root();
-            if (!Directory.Exists(root)) return removed;
-            foreach (var dir in Directory.GetDirectories(root))
-            {
-                string name = Path.GetFileName(dir); bool remove = name.StartsWith("staging-", StringComparison.Ordinal) || name.StartsWith("discard-", StringComparison.Ordinal) || name.StartsWith("verify-", StringComparison.Ordinal);
-                if (!remove)
-                {
-                    try { var manifest = NavigationCacheStore.ParseManifest(File.ReadAllText(Path.Combine(dir, "manifest.json"))); object scene; remove = manifest.TryGetValue("scene", out scene) && scene is string && sweptScenes.Contains((string)scene); }
-                    catch (Exception) { remove = false; }
-                }
-                if (!remove) continue;
-                try { Directory.Delete(dir, true); removed.Add(name); } catch (IOException) { } catch (UnauthorizedAccessException) { }
-            }
-            return removed;
         }
     }
 }

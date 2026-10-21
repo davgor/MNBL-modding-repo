@@ -262,6 +262,7 @@ namespace MNBL.ProceduralWorld.CampaignBootstrap
         CampaignRegistry.GeneratedCampaignInitializer.StartupPlan IGeneratedWorld.StartupPlan { get { return Dataset == null ? null : Dataset.StartupPlan; } }
         // OnGameStart reads the plan before the world registers: a new game takes the fixture rule its options select (the dataset records the
         // same rule for the package), a load the package's.
+        PopulationPlan IGeneratedWorld.Population { get { return null; } }   // MMR-281: the fixture world has no population pass
         NavalContentFactory.NavalPlan IGeneratedWorld.NavalPlan { get { return Package != null && Dataset == null ? savedNavalPlan : NavalEnabled ? (pendingNaval ?? (pendingNaval = FixturePlan())) : null; } }
         private Dictionary<string, object> placementData;
         // MMR-39: the fixture's fleet rule with its pirate spawn points (placement.naval.pirateSpawnPoints).

@@ -38,10 +38,10 @@ namespace MNBL.ProceduralWorld.CampaignBootstrap
             if (generated != null && generated.Length != Cells) throw new InvalidDataException("A colour-grade grid is " + Cells + " bytes, not " + generated.Length + ".");
             Remove();
             LastError = null; Replaced = 0;
-            GeneratedPatches.RequireInstalledVersion("colour-grade");
-            var type = AccessTools.TypeByName(ManagerType);
-            var init = type == null ? null : AccessTools.Method(type, "Init");
-            if (init == null || AccessTools.Field(type, "colorGradeGrid") == null) throw new InvalidOperationException("The colour-grade patch target is not the installed " + GeneratedPatches.GameVersion + " MapColorGradeManager.");
+            GeneratedPatches.RequireSupportedBuild("colour-grade");
+            // MMR-284: by signature; a changed MapColorGradeManager refuses the patch, naming it (PatchSignatureException).
+            var init = PatchSignatures.Method(ManagerType, "Init");
+            PatchSignatures.Field(ManagerType, "colorGradeGrid");
             Neutral = generated == null;
             grid = generated == null ? new byte[Cells] : (byte[])generated.Clone();
             harmony = new Harmony(HarmonyId);

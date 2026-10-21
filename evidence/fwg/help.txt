@@ -31,6 +31,15 @@ usage:
                           then, as the fwg.weather document (compact JSON). A
                           refused day or place is printed as a failure document,
                           exit 2
+  fwg apply --request PATH --operations PATH [--delta PATH]
+                          regenerate the world a request file describes, replay
+                          the fwg.operations document's ley shifts over it in
+                          order, and write the cells they moved -- biome_variant,
+                          dominant_magic, magic_hazard and each school's potency,
+                          before and after -- with the operations as the world
+                          logged them, as the fwg.ley_delta document (compact
+                          JSON; stdout without --delta). A refused operation is
+                          printed as a failure document, exit 2
 
 --terse-errors          a refused request's JSON envelope carries only code,
                         message and field, not received/expected/suggestion

@@ -10,6 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Script.Serialization;
 using MNBL.ProceduralWorld.Generation;
+using MNBL.ProceduralWorld.Surface;
 
 namespace MNBL.ProceduralWorld.UI
 {
@@ -43,7 +44,9 @@ namespace MNBL.ProceduralWorld.UI
         public const string Cancel = "{=mnbl_ws_cancel}Cancel";
         public const string Settings = "{=mnbl_ws_settings}World settings";
         public const string Wait = "{=mnbl_ws_wait}Generating the world takes about {GENERATE} seconds.";
-        public const string WaitStart = "{=mnbl_ws_wait_start}The first start of its campaign takes about {START} minutes more while the world's navigation is prepared; the game may stop responding until it is done.";
+        // MMR-282 (RT-38): no fixed campaign-start time; the preview states each world's own (CacheBuildModel, WaitTime.Navigation).
+        public const string WaitStartPreview = "{=mnbl_ws_wait_start_preview}The first start of its campaign takes longer while the world's navigation is prepared; the preview says how long for that world.";
+        public const string WaitNavigation = CacheBuildText.Preview;
         public const string Diagnostics = "{=mnbl_ws_diagnostics}Diagnostics";
         public const string Generated = "{=mnbl_ws_generated}World generated from seed {SEED}: {CITIES} cities of {PEOPLE_COUNT} peoples.";
         public const string Peoples = "{=mnbl_ws_peoples}Peoples of this world, with the culture each is shown as: {PEOPLES}";
@@ -137,6 +140,7 @@ namespace MNBL.ProceduralWorld.UI
         public SortedDictionary<string, long> Overrides = new SortedDictionary<string, long>(StringComparer.Ordinal);
         public Dictionary<string, Control> Controls = new Dictionary<string, Control>(StringComparer.Ordinal);
         public List<WaitPhase> Wait = new List<WaitPhase>();
+        public CacheBuildModel CacheBuild;   // MMR-282: the budget's navigationCacheBuild (null without it)
         public Dictionary<string, string> Presentations = new Dictionary<string, string>(StringComparer.Ordinal);   // civilization -> official culture
         public List<string> OfficialCultures = new List<string>();
         public SortedDictionary<string, string> Sources = new SortedDictionary<string, string>(StringComparer.Ordinal);
@@ -214,6 +218,7 @@ namespace MNBL.ProceduralWorld.UI
                 var seconds = ((object[])d["seconds"]).Select(v => Convert.ToDouble(v, CultureInfo.InvariantCulture)).ToArray();
                 contract.Wait.Add(new WaitPhase { Id = kv.Key, MaxSeconds = seconds.Max(), Source = (string)d["source"] });
             }
+            contract.CacheBuild = CacheBuildModel.FromPolicy(b2.ContainsKey("navigationCacheBuild") ? (IDictionary<string, object>)b2["navigationCacheBuild"] : null);
             // Only what the pinned producer publishes, within its published range, and what the product policy allows.
             foreach (var kv in contract.Overrides)
             {
@@ -318,9 +323,9 @@ namespace MNBL.ProceduralWorld.UI
 
     internal static class WaitTime
     {
-        // The budget's measured upper bound for generating the world, rounded up; without a measurement nothing is promised. MMR-56: the
-        // first start of a new world's campaign (its navigation caches built, the initial save written) as its measured upper bound in whole
-        // minutes, rounded up, once the budget holds a startCampaign measurement.
+        // The budget's measured upper bound for generating the world, rounded up; without a measurement nothing is promised. MMR-282: the
+        // first start of a campaign is not one time for every world (MMR-56 stated about 7 minutes; world B waits about 14): the preview
+        // states each world's own (Navigation), so the setup's waiting text says only that it is longer.
         public static Dictionary<string, string> Variables(WorldSetupContract c)
         {
             var vars = new Dictionary<string, string>(StringComparer.Ordinal);
@@ -330,19 +335,27 @@ namespace MNBL.ProceduralWorld.UI
                 double step = Math.Max(1, c.RoundToSeconds);
                 vars["GENERATE"] = (Math.Ceiling(phase.MaxSeconds / step) * step).ToString("0", CultureInfo.InvariantCulture);
             }
-            var start = c.Wait.FirstOrDefault(p => p.Id == "startCampaign");
-            if (start != null) vars["START"] = Math.Max(1, Math.Ceiling(start.MaxSeconds / 60)).ToString("0", CultureInfo.InvariantCulture);
             return vars;
         }
         public static bool Available(WorldSetupContract c) { return Variables(c).ContainsKey("GENERATE"); }
 
-        // The waiting text: generation, and the first campaign start when it is measured.
+        // The waiting text: generation, and that the first campaign start takes longer when the preview can say how long.
         public static string Text(WorldSetupContract c, Func<string, Dictionary<string, string>, string> render)
         {
             var vars = Variables(c);
             if (!vars.ContainsKey("GENERATE")) return "";
             string text = render(WorldSetupText.Wait, vars);
-            return vars.ContainsKey("START") ? text + " " + render(WorldSetupText.WaitStart, vars) : text;
+            return c.CacheBuild != null ? text + " " + render(WorldSetupText.WaitStartPreview, vars) : text;
+        }
+
+        // MMR-282: the preview's wait for this world's first campaign start (its navigation caches built), from its settlement count; null
+        // without a model. MINUTES and SETTLEMENTS for WorldSetupText.WaitNavigation.
+        public static Dictionary<string, string> Navigation(WorldSetupContract c, int towns, int castles, int villages)
+        {
+            if (c.CacheBuild == null) return null;
+            int settlements = CacheBuildModel.Settlements(towns, castles, villages);
+            return new Dictionary<string, string>(StringComparer.Ordinal) { ["MINUTES"] = CacheBuildModel.Minutes(c.CacheBuild.Seconds(settlements)).ToString(CultureInfo.InvariantCulture),
+                ["SETTLEMENTS"] = settlements.ToString(CultureInfo.InvariantCulture) };
         }
     }
 

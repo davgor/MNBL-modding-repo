@@ -36,7 +36,7 @@ $exe=Join-Path $work 'InspectWorld.exe'
 $compile=@(& $csc /nologo /noconfig /nostdlib+ /target:exe /platform:x64 /langversion:7.3 /warnaserror /nowarn:0649 "/out:$exe" @references @($sources|ForEach-Object { Join-Path $repo $_ }) 2>&1|ForEach-Object { "$_" })
 if($LASTEXITCODE){$compile|ForEach-Object { Write-Output $_ }; throw 'Inspect-World compilation failed'}
 $producerLock=(Get-FileHash -LiteralPath (Join-Path $repo 'worldgen/producer.lock.json')).Hash.ToLowerInvariant()
-$capabilities='R01,R02,R03,R04,R05,R06,R07,R08,R09,R10'
+$capabilities='R01,R02,R03,R04,R05,R06,R07,R08,R09,R10,R11'
 if(-not $Out){$Out=Join-Path $work 'inspection.json'}
 $arguments=@('--game',$GameVersion,'--naval',$NavalVersion,'--capabilities',$capabilities,'--lock',$producerLock,'--out',$Out)
 if($Store){$arguments+=@('--store',$Store); if(Test-Path -LiteralPath $Saves){$arguments+=@('--saves',$Saves)}}

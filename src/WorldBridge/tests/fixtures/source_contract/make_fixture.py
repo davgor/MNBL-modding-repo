@@ -75,6 +75,8 @@ def main():
         'civilizations': {'version': 3, 'registry': {'elf': {}}},
         'roads': {'version': 1, 'routes': []},
         'heroes': {'version': 6, 'status': 'ok', 'realms': [], 'people': []},
+        'npcs': {'version': 3, 'status': 'ok', 'people': [], 'life_spans': {'parent_races': [], 'peoples': []}},
+        'nomads': {'version': 1, 'groups': []},
         'humans': {'version': 10, 'population_profile': 'mixed',
                    'cores': [{'culture_id': 'elf-1a2b', 'fortress_ids': ['fortress-0'], 'hamlet_ids': ['hamlet-0', 'coastal-0-0'], 'site_id': 0},
                              {'culture_id': 'elf-1a2b', 'fortress_ids': [], 'hamlet_ids': ['coastal-1-0'], 'site_id': 1}],

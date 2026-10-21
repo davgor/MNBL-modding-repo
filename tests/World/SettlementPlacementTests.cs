@@ -9,9 +9,10 @@ using System.Xml;
 using MNBL.ProceduralWorld.CampaignRegistry;
 using MNBL.ProceduralWorld.CampaignBootstrap;
 using MNBL.ProceduralWorld.Surface;
+using MNBL.ProceduralWorld.World;
 
 // MMR-40 settlement placement tests, without the game:
-//   SettlementPlacementTests REPO BUNDLE_A BUNDLE_B GAME_ROOT OUT_JSON REPORT_JSON
+//   SettlementPlacementTests REPO BUNDLE_A BUNDLE_B GAME_ROOT OUT_JSON REPORT_JSON [LOOKS_JSON]
 // On two real compiled worlds: the bundle's settlements as sites (towns, castles, villages, port towns, and harbour villages by the campaign's
 // harbour flag, each with its harbour cell); the resolved layout against the navigation (binding points) and the surface, re-checked
 // independently (every gate and gate-frame marker on passable land of its settlement's component within the slope limit and its installed
@@ -30,16 +31,22 @@ internal static class SettlementPlacementTests
     private static int checks, failures;
     private static readonly List<string> lines = new List<string>();
     private static readonly JavaScriptSerializer Serializer = new JavaScriptSerializer { MaxJsonLength = Int32.MaxValue };
+    // MMR-258: a fortification's gate stands at its look's gate distance (the policy's installed median without a look).
+    private static double GateDistanceOf(SettlementSite site, SettlementPlacementPolicy policy) { return site.Frame != null ? site.Frame.GateDistance : policy.GateDistance; }
     private static void Check(bool condition, string label) { checks++; if (!condition) failures++; string line = (condition ? "ok    " : "FAIL  ") + label; lines.Add(line); Console.WriteLine(line); }
 
     private static int Main(string[] args)
     {
-        if (args.Length != 6) { Console.Error.WriteLine("usage: SettlementPlacementTests REPO BUNDLE_A BUNDLE_B GAME_ROOT OUT_JSON REPORT_JSON"); return 2; }
+        if (args.Length != 6 && args.Length != 7) { Console.Error.WriteLine("usage: SettlementPlacementTests REPO BUNDLE_A BUNDLE_B GAME_ROOT OUT_JSON REPORT_JSON [LOOKS_JSON]"); return 2; }
         var evidence = new SortedDictionary<string, object>(StringComparer.Ordinal) { ["schema"] = "mnbl.evidence.settlement-placement-tests", ["version"] = 2, ["ticket"] = "MMR-40" };
         var report = new SortedDictionary<string, object>(StringComparer.Ordinal) { ["schema"] = "mnbl.evidence.settlement-position-report", ["version"] = 2, ["ticket"] = "MMR-40" };
         try { Run(args, evidence, report); }
         catch (Exception e) { Check(false, "unexpected exception: " + e); }
         evidence["checks"] = checks; evidence["failures"] = failures; evidence["lines"] = lines;
+        // MMR-258: the look evidence (catalog, per world the look usage and reuse report, entity counts and scene sizes) goes to its own file.
+        object looks = null;
+        if (evidence.TryGetValue("looks", out looks)) evidence.Remove("looks");
+        if (args.Length == 7 && looks != null) File.WriteAllText(args[6], Serializer.Serialize(looks), new UTF8Encoding(false));
         File.WriteAllText(args[4], Serializer.Serialize(evidence), new UTF8Encoding(false));
         File.WriteAllText(args[5], Serializer.Serialize(report), new UTF8Encoding(false));
         Console.WriteLine((checks - failures) + "/" + checks + " checks passed");
@@ -49,7 +56,7 @@ internal static class SettlementPlacementTests
     private static void Run(string[] args, SortedDictionary<string, object> evidence, SortedDictionary<string, object> report)
     {
         string repo = args[0], gameRoot = args[3];
-        var host = new WorldDataBundle.HostProfile("v1.4.8.119303", "v1.2.8.119303", new[] { "R01", "R02", "R03", "R04", "R05", "R06", "R07", "R08", "R09", "R10" });
+        var host = new WorldDataBundle.HostProfile("v1.4.8.119303", "v1.2.8.119303", WorldDataBundle.HostCapabilities);
         var navPolicy = NavigationPolicy.FromBytes(File.ReadAllBytes(Path.Combine(repo, NavigationPolicy.PolicyPath)));
         var calibration = (IDictionary<string, object>)Serializer.DeserializeObject(File.ReadAllText(Path.Combine(repo, "worldgen/calibration/naval-transitions/naval-transitions.json")).TrimStart('﻿'));
         var model = NavigationModel.FromCalibration(calibration);
@@ -65,6 +72,21 @@ internal static class SettlementPlacementTests
             "contract: a campaign map without the helper scripts is refused; the policy's wall meshes (" + policy.SolidWallMesh + ", " + policy.BrokenWallMesh + ") are installed references, an unknown mesh is refused");
         Check(policy.Walls.Count == 6 && policy.WallEngines.Count == 12 && policy.CircleScale.Count == 2 && policy.CampScale.Count == 2 && Throws(() => SettlementPlacementPolicy.FromBytes(Encoding.UTF8.GetBytes("{\"schema\":\"mnbl.settlement-placement\",\"version\":1}"), File.ReadAllBytes(Path.Combine(repo, SettlementPlacementPolicy.NavalPath)))),
             "policy version 2: two wall sections and four wall engines per wall level, circle and camp-area scales; a version 1 policy is refused");
+
+        // MMR-258: the look catalog from the installed campaign map and prefabs, and the policies the look plan reads.
+        var looksPolicy = SettlementLooksPolicy.FromBytes(File.ReadAllBytes(Path.Combine(repo, SettlementLooksPolicy.PolicyPath)));
+        byte[] prototypesBytes = File.ReadAllBytes(Path.Combine(repo, "worldgen/templates/settlements/prototypes.json")), economyBytes = File.ReadAllBytes(Path.Combine(repo, "worldgen/policies/economy.json"));
+        var pinDefaults = new HashSet<string>(((object[])((IDictionary<string, object>)Serializer.DeserializeObject(File.ReadAllText(Path.Combine(repo, "worldgen/policies/campaign-catalog.json")).TrimStart('﻿')))["defaults"]).Cast<string>(), StringComparer.Ordinal);
+        var missionScenes = MNBL.ProceduralWorld.Missions.MissionScenes.FromBytes(File.ReadAllBytes(Path.Combine(repo, "worldgen/policies/mission-scenes.json")));
+        Func<string, string, bool, bool> conforms = (p, k, port) => missionScenes.PrototypeProblems(p, k, port).Count == 0;
+        var prefabFolders = new[] { "NavalDLC", "SandBox", "Native" }.Select(m => Path.Combine(gameRoot, "Modules", m, "Prefabs")).ToList();
+        var catalog = SettlementLookCatalog.FromInstalled(mainMap, SettlementLookCatalog.PrefabResolver(prefabFolders), prototypesBytes, looksPolicy);
+        var pools = SettlementLookCatalog.Pools(prototypesBytes);
+        LooksCatalogChecks(catalog, pools, looksPolicy, evidence);
+        var lookEvidence = new SortedDictionary<string, object>(StringComparer.Ordinal) { ["schema"] = "mnbl.evidence.settlement-looks", ["version"] = 1, ["ticket"] = "MMR-258",
+            ["installedCampaignMapSha256"] = catalog.SourceSha256, ["policySha256"] = looksPolicy.Sha256, ["catalog"] = evidence["lookCatalog"] };
+        evidence["looks"] = lookEvidence;
+        var lookWorlds = new SortedDictionary<string, object>(StringComparer.Ordinal); lookEvidence["worlds"] = lookWorlds;
 
         var worlds = new SortedDictionary<string, object>(StringComparer.Ordinal); report["worlds"] = worlds;
         var summary = new SortedDictionary<string, object>(StringComparer.Ordinal); evidence["worlds"] = summary;
@@ -88,12 +110,19 @@ internal static class SettlementPlacementTests
                 && sites.Count(s => s.HasPort) == portTowns && sites.Where(s => s.Harbour).Select(s => s.Id).OrderBy(x => x, StringComparer.Ordinal).SequenceEqual(flagged.OrderBy(x => x, StringComparer.Ordinal))
                 && sites.Where(s => s.Harbour).All(s => s.HarbourCell != null),
                 label + ": every compiled settlement is a site (" + kinds["town"] + " towns, " + kinds["castle"] + " castles, " + kinds["village"] + " villages; " + portTowns + " port towns); the harbour villages are the campaign's harbour flag (" + flagged.Count + "), each with the harbour cell of a port candidate naming it, as SettlementFactory gives them ports");
-            var layout = SettlementPositionResolver.Resolve(sites, plan, ground, policy);
+            // The production plan (RuntimeWorldBackend.Prepare): every settlement's look, then the placement at the looks' offsets.
+            byte[] travelJson = bundle.ReadVerified("compiled/travel/travel-graph.json");
+            Func<SettlementLookPlan.Inputs> lookInputs = () => {
+                var x = SettlementLookPlan.ForCampaign(campaignJson, travelJson, portsJson, economyBytes, prototypesBytes, pinDefaults.Contains, looksPolicy);
+                x.Catalog = catalog; x.Conforms = conforms; return x; };
+            FrozenLooks frozen;
+            var layout = SettlementLookPlan.Resolve(sites, plan, ground, policy, lookInputs(), out frozen);
             var refusals = layout.Problems.Where(p => p.Refusal).ToList();
             Check(layout.Activatable, label + ": the layout has no refusal" + (refusals.Count > 0 ? " (" + refusals.Count + ": " + String.Join("; ", refusals.Take(5)) + ")" : ""));
             Check(layout.Settlements.Count == sites.Count, label + ": every site is resolved");
-            var again = SettlementPositionResolver.Resolve(SettlementPositionResolver.SitesFromBundle(input, campaignJson, portsJson), NavigationPlan.Create(RuntimeNavigationBuilder.Build(input, navPolicy), model), ground, policy);
-            Check(again.Sha256 == layout.Sha256 && Serializer.Serialize(again.Report(ground)) == Serializer.Serialize(layout.Report(ground)), label + ": the layout and its report are deterministic (" + layout.Sha256.Substring(0, 12) + ")");
+            FrozenLooks frozenAgain;
+            var again = SettlementLookPlan.Resolve(SettlementPositionResolver.SitesFromBundle(input, campaignJson, portsJson), NavigationPlan.Create(RuntimeNavigationBuilder.Build(input, navPolicy), model), ground, policy, lookInputs(), out frozenAgain);
+            Check(again.Sha256 == layout.Sha256 && Serializer.Serialize(again.Report(ground)) == Serializer.Serialize(layout.Report(ground)), label + ": the layout (looks included) and its report are deterministic (" + layout.Sha256.Substring(0, 12) + ")");
 
             // Independent re-check of the resolved positions.
             var bad = new List<string>();
@@ -112,14 +141,19 @@ internal static class SettlementPlacementTests
                 Func<double[], bool, bool> onLand = (q, steep) => ground.Land(q[0], q[1]) == land && (ground.Slope(q[0], q[1]) <= policy.MaxMarkerSlope || (steep && steepReported));
                 if (r.Site.Fortification)
                 {
-                    if (r.Gate == null || !onLand(r.Gate, r.GateSteep) || SettlementPositionResolver.Distance(ground, r.Centre, r.Gate) > policy.GateDistance + 1e-9) bad.Add(r.Site.Id + ": gate invalid");
+                    // A look's markers stand at its own offsets at its scale (MMR-258); a phase-0 settlement's at the installed medians.
+                    var frame = r.Site.Frame;
+                    var slots = frame == null ? null : frame.Slots.ToDictionary(x => x.Suffix, StringComparer.Ordinal);
+                    double gateReach = frame == null ? policy.GateDistance : frame.GateDistance;
+                    if (r.Gate == null || !onLand(r.Gate, r.GateSteep) || SettlementPositionResolver.Distance(ground, r.Centre, r.Gate) > gateReach + 1e-9) bad.Add(r.Site.Id + ": gate invalid");
                     else everyMarker.Add(new KeyValuePair<string, double[]>(r.Site.Id, r.Gate));
-                    if (r.Markers.Count(m => m.Level == null) != policy.Markers.Count + policy.SiegeTowers - 1 || r.Markers.Count(m => m.Level != null) != 12 || r.Walls.Count != 6) bad.Add(r.Site.Id + ": " + r.Markers.Count + " markers, " + r.Walls.Count + " walls");
+                    int expectedMarkers = frame == null ? policy.Markers.Count + policy.SiegeTowers - 1 : frame.Slots.Count(x => x.Level == null);
+                    if (r.Markers.Count(m => m.Level == null) != expectedMarkers || r.Markers.Count(m => m.Level != null) != 12 || r.Walls.Count != 6) bad.Add(r.Site.Id + ": " + r.Markers.Count + " markers, " + r.Walls.Count + " walls");
                     foreach (var m in r.Markers.Concat(r.Walls))
                     {
                         if (m.Level == null) markers++; else wallMarkers++;
                         if (m.Turns != 0 || m.Scale < 1 || m.Steep) adjusted++; if (m.Steep) steepMarkers++;
-                        var o = m.Level == null ? policy.Markers[m.Tag] : m.Tag == "map_breachable_wall" ? policy.Walls[m.Level + "/" + m.Suffix.Substring(m.Suffix.Length - 1)] : policy.WallEngines[m.Tag.Substring(m.Tag.Length - 1) + "/" + m.Level];
+                        var o = slots != null ? slots[m.Suffix].Offset : m.Level == null ? policy.Markers[m.Tag] : m.Tag == "map_breachable_wall" ? policy.Walls[m.Level + "/" + m.Suffix.Substring(m.Suffix.Length - 1)] : policy.WallEngines[m.Tag.Substring(m.Tag.Length - 1) + "/" + m.Level];
                         double reach = Math.Sqrt(o[0] * o[0] + o[1] * o[1]);
                         bool valid = m.Level == null ? onLand(m.Logical, m.Steep) : ground.Land(m.Logical[0], m.Logical[1]) == land;
                         if (!valid || SettlementPositionResolver.Distance(ground, r.Centre, m.Logical) > reach + 1e-9) bad.Add(r.Site.Id + ": marker " + m.Suffix + " invalid");
@@ -179,63 +213,163 @@ internal static class SettlementPlacementTests
                 && layout.Settlements.Where(r => r.GateSteep).All(r => r.GateRule.Contains("least steep")),
                 label + ": the report gives each position canonically and where the scene builds it (beside its settlement), each marker's unadjusted position, the walls; a least-steep gate says so in its rule");
 
-            // The scene entities.
-            var specs = SettlementEntityFactory.Build(layout, ground, contract, policy, "mnbl_world", surface.Extent, surface.High + 100);
+            // The scene entities (MMR-258: from the looks).
+            var specs = SettlementEntityFactory.Build(layout, ground, contract, policy, looksPolicy, "mnbl_world", surface.Extent, SettlementEntityFactory.MapMaximumHeight(surface.High));
             string xml = SettlementEntityFactory.ToXml(specs);
             string template = "<scene name=\"test\">\n\t<levels>\n\t\t<level name=\"base\" mask=\"1\" />\n\t\t<level name=\"level_1\" mask=\"2\" />\n\t\t<level name=\"level_2\" mask=\"4\" />\n\t\t<level name=\"level_3\" mask=\"8\" />\n\t</levels>\n<entities>\n</entities></scene>";
             string scene = SettlementEntityFactory.DeclareSceneLevels(SettlementEntityFactory.Splice(template, xml));
             var problems = SettlementEntityFactory.Validate(scene, layout, ground, policy, "mnbl_world");
-            Check(problems.Count == 0, label + ": the scene entities meet the structural contract (scene levels; one root per settlement named its id with its kind's tag and Town Entity Manager, circle, selection, banner placeholders with one volume_box each, village icons per level, gate, every marker, wall section and wall engine by name with its tag, offset and levels, each wall with a solid and a broken child, port and blockade arc with BlockadePositionScript on port towns with an arc, drop-offs on harbour villages; unique names; borders; the baked helper only)" + (problems.Count > 0 ? " - " + String.Join("; ", problems.Take(6)) : ""));
-            Check(SettlementEntityFactory.ToXml(SettlementEntityFactory.Build(layout, ground, contract, policy, "mnbl_world", surface.Extent, surface.High + 100)) == xml, label + ": the entity XML is deterministic (the encoding's identity hashes it)");
+            Check(problems.Count == 0, label + ": the scene entities meet the relaxed contract (scene levels; one root per settlement named its id with its kind's tag and Town Entity Manager, circle, selection, banner placeholders (the policy's, or the look's with one child each under parents with every wall level's bit), village icons per level, gate, every marker, wall section and wall engine by name with its tag, offset and levels, each wall with at most one solid and one broken piece, port and blockade arc with BlockadePositionScript on port towns with an arc, drop-offs as direct children of harbour villages; no nested prefab instance, no solid collider, no functional tag below the direct children; unique names; borders; the baked helper only)" + (problems.Count > 0 ? " - " + String.Join("; ", problems.Take(6)) : ""));
+            Check(SettlementEntityFactory.ToXml(SettlementEntityFactory.Build(layout, ground, contract, policy, looksPolicy, "mnbl_world", surface.Extent, SettlementEntityFactory.MapMaximumHeight(surface.High))) == xml, label + ": the entity XML is deterministic (the encoding's identity hashes it)");
             var doc = new XmlDocument(); doc.LoadXml(scene);
             int roots = doc.SelectNodes("/scene/entities/game_entity").Count, entities = doc.SelectNodes("//game_entity").Count;
             Check(roots == 3 + layout.Settlements.Count && doc.SelectNodes("//script[@name='CampaignMapSiegePrefabEntityCache']").Count == 0, label + ": " + roots + " root entities: 2 borders, the Town Scene Manager helper and one per settlement (" + entities + " entities in all); no siege prefab cache (its script throws in a read without a campaign, run 25412; GeneratedMapScene.Load adds it to the campaign map)");
-            var withCache = SettlementEntityFactory.Splice(scene, "<game_entity name=\"mnbl_world_helper_campaignmapsiegeprefabentitycache\">" + contract.Helpers["CampaignMapSiegePrefabEntityCache"].Replace("<script", "<scripts><script").Replace("</script>", "</script></scripts>") + "</game_entity>");
+            // MMR-262: border_max's z (the campaign's MapMaximumHeight: the camera's zoom-out cap) is the fixed floor on these low worlds, and
+            // 100 above the terrain on a higher one.
+            var borderMax = (XmlElement)doc.SelectSingleNode("/scene/entities/game_entity[@name='border_max']/transform");
+            double borderZ = borderMax == null ? Double.NaN : Double.Parse(borderMax.GetAttribute("position").Split(',')[2].Trim(), CultureInfo.InvariantCulture);
+            Check(borderZ == SettlementEntityFactory.MapMaximumHeight(surface.High) && borderZ >= SettlementEntityFactory.MinimumMapHeight && (surface.High + 100 > SettlementEntityFactory.MinimumMapHeight || borderZ == SettlementEntityFactory.MinimumMapHeight)
+                  && SettlementEntityFactory.MapMaximumHeight(16.718) == 180 && SettlementEntityFactory.MapMaximumHeight(120) == 220,
+                  label + ": border_max z " + borderZ.ToString("R", CultureInfo.InvariantCulture) + " (terrain high " + surface.High.ToString("0.###", CultureInfo.InvariantCulture) + ") is Max(high + 100, " + SettlementEntityFactory.MinimumMapHeight + "): the camera's zoom-out cap does not follow the vertical scale");
+            var withCache = SettlementEntityFactory.Splice(scene,"<game_entity name=\"mnbl_world_helper_campaignmapsiegeprefabentitycache\">" + contract.Helpers["CampaignMapSiegePrefabEntityCache"].Replace("<script", "<scripts><script").Replace("</script>", "</script></scripts>") + "</game_entity>");
             Check(SettlementEntityFactory.Validate(withCache, layout, ground, policy, "mnbl_world").Any(p => p.Contains("CampaignMapSiegePrefabEntityCache")), label + ": a scene carrying a baked siege prefab cache fails the contract");
-            // The engine's rules over the entities: SettlementVisual.SetSettlementLevelVisibility shows a child whose level mask holds the visual's
-            // current mask (a child without levels has every level); UpdateDefenderSiegeEntitiesCache keeps the wall sections and wall engines whose
-            // mask has the current wall level's bit.
+            int nestedPrefabs = doc.SelectNodes("//game_entity[@prefab]").Count, colliders = doc.SelectNodes("//physics[@shape]").Count;
+            int solidColliders = doc.SelectNodes("/scene/entities/game_entity[tags/tag/@name='town' or tags/tag/@name='castle' or tags/tag/@name='village']//physics[@shape]").Cast<XmlElement>().Count(p => p.SelectSingleNode("body_flags/body_flag[@name='only_collide_with_raycast']") == null);
+            Check(nestedPrefabs == 0 && solidColliders == 0, label + ": the baked scene has no nested prefab reference and no solid collider under a town, castle or village (" + colliders + " colliders, all raycast-only)");
+            // The engine's rules over the entities (SettlementVisual reads a settlement's whole hierarchy): SetSettlementLevelVisibility shows a child
+            // whose level mask holds the visual's current mask (a child without levels has every level); UpdateDefenderSiegeEntitiesCache keeps the
+            // wall sections and wall engines whose mask has the current wall level's bit; a look's tree holds no functional tag.
             var levelProblems = new List<string>();
-            Func<EntitySpec, uint> mask = sp => sp.Levels.Count == 0 ? UInt32.MaxValue : SettlementEntityFactory.LevelMask(sp.Levels);
-            foreach (var sp in specs.Skip(3))
+            Func<XmlElement, uint> mask = x => { var names = x.SelectNodes("levels/level").Cast<XmlElement>().Select(l => l.GetAttribute("name")).ToList(); return names.Count == 0 ? UInt32.MaxValue : SettlementEntityFactory.LevelMask(names); };
+            Func<XmlElement, string, bool> tagged = (x, t) => x.SelectSingleNode("tags/tag[@name='" + t + "']") != null;
+            Func<XmlElement, double[]> transform = x => LookFrame.Vec(x.SelectSingleNode("transform") as XmlElement, "rotation_euler", 0);
+            Func<XmlElement, double[]> scaleOf = x => LookFrame.Vec(x.SelectSingleNode("transform") as XmlElement, "scale", 1);
+            int resnapped = 0; double worstSnap = 0; int looksBuilt = 0, ownBanners = 0, emptyWalls = 0, production = 0, piers = 0;
+            foreach (var r in layout.Settlements)
             {
-                var rs = layout.Find(sp.Name);
-                if (rs.Site.Kind == SiteKind.Village)
+                var root = (XmlElement)doc.SelectSingleNode("/scene/entities/game_entity[@name='" + r.Site.Id + "']");
+                var direct = root.SelectNodes("children/game_entity").Cast<XmlElement>().ToList();
+                var look = r.Look == null ? null : r.Look.Source;
+                if (r.Site.Kind == SiteKind.Village)
                     foreach (var state in new[] { "civilian", "looted" })
                         for (int level = 1; level <= 3; level++)
                         {
                             uint current = SettlementEntityFactory.LevelMask(new[] { "level_" + level, state });
-                            int visible = sp.Children.Count(c => c.Name.StartsWith(sp.Name + "_icon", StringComparison.Ordinal) && (mask(c) & current) == current);
-                            if (visible != 1) levelProblems.Add(sp.Name + ": " + visible + " icons visible at level_" + level + " " + state);
+                            int visible = direct.Count(c => c.GetAttribute("name").StartsWith(r.Site.Id + "_icon", StringComparison.Ordinal) && (mask(c) & current) == current);
+                            if (visible != 1) levelProblems.Add(r.Site.Id + ": " + visible + " icons visible at level_" + level + " " + state);
                         }
-                if (!rs.Site.Fortification) continue;
+                // The village type's production pieces (RT-15): every production mesh of the village shows its type.
+                if (r.Site.Kind == SiteKind.Village && r.Look != null && r.Look.VillageType != null)
+                {
+                    var allowed = looksPolicy.Production[r.Look.VillageType];
+                    var meshes = root.SelectNodes(".//meta_mesh_component").Cast<XmlElement>().Select(m => m.GetAttribute("name")).Where(m => looksPolicy.Production.Values.Any(v => v.Contains(m))).ToList();
+                    if (meshes.Count == 0 || meshes.Any(m => !allowed.Contains(m))) levelProblems.Add(r.Site.Id + ": production pieces [" + String.Join(",", meshes.Distinct()) + "] are not its type " + r.Look.VillageType + "'s");
+                    production += meshes.Count;
+                }
+                piers += direct.Count(c => c.GetAttribute("name") == r.Site.Id + "_pier");
+                // Re-snapped: each topmost visible piece of the look stands on the terrain under it.
+                var container = direct.FirstOrDefault(c => c.GetAttribute("name") == r.Site.Id + "_look");
+                if (look != null && container == null) levelProblems.Add(r.Site.Id + ": a look without its _look container");
+                if (container != null)
+                {
+                    looksBuilt++;
+                    var rootZ = LookFrame.Vec(root.SelectSingleNode("transform") as XmlElement, "position", 0)[2];
+                    var cf = new LookFrame().Child(container); double cs = scaleOf(container)[0];
+                    Action<XmlElement, LookFrame> walk = null;
+                    walk = (parent, f) => {
+                        foreach (var e in SettlementLook.Children(parent))
+                        {
+                            var g = f.Child(e);
+                            if (SettlementLook.Visible(e) && Math.Abs(f.U[2]) > 0.2 * cs)
+                            {
+                                double z = ground.Elevation(r.Centre[0] + g.O[0], r.Centre[1] + g.O[1]) - rootZ;
+                                worstSnap = Math.Max(worstSnap, Math.Abs(g.O[2] - z)); resnapped++;
+                                continue;
+                            }
+                            walk(e, g);
+                        } };
+                    walk(container, cf);
+                    foreach (var t in SettlementLook.FunctionalTags.Concat(r.Site.Fortification && look != null && look.OwnBanners ? new string[0] : new[] { SettlementLook.BannerTag }))
+                        if (container.SelectNodes(".//game_entity[tags/tag/@name='" + t + "']").Count > 0) levelProblems.Add(r.Site.Id + ": its look tree holds a " + t);
+                }
+                if (!r.Site.Fortification) continue;
+                if (look != null && look.OwnBanners) ownBanners++;
                 for (int level = 1; level <= 3; level++)
                 {
                     uint bit = SettlementEntityFactory.LevelMask(new[] { "level_" + level });
-                    int wallCache = sp.Children.Count(c => c.Tags.Contains("map_breachable_wall") && (mask(c) & bit) != 0), engineCache = sp.Children.Count(c => c.Tags.Any(t => t.StartsWith("map_defensive_engine")) && (mask(c) & bit) != 0);
+                    int wallCache = direct.Count(c => tagged(c, "map_breachable_wall") && (mask(c) & bit) != 0), engineCache = direct.Count(c => c.SelectNodes("tags/tag").Cast<XmlElement>().Any(t => t.GetAttribute("name").StartsWith("map_defensive_engine")) && (mask(c) & bit) != 0);
                     foreach (var state in new[] { "civilian", "siege" })
                     {
                         uint current = SettlementEntityFactory.LevelMask(new[] { "level_" + level, state });
-                        if (sp.Children.Count(c => c.Tags.Contains("map_breachable_wall") && (mask(c) & current) == current) != 2) levelProblems.Add(sp.Name + ": walls at level_" + level + " " + state + " not 2 visible");
+                        if (direct.Count(c => tagged(c, "map_breachable_wall") && (mask(c) & current) == current) != 2) levelProblems.Add(r.Site.Id + ": walls at level_" + level + " " + state + " not 2 visible");
                     }
-                    if (wallCache != 2 || engineCache != 4) levelProblems.Add(sp.Name + ": level_" + level + " caches " + wallCache + " walls and " + engineCache + " engines");
+                    if (wallCache != 2 || engineCache != 4) levelProblems.Add(r.Site.Id + ": level_" + level + " caches " + wallCache + " walls and " + engineCache + " engines");
                 }
-                if (sp.Children.Any(c => c.Levels.Count == 0 && c.Tags.Contains("map_settlement_circle") && (c.Scale == null || c.Scale[0] != policy.CircleScale[rs.Site.Kind == SiteKind.Town ? "town" : "castle"]))) levelProblems.Add(sp.Name + ": circle not at the installed scale");
-                foreach (var camp in policy.CampScale) if (!sp.Children.Any(c => c.Tags.Contains(camp.Key) && c.Scale != null && c.Scale[0] == camp.Value[0] && c.Scale[1] == camp.Value[1])) levelProblems.Add(sp.Name + ": " + camp.Key + " not at the installed scale");
-                if (sp.Children.Where(c => c.Tags.Any(t => t == "main_map_city_gate" || t.StartsWith("map_siege") || t.StartsWith("map_camp") || t == "map_breachable_wall")).Any(c => Math.Abs(c.Yaw - (rs.GateAngle - Math.PI / 2)) > 1e-12)) levelProblems.Add(sp.Name + ": a marker does not face the gate (yaw " + (rs.GateAngle - Math.PI / 2) + ")");
+                emptyWalls += direct.Count(c => tagged(c, "map_breachable_wall") && c.SelectNodes("children/game_entity[tags/tag/@name='map_solid_wall']").Count == 0);
+                var circle = direct.First(c => tagged(c, "map_settlement_circle"));
+                double wantCircle = look != null ? look.CircleScale * r.Look.Scale : policy.CircleScale[r.Site.Kind == SiteKind.Town ? "town" : "castle"];
+                if (Math.Abs(scaleOf(circle)[0] - wantCircle) > 1e-9) levelProblems.Add(r.Site.Id + ": circle at " + scaleOf(circle)[0] + ", not " + wantCircle);
+                if (look == null) foreach (var camp in policy.CampScale) if (!direct.Any(c => tagged(c, camp.Key) && scaleOf(c)[0] == camp.Value[0] && scaleOf(c)[1] == camp.Value[1])) levelProblems.Add(r.Site.Id + ": " + camp.Key + " not at the installed scale");
+                // Every marker faces as its look's entity does once the look's gate is turned onto the resolved gate (phase 0: the gate, yaw = gate angle - pi/2).
+                double frameAngle = look == null ? 0 : look.GateAngle;
+                var gateEntity = direct.First(c => tagged(c, "main_map_city_gate"));
+                if (Math.Abs(transform(gateEntity)[2] - (r.GateAngle - Math.PI / 2)) > 1e-12) levelProblems.Add(r.Site.Id + ": the gate does not face the gate direction");
+                foreach (var m in r.Markers.Concat(r.Walls))
+                {
+                    var e = direct.First(c => c.GetAttribute("name") == r.Site.Id + "_" + m.Suffix);
+                    if (Math.Abs(transform(e)[2] - (m.LocalYaw + r.GateAngle - frameAngle)) > 1e-12) levelProblems.Add(r.Site.Id + ": " + m.Suffix + " yaw " + transform(e)[2] + ", not its look's turned");
+                }
             }
-            Check(levelProblems.Count == 0, label + ": with the engine's level rules exactly one village icon shows in each state (level 1-3, civilian or looted); each wall level shows its two wall sections in civilian and siege and caches two sections and four wall engines; circles and camp areas at the installed scales; every marker faces the gate (yaw = gate angle - pi/2)" + (levelProblems.Count > 0 ? " - " + String.Join("; ", levelProblems.Take(6)) : ""));
-            var perKind = specs.Skip(3).GroupBy(sp => sp.Tags.FirstOrDefault() ?? "-").ToDictionary(g => g.Key, g => (object)g.Average(sp => sp.SelfAndDescendants().Count()));
+            Check(levelProblems.Count == 0 && worstSnap < 1e-6, label + ": with the engine's level rules exactly one village icon shows in each state (level 1-3, civilian or looted); each wall level shows its two wall sections in civilian and siege and caches two sections and four wall engines; circles at the look's scale (the installed one in phase 0) and phase-0 camp areas at the installed scales; every marker faces as its look's entity once the look is turned onto the gate; every village's production pieces are its type's (" + production + " pieces); no look tree holds a functional tag; every topmost visible look piece stands on the terrain (" + resnapped + " pieces, worst " + worstSnap.ToString("0.###E0", CultureInfo.InvariantCulture) + ")" + (levelProblems.Count > 0 ? " - " + String.Join("; ", levelProblems.Take(6)) : ""));
+            var perKind = specs.Skip(3).GroupBy(sp => sp.Tags.FirstOrDefault() ?? "-").ToDictionary(g => g.Key, g => (object)Math.Round(g.Average(sp => doc.SelectSingleNode("/scene/entities/game_entity[@name='" + sp.Name + "']").SelectNodes(".//game_entity").Count + 1.0), 1));
             // Breaking the scene is caught.
             var broken = scene.Replace("main_map_city_port", "main_map_city_prt");
             Check(SettlementEntityFactory.Validate(broken, layout, ground, policy, "mnbl_world").Any(p => p.Contains("main_map_city_port")), label + ": a scene whose port children are mistagged fails the contract");
-            var noWall = scene.Replace("<tag name=\"map_solid_wall\" />", "<tag name=\"map_solid_wal\" />");
-            Check(SettlementEntityFactory.Validate(noWall, layout, ground, policy, "mnbl_world").Any(p => p.Contains("solid and one broken")), label + ": a scene whose walls lack their solid child fails the contract");
+            var faultDoc = new XmlDocument(); faultDoc.LoadXml(scene);
+            var solidPiece = faultDoc.SelectSingleNode("//game_entity[tags/tag/@name='map_breachable_wall']/children/game_entity[tags/tag/@name='map_solid_wall']") as XmlElement;
+            var copy = (XmlElement)solidPiece.CloneNode(true); copy.SetAttribute("name", solidPiece.GetAttribute("name") + "_twin"); solidPiece.ParentNode.AppendChild(copy);
+            Check(SettlementEntityFactory.Validate(faultDoc.OuterXml, layout, ground, policy, "mnbl_world").Any(p => p.Contains("more than one solid or broken")), label + ": a wall section with two solid pieces fails the relaxed contract");
+            faultDoc.LoadXml(scene);
+            var aLook = faultDoc.SelectSingleNode("//game_entity[substring(@name, string-length(@name) - 4) = '_look']//game_entity") as XmlElement;
+            aLook.SetAttribute("prefab", "map_barrel_a");
+            var raycast = faultDoc.SelectSingleNode("//game_entity[substring(@name, string-length(@name) - 4) = '_look']//physics/body_flags/body_flag[@name='only_collide_with_raycast']") as XmlElement;
+            if (raycast != null) raycast.SetAttribute("name", "dynamic_constraint");
+            var faultProblems = SettlementEntityFactory.Validate(faultDoc.OuterXml, layout, ground, policy, "mnbl_world");
+            Check(faultProblems.Any(p => p.Contains("nested prefab instance")) && (raycast == null || faultProblems.Any(p => p.Contains("solid colliders"))), label + ": a nested prefab instance and a solid collider in a look fail the contract");
+            faultDoc.LoadXml(scene);
+            var stray = faultDoc.SelectSingleNode("//game_entity[substring(@name, string-length(@name) - 4) = '_look']/children/game_entity") as XmlElement;
+            var strayTags = faultDoc.CreateElement("tags"); var strayTag = faultDoc.CreateElement("tag"); strayTag.SetAttribute("name", "main_map_city_gate"); strayTags.AppendChild(strayTag); stray.InsertBefore(strayTags, stray.FirstChild);
+            Check(SettlementEntityFactory.Validate(faultDoc.OuterXml, layout, ground, policy, "mnbl_world").Any(p => p.Contains("main_map_city_gate entities below its direct children")), label + ": a functional tag inside a look's tree fails the contract (SettlementVisual reads the hierarchy recursively)");
+            faultDoc.LoadXml(scene);
+            var bannerParent = faultDoc.SelectSingleNode("//game_entity[tags/tag/@name='map_banner_placeholder']/../..") as XmlElement;
+            if (bannerParent != null && bannerParent.SelectSingleNode("levels") != null)
+            {
+                bannerParent.RemoveChild(bannerParent.SelectSingleNode("levels"));
+                Check(SettlementEntityFactory.Validate(faultDoc.OuterXml, layout, ground, policy, "mnbl_world").Any(p => p.Contains("banner placeholders")), label + ": a look banner placeholder under a parent without wall level bits fails the contract");
+            }
+            var policyWall = layout.Settlements.FirstOrDefault(r => r.Site.Fortification && (r.Look == null || r.Look.Source == null));
+            if (policyWall != null)
+            {
+                faultDoc.LoadXml(scene);
+                var piece = faultDoc.SelectSingleNode("//game_entity[@name='" + policyWall.Site.Id + "_wall_1_0_solid']");
+                piece.ParentNode.RemoveChild(piece);
+                Check(SettlementEntityFactory.Validate(faultDoc.OuterXml, layout, ground, policy, "mnbl_world").Any(p => p.Contains("solid or broken")), label + ": a phase-0 wall without its solid piece fails the contract");
+            }
             Check(SettlementEntityFactory.Validate(SettlementEntityFactory.Splice(template, xml), layout, ground, policy, "mnbl_world").Any(p => p.Contains("scene level civilian")), label + ": a scene that does not declare the campaign map's levels fails the contract");
             var firstVillage = layout.Settlements.First(r => r.Site.Kind == SiteKind.Village).Site.Id;
             var missing = doc.SelectSingleNode("/scene/entities/game_entity[@name='" + firstVillage + "']"); missing.ParentNode.RemoveChild(missing);
             Check(SettlementEntityFactory.Validate(doc.OuterXml, layout, ground, policy, "mnbl_world").Any(p => p.StartsWith(firstVillage + ": no root")), label + ": a scene missing a settlement's entity fails the contract");
-
+            LooksWorldChecks(label, layout, sites, frozen, looksPolicy, pools, missionScenes, ground, () => {
+                    FrozenLooks again2; var read = FrozenLooks.Read(path => frozen.Files()[path], looksPolicy);
+                    var inputs = SettlementLookPlan.ForCampaign(campaignJson, travelJson, portsJson, economyBytes, prototypesBytes, pinDefaults.Contains, looksPolicy); inputs.Frozen = read;
+                    var l2 = SettlementLookPlan.Resolve(SettlementPositionResolver.SitesFromBundle(input, campaignJson, portsJson), NavigationPlan.Create(RuntimeNavigationBuilder.Build(input, navPolicy), model), ground, policy, inputs, out again2);
+                    return new KeyValuePair<string, string>(l2.Sha256, SettlementEntityFactory.ToXml(SettlementEntityFactory.Build(l2, ground, contract, policy, looksPolicy, "mnbl_world", surface.Extent, SettlementEntityFactory.MapMaximumHeight(surface.High)))); }, xml);
+            int sceneBytes = new UTF8Encoding(false).GetByteCount(scene), xmlBytes = new UTF8Encoding(false).GetByteCount(xml);
+            lookWorlds[label] = new SortedDictionary<string, object>(StringComparer.Ordinal) { ["worldContentId"] = bundle.WorldContentId, ["layoutSha256"] = layout.Sha256, ["xmlSha256"] = Sha(xml),
+                ["entities"] = entities, ["roots"] = roots, ["perKindEntities"] = perKind, ["settlementXmlBytes"] = xmlBytes, ["sceneBytesWithTemplate"] = sceneBytes,
+                ["looksBuilt"] = looksBuilt, ["ownBanners"] = ownBanners, ["wallSectionsWithoutSolidPiece"] = emptyWalls, ["productionPieces"] = production, ["piers"] = piers,
+                ["resnapped"] = resnapped, ["colliders"] = colliders, ["frozenFiles"] = frozen.Files().Count, ["frozenBytes"] = frozen.Files().Values.Sum(b => (long)b.Length),
+                ["looks"] = layout.Looks };
             var full = layout.Report(ground); full["sceneEntities"] = new Dictionary<string, object> { ["roots"] = roots, ["entities"] = entities, ["perKindEntities"] = perKind, ["xmlSha256"] = Sha(xml), ["contractSha256"] = contract.Sha256 };
             worlds[label] = full;
             summary[label] = new Dictionary<string, object> { ["worldContentId"] = bundle.WorldContentId, ["layoutSha256"] = layout.Sha256, ["counts"] = full["counts"], ["adjusted"] = full["adjusted"],
@@ -260,7 +394,7 @@ internal static class SettlementPlacementTests
         Check(!centreOnWater.Activatable && centreOnWater.Problems.Any(p => p.Refusal && p.Code == "settlement.centre_not_land" && p.Subject == town.Site.Id), "refusal: a settlement centre off land (" + town.Site.Id + "'s point moved onto its port)");
         var portOnLand = Mutate(planA, "port:" + town.Site.Id, town.Centre, () => resolve(groundA, planA, sitesA));
         Check(!portOnLand.Activatable && portOnLand.Problems.Any(p => p.Refusal && p.Code == "settlement.port_not_water"), "refusal: a port on land");
-        var walled = new Faulted(groundA) { NoLandBeyond = 0.2, Around = town.Centre };
+        var walled = new Faulted(groundA) { NoLandBeyond = 0.02, Around = town.Centre };
         var noGate = resolve(walled, planA, sitesA);
         Check(!noGate.Activatable && noGate.Problems.Any(p => p.Refusal && p.Code == "settlement.gate_unplaced" && p.Subject == town.Site.Id), "refusal: no room for a gate (the land around a town turned to mountain)");
         var dry = new Faulted(groundA) { DryBeyond = 0.5, Around = town.Port };
@@ -302,8 +436,8 @@ internal static class SettlementPlacementTests
             // Within reach: beyond the limit from the road-facing gate, at most a unit inside it from the centre, as the swept worlds' ports
             // (11.25); a gate turned toward it keeps it.
             reachable = water((fromCentre, fromGate) => fromGate > limit && fromCentre <= limit - 1);
-            // Out of reach: beyond the limit from every gate position (each stands at most GateDistance from the centre).
-            unreachable = water((fromCentre, fromGate) => fromCentre > limit + policy.GateDistance + 0.1);
+            // Out of reach: beyond the limit from every gate position (each stands at its look's gate distance from the centre).
+            unreachable = water((fromCentre, fromGate) => fromCentre > limit + GateDistanceOf(t.Site, policy) + 0.1);
             searched.Add(t.Site.Id.Substring(t.Site.Id.Length - 4) + (reachable != null ? " r" : " -") + (unreachable != null ? "u" : "-"));
             if (reachable != null && unreachable != null) { turnTown = t; break; }
         }
@@ -314,7 +448,7 @@ internal static class SettlementPlacementTests
             var tooFarLayout = Mutate(planA, "port:" + turnTown.Site.Id, unreachable, () => resolve(groundA, planA, sitesA));
             var tooFar = tooFarLayout.Find(turnTown.Site.Id);
             Check(turned.Gate != null && SettlementPositionResolver.Distance(groundA, turned.Gate, reachable) <= limit && turned.GateRule.Contains("turned to keep its port within")
-                && SettlementPositionResolver.Distance(groundA, turned.Centre, turned.Gate) <= policy.GateDistance + 1e-9
+                && SettlementPositionResolver.Distance(groundA, turned.Centre, turned.Gate) <= GateDistanceOf(turnTown.Site, policy) + 1e-9
                 && tooFarLayout.Problems.Any(p => p.Refusal && p.Code == "settlement.port_far" && p.Subject == turnTown.Site.Id) && SettlementPositionResolver.Distance(groundA, tooFar.Gate, turnTown.Gate) < 1e-9,
                 "a port beyond the limit from " + turnTown.Site.Id + "'s road-facing gate turns the gate (" + (turned.GateRule ?? "") + ", " + SettlementPositionResolver.Distance(groundA, turned.Gate, reachable).ToString("0.###", CultureInfo.InvariantCulture)
                 + " from its port); a port no gate keeps within " + limit + " is refused (port_far), the gate facing its road");
@@ -372,6 +506,87 @@ internal static class SettlementPlacementTests
         Check(clean.Count == 0 && moved.Count == 1 && moved[0].StartsWith(castle.Site.Id + " gate") && unplaced.Any(x => x == "mnbl_test_v_unplaced placement missing"),
             "a record that differs from the placement the scene was built from is found (a castle's gate moved half a unit), as is a record with no placement (MMR-45 refuses such a world)");
         evidence["placementPolicy"] = new Dictionary<string, object> { ["gateDistance"] = policy.GateDistance, ["maxPortCentre"] = policy.MaxPortCentre, ["maxDropoff"] = policy.MaxDropoff, ["maxPadSlope"] = policy.MaxPadSlope, ["maxMarkerSlope"] = policy.MaxMarkerSlope, ["minSeparation"] = policy.MinSeparation };
+    }
+
+    // MMR-258: the look catalog from the installed campaign map: every prototype root of the presentation cultures found and normalized (no
+    // nested prefab instance, no solid collider, no SceneLeveler or editor data, no source port, arc or drop-off), the siege contract per look,
+    // the round trip through its XML, and a look that breaks the contract (three wall sections at a level, no gate) refused.
+    private static void LooksCatalogChecks(SettlementLookCatalog catalog, List<SettlementLookCatalog.PoolEntry> pools, SettlementLooksPolicy policy, SortedDictionary<string, object> evidence)
+    {
+        var byKind = catalog.Looks.Values.GroupBy(l => l.Kind).ToDictionary(g => g.Key, g => g.Count());
+        var expected = pools.GroupBy(p => p.Kind).ToDictionary(g => g.Key, g => g.Select(p => p.Id).Distinct().Count());
+        Check(byKind["town"] == 57 && byKind["castle"] == 76 && expected.All(kv => byKind[kv.Key] + catalog.Missing.Count(m => pools.Any(p => p.Id == m && p.Kind == kv.Key)) == kv.Value),
+            "look catalog: the installed campaign map holds a root for the prototype pools' settlements (" + byKind["town"] + " towns, " + byKind["castle"] + " castles, " + byKind["village"] + " villages; " + catalog.Missing.Count + " prototypes without a root" + (catalog.Missing.Count > 0 ? ": " + String.Join(", ", catalog.Missing.Take(5)) : "") + ")");
+        var bad = new List<string>();
+        foreach (var look in catalog.Looks.Values)
+        {
+            var d = new XmlDocument(); d.LoadXml(look.Xml);
+            if (d.SelectSingleNode("//game_entity[@prefab or @_index_ or @old_prefab_name]") != null) bad.Add(look.Id + ": prefab or editor attributes");
+            if (d.SelectNodes("//physics[@shape]").Cast<XmlElement>().Any(p => p.SelectSingleNode("body_flags/body_flag[@name='only_collide_with_raycast']") == null)) bad.Add(look.Id + ": a solid collider");
+            if (d.SelectSingleNode("//tag[@name='main_map_city_port' or @name='Blockade_Arc_Start' or @name='Blockade_Arc_End' or @name='main_map_village_dropoff']") != null) bad.Add(look.Id + ": a source port, arc or drop-off");
+            if (d.SelectSingleNode("//script[@name='SceneLeveler' or @name='Town Entity Manager' or @name='BlockadePositionScript'] | //edit_mode_data") != null) bad.Add(look.Id + ": a SceneLeveler, nested manager or edit data");
+            if (d.SelectNodes("//visibility_mask[@name='visible_only_when_editing']").Cast<XmlElement>().Any(m => !SettlementLook.Tags((XmlElement)m.ParentNode.ParentNode.ParentNode.ParentNode).Contains(SettlementLook.BannerTag)
+                    && m.ParentNode.ParentNode.SelectSingleNode(".//tag") == null)) bad.Add(look.Id + ": an untagged editor-only entity that is not a banner's volume");
+            if (SettlementLook.FromXml(look.Xml, policy).Sha256 != look.Sha256) bad.Add(look.Id + ": not stable through its XML");
+        }
+        int inlined, raycast;
+        catalog.Normalized.TryGetValue("prefabsInlined", out inlined); catalog.Normalized.TryGetValue("collidersMadeRaycastOnly", out raycast);
+        Check(bad.Count == 0 && inlined > 0 && raycast > 900, "look catalog: every look is normalized (" + String.Join(", ", catalog.Normalized.Select(kv => kv.Key + " " + kv.Value)) + "): no nested prefab instance, no solid collider, no SceneLeveler, nested manager, edit data or untagged editor-only entity, no source port, arc or drop-off, stable through its XML" + (bad.Count > 0 ? " - " + String.Join("; ", bad.Take(5)) : ""));
+        var fortifications = catalog.Looks.Values.Where(l => l.Kind != "village").ToList();
+        Check(fortifications.All(l => l.Conforms) && catalog.Looks.Values.Where(l => l.Kind == "village").Count(l => l.Conforms) > 250,
+            "look catalog: every installed town and castle meets the siege contract (2 wall sections and 4 wall engines per level, at most one solid and one broken piece per wall, a gate, camps, a ram and towers); " + catalog.Looks.Values.Count(l => l.Kind == "village" && l.Conforms) + " of " + byKind["village"] + " villages have one icon per hearth level and a looted one"
+            + (fortifications.Any(l => !l.Conforms) ? " - " + String.Join("; ", fortifications.Where(l => !l.Conforms).Take(4).Select(l => l.Id + ": " + l.Problems[0])) : ""));
+        var castle = catalog.Looks.Values.First(l => l.Kind == "castle" && l.Conforms);
+        var cd = new XmlDocument(); cd.LoadXml(castle.Xml);
+        var wall = (XmlElement)cd.SelectSingleNode("//game_entity[tags/tag/@name='map_breachable_wall']");
+        wall.ParentNode.AppendChild(wall.CloneNode(true));
+        var threeWalls = SettlementLook.FromXml(cd.OuterXml, policy);
+        cd.LoadXml(castle.Xml);
+        foreach (var t in cd.SelectNodes("//tag[@name='main_map_city_gate']").Cast<XmlNode>().ToList()) t.ParentNode.RemoveChild(t);
+        var noGate = SettlementLook.FromXml(cd.OuterXml, policy);
+        Check(!threeWalls.Conforms && threeWalls.Problems.Any(p => p.Contains("wall sections")) && !noGate.Conforms, "look catalog: a look with three wall sections at a level, or without a city gate, breaks the contract and is never selected");
+        evidence["lookCatalog"] = new SortedDictionary<string, object>(StringComparer.Ordinal) { ["looks"] = byKind, ["missingPrototypes"] = catalog.Missing, ["normalized"] = catalog.Normalized,
+            ["conforming"] = catalog.Looks.Values.GroupBy(l => l.Kind).ToDictionary(g => g.Key, g => (object)g.Count(l => l.Conforms)),
+            ["ownBanners"] = fortifications.Count(l => l.OwnBanners), ["wallsWithoutSolid"] = fortifications.Sum(l => l.Slots.Count(s => s.Tag == "map_breachable_wall" && (s.Children == null || !s.Children.Contains("map_solid_wall")))),
+            ["coreRadius"] = catalog.Looks.Values.GroupBy(l => l.Kind).ToDictionary(g => g.Key, g => (object)Math.Round(g.Select(l => l.CoreRadius).OrderBy(x => x).ElementAt(g.Count() / 2), 2)),
+            ["radius"] = catalog.Looks.Values.GroupBy(l => l.Kind).ToDictionary(g => g.Key, g => (object)Math.Round(g.Select(l => l.Radius).OrderBy(x => x).ElementAt(g.Count() / 2), 2)) };
+    }
+
+    // MMR-258: one world's looks: every town and castle culture-correct (a look of its culture, or its culture's phase-0 pieces), every look's
+    // record prototype its own id unless a variant (RT-14), the reuse report (RT-15), and the frozen looks rebuilding the same scene.
+    private static void LooksWorldChecks(string label, SettlementLayout layout, IList<SettlementSite> sites, FrozenLooks frozen, SettlementLooksPolicy policy, List<SettlementLookCatalog.PoolEntry> pools,
+                                         MNBL.ProceduralWorld.Missions.MissionScenes scenes, IPlacementGround ground, Func<KeyValuePair<string, string>> rebuild, string xml)
+    {
+        var wrong = new List<string>();
+        foreach (var r in layout.Settlements)
+        {
+            var c = r.Look;
+            if (c == null) { wrong.Add(r.Site.Id + ": no look"); continue; }
+            if (c.Culture == null || !policy.CultureCodes.ContainsKey(c.Culture)) wrong.Add(r.Site.Id + ": no presentation culture");
+            if (c.Source != null && c.Source.Culture != c.Culture) wrong.Add(r.Site.Id + ": a " + c.Source.Culture + " look for a " + c.Culture + " settlement");
+            if (c.Source != null && c.Variant == null && (c.Prototype != c.Look || !pools.Any(p => p.Id == c.Look && p.Culture == c.Culture && p.Kind == c.Kind))) wrong.Add(r.Site.Id + ": prototype " + c.Prototype + " is not its look " + c.Look);
+            if (c.Prototype != null && scenes.PrototypeProblems(c.Prototype, c.Kind, r.Site.Kind == SiteKind.Town ? r.Site.HasPort : r.Site.Harbour && r.Site.HarbourCell != null).Count > 0) wrong.Add(r.Site.Id + ": prototype " + c.Prototype + " fails the mission scene contracts");
+            if (c.Variant == "portGrafted" || c.Variant == "castleAsSmallTown") { if (c.Prototype != null) wrong.Add(r.Site.Id + ": a " + c.Variant + " look names a prototype"); }
+            if (r.Site.Kind == SiteKind.Village && c.VillageType == null) wrong.Add(r.Site.Id + ": no village type for its production pieces");
+        }
+        var report = layout.Looks;
+        Func<string, Dictionary<string, object>> kind = k => (Dictionary<string, object>)report[k];
+        Check(wrong.Count == 0, label + ": every town, castle and village has a culture-correct look (towns " + kind("town")["looks"] + " looks and " + kind("town")["phase0"] + " phase 0, castles " + kind("castle")["looks"] + " and " + kind("castle")["phase0"] + ", villages " + kind("village")["looks"] + " and " + kind("village")["phase0"]
+            + "); a look's record prototype is the look itself unless it is a variant, and meets the mission scene contracts (RT-14); every village has a type for its production pieces" + (wrong.Count > 0 ? " - " + String.Join("; ", wrong.Take(5)) : ""));
+        var reuse = new List<string>();
+        foreach (var k in new[] { "town", "castle", "village" })
+        {
+            var row = kind(k);
+            reuse.Add(k + "s " + row["distinctLooks"] + " distinct looks for " + row["settlements"] + " (max " + row["maxUses"] + " uses), " + row["neighbourRepeats"] + " of " + row["neighbourPairs"] + " nearest-neighbour pairs share a look, " + row["avoidableRepeats"] + " avoidable");
+        }
+        Check(kind("town").ContainsKey("usage") && kind("castle").ContainsKey("usage") && kind("village").ContainsKey("usage") && report.ContainsKey("villageProduction")
+            && (int)kind("town")["avoidableRepeats"] == 0 && (int)kind("castle")["avoidableRepeats"] == 0 && (int)kind("village")["avoidableRepeats"] == 0,
+            label + ": the reuse report lists look usage for towns, castles and villages (RT-15): " + String.Join("; ", reuse) + "; no settlement shares a look with one of its " + policy.Neighbours + " nearest of its kind where a fitting look of its pool was free (a counted repeat had none)");
+        var files = frozen.Files();
+        var again = rebuild();
+        Check(files.ContainsKey(FrozenLooks.SelectionPath) && files.Keys.Count(f => f.StartsWith(FrozenLooks.CatalogFolder, StringComparison.Ordinal)) == frozen.Choices.Values.Where(c => !c.Phase0).Select(c => c.Look).Distinct().Count()
+            && again.Key == layout.Sha256 && again.Value == xml,
+            label + ": the frozen looks (" + files.Count + " files, " + files.Values.Sum(b => (long)b.Length) / 1024 + " KiB: the selection and each used look's normalized XML) rebuild the same layout and scene entities without the installed campaign map");
     }
 
     private static T Let<T>(this XmlDocument d, Func<XmlDocument, T> f) { return f(d); }

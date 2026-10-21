@@ -22,6 +22,7 @@
     "engine",
     "roads",
     "requiredBridges",
+    "roadNetwork",
     "transitions",
     "exclusions",
     "repairs",
@@ -81,6 +82,86 @@
       "items": {
         "type": "integer"
       }
+    },
+    "roadEnd": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "cell",
+        "point"
+      ],
+      "description": "map epic 2 (MMR-253): a road piece's end. gate: a settlement's end (settlement; point its placement point); pole: a pole passage cuts the road (the end cell's centre); bank: the road stops at the bank of a crossing without a deck (point the middle of the bank edge, water the first water cell beyond it); junction: a feeder meets an earlier road (road its index; the end cell's centre)",
+      "properties": {
+        "kind": {
+          "enum": [
+            "gate",
+            "pole",
+            "bank",
+            "junction"
+          ]
+        },
+        "cell": {
+          "$ref": "#/$defs/cell"
+        },
+        "point": {
+          "$ref": "#/$defs/point"
+        },
+        "settlement": {
+          "type": "string"
+        },
+        "water": {
+          "$ref": "#/$defs/cell"
+        },
+        "road": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "gate"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "settlement"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "bank"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "water"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "junction"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "road"
+            ]
+          }
+        }
+      ]
     }
   },
   "properties": {
@@ -183,7 +264,9 @@
         "compiledClasses",
         "classes",
         "openSeaCells",
-        "cellsSha256"
+        "cellsSha256",
+        "landTypes",
+        "roadCells"
       ],
       "properties": {
         "cols": {
@@ -221,6 +304,15 @@
         },
         "cellsSha256": {
           "$ref": "#/$defs/sha256"
+        },
+        "landTypes": {
+          "$ref": "#/$defs/counts",
+          "description": "map epic 2 (MMR-254): land cells per face TerrainType name (cells.bin v2 land-type plane); the counts sum to classes.land"
+        },
+        "roadCells": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "map epic 2 (MMR-253): road cells, the cells.bin v2 road bit (MMR-254 writes it; roadNetwork.cells)"
         }
       }
     },
@@ -379,7 +471,9 @@
               "direct",
               "footprint",
               "snap",
+              "carve",
               "move",
+              "synthesized",
               "unplaceable"
             ]
           },
@@ -452,19 +546,12 @@
         "additionalProperties": false,
         "required": [
           "index",
+          "kind",
           "from",
           "to",
-          "fromUid",
-          "toUid",
           "cells",
-          "compiledClasses",
-          "passes",
-          "maxGrade",
-          "polePassages",
-          "sameGroup",
-          "crossings",
-          "producerCrossings",
-          "producerPoleCrossings"
+          "pieces",
+          "decks"
         ],
         "properties": {
           "index": {
@@ -474,7 +561,8 @@
             "type": "string"
           },
           "to": {
-            "type": "string"
+            "type": "string",
+            "description": "route: the far town; feeder: the settlement it leads to (its bound settlement, else the town it reaches or the one its junction road leads to)"
           },
           "fromUid": {
             "type": "string"
@@ -483,7 +571,8 @@
             "type": "string"
           },
           "cells": {
-            "type": "integer"
+            "type": "integer",
+            "description": "route: the cells of its lattice path before any cut; feeder: its path cells"
           },
           "compiledClasses": {
             "$ref": "#/$defs/counts"
@@ -572,8 +661,101 @@
             "type": "integer",
             "minimum": 0,
             "description": "producer-reported crossings on a step touching a pole node (no step to rasterize)"
+          },
+          "kind": {
+            "enum": [
+              "route",
+              "feeder"
+            ],
+            "description": "map epic 2 (MMR-253): an FWGC++ route or a feeder road"
+          },
+          "decks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/cell"
+            },
+            "description": "map epic 2 (MMR-253): the deck cells of existing bridges on the pieces, in order (feeders cross water only there, along the route that laid the deck)"
+          },
+          "settlement": {
+            "type": "string",
+            "description": "a feeder road: the castle, village or road-less town it serves"
+          },
+          "pieces": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "path",
+                "start",
+                "end"
+              ],
+              "properties": {
+                "path": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": {
+                    "$ref": "#/$defs/cell"
+                  },
+                  "description": "edge-connected road cells in order (columns wrap); deck cells of an existing bridge included"
+                },
+                "start": {
+                  "$ref": "#/$defs/roadEnd"
+                },
+                "end": {
+                  "$ref": "#/$defs/roadEnd"
+                }
+              }
+            },
+            "description": "map epic 2 (MMR-253): the drawable runs of road cells: a route's lattice path split at poles and cut at every crossing without a deck (sea legs, river or lake crossings that join nothing, blocked runs), so route roads end at the bank; a feeder has one piece"
           }
-        }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "const": "feeder"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "index",
+                "kind",
+                "from",
+                "to",
+                "fromUid",
+                "toUid",
+                "cells",
+                "pieces",
+                "decks",
+                "settlement"
+              ]
+            },
+            "else": {
+              "required": [
+                "index",
+                "kind",
+                "from",
+                "to",
+                "fromUid",
+                "toUid",
+                "cells",
+                "compiledClasses",
+                "passes",
+                "maxGrade",
+                "polePassages",
+                "sameGroup",
+                "crossings",
+                "producerCrossings",
+                "producerPoleCrossings",
+                "pieces",
+                "decks"
+              ]
+            }
+          }
+        ]
       }
     },
     "requiredBridges": {
@@ -699,9 +881,12 @@
               "footprint",
               "snap",
               "harbour_shift",
+              "town_snap",
+              "carve",
               "coast_port",
               "join",
-              "move"
+              "move",
+              "clearance"
             ]
           },
           "subject": {
@@ -763,6 +948,138 @@
           "status": {
             "const": "pending"
           }
+        }
+      }
+    },
+    "roadNetwork": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "map epic 2 (MMR-253): the laid road network (docs/travel-graph.md \"Road network\"). A kept settlement is connected when its cell is a road cell whose road component (edge-connected road cells) holds a town, or it sits on a town's cell in a land group without road cells whose kept settlements all share that cell (an islet)",
+      "required": [
+        "cells",
+        "routeCells",
+        "feederOnlyCells",
+        "deckCells",
+        "waterCellsWithoutDeck",
+        "feeders",
+        "maxFeederCells",
+        "ends",
+        "connected",
+        "unconnected",
+        "boundNotReached"
+      ],
+      "properties": {
+        "cells": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "routeCells": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "feederOnlyCells": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "deckCells": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "road cells on an existing deck"
+        },
+        "waterCellsWithoutDeck": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 0,
+          "description": "road cells on water without a deck (RT-17: always 0)"
+        },
+        "feeders": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "maxFeederCells": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "ends": {
+          "$ref": "#/$defs/counts",
+          "description": "piece ends by kind (gate, pole, bank, junction)"
+        },
+        "connected": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "connected",
+              "total"
+            ],
+            "properties": {
+              "connected": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "total": {
+                "type": "integer",
+                "minimum": 0
+              }
+            }
+          },
+          "description": "per settlement kind"
+        },
+        "unconnected": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "uid",
+              "kind",
+              "reason"
+            ],
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "uid": {
+                "type": "string"
+              },
+              "kind": {
+                "type": "string"
+              },
+              "reason": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "boundNotReached": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "uid",
+              "kind",
+              "reason"
+            ],
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "uid": {
+                "type": "string"
+              },
+              "kind": {
+                "type": "string"
+              },
+              "reason": {
+                "type": "string"
+              }
+            }
+          },
+          "description": "connected castles and villages whose road component does not hold their bound settlement (beyond feeders.maxCells by land; they joined the nearest road or town)"
         }
       }
     }

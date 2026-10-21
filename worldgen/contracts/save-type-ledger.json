@@ -24,6 +24,52 @@
         "mnbl.save.": ["contract", "module", "moduleAssemblySha256", "game", "naval", "backend", "navigationCache", "saveIds", "worldIdentity"]
       },
       "note": "The module defines no saveable types: a world binding is header strings, and the only campaign data the module saves are two SyncData lists of installed types."
+    },
+    {
+      "entry": 2,
+      "moduleVersion": "v0.0.1",
+      "tickets": ["MMR-281"],
+      "saveIdsVersion": 1,
+      "definers": [],
+      "typeIds": [],
+      "syncData": [
+        { "behavior": "MNBL.ProceduralWorld.CampaignRegistry.GeneratedStartupBehavior", "key": "_mnblStartupIntentIds", "type": "System.Collections.Generic.List<System.String>", "since": "MMR-34" },
+        { "behavior": "MNBL.ProceduralWorld.CampaignRegistry.GeneratedStartupBehavior", "key": "_mnblStartupIntentHeroes", "type": "System.Collections.Generic.List<TaleWorlds.CampaignSystem.Hero>", "since": "MMR-34" },
+        { "behavior": "MNBL.ProceduralWorld.CampaignRegistry.GeneratedPopulationBehavior", "key": "_mnblPopulationPendingHouses", "type": "System.Collections.Generic.List<System.String>", "since": "MMR-281" },
+        { "behavior": "MNBL.ProceduralWorld.CampaignRegistry.GeneratedPopulationBehavior", "key": "_mnblPopulationReserveKeys", "type": "System.Collections.Generic.List<System.String>", "since": "MMR-281" },
+        { "behavior": "MNBL.ProceduralWorld.CampaignRegistry.GeneratedPopulationBehavior", "key": "_mnblPopulationReserveCounts", "type": "System.Collections.Generic.List<System.Int32>", "since": "MMR-281" },
+        { "behavior": "MNBL.ProceduralWorld.CampaignRegistry.GeneratedPopulationBehavior", "key": "_mnblPopulationRotated", "type": "System.Int32", "since": "MMR-281" },
+        { "behavior": "MNBL.ProceduralWorld.CampaignRegistry.GeneratedPopulationBehavior", "key": "_mnblPopulationToppedUp", "type": "System.Int32", "since": "MMR-281" }
+      ],
+      "headerKeys": {
+        "mnbl.world.": ["schema", "id", "seed", "scene", "package", "manifestSha256", "placementSha256", "sceneFilesSha256", "documentsSha256", "periodic", "coordinatePolicy", "climate", "sceneXmlCrc", "navMeshCrc", "instance", "contentId"],
+        "mnbl.save.": ["contract", "module", "moduleAssemblySha256", "game", "naval", "backend", "navigationCache", "saveIds", "worldIdentity"]
+      },
+      "note": "Entry 1 plus GeneratedPopulationBehavior's SyncData (MMR-281): the homeless houses awaiting a kingdom, the wanderer reserve's use counts (keys and counts), and the rotation and top-up counters; lists of strings and integers only."
+    },
+    {
+      "entry": 3,
+      "moduleVersion": "v0.0.1",
+      "tickets": ["MMR-261"],
+      "saveIdsVersion": 2,
+      "definers": [],
+      "typeIds": [],
+      "syncData": [
+        { "behavior": "MNBL.ProceduralWorld.CampaignRegistry.GeneratedStartupBehavior", "key": "_mnblStartupIntentIds", "type": "System.Collections.Generic.List<System.String>", "since": "MMR-34" },
+        { "behavior": "MNBL.ProceduralWorld.CampaignRegistry.GeneratedStartupBehavior", "key": "_mnblStartupIntentHeroes", "type": "System.Collections.Generic.List<TaleWorlds.CampaignSystem.Hero>", "since": "MMR-34" },
+        { "behavior": "MNBL.ProceduralWorld.CampaignRegistry.GeneratedPopulationBehavior", "key": "_mnblPopulationPendingHouses", "type": "System.Collections.Generic.List<System.String>", "since": "MMR-281" },
+        { "behavior": "MNBL.ProceduralWorld.CampaignRegistry.GeneratedPopulationBehavior", "key": "_mnblPopulationReserveKeys", "type": "System.Collections.Generic.List<System.String>", "since": "MMR-281" },
+        { "behavior": "MNBL.ProceduralWorld.CampaignRegistry.GeneratedPopulationBehavior", "key": "_mnblPopulationReserveCounts", "type": "System.Collections.Generic.List<System.Int32>", "since": "MMR-281" },
+        { "behavior": "MNBL.ProceduralWorld.CampaignRegistry.GeneratedPopulationBehavior", "key": "_mnblPopulationRotated", "type": "System.Int32", "since": "MMR-281" },
+        { "behavior": "MNBL.ProceduralWorld.CampaignRegistry.GeneratedPopulationBehavior", "key": "_mnblPopulationToppedUp", "type": "System.Int32", "since": "MMR-281" },
+        { "behavior": "MNBL.ProceduralWorld.CampaignRegistry.WorldMutationBehavior", "key": "_mnblWorldMutations", "type": "System.String", "since": "MMR-261" }
+      ],
+      "headerKeys": {
+        "mnbl.world.": ["schema", "id", "seed", "scene", "package", "manifestSha256", "placementSha256", "sceneFilesSha256", "documentsSha256", "periodic", "coordinatePolicy", "climate", "sceneXmlCrc", "navMeshCrc", "instance", "contentId"],
+        "mnbl.save.": ["contract", "module", "moduleAssemblySha256", "game", "naval", "backend", "navigationCache", "saveIds", "worldIdentity"],
+        "mnbl.campaign.": ["mutationProducer"]
+      },
+      "note": "Entry 2 plus WorldMutationBehavior's SyncData (MMR-261): one string, the canonical mnbl.world-mutations v1 document (producer build, world, request, applied and pending edits, live cells and nodes, residue, digest; docs/magic-ground.md 'Live mutation'), and the header key mnbl.campaign.mutationProducer (the producer build the campaign casts with). saveIdsVersion 2: a version 1 save is refused (no converter)."
     }
   ]
 }

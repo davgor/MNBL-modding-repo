@@ -75,6 +75,10 @@ def read_field(path):
     return [list(values[r * side:(r + 1) * side]) for r in range(side)]
 
 
+def read_side(path):
+    return len(read_field(path))
+
+
 def neighbors(c, r, size):
     for x, y in ((c - 1, r), (c + 1, r), (c, r - 1), (c, r + 1)):
         if 0 <= x < size and 0 <= y < size:
@@ -452,8 +456,13 @@ def build(args):
     xml=ET.parse(local_template/'scene.xscene'); xml.getroot().set('name',scene_name)
     xml.write(local_template/'scene.xscene',encoding='utf-8',xml_declaration=True)
     folder=out/scene_name
+    # MMR-255: the encoder takes layer weights (MNBLWT02); a fixture without compiled layers gets the base layer only.
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+    import terrain_layers
+    weights=out/'weights.bin'
+    weights.write_bytes(terrain_layers.base_weights(read_side(source), terrain_layers.template_layer_names((local_template/'scene.xscene').read_text(encoding='utf-8'))))
     command=[str(encoder),'--surface-heightfield',str(source),'--surface-template',str(local_template),
-             '--surface-output',str(folder),'--surface-extent',str(args.extent),'--surface-scale',str(args.scale)]
+             '--surface-output',str(folder),'--surface-extent',str(args.extent),'--surface-scale',str(args.scale),'--surface-weights',str(weights)]
     result=subprocess.run(command,capture_output=True,text=True,check=False)
     (out/'encoder.stdout.log').write_text(result.stdout,encoding='utf-8');(out/'encoder.stderr.log').write_text(result.stderr,encoding='utf-8')
     require(result.returncode==0,'Native encoder failed; see isolated logs')
@@ -504,7 +513,7 @@ def main():
     parser.add_argument('--world-id',required=True);parser.add_argument('--scene-name',required=True)
     parser.add_argument('--heightfield',required=True);parser.add_argument('--extent',type=float,required=True)
     parser.add_argument('--scale',type=float,default=.01)
-    parser.add_argument('--surface-template',default='build/slots/mnbl_world_b')
+    parser.add_argument('--surface-template',default='build/surface-template',help='python tools/scenebin/make_surface_template.py --materialize build/surface-template')
     parser.add_argument('--encoder',default='build/worldbridge/Release/worldbridge.exe')
     parser.add_argument('--game-root',default=build_slot.GAME)
     parser.add_argument('--settlement-ids',nargs=4,metavar=('TOWN1','TOWN2','VILLAGE1','VILLAGE2'))

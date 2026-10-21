@@ -22,6 +22,8 @@ sys.path.insert(0, str(REPO / "tools/scenebin"))
 import terrain_bin as terrain
 import navmesh_bin as nav
 import build_slot as slot
+sys.path.insert(0, str(REPO / "tools"))
+import terrain_layers
 
 checks = 0
 
@@ -105,16 +107,52 @@ def containers(data):
     check(next_offset == len(data), "no terrain trailing bytes")
 
 
+def layer_planes(grid, spacing, names):
+    """Synthetic layer alphas (MMR-255): the base at 255, the slope rule in the 'rock' plane, blocky patterns that leave some layers
+    absent from some nodes, and the last layer empty everywhere (absent from every node)."""
+    side = len(grid)
+    rock = slot.slope_weights(grid, spacing)
+    planes = []
+    for k, name in enumerate(names):
+        if k == 0:
+            planes.append([[255] * side for _ in range(side)])
+        elif name == "rock":
+            planes.append(rock)
+        elif k == len(names) - 1:
+            planes.append([[0] * side for _ in range(side)])
+        else:
+            planes.append([[((r * 7 + c * 13 + k * 31) % 256) if ((r * 4 // side) * 4 + (c * 4 // side) + k) % 3 == 0 else 0 for c in range(side)] for r in range(side)])
+    return planes
+
+
+def wt_write(path, planes, names):
+    side = len(planes[0])
+    path.write_bytes(terrain_layers.weights_bytes(side, names, [bytes(v for row in p for v in row) for p in planes]))
+
+
+def template_names(template):
+    return terrain_layers.template_layer_names((template / "scene.xscene").read_text(encoding="utf-8"))
+
+
+def flr2(trees):
+    body = b""
+    for name, x, y, z in trees:
+        raw = name.encode()
+        body += struct.pack("<I", len(raw)) + raw + struct.pack("<I", 0) + struct.pack("<16f", .25, 0, 0, 0, 0, .25, 0, 0, 0, 0, .25, 0, x, y, z, 1) + struct.pack("<4f", 1, 1, 1, 1)
+    return b"FLR2" + struct.pack("<II", len(body) + 4, len(trees)) + body
+
+
 def hf_write(path, grid):
     flat = [v for row in grid for v in row]
     path.write_bytes(b"MNBLHF01" + struct.pack("<I", len(grid)) + struct.pack("<%dd" % len(flat), *flat))
 
 
-def verify(output, original_grid, extent, scale, template):
+def verify(output, original_grid, extent, scale, template, planes, flora=None):
     grid = [[v*scale for v in row] for row in original_grid]
     side = len(grid)
     spacing = extent/(side-1)
-    reference, info = terrain.build_terrain(grid, 4, 4, extent/4, layer_weights={1: slot.slope_weights(grid, spacing)}, physics_layers=[0, 1])
+    # The Python reference encoder with every layer plane (MMR-255: PHYM is the dominant visible layer over all of them).
+    reference, info = terrain.build_terrain(grid, 4, 4, extent/4, layer_weights={k: p for k, p in enumerate(planes)})
     actual_bytes = (output/"terrain.bin").read_bytes()
     containers(actual_bytes)
     actual, expected = terrain.parse(actual_bytes), terrain.parse(reference)
@@ -157,6 +195,8 @@ def verify(output, original_grid, extent, scale, template):
         vals = slot.interpolate(quantized, point["x"], point["y"], spacing)
         check(all(abs(point[k]-v) < 1e-10 for k, v in zip(("bilinear", "triangleA", "triangleB"), vals)), "sample interpolation")
     check(len(meta["points"]) >= 29 and "official kernel approximate" in meta["normalSource"], "sample/provenance coverage")
+    check(meta["layers"] == template_names(template) and meta["weightSource"].startswith("compiled layer weights (--surface-weights MNBLWT02)"), "metadata names the weights' layers")
+    check(meta["floraInstances"] == (struct.unpack_from("<I", flora, 8)[0] if flora else 0), "metadata counts the map trees")
     xml = ET.parse(output/"scene.xscene").getroot()
     check(xml.attrib["name"] == meta["sceneName"] == ET.parse(template/"scene.xscene").getroot().attrib["name"], "preserved owned scene name")
     check(not list(xml.find("entities")) and all(xml.find(n) is None for n in ("Paths", "camera_data", "editor_data")), "no copied geography")
@@ -185,7 +225,7 @@ def verify(output, original_grid, extent, scale, template):
     check(container.scratch0 == container.scratch1 == container.reserved == 0, "navmesh deterministic reserved fields")
     result = nav.validate(nav.decode_payload(container.payload))
     check(not result["errors"], "navmesh topology validation")
-    check((output/"flora.bin").read_bytes() == b"FLR2"+struct.pack("<II", 4, 0), "empty generated flora")
+    check((output/"flora.bin").read_bytes() == (flora or b"FLR2"+struct.pack("<II", 4, 0)), "flora: the given map trees byte for byte, or the empty flora file")
     check((output/"atmosphere.xml").read_bytes() == (template/"atmosphere.xml").read_bytes(), "passive atmosphere unchanged")
     check(set(p.name for p in output.iterdir()) == {"terrain.bin", "scene.xscene", "navmesh.bin", "flora.bin", "atmosphere.xml", "quantized-heightfield.bin", "surface.json"}, "exact output inventory")
     return {"path": str(output), "gridSide": side, "extent": extent, "files": {p.name: sha(p) for p in output.iterdir()}}
@@ -201,77 +241,133 @@ def main():
     args.output.mkdir(parents=True, exist_ok=False)
     before = {str(p): sha(p) for t in (args.template, args.prepared_template) if t for p in t.iterdir() if p.is_file()}
     calls, reports = [], []
-    def execute(hf, dest, extent=256, scale=1, template=None, bad=None):
+    names = template_names(args.template)
+    check(len(names) == 15 and names[0] == "grass" and "rock" in names, "the tracked template carries the 15-layer set (MMR-255)")
+    def weights_for(hf, extent, scale):
+        """A WT02 for a heightfield (written beside it) and its planes."""
+        _, grid = slot.read_heightfield(hf)
+        g = [[v*scale for v in row] for row in grid]
+        planes = layer_planes(g, extent/(len(g)-1), names)
+        wt = hf.with_suffix(".weights.bin")
+        wt_write(wt, planes, names)
+        return wt, planes
+    def execute(hf, dest, extent=256, scale=1, template=None, bad=None, extra=(), weights=None):
+        if weights is None and hf.exists() and hf.stat().st_size in (12 + 129*129*8, 12 + 257*257*8, 12 + 513*513*8):
+            weights, _ = weights_for(hf, extent if not isinstance(extent, str) and extent and extent > 0 else 256, scale if not isinstance(scale, str) and scale and 0 < scale < 1e6 else 1)
         cmd = [str(args.exe), "--surface-heightfield", str(hf), "--surface-template", str(template or args.template),
-               "--surface-output", str(dest), "--surface-extent", str(extent), "--surface-scale", str(scale)]
+               "--surface-output", str(dest), "--surface-extent", str(extent), "--surface-scale", str(scale)] + (["--surface-weights", str(weights)] if weights else []) + list(extra)
         proc = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
         calls.append({"args": cmd, "exit": proc.returncode, "stdout": proc.stdout, "stderr": proc.stderr})
         check(proc.returncode == (2 if bad else 0), "CLI exit: " + proc.stderr)
         if bad:
             check(bad in proc.stderr, "actionable refusal: " + proc.stderr)
         return proc
-    for side in (129, 257):
+    for side in (129, 257, 513):   # 513: level 7, 128 cells per node (MMR-278)
         grid = [[slot.calibration(c*256/(side-1), r*256/(side-1)) for c in range(side)] for r in range(side)]
         hf = args.output/('calibration%d.bin' % side)
         hf_write(hf, grid)
         dest = args.output/('calibration%d' % side)
-        execute(hf, dest)
-        reports.append(verify(dest, grid, 256, 1, args.template))
+        wt, planes = weights_for(hf, 256, 1)
+        execute(hf, dest, weights=wt)
+        reports.append(verify(dest, grid, 256, 1, args.template, planes))
         if side == 129:
             original = {p.name: sha(p) for p in dest.iterdir()}
-            execute(hf, dest, bad="output must be absent")
+            execute(hf, dest, bad="output must be absent", weights=wt)
             check(original == {p.name: sha(p) for p in dest.iterdir()}, "existing result never overwritten")
             duplicate = args.output/"repeat129"
-            execute(hf, duplicate)
+            execute(hf, duplicate, weights=wt)
             check(original == {p.name: sha(p) for p in duplicate.iterdir()}, "deterministic bytes independent of output directory")
+        if side == 513:
+            # MMR-278: --surface-normals smoothed changes only the normal maps (and their provenance line).
+            smooth = args.output/'calibration513-smoothed'
+            execute(hf, smooth, extra=("--surface-normals", "smoothed"), weights=wt)
+            a, b = terrain.parse((dest/"terrain.bin").read_bytes()), terrain.parse((smooth/"terrain.bin").read_bytes())
+            check((smooth/"quantized-heightfield.bin").read_bytes() == (dest/"quantized-heightfield.bin").read_bytes(), "smoothed normals: heights unchanged")
+            check(all(x.height_png == y.height_png and x.weights == y.weights and x.physics == y.physics for x, y in zip(a.nodes(), b.nodes())), "smoothed normals: heights, weights and physics unchanged")
+            check(any(x.normal_png != y.normal_png for x, y in zip(a.nodes(), b.nodes())), "smoothed normals: the normal maps differ")
+            check("smoothed by [1,4,6,4,1]/16" in json.loads((smooth/"surface.json").read_text())["normalSource"], "smoothed normals: recorded in surface.json")
+            execute(hf, args.output/'badnormals', bad="--surface-normals", extra=("--surface-normals", "blurry"), weights=wt)
+            # MMR-255: map trees pass through byte for byte; trees outside the terrain and malformed files are refused.
+            trees = flr2([("map_spruce_mix", 10.5, 20.25, 3.0), ("worldmap_tree_beech_01", 100.0, 200.0, 1.5), ("worldmap_tree_acacia_01", 255.0, 1.0, 0.5)])
+            fl = args.output/'trees.bin'; fl.write_bytes(trees)
+            forest = args.output/'calibration513-flora'
+            execute(hf, forest, extra=("--surface-flora", str(fl)), weights=wt)
+            reports.append(verify(forest, grid, 256, 1, args.template, planes, flora=trees))
+            for i, (payload, error) in enumerate(((flr2([("map_spruce_mix", 300.0, 20.0, 1.0)]), "outside the terrain"), (b"FLR3" + trees[4:], "FLR2"),
+                                                  (trees[:-1], "payload size"), (flr2([("Map Tree", 1.0, 1.0, 1.0)]), "identifiers"))):
+                bad = args.output/('badflora%d.bin' % i); bad.write_bytes(payload)
+                dest2 = args.output/('badflora%d' % i); execute(hf, dest2, bad=error, extra=("--surface-flora", str(bad)), weights=wt)
+                check(not dest2.exists(), "invalid flora leaves no bundle")
+            # Weights refusals: the version-1 format, a layer table that is not the template's, a base that is not 255.
+            raw = wt.read_bytes()
+            bad_weights = ((b"MNBLWT01" + raw[8:], "MNBLWT02"), (terrain_layers.weights_bytes(513, names[:-1], [bytes(p) for p in terrain_layers.read_weights(raw)[2][:-1]]), "must match the weights' layers"),
+                           (terrain_layers.weights_bytes(513, [names[0], names[2], names[1]] + names[3:], terrain_layers.read_weights(raw)[2]), "material order"),
+                           (raw[:-513*513*len(names)] + b"\x00" + raw[-513*513*len(names) + 1:], "base"))
+            for i, (payload, error) in enumerate(bad_weights):
+                bad = args.output/('badweights%d.bin' % i); bad.write_bytes(payload)
+                dest2 = args.output/('badweights%d' % i); execute(hf, dest2, bad=error, weights=bad)
+                check(not dest2.exists(), "invalid weights leave no bundle")
+            dest2 = args.output/'noweights'
+            proc = subprocess.run([str(args.exe), "--surface-heightfield", str(hf), "--surface-template", str(args.template), "--surface-output", str(dest2), "--surface-extent", "256", "--surface-scale", "1"], capture_output=True, text=True, timeout=60)
+            check(proc.returncode == 2 and "--surface-weights" in proc.stderr and not dest2.exists(), "the layer weights are required")
     for seed, extent in ((42, 800), (43, 640)):
         source = REPO/('build/heightfield-source%d/heightfield.bin' % seed)
         check(source.is_file(), "required retained FWGC fixture")
         _, grid = slot.read_heightfield(source)
         dest = args.output/('seed%d' % seed)
-        execute(source, dest, extent, .01)
-        reports.append(verify(dest, grid, extent, .01, args.template))
+        wt, planes = weights_for(source, extent, .01)
+        execute(source, dest, extent, .01, weights=wt)
+        reports.append(verify(dest, grid, extent, .01, args.template, planes))
     # Constant and exact half-code cases exercise empty rock layers and ties-to-even quantization.
     for label, grid in (("flat", [[7.25]*129 for _ in range(129)]),
                         ("ties", [[(0 if (r,c)==(0,0) else 1 if (r,c)==(0,1) else 10.5/65535 if c%2 else 11.5/65535) for c in range(129)] for r in range(129)])):
         hf = args.output/(label+'.bin'); hf_write(hf, grid)
-        dest = args.output/label; execute(hf, dest)
-        reports.append(verify(dest, grid, 256, 1, args.template))
+        wt, planes = weights_for(hf, 256, 1)
+        dest = args.output/label; execute(hf, dest, weights=wt)
+        reports.append(verify(dest, grid, 256, 1, args.template, planes))
     good = args.output/"calibration129.bin"
+    good_weights = good.with_suffix(".weights.bin")
     for i, (payload, error) in enumerate(((b"bad", "magic/header"), (good.read_bytes()[:-1], "truncated"),
-                                          (good.read_bytes()+b"x", "truncated"), (b"MNBLHF01"+struct.pack("<I", 130), "129 or 257"),
+                                          (good.read_bytes()+b"x", "truncated"), (b"MNBLHF01"+struct.pack("<I", 130), "257 or 513"),
                                           (good.read_bytes()[:12]+struct.pack("<d", float('nan'))+good.read_bytes()[20:], "nonfinite"))):
         path = args.output/('bad%d.bin' % i); path.write_bytes(payload)
-        dest = args.output/('bad%d' % i); execute(path, dest, bad=error)
+        dest = args.output/('bad%d' % i); execute(path, dest, bad=error, weights=good_weights)
         check(not dest.exists(), "invalid input leaves no bundle")
     for value in (0, -1, 'nan', 'inf', '2garbage', .001, 256.001):
-        dest = args.output/('badextent'+str(value)); execute(good, dest, extent=value, bad="extent")
+        dest = args.output/('badextent'+str(value)); execute(good, dest, extent=value, bad="extent", weights=good_weights)
         check(not dest.exists(), "invalid extent leaves no bundle")
     for value in (0, -1, 'nan', 'inf', '1e300'):
-        dest = args.output/('badscale'+str(value)); execute(good, dest, scale=value, bad="scale" if value != '1e300' else "scaled height")
+        dest = args.output/('badscale'+str(value)); execute(good, dest, scale=value, bad="scale" if value != '1e300' else "scaled height", weights=good_weights)
         check(not dest.exists(), "invalid scale leaves no bundle")
     xml = (args.template/"scene.xscene").read_text()
+    meshes = '<meshes>\n\t\t\t\t\t</meshes>'
     mutations = [(xml.replace('node_dimension_x="4"', 'node_dimension_x="3"', 1), "4x4"),
-                 (xml.replace('<layer name="grass">', '<layer name="rock_k">', 1), "material order"),
+                 (xml.replace('<layer name="grass">', '<layer name="rock">', 1), "material order"),
                  (xml.replace('idx="1" idy="0"', 'idx="0" idy="0"', 1), "coordinates"),
                  (xml.replace('<entities>', '<entities><entity/>', 1), "entities must be empty"),
                  (xml.replace('<scene ', '<!DOCTYPE scene><scene ', 1), "XML"),
                  (xml.replace('version="2"', 'version="2" version="2"', 1), "duplicate XML attribute"),
                  (xml.replace('physics_material="stone"', 'physics_material="water"', 1), "physical material"),
-                 (xml.replace('name="rock_k" is_flora_layer="false"', 'name="rock_k" is_flora_layer="true"', 1), "flora/mesh"),
-                 (xml.replace('vista_tileset=""', 'vista_tileset="campaign"', 1), "tileset")]
+                 (xml.replace('is_flora_layer="false"', 'is_flora_layer="true"', 1), "flora/mesh"),
+                 (xml.replace('vista_tileset=""', 'vista_tileset="campaign"', 1), "tileset"),
+                 (xml.replace('use_dynamic_weather_effects="true"', 'use_dynamic_weather_effects="false"', 1), "use_dynamic_weather_effects"),
+                 (xml.replace('use_dynamic_weather_effects="true"', 'use_dynamic_weather_effects="true" terrain_render_version="1"', 1), "terrain_render_version"),
+                 (xml.replace(meshes, '<meshes><mesh name="flora_grass_a_non_shadow"/></meshes>', 1), "no flora meshes"),
+                 (xml.replace('<fall is_enabled="true" name="grass"', '<fall is_enabled="false" name="grass"', 1), "enablement"),
+                 (xml.replace('<winter is_enabled="true" name="grass" is_flora_layer="false" is_mesh_blend_layer="false" pitch_roll_yaw="0.000, 0.000, 0.000" scale="15.000, 15.000"',
+                              '<winter is_enabled="true" name="grass" is_flora_layer="false" is_mesh_blend_layer="false" pitch_roll_yaw="0.000, 0.000, 0.000" scale="6.000, 6.000"', 1), "same in every season")]
     for i, (text, error) in enumerate(mutations):
         check(text != xml, "mutation actually changed XML")
         template = args.output/('templatebad%d' % i)
         shutil.copytree(args.template, template)
         (template/"scene.xscene").write_text(text)
-        dest = args.output/('badtemplate%d' % i); execute(good, dest, template=template, bad=error)
+        dest = args.output/('badtemplate%d' % i); execute(good, dest, template=template, bad=error, weights=good_weights)
         check(not dest.exists(), "invalid template leaves no bundle")
     if args.prepared_template:
         _, grid = slot.read_heightfield(good)
         dest = args.output/"prepared-template"
-        execute(good, dest, template=args.prepared_template)
-        reports.append(verify(dest, grid, 256, 1, args.prepared_template))
+        execute(good, dest, template=args.prepared_template, weights=good_weights)
+        reports.append(verify(dest, grid, 256, 1, args.prepared_template, layer_planes(grid, 256/(len(grid)-1), names)))
         check(json.loads((dest/"surface.json").read_text())["sceneName"] == "mnbl_runtime_surface", "prepared runtime scene name")
     check(before == {p: sha(Path(p)) for p in before}, "all supplied template files unchanged")
     old = subprocess.run([str(args.exe), '--self-test'], capture_output=True, text=True, timeout=30)
@@ -282,7 +378,7 @@ def main():
     check(old.returncode == 0, "existing source mode " + old.stderr)
     check((legacy/'heightfield.bin').read_bytes() == (REPO/'build/heightfield-source42/heightfield.bin').read_bytes(), "source-mode heightfield unchanged")
     pinned = [REPO/'src/WorldBridge'/n for n in ('main.cpp', 'surface.cpp', 'surface.hpp', 'CMakeLists.txt')]
-    pinned += [REPO/'tools/scenebin'/n for n in ('terrain_bin.py', 'navmesh_bin.py', 'build_slot.py')]
+    pinned += [REPO/'tools/scenebin'/n for n in ('terrain_bin.py', 'navmesh_bin.py', 'build_slot.py', 'make_surface_template.py')] + [REPO/'tools/terrain_layers.py']
     receipt = {"schema": "mnbl.worldbridge-surface-tests", "assertions": checks, "cases": reports,
                "executable": {"path": str(args.exe), "sha256": sha(args.exe)}, "inputs": {str(p): sha(p) for p in pinned},
                "templateInputs": before, "calls": calls, "scope": "Offline codec/CLI equivalence only; no native runtime or cache claim."}

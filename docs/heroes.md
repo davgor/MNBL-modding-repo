@@ -1,13 +1,13 @@
-# Heroes, families and rosters (MMR-32, 2026-10-15)
+# Heroes, families and rosters (MMR-32, 2026-10-15; MMR-280, 2026-10-20)
 
-`HeroFactory` turns the MMR-27 compiler heroes and the MMR-31 faction intents into generated heroes, and resolves the compiler slots MMR-32 owns. `CharacterTemplateResolver` proves that every installed template and troop they rely on resolves.
+`HeroFactory` turns the compiler heroes (campaign.json v2: MMR-27 and the MMR-279 population pass, [population.md](population.md)) and the MMR-31 faction intents into generated heroes, and resolves the compiler slots MMR-32 owns. Since MMR-280 it emits exactly the planned population: every house, company and outlaw clan Lord, the houses' minors and dead parents, and the W planned wanderers, checked against the campaign v2 `census`. `CharacterTemplateResolver` proves that every installed template and troop they rely on resolves.
 
 | | |
 |---|---|
 | Code (pure managed) | `src/MNBL.ProceduralWorld/Campaign/HeroFactory.cs` and `CharacterTemplateResolver.cs` |
 | Code (game) | `HeroBodies.cs` (explicit bodies), `GeneratedCharacterCreation.cs` (creation cultures), registered by `GeneratedGameManager` |
-| Policy | `worldgen/policies/rosters.json` (`mnbl.rosters` v1), written by `tools/make_rosters_policy.py`. The rules are authored; the engine numbers come from the installed IL; the catalog and default references are hash-pinned |
-| Tests | `tests/Campaign/CharacterTests.cs` via `tools/Test-Characters.ps1`: the real size-129 world (verified MMR-29 bundle) and the installed merged catalog, 19 checks (`evidence/fwg/heroes-tests.txt`) |
+| Policy | `worldgen/policies/rosters.json` (`mnbl.rosters` v1), written by `tools/make_rosters_policy.py`. The rules are authored; the engine numbers come from the installed IL; the catalog and default references are hash-pinned. `worldgen/policies/population.json` gives the lord-trait distribution and the wanderer pool |
+| Tests | `tests/Campaign/CharacterTests.cs` via `tools/Test-Characters.ps1`: the regenerated worlds A' (seed 42) and B' (seed 73) from their verified bundles and the installed merged catalog, 22 checks (`evidence/fwg/heroes-tests.txt`) |
 | In game | `generated_campaign` probe with `creationAudit=1`, `restrictCreationCultures`, `creationCultures` and `heroBundle`, summarized by `tools/summarize_character_creation.py` (`evidence/runtime/character-creation.json`) |
 | Evidence | `evidence/fwg/heroes.json`; review and disposition in `evidence/fwg/heroes-review.md` |
 
@@ -21,19 +21,22 @@ How the installed engine creates heroes (installed IL) decides the split:
 
   No XML attribute gives a hero a home settlement.
 
-| Kind | How | Count at size 129 |
-|---|---|---|
-| Source lords | XML: an NPCCharacter made from an installed lord template, and a Hero in its MMR-31 affiliation clan | 92 |
-| Spouses and heirs | XML, adapter-synthesized: one spouse per clan leader aged 25 or more; 0-2 adult heirs per couple | 88 spouses, 61 heirs |
-| Notables | runtime intent: an installed notable template, home settlement, name and age | 909 (172 source, 737 synthesized) |
-| Companions | runtime intent: an installed wanderer template, home town, name and age | 28 |
+| Kind | How | A' | B' |
+|---|---|---|---|
+| Planned lords | XML: an NPCCharacter made from an installed lord template, and a Hero in its MMR-31 affiliation clan: house adults, minors and dead parents, company and outlaw clan members | 338 (226 house adults, 22 minors, 24 dead parents, 45 company, 21 outlaw clan members) | 501 (326, 31, 36, 73, 35) |
+| Notables | runtime intent: an installed notable template, home settlement, name and age | 805 (143 source, 662 synthesized) | 1,182 (184, 998) |
+| Companions | runtime intent: a backstory-safe wanderer template, home town, name and age | 28 | 40 |
+
+No lord, spouse or heir is synthesized here any more: the population pass plans every kin link (MMR-279), and the MMR-32 families block is gone.
 
 **Dispositions.** Every compiler hero gets exactly one:
 - `instantiated`;
-- `bounded`, naming the policy rule that left it out;
-- `notInstantiated`, for the 12 the compiler does not instantiate, or a lord of a dissolved realm.
+- `bounded`, naming the policy rule that left it out (none on a compiled world: the census applies the notable caps, so a bounded notable refuses the build);
+- `notInstantiated`, for the heroes the compiler does not instantiate (legends), or a lord of a dissolved realm.
 
-At size 129: 292 instantiated, 35 bounded (29 wanderers over the companion bound, 6 notables over a cap), 12 not instantiated.
+A': 519 instantiated, 12 not instantiated. B': 723 and 27.
+
+**Census (MMR-280).** What is instantiated must equal the campaign v2 `census`, or the build is refused: houses, mercenary companies and outlaw clans, adult house lords, minors, dead parents (outside every other count), company and outlaw clan members, source notables, and the wanderers W. `Result.Census` records it; the graph validator recounts it from the staged documents.
 
 **Slots.** MMR-32 resolves every compiler slot it owns, 765 at size 129:
 - each kingdom's `troopTreeAndRecruitTemplates`: its culture's basic and elite troops, militia and default party template;
@@ -53,14 +56,17 @@ The stable identity of a runtime hero is therefore its intent id. MMR-34 must ke
 
 **Template.** One of the presentation culture's installed `lord_templates`, drawn from the templates stream. The list is the installed one: sturgia's includes four NavalDLC templates of culture nord, and the hero still takes its own culture.
 
-**What the hero keeps from the template:** its body range (face key template), skill set and traits.
+**What the hero keeps from the template:** its body range (face key template), skill set and traits other than the personality ones.
 
-**What the world supplies:** the id, the localized source name, culture, age and sex.
+**What the world supplies:** the id, the localized source name, culture, the planned age and FWGC++ sex (campaign v2 `age` and `female`; a lord without them refuses the build), clan, `alive` and kin.
+
+**Personality (RT-05).** The template's `<Traits>` personality entries (Mercy, Valor, Honor, Generosity, Calculating) are never copied. Each XML hero draws one vector of `population.json lordTraits.joint`, the 127 vectors of the 443 installed alive War Sails lords weighted by count, from the population traits stream seeded by its hero id, and the NPCCharacter carries its non-zero values. Lords are drawn in id order, and a draw that repeats a vector an earlier lord of the same culture already has is drawn once more (`TraitDraws` 2; default taken), so same-culture lords share a personality less often than the installed lords do. The share of same-culture house lords with an identical vector is 0.219 on A' and 0.346 on B', against 0.512 among the installed lords, recomputed by the tests from the catalog. Non-personality template traits (Commander, Manager and the like) are kept (default taken).
 
 **Equipment.**
 - No installed lord template is female, and their rosters carry men's gear; one Battanian template's armour is `NotUsableByFemale`.
 - A man wears the template's equipment sets.
 - A woman wears one battle and one civilian roster of her culture flagged `IsLordTemplate` and `IsFemaleTemplate` (never child or teenager), as the installed equipment selection flags them. Each culture has exactly one female battle roster (`*_bat_template_lady`, with 2-7 sets) and one to five civilian ones.
+- A minor (under 18) wears, as civilian equipment, its culture's noble child roster below 14 or teenager roster from 14 (`IsLordTemplate` with `IsChildEquipmentTemplate` or `IsTeenagerEquipmentTemplate`, of its sex), as the engine's random child generator dresses its children; a girl's battle roster is her culture's female lord roster and a boy keeps his template's. Where every roster of the stage holds an item the minor's sex cannot wear, it keeps its lord civilian equipment (recorded in its provenance; none on A' and B').
 - Every worn item must exist, fit its slot (`Equipment.IsItemFitsToSlot`) and be usable by the wearer's sex (`NotUsableByFemale` / `NotUsableByMale`). The tests re-derive this from the emitted XML.
 
 **Bodies.**
@@ -70,21 +76,19 @@ The stable identity of a runtime hero is therefore its intent id. MMR-34 must ke
 - In run 17280 the engine drew 241 distinct bodies (114 female) over 13 body templates. Drawing again with the same seeds gave the same bodies, and none is a template minimum.
 - Every hero uses the installed human body. The source `raceId` is kept as metadata, since custom skeletons are out of scope.
 
-**Ages by role:** sovereign 35-62, regent 40-66, pretender 22-45, castellan 28-56, founder 25-50. Rulers and clan leaders are always adults (20 or more) and alive.
-
-**Sex:** each source lord is female with probability 0.25 from the sex stream (21 of 92 at size 129).
+**Ages and sex** are the planned ones (FWGC++'s NPC roster, clamped by the population pass). Rulers and clan leaders are always living adults (20 or more).
 
 **Clan:** each lord's clan is the MMR-31 affiliation, so `Kingdom.Deserialize` takes the ruling clan from the ruler's clan.
 
-**Families**, all adapter-synthesized:
-- every clan leader aged 25 or more gets a spouse of the opposite sex, in the clan, with the spouse link written on both heroes;
-- each couple gets 0-2 adult heirs aged 18 to min(min(parent age) − 18, 30), with father and mother set; a couple whose upper bound is below 18 has none;
-- names are first names from the culture's installed name lists;
-- at most 3 relatives per clan.
+**Kin** (campaign v2, MMR-279), all checked:
+- a spouse link is written on both heroes, between living lords of one clan and opposite sexes;
+- father (a man) and mother (a woman) are lords of the child's clan, a living parent at least 18 years older;
+- a dead parent (`alive` false) is an XML hero of its house written `alive="false"` in Heroes.xml (as the installed `dead_lord_*` heroes are), the parent of a member, outside the census and every party and lord rule (never a ruler, leader or spouse); its planned age is its age at death, so it may exceed 70 and the age gap is not checked;
+- a minor is accepted only with both parents set.
 
-Without relatives, every clan is a single hero and would die with its leader.
+**Random child generator.** `InitialChildGenerationCampaignBehavior` stays on (owner decision 15): it adds ceil(adults / 2) − existing children per house, each cloned from a same-sex adult Lord of the house and dressed from its culture's four child and teenager civilian rosters. So every house has a living adult Lord of each sex and every lord culture has the four rosters; HeroFactory and the graph validator (`graph.child_generator`) refuse otherwise. Planned members are XML heroes, so the generator counts them.
 
-**Bound.** The source lords are MMR-27's lord records (sovereign or regent per realm, castellans, pretenders, founders), never one per person of a population. XML heroes number at most source lords + 3 per clan: 241 ≤ 92 + 3 × 92.
+**Bound.** The XML lords are exactly the planned Lords; the census counts them.
 
 ## Notables
 
@@ -108,11 +112,12 @@ The map is in the intents (`settlementCultures`), and the garrison slots use it.
 
 ## Companions
 
-**Count:** as many as the installed loop creates. `CompanionsCampaignBehavior.OnNewGameCreated` runs `for (i = 0; (float)i < 0.6f * towns; i++)`, so 28 at 45 towns (0.6f × 45 = 27.000002).
-- **Selection:** source wanderers are ranked by the companions stream over their uid, so record order does not matter. None is synthesized, because the source supplies 57.
-- **Age:** 23-34, from the installed HeroComesOfAge (18) + 5 + [0, 12).
+**Count:** W, campaign v2 `census.wanderers`, the smallest integer not below the float32 product 0.6f × towns, as `CompanionsCampaignBehavior.OnNewGameCreated` counts (`for (i = 0; (float)i < 0.6f * towns; i++)`): 28 at 45 towns (0.6f × 45 = 27.000002), 40 at 66 (RT-04).
+- **Selection:** the companions are exactly campaign v2's `wanderers[]` (MMR-279: champions, magisters, exiles and domain holders rotating by civilization). A Wanderer not planned, a planned one missing, or a census W other than the planned count refuses the build. None is synthesized. In play the daily tick keeps W (rotation of unmet, unhired wanderers and a top-up made in the installed four steps with the world's `wandererReserve` names; MMR-281, [campaign-behavior-compatibility.md](campaign-behavior-compatibility.md) "Houses, companies and wanderers in play").
+- **Age:** the planned one.
 - **Home:** a town of the companion's culture.
-- **Template:** a Wanderer template of that culture.
+- **Template (MMR-287, RT-32):** from the backstory-safe pool (`WandererPool`, the one accessor every generated wanderer uses: HeroFactory here, MMR-280's emitter and MMR-281's top-up). A wanderer's conversation lines are keyed by its template id; `tools/census_wanderer_backstories.py` finds the 38 of 78 installed templates whose lines name a Calradian proper noun (an installed settlement, realm, non-bandit clan or hero, Calradia, the emperor, or a reviewed lore noun such as Svalfjord or the Company of the Boar; story-only personal names stay) and lists them in `population.json wanderers.backstoryUnsafe`. The pick keeps the wanderer's FWGC++ sex (campaign v2 `female`), takes the culture's templates least used so far (distinct while the pool allows, then repeats, recorded), and only when the culture has no safe template of that sex the first culture of `wanderers.fallback` that has one (recorded; nord has none). Safe templates per culture (female/male): aserai 2/7, battania 3/4, empire 1/3, khuzait 2/3, nord 0/0, sturgia 3/4, vlandia 2/6.
+- **Name:** the source name, which keeps its FWGC++ epithet ("Ulkdurn Wyrmward", "Taelkelev of the Water Line"); a source without one takes the template's epithet ("the Scholar", `wanderers.templates[].epithet`).
 
 ## Troops and rosters
 
@@ -166,18 +171,18 @@ In run 17280 every one of the 7 cultures had 8 origins, urban and rural, each wi
 ## Identities and determinism
 
 - **Source heroes** keep their compiler ids.
-- **Synthesized heroes** take MMR-27 stable ids, `<prefix>h_<sha256("mnbl.stable-id/1\nhero\n" + uid)[:10]>`, of documented uids: `spouse:<leader uid>`, `heir:<leader uid>:<n>`, `notable:<settlement uid>:<occupation>:<n>`.
+- **Synthesized heroes** (notables only) take MMR-27 stable ids, `<prefix>h_<sha256("mnbl.stable-id/1\nhero\n" + uid)[:10]>`, of documented uids: `notable:<settlement uid>:<occupation>:<n>`. The population pass's synthesized kin have compiler ids.
 - **Collisions:** an id that is generated twice, collides with an assigned id or is not world-qualified refuses the build. This matters for XML heroes, whose ids are their StringIds: the engine renames a duplicate registered id silently, while XML merges into the existing object.
 
-**Streams.** Every synthesized value comes from a named, versioned stream: `sha256("mnbl.hero-stream/1\n" + stream + "\n" + version + "\n" + prefix + "\n" + entity + "\n" + draw)`. The streams are `templates`, `ages`, `sex`, `names`, `family`, `companions` and `bodies`. Re-versioning a stream changes what it draws and what is derived from that, never ownership, occupations, clans or families. The tests show:
+**Streams.** Every synthesized value comes from a named, versioned stream: `sha256("mnbl.hero-stream/1\n" + stream + "\n" + version + "\n" + prefix + "\n" + entity + "\n" + draw)`. The streams are `templates`, `ages` (notables), `names` and `bodies`; personalities use population.json's `traits` stream (`mnbl.population-stream/1`). The `sex`, `family` and `companions` streams are gone with the families block and the companion ranking. Re-versioning a stream changes what it draws and what is derived from that, never ownership, occupations, clans or families. The tests show:
 - the names stream: only synthesized names;
-- the templates stream: templates, homes and rosters, and with them a notable's or companion's sex (which follows its template) and a synthesized name that follows that sex;
+- the templates stream: templates, homes and rosters, and with them a notable's sex (which follows its template) and a synthesized name that follows that sex;
 - the bodies stream: only body seeds;
-- the companions stream: only which wanderers become companions.
+- the traits stream: only personalities.
 
 **Bounds.**
-- Notables follow settlements (targets and caps), companions follow towns, relatives follow clans.
-- Twenty more copies of every source merchant and wanderer (3,447 source heroes) still give the same capped notables and 28 companions, with 3,092 bounded.
+- Notables follow settlements (targets and caps), companions are the planned W, lords the planned houses and minor clans.
+- Twenty more copies of every source merchant exceed the per-settlement caps the census applied, and are refused.
 
 **Reproducibility** covers the frozen world bundle; explicit bodies are reproducible from their seeds. HeroCreator and the engine still randomize what the runtime intents leave to them (a runtime hero's body within its template's range, birthdays), so campaign save state is not byte-identical.
 
@@ -202,3 +207,4 @@ In run 17280 every one of the 7 cultures had 8 origins, urban and rural, each wi
 - **The full world in game (MMR-45).** The XML, with HeroBodies' explicit bodies, is registered and closed in world A's activated campaign: 1,344 objects, closure 0 problems. The notable and companion intents are instantiated by MMR-34's startup replacement. Recruitment in play is MMR-51's; in-mission troop gear is MMR-52's.
 - **The character-creation audit runs in the sandbox world.** The culture list, origins and creation assets do not depend on the map; start positions do (MMR-34).
 - **Ruler relations** (`relations`, from MMR-31) are hero relation intents for the startup to apply once the heroes exist.
+- **The generated population in game:** MMR-281 marks `IsMinorFactionHero` on company and outlaw clan members right after registration and runs the wanderer tick (tested offline, `tools/Test-PopulationRuntime.ps1`); the engine children the generator adds, the marking's effect on the hire dialogue and the rotation over 30+ days are for MMR-247's census.

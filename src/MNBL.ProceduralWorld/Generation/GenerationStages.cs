@@ -42,12 +42,14 @@ namespace MNBL.ProceduralWorld.Generation
             ["campaign-content.json"] = "worldgen/policies/campaign-content.json",
             ["culture-presentations.json"] = "worldgen/policies/culture-presentations.json",
             ["playability.json"] = "worldgen/policies/playability.json",
+            ["terrain-shaping.json"] = "worldgen/policies/terrain-shaping.json",   // MMR-278: the bundle stage shapes the surface
+            ["population.json"] = "worldgen/policies/population.json",
             ["terrain-import.json"] = "worldgen/calibration/terrain-import/terrain-import.json",
             ["axis-sea-datum-calibration.json"] = "worldgen/calibration/axis-sea-datum/calibration.json",
             ["naval-transitions.json"] = "worldgen/calibration/naval-transitions/naval-transitions.json",
             ["runtime-api-lock.json"] = "config/runtime-api-lock.json" };
         private static readonly string[] Policies = { "product-policy", "world-quality", "source-compatibility", "projection", "terrain-materials", "terrain-import", "campaign-content",
-            "culture-presentations", "playability" };
+            "culture-presentations", "playability", "population" };
 
         // MMR-47: the first policy a request binds with another hash than this module's (null when all match): an unfinished job made under
         // other policies is not resumed. A policy this module does not carry differs.
@@ -257,7 +259,8 @@ namespace MNBL.ProceduralWorld.Generation
             job.Report(null, null, "compiling_world");
             var run = BridgeRun.Execute(job, "bundle", new[] { "--bundle", job.Get<string>("split"), "--contract", inputs["source-compatibility.json"],
                 "--projection-policy", inputs["projection.json"], "--materials", inputs["terrain-materials.json"], "--import", inputs["terrain-import.json"],
-                "--content", inputs["campaign-content.json"], "--cultures", inputs["culture-presentations.json"], "--playability", inputs["playability.json"],
+                "--content", inputs["campaign-content.json"], "--cultures", inputs["culture-presentations.json"], "--playability", inputs["playability.json"], "--shaping", inputs["terrain-shaping.json"],
+                "--population", inputs["population.json"],
                 "--producer-lock", inputs["producer.lock.json"], "--runtime-lock", inputs["runtime-api-lock.json"], "--recipe", job.Get<string>("attemptRequest"),
                 "--root", root, "--diagnostics", job.File("diagnostics") });
             job.Token.ThrowIfCancellationRequested();
@@ -311,9 +314,12 @@ namespace MNBL.ProceduralWorld.Generation
             prepared.Discard();
             job.Disown("surface staging");
             var install = job.Engine("register scene " + prepared.SceneName, () => RuntimeWorldBackend.Register(prepared, reused));
-            foreach (var kv in RuntimeWorldBackend.Sweep()) install[kv.Key] = kv.Value;
+            install["archive"] = prepared.Archive;
+            // MMR-282: the sweep keeps every scene a world package, a save or this process names (the save list is read on the engine thread).
+            var references = job.Engine("world references", () => RuntimeWorldBackend.References());
+            foreach (var kv in RuntimeWorldBackend.Sweep(references)) install[kv.Key] = kv.Value;
             job.Set("install", install);
-            job.Set("sceneStore", "SceneObj/" + prepared.SceneName + " belongs to the scene store (reused by name; an install of another world removes it unless used)");
+            job.Set("sceneStore", "SceneObj/" + prepared.SceneName + " belongs to the scene store (reused by name, archived under world-scenes; a sweep removes it only while no package, save or process names it)");
         }
     }
 
@@ -356,9 +362,20 @@ namespace MNBL.ProceduralWorld.Generation
             })) items++;
             var report = result.Report;
             job.Set("navigationSteps", taken); job.Set("navigationItems", items + 1);
-            // MMR-40: the read scene's settlement entities against the layout they were built from (one engine item, before the world goes).
+            // MMR-40: the read scene's settlement entities against the layout they were built from, before the world goes; MMR-258: in slices of
+            // about 25 ms like the routes (a look's hierarchy is larger).
             job.Report(null, null, "checking_settlement_entities");
-            var settlements = job.Engine("check settlement entities", () => SettlementEntityChecks.Run(world, prepared));
+            var settlements = new Dictionary<string, object>();
+            var entitySteps = SettlementEntityChecks.Steps(world, prepared, settlements).GetEnumerator();
+            int entityItems = 0;
+            while (job.Engine("check settlement entities " + entityItems, () =>
+            {
+                var watch = System.Diagnostics.Stopwatch.StartNew();
+                bool more;
+                do { more = entitySteps.MoveNext(); } while (more && watch.ElapsedMilliseconds < ValidationSliceMs);
+                return more;
+            })) entityItems++;
+            job.Set("settlementEntityItems", entityItems + 1);
             job.Set("settlementEntitiesPassed", settlements["passed"]); job.Set("settlementEntityPositionChecks", settlements["positionChecks"]);
             // MMR-41: the post-placement semantic route set through the engine, in slices like the navigation routes. The scene's previous report
             // goes first, so a run that stops before Persist leaves none.

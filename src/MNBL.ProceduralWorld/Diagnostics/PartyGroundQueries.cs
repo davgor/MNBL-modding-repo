@@ -57,7 +57,9 @@ namespace MNBL.ProceduralWorld.Diagnostics
             foreach (object value in (System.Collections.IEnumerable)manifest["extent"]) extent.Add(Convert.ToDouble(value, CultureInfo.InvariantCulture));
             Require(extent.Count == 2 && extent[0] == Extent && extent[1] == Extent, "Fixture must be 1040 by 1040.");
             var source = (Dictionary<string, object>)manifest["source"];
-            Require(Text(source, "kind") == "fwgc" && Convert.ToDouble(source["verticalScale"], CultureInfo.InvariantCulture) == .01, "Fixture source/scale mismatch.");
+            // MMR-278: the fixture records the vertical scale it was built with (the retained fixture is 0.01); heights use it, not a literal.
+            double verticalScale = Convert.ToDouble(source["verticalScale"], CultureInfo.InvariantCulture);
+            Require(Text(source, "kind") == "fwgc" && verticalScale > 0 && verticalScale <= 1, "Fixture source/scale mismatch.");
             string sourceHash = Hash(heightfieldPath);
             Require(String.Equals(sourceHash, Text(source, "sha256"), StringComparison.OrdinalIgnoreCase), "Heightfield does not match fixture manifest source hash.");
             string folder = Path.Combine(ModuleHelper.GetModuleFullPath(GeneratedMapSceneCreator.ModuleId), "SceneObj", GeneratedMapSceneCreator.Slot);
@@ -75,14 +77,14 @@ namespace MNBL.ProceduralWorld.Diagnostics
             Require(field.Side == 129, "Expected retained 129x129 campaign fixture source.");
             double low = double.PositiveInfinity, high = double.NegativeInfinity;
             for (int y = 0; y < field.Side; y++) for (int x = 0; x < field.Side; x++)
-            { double h = field.At(x, y) * .01; low = Math.Min(low, h); high = Math.Max(high, h); }
+            { double h = field.At(x, y) * verticalScale; low = Math.Min(low, h); high = Math.Max(high, h); }
             low = Math.Floor(low * 1000) / 1000; high = Math.Ceiling(high * 1000) / 1000;
             if (high <= low) high = low + 1;
             Require(Number(terrain.GetAttribute("min_height")) == low && Number(terrain.GetAttribute("max_height")) == high, "Source quantization range differs from installed fixture XML.");
             fixture.Side = field.Side; fixture.Heights = new double[field.Side * field.Side];
             for (int y = 0; y < field.Side; y++) for (int x = 0; x < field.Side; x++)
             {
-                double q = Math.Max(0, Math.Min(65535, Math.Round((field.At(x, y) * .01 - low) / (high - low) * 65535, MidpointRounding.ToEven)));
+                double q = Math.Max(0, Math.Min(65535, Math.Round((field.At(x, y) * verticalScale - low) / (high - low) * 65535, MidpointRounding.ToEven)));
                 fixture.Heights[y * field.Side + x] = low + q * ((high - low) / 65535);
             }
             report["fixture"] = new { folder, scene = GeneratedMapSceneCreator.Slot, module = GeneratedMapSceneCreator.ModuleId,

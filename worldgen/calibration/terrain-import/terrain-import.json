@@ -10,11 +10,13 @@
     ],
     "nodeCells": [
       32,
-      64
+      64,
+      128
     ],
     "gridSides": [
       129,
-      257
+      257,
+      513
     ],
     "square": true,
     "sharedNodeBorders": true,
@@ -26,7 +28,8 @@
     "heightLimit": 1000000,
     "heightmapLevel": {
       "32": 5,
-      "64": 6
+      "64": 6,
+      "128": 7
     },
     "origin": [
       0,
@@ -51,14 +54,10 @@
   "materials": {
     "slots": 16,
     "weightBits": 8,
-    "templateLayers": [
-      "grass",
-      "rock_k"
-    ],
-    "base": "slot 0 (grass) is written at full weight everywhere; slot 1 (rock_k) is painted over it by its weight",
-    "physics": "PHYM per node, x-major: stone where the rock weight >= 128, otherwise grass, for all four seasons",
-    "seasons": "winter enables snow physics on grass and disables rock_k (template check in surface.cpp)",
-    "encoderDefaultRock": "without compiled weights the encoder derives rock from slope: round-half-even(clamp((slope - 0.6) / 0.6, 0, 1) * 255)"
+    "layers": "the template's material layers are terrain-materials.json layerSet in slot order; weights.bin v2 (MNBLWT02) names them, and the encoder refuses a template whose layers differ (surface.cpp check_template, MMR-255)",
+    "base": "slot 0 is written at full weight everywhere; every other slot holds the over-compositing alpha of its target fraction (MMR-249: alpha-over from slot 15 down)",
+    "physics": "PHYM per node, x-major: the dominant visible layer's slot, identical for all four seasons",
+    "seasons": "per-season masks and layer variants never switch at run time (MMR-249), so every season carries the same mask and the same layer"
   },
   "navigation": {
     "encoderNavmesh": "33 x 33 vertices, 2048 faces, z offset 0.2; slope > 1 -> group 7 else group 1 (surface encoder diagnostic navmesh only; campaign navmesh is MMR-28/38)"
@@ -91,8 +90,13 @@
     },
     {
       "file": "src/WorldBridge/surface.cpp",
-      "fields": "check_template (4x4 nodes, grass then rock_k), make_grid (129 or 257, range, round-half-even), terrain (big-endian heights, slot 0 full, slot 1 weights, PHYM x-major), surface_main (extent rule)"
+      "fields": "check_template (4x4 nodes, grass then rock_k), make_grid (129, 257 or 513, range, round-half-even), terrain (big-endian heights, slot 0 full, slot 1 weights, PHYM x-major), surface_main (extent rule)"
+    },
+    {
+      "file": "evidence/probe/map-epic-2-probe.json",
+      "sha256": "ac231b677bc722f96971bb41bc699e6a07909679bd4da24dac9d805a36b91d3f",
+      "fields": "MMR-249: a level-7 terrain (4 x 4 nodes of 128 cells, 513 samples) read in 0.13 s, ready in 0.9 s, rendered cleanly at the main-thread cost of level 6 (decision terrain513 go)"
     }
   ],
-  "observedSides": "MMR-16 ran 129-vertex surfaces in the engine. 257 is accepted by the same encoder path (level 6) and was used by the MMR-63 periodic fixture (257 x 257, 1600 extent, run 12348); both are proven."
+  "observedSides": "MMR-16 ran 129-vertex surfaces in the engine. 257 is accepted by the same encoder path (level 6) and was used by the MMR-63 periodic fixture (257 x 257, 1600 extent, run 12348); both are proven. 513 (level 7, 128 cells per node) was proven by MMR-249's probe (map epic 2) and is the shaped surface side (MMR-278)."
 }

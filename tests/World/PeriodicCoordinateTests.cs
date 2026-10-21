@@ -174,6 +174,8 @@ internal static class PeriodicCoordinateTests
     {
         Check(p.PoleOf(600) == PeriodicWorldCoordinates.Pole.North && p.PoleOf(550) == PeriodicWorldCoordinates.Pole.North && p.PoleOf(1000) == PeriodicWorldCoordinates.Pole.South
               && p.PoleOf(1200) == PeriodicWorldCoordinates.Pole.South && p.PoleOf(601) == PeriodicWorldCoordinates.Pole.None, "the pole lines and the padding beyond them are poles; the rows between are not");
+        Check(p.ClampY(550) == 600 && p.ClampY(1250) == 1000 && p.ClampY(733.5) == 733.5 && p.ClampY(600) == 600 && p.ClampY(1000) == 1000,
+              "MMR-278 (RT-19): the camera's y is held between the pole lines (600 and 1000 physical); y between them is unchanged");
         Check(p.LocationKey(410, 600) == "N" && p.LocationKey(1100, 600) == "N" && p.LocationKey(20, 590) == "N" && p.LocationKey(700, 1000) == "S",
             "every x on a pole line is one location (pole alias): the north key is N everywhere, the south S");
         Check(p.SourceUid(410, 600) == "N" && p.SourceUid(1100, 601) == "N" && p.SourceUid(700, 999.5) == "S" && p.SourceUid(400, 800) == "r64c0",
@@ -290,7 +292,7 @@ internal static class PeriodicCoordinateTests
     // ---- the production layout of a real bundle ----
     private static void Layout(string bundleDirectory, SortedDictionary<string, object> evidence)
     {
-        var host = new WorldDataBundle.HostProfile("v1.4.8.119303", "v1.2.8.119303", new[] { "R01", "R02", "R03", "R04", "R05", "R06", "R07", "R08", "R09", "R10" });
+        var host = new WorldDataBundle.HostProfile("v1.4.8.119303", "v1.2.8.119303", WorldDataBundle.HostCapabilities);
         var bundle = WorldDataBundle.Open(bundleDirectory, host);
         var surface = WorldSurface.FromBundle(bundle);
         var c = PeriodicWorldCoordinates.FromSurface(surface);
@@ -303,9 +305,11 @@ internal static class PeriodicCoordinateTests
         Check(c.Identity == new PeriodicWorldCoordinates(800, 400, 400, 600, 1600, 128).Identity, "the bundle's policy identity is the production layout's");
         // Every settlement's source node (its uid names it: node = 1 + (row - 1) * 128 + column) is the SourceUid of its source point.
         var graph = (IDictionary<string, object>)Serializer.DeserializeObject(new UTF8Encoding(false).GetString(bundle.ReadVerified("compiled/travel/travel-graph.json")).TrimStart('\uFEFF'));
-        int settlements = 0, matched = 0; var mismatches = new List<object>();
+        int settlements = 0, matched = 0, synthesized = 0; var mismatches = new List<object>();
         foreach (IDictionary<string, object> s in (object[])graph["settlements"])
         {
+            // A village the quota synthesized (MMR-252) has no source node: its uid names its fortification's.
+            if (((string)s["uid"]).StartsWith("mnbl-quota-village:", StringComparison.Ordinal)) { synthesized++; continue; }
             settlements++;
             var m = System.Text.RegularExpressions.Regex.Match((string)s["uid"], @"(?:node-|surface-city-\d+-)(\d+)");
             var point = (IDictionary<string, object>)s["sourcePoint"];
@@ -315,7 +319,7 @@ internal static class PeriodicCoordinateTests
             string expected = "r" + ((node - 1) / 128 + 1).ToString(CultureInfo.InvariantCulture) + "c" + ((node - 1) % 128).ToString(CultureInfo.InvariantCulture);
             if (c.SourceUid(physical[0], physical[1]) == expected) matched++; else if (mismatches.Count < 3) mismatches.Add(new { uid = s["uid"], expected, got = c.SourceUid(physical[0], physical[1]) });
         }
-        Check(settlements > 0 && matched == settlements, "the SourceUid of every settlement's source point is the source node its uid names (" + matched + "/" + settlements + ")", mismatches);
+        Check(settlements > 0 && matched == settlements, "the SourceUid of every settlement's source point is the source node its uid names (" + matched + "/" + settlements + "; " + synthesized + " quota villages have none)", mismatches);
     }
 
     // ---- placement fixtures (MMR-63) ----

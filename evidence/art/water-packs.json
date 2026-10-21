@@ -1,0 +1,65 @@
+{
+ "schema": "mnbl.water-packs",
+ "version": 1,
+ "ticket": "MMR-247 (cluster W)",
+ "packs": [
+  "pack0.tpac"
+ ],
+ "rows": [
+  {
+   "name": "mnbl_water_surface_d",
+   "found": true,
+   "pack": "pack0.tpac",
+   "format": "BC7",
+   "width": 1024,
+   "height": 1024,
+   "flags": [
+    "has_alpha",
+    "dont_resize_in_atlas"
+   ],
+   "source": "$BASE/Modules/MNBL.ProceduralWorld/AssetSources/water_surface/mnbl_water_surface_d.png",
+   "problems": []
+  },
+  {
+   "name": "mnbl_water_surface_n",
+   "found": true,
+   "pack": "pack0.tpac",
+   "format": "BC5",
+   "width": 1024,
+   "height": 1024,
+   "flags": [],
+   "source": "$BASE/Modules/MNBL.ProceduralWorld/AssetSources/water_surface/mnbl_water_surface_n.png",
+   "problems": []
+  },
+  {
+   "name": "mnbl_water_surface_s",
+   "found": true,
+   "pack": "pack0.tpac",
+   "format": "DXT1",
+   "width": 1024,
+   "height": 1024,
+   "flags": [
+    "is_specularmap"
+   ],
+   "source": "$BASE/Modules/MNBL.ProceduralWorld/AssetSources/water_surface/mnbl_water_surface_s.png",
+   "problems": []
+  },
+  {
+   "name": "mnbl_water_surface",
+   "kind": "material",
+   "found": true,
+   "flags": [
+    "gbuffer_alpha_blend",
+    "use_albedo",
+    "render_on_terrain",
+    "use_normalmap",
+    "use_specular"
+   ],
+   "optionalAbsent": [
+    "do_not_blend_normals"
+   ]
+  }
+ ],
+ "problems": [],
+ "passed": true
+}

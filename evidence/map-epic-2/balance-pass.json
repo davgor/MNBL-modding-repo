@@ -1,0 +1,85 @@
+{
+ "schema": "mnbl.map2-balance-pass",
+ "version": 1,
+ "ticket": "MMR-247",
+ "by": "MMR-247 F (the acc6 fix batch)",
+ "run": "acc6",
+ "source": "build/acceptance/acc6: world 1 (seed 42, pid 4996) w1.speed, w1.soak (economyBefore/After, homeTerrain, census, events), w1.census0; baseline (pid 16588) base.soak; the kept bundles' cells.bin",
+ "policyChanges": [],
+ "caveats": [
+  "The generated soak ran from campaign day 91129 (about 52 days after world 1's start, after the season and cast steps); the vanilla soak from day 91078 (the sandbox start). Same length (30 days), not the same point in a campaign.",
+  "One 30-day soak on one world; long-run drift is not measured."
+ ],
+ "items": [
+  {
+   "id": "speed.Snow",
+   "policy": "worldgen/policies/roads.json speed.terrain.Snow = -0.15",
+   "observation": "In game (w1.speed) the Snow face's Terrain line is -0.239 on a 2.197 party speed (-10.9%; Desert -0.159 = -7.2%, Forest -0.478 = -21.7%). Snow is 182 of 1,898 land cells on world 1 (9.6%) and 671 of 3,736 on world 2 (18.0%); 8% of nord's and 9% of sturgia's home samples. The soak advanced 30 days with 0 stalls; one town changed hands by siege three times, no kingdom dissolved.",
+   "decision": "none",
+   "reason": "The term sits between vanilla's Desert (-0.1) and Forest (-0.3) factors as MMR-254 set it, and nothing in the soak points at snow: the cultures that live on it lost nothing to it (sturgia's Borrakrik 12 -> 11 fiefs, a castle to the kingdom it was at war with from day 0; the nord fiefs' kingdoms grew)."
+  },
+  {
+   "id": "speed.Swamp",
+   "policy": "worldgen/policies/roads.json speed.terrain.Swamp = -0.2",
+   "observation": "No Swamp land cell on world 1 or world 2 (cells.bin: A' Plain 45, Desert 498, Snow 182, Forest 301, Steppe 872; B' Plain 120, Desert 1,131, Snow 671, Forest 363, Steppe 1,451); w1.speed records Swamp absent (no face of the type). Marsh never wins a cell's corner majority; only a water-school live mutation makes Swamp, and acc6's cast was fire.",
+   "decision": "none",
+   "reason": "Nothing to measure in game: no generated world has a Swamp face, so the soak cannot show the term's effect. Test-PartySpeed covers the term offline and c7 grades Swamp n/a (owner default)."
+  },
+  {
+   "id": "speed.road",
+   "policy": "worldgen/policies/roads.json speed.road = 0.2 (chain Road, Naval, Default; no road term at sea; a ford cancelled on decks)",
+   "observation": "In game the Road line is +0.318 (+14.5%: 2.197 -> 2.515); a bridge on a road cancels the ford (-0.478 + 0.478) and keeps the road term. It offsets Desert fully and Forest partly. The soak shows armies reaching sieges (one town taken by siege three times), 9 clans joining kingdoms as mercenaries, 0 stalls.",
+   "decision": "none",
+   "reason": "Roads are the generated map's only speed bonus and vanilla has no road term to compare with; the soak shows no distorted movement, so there is no clear case for another value."
+  },
+  {
+   "id": "economy.tradeArea",
+   "policy": "economy.json townVillages 3 (and 2 per castle): the exact 3/2 rule the owner kept (RT-42)",
+   "observation": "Generated world 1 (45 towns, 26 castles, 187 villages) against the vanilla War Sails sandbox (57 towns, 307 villages), 30 days each: mean town prosperity 3,186 -> 3,213 (+0.9%) against 3,483 -> 3,448 (-1.0%); mean village hearth 364 -> 392 (+7.6%) against 319 -> 349 (+9.3%); mean town food 255 -> 318 (+25%) against 376 -> 259 (-31%); mean village stock 103 -> 94 (-8%) against 75 -> 101 (+34%); villages looted 7 -> 10 against 2 -> 7; mean town gold 33,320 -> 35,330 against 28,130 -> 33,465.",
+   "decision": "none",
+   "reason": "The rule is the owner's. Its cost over 30 days is a prosperity level 7-9% under vanilla's that does not erode (it rises where vanilla's falls), with town food rising and hearths growing at vanilla's pace: no starvation or decline to correct on this evidence."
+  },
+  {
+   "id": "home.aserai",
+   "observation": "Desert 72%, Forest 24%, Plain 3% (39 settlements, 319 face samples). The aserai kingdom (Strandformark) lost 4 of its 11 fiefs between day 0 and the soak's end, all to Halwegmark (vlandia, 17 fiefs), with which it was at war from day 0.",
+   "decision": "none",
+   "reason": "A desert home suits the culture; the losses follow the starting war against a larger kingdom, not the terrain."
+  },
+  {
+   "id": "home.battania",
+   "observation": "Forest 59%, Desert 38%, Steppe 3%, Plain 1% (36 settlements); no battania kingdom on world 1, its 6 houses in other kingdoms.",
+   "decision": "none",
+   "reason": "Mostly forest, which suits the culture; nothing in the soak to correct."
+  },
+  {
+   "id": "home.empire",
+   "observation": "Forest 53%, Desert 31%, Plain 9%, Steppe 7% (41 settlements). The empire kingdom (Torsirlrik) grew from 14 to 16 fiefs.",
+   "decision": "none",
+   "reason": "Mixed ground with no culture-specific penalty that the soak shows; the kingdom gained fiefs."
+  },
+  {
+   "id": "home.khuzait",
+   "observation": "Forest 88%, Plain 12% (16 settlements, 108 face samples): RT-27's case (findings: forest cuts cavalry by 0.2/0.15 and horse archers by 0.3/0.25 in auto-resolve; biome-presentation.md measured 81% offline). No khuzait kingdom on world 1 (the five are vlandia twice, sturgia, aserai, empire); the 4 khuzait houses (2 in Strandformark, 1 in Borrakrik, 1 in Verlinmark) kept every fief and every member through the soak, one gained a fief.",
+   "decision": "none",
+   "reason": "The soak shows no cost of the forest home. The remedy biome-presentation.md names (culture-presentations.json human_large_island -> battania, or a vlandia/empire swap) changes every world's factions and the factions.json pin: not a conservative change and not justified on this evidence. Left to the owner."
+  },
+  {
+   "id": "home.nord",
+   "observation": "Steppe 69%, Forest 14%, Desert 9%, Snow 8% (35 settlements); the nord fiefs sit in Torsirlrik (7) and Halwegmark (2), and both kingdoms grew.",
+   "decision": "none",
+   "reason": "Cold steppe suits the culture; nothing in the soak to correct."
+  },
+  {
+   "id": "home.sturgia",
+   "observation": "Steppe 63%, Forest 26%, Snow 9%, Plain 1%, Desert 1% (19 settlements). Borrakrik (sturgia) went from 12 to 11 fiefs (an empire-culture castle lost to Verlinmark, at war from day 0).",
+   "decision": "none",
+   "reason": "Steppe, forest and snow are sturgia's vanilla ground; one castle lost in a starting war is no terrain signal."
+  },
+  {
+   "id": "home.vlandia",
+   "observation": "Forest 44%, Desert 37%, Plain 11%, Steppe 8% (72 settlements). The two vlandia kingdoms grew (Halwegmark 17 -> 19, Verlinmark 17 -> 18 fiefs).",
+   "decision": "none",
+   "reason": "Mixed ground under a cavalry culture, but both vlandia kingdoms gained fiefs; nothing to correct."
+  }
+ ]
+}

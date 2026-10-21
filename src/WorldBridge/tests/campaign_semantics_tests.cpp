@@ -3,6 +3,7 @@
 // sovereigns, realm-less lords and notables, village and town notables, legends, missing names and name collisions,
 // all four harbour variants, garrisoned and ungarrisoned fortresses, exclusions after placement, producer limits,
 // minima, every reference check and every refusal.
+#include <algorithm>
 #include <filesystem>
 #include <fstream>
 #include <functional>
@@ -44,11 +45,11 @@ source::SourceWorld world() {
         source::City c; c.site_id = site; c.uid = uid; c.name = name; c.kind = "city"; c.civilization_id = civ; c.culture_id = culture; c.city_class = "small"; c.population_estimate = 1000 + site;
         return c;
     };
-    w.cities = {city(0, "city-a", "Alpha", "human_maritime", "cul-a"), city(1, "city-b", "Beta", "human_maritime", "cul-a"), city(2, "city-c", "Alpha", "dwarf", "cul-c")};
+    w.cities = {city(0, "city-a", "Alpha", "human_maritime", "cul-a"), city(1, "city-b", "Beta", "human_maritime", "cul-a"), city(2, "city-c", "Alpha (Age 2)", "dwarf", "cul-c")};
     w.cultures = {{"cul-a", "human_maritime", {0, 1}}, {"cul-c", "dwarf", {2}}};
     source::Realm a; a.uid = "realm-a"; a.name = "Aster"; a.english_name = "Realm of Aster"; a.civilization_id = "human_maritime"; a.civilization_name = "Maritime humans";
     a.parent_race_id = "human"; a.culture_id = "cul-a"; a.capital_uid = "city-a"; a.city_uids = {"city-a", "city-b"}; a.sovereign_uid = "hero-sov-a";
-    source::Realm c; c.uid = "realm-c"; c.name = "Carn"; c.english_name = "Realm of Carn"; c.civilization_id = "dwarf"; c.civilization_name = "Dwarves";
+    source::Realm c; c.uid = "realm-c"; c.name = "Carn (age 1)"; c.english_name = "Realm of Carn"; c.civilization_id = "dwarf"; c.civilization_name = "Dwarves";
     c.parent_race_id = "dwarf"; c.culture_id = "cul-c"; c.capital_uid = "city-c"; c.city_uids = {"city-c"};
     w.realms = {a, c};
     auto person = [](const char* uid, const char* role, const char* status, const char* realm, const char* home) {
@@ -63,7 +64,7 @@ source::SourceWorld world() {
                 person("hero-keeper", "keeper", "living", nullptr, nullptr), person("hero-heresiarch", "heresiarch", "living", nullptr, nullptr),
                 person("hero-reeve", "reeve", "living", "realm-a", "city-a"), person("hero-reeve2", "reeve", "living", "realm-c", "city-c"),
                 person("hero-harbour", "harbourmaster", "living", "realm-a", "city-a")};
-    w.people[0].display_name = "Asterix the Bold";
+    w.people[0].display_name = "Asterix the Bold (Age 2)";
     w.people[8].presence_kind = "hamlet"; w.people[8].presence_uid = "ham-1";
     w.people[10].presence_kind = "port"; w.people[10].presence_uid = "coastal-0-0";
     auto hamlet = [](const char* uid, std::int64_t core, const char* role, std::optional<std::int64_t> sea, double quality = 0) {
@@ -76,6 +77,15 @@ source::SourceWorld world() {
     source::Castle f1; f1.uid = "fort-1"; f1.kind = "fortress"; f1.core_uid = "city-b"; f1.garrisoned = true; f1.culture_id = "cul-a";
     source::Castle f2; f2.uid = "fort-2"; f2.kind = "fortress"; f2.core_uid = ""; f2.garrisoned = false; f2.culture_id = "cul-c";
     w.castles = {f1, f2};
+    // MMR-286: one civilization's naming heritage (the dwarves have none: the cleaner's neutral roots), a dwarf resident for the regent and
+    // two ruins of one source name.
+    source::HeritageEntry maritime; maritime.civilization_id = "human_maritime"; maritime.naming_pattern = "given_plus_vessel";
+    maritime.lexicon = {{"field", "fen"}, {"gate", "por"}, {"hall", "sal"}, {"harbour", "mar"}, {"hill", "tor"}, {"old", "eld"}, {"realm", "mark"}, {"shore", "strand"},
+                        {"stone", "kor"}, {"water", "dun"}};
+    w.heritage = {maritime};
+    source::Npc durin; durin.uid = "npc-durin"; durin.name = "Durin (Age 1)"; durin.civilization_id = "dwarf"; durin.post = "commander"; durin.female = true; durin.known_sex = true;
+    w.residents = {durin};
+    w.ruins = {{"ruin-1", "Fenpor (Age 1)", "human_maritime"}, {"ruin-2", "Fenpor (Age 2)", "human_maritime"}};
     return w;
 }
 
@@ -112,7 +122,7 @@ void compile_tests() {
     for (const auto& v : c.villages) traceable(v.id, "village", v.uid);
     for (const auto& k : c.castles) traceable(k.id, "castle", k.uid);
     for (const auto& k : c.kingdoms) traceable(k.id, "kingdom", k.uid);
-    for (const auto& k : c.clans) traceable(k.id, "clan", k.uid);
+    for (const auto& k : c.houses) traceable(k.id, "clan", k.uid);
     for (const auto& h : c.heroes) traceable(h.id, "hero", h.uid);
     check(traced && c.id_map.size() == 3 + 6 + 2 + 2 + 2 + 11, "every record id is in the id map with its kind and source uid (26 entries)");
     check(ids::Registry("mnbl_00000000").assign("town", "city-a") == c.towns[0].id.substr(0, 5) + "00000000" + c.towns[0].id.substr(13),
@@ -122,13 +132,14 @@ void compile_tests() {
     const auto* ka = by_uid(c.kingdoms, "realm-a");
     const auto* kc = by_uid(c.kingdoms, "realm-c");
     const auto* sov = by_uid(c.heroes, "hero-sov-a");
-    check(ka && sov && ka->ruler_id == sov->id && sov->ruler && sov->name == "Asterix the Bold" && ka->presentation == "empire" && ka->civilization_name == "Maritime humans" &&
+    check(ka && sov && ka->ruler_id == sov->id && sov->ruler && sov->name == "Asterix the Bold" && sov->source_name == "Asterix the Bold (Age 2)" && ka->presentation == "empire" && ka->civilization_name == "Maritime humans" &&
           sov->presentation == "empire" && sov->race_id == "human", "realm A: kingdom ruled by its sovereign, presented as empire; the hero keeps its race and presentation");
     const auto* regent = by_uid(c.heroes, "regent:realm-c");
-    check(kc && regent && kc->ruler_id == regent->id && regent->provenance.find("synthesized") == 0 && regent->name == "Regent of Carn" && kc->presentation == "sturgia" &&
-          kc->parent_race_id == "dwarf" && regent->race_id == "dwarf" && regent->presentation == "sturgia", "nullable sovereign: realm C gets a synthesized regent of its parent race");
+    check(kc && regent && kc->ruler_id == regent->id && regent->provenance.find("synthesized") == 0 && regent->name == "Durin" && regent->given == "Durin" && regent->female &&
+          has(regent->provenance, "resident npc-durin") && kc->name == "Carn" && kc->source_name == "Carn (age 1)" && kc->presentation == "sturgia" &&
+          kc->parent_race_id == "dwarf" && regent->race_id == "dwarf" && regent->presentation == "sturgia", "nullable sovereign: realm C gets a synthesized regent of its parent race, named after an FWGC++ resident (with her sex); Age tags leave kingdom names");
     const auto* castellan = by_uid(c.heroes, "hero-castellan");
-    const auto* clan_c = by_uid(c.clans, "clan:realm-c");
+    const auto* clan_c = by_uid(c.houses, "house:realm-c");
     check(castellan && clan_c && castellan->clan_id == clan_c->id && clan_c->leader_id == regent->id && clan_c->members.size() == 2 && clan_c->name == "House of Carn",
           "lords join their realm's ruling clan; the regent leads it");
     const auto* dom = by_uid(c.heroes, "hero-dom");
@@ -154,13 +165,35 @@ void compile_tests() {
     check(reeve2 && town_c && reeve2->occupation == "Headman" && reeve2->settlement_kind == "town" && reeve2->settlement_id == town_c->id && has(reeve2->provenance, "no hamlet presence"),
           "a reeve without a hamlet presence falls back to its home town, with provenance");
     check(c.not_instantiated.size() == 1 && c.not_instantiated[0] == "hero-legend" && !by_uid(c.heroes, "hero-legend"), "legends are recorded, not instantiated");
-    check(town_a && town_a->capital && town_a->owner_clan_id == ka->ruling_clan_id && town_a->villages.size() == 3 && town_a->port && town_a->culture_uid == "cul-a" &&
+    check(town_a && town_a->capital && town_a->owner_clan_id == ka->ruling_house_id && town_a->villages.size() == 3 && town_a->port && town_a->culture_uid == "cul-a" &&
           town_a->culture_provenance.find("source") == 0, "town A: capital, owned by the ruling clan, three villages, a port, its core's culture");
-    check(town_c && town_c->name == "Alpha 2" && has(town_c->name_provenance, "disambiguated"), "a repeated source name is disambiguated with the ordinal");
-    std::vector<std::string> names;
-    for (const auto& v : c.villages) names.push_back(v.name);
-    check(names == std::vector<std::string>{"Alpha Fields", "Alpha Harbour", "Alpha Fields 2", "Alpha 2 Fishery", "Beta Harbour", "Alpha 2 Landing"},
-          "nameless hamlets get synthesized, unique village names in UID order");
+    check(town_c && town_c->name.rfind("Alpha", 0) == 0 && town_c->name.size() > 5 && town_c->name.find(' ') == std::string::npos && !names::has_numeral(town_c->name) &&
+          town_c->source_name == "Alpha (Age 2)" && has(town_c->name_provenance, "lexicon suffix"),
+          "a repeated source name loses its Age tag and is told apart by a lexicon suffix, never an ordinal: " + (town_c ? town_c->name : std::string()));
+    std::set<std::string> names;
+    bool coined = true;
+    for (const auto& t : c.towns) names.insert(t.name);
+    for (const auto& v : c.villages) coined = coined && !v.name.empty() && names.insert(v.name).second && !names::has_numeral(v.name) && v.name.find(' ') == std::string::npos;
+    for (const auto& k : c.castles) coined = coined && !k.name.empty() && names.insert(k.name).second && !names::has_numeral(k.name);
+    auto ends = [](const std::string& name, std::initializer_list<const char*> roots) {
+        for (const char* r : roots) { const std::string x(r); if (name.size() > x.size() && name.compare(name.size() - x.size(), x.size(), x) == 0) return true; }
+        return false;
+    };
+    const auto* ham3 = by_uid(c.villages, "ham-3");
+    const auto* ham2 = by_uid(c.villages, "ham-2");
+    const auto* fort1 = by_uid(c.castles, "fort-1");
+    check(coined && ham1 && ham3 && ham2 && fort1 && ends(ham1->name, {"fen"}) && ends(ham3->name, {"fen"}) && ends(ham2->name, {"mar", "dun", "strand"}) &&
+          ends(fort1->name, {"kor", "tor", "sal", "por"}) && has(ham1->name_provenance, "lexicon roots"),
+          "villages and castles are coined from their civilization's lexicon roots of their kind's concepts, unique among all settlements, no numerals (" +
+          (ham1 ? ham1->name : std::string()) + ", " + (ham2 ? ham2->name : std::string()) + ", " + (fort1 ? fort1->name : std::string()) + ")");
+    const Compiled twice = campaign::compile(world(), content, cultures, kWorldSha);
+    bool stable = twice.villages.size() == c.villages.size() && twice.castles.size() == c.castles.size();
+    for (std::size_t i = 0; stable && i < c.villages.size(); ++i) stable = twice.villages[i].name == c.villages[i].name;
+    for (std::size_t i = 0; stable && i < c.castles.size(); ++i) stable = twice.castles[i].name == c.castles[i].name;
+    check(stable, "coined names are the same on a re-run");
+    check(c.ruins.size() == 2 && c.ruins[0].name == "Fenpor" && c.ruins[0].source_name == "Fenpor (Age 1)" && c.ruins[1].name.rfind("Fenpor", 0) == 0 &&
+          c.ruins[1].name != "Fenpor" && !names::has_numeral(c.ruins[1].name) && c.ruins[1].source_name == "Fenpor (Age 2)",
+          "ruins: Age tags stripped, unique by a lexicon suffix, the source name kept");
     const auto* combined = by_uid(c.villages, "ham-2");
     const auto* fishing = by_uid(c.villages, "ham-4");
     const auto* harbor = by_uid(c.villages, "ham-5");
@@ -176,8 +209,8 @@ void compile_tests() {
           "each town's port collects its harbour villages only");
     const auto* f1 = by_uid(c.castles, "fort-1");
     const auto* f2 = by_uid(c.castles, "fort-2");
-    check(f1 && f1->owner_clan_id == ka->ruling_clan_id && f1->garrison_town_id == town_b->id && f1->name == "Beta Watch", "a garrisoned fortress is owned through its garrison city");
-    check(f2 && f2->owner_clan_id == clan_c->id && f2->garrison_town_id.empty() && f2->name == "Carn Hold" && has(f2->owner_provenance, "culture"),
+    check(f1 && f1->owner_clan_id == ka->ruling_house_id && f1->garrison_town_id == town_b->id, "a garrisoned fortress is owned through its garrison city");
+    check(f2 && f2->owner_clan_id == clan_c->id && f2->garrison_town_id.empty() && !f2->name.empty() && has(f2->owner_provenance, "culture"),
           "an ungarrisoned fortress is owned by the realm of its culture");
     // Slots: decided here or owned downstream, never silent.
     bool typed = !town_a->slots.empty() && !combined->slots.empty() && !c.ports[0].slots.empty() && !sov->slots.empty();
@@ -192,13 +225,14 @@ void compile_tests() {
     for (const auto& r : c.rules) rules = rules && (r.status == "ok" ? r.actual >= r.minimum : r.status == "deferred" && r.rule == "playerAliases");
     check(rules, "every minimum holds; the player aliases are deferred to the registry (MMR-30)");
     check(c.towns.size() == 3 && c.villages.size() == 6 && c.castles.size() == 2, "settlement counts preserved: nothing added or dropped");
-    // c4: towns without names get the policy name, with an ordinal when two collide.
+    // c4: towns without names get coined names (lexicon roots of names.places.town), unique without numerals.
     auto nameless = world(); nameless.cities[0].name = ""; nameless.cities[1].name = "";
     const Compiled n = campaign::compile(nameless, content, cultures, kWorldSha);
     const auto* na = by_uid(n.towns, "city-a");
     const auto* nb = by_uid(n.towns, "city-b");
-    check(na && nb && na->name == "Aster Town" && nb->name == "Aster Town 2" && na->name_provenance.find("synthesized") == 0 && nb->name_provenance.find("synthesized") == 0,
-          "nameless cities of one realm become 'Aster Town' and 'Aster Town 2', marked synthesized");
+    check(na && nb && !na->name.empty() && na->name != nb->name && !names::has_numeral(na->name) && !names::has_numeral(nb->name) &&
+          na->name_provenance.find("synthesized") == 0 && nb->name_provenance.find("synthesized") == 0 && na->source_name.empty(),
+          "nameless cities get distinct coined names, marked synthesized (" + (na ? na->name : std::string()) + ", " + (nb ? nb->name : std::string()) + ")");
     std::set<std::string> civilizations;
     for (const auto& [civ, culture] : cultures.presentation) civilizations.insert(civ);
     check(civilizations == std::set<std::string>{"human_maritime", "human_desert", "human_cold", "human_large_island", "human_rainforest", "human_heartland",
@@ -220,6 +254,31 @@ void compile_tests() {
     refused("excluding a town", "preserved_settlement", [&] { Compiled x = c; campaign::exclude(x, town_a->id, "test"); });
     refused("excluding an unknown id", "broken_join", [&] { Compiled x = c; campaign::exclude(x, "mnbl_nope", "test"); });
     refused("excluding without a reason", "missing_field", [&] { Compiled x = c; campaign::exclude(x, combined->id, ""); });
+    // Map epic 2 (MMR-252): villages bound to castles close, and exclude() erases only the ports it empties (RT-12).
+    Compiled k = c;
+    const std::string castle_id = by_uid(k.castles, "fort-1")->id;
+    for (auto& v : k.villages)
+        if (v.id == ham1->id) {
+            v.bound_id = castle_id; v.bound_kind = "castle"; v.origin = "reassigned";
+            for (auto& t : k.towns) t.villages.erase(std::remove(t.villages.begin(), t.villages.end(), v.id), t.villages.end());
+            for (auto& x : k.castles) if (x.id == castle_id) x.villages.push_back(v.id);
+        }
+    check(campaign::closure_problems(k).empty() && campaign::records_document(k, content, cultures).find("\"boundKind\":\"castle\"") != std::string::npos,
+          "a village bound to a castle that lists it keeps the records closed (campaign v2 boundKind)");
+    Compiled unlisted = k;
+    for (auto& x : unlisted.castles) x.villages.clear();
+    check(!campaign::closure_problems(unlisted).empty(), "a village bound to a castle that does not list it breaks closure");
+    refused("excluding a castle with a bound village", "broken_join", [&] { Compiled x = k; campaign::exclude(x, castle_id, "test"); });
+    Compiled kx = k;
+    campaign::exclude(kx, ham1->id, "quota: test");
+    check(by_uid(kx.castles, "fort-1")->villages.empty() && campaign::closure_problems(kx).empty(), "excluding a castle's village removes it from the castle and keeps closure");
+    Compiled forced = c;
+    campaign::Port empty_port; empty_port.town_id = by_uid(forced.towns, "city-b")->id; empty_port.forced = true;
+    forced.ports.push_back(empty_port);
+    const std::size_t before = forced.ports.size();
+    campaign::exclude(forced, ham1->id, "no site (test)");
+    check(forced.ports.size() == before && std::any_of(forced.ports.begin(), forced.ports.end(), [&](const campaign::Port& p) { return p.forced && p.village_ids.empty(); }),
+          "excluding a village leaves a forced port that never had a village (only the ports an exclusion empties are erased, RT-12)");
 }
 
 void escaping_tests() {
@@ -294,8 +353,10 @@ void refusal_tests() {
     mutated(content_file, "content_settlement_kind_unknown", "\"settlement\": \"village\"", "\"settlement\": \"castle\"", "unmapped_category", false);
     mutated(content_file, "content_settlement_kind_missing", "\"settlement\": \"town\",", "", "unmapped_category", false);
     mutated(content_file, "content_unknown_rule", "\"rule\": \"towns\"", "\"rule\": \"bridges\"", "unmapped_category", false);
-    mutated(content_file, "content_ordinal_without_n", "\"ordinal\": \"{name} {n}\"", "\"ordinal\": \"{name}\"", "invalid_template", false);
-    mutated(content_file, "content_unknown_placeholder", "\"town\": \"{realm} Town\"", "\"town\": \"{kingdom} Town\"", "invalid_template", false);
+    mutated(content_file, "content_unknown_placeholder", "\"rulingClan\": \"House of {realm}\"", "\"rulingClan\": \"House of {kingdom}\"", "invalid_template", false);
+    mutated(content_file, "content_numerals_allowed", "\"numerals\": false", "\"numerals\": true", "unmapped_category", false);
+    mutated(content_file, "content_role_label", "\"harbour\": false,\n      \"concepts\"", "\"harbour\": false,\n      \"label\": \"Fields\",\n      \"concepts\"", "unknown_field", false);
+    mutated(content_file, "content_concept_not_a_word", "\"field\",", "\"Field 2\",", "wrong_type", false);
     mutated(culture_file, "culture_unofficial", "\"culture\": \"aserai\"", "\"culture\": \"looters\"", "unmapped_category", true);
     mutated(culture_file, "culture_duplicate", "{\"civilization\": \"human_desert\"", "{\"civilization\": \"human_maritime\"", "duplicate_id", true);
 }

@@ -519,14 +519,16 @@ internal static class RegistrationTests
     // The compiler's records (MMR-27 ids, read from the verified MMR-29 bundle) plan without a problem.
     private static void CompilerRecords(string bundleDir)
     {
-        var host = new WorldDataBundle.HostProfile("v1.4.8.119303", "v1.2.8.119303", new[] { "R01", "R02", "R03", "R04", "R05", "R06", "R07", "R08", "R09", "R10" });
+        var host = new WorldDataBundle.HostProfile("v1.4.8.119303", "v1.2.8.119303", WorldDataBundle.HostCapabilities);
         var bundle = WorldDataBundle.Open(bundleDir, host);
         var text = new UTF8Encoding(false).GetString(bundle.ReadVerified("compiled/campaign/campaign.json"));
         var campaign = (Dictionary<string, object>)new JavaScriptSerializer { MaxJsonLength = Int32.MaxValue }.DeserializeObject(text);
         var counts = (Dictionary<string, object>)campaign["counts"];
         var plan = RegistrationPlan.FromCompilerRecords(campaign);
         var problems = plan.Problems((t, i) => false, (t, i) => true);
-        int expected = 2 * (int)counts["heroes"] + (int)counts["kingdoms"] + (int)counts["clans"] + 2 * ((int)counts["towns"] + (int)counts["castles"]) + 2 * (int)counts["villages"];
+        // campaign.json v2: the clans are the houses, the mercenary companies and the outlaw clans (MMR-280).
+        int minorClans = ((object[])campaign["mercenaryCompanies"]).Length + ((object[])campaign["outlawClans"]).Length;
+        int expected = 2 * (int)counts["heroes"] + (int)counts["kingdoms"] + (int)counts["houses"] + minorClans + 2 * ((int)counts["towns"] + (int)counts["castles"]) + 2 * (int)counts["villages"];
         Check(problems.Count == 0 && plan.Objects.Count == expected && plan.Objects.All(o => o.Generated && (CampaignIdentity.IsCompilerId(o.Id) || o.Id.EndsWith("_component"))) &&
               plan.WorldPrefix == CampaignIdentity.WorldPrefix((string)((Dictionary<string, object>)((object[])campaign["towns"])[0])["id"]),
               "the real world's compiler records (" + plan.Objects.Count + " objects) plan in the proven order with compiler ids, no early reference and no duplicate" +

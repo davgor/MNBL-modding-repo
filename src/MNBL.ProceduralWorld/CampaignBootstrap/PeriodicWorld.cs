@@ -36,6 +36,8 @@ namespace MNBL.ProceduralWorld.CampaignBootstrap
         public bool IsCanonical(float x) { return x >= OriginX && x < MaxX; }
         public float Canonical(float x) { return Coordinates.CanonicalX(x); }
         public float LogicalX(float x) { return (float)Coordinates.LogicalX(x); }
+        // MMR-278 (RT-19): y held between the pole lines, in single precision.
+        public float ClampY(float y) { return (float)Coordinates.ClampY(y); }
 
         // Signed shortest x difference b - a on the circle, in (-Width/2, Width/2] (the half width resolves east, +).
         public float DeltaX(float a, float b) { return (float)Coordinates.DeltaX(a, b); }

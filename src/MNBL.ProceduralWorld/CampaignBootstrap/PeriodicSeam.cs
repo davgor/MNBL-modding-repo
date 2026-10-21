@@ -36,7 +36,13 @@ namespace MNBL.ProceduralWorld.CampaignBootstrap
             {
                 var campaign = Campaign.Current;
                 if (campaign != null) { campaign.TimeControlMode = CampaignTimeControlMode.Stop; campaign.SetTimeControlModeLock(true); }
-                if (!frozen) { frozen = true; InformationManager.DisplayMessage(new InformationMessage("This periodic world cannot run: its periodic patches did not apply (" + (PeriodicPatches.LastError ?? "unknown").Split('\n')[0] + ").")); }
+                if (!frozen)
+                {
+                    frozen = true;
+                    var text = new TaleWorlds.Localization.TextObject(Persistence.LoadPolicy.Texts.PeriodicFrozen);
+                    text.SetTextVariable("REASON", (PeriodicPatches.LastError ?? "unknown").Split('\n')[0]);
+                    InformationManager.DisplayMessage(new InformationMessage(text.ToString()));
+                }
                 return;
             }
             PeriodicSeam.RebaseAll();

@@ -124,6 +124,7 @@ std::string state_json(const State& s) {
         item.set("producerOutcome", Value::string(a.producer_outcome));
         item.set("reasons", reasons_value(a.reasons));
         item.set("worldContentId", Value::string(a.world_content_id));
+        item.set("cities", a.cities ? Value::integer(*a.cities) : Value());
         Value history; history.kind = Value::Kind::Array;
         for (const auto& h : a.history) {
             Value run = Value::object();
@@ -198,6 +199,12 @@ State load_state(const fs::path& file) {
         a.producer_outcome = str(need(item, "producerOutcome"));
         a.world_content_id = str(need(item, "worldContentId"));
         a.reasons = reasons_of(need(item, "reasons"));
+        const Value& cities = need(item, "cities");
+        if (cities.kind != Value::Kind::Null) {
+            const auto n = num(cities);
+            if (n < 0) throw Error("out_of_range", "cities must be a non-negative integer or null", cities.at);
+            a.cities = static_cast<std::uint64_t>(n);
+        }
         const Value& history = need(item, "history");
         if (history.kind != Value::Kind::Array) throw Error("wrong_type", "history must be an array", history.at);
         for (const auto& h : history.items)
@@ -269,7 +276,7 @@ State run(const identity::GenerationRequest& request, const fs::path& state_file
         }
         Attempt& a = s.attempts.back();
         if (a.runs > 0) a.history.push_back(Run{a.runs, a.state, a.failure, a.producer_outcome, a.reasons});  // keep the interrupted run's record
-        a.state = "running"; a.runs++; a.reasons.clear(); a.failure = "none"; a.producer_outcome.clear();
+        a.state = "running"; a.runs++; a.reasons.clear(); a.failure = "none"; a.producer_outcome.clear(); a.cities.reset();
         save_state(state_file, s);
         const std::string recipe = identity::recipe_bytes(request, a.seed);
         if (cjson::sha256_hex(recipe) != a.recipe_sha256) throw Error("state_request_mismatch", "Recipe bytes differ from the persisted attempt", state_at);
@@ -283,6 +290,7 @@ State run(const identity::GenerationRequest& request, const fs::path& state_file
         }
         a.producer_outcome = result.producer_outcome;
         a.reasons = result.reasons;
+        a.cities = result.cities;
         a.failure = failure_name(result.failure);
         switch (result.failure) {
         case Failure::none:

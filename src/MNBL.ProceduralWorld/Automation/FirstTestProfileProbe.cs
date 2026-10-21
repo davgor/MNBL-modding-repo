@@ -324,7 +324,7 @@ namespace MNBL.ProceduralWorld.Automation
 
         // ---------------------------------------------------------------- the world's geography and routes
 
-        // The bundle's compiled terrain and travel cells: the files' hashes; the cell classes (MNBLTC01: cols, rows, class bytes, OpenSea flags)
+        // The bundle's compiled terrain and travel cells: the files' hashes; the cell classes (MNBLTC02: cols, rows, class bytes, OpenSea flags, land types, flags)
         // counted; the coastline as the land and mountain cells with a sea, lake or river 4-neighbour (columns wrap), its mask hashed; land
         // components of land and mountain cells (4-neighbour, wrapping); the compiler's own land components; the class grid itself (base64) so
         // A and B can be compared cell by cell.
@@ -339,7 +339,7 @@ namespace MNBL.ProceduralWorld.Automation
                 record["files"] = new Dictionary<string, object> { ["height-q16.bin"] = sha("compiled/terrain/height-q16.bin"), ["heightfield.bin"] = sha("compiled/terrain/heightfield.bin"),
                     ["masks.bin"] = sha("compiled/terrain/masks.bin"), ["cells.bin"] = sha("compiled/travel/cells.bin"), ["travel-graph.json"] = sha("compiled/travel/travel-graph.json") };
                 var bytes = File.ReadAllBytes(Path.Combine(dir, "compiled", "travel", "cells.bin"));
-                if (System.Text.Encoding.ASCII.GetString(bytes, 0, 8) != "MNBLTC01") throw new InvalidDataException("cells.bin is not MNBLTC01");
+                if (System.Text.Encoding.ASCII.GetString(bytes, 0, 8) != MNBL.ProceduralWorld.Surface.TravelCells.Magic) throw new InvalidDataException("cells.bin is not " + MNBL.ProceduralWorld.Surface.TravelCells.Magic);
                 int cols = BitConverter.ToInt32(bytes, 8), rows = BitConverter.ToInt32(bytes, 12), n = cols * rows;
                 var cls = new byte[n]; Array.Copy(bytes, 16, cls, 0, n);
                 int openSea = 0; for (int i = 0; i < n && 16 + n + i < bytes.Length; i++) if (bytes[16 + n + i] != 0) openSea++;
@@ -389,10 +389,8 @@ namespace MNBL.ProceduralWorld.Automation
                 record["playabilityRoutes"] = job.Artifacts.ContainsKey("playabilityRoutes") ? job.Artifacts["playabilityRoutes"] : null;
                 record["playabilityRoutesFailed"] = job.Artifacts.ContainsKey("playabilityRoutesFailed") ? job.Artifacts["playabilityRoutesFailed"] : null;
                 if (!File.Exists(path)) { record["error"] = "no persisted navigation report"; return record; }
-                var json = new JavaScriptSerializer { MaxJsonLength = Int32.MaxValue };
-                var wrapper = (IDictionary<string, object>)json.DeserializeObject(File.ReadAllText(path));
-                var report = (IDictionary<string, object>)json.DeserializeObject((string)wrapper["report"]);
-                record["reportIsTheJobs"] = Equals(wrapper.ContainsKey("reportSha256") ? wrapper["reportSha256"] : null, job.Get<string>("navigationReportSha256"));
+                var report = MNBL.ProceduralWorld.Surface.NavigationGate.ReadAt(path, scene);   // MMR-247: the one reader of the persisted record
+                record["reportIsTheJobs"] = Equals(report["reportSha256"], job.Get<string>("navigationReportSha256"));
                 record["summary"] = report["summary"];
                 var build = (IDictionary<string, object>)report["build"];
                 record["facesByTerrainType"] = build["facesByTerrainType"]; record["faces"] = build["faces"];

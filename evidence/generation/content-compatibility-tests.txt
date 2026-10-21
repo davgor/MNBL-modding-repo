@@ -1,0 +1,18 @@
+ok    the captured catalog the policies were made from passes the reduced pin (6272 objects, 6 tolerated closure problems of its own)
+ok    the pin covers only what a world can reference, by key, element and read fields: 6272 of 8072 installed objects, no Calradian lord, kingdom or hero but main_hero (BodyProperty 74, CraftingPiece 952, CraftingTemplate 12, Culture 17, EquipmentRoster 1659, Faction 10, Hero 1, Item 1177, ItemModifierGroup 19, LocationComplexTemplate 6, MissionShip 31, Monster 2, NPCCharacter 1178, PartyTemplate 151, Settlement 540, ShipHull 31, ShipPhysicsReference 1, ShipSlot 10, ShipUpgradePiece 77, SkillSet 290, WeaponDescription 22, WorkshopType 12)
+ok    setup: a module adding an item, a troop and a wanderer template that carries the item passes the content check
+ok    activation: world A builds and validates with the module (1345 declared objects, graph 9244f95521e5); load: rebuilt from the frozen catalog, its 8 documents are byte for byte the activation's
+ok    load: the live catalog with the module passes the load's check of the 4473 installed objects world A references (not the 6272 pinned)
+ok    a balance patch (Item.a_aserai_scale_b_shoulder_a's value and weight, NPCCharacter.armed_trader_aserai's skills and level) passes setup and the load's check, and the world still rebuilds from its frozen copies
+ok    setup: a module changing Item.a_aserai_scale_b_shoulder_a's type is refused, naming the module and the object in a localizable message ({=mnbl_err_content_changed_mod}The module {MODULE} changes {OBJECT} in what generated worlds read from it. MODULE=MNBLTestChangesItem)
+ok    load: an item the world references, removed by a module's XSLT, refuses the load naming the module and the object in a localizable message ({=mnbl_load_content_missing_mod}This cam... Item.wrapped_shoes)
+ok    setup: a module's template naming an item that is not installed is refused before generation, naming the module, the template and the item (unresolved NPCCharacter.mnbl_test_mod_wanderer -> Item.mnbl_test_not_installed [MNBLTestAddsContent]: names an object that is not installed)
+ok    load: a culture a module added after the campaign was made, naming a troop the world does not supply, refuses the load naming the module and the culture (added Culture.mnbl_test_later_culture -> NPCCharacter.mnbl_test_mod_recruit [MNBLTestLaterCulture]: added after the campaign was created)
+ok    attribution: an installed troop is the game's own module's (SandBoxCore), so a change there reads as a game update
+ok    battle table: the active modules' sp_battle_scenes.xml, read as Campaign.InitializeScenes reads them, are the catalogue's table (126 scenes, 3aa0154cbc86)
+ok    battle table: a scene pack adding a high-forest Plain scene (index 52) is absorbed: no ground loses its scene, and woodland ground can now take the new scene
+ok    battle table: a scene listing every land index makes 518 kinds of ground non-deterministic (first cold land) and is refused at setup and before a load, naming the module and the scene
+ok    battle map: rebuilt against the absorbed table on a periodic strip with a stored mutation, the mutated cells take their class's scene in every image (columns 7, 39: Desert), and re-patched cells are rewritten in all 15 images (Swamp)
+ok    a battle map that cannot be built (a table with no scenes) is caught and recorded as failed, never thrown (DivideByZeroException: Attempted to divide by zero.); the table check refuses it first
+ok    GeneratedMapScene.AfterLoad checks the loaded battle table before it builds the navigation caches, records every failure and throws nothing
+17/17 checks passed

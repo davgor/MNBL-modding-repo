@@ -51,7 +51,7 @@ def main():
         assert t in registered, t
     templates = sorted('worldgen/templates/cultures/' + f for f in os.listdir(os.path.join(REPO, 'worldgen/templates/cultures')) if f.endswith('.json'))
     policies = ['worldgen/policies/culture-presentations.json', 'worldgen/policies/economy.json', 'worldgen/policies/factions.json',
-                'worldgen/policies/naval-content.json', 'worldgen/policies/rosters.json', 'worldgen/policies/startup.json',
+                'worldgen/policies/naval-content.json', 'worldgen/policies/rosters.json', 'worldgen/policies/population.json', 'worldgen/policies/startup.json',
                 'worldgen/templates/settlements/prototypes.json', 'worldgen/policies/mission-scenes.json'] + templates
     for p in policies:
         assert os.path.isfile(os.path.join(REPO, p)), p
@@ -64,7 +64,7 @@ def main():
         ('worldTypes', world),
         ('reusableTypes', reusable),
         ('settlementComponents', components),
-        ('deliveredOwners', ['MMR-27', 'MMR-28', 'MMR-31', 'MMR-32', 'MMR-33', 'MMR-35', 'MMR-42']),
+        ('deliveredOwners', ['MMR-27', 'MMR-28', 'MMR-31', 'MMR-32', 'MMR-33', 'MMR-35', 'MMR-42', 'MMR-279', 'MMR-280']),
         ('deferredOwners', od()),
         ('policies', policies),
         ('requiredInventory', ['worldgen/policies/graph-validation.json', 'runtime:catalogReceipt', 'runtime:liveDefaults']),
@@ -77,6 +77,18 @@ def main():
         ('pendingRuntime', ['W05: runtime settlement, gate and port positions on the generated scene and its navigation mesh (not checked here)',
                             'U03: runtime route reachability between generated settlements (not checked here)']),
         ('positionTolerance', 0.01),
+        ('minorClans', od(
+            ('rule', 'MMR-280: mercenary companies and outlaw clans are minor clans (no super_faction) owned by a member, homed at a town, with default_party_template and '
+                     'the 4 minor_faction_character_templates of their population.json troopTemplates line, never a lord party template'),
+            ('company', ['is_minor_faction', 'is_clan_type_mercenary']),
+            ('outlaw', ['is_minor_faction', 'is_outlaw']),
+            ('outlawKinds', ['is_mafia', 'is_nomad', 'is_sect']),
+            ('characterTemplates', 4))),
+        ('childGenerator', od(
+            ('rule', 'InitialChildGenerationCampaignBehavior clones each child from a same-sex adult of a non-minor clan and dresses it from the four civilian rosters '
+                     'of its culture (Lord + child or teenager, male and female); with no same-sex adult it draws from another clan of the culture and can throw at new game'),
+            ('rosters', 'the EquipmentRosters of the culture flagged IsLordTemplate with IsChildEquipmentTemplate or IsTeenagerEquipmentTemplate, for each value of IsFemaleTemplate'),
+            ('adultAge', 18))),
         ('codes', od(
             ('graph.policy', 'the validation policy is malformed'),
             ('graph.malformed_input', 'a staged document without a root, a record element or component without an id, or a disposition, id-map entry, exclusion or slot without its keys'),
@@ -93,14 +105,17 @@ def main():
             ('graph.ownership', 'a kingdom without its ruler, ruling clan or capital; a clan without its leader; a fief without an owner'),
             ('graph.hero_role', 'a hero without its hero character or clan; a ruler, clan leader or noble clan member who is not a Lord'),
             ('graph.settlement_component', 'a settlement without exactly one component of a supported kind, the location complex every installed settlement of its kind has, or its village type'),
-            ('graph.village_binding', 'a village not bound to a town or castle of the world'),
+            ('graph.village_binding', 'a village not bound to a town or castle of the world, or a generated town or castle with no bound village (RT-31)'),
             ('graph.port', 'a port town without a shipyard, or a shipyard without a town port'),
             ('graph.troop_upgrade', 'a cycle in the upgrade tree of a character the world stages or reaches'),
             ('graph.party_intent', 'a clan with lords but no fortified home, a bandit clan without a home, a runtime hero without an installed template of its occupation or a home of its kind, a runtime relation to no hero of the world'),
             ('graph.fixed_position', 'a settlement, start point or spawn position at an installed Calradia coordinate (settlement, gate, port or start point)'),
             ('graph.silent_discard', 'a compiler record with neither a generated object nor an explicit disposition'),
             ('graph.pending_slot', 'a compiler slot still pending whose owner is delivered (or not deferred), or claimed resolved while the staged graph lacks it'),
-            ('graph.policy_identity', 'a resolving policy or required inventory missing from the identity snapshot'))),
+            ('graph.policy_identity', 'a resolving policy or required inventory missing from the identity snapshot'),
+            ('graph.minor_clan', 'a mercenary company or outlaw clan (campaign v2, MMR-280) without the flags of its kind, a default party template, four installed character templates or a town home, or with a kingdom'),
+            ('graph.census', 'the staged heroes and clans disagree with the campaign v2 census (houses, adult lords, minors, dead parents, company and outlaw members, wanderers W)'),
+            ('graph.child_generator', 'a noble house the random child generator of the engine cannot serve: no adult Lord of each sex, or a lord culture without the four child and teen civilian equipment rosters'))),
         ('provenance', od(('objectTypeScan', SCAN), ('objectTypeScanSha256', sha(os.path.join(REPO, SCAN))))),
     )
     out = os.path.join(REPO, 'worldgen/policies/graph-validation.json')

@@ -8,11 +8,11 @@ namespace MNBL.ProceduralWorld.Persistence
     internal sealed class WorldReference
     {
         public const string Save = "save", PendingInitialSave = "pending initial save", PendingSave = "pending save", Active = "active campaign";
-        public string Kind, Name, Instance, WorldId, ManifestSha256, ContentId, Package;
+        public string Kind, Name, Instance, WorldId, ManifestSha256, ContentId, Package, Scene;   // Scene: the header's (MMR-282); null from a journal
 
         public Dictionary<string, object> Report()
         {
-            return new Dictionary<string, object> { ["kind"] = Kind, ["name"] = Name, ["instance"] = Instance, ["worldId"] = WorldId, ["package"] = Package, ["contentId"] = ContentId };
+            return new Dictionary<string, object> { ["kind"] = Kind, ["name"] = Name, ["instance"] = Instance, ["worldId"] = WorldId, ["package"] = Package, ["contentId"] = ContentId, ["scene"] = Scene };
         }
     }
 
@@ -123,7 +123,7 @@ namespace MNBL.ProceduralWorld.Persistence
         private void Add(string kind, string name, WorldBinding binding)
         {
             References.Add(new WorldReference { Kind = kind, Name = name, Instance = binding.Instance, WorldId = binding.WorldId, ManifestSha256 = binding.ManifestSha256,
-                ContentId = binding.ContentId, Package = binding.PackageName });
+                ContentId = binding.ContentId, Package = binding.PackageName, Scene = binding.Scene });
         }
     }
 }

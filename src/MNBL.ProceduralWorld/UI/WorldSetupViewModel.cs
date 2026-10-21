@@ -141,6 +141,10 @@ namespace MNBL.ProceduralWorld.UI
                     counts["compiled"] = Text(WorldSetupText.CompiledCounts, new Dictionary<string, string> { ["TOWNS"] = n("towns"), ["CASTLES"] = n("castles"), ["VILLAGES"] = n("villages"),
                         ["PORTS"] = n("ports"), ["KINGDOMS"] = n("kingdoms"), ["CLANS"] = n("clans"), ["CITIES"] = model.Result.Cities.ToString(CultureInfo.InvariantCulture),
                         ["PEOPLE_COUNT"] = model.Result.Peoples.Count.ToString(CultureInfo.InvariantCulture) });
+                    // MMR-282: this world's own first-start wait (its navigation caches), from its settlement count.
+                    Func<string, int> c = key => { int v; return shownPreview.Counts.TryGetValue(key, out v) ? v : 0; };
+                    var navigation = WaitTime.Navigation(model.Contract, c("towns"), c("castles"), c("villages"));
+                    if (navigation != null) counts["navigation"] = Text(WorldSetupText.WaitNavigation, navigation);
                 }
                 Preview.Show(shownPreview, counts, Text(WorldSetupText.Legend));
             }

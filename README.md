@@ -52,9 +52,9 @@ python tests/check_producer_lock.py --source <path to FWGC++>
 
 Each implementation ticket has a doc in `docs/` (named in its first line) and a review record in `evidence/fwg/*-review.md`.
 
-- **World pipeline:** `world-projection`, `terrain-compiler`, `campaign-semantics`, `travel-graph`, `world-bundle`.
+- **World pipeline:** `world-projection`, `terrain-compiler`, `campaign-semantics`, `travel-graph`, `population` (kingdoms, noble houses, companies, outlaw clans, wanderers), `world-bundle`, `biome-presentation` (map epic 2's shared biome table and policy keys).
 - **Campaign content:** `campaign-registry`, `factions`, `heroes`, `settlements`, `campaign-behavior-compatibility`, `naval-content`, `campaign-graph-validation`.
-- **Runtime map:** `runtime-backend-decision`, `runtime-surface`, `runtime-navigation`, `water-climate`, `settlement-entities`, `playability`, `periodic-coordinates`, `periodic-movement`, `periodic-presentation`.
+- **Runtime map:** `runtime-backend-decision`, `runtime-surface`, `runtime-navigation`, `water-climate`, `settlement-entities`, `settlement-looks`, `playability`, `periodic-coordinates`, `periodic-movement`, `periodic-presentation`, `map-dressing`.
 - **Missions:** `mission-scenes`, `land-missions`, `naval-missions`.
 - **Player flow:** `world-setup`, `generation-job`, `world-activation`, `world-preview`, `recovery`, `first-test-profile`.
 - **Saves:** `save-binding`, `world-loading`, `save-compatibility`.

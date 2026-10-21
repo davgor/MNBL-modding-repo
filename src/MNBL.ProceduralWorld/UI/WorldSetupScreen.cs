@@ -185,8 +185,10 @@ namespace MNBL.ProceduralWorld.UI
         }
     }
 
-    // The host the setup screen runs on: War Sails installed and enabled, the exact game and War Sails builds the mod was made for
-    // (GeneratedPatches), and the pinned generator binaries beside the module DLL. Evaluated once per process (the binaries are hashed once).
+    // The host the setup screen runs on: War Sails installed and enabled, game and War Sails builds at or above this release's minimum
+    // (SupportedBuilds; MMR-284: no maximum), every patch target's signature (PatchSignatures, so a game update that changes one is refused
+    // here, naming the patch, before any wait), and the pinned generator binaries beside the module DLL. Evaluated once per process (the
+    // binaries are hashed once).
     internal static class WorldSetupHost
     {
         private static List<GenerationError> problems;
@@ -212,6 +214,10 @@ namespace MNBL.ProceduralWorld.UI
                 catch (Exception error) when (error is IOException || error is UnauthorizedAccessException) { tools.Add(new KeyValuePair<string, string>(tool, "unreadable: " + error.Message)); }
             }
             problems = GenerationErrors.Host(game, GeneratedPatchesVersions.Game, navalVersion, GeneratedPatchesVersions.Naval, enabled, tools);
+            // MMR-284: the patch signatures, on a host whose builds are supported (the catalog follows, MMR-283).
+            if (problems.Count == 0) problems.AddRange(GenerationErrors.PatchProblems(GeneratedPatches.Verify().Select(f => Tuple.Create(f.Patch, f.Target, f.Installed))));
+            // MMR-283: the other active modules' content, before Generate (on a host that is otherwise compatible).
+            if (problems.Count == 0) problems.AddRange(ContentCompatibility.SetupProblems());
             return problems;
         }
         // Probes evaluate a host they describe (offline the same function is tested directly).
@@ -230,14 +236,15 @@ namespace MNBL.ProceduralWorld.UI
             using (var reader = new StreamReader(stream))
                 locked = ((IDictionary<string, object>)new JavaScriptSerializer().DeserializeObject(reader.ReadToEnd()))["navalVersion"] as string;
             string navalVersion = release != null && locked != null && locked.StartsWith(release + ".", StringComparison.Ordinal) ? locked : release;
-            return new WorldDataBundle.HostProfile(game, navalVersion, new[] { "R01", "R02", "R03", "R04", "R05", "R06", "R07", "R08", "R09", "R10" });
+            return new WorldDataBundle.HostProfile(game, navalVersion, WorldDataBundle.HostCapabilities);
         }
     }
 
+    // MMR-284: the minimum builds the setup host accepts (no maximum).
     internal static class GeneratedPatchesVersions
     {
-        public const string Game = MNBL.ProceduralWorld.CampaignRegistry.GeneratedPatches.GameVersion;
-        public const string Naval = MNBL.ProceduralWorld.CampaignRegistry.GeneratedPatches.NavalVersion;
+        public const string Game = SupportedBuilds.MinimumGame;
+        public const string Naval = SupportedBuilds.MinimumNaval;
     }
 
     // The setup's generation job: MMR-44's GenerationCoordinator (GenerationRuntime.Coordinator). Run starts a job for the choice, forwards
@@ -330,7 +337,7 @@ namespace MNBL.ProceduralWorld.UI
             var templates = ((IEnumerable)policy(CampaignGraphValidator.PolicyPath)["policies"]).Cast<object>().Select(o => (string)o)
                 .Where(path => path.StartsWith("worldgen/templates/cultures/", StringComparison.Ordinal) && !path.EndsWith("/contract.json", StringComparison.Ordinal))
                 .ToDictionary(path => path.Substring(path.LastIndexOf('/') + 1, path.Length - path.LastIndexOf('/') - 1 - ".json".Length), path => policy(path), StringComparer.Ordinal);
-            var factions = FactionFactory.Build(campaign, idMap, policy("worldgen/policies/factions.json"), policy("worldgen/policies/culture-presentations.json"), templates);
+            var factions = FactionFactory.Build(campaign, idMap, policy("worldgen/policies/factions.json"), policy("worldgen/policies/culture-presentations.json"), templates, policy(WandererPool.PolicyPath));
             // The villages bound as the campaign binds them (SettlementFactory runs the same VillageBinding).
             var bindingProblems = new List<string>();
             var binding = VillageBinding.FromRecords(policy("worldgen/policies/economy.json"), campaign, parse(bundle.ReadVerified("compiled/travel/travel-graph.json")), bindingProblems);
@@ -358,6 +365,9 @@ namespace MNBL.ProceduralWorld.UI
             {
                 var activation = stage.Error as ActivationException;
                 var outcome = StartOutcome.FromCommit(job.Phase, job.Error, job.FailureDetail, activation != null && activation.Recoverable);
+                // MMR-283: an activation refused for the installed content names the module and object, as the setup screen's check does.
+                var conflict = activation == null ? null : activation.InnerException as ContentConflictException;
+                if (outcome.Kind == "failed" && conflict != null && !activation.Recoverable) outcome.Error = ContentCompatibility.Errors(conflict.Conflicts)[0];
                 if (outcome.Kind == "playing") Release(jobRoot);
                 return outcome;
             }, TaskScheduler.Default);

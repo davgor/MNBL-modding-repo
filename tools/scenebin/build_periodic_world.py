@@ -226,8 +226,13 @@ def build(args):
     xml = ET.parse(local_template / 'scene.xscene'); xml.getroot().set('name', scene_name)
     xml.write(local_template / 'scene.xscene', encoding='utf-8', xml_declaration=True)
     folder = out / scene_name
+    # MMR-255: the encoder takes layer weights (MNBLWT02); the periodic fixture carries the base layer only.
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+    import terrain_layers
+    weights = out / 'weights.bin'
+    weights.write_bytes(terrain_layers.base_weights(bbw.read_side(extended), terrain_layers.template_layer_names((local_template / 'scene.xscene').read_text(encoding='utf-8'))))
     command = [str(encoder), '--surface-heightfield', str(extended), '--surface-template', str(local_template),
-               '--surface-output', str(folder), '--surface-extent', str(extent), '--surface-scale', str(args.scale)]
+               '--surface-output', str(folder), '--surface-extent', str(extent), '--surface-scale', str(args.scale), '--surface-weights', str(weights)]
     result = subprocess.run(command, capture_output=True, text=True, check=False)
     (out / 'encoder.stdout.log').write_text(result.stdout, encoding='utf-8'); (out / 'encoder.stderr.log').write_text(result.stderr, encoding='utf-8')
     bbw.require(result.returncode == 0, 'Native encoder failed; see isolated logs')
@@ -309,7 +314,7 @@ def main():
     parser.add_argument('--heightfield', required=True)
     parser.add_argument('--cell', type=float, default=6.25)
     parser.add_argument('--scale', type=float, default=.01)
-    parser.add_argument('--surface-template', default='build/slots/mnbl_world_b')
+    parser.add_argument('--surface-template', default='build/surface-template', help='python tools/scenebin/make_surface_template.py --materialize build/surface-template')
     parser.add_argument('--encoder', default='build/worldbridge/Release/worldbridge.exe')
     parser.add_argument('--game-root', default=build_slot.GAME)
     parser.add_argument('--out', required=True)

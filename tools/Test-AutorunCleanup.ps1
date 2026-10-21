@@ -3,10 +3,10 @@ $repo = Split-Path $PSScriptRoot
 $output = Join-Path $repo ('build/research-cleanup15/run-' + [Guid]::NewGuid().ToString('N'))
 New-Item $output -ItemType Directory -Force | Out-Null
 $csc = 'C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/MSBuild/Current/Bin/Roslyn/csc.exe'
-$sourcePaths = @('src/MNBL.ProceduralWorld/Automation/AutorunHost.cs','src/MNBL.ProceduralWorld/Automation/ProbeContext.cs','tests/AutorunCleanupTests.cs','tools/Test-AutorunCleanup.ps1')
+$sourcePaths = @('src/MNBL.ProceduralWorld/Automation/AutorunHost.cs','src/MNBL.ProceduralWorld/Automation/ProbeContext.cs','src/MNBL.ProceduralWorld/Automation/HangWatchdog.cs','tests/AutorunCleanupTests.cs','tools/Test-AutorunCleanup.ps1')
 $inputs = @($sourcePaths | ForEach-Object { [ordered]@{path=$_;sha256=(Get-FileHash -LiteralPath (Join-Path $repo $_)).Hash.ToLowerInvariant()} })
 $exe = Join-Path $output 'AutorunCleanupTests.exe'
-& $csc /nologo /target:exe /platform:x64 /langversion:7.3 /warnaserror "/out:$exe" /reference:System.Web.Extensions.dll "$repo/tests/AutorunCleanupTests.cs" "$repo/src/MNBL.ProceduralWorld/Automation/AutorunHost.cs" "$repo/src/MNBL.ProceduralWorld/Automation/ProbeContext.cs"
+& $csc /nologo /target:exe /platform:x64 /langversion:7.3 /warnaserror "/out:$exe" /reference:System.Web.Extensions.dll "$repo/tests/AutorunCleanupTests.cs" "$repo/src/MNBL.ProceduralWorld/Automation/AutorunHost.cs" "$repo/src/MNBL.ProceduralWorld/Automation/ProbeContext.cs" "$repo/src/MNBL.ProceduralWorld/Automation/HangWatchdog.cs"
 if ($LASTEXITCODE) { throw 'Managed cleanup harness compilation failed' }
 & $exe "$output/cases" 2>&1 | Tee-Object "$output/checks.log"
 $code = $LASTEXITCODE

@@ -8,7 +8,11 @@
 //   biome, water, river, landform (categorical)   nearest sample, half rounding up; never mixed
 //   intent                     land / ocean / lake / river from water_type and river through the material policy
 //   coherence                  ocean <= -coastEpsilon, land and river >= +coastEpsilon (lakes as compiled)
-//   rock weight                max(biome rock, slope rule on the output grid, x periodic)
+//   permanent white (MMR-254)  the material policy's permanentWhite: a sample whose nearest source biome it lists, or a land or river
+//                              sample whose nearest source sample has snowMonths months of snow at or above snowThreshold; not written
+//                              to masks.bin (the travel compiler's Snow face and MMR-255's permanent_snow layer read it)
+//   climate (temperature, moisture, ice_cap, rocky_coast, snow months)   nearest sample, like the categories
+//   layer weights              the layer compile (terrain_layers.hpp, MMR-255): one alpha plane per layerSet slot, x periodic
 //   16-bit                     the import calibration's global range and round-half-even rule, big-endian
 #pragma once
 #include <cstdint>
@@ -16,6 +20,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include "worldbridge/canonical_json.hpp"
 #include "worldbridge/material_compiler.hpp"
 #include "worldbridge/projection.hpp"
 #include "worldbridge/source_world.hpp"
@@ -32,7 +37,7 @@ struct Import {
     int node_size_decimals = 0;
     int height_bits = 0, range_decimals = 0;
     double zero_range_span = 0, engine_truncation = 0;
-    std::vector<std::string> template_layers;
+    int weight_slots = 16;                             // materials.slots: the engine's layer limit
     std::string sha256;
 };
 Import load_import(const fs::path& file);
@@ -40,10 +45,14 @@ Import load_import(const fs::path& file);
 struct SourceLayers {
     std::int64_t side = 0;
     std::vector<double> height, biome, water_type, river, landform;  // row-major, side * side
+    // MMR-255: the layer rules' climate inputs, row-major side * side: degrees C, 0..1, 0..1, 0..1.
+    std::vector<double> temperature, moisture, ice_cap, rocky_coast;
     std::vector<source::BiomeEntry> biomes;
     std::vector<std::string> landforms;
+    std::vector<std::uint8_t> snow_months;                           // per sample, months with snow >= the permanent-white threshold
 };
-SourceLayers layers_of(const source::SourceWorld& world);
+// snow_threshold: the material policy's permanentWhite.snowThreshold (SourceWorld::snow_months).
+SourceLayers layers_of(const source::SourceWorld& world, double snow_threshold);
 
 struct Quantized {
     double hmin = 0, hmax = 0, step = 0;
@@ -72,7 +81,22 @@ struct Compiled {
     std::int64_t period = 0;                                           // output columns per W
     std::vector<double> z;                                             // world units after coherence
     Quantized height;
-    std::vector<std::uint8_t> biome, intent, landform, rock, padding;   // padding: 1 on rows beyond a pole line
+    std::vector<std::uint8_t> biome, intent, landform, padding;        // padding: 1 on rows beyond a pole line
+    std::vector<std::uint8_t> white;                                   // 1 in the permanent-white mask (MMR-254; not in masks.bin)
+    std::vector<double> temperature, moisture, ice_cap, rocky_coast;   // the climate inputs at each output sample (nearest)
+    std::vector<std::uint8_t> snow_months;
+    std::vector<std::string> layer_names;                              // terrain-materials.json layerSet, by slot
+    std::vector<std::vector<std::uint8_t>> weights;                    // one alpha plane per slot (weights.bin v2); plane 0 is 255
+    std::vector<double> flora_share;                                   // the target fraction of the sample biome's flora layer (0 elsewhere)
+    struct LayerRecord {
+        std::vector<double> target, dominant;                          // per slot: mean target fraction and dominant-visible share over land
+        std::size_t land = 0, white_samples = 0, white_biome = 0, white_season = 0;
+        std::size_t interior = 0;                                      // plain interior land samples checked against their biome row
+        double interior_max_error = 0;                                 // the largest |composited coverage - table fraction| among them
+        double moisture_pair_max_error = 0;                            // the moisture biome's wet + dry total against its row
+        std::map<int, std::vector<double>> biome_coverage;             // biome id -> per slot mean composited coverage over its land samples
+        std::map<int, std::size_t> biome_land;
+    } layers;
     std::size_t lowered = 0, raised = 0, engine_sign_violations = 0, lake_below_datum = 0;
     double max_adjustment = 0, max_roundtrip_error = 0;
     std::size_t seam_pairs = 0, padding_rows = 0;
@@ -92,10 +116,15 @@ Compiled compile(const SourceLayers& layers, const projection::Projection& proje
 // side, then the biome, intent, landform and padding planes, side^2 bytes each), exactly as --compile-terrain writes them.
 std::string heightfield_bytes(const Compiled& compiled);
 std::string masks_bytes(const Compiled& compiled);
-// weights.bin ("MNBLWT01", u32 side, side^2 rock_k bytes) and height-q16.bin ("MNBLQ16B", u32 side, binary64 hmin and hmax,
-// side^2 big-endian 16-bit codes), exactly as --compile-terrain writes them.
+// weights.bin v2 ("MNBLWT02", u32 side, u32 layer count N, N x (u32 byte length, UTF-8 layer name), then N planes of side^2
+// alpha bytes in slot order) and height-q16.bin ("MNBLQ16B", u32 side, binary64 hmin and hmax, side^2 big-endian 16-bit codes),
+// exactly as --compile-terrain writes them.
 std::string weights_bytes(const Compiled& compiled);
 std::string q16_bytes(const Compiled& compiled);
+// The terrain-metadata layers array (per slot, the share of canonical land samples where it is the dominant visible layer) and
+// permanentWhite block, as terrain.json and the bundle's shaping record carry them.
+cjson::Value layers_value(const Compiled& compiled);
+cjson::Value permanent_white_value(const Compiled& compiled);
 
 // worldbridge --compile-terrain SPLIT --contract FILE --projection-policy FILE --materials FILE --import FILE --side N --out NEW_DIRECTORY
 int compile_terrain_main(int argc, char** argv);

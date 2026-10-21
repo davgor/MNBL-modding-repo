@@ -34,7 +34,7 @@ internal static class LoaderTests
     private static Dictionary<string, string> Build(string game = "v1.4.8.119303", string module = "v0.0.1.0")
     {
         return new Dictionary<string, string> { ["contract"] = "mnbl.save-binding.v1", ["module"] = module, ["moduleAssemblySha256"] = new string('a', 64), ["game"] = game, ["naval"] = "v1.2.8.119303",
-            ["backend"] = "mnbl.runtime-world-backend/R07; producerLock 000000000000", ["navigationCache"] = "mnbl.navigation-cache-key/1; adapter mmr41/1", ["saveIds"] = "7910000/v1", ["worldIdentity"] = "mnbl.world-identity.v1" };
+            ["backend"] = "mnbl.runtime-world-backend/R07; producerLock 000000000000", ["navigationCache"] = "mnbl.navigation-cache-key/1; adapter mmr41/1", ["saveIds"] = "7910000/v2", ["worldIdentity"] = "mnbl.world-identity.v1" };
     }
 
     private static void Run()
@@ -109,6 +109,17 @@ internal static class LoaderTests
         }
         Check(LoadPolicy.Refuse(LoadPolicy.MissingWorld, "x").Message.Contains("Transfer-WorldSave") && LoadPolicy.Refuse(LoadPolicy.IncompatibleBuild, "x").Message.Contains("version"),
             "refusals say what to do: copy the world with the save, or use the version the campaign was made with");
+        // MMR-286: every load title and message is a localizable "{=mnbl_...}" string with its own id (the module strings file holds them).
+        var idForm = new System.Text.RegularExpressions.Regex(@"^\{=mnbl_[a-z0-9_]+\}[^{]");
+        var allTexts = LoadPolicy.AllTexts().ToList();
+        var refusalTexts = new[] { LoadPolicy.MissingWorld, LoadPolicy.DamagedWorld, LoadPolicy.DamagedSave, LoadPolicy.IncompatibleBuild, LoadPolicy.NotRebuildable, LoadPolicy.NotGenerated,
+                LoadPolicy.Busy, LoadPolicy.Unavailable, LoadPolicy.Failed, LoadPolicy.ContentConflict, "unknown-code" }.SelectMany(c => new[] { LoadPolicy.Refuse(c, "x").Title, LoadPolicy.Refuse(c, "x").Message })
+            .Concat(new[] { LoadPolicy.BelowMinimum("game", true, "v1.4.7", "v1.4.8", "x").Message, LoadPolicy.BelowMinimum("naval", false, "v1.2.7", "v1.2.8", "x").Message,
+                            LoadPolicy.Patch("p", "t", "x").Message, LoadPolicy.Content("missing", "o", "m", false, null, "x").Message }).ToList();
+        var ids = allTexts.Concat(refusalTexts).Select(t => t.Substring(2, t.IndexOf('}') - 2)).Distinct().ToList();
+        Check(allTexts.Count == 27 && allTexts.Concat(refusalTexts).All(t => idForm.IsMatch(t)) &&
+              allTexts.GroupBy(t => t.Substring(0, t.IndexOf('}'))).All(g => g.Distinct().Count() == 1),
+              "every load refusal's title and message and every loader message is a localizable TextObject string with an id (" + ids.Count + " ids, e.g. " + LoadPolicy.Refuse(LoadPolicy.MissingWorld, "x").Title + ")");
         // WorldLifetimeScope.
         int prefabs = 0, wrapper = 0;
         WorldLifetimeScope.Track("test: prefabs", () => prefabs);

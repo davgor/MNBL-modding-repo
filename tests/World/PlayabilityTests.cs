@@ -127,6 +127,21 @@ internal static class PlayabilityTests
         Check(Throws(() => new NavigationCacheKey().Set("a=b", "x")) && Throws(() => new NavigationCacheKey().Set("a", "x\ny")) && Throws(() => SampleKey(k => k.Settlement("w_town_1", "town", new[] { 0f, 0f }, new[] { 0f, 0f }, null))),
             "key: an input name with '=', a value with a line break and a settlement keyed twice are refused");
         evidence["keyInputs"] = keyRows;
+        // MMR-254 (a3): no navigation-cache key input depends on anything mutable. The inputs WorldNavigationCache.BuildKey sets are exactly the
+        // classified ones (NavigationCacheKey.Sources: installed game, models and their cache parameters, the scene's files, the world's identity
+        // and frame, the placed settlements, this module's code), the sample key above covers every one, an unclassified input is refused, and
+        // BuildKey reads nothing of a campaign's mutable state (the party speed model, roads.json, road bits, face overrides, weather, season,
+        // time). The road bits leave the navmesh itself unchanged (NavigationContractTests).
+        string buildKey = File.ReadAllText(Path.Combine(repo, "src/MNBL.ProceduralWorld/World/WorldNavigationCache.cs")).Replace("\r\n", "\n");
+        int begin = buildKey.IndexOf("public static NavigationCacheKey BuildKey(", StringComparison.Ordinal), end = begin < 0 ? -1 : buildKey.IndexOf("\n        }\n", begin, StringComparison.Ordinal);
+        string body = begin < 0 || end < 0 ? "" : buildKey.Substring(begin, end - begin);
+        var setNames = System.Text.RegularExpressions.Regex.Matches(body, "key\\.Set\\((?:t \\+ )?\"\\.?([A-Za-z0-9]+)\"").Cast<System.Text.RegularExpressions.Match>().Select(x => x.Groups[1].Value).Distinct().OrderBy(x => x, StringComparer.Ordinal).ToList();
+        var sampleNames = key.Inputs.Keys.Select(NavigationCacheKey.SourceName).Distinct().OrderBy(x => x, StringComparer.Ordinal).ToList();
+        var mutable = new[] { "PartySpeed", "RoadsPolicy", "RoadSpeed", "RoadFlag", "Override", "Weather", "Season", "CampaignTime", "MapTime", "Mutation" }.Where(w => body.IndexOf(w, StringComparison.Ordinal) >= 0).ToList();
+        Check(body.Length > 0 && setNames.SequenceEqual(NavigationCacheKey.Sources.Keys) && sampleNames.SequenceEqual(NavigationCacheKey.Sources.Keys) && mutable.Count == 0 && Throws(() => new NavigationCacheKey().Set("roadSpeed", "0.2")),
+              "key (a3): BuildKey keys exactly the " + NavigationCacheKey.Sources.Count + " classified inputs (" + String.Join(", ", setNames) + "), each fixed for a world (game, models and cache parameters, scene files, world identity and frame, module code) plus the placed settlements; nothing mutable is read" +
+              (mutable.Count > 0 ? " (found " + String.Join(", ", mutable) + ")" : "") + " and an unclassified input is refused");
+        evidence["keySources"] = NavigationCacheKey.Sources;
 
         // ---- cache file ----
         var pairs = new List<Tuple<string, bool, string, bool, float, float>> {
@@ -182,7 +197,7 @@ internal static class PlayabilityTests
         finally { try { Directory.Delete(temp, true); } catch (IOException) { } }
 
         // ---- route set and dry run on worlds A and B ----
-        var host = new WorldDataBundle.HostProfile("v1.4.8.119303", "v1.2.8.119303", new[] { "R01", "R02", "R03", "R04", "R05", "R06", "R07", "R08", "R09", "R10" });
+        var host = new WorldDataBundle.HostProfile("v1.4.8.119303", "v1.2.8.119303", WorldDataBundle.HostCapabilities);
         var navPolicy = NavigationPolicy.FromBytes(File.ReadAllBytes(Path.Combine(repo, NavigationPolicy.PolicyPath)));
         var calibration = (IDictionary<string, object>)Serializer.DeserializeObject(File.ReadAllText(Path.Combine(repo, "worldgen/calibration/naval-transitions/naval-transitions.json")).TrimStart('﻿'));
         var model = NavigationModel.FromCalibration(calibration);

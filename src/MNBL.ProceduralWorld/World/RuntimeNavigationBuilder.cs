@@ -11,8 +11,9 @@ using MNBL.ProceduralWorld.CampaignBootstrap;
 namespace MNBL.ProceduralWorld.Surface
 {
     // MMR-38: the campaign navmesh of a compiled world (docs/runtime-navigation.md). Pure managed (no native call), tested offline.
-    //   * NavigationInput: the world's MMR-28 travel cells and graph (cells.bin, travel-graph.json), the MMR-27 village bindings and the
-    //     bundle's playability policy, whose cells.faceGroups name the installed TerrainType of each cell class.
+    //   * NavigationInput: the world's MMR-28 travel cells and graph (cells.bin v2, travel-graph.json), the MMR-27 village bindings and the
+    //     bundle's playability policy, whose cells.faceGroups name the installed TerrainType of each cell class; a land cell's TerrainType is
+    //     its cells.bin land type (MMR-254: the shared biome table's face, compiled by the travel compiler).
     //   * RuntimeNavigationBuilder: one quad per physical cell between the pole lines, over every physical column (the periodic strips repeat
     //     the opposite side), grounded on the collision reference; typed faces (domain, water class, terrain cost and passage are kept per
     //     cell, separately); bridge decks over under-bridge faces for every joining crossing; encoded as the scene's navmesh.bin (RNM1,
@@ -120,26 +121,49 @@ namespace MNBL.ProceduralWorld.Surface
         public static string Sha(string text) { return Sha(new UTF8Encoding(false).GetBytes(text)); }
     }
 
-    // cells.bin (MMR-28): "MNBLTC01", int32 cols, int32 rows, cols*rows class bytes after repairs, cols*rows OpenSea flags; row-major from the
-    // north pole line; columns wrap.
+    // cells.bin v2 (MMR-254; docs/travel-graph.md "Land face types"): "MNBLTC02", int32 cols, int32 rows, then four cols*rows byte planes: the
+    // class after repairs, the OpenSea flag, the land type (the installed TerrainType id of a land cell, 0 on every other class) and the flags
+    // (bit 0: a road cell, deck cells included); row-major from the north pole line; columns wrap. Clean break: version 1 is refused.
     internal sealed class TravelCells
     {
         public const byte Land = 0, Mountain = 1, Sea = 2, Lake = 3, River = 4;
+        public const byte RoadFlag = 1;
+        public const string Magic = "MNBLTC02";
         public static readonly string[] ClassNames = { "land", "mountain", "sea", "lake", "river" };
         public int Cols, Rows, ColumnOffset, RowOffset;
         public double Spacing;
-        public byte[] Classes, OpenSea;
+        public byte[] Classes, OpenSea, LandTypes, Flags;
         public static TravelCells Read(byte[] bytes, int cols, int rows, int columnOffset, int rowOffset, double spacing)
         {
-            if (bytes == null || bytes.Length < 16 || Encoding.ASCII.GetString(bytes, 0, 8) != "MNBLTC01") throw new InvalidDataException("cells.bin is not MNBLTC01.");
+            if (bytes == null || bytes.Length < 16 || Encoding.ASCII.GetString(bytes, 0, 8) != Magic) throw new InvalidDataException("cells.bin is not " + Magic + " (a world compiled before map epic 2 is refused).");
             int c = BitConverter.ToInt32(bytes, 8), r = BitConverter.ToInt32(bytes, 12);
-            if (c != cols || r != rows || bytes.Length != 16 + 2 * cols * rows) throw new InvalidDataException("cells.bin does not match the travel grid (" + cols + " x " + rows + ").");
-            var t = new TravelCells { Cols = cols, Rows = rows, ColumnOffset = columnOffset, RowOffset = rowOffset, Spacing = spacing, Classes = new byte[cols * rows], OpenSea = new byte[cols * rows] };
-            Array.Copy(bytes, 16, t.Classes, 0, cols * rows); Array.Copy(bytes, 16 + cols * rows, t.OpenSea, 0, cols * rows);
-            if (t.Classes.Any(k => k > River) || t.OpenSea.Any(f => f > 1)) throw new InvalidDataException("cells.bin holds an unknown class or flag.");
+            if (c != cols || r != rows || bytes.Length != 16 + 4 * cols * rows) throw new InvalidDataException("cells.bin does not match the travel grid (" + cols + " x " + rows + ").");
+            int n = cols * rows;
+            var t = new TravelCells { Cols = cols, Rows = rows, ColumnOffset = columnOffset, RowOffset = rowOffset, Spacing = spacing, Classes = new byte[n], OpenSea = new byte[n], LandTypes = new byte[n], Flags = new byte[n] };
+            Array.Copy(bytes, 16, t.Classes, 0, n); Array.Copy(bytes, 16 + n, t.OpenSea, 0, n); Array.Copy(bytes, 16 + 2 * n, t.LandTypes, 0, n); Array.Copy(bytes, 16 + 3 * n, t.Flags, 0, n);
+            if (t.Classes.Any(k => k > River) || t.OpenSea.Any(f => f > 1) || t.Flags.Any(f => (f & ~RoadFlag) != 0)) throw new InvalidDataException("cells.bin holds an unknown class or flag.");
+            for (int i = 0; i < n; i++)
+                if ((t.Classes[i] == Land) != (t.LandTypes[i] != 0) || (t.LandTypes[i] != 0 && TerrainTypes.Name(t.LandTypes[i]) == null))
+                    throw new InvalidDataException("cells.bin cell " + (i / cols) + "," + (i % cols) + " has land type " + t.LandTypes[i] + " on a " + ClassNames[t.Classes[i]] + " cell (a land cell needs an installed TerrainType, any other none).");
             return t;
         }
-        public TravelCells Clone() { return new TravelCells { Cols = Cols, Rows = Rows, ColumnOffset = ColumnOffset, RowOffset = RowOffset, Spacing = Spacing, Classes = (byte[])Classes.Clone(), OpenSea = (byte[])OpenSea.Clone() }; }
+        public TravelCells Clone() { return new TravelCells { Cols = Cols, Rows = Rows, ColumnOffset = ColumnOffset, RowOffset = RowOffset, Spacing = Spacing, Classes = (byte[])Classes.Clone(), OpenSea = (byte[])OpenSea.Clone(), LandTypes = (byte[])LandTypes.Clone(), Flags = (byte[])Flags.Clone() }; }
+        public bool Road(int i) { return (Flags[i] & RoadFlag) != 0; }
+        // The distinct installed TerrainType names of the land cells whose closure holds a logical point (on an edge or a corner, every cell
+        // sharing it): the faces a point can resolve to (MMR-254: 15-16% of land-land edges change biome).
+        public string[] LandNamesAt(double x, double y)
+        {
+            double fx = x / Spacing, fy = y / Spacing;
+            Func<double, int[]> span = v => { double k = Math.Round(v); return Math.Abs(v - k) <= 1e-9 * Math.Max(1, Math.Abs(v)) ? new[] { (int)k - 1, (int)k } : new[] { (int)Math.Floor(v) }; };
+            var names = new SortedSet<string>(StringComparer.Ordinal);
+            foreach (int r in span(fy)) foreach (int c in span(fx))
+            {
+                if (!InRows(r)) continue;
+                int i = Index(r, c);
+                if (Classes[i] == Land) names.Add(TerrainTypes.Name(LandTypes[i]));
+            }
+            return names.ToArray();
+        }
         public int Wrap(int c) { return ((c % Cols) + Cols) % Cols; }
         public int Index(int r, int c) { return r * Cols + Wrap(c); }
         public bool InRows(int r) { return r >= 0 && r < Rows; }
@@ -218,6 +242,7 @@ namespace MNBL.ProceduralWorld.Surface
         public List<BasinRecord> Basins = new List<BasinRecord>();
         public Dictionary<int, int> LandComponentCells = new Dictionary<int, int>();
         public Dictionary<string, int> ClassCounts = new Dictionary<string, int>(StringComparer.Ordinal);
+        public Dictionary<string, int> LandTypeCounts = new Dictionary<string, int>(StringComparer.Ordinal);   // grid.landTypes (MMR-254)
         public List<string[]> PositionCollisions = new List<string[]>();
         public List<NavigationFixtures.Check> FixtureChecks;   // fixture worlds only
         public NavigationInput Shallow() { return (NavigationInput)MemberwiseClone(); }
@@ -240,10 +265,12 @@ namespace MNBL.ProceduralWorld.Surface
             input.Cells = TravelCells.Read(cellsBin, Json.I(grid, "cols"), Json.I(grid, "rows"), Json.I(grid, "columnOffset"), Json.I(grid, "rowOffset"), Json.D(grid, "spacing"));
             if (Json.S(grid, "cellsSha256") != Json.Sha(cellsBin)) throw new InvalidDataException("cells.bin is not the travel graph's cells (sha256 differs).");
             var t = input.Cells;
-            if (Math.Abs(t.Spacing - surface.Spacing) > 1e-9 || Math.Abs(t.ColumnOffset * t.Spacing - surface.Strip) > 1e-9 || Math.Abs(t.RowOffset * t.Spacing - surface.PoleMargin) > 1e-9
+            double ratio = t.Spacing / surface.Spacing;   // MMR-278: travel cells stay 6.25 on the 3.125 shaped surface, a whole number of samples
+            if (ratio < 1 - 1e-9 || Math.Abs(ratio - Math.Round(ratio)) > 1e-9 || Math.Abs(t.ColumnOffset * t.Spacing - surface.Strip) > 1e-9 || Math.Abs(t.RowOffset * t.Spacing - surface.PoleMargin) > 1e-9
                 || Math.Abs(t.Cols * t.Spacing - surface.LogicalWidth) > 1e-9 || Math.Abs(t.Rows * t.Spacing - surface.LogicalHeight) > 1e-9)
                 throw new InvalidDataException("The travel grid does not cover the surface's logical globe (spacing, strip, pole margin, width or height differ).");
             foreach (var kv in Json.O(grid, "classes")) input.ClassCounts[kv.Key] = Convert.ToInt32(kv.Value, CultureInfo.InvariantCulture);
+            foreach (var kv in Json.O(grid, "landTypes")) input.LandTypeCounts[kv.Key] = Convert.ToInt32(kv.Value, CultureInfo.InvariantCulture);
             var cellPolicy = Json.O(playability, "cells");
             foreach (var kv in Json.O(cellPolicy, "faceGroups")) input.FaceGroupNames[kv.Key] = (string)kv.Value;
             input.OpenSeaCells = Json.I(cellPolicy, "openSeaCells");
@@ -267,6 +294,8 @@ namespace MNBL.ProceduralWorld.Surface
             foreach (IDictionary<string, object> v in Json.A(campaign, "villages")) input.VillageTown[Json.S(v, "id")] = Json.S(v, "bound");
             foreach (IDictionary<string, object> r in Json.A(graph, "roads"))
             {
+                // Feeder roads (MMR-253) are drawn and flag road cells; they carry no crossings or route host checks.
+                if (Json.S(r, "kind") == "feeder") continue;
                 int index = Json.I(r, "index");
                 input.Roads.Add(new RoadRecord { Index = index, From = Json.S(r, "from"), To = Json.S(r, "to"), FromUid = Json.S(r, "fromUid"), ToUid = Json.S(r, "toUid"), SameGroup = Json.B(r, "sameGroup") });
                 int j = 0;
@@ -546,7 +575,8 @@ namespace MNBL.ProceduralWorld.Surface
             for (int i = 0; i < t.Classes.Length; i++)
             {
                 byte k = t.Classes[i]; var cell = new NavCell { Class = k };
-                if (k == TravelCells.Land) { cell.Domain = "land"; cell.Cost = "plain"; cell.Passage = "open"; cell.TerrainType = build.FaceGroups["land"]; }
+                // MMR-254: a land cell's face is its cells.bin land type (the shared biome table's face for its corners).
+                if (k == TravelCells.Land) { cell.Domain = "land"; cell.Cost = "plain"; cell.Passage = "open"; cell.TerrainType = t.LandTypes[i]; }
                 else if (k == TravelCells.Mountain) { cell.Domain = "none"; cell.Cost = "mountain"; cell.Passage = "impassable"; cell.TerrainType = build.FaceGroups["mountain"]; }
                 else
                 {

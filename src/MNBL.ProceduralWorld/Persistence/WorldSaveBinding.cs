@@ -52,13 +52,13 @@ namespace MNBL.ProceduralWorld.Persistence
         public static void Attach(WorldIdentityBehavior behavior, Action<string> traceSink)
         {
             if (behavior == null) throw new ArgumentNullException("behavior");
-            GeneratedPatches.RequireInstalledVersion("save binding");
+            GeneratedPatches.RequireSupportedBuild("save binding");
             foreach (var entry in Compatibility()) behavior.SaveEntries[entry.Key] = entry.Value;
             if (harmony == null)
             {
-                var target = AccessTools.Method(typeof(MBSaveLoad), "OverwriteSaveAux");
-                saveArgsQueue = AccessTools.Field(typeof(SaveHandler), "SaveArgsQueue");
-                if (target == null || saveArgsQueue == null) throw new InvalidOperationException("The save binding targets are not the installed " + GeneratedPatches.GameVersion + " members.");
+                // MMR-284: by signature (PatchSignatureException names the patch).
+                var target = PatchSignatures.Method(typeof(MBSaveLoad).FullName, "OverwriteSaveAux");
+                saveArgsQueue = PatchSignatures.Field(typeof(SaveHandler).FullName, "SaveArgsQueue");
                 harmony = new Harmony(HarmonyId);
                 harmony.Patch(target, prefix: new HarmonyMethod(typeof(WorldSaveBinding), nameof(OverwritePrefix)));
             }

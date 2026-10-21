@@ -24,112 +24,161 @@
       "role": "farming",
       "production": "farming",
       "harbour": false,
-      "label": "Fields"
+      "concepts": [
+        "field",
+        "green",
+        "mill",
+        "house"
+      ]
     },
     {
       "role": "fishing",
       "production": "fishing",
       "harbour": false,
-      "label": "Fishery"
+      "concepts": [
+        "water",
+        "river",
+        "bay"
+      ]
     },
     {
       "role": "resource",
       "production": "resource",
       "harbour": false,
-      "label": "Works"
+      "concepts": [
+        "stone",
+        "deep",
+        "mill",
+        "fire"
+      ]
     },
     {
       "role": "harbor",
       "production": "harbor",
       "harbour": true,
-      "label": "Harbour"
+      "concepts": [
+        "harbour",
+        "shore",
+        "bay"
+      ]
     },
     {
       "role": "harbor + fishing",
       "production": "fishing",
       "harbour": true,
-      "label": "Harbour"
+      "concepts": [
+        "harbour",
+        "water",
+        "shore"
+      ]
     },
     {
       "role": "landing",
       "production": "landing",
       "harbour": true,
-      "label": "Landing"
+      "concepts": [
+        "shore",
+        "ford",
+        "bay"
+      ]
     }
   ],
   "heroRoles": [
     {
       "role": "sovereign",
-      "occupation": "Lord"
+      "occupation": "Lord",
+      "bucket": "house"
     },
     {
       "role": "domain_holder",
       "occupation": "Lord",
+      "bucket": "wanderer",
+      "fallbackBucket": "company",
       "withoutRealm": "Wanderer"
     },
     {
       "role": "castellan",
-      "occupation": "Lord"
+      "occupation": "Lord",
+      "bucket": "house"
     },
     {
       "role": "pretender",
       "occupation": "Lord",
+      "bucket": "house",
       "withoutRealm": "Wanderer"
     },
     {
       "role": "council",
-      "occupation": "Merchant"
+      "occupation": "Merchant",
+      "bucket": "notable",
+      "seatBuckets": {
+        "magistrate": "house",
+        "commander": "house"
+      }
     },
     {
       "role": "reeve",
-      "occupation": "Headman"
+      "occupation": "Headman",
+      "bucket": "notable"
     },
     {
       "role": "harbourmaster",
-      "occupation": "Merchant"
+      "occupation": "Merchant",
+      "bucket": "notable"
     },
     {
       "role": "champion",
-      "occupation": "Wanderer"
+      "occupation": "Wanderer",
+      "bucket": "company",
+      "fallbackBucket": "wanderer"
     },
     {
       "role": "warlord",
-      "occupation": "GangLeader"
+      "occupation": "GangLeader",
+      "bucket": "company"
     },
     {
       "role": "keeper",
       "occupation": "Preacher",
+      "bucket": "notable",
       "withoutRealm": "Wanderer"
     },
     {
       "role": "magister",
-      "occupation": "Wanderer"
+      "occupation": "Wanderer",
+      "bucket": "wanderer"
     },
     {
       "role": "heresiarch",
       "occupation": "Preacher",
+      "bucket": "notable",
       "withoutRealm": "Wanderer"
     },
     {
       "role": "founder",
       "occupation": "Lord",
+      "bucket": "house",
       "withoutRealm": "Wanderer"
     },
     {
       "role": "exile",
-      "occupation": "Wanderer"
+      "occupation": "Wanderer",
+      "bucket": "wanderer"
     },
     {
       "role": "prophet",
-      "occupation": "Preacher"
+      "occupation": "Preacher",
+      "bucket": "notable"
     },
     {
       "role": "legend",
-      "occupation": "Wanderer"
+      "occupation": "Wanderer",
+      "bucket": "none"
     },
     {
       "role": "dread",
-      "occupation": "GangLeader"
+      "occupation": "GangLeader",
+      "bucket": "none"
     }
   ],
   "heroStatuses": [
@@ -143,13 +192,32 @@
     }
   ],
   "names": {
-    "town": "{realm} Town",
-    "village": "{core} {label}",
-    "castle": "{core} Watch",
-    "castleWithoutCore": "{culture} Hold",
     "rulingClan": "House of {realm}",
-    "regent": "Regent of {realm}",
-    "ordinal": "{name} {n}"
+    "places": {
+      "town": {
+        "concepts": [
+          "hall",
+          "market",
+          "gate",
+          "realm"
+        ]
+      },
+      "castle": {
+        "concepts": [
+          "stone",
+          "hill",
+          "high",
+          "gate",
+          "hall"
+        ]
+      }
+    },
+    "cleaner": {
+      "stripAgeTag": true,
+      "dedupe": "lexiconSuffix",
+      "numerals": false,
+      "keepSourceName": true
+    }
   },
   "minima": [
     {
@@ -188,7 +256,7 @@
       "evidence": "MMR-18 RequiredAliases: NPCCharacter.main_hero, Hero.main_hero, Faction.player_faction, MobileParty.player_party (created by the registry, MMR-30)"
     }
   ],
-  "notes": "MMR-27 semantic compiler policy: it maps source categories to game object kinds and typed pending slots; it creates no Bannerlord objects. Every source kind, hamlet role, hero role and hero status that appears must be listed here, or the compile fails. Hamlets and fortresses carry no names, so village and castle names are synthesized from the core town's name with provenance; names are assigned in source-UID order and an ordinal is added only when two would collide. Name templates may use only their own placeholders, and the ordinal must contain {name} and {n}. A realm with a null sovereign gets a synthesized regent hero. Hero roles map to installed Occupation values that carry hero characters or templates in the installed game; each occupations[] entry names that evidence. The table covers the generator's whole hero role catalogue (FWGC++ generated/content_heroes.cpp kEpithets, 17 roles). A role without a realm uses its withoutRealm occupation: ruin-warden domain holders, realm-less pretenders and founders, and keepers or heresiarchs whose people have no surviving city (heroes.cpp: home and realm are both null) become Wanderers; a Lord role without one is refused. harbourmaster maps to Merchant: the installed game has 14 ShipWright characters, all NavalDLC location characters (shipwright_*, shipyard_worker_*) that are neither heroes nor templates, so ShipWright cannot be a generated hero; naval roles are revisited by MMR-35. Lords join the ruling clan of their realm. Town notables attach to their home city's town (or the realm capital when they have no home); village notables (Headman) attach to the hamlet they are present at (presence.site_kind hamlet), or to their home town when they have none. Wanderers stay unaffiliated. A fortress without a garrison city (the writer's -1/\"\" sentinel) is owned by the ruling clan of the realm whose culture_id equals the fortress's; the generator writes that sentinel only for player-adopted rows, which carry no culture and are refused anyway. Populations are carried as metadata only; mapping them to prosperity or hearths is MMR-33. Producer limits: an explicit settlement_count request is capped at 24 (generator config.cpp require_int_range), but worlds that infer their own settings place cities by habitat packing (settlement.cpp city_limit), so the compiler requires the producer's own founding report (placed_cities equals the site count, never above target_cities, which founding.cpp keeps within city_limit), fortresses within fortress_count, and land (non-harbour-shaped) hamlets per core within hamlets_per_core (humans.cpp; harbour-shaped hamlets come from fisheries, society.cpp). Player-adopted rows (founded_by) are appended past those limits by the generator and belong to the player faction; they are refused here (MMR-30). Nothing is ever added or dropped.",
+  "notes": "Map epic 2 (MMR-248): every hero role names its population bucket (MMR-279): house (a noble house member), company (a mercenary company), wanderer, notable (stays a named notable) or none (not instantiated: dead legends and the monster cast); fallbackBucket is where a role goes when its first bucket has no place (a champion not used as a company captain becomes a wanderer; a domain holder not used as a wanderer joins a company); seatBuckets override the bucket per council seat (magistrates and commanders join houses; other seats stay notables). Warlords become mercenaries (owner decision 12). Outlaw clan leaders come from FWGC++ bands and ruin camps, not from a hero role. names.cleaner is the shared name cleaner MMR-279 adds and MMR-286 applies to every display name (kingdoms, clans, towns, castles, villages, heroes and ruins): strip FWGC++ Age tags, dedupe by a lexicon suffix word per kind (towns, castles and villages are one kind), never numerals, keep the source name as sourceName (written when it differs). Villages, castles and nameless towns are coined FWGC++-style: a compound of two lexicon roots of their civilization (civilizations.entities heritage.genome.lexicon), the second a root of the kind's concepts (hamletRoles[] concepts for villages, names.places for castles and towns; a concept the lexicon lacks is skipped). Regents are named after an FWGC++ resident of the realm's civilization (npcs.people of the naming posts), with the resident's sex. MMR-27 semantic compiler policy: it maps source categories to game object kinds and typed pending slots; it creates no Bannerlord objects. Every source kind, hamlet role, hero role and hero status that appears must be listed here, or the compile fails. Hamlets and fortresses carry no names, so village and castle names are coined with provenance; names are assigned in source-UID order, so the first by uid keeps a repeated source name. Name templates (rulingClan, the provisional house the population pass renames) may use only their own placeholders. A realm with a null sovereign gets a synthesized regent hero. Hero roles map to installed Occupation values that carry hero characters or templates in the installed game; each occupations[] entry names that evidence. The table covers the generator's whole hero role catalogue (FWGC++ generated/content_heroes.cpp kEpithets, 17 roles). A role without a realm uses its withoutRealm occupation: ruin-warden domain holders, realm-less pretenders and founders, and keepers or heresiarchs whose people have no surviving city (heroes.cpp: home and realm are both null) become Wanderers; a Lord role without one is refused. harbourmaster maps to Merchant: the installed game has 14 ShipWright characters, all NavalDLC location characters (shipwright_*, shipyard_worker_*) that are neither heroes nor templates, so ShipWright cannot be a generated hero; naval roles are revisited by MMR-35. Lords join the ruling clan of their realm. Town notables attach to their home city's town (or the realm capital when they have no home); village notables (Headman) attach to the hamlet they are present at (presence.site_kind hamlet), or to their home town when they have none. Wanderers stay unaffiliated. A fortress without a garrison city (the writer's -1/\"\" sentinel) is owned by the ruling clan of the realm whose culture_id equals the fortress's; the generator writes that sentinel only for player-adopted rows, which carry no culture and are refused anyway. Populations are carried as metadata only; mapping them to prosperity or hearths is MMR-33. Producer limits: there is no 24-city cap on the worlds MNBL generates. The generator refuses (does not clamp) an explicit settlement_count above 24 (config.cpp require_int_range), and MNBL never sends settlement_count; worlds that infer their own settings place cities up to the spacing and habitat-packing ceiling (settlement.cpp city_limit, 15 to 103 on real worlds; size 33 giving 24 is a coincidence), so the compiler requires the producer's own founding report (placed_cities equals the site count, never above target_cities, which founding.cpp keeps within city_limit), fortresses within fortress_count, and land (non-harbour-shaped) hamlets per core within hamlets_per_core (humans.cpp; harbour-shaped hamlets come from fisheries, society.cpp). Player-adopted rows (founded_by) are appended past those limits by the generator and belong to the player faction; they are refused here (MMR-30). Nothing is ever added or dropped: every city is one town at every stage, and the travel compiler repairs a town instead of rejecting its world (MMR-251, docs/travel-graph.md \"Town repairs\" and \"City preservation\").",
   "occupations": [
     {
       "occupation": "Lord",

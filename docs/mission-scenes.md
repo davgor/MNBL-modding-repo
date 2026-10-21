@@ -21,7 +21,7 @@
 ## The catalogue
 
 `tools/make_mission_scenes.py` reads the installed game, hash-pinned:
-- **Battle scenes:** every module's `sp_battle_scenes.xml` in the order the game loads them (SandBox 80, NavalDLC 46 scenes). The catalogue records the table hash `GeneratedBattleTerrain` computes in game, `3aa0154c…`, which MMR-60 recorded in its runs. The resolver refuses a loaded table whose hash differs, so a game update cannot silently change what an index means.
+- **Battle scenes:** every module's `sp_battle_scenes.xml` in the order the game loads them (SandBox 80, NavalDLC 46 scenes). The catalogue records the table hash `GeneratedBattleTerrain` computes in game, `3aa0154c…`, which MMR-60 recorded in its runs. MMR-283: the resolver works over the table the game loads, whatever scene packs add. A table that still serves every geography the catalogue's table serves is absorbed and the battle map is rebuilt against it; one that loses any is refused before any navigation cache is built (see "Scene packs" below).
 - **Conversation scenes:** `conversation_scenes.xml` (10 entries).
 - **Location scenes:** every scene a settlement prototype names, per location and wall level, from the campaign catalog's Settlements document the prototypes were made from (539 prototypes).
 - **Inventory of each scene's `scene.xscene`, parsed as XML.** Nothing is inferred from a scene's name. The catalogue records:
@@ -96,14 +96,14 @@ Each contract is what the installed code (1.4.8 / War Sails 1.2.8, read in IL) r
 
 **Cell choice (`GeneratedEncounterResolver.Choose`).**
 - **Sampling.** Each 4-unit battle-map cell is sampled at 3×3 points. Land and sea faces are classified by the navigation model: land-valid, naval-valid or blocked.
-- **The guarantee, for every sampled party.** A land party (where land was sampled) finds exactly one land scene. A ship on each sampled sea terrain finds exactly one naval scene. A dense 6 × 6 check of every cell of both compiled worlds found no unsampled party position that resolves randomly (Offline tests).
-- **Settlement cells.** The cells around every settlement's position, gate and port, a ring of one cell, take an index every naval-valid terrain resolves (28 installed). Naval map events at a settlement read the patch at the main party, which may stand on land there.
+- **The guarantee, for every sampled party.** A land party (where land was sampled) finds exactly one land scene. A ship on each sampled sea terrain finds exactly one naval scene, except in a sea-touching land cell whose class has no index for that sea (MMR-254, below): there the ship gets a random naval scene of its own terrain. A dense 6 × 6 check of every cell of both compiled worlds found no unsampled party position that resolves randomly otherwise (Offline tests).
+- **Port cells (MMR-254, RT-24).** The cells around every port town's position, gate and port, a ring of one cell, take an index every naval-valid terrain resolves (28 installed, all Plain). Naval map events at a port read the patch at the main party, which may stand on land there. Until MMR-254 every settlement was ringed, so battles next to any town, castle or village opened Plain or Steppe whatever the biome; now only ports are. `Install` rings every `Settlement.HasPort`, which is every record with a port position: port towns and harbour villages (MMR-247 found this; A' 30 port towns and 72 harbour villages of 310 settlements, 1,014 cells; B' 25 and 84 of 445, 1,077 cells).
 - **Preference.** Among the indices that meet that guarantee, the cell's geography decides:
 
 | Class | Biomes (compiled worlds) | Face terrain (without a biome) | Scene terrain | Preference | Fallback |
 |---|---|---|---|---|---|
 | open | grassland (ocean, lake) | Plain, RuralArea, Beach, Fording, Bridge | Plain | none | Steppe |
-| woodland | forest, boreal forest, rainforest | Forest | Plain | forest density High, else Low | none |
+| woodland | forest, boreal forest, rainforest | Forest | Plain | forest density High or Low (MMR-254, RT-25: every listed density; before, High alone, which installed 4 indices of 2 scenes) | none |
 | steppe | | Steppe | Steppe | none | Plain |
 | rock | exposed rock | Mountain, Cliff, Canyon | Plain | Mountain or Canyon ground (the installed scenes with such ground are Plain) | Steppe |
 | cold | tundra, cold tundra, snow, land ice | Snow | Steppe | none | Plain |
@@ -116,13 +116,17 @@ Each contract is what the installed code (1.4.8 / War Sails 1.2.8, read in IL) r
 
 **Sea.** A naval scene of each sampled sea terrain itself is preferred: CoastalSea, OpenSea, River, UnderBridge. Lake and Water have no naval scenes of their own, so they take an index naming one naval scene only, a CoastalSea one where possible, which the engine then uses whatever the terrain.
 
-**Tiers, best first:**
+**Tiers, best first** (MMR-254, RT-24: a cell with land keeps its class's land scene before it borrows another terrain's):
 1. class land with the cell's own sea;
-2. class terrain;
-3. each fallback terrain;
-4. any land;
-5. then the same with any deterministic sea scene;
+2. class terrain with the cell's own sea;
+3. class terrain with any deterministic sea scene;
+4. each fallback terrain with the cell's own sea, then any land with it;
+5. each fallback terrain, then any land, with any deterministic sea scene;
 6. naval only, for cells where no land was sampled.
+
+Every tier names exactly one naval scene per sampled sea terrain. MMR-254 had added a tier between 3 and 4: a class index that names no naval scene, so a desert coast kept a Desert battle and a ship there took the engine's pick for an unlisted index, a random naval scene of the terrain under it (12 CoastalSea, 11 River, 5 UnderBridge scenes). The activation's PostBuild check refuses such a map: the live acceptance run acc3 (MMR-247) failed on A' with 147 of 16,076 (cell, sea terrain) pairs random, and the mismatch guard would flag every such battle. MMR-247 removed the tier. No installed Desert index names a naval scene and no Swamp index a River or UnderBridge one, so desert coasts and banks borrow their fallback (Steppe, then Plain) and wetland banks Plain: on A' 189 sea-touching desert cells take Steppe and 1 wetland cell Plain (B' 457 and 8), outside the port rings. Sea-touching land keeps its class wherever the installed table lets it do so deterministically. `tools/Test-EncounterResolver.ps1` runs the PostBuild check itself (`PostBuildBattleMap.Check`) on the record of A' and B' battle maps built as `GeneratedBattleTerrain.Install` builds them: the same ring (every settlement with a port: port towns and harbour villages, at the resolved centre, gate and port) and the magic ground class patch.
+
+A cell where no land was sampled keeps the order before MMR-254 (own sea first, whatever the land terrain).
 
 Then two narrowing steps. Relief narrows the chosen tier to the indices whose ground shows the landform, when any do. A settlement cell narrows it to the naval-robust indices, or searches them with the class's terrain first.
 
@@ -137,7 +141,7 @@ The pick among the tier's indices is the MMR-60 stable hash of the world and the
 - `MissionScenePatches.BattleScenePostfix` observes every `GetBattleSceneForMapPatch` result on a generated map and checks it with `GeneratedEncounterResolver.Check`, using the model's own terrain input (`IMapScene.GetTerrainTypeAtPosition`).
 - It is an observe-only Harmony postfix in the world patch set (all or nothing), declared in `GeneratedPatches.Manifest` and `docs/campaign-behavior-compatibility.md`.
 - A patch index 0 (no generated battle map), a patch that does not resolve deterministically, or an opened scene other than the patch's is a mismatch. Each one is logged and counted; the last 256 observations are kept; the result is never changed.
-- The battle map itself is refused at load if the loaded table or its inventory is not the catalogue's.
+- The battle map is rebuilt against the loaded table (MMR-283). A table that loses ground the catalogue's table serves is refused before the map loads.
 
 **Conversations.**
 - Map conversations reach `GetConversationSceneForMapPosition` (`SandBoxMissions.OpenConversationMission` without a special scene, IL).
@@ -164,6 +168,10 @@ The pick among the tier's indices is the MMR-60 stable hash of the world and the
 | Seam | On A and B every strip cell holds its canonical cell's bytes, and a block starts at the seam column. A seam-adjacent pair reads the same patch at a point and its other image, with the short-way encounter direction (`PeriodicWorldCoordinates.DeltaX`). A synthetic 80 × 16 fixture checks the same |
 | Mismatch | Flagged: patch index 0, a random naval index (46 on CoastalSea), another opened scene, an unlisted index. The patch's own scene agrees |
 | Conversations | The engine's counting rule on the generated terrains |
+
+**MMR-254 (2026-10-20), on A' and B'** (39/39): woodland takes 67 indices of 27 Plain scenes (High alone: 4); a desert coast takes a Desert scene (tier "class land + sea by terrain"); every sea-touching land cell outside a port ring whose sea has naval scenes of its own keeps its class's land terrain (A' 1,018, B' 1,105; with the port rings and the Lake and Water cells, 1,261 of 1,316 and 1,993 of 2,240); 158 (A') and 299 (B') (cell, sea terrain) pairs and 2,679 / 4,536 dense sea points take a naval scene by their own terrain; the robust ring covers the 30 (A') and 25 (B') port towns only (482 and 361 cells). Every other check above still holds on the new worlds.
+
+**MMR-247 (2026-10-20), on A' and B'** (41/41): the tier "class land + sea by terrain" is gone. Built as `Install` builds it, the unfixed resolver gave A' land 5,548 of 5,548 and sea 15,929 of 16,076, the acc3 numbers exactly (B' sea 11,919 of 12,172); the old harness ringed port towns only and accepted the random pairs, so it passed. Fixed: A' sea 16,076 of 16,076, B' 12,172 of 12,172; a desert coast takes a Steppe scene (tier "fallback Steppe land + own sea"); sea-touching land on its class terrain A' 1,092 of 1,316 (1,235 before, same ring), B' 1,694 of 2,240 (1,942); 760 combinations of biomes and class overrides, sea sets, land and settlement resolve deterministically.
 
 **The other harnesses.** The graph test (`tools/Test-GraphValidation.ps1`) passes 72/72. It expects all 71 `prototypeAndScenes` slots of world A resolved, plus the two new refusals. Settlements 22/22, NavalContent 15/15, SpawnPolicy 18/18, GeneratedCampaignDataset 60/60, SettlementPlacement 52/52 and Playability 24/24 pass with the catalogue compiled in.
 
@@ -207,7 +215,11 @@ The pick among the tier's indices is the MMR-60 stable hash of the world and the
   - MMR-53 opens the naval ones on world A's designated save (`docs/naval-missions.md`): a pirate battle and a naval defeat, each on the patch's naval scene, and a seaborne raid on the village's center scene in its `naval_raid` level. A naval battle at the seam was not opened.
 - **Contracts are what the installed code reads, as traced.** Siege entity needs and the port scene's contents are inventoried, not required. Our settlements copy their prototype's whole component and locations, so workshop and notable markers come from the same installed settlement; their counts are not compared with the settlement's data (the Player Settlement mod guards these mismatches: `docs/research/player-settlement.md`).
 - **Passages:** the installed location scenes carry no passage scripts. Location targets are the prototype's location complex (the catalogue's per-location scenes), not entities in the scenes.
-- **Fail-closed table.** A game whose battle scene table or its inventory differs from the catalogue's, for example a mod adding `sp_battle_scenes` entries, refuses the generated battle map: a generated campaign does not load. Regenerate the catalogue (`tools/make_mission_scenes.py`) for such a setup.
+- **Scene packs (MMR-283).** `BattleTableCheck` compares the table a campaign will load with the catalogue's (`GeneratedEncounterResolver.CoverageLoss`). It checks every cell kind a party can stand in: each scene class, with land or without, alone or with each sea terrain and each pair of them, at a settlement or not. A kind that resolves deterministically with the catalogue's table must still do so.
+  - A pack that only adds scenes is absorbed. Its scenes join the candidates of their class, for example a high-forest Plain scene for woodland.
+  - A pack that makes indices ambiguous or takes scenes away is refused. The refusal names its module and scene, on the setup screen, at the activation's BuildWorld and in the loader's `CheckStart`, all before any navigation cache is built.
+  - At the main menu no `GameSceneDataManager` exists yet: the check reads every active module's `ModuleData/sp_battle_scenes.xml` in active-module order, as `Campaign.InitializeScenes` does (installed IL). In game, `GeneratedMapScene.AfterLoad` runs the same check on the loaded table before it builds the navigation caches. Nothing escapes AfterLoad: a failure is recorded in the support report, and the activation's PostBuild or the loader then ends the game.
+- **The battle map request (MMR-283).** `GeneratedEncounterResolver.MapRequest` holds what a world's map is made from: the cells a settlement's ring covers and the patches applied to a cell's samples before its choice. Later tickets add to it: MMR-254 narrows the ring to port settlements and widens woodland; MMR-260 and MMR-261 set a live mutation cell's class through `CellSamples.ClassOverride`, registered per scene in `GeneratedBattleTerrain.CellPatches`. Keys and patches are canonical cells, so a patch reaches every strip image. `RebuildCells` chooses changed cells again and rewrites all their images.
 - **Sampling.** The 3×3 sampling cannot see sub-cell slivers. The dense check found none on A and B, and settlement cells are naval-robust. `ReadPatch` computes in double where the engine uses float32, so an image exactly on a cell boundary can land in an adjacent cell.
 - **The seam assertion** relies on MMR-63/65 keeping the main party canonical.
 - **Conversation scenes** are random by the engine's design. Bridge and UnderBridge are not counted by its rule.

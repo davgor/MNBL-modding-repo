@@ -22,5 +22,5 @@ foreach($name in @('mscorlib','netstandard','System','System.Core','System.Xml',
 $exe=Join-Path $build 'SynthesizeClimate.exe'
 & $csc /nologo /noconfig /nostdlib+ /target:exe /platform:x64 /langversion:7.3 /warnaserror "/out:$exe" @references @($sources|ForEach-Object { Join-Path $repo $_ })
 if($LASTEXITCODE){throw 'Climate tool compilation failed'}
-& $exe (Resolve-Path -LiteralPath $Placement).Path (Resolve-Path -LiteralPath $WorldJson).Path ([IO.Path]::GetFullPath($OutDir))
+& $exe (Resolve-Path -LiteralPath $Placement).Path (Resolve-Path -LiteralPath $WorldJson).Path ([IO.Path]::GetFullPath($OutDir)) (Join-Path $repo 'worldgen/policies/climate-flow.json')
 if($LASTEXITCODE){throw 'Climate synthesis failed'}

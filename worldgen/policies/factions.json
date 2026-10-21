@@ -1,7 +1,7 @@
 {
  "schema": "mnbl.factions",
  "version": 1,
- "notes": "MMR-31 faction definitions (docs/factions.md). Owner: FactionFactory (src/MNBL.ProceduralWorld/Campaign/FactionFactory.cs). Kingdoms and clans are intents over the MMR-27 compiler records: identities, relationships and ownership come from the generated world; assets (cultures, banner meshes, palette, icons, policies, title strings) are the installed public ones listed here. C03 (MMR-32) fills hero bodies and rosters, C04 (MMR-33) binds fiefs, C07 (MMR-36) proves registered closure.",
+ "notes": "MMR-31 faction definitions (docs/factions.md), emitting the campaign.json v2 population blocks since MMR-280. Owner: FactionFactory (src/MNBL.ProceduralWorld/Campaign/FactionFactory.cs). Kingdoms, noble houses, mercenary companies and outlaw clans are intents over the compiler records (MMR-27, the MMR-279 population pass): identities, relationships, wars and ownership come from the generated world; assets (cultures, banner meshes, palette, icons, policies, title strings) are the installed public ones listed here. C03 (MMR-32) fills hero bodies and rosters, C04 (MMR-33) binds fiefs, C07 (MMR-36) proves registered closure.",
  "streams": {
   "rule": "value(stream, version, world prefix, entity id, draw) = first 8 bytes of sha256(\"mnbl.faction-stream/1\\n\" + stream + \"\\n\" + version + \"\\n\" + prefix + \"\\n\" + entity + \"\\n\" + draw), big-endian. Each purpose has its own stream and version, so a new or re-versioned cosmetic stream never changes ownership or another stream. Ownership and membership use no randomness at all.",
   "banner": 1,
@@ -10,8 +10,7 @@
  },
  "sovereign": "MMR-27 resolves every realm's ruler: its sovereign, or the synthesized regent (regent:<realm uid>) when sovereign_uid is null. The ruler always leads the ruling clan. A kingdom intent without a ruler, ruling clan or capital is refused.",
  "rulingClan": {
-  "source": "MMR-27 synthesizes one ruling clan per realm (clan:<realm uid>, \"House of {realm}\")",
-  "keeps": "the ruler, every regent, and every lord whose role is not a vassal-clan leader role",
+  "source": "campaign.json v2 kingdoms[].rulingHouse: the planned house of the merged kingdom's ruler (MMR-279)",
   "tierByFiefs": [
    {
     "minFiefs": 1,
@@ -26,29 +25,51 @@
     "tier": 6
    }
   ],
-  "fiefs": "towns plus castles of the realm"
+  "fiefs": "towns plus castles of the kingdom"
  },
- "vassalClans": {
-  "leaderRoles": [
-   "castellan",
-   "pretender",
-   "founder"
+ "houses": {
+  "rule": "every planned house (campaign.json v2 houses[], MMR-279) is one noble clan of its kingdom: owner its leader, home its seat (one of its fiefs), members its living planned Lords (adults, and minors with both parents set); its dead parents (alive false) belong to it but are not members. There is no clan per lord (the vassal-per-lord path is gone, clean break)",
+  "tierByFiefs": [
+   {
+    "minFiefs": 1,
+    "tier": 3
+   },
+   {
+    "minFiefs": 2,
+    "tier": 4
+   },
+   {
+    "minFiefs": 3,
+    "tier": 5
+   }
   ],
-  "rule": "every living lord of a realm whose role is listed founds one vassal clan of that realm and leads it; its uid is clan:<lord uid> and its id the MMR-27 stable id of that uid (kind clan). Ordered by lord uid. Home: the realm capital (C04 may move it to a bound fief).",
-  "nameTemplate": "House of {leader}",
-  "tierByRole": {
-   "castellan": 3,
-   "pretender": 2,
-   "founder": 2
-  }
+  "fiefs": "the towns and castles the house owns (campaign.json v2 houses[].fiefs; at most 4)"
+ },
+ "minorClans": {
+  "rule": "every planned mercenary company and outlaw clan (campaign.json v2 mercenaryCompanies[], outlawClans[], MMR-279) is a minor clan with no kingdom: owner its leader, home its town, its own tier, members its planned Lords; default_party_template and the 4 minor_faction_character_templates are its line of population.json troopTemplates (RT-03), never a lord party template",
+  "companyFlags": [
+   "is_minor_faction",
+   "is_clan_type_mercenary"
+  ],
+  "outlawFlags": [
+   "is_minor_faction",
+   "is_outlaw"
+  ],
+  "kindFlags": {
+   "mafia": "is_mafia",
+   "nomad": "is_nomad",
+   "sect": "is_sect"
+  },
+  "wars": "an outlaw clan is at war with every kingdom of its culture (the engine declares it, as for the installed outlaw clans); campaign.json v2 outlawClans[].wars records them within population.json outlaws.maxWarKingdoms, and the intent keeps them"
  },
  "resources": {
   "tier": "Clan.Deserialize sets Tier and renown from it (CalculateInitialRenown); the tier above is the clan resource this ticket sets",
   "goldAndInfluence": "not set here: hero gold and clan influence follow the installed new-game logic once C03 instantiates the heroes"
  },
  "diplomacy": {
-  "stance": "neutral",
-  "stanceRule": "every kingdom pair starts neutral: the source carries no realm relations, so no kingdom starts at war and wars are left to the campaign's own diplomacy. Kingdoms.xml carries no <relationships>: the installed Kingdom.Deserialize reads only the sign of a relationship value (below 0 calls FactionManager.DeclareWar, otherwise SetNeutral), stores no magnitude, and isAtWar can only add a war. Neutral is the engine default for a pair with no stance.",
+  "stance": "campaignWars",
+  "stanceRule": "each campaign.json v2 wars[] pair (MMR-279, RT-06) starts at war: both kingdoms carry <relationship kingdom=\"Kingdom.<other>\" value=\"-1\" isAtWar=\"true\"/>, as the installed spkingdoms.xml writes its starting wars (Kingdom.Deserialize reads only the sign: below 0 calls FactionManager.DeclareWar). Every other pair starts neutral, the engine default, and is written nowhere.",
+  "warRelation": -1,
   "baseRelation": 0,
   "spread": 20,
   "rulerRelation": "each unordered kingdom pair once, lower id first: the relation between the two rulers is baseRelation + round(spread * (2 * u - 1)), u from the relations stream for \"<a>|<b>\". It is a hero relation intent for C03 (MMR-32), applied once the heroes exist; it is not written to Kingdoms.xml",
@@ -61,6 +82,9 @@
  "texts": {
   "kingdomEncyclopedia": "The {realm} of the {civilization}, ruled from {capital}.",
   "clanEncyclopedia": "A noble house of the {realm}.",
+  "companyEncyclopedia": "A company of mercenaries based in {home}.",
+  "outlawEncyclopedia": "An outlaw clan based in {home}.",
+  "sourceNote": " Its old records name it {source}.",
   "escaping": "names keep their source text; localized strings are {=<id>}text with braces turned into parentheses (TextObject reads braces as variables); XML attributes are escaped; control characters are dropped"
  },
  "banners": {
@@ -70,9 +94,9 @@
   "iconSize": 454,
   "center": 764,
   "icons": "the presentation culture's possible_clan_banner_icon_ids (worldgen/templates/cultures)",
-  "colors": "two distinct palette colors per kingdom (background, icon), drawn in pairs from the colors stream; the ordered pair is unique among kingdoms (an equal or repeated pair draws the next pair). A kingdom's clans use the kingdom's colors",
-  "iconRule": "the kingdom's icon is one banner-stream draw; each clan of the kingdom (ruling clan first, then the vassal clans by id) draws from the banner stream until its icon differs from the kingdom's and every earlier clan's of that kingdom. A kingdom with more banners than icons is refused",
-  "unique": "every banner is unique in the world: colour pairs separate the kingdoms, icons separate a kingdom's own banners. The colors stream never changes an icon and the banner stream never changes a colour",
+  "colors": "two distinct palette colors per kingdom and per minor clan (background, icon), drawn in pairs from the colors stream, kingdoms first by id, then minor clans by id; the ordered pair is unique world-wide (an equal or repeated pair draws the next pair). A house uses its kingdom's colors",
+  "iconRule": "the kingdom's icon is one banner-stream draw; each house of the kingdom (ruling house first, then the others by id) draws from the banner stream until its icon differs from the kingdom's and every earlier house's of that kingdom. A kingdom with more banners than icons is refused. A minor clan's icon is one banner-stream draw from its presentation culture's icons",
+  "unique": "every banner is unique in the world: colour pairs separate the kingdoms and minor clans, icons separate a kingdom's own banners. The colors stream never changes an icon and the banner stream never changes a colour",
   "palette": [
    {
     "id": 0,
@@ -993,8 +1017,7 @@
   ]
  },
  "names": {
-  "ordinal": "{name} {n}",
-  "rule": "kingdom names and clan names are each unique in the world: a repeated name takes the ordinal form counting from 2 (the first by uid keeps it), as the MMR-27 compiler does (worldgen/policies/campaign-content.json names.ordinal). The source name stays in the intent"
+  "rule": "kingdom, house, company and outlaw clan names come unique and clean from the compiler's name cleaner (MMR-279, MMR-286: no Age tag, never an ordinal); a repeated one is refused. The source name stays in the intent (sourceName) and, for a renamed kingdom, in its encyclopedia text (texts.sourceNote)"
  },
  "cultures": {
   "empire": {

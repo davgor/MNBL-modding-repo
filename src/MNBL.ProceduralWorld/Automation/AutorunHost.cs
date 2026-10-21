@@ -53,6 +53,11 @@ namespace MNBL.ProceduralWorld.Automation
         private int checkpointFailures;
         private double cleanupAt;
         private bool cleanupTimedOut;
+        // MMR-247: the probe's engine-thread hang capture (HangWatchdog: 60 s without an application tick; three captures per process, since a
+        // first start's navigation cache build also blocks the engine thread for minutes and is recorded as a stall that resumed).
+        private HangWatchdog watchdog;
+        private volatile string lastStage, lastStageUtc;
+        internal const double HangSeconds = 60;
 
         public static AutorunHost Current { get; private set; }
 
@@ -60,6 +65,9 @@ namespace MNBL.ProceduralWorld.Automation
         public static bool Busy { get { var host = Current; return host != null && host.phase != Phase.Done; } }
         // The probe a harness request is running (null when none), for entries that only that probe may drive meanwhile.
         public static string RunningProbe { get { var host = Current; return host != null && host.phase != Phase.Done ? host.probeId : null; } }
+        // MMR-247: whether the running probe's hang capture watches (the decal lab's hang repro records it), and its captures so far (-1: none runs).
+        public static bool HangCaptureOn { get { var host = Current; return host != null && host.watchdog != null; } }
+        public static int HangCaptures { get { var host = Current; var w = host == null ? null : host.watchdog; return w == null ? -1 : w.Reports; } }
 
         private string lastTopScreen;
 
@@ -157,6 +165,7 @@ namespace MNBL.ProceduralWorld.Automation
 
         public void Tick(float dt)
         {
+            if (watchdog != null) watchdog.Beat();
             // Any screen change after the menu appeared is traced, so foreign UI activity is attributable in the log.
             var current = ScreenManager.TopScreen;
             var currentName = current == null ? "none" : current.GetType().FullName;
@@ -184,7 +193,9 @@ namespace MNBL.ProceduralWorld.Automation
                     if (Now - menuAt >= menuDelaySeconds) Begin();
                     break;
                 case Phase.Running:
+                    EngineMarks.Enter("the probe step");
                     Step();
+                    EngineMarks.Leave();
                     break;
                 case Phase.Quitting:
                     if (!fallbackQuitUsed && Now - quitAt > FallbackQuitSeconds)
@@ -218,6 +229,13 @@ namespace MNBL.ProceduralWorld.Automation
             probeStartAt = Now;
             context = new ProbeContext(args, directory, processId, Trace, () => WriteResult(false));
             phase = Phase.Running;
+            try
+            {
+                watchdog = new HangWatchdog(directory, processId, HangSeconds, 3, () => "probe " + probeId + ", last stage " + (lastStage ?? "none") + " at " + (lastStageUtc ?? "?"));
+                watchdog.Start();
+                Trace("hang_watchdog threshold=" + HangSeconds + "s files=hang-" + processId + "-<k>.txt/.dmp");
+            }
+            catch (Exception failure) { watchdog = null; Trace("hang_watchdog_failed " + failure.GetType().Name + ": " + failure.Message); }
             if (probe == null)
             {
                 status = "running";
@@ -279,6 +297,7 @@ namespace MNBL.ProceduralWorld.Automation
         private void CompleteFinish()
         {
             probeEndAt = Now;
+            if (watchdog != null) { watchdog.Dispose(); if (context != null && watchdog.Reports > 0) context.Outputs["hangCaptures"] = watchdog.Reports; watchdog = null; }
             Trace("probe_end status=" + status);
             WriteResult(true);
             if (!quit) { phase = Phase.Done; return; }
@@ -317,6 +336,7 @@ namespace MNBL.ProceduralWorld.Automation
             {
                 double ms = clock.Elapsed.TotalMilliseconds;
                 string utc = DateTime.UtcNow.ToString("O", CultureInfo.InvariantCulture);
+                lastStage = stage; lastStageUtc = utc;
                 stages.Add(new Dictionary<string, object> { { "name", stage }, { "utc", utc }, { "ms", Math.Round(ms, 1) } });
                 var bytes = Encoding.UTF8.GetBytes(utc + " +" + ms.ToString("F0", CultureInfo.InvariantCulture) + "ms " + stage + "\n");
                 try

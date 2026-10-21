@@ -24,6 +24,35 @@ namespace MNBL.ProceduralWorld.Surface
     {
         public const string Schema = "mnbl.navigation-cache-key";
         public const int Version = 1;
+        // MMR-254 (a3): every keyed input and what it is read from. Each is fixed for a world for as long as the game, War Sails and this module
+        // stay the same: the installed models' types and the caches' own parameters, the scene's files (its navmesh.bin hash and the engine's
+        // CRCs of them), the world's identity and coordinate frame, and the settlements' placed positions. None is a campaign's mutable state:
+        // not the party speed model, roads.json, the cells.bin road bits, the live face terrain overrides of a mutation (MMR-260/261: they
+        // retype faces through GeneratedMapScene, never the navmesh file), the weather, the season or the campaign time. Set refuses a name
+        // this table does not list, so a new input is classified before it can be keyed (PlayabilityTests checks the table against BuildKey).
+        public static readonly IDictionary<string, string> Sources = new SortedDictionary<string, string>(StringComparer.Ordinal)
+        {
+            ["game"] = "installed game and War Sails versions",
+            ["distanceModel"] = "installed model type and assembly version",
+            ["partyNavigationModel"] = "installed model type and assembly version",
+            ["pathFindingMaxCostLimit"] = "installed campaign constant",
+            ["excludedFaceIds"] = "the cache's parameter, set by the installed navigation model",
+            ["regionSwitchCosts"] = "the cache's parameter, set by the installed navigation model",
+            ["agentRadius"] = "the cache's parameter, set by the installed navigation model",
+            ["neighbourCostMultiplier"] = "the cache's parameter, set by the installed navigation model",
+            ["worldId"] = "the world's identity",
+            ["scene"] = "the world's content-addressed scene name",
+            ["navmeshSha256"] = "the scene's navmesh.bin, written once by the encoder",
+            ["sceneXmlCrc"] = "the engine's CRC of the scene's files",
+            ["navigationMeshCrc"] = "the engine's CRC of the scene's files",
+            ["periodic"] = "the world's coordinate frame",
+            ["distanceVersion"] = "this module's code",
+            ["adapter"] = "this module's code",
+            ["moduleSha256"] = "this module's code",
+            ["schema"] = "this module's code",
+        };
+        // The per-navigation-type inputs are keyed as "<type>.<name>".
+        public static string SourceName(string input) { int dot = input.IndexOf('.'); return dot < 0 ? input : input.Substring(dot + 1); }
         public readonly SortedDictionary<string, string> Inputs = new SortedDictionary<string, string>(StringComparer.Ordinal);
         private readonly SortedDictionary<string, string> settlements = new SortedDictionary<string, string>(StringComparer.Ordinal);
 
@@ -31,6 +60,7 @@ namespace MNBL.ProceduralWorld.Surface
         {
             if (String.IsNullOrEmpty(name) || name.IndexOfAny(new[] { '=', '\n', '\r' }) >= 0) throw new ArgumentException("Bad key input name " + name);
             if (value == null || value.IndexOfAny(new[] { '\n', '\r' }) >= 0) throw new ArgumentException("Bad key input value for " + name);
+            if (!Sources.ContainsKey(SourceName(name))) throw new ArgumentException("Key input " + name + " has no classified source (NavigationCacheKey.Sources).");
             Inputs[name] = value;
             return this;
         }

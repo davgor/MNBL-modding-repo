@@ -115,6 +115,8 @@ This epic builds on the same branch, scene backend and bundle pipeline. It chang
 - **Zero-village crash paths:**
   - `SnareTheWealthyIssueQuest.GetTargetSettlement`: the nearest *other* town with 0 villages throws an NRE.
   - Incident `incident_the_quiet_life` throws in a player fortification with 0 villages.
+  - Incident `incident_wages_of_war_and_diseases` throws on a fortification with 0 villages too (RT-31, added by the red team).
+  - The village quota (MMR-252) gives every town 3 and every castle 2, and `SettlementFactory` and the graph validator refuse a fortification with none.
   - Five villages break nothing.
 - **Vanilla counts are only roughly 3 per town and 2 per castle.**
   - War Sails: towns 2/3/4 (22/27/8 towns; 30 of 57 not 3); castles 2 except two with 1.
@@ -238,6 +240,14 @@ This needs one balance pass across terrain, roads and snow together.
   - Strip flora from weighted layers. Deciding on map trees is a separate question.
 - **Colour grade.** The per-biome grade exists but is not applied on production scenes, which have no `MapColorGradeManager`. Add the manager at runtime; it is also needed for snow, section 5. Split grassland by moisture and mode-filter it. It is mood, not the biome look.
 
+**Result (MMR-255, 2026-10-20).** Implemented with MMR-249's answers (`docs/terrain-compiler.md` "Layers", `docs/biome-presentation.md`).
+- **Template.** `tools/scenebin/make_surface_template.py` generates the template recipe from `terrain-materials.json` layerSet: 15 layers, no flora meshes, the same layer in every season, flags off, `use_dynamic_weather_effects="true"`, no road or school layer. The gitignored `build/slots` copy is no longer a source; the module derives the template from the installed official scene as before (`SurfaceTemplateSource`, recipe version 2).
+- **Compiler.** The layer compile (`terrain_layers.cpp`) computes target fractions from the biome row (moisture split), tent-kernel smoothing, then cold, mountain, slope, coast (`rocky_coast`), water edge, `ice_cap` and permanent white, on canonical periodic columns, and stores the over-compositing alphas (`MNBLWT02`, one plane per layer). `channels` and the per-biome `rock` are gone.
+- **Encoder.** `surface.cpp` reads `MNBLWT02`, checks the template against its layer names, writes WGHT per present plane, the same mask in every season, and PHYM as the dominant visible layer; the Python encoder (`terrain_bin.py`) matches it byte for byte in decoded content.
+- **Map trees.** Forest, boreal forest and rainforest get trees through `flora.bin`: 1,176 on A' and 1,990 on B'.
+- **Measured.** On A' and B' every plane is seam-identical and byte-identical to the Python reference, and plain interior samples composite to their table row within 0.002. Coasts, banks, the mountain landform and slopes take much of the small forest patches on these island worlds.
+- **Not measured.** The look of the 15 layers, the replaced textures (`ground_forest_b_d`, `ground_pebbles_a_d`, `cliff_b_d`) and the trees on a generated campaign map is MMR-247's.
+
 ## 5. Snow and winter
 
 **Today.**
@@ -262,6 +272,11 @@ This needs one balance pass across terrain, roads and snow together.
 - Does a vista-less terrain draw the dynamic overlay, and with which channel and orientation?
 - Does the current template's winter grass variant (`snow_b_d` + `flora_snow_c`) already whiten the whole map in winter? If it does, neutralise it.
 - Thread affinity of the texture bind.
+
+**Result (MMR-256).** `docs/water-climate.md` "Snow, rain and seasons" and "Terrain snow".
+- **Gameplay.** The node byte is the inverse installed formula of the footprint's mean season length (ceil, so the table 196/155/113/72/30 is exact); a mostly ice-cap node takes 255. Offline, every weather node of A' and B' is Snowy for its FWGC++ season to within 0.006 of a year.
+- **Visuals.** `SetDynamicSnowTexture` is never called (MMR-249). The world's 512 × 512 raster (R snow byte, G rain, row 0 at y = extent) is named by its hash in the scene's `dynamic_flowmap_texture_name` and loaded and named from a PNG before every `Read`; `GeneratedMapAtmosphere` drives `SetTerrainDynamicParams` per tick instead of a `MapColorGradeManager`. Whether the terrain draws the named runtime texture is MMR-247's live check; the policy's `permanentWhite` route is the fallback. **acc5 (MMR-247):** it does not. The texture loads under the scene's name, but the terrain's lookup logs `Cannot find texture: mnbl_snow_<hex>.png` at every map read, and the cold region did not whiten in winter. The policy now takes the `permanentWhite` route, so only land ice and 12-month snow are white (`docs/water-climate.md` "The decision").
+- **Colour grade.** Grassland splits by moisture, then a 3 × 3 mode filter. **Wind (RT-18).** Three latitude bands with a seeded 0.35 rad turn.
 
 ## 6. Magic-mutation ground textures
 
@@ -308,6 +323,16 @@ On world A, 1,784 of 5,063 land cells are mutated. Potency saturates at each net
 - A decal stamp atlas per school with baked falloff.
 - About 14–17 MB per set; the packs are release inputs (LFS), not CI outputs.
 - Hidden schools reuse a visible school's look.
+
+**Result (MMR-259, 2026-10-20).** Delivery A needs no school terrain layers, so the deliverable became 8 decal materials (`mnbl_magic_<school>`), each with 2048² stamp atlases: `_d` RGBA, `_n` and `_s`. The atlas holds 4 core-group rows (arid, verdant, rock, cold) by 2 fringe and 2 core columns, with the falloff baked into alpha from vanilla world-map decal masks.
+- All 128 cells pass the four gates (`evidence/art/magic-textures.json`). The minimum macro ΔE2000 is 10.02.
+- The spec contradictions are settled in `docs/magic-ground-textures.md`:
+  - no `_h` texture, and `ground_slope_scale` does not apply to decals;
+  - one parent layer per row;
+  - gloss inside the vanilla envelope;
+  - accents at least 4 texels.
+- The `.tpac` reader (`tools/art/tpac_textures.py`) handles raw chunks and the two-chunk large packs.
+- Publishing waits on one owner editor session. The headless `publish` command cannot import textures or create materials.
 
 ## 7. Runtime landscape mutation
 
@@ -360,6 +385,21 @@ On world A, 1,784 of 5,063 land cells are mutated. Potency saturates at each net
    - No decay in v1.
    - After a future producer change, old campaigns keep their stored mutations, and new casts are refused if the producer differs.
    - Nav caches never depend on the overlay; a test asserts it.
+
+**Result, consumer side (MMR-260, 2026-10-20).** `docs/magic-ground.md`; offline evidence `evidence/world/magic-ground.json`.
+- One decal overlay draws all magic ground: one decal per mutated land source sample of MMR-259's published `mnbl_magic_<school>` materials. A' draws 1,549, B' 3,815 (1,557 and 3,811 after MMR-261's producer re-pin). Generated variants retype no face (RT-20).
+- `biome_variant` indexes `terrain.magical_biomes` (8 visible schools per core first); `biome_variant / 12` is not the core.
+- Live mutation cells (MMR-261's API: `MagicGroundRuntime.Restore`, `Apply`, `DisableMutations`) retype land cells within `landValid`. `GeneratedMapScene`'s terrain-type members answer from a per-face table built at the map load, before `PreAfterLoad`. Battle cells take faceClass[remapped type] and are re-chosen in every strip image (RT-26). Land shares by type are recorded before and after each change.
+- A synthetic fire cast at a town retypes A' 6 cells (12 faces, 18 battle cells), B' 8 (16, 19). The navmesh builds byte-identical with mutations applied (a3).
+- Decals in a closest-camera window, with roads and water: at most 209 (A') and 162 (B'), far under the 5,000 in-view budget. B's whole-world total is 7,321 (7,317 after MMR-261).
+
+**Result, MNBL side (MMR-261, 2026-10-20).** `docs/magic-ground.md` "Live mutation"; offline evidence `evidence/world/world-mutation.json`.
+- The producer is re-pinned to FWGC++ `0ae1f3e` (`fwg apply`; the baseline fix changes every world's magic layers, key locations and founding definition, so A'/B' were regenerated). Every bundle stores its accepted `source/request.json`.
+- `WorldMutations.Report(MagicEvent)` and the console (`mnbl_magic.cast`, `mnbl_magic.list`) feed a daily (school, settlement) residue; a crossing emits a key point at the FWGC++ capital of the settlement's member realm while its kingdom holds it, else at the ruling house's home.
+- `fwg apply` runs on a background thread, never during a load (the runner's load gate, the launcher's own refusal, a load's Begin cancelling a job); the delta's changed variants replace the live state on the engine thread at the campaign tick.
+- One `SyncData` string holds the canonical document (producer, world, request, edits, cells, nodes, residue, pending, digest); it round-trips byte for byte, a load replays its cells only, and a digest mismatch disables only the live cells and casts.
+- RT-37: the package keeps every producer build a campaign may cast with by hash (`Producers/<sha256>/fwg.exe`); a campaign casts with the build that generated its world and is refused new casts only when that build is missing.
+- The recorded fire cast at Nerdun (intensity 4): 375 listed cells, 29 new variants (equal to MMR-250's recorded delta), 7 travel cells retyped; about 2.7 s per call.
 
 ## 8. Roads
 
@@ -483,6 +523,26 @@ On world A, 1,784 of 5,063 land cells are mutated. Potency saturates at each net
 - About 4× more entities (A about 6.3k → 25k), and display copies at the seam double that.
 - Scene XML grows by about 18–20 MB per world.
 - The look catalog makes scene bytes depend on installed TaleWorlds files, so a game patch changes rebuilds. Freeze the selected look XML in the world package.
+
+**Result (MMR-258, offline; `docs/settlement-looks.md`, `evidence/world/settlement-looks.json`).**
+- **Catalog.** All 57 towns, 76 castles and 307 villages conform once normalized:
+  - 190 nested prefabs inlined;
+  - 957 colliders made raycast-only;
+  - 13 SceneLevelers stripped;
+  - 29 source ports, 58 arcs and 144 drop-offs dropped.
+
+  8 Battanian castles have two `map_defensive_engine_3` and no `_0` at level 3, and 78 castle wall sections have no solid piece, so the contract counts 4 engines per level and allows at most one piece of each kind.
+- **Looks taken** (A' / B').
+  - Towns: 41 of 45 and 58 of 66 get a look. The rest are phase 0: no look fits the clearance even at 0.35.
+  - Castles: 26 of 26 and 38 of 39.
+  - Villages: every one.
+  - Town scales: median 0.40 and 0.46; 30 and 37 shrunk below 0.5.
+  - The map look matches the record's prototype for 32 of 41 and 53 of 58 towns; the others are grafted or castle variants.
+- **Neighbour repeats.** 0 of 774 and 1 of 1,143 nearest-neighbour pairs share a look; the one has no fitting free look.
+- **Costs.**
+  - Entities: 21,242 and 31,953, against the earlier 25k estimate for A.
+  - Settlement XML: 9.4 and 14.0 MB.
+  - Frozen looks: 6.6 and 8.2 MB per world package.
 
 ## 11. No generated city is lost
 
@@ -626,11 +686,147 @@ These can't be settled statically. The early probe settles them; it needs no cam
    - does the template's winter grass whiten the whole map?
 5. Tier-0 tints (mode 1 vs 2) and the full-colour `_d` biome textures at map scale.
 
+### Probe results (MMR-249, 2026-10-19)
+
+**Setup.** The `map_epic2` autorun probe (`Automation/MapEpic2Probe.cs`) read fixture slots built by `tools/scenebin/build_probe_slots.py`: 4 × 4 nodes of 400 units (extent 1600, as a production world), the installed battle_terrain_001 skeleton, layer sets copied from installed vanilla terrain layers. Scenes were created as `SandBox.MapScene` does (no physics, decals on, `DecalAtlasGroup.Worldmap`) and drawn through a `SceneLayer` at 1600 × 1024, time of day 12.
+- Three runs on the shared install:
+  - run 23716 covered every item;
+  - confirming run 6284 covered cost, decal variants and snow variants;
+  - run 26296 tested one snow route.
+- Each run hung at its last, riskiest step, after every earlier step was recorded. Those steps are the native refusals listed below.
+- `TaleWorlds.Native.dll` `2a5e0e0b…6e12a` and `TaleWorlds.MountAndBlade.dll` `19387f31…0b87e` were the same before and after. The module folder was restored and hash-verified.
+- Evidence: `evidence/probe/map-epic-2-probe.json`. It holds the decisions, every measurement, and 153 screenshots cited by path and SHA-256 (the BMPs are git-ignored). `tools/summarize_map2_probe.py` recomputes it from the raw results.
+
+**Decisions:**
+
+| Question | Answer |
+|---|---|
+| Magic ground delivery | **A: one runtime decal overlay** for generated variants and live mutations. No school terrain layers |
+| Decal technique | **Entity-less scene decals**: `Decal.CreateDecal(null)`, `SetMaterial(published material)`, `Scene.AddDecalInstance(d, "editor_set", true)`, `SetIsVisible`, `SetVectorArgument(atlas scale/offset)`, `Frame`. Tint per instance with `SetFactor1` |
+| 513-sample terrain (level 7) | **Go** |
+| Map trees (flora.bin) | **Go** |
+
+**1. Layers.**
+- **Compositing.** Layers composite alpha-over, front to back from slot 15 to slot 0. A layer's weight is linear in its stored byte: a plain-colour ramp measures affine in w, with under 1.5 % residual. A higher slot covers a lower one: green at 0.5 over a magenta ramp keeps green constant to 0.4 %. The shader divides weights by `smooth_blend_amount` and skips weights ≤ 2/255.
+- **Height blend.** `use_transparency_of_ground_slope` switches on height blend. The layer then stays hidden until w ≈ 0.6 and rises steeply to full at 1. Leave the flag off and convert target fractions with the over-compositing inverse a_k = f_k / (f_0 + … + f_k).
+- **Per-season masks.** These are inert at run time. `MBMapScene.SetSeasonTimeFactor(1)` and `Scene.SetWinterTimeFactor(1)` gave byte-identical images: no mask change (layer 1 was dropped from the winter mask of half the nodes) and no seasonal layer variant took effect. Write identical masks and identical variants for all seasons.
+- **Load.** `Read` takes 0.04–0.17 s. A scene is ready about 1 s later with 2, 6 or 15 layers per node. Each scene compiles 6–9 terrain shader permutations inside that second.
+- **Frame cost.** Every view held the 60 fps cap (p95 ≤ 17.9 ms). The cap sits outside the game's settings, and `SetForceVsync(false)` did not lift it, so GPU cost above 60 fps is unmeasured. Main-thread time was 0.39–0.56 ms per frame with no layer-count trend.
+
+**2. Scale.**
+- A layer's `scale` is its tile size in map units: scale 5 repeats every 5.03 units and scale 20 every 20.0.
+- At camera distance 38 the map camera gives 37.0 px per unit on a 1,024-px-tall view, about 0.0362 × screen height, or 39 px at 1080p.
+- The screen then spans about 58 × 37 units. Scale 5 reads as noise; scale 15–20 shows 2–4 repeats.
+
+**3. Decals.**
+- **Scene decals** follow relief on slopes up to about 40°.
+- **Count and cost.** 200, 1,000, 3,000 and 7,500 decals in view all held the cap. Main-thread time was 0.46 / 0.84 / 1.59 / 3.19 ms, about 0.36 µs per decal per frame.
+- **Create and remove.** 7,500 decals are created in 4.3 ms and removed in 4.7 ms. Removal restores the decal-free image exactly, and re-creation reproduces the earlier image.
+- **Runtime textures don't work.** A runtime `Texture.CreateFromByteArray` texture set on a `Material.CreateCopy` draws nothing, with or without `CheckAndRegisterToDecalSet`; a plain copy draws. So school textures must be published module decal materials (MMR-259). NavalDLC's own `decal_water_foam` is the precedent.
+- **Entity decals** (`AddComponent(Decal)`) draw only after `CheckAndRegisterToDecalSet()`.
+- **The mesh-decal fallback** draws nothing.
+- **Soft ground overlays** exist as vanilla materials: `decal_city_ground` and `mainmap_decal_undervillage(_desert)`. `mainmap_cracked_mud_a` is not a material.
+- **Budget.** Keep the in-view total under about 5,000 decals.
+
+**4. Dynamic snow.**
+- **The flag alone.** `use_dynamic_weather_effects="true"` does nothing visible on its own.
+- **With a named texture.** With `dynamic_flowmap_texture_name` (vanilla Main_map's `main_map_snow_flowmap`), the terrain snows from that texture's R channel. The season follows `MBMapScene.SetTerrainDynamicParams(scene, (x, 0.65, 0))` on the application thread: summer x = 0.55, winter x = −0.1.
+- **`Scene.SetDynamicSnowTexture`.**
+  - After `Read` it has no visible effect: patterns in R, G or A, a B water mask and the vanilla texture all gave identical images.
+  - Before `Read` it hangs the engine.
+- **Channel and orientation.** These are not settled in game, because no runtime pattern reached the shader. The shader source says R channel, row 0 at the north edge (v = 1 − y/size). The vanilla mask's snow landing in our northern quadrants is consistent with that.
+- **The template's winter grass** never activates, so it does not whiten the map.
+- **Never in a non-map scene:**
+  - a runtime `MapColorGradeManager` hangs the engine, so drive `SetTerrainDynamicParams` ourselves;
+  - `terrain_render_version="1"` never becomes ready.
+- **Open for MMR-256.** A per-world snow mask needs a texture the terrain resolves by name at `Read`. Registering a runtime texture by name (`Texture.LoadTextureFromPath` before `Read`) is untested. MMR-256 proves it in the acceptance build, or falls back to the permanent-white layer plus `SetTerrainDynamicParams` with no seasonal mask.
+
+**5. Tints and textures.**
+- Mode 1 adds the colour to the layer albedo: +0.2 red gave +0.075 linear red after lighting.
+- Mode 2 multiplies and saturates, so it only darkens.
+- The full-colour battle textures read as their biome at map scale: `desert_floor_a`, `desert_floor_c_d`, `ground_drygrass_a_d`, `forest_a_d`, `ground_mud_b_d`, `ground_beach_a_d`, `ground_nord_grass_a_d`, `rock_k_d`, `ice_a_d` and `snow_a_d`.
+- The `*_mainmap` textures (`ground_grass_b_d_mainmap`, `ground_forest_b_d_main_map`, `main_map_mountains_d`) are pale blue-white without the vista colour multiply. Don't use them as plain biome layers.
+
+**6. Terrain resolution and normals.**
+- **Level 7.** It is written by `terrain_bin.py` (the C++ encoder still caps at 64 cells per node). It reads in 0.13 s, is ready in 0.9 s, renders cleanly at the cap, and costs the same main-thread time as level 6.
+- **Normals.** Normals from a smoothed field are indistinguishable from Sobel at level 6: oblique Laplacian energy 5.23 against 5.23. The facets are geometry.
+- **The shaped field.** The shaped, half-vertical-scale level-7 field renders without spikes. Its land slope p95 is 39.6°, against 62.6° unshaped at level 7 and 69.0° today.
+
+**Map trees (RT-21).**
+- **The format.** `flora.bin` is FLR2: u32 payload size, u32 count, then per tree the name, a u32 flora_variation index, a 4 × 4 f32 frame and an RGBA f32 colour. It was decoded from the installed Main_map, which holds 69,500 trees.
+- **The test.** 88,000 trees (`map_spruce_mix`, `worldmap_tree_beech_01`, `worldmap_tree_acacia_01`, scale 0.18–0.32) loaded and read well at distance 38.
+- **Cost.** Frame time held the cap. The overview cost 0.24 ms more main thread.
+
 Only in the final live test:
 - Snow, Swamp and Forest faces in native sound and missions;
 - per-group native path cost (route-matrix ratio);
 - overlay install before `PreAfterLoad` / `ComputePathAfterLoad`;
 - nav-cache time with more settlements.
+
+### Native answers from the live runs (MMR-247, 2026-10-21)
+
+Settled by the acceptance runs acc5 and acc6, the decal labs acc5lab, acc6lab and lab291w, and the hang bisect acc5bis. Run folders are
+git-ignored: `C:\Users\davgo\m2\int\build\acceptance\<run>\`, except lab291w (`C:\Users\davgo\m2\t291-W\build\acceptance\lab291w\`) and
+acc5bis (`C:\Users\davgo\m2\t247-X\build\acceptance\acc5bis\`).
+
+- **Scene decals draw only from Native's prebaked atlas (MMR-247 D).** The map scene is created with `DecalAtlasGroup.Worldmap`, and the
+  terrain and map water shaders sample one texture for every scene decal: `decal_atlas_worldmap` (Native `core.tpac`, 4096², the 29 rects of
+  `decal_textures_worldmap.xml`). The native loader reads those lists from the `native` module only (`TaleWorlds.Native.dll` 0x18025B900:
+  `strcpy_s(buf, 64, "native")`), so a module texture has no rect and samples alpha 0. acc5lab, land spot: the vanilla column and the water
+  material with the vanilla texture swapped in drew in 6 of 7 rows each; the columns with module textures drew in 2 marginal cells of 28
+  (meanDiff 6.5 and 8.3, threshold 6.0). Module art reaches the map only as meshes (below); the decal fallback is tinted vanilla stamps
+  (`World/DecalAtlas.cs`). Evidence: `acc5lab\decal-lab\decal-lab.json`, `C:\Users\davgo\m2\results\MMR-247-D.md` (the atlas map and the
+  loader's disassembly in `results\mmr247d\`).
+- **No decal draws on the generated water surface (R1: negative).** At the deep sea spot no decal of any column or row drew, the vanilla
+  column and the box on the sea datum included: 0 of 56 in acc5lab, acc6lab and lab291w. Lakes use the same plane material
+  (`naval_worldmap_water`). Magic water over water cannot be decals. Evidence: `acc5lab\decal-lab\decal-lab.json` (spot `sea`), the same in
+  acc6lab.
+- **Runtime meshes with copies of vanilla materials render (MMR-291).** A runtime mesh with a `CreateCopy` of Native's `torch_flame_base`
+  carrying published module textures draws on the map, as does a ribbon of `naval_worldmap_water` as it is. acc6lab, land spot: the vein and
+  magic water copies drew (full and cell rows), the river ribbon in 4 of 5 rows. acc6 world 1: veins 80 entities (775 pieces), rivers 54
+  (230), magic water 75 (1,708), every material resolved, each layer hidden and shown again (c33 pass). Evidence:
+  `acc6lab\decal-lab\decal-lab.json` (spot `land-mesh`), `acc6\in-game\map2_acceptance-4996.json` (`overlayMeshes` of `w1.magic`,
+  `w1.water`, `w1.magicWater`), `C:\Users\davgo\m2\results\MMR-291.md`.
+- **The sea hides blended meshes; an alpha-tested, depth-writing pass shows (MMR-291 W).** The map water (`water_surface_worldmap`) is
+  opaque, depth-tested and writes no depth, and draws after the blended forward meshes, so a blended copy that writes no depth is painted over
+  (acc6lab: nothing over the sea, even flat on the sea plane). With `no_modify_depth_buffer` cleared and `pbr_shading`'s `alpha_test` at 0.3
+  (`roads.json overlayMeshes.magicWater.pass` `depth`), the texels past the test write depth and the water keeps off them. lab291w, sea spot:
+  `mesh:magicWater/blend` not drawn (meanDiff 3.9), `/depth` drawn (45.2), `/afterPostfx` drawn (32.2), `/forward` not drawn (3.6); on land
+  every pass but `under` drew. The alpha test value is on a 0-1 scale (`beards_h` 0.627, `thatched_roof_b_alpha` 0.392), and the runtime
+  shader flag applied with no error. Evidence: `lab291w\decal-lab\decal-lab.json` (spot `sea-mesh`, `meshPasses`),
+  `lab291w\in-game\map2_acceptance-22752.json` (`w1.decalLab` `meshMaterials`, `passReferences`), `C:\Users\davgo\m2\results\MMR-291-W.md`.
+- **Moving an entity with an occlusion body after `Scene.CheckResources` crashes the engine (MMR-247 X).** `CheckResources` rebuilds the
+  scene's software occlusion rasterizer without re-creating the occluder records entities hold, and `MapScreen` calls it each time its scene
+  view is enabled again (after a load, a mission, a conversation, another screen). A moved entity's next frame write goes through its stale
+  record; after a mission that faulted: `c0000005` at `TaleWorlds.Native.dll+0x55e625` (`DepthBufferRasterizer*` vtable slot 3). Our ruin
+  markers `ruinous_battania_castle_tower_a` / `_wall_a` carry occlusion bodies; vanilla's map moves no such entity. The fix: re-create the
+  dressing entities at the new image instead of moving them (`EntityImageMode.Recreate`), instantiated at their frame, refreshed only while the
+  scene view is enabled. acc5bis bisect: `warControl` (move), `warNoMagic` and `warNoCopySync` (move) crashed at that offset; `war` (re-create),
+  `warNoDressingMoves` (frozen) and `castle` (re-create) ran. Evidence: `acc5bis\state.json` (`phases.hangrepro.detail.hangRepro`),
+  `docs/map-dressing.md` "Seam", `C:\Users\davgo\m2\results\MMR-247-X.md`.
+- **The acc4/acc5 "hang" was that crash.** The process stopped inside the game's crash handling: Application log event 1000 with the fault
+  above, then the game's Watchdog (attached as the debugger about 49 ms after launch) failed to write its dump with a
+  `DirectoryNotFoundException` on the crashes folder, a junction here. The game sat with flat CPU until the runner stopped it. A launch that
+  exits with a probe step open is now recorded as a crash with its fault event (c32). Evidence: the acc5rep launches
+  (`C:\Users\davgo\m2\t247-K\build\acceptance\acc5rep\`) and their Application log events, `docs/map-epic-2-acceptance.md` "What acc5rep
+  showed", `C:\Users\davgo\m2\results\MMR-247-X.md`.
+- **A path-loaded snow texture does not resolve by name (MMR-256, acc5).** The texture loaded under the scene's
+  `dynamic_flowmap_texture_name`, but `resolvesByName` stayed false and every map read logged `Cannot find texture: mnbl_snow_<hex>.png`;
+  the cold region's white share was 0.05 in winter and 0.03 in summer. `climate-flow.json` takes the `permanentWhite` route: only land ice and
+  12-month snow are white. acc6 confirmed it (cold region 0.05 / 0.02, land ice 0.83 both seasons). The snow mask's channel and orientation
+  stay unsettled in game, since no runtime pattern reached the shader. Evidence: `docs/water-climate.md` "The decision", acc5's rgl logs (pids
+  15620, 15876, 16756, 43864, 56312, 56816), `acc6\in-game\map2_acceptance-4996.json` (`w1.season`).
+- **A besieged fortification sallies on a 4-hour check (MMR-247 F).** `SallyOutsCampaignBehavior` (1.4.8 IL) checks it on its hourly
+  settlement tick in hours with `Floor(h) % 4 == 0`, and when a map event starts against a party of the siege; it sallies when the defenders'
+  strength (its `SallyOut` parties plus its faction's parties near the camp) exceeds 2 × the besiegers' (1.5 × outside or blockade). acc6's
+  siege camp was stopped at progress 0.996 by a sally 2.06 h after camp-up (garrison 194 healthy against the player's 150). The probe now
+  finishes the camp before the next check hour, adds troops to the besieger until twice its strength reaches 1.5 × the defenders', and
+  retries once; that path is tested offline only. Evidence: `acc6\in-game\map2_acceptance-4996.json` (`w1.siege.case.setup.interruption`), `C:\Users\davgo\m2\results\MMR-247-F.md`.
+- **Frame cost and memory against vanilla War Sails (acc6, c27).** Same camera, 600 frames: frame time 5.0 ms mean in both (p95 5.2 ms);
+  main thread near 2.39 ms against 2.42 ms (−1 %), far 2.38 ms against 2.52 ms (−5 %); renderer 598 / 650 fps against 454 / 531 fps (near /
+  far). Working set after a campaign day 5.52 GB against 5.11 GB (+8 %), private bytes 8.53 GB against 8.05 GB, managed heap 389 MB against
+  215 MB. No drop over 20 %. Evidence: `acc6\in-game\map2_acceptance-4996.json` (`w1.frames`, `w1.memoryDay`) and `-16588.json` (`base.*`),
+  graded in `evidence/map-epic-2/acceptance.json` (c27).
 
 ## 14. Decisions (owner, 2026-10-18)
 
@@ -724,6 +920,20 @@ Only in the final live test:
 - the existing `coast_sign` refusal still passes.
 
 Peak landmark heights no longer match their source metres; that is expected.
+
+**Result (MMR-278, 2026-10-20).** Implemented as designed, with every step and the 513-sample output (`docs/terrain-compiler.md` "Shaping").
+On the regenerated A' (seed 42) and B' (seed 73) every offline gate passes (`evidence/fwg/terrain-shaping.json`):
+- interior slope p95 / max 26.8 / 48.1 degrees on A' and 25.3 / 57.0 on B'; coast p95 44.2 and 40.3; crease p95 8.1 and 6.2;
+- isolated spikes 0; pads over 25 degrees 2 of 258 and 3 of 381;
+- travel classes byte-identical to the pre-smoothing compile (verticalScale 0.01); seam pairs identical; no coastline sign lost;
+- no lake newly hidden: 31 of 35 lake groups shown on A' (0 before) and 127 of 159 on B' (18 before). The groups still hidden sit inside a
+  neighbouring group's box, which the runtime plane rule counts as shore; each group's record (level, plane, bed and shore status) is in
+  `compiled/terrain/shaping.json` for MMR-285;
+- C++/Python parity: z error 0.
+
+Decisions: verticalScale stays 0.005; pads lie on least-squares planes capped at 8 degrees (flat pads cut terraces where villages cluster);
+navigation keeps the travel compile at 257 as its own field, and the surface is a separate 513 field; the camera is held between the pole
+lines and the polar land share is recorded as a known limit (RT-19: on A' 33.6% of land cells have an east-west stretch of at least 2).
 
 ## 16. Noble houses, mercenary companies and wanderers
 
@@ -921,3 +1131,16 @@ Peak landmark heights no longer match their source metres; that is expected.
   - the pole clamp;
   - a troop-bearing synthetic mod.
 - **Policy keys.** MMR-248 lists the keys that later tickets consume. The re-pin is a script re-run whenever a pinned value is tuned.
+
+**Result for RT-16 (MMR-285, 2026-10-20).** Every travel cell land parties cannot cross renders as water (`docs/map-dressing.md` "Water",
+`docs/water-climate.md`):
+- **Lakes.** The runtime plane rule no longer counts another lake's samples as shore, and MMR-278's shaping lowers every matched group's
+  bed under the plane its shore allows. Every lake group shows: A' 35 of 35, B' 159 of 159 (31 and 127 under the old rule).
+- **Rivers** have no plane (they follow their slope). They are drawn as water decal strips along the River cells: MMR-249's entity-less
+  scene decals with a tinted vanilla stamp (`mainmap_decal_undervillage`), because runtime textures never draw on decals and MMR-259's
+  module materials are unpublished. MMR-255's riverbed layer stays as the bank.
+- **Consistency.** Sea and lake cells whose centre no plane shows get a fill stamp: the nav/visual coast mismatch (A' 166, B' 116 sea
+  cells) and lake cells only one corner of which carries lake intent (A' 33, B' 266).
+- **Gate** (`evidence/world/water-visibility.json`): over `cells.bin` v2, 0 impassable water cells show dry land (A' 5,801, B' 3,983
+  checked) and every river cell is drawn (37 and 145). Water decals: A' 331, B' 903; with road decals 2,546 and 3,506, under the
+  5,000 budget. The look in game is MMR-247's (`Diagnostics/WaterVisibilityProbe.cs`).

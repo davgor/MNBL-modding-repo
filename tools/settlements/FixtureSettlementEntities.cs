@@ -54,7 +54,7 @@ internal static class FixtureSettlementEntities
         var layout = SettlementPositionResolver.Resolve(sites, null, ground, policy);
         var report = layout.Report(ground);
         if (!layout.Activatable) { File.WriteAllText(reportPath, Json.Serialize(report)); Console.Error.WriteLine("refused: " + String.Join("; ", layout.Problems.Where(p => p.Refusal))); return 1; }
-        string entities = SettlementEntityFactory.ToXml(SettlementEntityFactory.Build(layout, ground, contract, policy, worldId, extent, ground.MaxHeight + 100));
+        string entities = SettlementEntityFactory.ToXml(SettlementEntityFactory.Build(layout, ground, contract, policy, null, worldId, extent, ground.MaxHeight + 100));
 
         // Keep only the scenebin water plane; splice the factory's entities in.
         string scenePath = Path.Combine(folder, "scene.xscene");

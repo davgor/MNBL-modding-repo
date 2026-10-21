@@ -1,0 +1,89 @@
+{
+  "schema": "mnbl.settlement-looks",
+  "version": 1,
+  "catalog": {
+    "scene": "Modules/NavalDLC/SceneObj/Main_map/scene.xscene",
+    "frozen": true,
+    "kinds": ["town", "castle", "village"]
+  },
+  "normalize": {
+    "inlinePrefabs": true,
+    "stripEditorData": true,
+    "stripSceneLeveler": true,
+    "collidersRaycastOnly": true,
+    "dropSourcePorts": true,
+    "dropArcs": true,
+    "dropDropoffs": true
+  },
+  "fit": {
+    "scale": 0.5,
+    "minScale": 0.35,
+    "cull": true,
+    "clearanceMargin": 0.5,
+    "resnapChildren": true,
+    "yaw": "portOrGate"
+  },
+  "selector": {
+    "inputs": ["culture", "kind", "port", "sizeTier"],
+    "neighbours": 3,
+    "repeatPenalty": 1.0,
+    "usageBalance": 0.5,
+    "stream": 1
+  },
+  "variants": {
+    "portStripped": ["nord"],
+    "portGrafted": ["battania", "khuzait"],
+    "castleAsSmallTown": true
+  },
+  "contract": {
+    "wallsPerLevel": 2,
+    "maxSolidOrBrokenPerWall": 1,
+    "bannerLevelBits": true,
+    "dropoffParentIsVillage": true
+  },
+  "phase0": {
+    "cultureCodes": {"aserai": "aserai", "battania": "bat", "empire": "emp", "khuzait": "khuz", "nord": "nord", "sturgia": "stu", "vlandia": "vla"},
+    "keep": "mi_{code}_keep_{level}",
+    "wall": "mi_{code}_wall_{level}",
+    "wallSegment": "mi_{code}_wall_{level}s",
+    "collapsed": "mi_{code}_wall_{level}s_collapsed",
+    "collapsedCultures": ["battania", "empire", "nord", "vlandia"],
+    "collapsedFallback": "mi_emp_wall_{level}s_collapsed",
+    "village": "village_{culture}_{level}",
+    "piers": ["mi_port_pier_1", "mi_port_pier_2", "mi_port_pier_3"],
+    "production": {
+      "wheat_farm": ["wheat_group_summer_4x"],
+      "cattle_farm": ["mi_cattle_farm_a", "mi_cattle_farm_b", "mi_cattle_farm_c", "mi_cattle_farm_d"],
+      "swine_farm": ["mi_cattle_farm_a"],
+      "sheep_farm": ["mi_sheep_a", "mi_sheep_b", "mi_sheep_c", "mi_sheep_d"],
+      "olive_trees": ["mi_olive_plant_a", "mi_olive_plant_b", "mi_olive_plant_c"],
+      "vineyard": ["mi_vineyard_a", "mi_vineyard_b"],
+      "date_farm": ["mi_date_a", "mi_date_b", "mi_date_c", "mi_date_d"],
+      "flax_plant": ["mi_straw_pile"],
+      "silk_plant": ["mi_straw_pile"],
+      "europe_horse_ranch": ["mi_saddle_horse_a", "mi_saddle_horse_b"],
+      "vlandian_horse_ranch": ["mi_saddle_horse_c", "mi_saddle_horse_d"],
+      "battanian_horse_ranch": ["mi_saddle_horse_a"],
+      "sturgian_horse_ranch": ["mi_saddle_horse_b"],
+      "desert_horse_ranch": ["mi_steppe_horse_a", "mi_steppe_horse_b"],
+      "steppe_horse_ranch": ["mi_steppe_horse_c", "mi_steppe_horse_d"],
+      "iron_mine": ["mi_iron_mine_a", "mi_iron_mine_b", "mi_iron_mine_c"],
+      "silver_mine": ["mi_iron_mine_c"],
+      "salt_mine": ["mi_salt_mine_a", "mi_salt_mine_b", "mi_salt_mine_c"],
+      "clay_mine": ["mi_clay_mine_a", "mi_clay_mine_b", "mi_clay_mine_d", "mi_clay_mine_e"],
+      "lumberjack": ["mi_lumberjack_a", "mi_lumberjack_b", "mi_lumberjack_c", "mi_lumberjack_d"],
+      "trapper": ["mi_lumberjack_d"],
+      "fisherman": ["mi_fisherman_1", "mi_fisherman_2", "mi_fisherman_3"],
+      "whaler": ["mi_fisherman_2"],
+      "walrus_hunter": ["mi_fisherman_3"]
+    }
+  },
+  "ruins": {
+    "minGap": 5.0,
+    "snapCells": 1,
+    "pieces": ["ruinous_castle_building_a", "ruinous_battania_castle_tower_a", "ruinous_battania_castle_wall_a"],
+    "scale": 0.05,
+    "encyclopedia": true
+  },
+  "notes": "Map epic 2 settlement looks (MMR-248 freezes the keys; MMR-258 owns the looks, MMR-257 the ruin markers). catalog: the look catalog is built from the player's installed War Sails campaign map, and the selected look XML is frozen into the world package, so no TaleWorlds XML ships and rebuilds survive game patches. normalize lists the normalizer's steps (findings section 10). fit: looks are placed at scale (owner decision 5: about 0.5), shrunk to at least minScale or culled to keep clearanceMargin units from neighbours, children re-snapped to the terrain, yawed to the generated port or gate. selector: deterministic per world from its inputs, with repeatPenalty against the same look among the nearest neighbours and usageBalance across the pool (RT-14, RT-15). variants: Nord port looks stripped for inland Nord towns, inland looks grafted with a port for Battania and Khuzait ports, castle layouts as small towns. contract: the relaxed siege contract (2 walls per level, at most one solid or broken child per wall, banner parents with level bits, drop-offs as direct children named by the village id). phase0: the culture-piece fallback, mesh names verified on the installed NavalDLC Main_map (meta_mesh_component names): {code} is the culture code, {level} the wall level 1..3; aserai, khuzait and sturgia have no collapsed wall mesh and take collapsedFallback; production pieces per village type (types without an installed piece take the nearest one listed). ruins (MMR-257): one marker per FWGC++ ruin on land, snapped at most snapCells cells to land, skipped within minGap units of a live settlement, from the installed ruin prefabs (Native Prefabs) at scale (a starting value MMR-257 measures), and listed on a ruins encyclopedia page. Initial wall levels are drawn from economy.json walls."
+}

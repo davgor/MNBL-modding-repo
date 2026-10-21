@@ -49,10 +49,9 @@ namespace MNBL.ProceduralWorld.CampaignRegistry
             manager.RegisterCharacterCreationContentHandler(this, Priority);
             if (harmony == null)
             {
-                var type = AccessTools.TypeByName("TaleWorlds.CampaignSystem.ViewModelCollection.CharacterCreation.CharacterCreationCultureStageVM");
-                var sort = type == null ? null : AccessTools.Method(type, "SortCultureList");
-                if (sort == null) throw new InvalidOperationException("CharacterCreationCultureStageVM.SortCultureList is not the installed v1.4.8 method.");
-                MNBL.ProceduralWorld.CampaignRegistry.GeneratedPatches.RequireInstalledVersion("character creation");
+                // MMR-284: by signature (PatchSignatures); a changed sort refuses the patch, naming it.
+                MNBL.ProceduralWorld.CampaignRegistry.GeneratedPatches.RequireSupportedBuild("character creation");
+                var sort = MNBL.ProceduralWorld.CampaignRegistry.PatchSignatures.Method("TaleWorlds.CampaignSystem.ViewModelCollection.CharacterCreation.CharacterCreationCultureStageVM", "SortCultureList");
                 harmony = new Harmony(HarmonyId);
                 harmony.Patch(sort, prefix: new HarmonyMethod(typeof(GeneratedCharacterCreation), nameof(SortPrefix)));
                 trace("character_creation_sort_patch_applied");
@@ -90,9 +89,9 @@ namespace MNBL.ProceduralWorld.CampaignRegistry
 
         void ICharacterCreationContentHandler.AfterInitializeContent(CharacterCreationManager manager)
         {
-            var field = typeof(CharacterCreationContent).GetField("_characterCreationCultures", BindingFlags.NonPublic | BindingFlags.Instance);
-            var dictionary = field == null ? null : field.GetValue(manager.CharacterCreationContent) as IDictionary;
-            if (dictionary == null) throw new InvalidOperationException("CharacterCreationContent._characterCreationCultures is not the installed v1.4.8 dictionary.");
+            var field = MNBL.ProceduralWorld.CampaignRegistry.PatchSignatures.Field(typeof(CharacterCreationContent).FullName, "_characterCreationCultures");
+            var dictionary = field.GetValue(manager.CharacterCreationContent) as IDictionary;
+            if (dictionary == null) throw new InvalidOperationException("CharacterCreationContent._characterCreationCultures is null.");
             var listed = dictionary.Keys.Cast<CultureObject>().ToList();
             Removed = listed.Where(c => !cultures.Contains(c.StringId)).Select(c => c.StringId).OrderBy(c => c, StringComparer.Ordinal).ToList();
             foreach (var culture in listed.Where(c => !cultures.Contains(c.StringId))) dictionary.Remove(culture);

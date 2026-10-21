@@ -179,5 +179,44 @@
    246.6,
    269.5
   ]
+ },
+ "navigationCacheBuild": {
+  "rule": "MMR-282: the first campaign start of a world, and a load whose navigation caches must be rebuilt, wait for the installed SandBoxNavigationCache build of Default, Naval and All, on the engine thread (the game does not respond). The wait is modelled as seconds(n) = s0 * (n / n0) ^ p in the world's settlements n = towns + castles + villages, fitted by least squares on (log n, log seconds) through each world's median build here (p is 2, the distance-pair count's square law, with one world). The setup preview states it per world and the loader warns with it before a rebuild (src/MNBL.ProceduralWorld/World/NavigationCacheForecast.cs). MMR-247 calibrates it: add the epic build's two measured worlds (settlements from compiled/campaign/campaign.json counts, seconds = the cache record's Default + Naval + All generateMilliseconds / 1000) and remove the pre-epic rows.",
+  "machine": "the machine of testedSettings.machine",
+  "worlds": [
+   {
+    "world": "A (seed 42, mnbl_1609fb72, pre-epic bundle f596b58c)",
+    "settlements": 286,
+    "seconds": [
+     386.5,
+     379.5,
+     380.7,
+     379.8,
+     382.0,
+     377.1,
+     389.9,
+     379.3,
+     392.4,
+     383.4,
+     378.5,
+     392.0,
+     381.1,
+     380.2,
+     389.0
+    ],
+    "source": "45 towns, 26 castles, 215 villages; the cache record's Default + Naval + All generateMilliseconds of evidence/runtime/in-game first_test_profile-23796, -23852, -33316, -33872, -35468, -36568, -40136, -40412, -544, naval_missions-7368, seam_presentation-21508, -36540, two_world_matrix-31404, -47388, -5452 (two_world_matrix-35948 repeats -31404's record). The engine thread froze 383.1 s in run 35468 (docs/first-test-profile.md)."
+   },
+   {
+    "world": "B (seed 73, mnbl_214f6557, pre-epic bundle f63c6841)",
+    "settlements": 410,
+    "seconds": [
+     824.2,
+     829.6,
+     861.1,
+     828.6
+    ],
+    "source": "66 towns, 39 castles, 305 villages; the same sums in seam_presentation-18104, -9524, two_world_matrix-47388, -5452. Its Default build (about 321 s against A's 48 s) is the larger share: rivers split B's main landmass (findings §17 RT-16)."
+   }
+  ]
  }
 }

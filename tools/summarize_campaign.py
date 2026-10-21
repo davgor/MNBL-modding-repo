@@ -207,41 +207,14 @@ def verify(source_dir, compiled_dir, content, cultures, installed):
     checks['legendsNotInstantiated'] = set(rec['notInstantiated']) == {p['uid'] for p in people if not statuses[p['status']]}
     harbour_towns = {by_site[x['core_id']]['uid'] for x in hamlets if hroles[x['role']]['harbour']}
     checks['portsFromHarbourVillages'] = {p['town'] for p in rec['ports']} == {gid('town', u) for u in harbour_towns}
-    # Every name recomputed: clans, towns, villages and castles in source-UID order, then regents; collisions take the ordinal.
-    names = content['names']
-    taken = set()
-
-    def take(wanted):
-        if wanted not in taken:
-            taken.add(wanted)
-            return wanted
-        n = 2
-        while fill(names['ordinal'], {'name': wanted, 'n': str(n)}) in taken:
-            n += 1
-        taken.add(fill(names['ordinal'], {'name': wanted, 'n': str(n)}))
-        return fill(names['ordinal'], {'name': wanted, 'n': str(n)})
-    want = {}
-    for r in sorted(realms, key=lambda r: r['uid']):
-        want[('clan', 'clan:' + r['uid'])] = take(fill(names['rulingClan'], {'realm': r['name']}))
-    for s in sorted(sites, key=lambda s: s['uid']):
-        want[('town', s['uid'])] = take(s['name']) if s.get('name') else take(fill(names['town'], {'realm': realm_of_city[s['uid']]['name']}))
-    for x in sorted(hamlets, key=lambda x: x['uid']):
-        want[('village', x['uid'])] = take(fill(names['village'], {'core': want[('town', by_site[x['core_id']]['uid'])], 'label': hroles[x['role']]['label']}))
-    for f in sorted(forts, key=lambda f: f['uid']):
-        if f['core_id'] != -1 and f.get('core_uid'):
-            want[('castle', f['uid'])] = take(fill(names['castle'], {'core': want[('town', f['core_uid'])]}))
-        else:
-            want[('castle', f['uid'])] = take(fill(names['castleWithoutCore'], {'culture': realm_by_uid[castle_owner(f)]['name']}))
-    for r in sorted(realms, key=lambda r: r['uid']):
-        if not r.get('sovereign_uid'):
-            want[('regent', r['uid'])] = take(fill(names['regent'], {'realm': r['name']}))
-    got = {('clan', c['uid']): c['name'] for c in rec['clans']}
-    got.update({('town', t['uid']): t['name'] for t in rec['towns']})
-    got.update({('village', v['uid']): v['name'] for v in rec['villages']})
-    got.update({('castle', c['uid']): c['name'] for c in rec['castles']})
-    got.update({('regent', x['uid'][len('regent:'):]): x['name'] for x in regents})
-    checks['namesRecomputed'] = got == want
-    all_named = rec['towns'] + rec['villages'] + rec['castles'] + rec['clans'] + rec['kingdoms'] + rec['heroes']
+    # Names (MMR-286): the shared cleaner names every kind (tools/summarize_names.py is the census): no Age tag, no ordinal numeral, unique
+    # per kind (towns, castles and villages together), a renamed source name kept as sourceName, regents with personal names.
+    from summarize_names import AGE, numeral  # noqa: E402
+    clans = rec.get('houses', rec.get('clans', [])) + rec.get('mercenaryCompanies', []) + rec.get('outlawClans', [])
+    kinds = [rec['kingdoms'], clans, rec['towns'] + rec['villages'] + rec['castles'], rec['heroes']]
+    checks['namesClean'] = all(len({x['name'] for x in k}) == len(k) and not any(AGE.search(x['name']) or numeral(x['name']) for x in k) for k in kinds) and \
+        all(not x['name'].startswith('Regent of') for x in regents) and all(x.get('sourceName', x['name']) != x['name'] or 'sourceName' not in x for x in rec['towns'] + rec['kingdoms'])
+    all_named = rec['towns'] + rec['villages'] + rec['castles'] + clans + rec['kingdoms'] + rec['heroes']
     checks['nameEscaping'] = all(x['nameXml'] == xml_escape(x['name']) and x['nameLocalized'] == localized(x['id'], x['name']) and x['nameLocalizedXml'] == xml_escape(localized(x['id'], x['name'])) for x in all_named)
     founding, config = world['settlements']['founding'], world['effective_config']
     land = collections.Counter(x['core_id'] for x in hamlets if 'sea_node' not in x)

@@ -1,44 +1,119 @@
 {
   "schema": "mnbl.climate-flow-policy",
-  "version": "mmr39/1",
-  "owner": "MMR-39",
+  "version": "mmr256/1",
+  "owner": "MMR-39; MMR-256 (snow season, snow texture, latitude winds, runtime atmosphere)",
   "code": [
     "src/MNBL.ProceduralWorld/World/GeneratedClimateSystem.cs",
     "src/MNBL.ProceduralWorld/World/GeneratedWaterSystem.cs",
     "src/MNBL.ProceduralWorld/CampaignBootstrap/GeneratedClimate.cs",
     "src/MNBL.ProceduralWorld/CampaignBootstrap/GeneratedMapSupport.cs",
-    "src/MNBL.ProceduralWorld/CampaignBootstrap/GeneratedColorGrade.cs"
+    "src/MNBL.ProceduralWorld/CampaignBootstrap/GeneratedColorGrade.cs",
+    "src/MNBL.ProceduralWorld/CampaignBootstrap/GeneratedSnowTexture.cs",
+    "src/MNBL.ProceduralWorld/CampaignBootstrap/GeneratedMapAtmosphere.cs"
   ],
   "why": "FWGC++ exports no engine flow or weather field. The host synthesizes them deterministically from what the source world carries; nothing is guessed from texture art.",
   "source": {
     "file": "world.json (a bundle's source/world.json, verified by the bundle manifest; a fixture names it by path and SHA-256)",
-    "wind": "climate.wind_arrows: fixed compass-bearing transport directions on an 8 x 6 lattice of the 129 source grid (columns 0..112 step 16, rows 21..126 step 21). Each arrow's 3D tangent is turned into local (east, north) at its position (y-up frame).",
+    "wind": "not read: since MMR-256 the wind comes from the latitude bands below (FWGC++'s climate.wind_arrows are one fixed bearing per world, RT-18)",
     "rain": "layers.rainfall (129 x 129, a relative proxy)",
     "snow": "seasonal_environment.months[0..11].snow (129 x 129 each) and layers.ice_cap",
-    "note": "the seed-42 world's arrows all point due east, so its synthesized wind is a uniform east wind faded at the poles",
-    "colorGrade": "layers.biome (FWGC++ natural biome ids, generator/data/biomes.json; append-only) and layers.temperature (degrees C)",
-    "lakes": "layers.water_type (2 = lake) and layers.water_surface (the lake level in metres); docs/water-climate.md"
+    "colorGrade": "layers.biome (FWGC++ natural biome ids, generator/data/biomes.json; append-only), layers.moisture (0..1, splits grassland) and layers.temperature (degrees C)",
+    "lakes": "layers.water_type (2 = lake) and layers.water_surface (the lake level in metres); docs/water-climate.md",
+    "seed": "config.seed (the world's master seed; it perturbs the wind)"
   },
   "wind": {
     "dimension": 512,
     "layout": "SandBox.MapScene._windFlowMapData: row-major (x, y) float32 pairs over the physical terrain [0, extent]^2; index row * 512 + col with col = floor(x / extent * 512) (the MMR-59 layout, read back through the engine and War Sails)",
-    "sample": "each sample's centre is mapped to its canonical logical location (PeriodicWorldCoordinates) and to the source grid (projection inverse.sourceGrid)",
-    "interpolation": "bilinear on the arrow lattice; columns periodic, rows clamped to the outer rings",
+    "sample": "each sample's centre is mapped to its canonical logical location (PeriodicWorldCoordinates) and to the source grid (projection inverse.sourceGrid): latitude 90 - 180 x row / 128, longitude 360 x column / 128",
     "poleTaperRows": 16,
     "poleTaper": "smoothstep fade to zero over 16 source rows towards each pole line: a pole is one location, so it has one value (calm)",
     "scale": 0.4,
     "scaleReason": "NavalDLCMapWeatherModel clamps the wind's length to [0.0667, 0.46] before War Sails' boost (Map(angle, 0, 120, |w|, 0) x 1.5, clamped to [0, 1.5]) uses it; the official NavalDLC Main_map flowmap's background magnitude is 0.2 (its median, peaks to 12). 0.4 lies inside the clamp, so the synthesized strength reaches ships unchanged, and the pole taper stays visible down to the clamp's floor",
     "mapVector": "(east, -north): physical y runs south",
-    "smoothness": "C1 across the pole taper; the largest neighbour step is recorded (0.037 for the seed-42 world at scale 0.4; the official flowmap's mean step is 0.39)"
+    "smoothness": "C1 across the pole taper; the largest neighbour step is recorded. The band edges (blendDeg) turn the wind through calm, so the step is bounded by the blend, not by MMR-39's 0.04",
+    "bands": {
+      "owner": "MMR-256 (RT-18); keys frozen by MMR-248",
+      "bands": [
+        {
+          "toLatDeg": 30,
+          "direction": [
+            -0.9,
+            -0.44
+          ]
+        },
+        {
+          "toLatDeg": 60,
+          "direction": [
+            0.9,
+            0.44
+          ]
+        },
+        {
+          "toLatDeg": 90,
+          "direction": [
+            -0.9,
+            0.44
+          ]
+        }
+      ],
+      "blendDeg": 6,
+      "perturbation": {
+        "amplitude": 0.35,
+        "unit": "radians",
+        "wavelengthDeg": 40,
+        "octaves": 2,
+        "noise": "value noise on a lattice of wavelengthDeg (halved per octave, weight halved), periodic in longitude, latitude clamped; smoothstep interpolation; the sum divided by the weights",
+        "seed": "world.json config.seed; FNV-1a 64 of \"wind/1:<seed>:<octave>:<i>:<j>\", then the MurmurHash3 64-bit finalizer, gives each lattice value in [-1, 1] (the top 53 bits)"
+      },
+      "rule": "each band is a unit (east, north) direction for |latitude| below toLatDeg in the northern hemisphere; the southern hemisphere mirrors the north component. Neighbouring bands blend by smoothstep over blendDeg centred on their edge, and the hemispheres blend the same way across the equator. The result is turned by a seeded angle (perturbation, radians) and scaled to `scale`; the pole taper applies last"
+    }
   },
   "precipitation": {
     "dimension": 32,
     "layout": "SandBox.MapScene._snowAndRainData: row-major (snow, rain) byte pairs, 32 x 32 over the physical terrain (DefaultWeatherNodeDimension 32)",
     "footprint": "each node averages 8 x 8 sub-samples of its square (each at its canonical location)",
     "rain": "rainfall / the layer's maximum",
-    "snow": "max(largest monthly snow cover, ice cap)",
-    "byte": "round(255 x value), clamped to [0, 1] before scaling",
-    "season": "the engine's own (global, time-only); the field is where it snows or rains, not when"
+    "snow": "from the snow-season length (snowSeason below)",
+    "byte": "rain: round(255 x value), clamped to [0, 1] before scaling; snow: snowSeason",
+    "season": "the engine's own (global, time-only); the field is where it snows or rains, not when",
+    "snowSeason": {
+      "owner": "MMR-256; keys frozen by MMR-248",
+      "rule": "each sub-sample's season length k is the number of months whose bilinear snow is at or above monthThreshold; a sub-sample whose bilinear ice cap is at or above monthThreshold counts as ice cap. A node whose ice-cap share is at least half takes iceCap; any other node takes the byte of its mean season length f = mean(k) / 12 (ice-cap sub-samples count 12): 0 for f = 0, else ceil(255 x (0.55 - 0.65 + 1.3 t - 0.65 (1 - f))), the inverse of the installed DefaultMapWeatherModel formula, so the Snowy share of the year (snow > 0.55) is f. The bytes table is that rule at f = 12/12, 9/12, 6/12, 3/12 and the peak (f -> 0+); the code checks it",
+      "monthThreshold": 0.5,
+      "bytes": {
+        "12": 196,
+        "9": 155,
+        "6": 113,
+        "3": 72,
+        "peak": 30
+      },
+      "iceCap": 255,
+      "inverse": {
+        "season": "CalculateTimeFactorForSnow: s = 1 - d / 2, d the distance in seasons from 3.5 (mid-winter) on the 4-season circle, so s is uniform over the year",
+        "snow": "snow = v^2, v = SmoothStep(c - 0.65, c + 0.65, byte / 255), c = Lerp(0.55, -0.1, s) = 0.55 - 0.65 s",
+        "snowy": 0.55,
+        "t": "SmoothStep^-1(sqrt(0.55))",
+        "s": "the threshold season factor 1 - f: Snowy for the share f of the year"
+      }
+    },
+    "snowTexture": {
+      "owner": "MMR-256",
+      "route": "permanentWhite",
+      "routes": {
+        "namedTexture": "the world scene names its snow texture (terrain dynamic_flowmap_texture_name); the texture is written as a PNG in the store and loaded and named (Texture.LoadTextureFromPath, Name) before every Read of the scene; Scene.SetDynamicSnowTexture is never called (no effect after Read, hangs before it, MMR-249)",
+        "permanentWhite": "the fallback: no texture name in the scene and nothing loaded; only the permanent-white layer (land_ice and 12-month snow, terrain-materials.json) is white; the season threshold is still driven"
+      },
+      "dimension": 512,
+      "layout": "RGBA8, row-major; texture row 0 at physical y = extent and column 0 at x = 0 (the terrain shader samples v = 1 - y / extent, terrain_pixel_functions.rsh): pixel (col, row) has its centre at x = (col + 0.5) e, y = extent - (row + 0.5) e, e = extent / 512, taken at its canonical location",
+      "channels": {
+        "r": "the snow byte of the pixel by the snowSeason rule (one sub-sample): the shader whitens by SmoothStep(x - 0.65, x + 0.65, R), x the season threshold below, the curve the weather model uses",
+        "g": "the rain byte (rainfall / maximum)",
+        "b": "0 (the shader water mask, unused)",
+        "a": 255
+      },
+      "name": "mnbl_snow_ and the first 16 hex digits of the raster SHA-256 (the scene XML names it, so it is part of the scene identity)",
+      "folder": "<store>/world-snow/<name>.png"
+    }
   },
   "colorGrade": {
     "dimension": 512,
@@ -59,9 +134,28 @@
       "17 land_ice": 120
     },
     "water and other ids": "ocean (0), lake (8) and any unlisted id take a temperature band from the source temperature at the cell: below 2 C north (120), below 18 C normandy (100), else mediterranean (140)",
-    "binding": "a Harmony postfix on MapColorGradeManager.Init copies the grid over the one the manager reads from Calradia's worldmap_colorgrade_grid texture (patched before the map scene is read, removed when it is destroyed); managers already initialized are replaced in PrepareWeather. Production scenes carry the manager (the official Main_map script variables)"
+    "binding": "fixture scenes that carry a MapColorGradeManager: a Harmony postfix on MapColorGradeManager.Init copies the grid over the one the manager reads from Calradia's worldmap_colorgrade_grid texture (patched before the map scene is read, removed when it is destroyed). Production scenes carry no manager (its Init reads that texture natively; an inspection read of a scene carrying one hung, run 15744; a runtime manager hung a non-map scene, MMR-249): GeneratedMapAtmosphere does the manager's tick itself (runtime)",
+    "grassland": {
+      "owner": "MMR-256; keys frozen by MMR-248 (terrain-materials.json colourGrade / colourGradeWet)",
+      "split": "moisture",
+      "threshold": 0.5,
+      "dry": 40,
+      "wet": 60,
+      "modeFilterCells": 3,
+      "rule": "grassland (biome 3) takes dry below threshold of the nearest source cell's moisture, else wet; then the whole grid is mode-filtered over modeFilterCells x modeFilterCells cells (columns beyond the grid's edges continue one width away, rows clamp; a tie keeps the cell's own grade if it is among the most frequent, else the smallest grade)"
+    },
+    "runtime": {
+      "owner": "MMR-256",
+      "rule": "GeneratedMapAtmosphere, on every application tick while the generated campaign map is the top screen and the scene has no MapColorGradeManager, does what the installed manager's OnTick does: season = MBMapScene.GetSeasonTimeFactor(scene); SetFrameForAtmosphere(scene, TimeOfDay x 10, camera z, false); SetTerrainDynamicParams(scene, (Lerp(0.55, -0.1, season), 0.65, 0)); and the grade under the camera (night 22:00-02:00, above 400 the default, rain below 50 with MBMapScene.GetApplyRainColorGrade) blended with SetColorGradeBlend over 1 s (0.2 s for rain), the grade textures from worldmap_color_grades.xml (MBObjectManager.GetMergedXmlForNative). The grid carries live overrides (MMR-260's colour-grade cells)",
+      "threshold": [
+        0.55,
+        -0.1
+      ],
+      "blizzard": 0.65,
+      "driver": "managed"
+    }
   },
   "seam": "every sample is taken at its canonical location, so a strip sample is an exact copy of its canonical sample (a width holds 256 wind samples and 16 weather nodes)",
   "poles": "rows beyond each pole line repeat the pole node's value (the accepted pole-alias rule, worldgen/policies/periodic-coordinates.json)",
-  "identity": "SHA-256 of the policy text (version, source SHA-256, coordinate policy identity, constants, the biome table) with the wind, snow/rain and colour-grade hashes; recorded in the placement's climate block (schema mnbl.generated-climate.v2) and checked on load"
+  "identity": "SHA-256 of the policy text (version, source SHA-256, seed, coordinate policy identity, constants, the band and grade tables) with the wind, snow/rain, colour-grade and snow-texture hashes; recorded in the placement's climate block (schema mnbl.generated-climate.v2) and checked on load"
 }

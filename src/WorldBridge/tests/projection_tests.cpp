@@ -142,7 +142,8 @@ void samples() {
     check(same(p.node(p.grid().node_of(3, 4)), p.sample(3, 4)), "node position = its canonical sample");
     refused("position of the north pole node", "singular_point", [&] { p.node(0); });
     refused("position of the south pole node", "singular_point", [&] { p.node(p.grid().south_pole()); });
-    check(near(p.z(110), 1.0) && near(p.z(10), 0) && near(p.z(-90), -1.0), "z = (height - sea level) * 0.01");
+    const double vs = projection::load_policy(policy_file).vertical_scale;
+    check(near(p.z(110), 100 * vs) && near(p.z(10), 0) && near(p.z(-90), -100 * vs), "z = (height - sea level) * verticalScale");
     check(p.below_datum(9.999) && !p.below_datum(10) && !p.below_datum(11), "below the datum only");
     refused("non-finite height", "nonfinite_number", [&] { p.z(std::numeric_limits<double>::infinity()); });
     refused("zero radius", "out_of_range", [&] { Projection(policy_with(0), frame(9, 0, 0)); });
@@ -198,8 +199,8 @@ void paths() {
 
 void policy() {
     const auto p = projection::load_policy(policy_file);
-    check(p.type == "periodic-equirectangular" && p.logical_width == 800 && p.height_ratio == 0.5 && p.vertical_scale == 0.01 && p.strip_ratio == 0.5,
-          "policy: periodic-equirectangular, W 800, H/W 1/2, 0.01 units per metre, strips W/2");
+    check(p.type == "periodic-equirectangular" && p.logical_width == 800 && p.height_ratio == 0.5 && p.vertical_scale == 0.005 && p.strip_ratio == 0.5,
+          "policy: periodic-equirectangular, W 800, H/W 1/2, 0.005 units per metre (map epic 2), strips W/2");
     check(cjson::sha256_file_hex(calibration_file) == p.calibration_sha256, "policy pins the calibration receipt by SHA-256");
     check(projection::load_policy(policy_file).sha256 == p.sha256, "policy hash is stable");
     const std::string text = slurp(policy_file);

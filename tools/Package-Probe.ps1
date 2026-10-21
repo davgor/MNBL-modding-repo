@@ -10,6 +10,7 @@ Copy-Item "$repo/build/module/MNBL.ProceduralWorld.dll" $bin
 Copy-Item "$repo/build/producer/apps/Release/fwg.exe" $bin
 Copy-Item "$repo/build/worldbridge/Release/worldbridge.exe" $bin
 if (Test-Path "$repo/Modules/MNBL.ProceduralWorld/GUI") { Copy-Item "$repo/Modules/MNBL.ProceduralWorld/GUI" "$module/GUI" -Recurse }
+if (Test-Path "$repo/Modules/MNBL.ProceduralWorld/ModuleData/Languages") { New-Item "$module/ModuleData" -ItemType Directory -Force | Out-Null; Copy-Item "$repo/Modules/MNBL.ProceduralWorld/ModuleData/Languages" "$module/ModuleData/Languages" -Recurse }   # MMR-286
 (Get-FileHash "$bin/fwg.exe").Hash.ToLowerInvariant() | Set-Content "$bin/fwg.sha256"
 (Get-FileHash "$bin/worldbridge.exe").Hash.ToLowerInvariant() | Set-Content "$bin/worldbridge.sha256"
 Copy-Item "$repo/README.md" "$package/README.md"

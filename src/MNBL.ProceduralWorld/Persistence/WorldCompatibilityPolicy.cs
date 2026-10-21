@@ -20,9 +20,9 @@ namespace MNBL.ProceduralWorld.Persistence
     //                               the activation kept, the settlement layout re-derived by the encoder with the scene, the engine's
     //                               navigation caches rebuilt from the frozen navmesh under a new cache key;
     //   unsupported-world           refused, with the refusal the loader gives (LoadPolicy codes): a torn, unreadable or held save, another
-    //                               binding contract, save id version, identity schema, game or War Sails version (a War Sails save on a
-    //                               game without War Sails among them; for a save made before MMR-48, the game and War Sails versions its
-    //                               header records), a missing or damaged world package, a header naming another world than its package, a
+    //                               binding contract, save id version or identity schema, a game or War Sails build below this release's
+    //                               minimum (MMR-284: no maximum; a War Sails save on a game without War Sails among them; for a save made
+    //                               before MMR-48, the versions its header records), a missing or damaged world package, a header naming another world than its package, a
     //                               missing, damaged or incompatible data bundle, an installed scene that differs, a report neither
     //                               installed nor kept, a settlement layout of another world, a world file that cannot be read now.
     // A missing data bundle is a missing world, never a cache miss: a world is never regenerated from its seed, its ids are never rewritten
@@ -60,6 +60,7 @@ namespace MNBL.ProceduralWorld.Persistence
             public string PackageScene, PackageSeed;
             public bool? BundlePresent; public IList<string> BundleProblems;
             public LoadPolicy.SceneState? Scene;   // the world's installed scene against its package's scene files
+            public bool SceneArchived;             // MMR-282: a missing scene's copy in <store>/world-scenes is the package's
             public string SceneName;
             public IDictionary<string, string> ReportState;   // report -> "installed", "kept" (activation evidence) or "missing"
             public string LayoutProblem;                      // the settlement layout (installed or kept) is not this world's
@@ -129,10 +130,11 @@ namespace MNBL.ProceduralWorld.Persistence
             {
                 row("build keys", Verified, "not recorded (a save made before MMR-48): its header's game and War Sails versions are compared, and the world's reconstruction is verified at load", null);
                 // As LoadPolicy.LegacyCompatibility: a header that records neither version is not compared.
-                if (f.LegacyBuild != null) foreach (var key in new[] { "game", "naval" }) Strict(key, f.LegacyBuild, f.RunningBuild, " (from the header)", row, refuse);
+                if (f.LegacyBuild != null) foreach (var key in LoadPolicy.BuildKeys) GameBuild(key, f.LegacyBuild, f.RunningBuild, " (from the header)", row, refuse);
                 return;
             }
             foreach (var key in LoadPolicy.StrictKeys) Strict(key, saved, f.RunningBuild, "", row, refuse);
+            foreach (var key in LoadPolicy.BuildKeys) GameBuild(key, saved, f.RunningBuild, "", row, refuse);
             foreach (var key in LoadPolicy.RebuiltKeys)
             {
                 string a, b; saved.TryGetValue(key, out a); f.RunningBuild.TryGetValue(key, out b);
@@ -154,8 +156,19 @@ namespace MNBL.ProceduralWorld.Persistence
             string a, b; saved.TryGetValue(key, out a); running.TryGetValue(key, out b);
             if (b == null) { row("build " + key, NotChecked, "saved " + (a ?? "(none)") + source + "; the running value was not given", null); return; }
             if (a == b) { row("build " + key, Same, a + source, null); return; }
-            if (key == "naval" && (b == "absent" || b == "(none)") && a != null && a != "absent") refuse("build naval", LoadPolicy.IncompatibleBuild, "this campaign was saved with War Sails " + a + ", which is not installed");
-            else refuse("build " + key, LoadPolicy.IncompatibleBuild, key + ": saved " + (a ?? "(none)") + source + ", running " + b);
+            refuse("build " + key, LoadPolicy.IncompatibleBuild, key + ": saved " + (a ?? "(none)") + source + ", running " + b);
+        }
+
+        // MMR-284: the game and War Sails builds as the loader decides them (LoadPolicy.BuildCheck): refused below the minimum or for a War
+        // Sails save without War Sails; a supported difference is verified (the catalog and the patch signatures at load).
+        private static void GameBuild(string key, IDictionary<string, string> saved, IDictionary<string, string> running, string source, Action<string, string, string, string> row, Action<string, string, string> refuse)
+        {
+            string a, b, note; saved.TryGetValue(key, out a); running.TryGetValue(key, out b);
+            if (b == null) { row("build " + key, NotChecked, "saved " + (a ?? "(none)") + source + "; the running value was not given", null); return; }
+            var refusal = LoadPolicy.BuildCheck(key, a, b == "(none)" ? null : b, source, out note);
+            if (refusal != null) refuse("build " + key, LoadPolicy.IncompatibleBuild, refusal.Detail);
+            else if (note == null) row("build " + key, Same, a + source, null);
+            else row("build " + key, Verified, note, null);
         }
 
         // The immutable world (package, bundle) and the derived resources built from it.
@@ -187,6 +200,8 @@ namespace MNBL.ProceduralWorld.Persistence
             // The derived resources.
             if (f.Scene == null) row("scene", NotChecked, f.SceneName ?? "unknown", null);
             else if (f.Scene == LoadPolicy.SceneState.Installed) row("scene", Same, f.SceneName + ": installed, every file the package's", null);
+            else if (f.Scene == LoadPolicy.SceneState.Missing && f.SceneArchived)
+                row("scene", Rebuild, f.SceneName + ": not in the module; its copy in the per-user scene archive is the package's and is copied back at load (no encoder)", null);
             else if (f.Scene == LoadPolicy.SceneState.Missing)
             {
                 bool tested = SameEncoder(f);
@@ -198,7 +213,7 @@ namespace MNBL.ProceduralWorld.Persistence
             foreach (var report in Reports)
             {
                 string state = null; if (f.ReportState != null) f.ReportState.TryGetValue(report, out state);
-                if (report == "settlement-layout.json" && f.Scene == LoadPolicy.SceneState.Missing)
+                if (report == "settlement-layout.json" && f.Scene == LoadPolicy.SceneState.Missing && !f.SceneArchived)
                     row("report " + report, Rebuild, "re-derived by the surface encoder with the scene" + (state == "kept" || state == "installed" ? ", and checked against the layout the campaign was activated with" : ""), null);
                 else if (state == null) row("report " + report, NotChecked, "not checked", null);
                 else if (state == "installed") row("report " + report, Same, "installed" + (report == "settlement-layout.json" ? "" : "; its gate runs at load"), null);
@@ -284,6 +299,11 @@ namespace MNBL.ProceduralWorld.Persistence
             string folder = Path.Combine(sceneStore, f.SceneName);
             var installed = expected.Keys.ToDictionary(k => k, k => File.Exists(Path.Combine(folder, k)) ? WorldSaveTransfer.Sha256File(Path.Combine(folder, k)) : null, StringComparer.Ordinal);
             f.Scene = LoadPolicy.Scene(expected, installed);
+            if (f.Scene == LoadPolicy.SceneState.Missing)
+            {
+                string archive = Path.Combine(store, "world-scenes", f.SceneName);
+                f.SceneArchived = LoadPolicy.Scene(expected, expected.Keys.ToDictionary(k => k, k => File.Exists(Path.Combine(archive, k)) ? WorldSaveTransfer.Sha256File(Path.Combine(archive, k)) : null, StringComparer.Ordinal)) == LoadPolicy.SceneState.Installed;
+            }
             if (!compiled) return;
             var paths = new Dictionary<string, string> { ["navigation.json"] = Path.Combine(store, "world-navigation", f.SceneName + ".json"),
                 ["settlement-layout.json"] = Path.Combine(store, "world-settlements", f.SceneName + ".json"), ["playability.json"] = Path.Combine(store, "world-playability", f.SceneName + ".json") };

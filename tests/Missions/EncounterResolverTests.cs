@@ -9,6 +9,7 @@ using System.Web.Script.Serialization;
 using MNBL.ProceduralWorld.CampaignBootstrap;
 using MNBL.ProceduralWorld.Missions;
 using MNBL.ProceduralWorld.Surface;
+using MNBL.ProceduralWorld.World;
 
 // MMR-42 offline tests: the mission scene catalogue against the installed game, the mission contracts, the battle-cell choice on every
 // geography class, full battle maps of compiled worlds A and B (the managed navmesh stand-in and the bundles' biome masks), the periodic seam
@@ -154,10 +155,22 @@ internal static class EncounterResolverTests
         var marshRow = (Dictionary<string, object>)probeRows[4]; var bridgeRow = (Dictionary<string, object>)probeRows[14]; var riverRow = (Dictionary<string, object>)probeRows[13];
         var lakeRow = (Dictionary<string, object>)probeRows[16];
         Func<object, string, string> navalOf = (row, t) => (string)((Dictionary<string, object>)((Dictionary<string, object>)row)["naval"])[t];
-        Check((string)forestRow["forestDensity"] == "High", "woodland: a forest biome takes a Plain scene of high forest density (" + forestRow["land"] + ", " + forestRow["forestDensity"] + ")");
+        // MMR-254 (RT-25): woodland takes High and Low forest density, not High alone (one or two maps away from water).
+        var woodland = resolver.LandCandidates("woodland", true).Select(i => table.UniqueLand(i)).Where(r => r != null).ToList();
+        var woodlandScenes = woodland.Select(r => r.Id).Distinct().ToList();
+        Check(((string)forestRow["forestDensity"] == "High" || (string)forestRow["forestDensity"] == "Low") && woodland.Any(r => r.ForestDensity == "High") && woodland.Any(r => r.ForestDensity == "Low") &&
+              woodland.All(r => r.ForestDensity == "High" || r.ForestDensity == "Low") && woodlandScenes.Count > m.Battle.Count(b => !b.Naval && b.Terrain == "Plain" && b.ForestDensity == "High"),
+              "woodland (RT-25): High u Low forest density, " + woodland.Count + " indices of " + woodlandScenes.Count + " Plain scenes (High alone: " + m.Battle.Count(b => !b.Naval && b.Terrain == "Plain" && b.ForestDensity == "High") + "); a forest biome took " + forestRow["land"] + " (" + forestRow["forestDensity"] + ")");
         var desertCoast = (Dictionary<string, object>)probeRows[10];
-        Check((string)desertCoast["landTerrain"] == "Desert" || (string)desertCoast["landTerrain"] == "Steppe" || (string)desertCoast["landTerrain"] == "Plain",
-              "fallback: a desert coast with no Desert + coast index installed falls back to Steppe, then Plain, never to another class's terrain (" + desertCoast["land"] + ", " + desertCoast["landTerrain"] + ", tier " + desertCoast["tier"] + ")");
+        // MMR-247: sea-touching land keeps its class only where an index of the class's terrain also resolves the sea (RT-24 within the
+        // determinism PostBuild requires): a steppe coast stays Steppe; no installed Desert index names a naval scene, so a desert coast borrows
+        // its first fallback (Steppe) with one naval scene, never a Desert index that leaves the ship's scene to the engine's random pick.
+        var steppeCoast = cell(new[] { "Steppe" }, new[] { "CoastalSea" }, null); steppeCoast.ClassOverride = "steppe";
+        var cs = resolver.Choose(steppeCoast, "mnbl_probe", 3, 5); var steppeRow = cs.LandScene == null ? null : m.Battle.First(b => !b.Naval && b.Id == cs.LandScene);
+        bool desertNaval = m.Battle.Where(b => !b.Naval && b.Terrain == "Desert").SelectMany(b => b.MapIndices).Any(i => m.Battle.Any(n => n.Naval && n.MapIndices.Contains(i)));
+        Check((string)desertCoast["landTerrain"] == "Steppe" && (bool)desertCoast["deterministic"] && !desertNaval && steppeRow != null && steppeRow.Terrain == "Steppe" && cs.Naval.Values.All(v => v != null),
+              "sea-touching land keeps its class where the table allows it deterministically (RT-24, MMR-247): a steppe coast takes a Steppe scene (" + cs.LandScene + ", tier " + cs.Tier + "); no installed Desert index names a naval " +
+              "scene, so a desert coast takes its fallback Steppe with one CoastalSea scene (" + desertCoast["land"] + ", " + navalOf(desertCoast, "CoastalSea") + ", tier " + desertCoast["tier"] + ")");
         Check(((string[])rockRow["terrainTypes"]).Any(t => t == "Mountain" || t == "Canyon") && (string)rockRow["landTerrain"] == "Plain",
               "rock: exposed rock takes a scene with Mountain or Canyon ground (the installed ones are Plain: " + rockRow["land"] + ")");
         Check((string)desertRow["landTerrain"] == "Desert" && (string)marshRow["landTerrain"] == "Swamp", "desert and marsh take Desert and Swamp scenes (" + desertRow["land"] + ", " + marshRow["land"] + ")");
@@ -184,33 +197,41 @@ internal static class EncounterResolverTests
         // Every class with every sea combination resolves.
         var seaSets = new[] { new string[0], new[] { "CoastalSea" }, new[] { "OpenSea" }, new[] { "River" }, new[] { "UnderBridge" }, new[] { "Lake" }, new[] { "CoastalSea", "OpenSea" }, new[] { "River", "UnderBridge" }, new[] { "Lake", "CoastalSea" }, new[] { "River", "CoastalSea" } };
         int combos = 0, resolved = 0; var unresolved = new List<string>();
-        foreach (var biome in m.BiomeClass.Keys)
+        // Biomes, and (MMR-247) every scene class as a class override, which a live mutation cell's patch sets (MMR-260; steppe has no biome),
+        // each at a settlement or not (the robust ring).
+        foreach (var biome in m.BiomeClass.Keys.Select(b => "biome " + b).Concat(m.Classes.Keys.Select(k => "class " + k)))
             foreach (var sea in seaSets)
                 foreach (bool hasLand in new[] { true, false })
+                foreach (bool robustCell in new[] { false, true })
                 {
                     if (!hasLand && sea.Length == 0) continue;
                     combos++;
                     try
                     {
-                        var c = resolver.Choose(cell(hasLand ? new[] { "Plain" } : new string[0], sea, biome), "mnbl_combo", combos, 1);
-                        bool ok = (!hasLand || c.LandScene != null) && sea.All(t => c.Naval[T(t)] != null);
-                        if (ok) resolved++; else unresolved.Add(biome + "/" + String.Join("+", sea) + (hasLand ? "+land" : ""));
+                        var probe = cell(hasLand ? new[] { "Plain" } : new string[0], sea, biome.StartsWith("biome ", StringComparison.Ordinal) ? biome.Substring(6) : null);
+                        if (biome.StartsWith("class ", StringComparison.Ordinal)) probe.ClassOverride = biome.Substring(6);
+                        probe.Robust = robustCell;
+                        var c = resolver.Choose(probe, "mnbl_combo", combos, 1);
+                        bool ok = (!hasLand || c.LandScene != null) && sea.All(t => c.Naval[T(t)] != null) && (!robustCell || c.Robust);
+                        if (ok) resolved++; else unresolved.Add(biome + "/" + String.Join("+", sea) + (hasLand ? "+land" : "") + (robustCell ? "+settlement" : ""));
                     }
                     catch (InvalidOperationException e) { unresolved.Add(biome + "/" + String.Join("+", sea) + ": " + e.Message); }
                 }
-        Check(resolved == combos, "cells: all " + combos + " combinations of " + m.BiomeClass.Count + " biomes, 10 sea terrain sets and land present or not resolve deterministically", unresolved);
+        Check(resolved == combos, "cells: all " + combos + " combinations of " + m.BiomeClass.Count + " biomes and " + m.Classes.Count + " class overrides, 10 sea terrain sets, land present or not and settlement or not resolve deterministically", unresolved);
         var coastalIndices = table.Indices.Where(i => table.UniqueLand(i) != null && new[] { "CoastalSea", "OpenSea" }.Any(t => { bool exact; return table.NavalScene(i, T(t), out exact) != null && exact; })).ToList();
         Check(coastalIndices.Count > 8, "coasts: " + coastalIndices.Count + " installed indices resolve both a land battle and a CoastalSea or OpenSea naval battle deterministically through the engine's terrain tie-break " +
               "(MMR-60 used only the 8 indices naming exactly one naval scene)");
 
         // ---- compiled worlds A and B: full battle maps ----
-        var host = new WorldDataBundle.HostProfile("v1.4.8.119303", "v1.2.8.119303", new[] { "R01", "R02", "R03", "R04", "R05", "R06", "R07", "R08", "R09", "R10" });
+        var host = new WorldDataBundle.HostProfile("v1.4.8.119303", "v1.2.8.119303", WorldDataBundle.HostCapabilities);
         var navPolicy = NavigationPolicy.FromBytes(File.ReadAllBytes(Path.Combine(repo, NavigationPolicy.PolicyPath)));
         var calibration = (IDictionary<string, object>)Serializer.DeserializeObject(File.ReadAllText(Path.Combine(repo, "worldgen/calibration/naval-transitions/naval-transitions.json")).TrimStart('﻿'));
         var model = NavigationModel.FromCalibration(calibration);
         var materials = (IDictionary<string, object>)Serializer.DeserializeObject(File.ReadAllText(Path.Combine(repo, "worldgen/policies/terrain-materials.json")).TrimStart('﻿'));
         var biomeNames = ((object[])materials["biomes"]).Cast<IDictionary<string, object>>().ToDictionary(b => Convert.ToInt32(b["id"], CultureInfo.InvariantCulture), b => (string)b["core"]);
         var landformNames = ((object[])materials["landforms"]).Cast<IDictionary<string, object>>().ToDictionary(b => Convert.ToInt32(b["index"], CultureInfo.InvariantCulture), b => (string)b["name"]);
+        var placementPolicy = SettlementPlacementPolicy.FromBytes(File.ReadAllBytes(Path.Combine(repo, SettlementPlacementPolicy.PolicyPath)), File.ReadAllBytes(Path.Combine(repo, SettlementPlacementPolicy.NavalPath)));
+        var biomeTable = BiomeTable.FromBytes(File.ReadAllBytes(Path.Combine(repo, BiomeTable.PolicyPath)));
         var worlds = new SortedDictionary<string, object>(StringComparer.Ordinal); evidence["worlds"] = worlds;
         var generatedTerrains = new HashSet<int>();
         foreach (var label in new[] { "A", "B" })
@@ -227,16 +248,37 @@ internal static class EncounterResolverTests
             bool whole = Math.Abs(origin - Math.Round(origin)) < 1e-6 && Math.Abs(period - Math.Round(period)) < 1e-6;
             int originCell = (int)Math.Round(origin), periodCells = (int)Math.Round(period);
             var landFaces = new HashSet<int>(); var seaFaces = new HashSet<int>();
-            // The cells around every settlement (travel graph points are logical: physical = logical + (strip, pole margin)), a ring of one cell.
-            var settlementCells = new HashSet<long>();
-            foreach (var st in navInput.Settlements)
+            // MMR-247: the request GeneratedBattleTerrain.Install builds in game (GeneratedMapScene.AfterLoad), so the record below is the one the
+            // activation's PostBuild reads. Its ring: the cells around every settlement with a port (Settlement.HasPort: every record with
+            // port_posX, so port towns and harbour villages), at its position, gate and port, from the resolved layout the records take
+            // (SettlementFactory.ApplyResolvedPositions: a village's gate is its centre, a harbour village's port its drop-off); its patch:
+            // the magic ground overlay's class override (MagicGroundRuntime.Begin registers it before AfterLoad, on every world).
+            var portTowns = new HashSet<string>(navInput.Transitions.Where(x => x.Kind == "port").Select(x => x.Town), StringComparer.Ordinal);
+            var layout = SettlementPositionResolver.Resolve(SettlementPositionResolver.SitesFromBundle(navInput, bundle.ReadVerified("compiled/campaign/campaign.json"), bundle.ReadVerified("compiled/travel/ports.json")),
+                                                            NavigationPlan.Create(build, model), new NavigationGround(build), placementPolicy);
+            var request = new GeneratedEncounterResolver.MapRequest { Width = width, Height = height, OriginCell = originCell, PeriodCells = periodCells, Periodic = true, WorldId = bundle.WorldContentId };
+            int ported = 0;
+            foreach (var r in layout.Settlements)
             {
-                int px = (int)Math.Floor((st.X + surface.Strip) / cellX), py = (int)Math.Floor((st.Y + surface.PoleMargin) / cellY);
-                for (int dy = -1; dy <= 1; dy++) for (int dx = -1; dx <= 1; dx++)
-                    if (py + dy >= 0 && py + dy < height && px + dx >= 0 && px + dx < width) settlementCells.Add((long)(py + dy) * 1000003 + GeneratedEncounterResolver.CanonicalColumn(px + dx, originCell, periodCells));
+                var port = r.Port ?? r.Dropoff;
+                if (port == null || !(r.Site.HasPort || r.Site.Harbour)) continue;
+                ported++;
+                foreach (var pt in new[] { r.Centre, r.Gate ?? r.Centre, port })
+                {
+                    int px = (int)Math.Floor((pt[0] + surface.Strip) / cellX), py = (int)Math.Floor((pt[1] + surface.PoleMargin) / cellY);   // the records are logical; Settlement.Position is physical
+                    for (int dy = -1; dy <= 1; dy++) for (int dx = -1; dx <= 1; dx++)
+                        if (py + dy >= 0 && py + dy < height && px + dx >= 0 && px + dx < width) request.SettlementCells.Add(GeneratedEncounterResolver.MapRequest.Key(GeneratedEncounterResolver.CanonicalColumn(px + dx, originCell, periodCells), py + dy));
+                }
             }
+            byte[] worldJson = bundle.ReadVerified("source/world.json");
+            GeneratedClimateSystem.Source climate;
+            using (var stream = new MemoryStream(worldJson)) climate = GeneratedClimateSystem.ReadSource(stream, GeneratedClimateSystem.Sha(worldJson));
+            var overlay = new WorldSurfaceOverlay(MagicGroundSource.From(climate, surface, navInput.Cells, biomeTable));
+            var magicCells = new MagicBattleCells { Width = width, Height = height, OriginCell = originCell, PeriodCells = periodCells, CellX = cellX, CellY = cellY };
+            int overridden = 0;
+            request.Patches.Add((lx, y, s) => { string cls = magicCells.ClassAt(overlay.Current, m.FaceClass, lx, y); if (cls != null) { s.ClassOverride = cls; overridden++; } });
             var watch = System.Diagnostics.Stopwatch.StartNew();
-            var map = resolver.Build(width, height, originCell, periodCells, true, bundle.WorldContentId, (cx, y) =>
+            request.Sample = (cx, y) =>
             {
                 var s = new CellSamples();
                 for (int sy = 0; sy < 3; ++sy)
@@ -255,10 +297,20 @@ internal static class EncounterResolverTests
                     }
                 string biome; s.Biome = biomeNames.TryGetValue(surface.BiomeAt((cx + .5) * cellX, (y + .5) * cellY), out biome) ? biome : null;
                 string landform; s.Landform = landformNames.TryGetValue(surface.LandformAt((cx + .5) * cellX, (y + .5) * cellY), out landform) ? landform : null;
-                s.Robust = settlementCells.Contains((long)y * 1000003 + (cx - originCell));
                 return s;
-            });
+            };
+            var map = resolver.Rebuild(request);
             double seconds = watch.Elapsed.TotalSeconds;
+            // MMR-247: the activation's own PostBuild check (PostBuildBattleMap) over the record Install writes. acc3 failed it in game on A'
+            // (land 5548 of 5548, sea 15929 of 16076) while the looser count below passed.
+            var installed = new Dictionary<string, object> { ["status"] = "installed", ["navigationSetsMatchCatalogue"] = true, ["terrainContextSource"] = "the world's masks (WorldSurface.BiomeAt, LandformAt)" };
+            foreach (var kv in resolver.Record(map)) installed[kv.Key] = kv.Value;
+            var postBuild = new List<string>();
+            MNBL.ProceduralWorld.Generation.PostBuildBattleMap.Check(installed, null, postBuild);
+            var undetermined = map.Choices.Values.Where(c => c.Naval.Values.Any(v => v == null)).GroupBy(c => c.Class + " " + c.Key + " (" + c.Tier + ")").OrderByDescending(g => g.Count()).Take(12).ToDictionary(g => g.Key, g => g.Count());
+            Check(postBuild.Count == 0 && overridden >= 0,
+                  label + ": the activation's PostBuild battle-map check passes on the record GeneratedBattleTerrain.Install writes (land " + map.LandDeterministic + " of " + map.LandCells + ", sea " + map.SeaDeterministic + " of " +
+                  map.SeaChecks + "; ring of " + ported + " port settlements, " + map.RobustCells + " cells; " + overridden + " cell samples with a magic class override)" + (postBuild.Count == 0 ? "" : ": " + String.Join("; ", postBuild)), undetermined);
             // Dense check: 6 x 6 points in every canonical cell (beyond the builder's 3 x 3), each land-valid face and each naval-valid face's
             // terrain against the engine's rule for the cell's index.
             long densePoints = 0, denseMisses = 0; var missExamples = new List<string>();
@@ -300,13 +352,34 @@ internal static class EncounterResolverTests
             Check(map.LandDeterministic == map.LandCells && map.SeaDeterministic == map.SeaChecks,
                   label + ": every one of " + map.LandCells + " cells with land resolves one land scene and every one of " + map.SeaChecks + " (cell, sea terrain) pairs one naval scene (" + map.SeaExact + " of the sea terrain itself) in " +
                   Math.Round(seconds, 1) + " s", rec);
+            // MMR-254 (RT-24): sea-touching land keeps its class's land scene wherever an index of the class's terrain also resolves its sea
+            // (MMR-247: deterministically; desert coasts and wetland banks have none and borrow, counted as borrowed).
+            int seaLand = 0, seaLandClass = 0, seaLandEligible = 0; var offClass = new SortedDictionary<string, int>(StringComparer.Ordinal); var borrowedLand = new SortedDictionary<string, int>(StringComparer.Ordinal);
+            foreach (var choice in map.Choices.Values)
+            {
+                if (choice.LandScene == null || choice.Naval.Count == 0 || !choice.Key.StartsWith("land:", StringComparison.Ordinal)) continue;   // land sampled and sea
+                seaLand++;
+                var row = m.Battle.First(b => !b.Naval && b.Id == choice.LandScene);
+                bool classTerrain = row.Terrain == m.Classes[choice.Class].Terrain;
+                if (classTerrain) seaLandClass++;
+                bool eligible = !choice.Robust && resolver.LandCandidates(choice.Class, false).Any(i => choice.Naval.Keys.All(t => { bool exact; return table.NavalScene(i, t, out exact) != null; }));
+                if (!eligible && !choice.Robust && !classTerrain) { string why = choice.Class + " -> " + row.Terrain; int n; borrowedLand.TryGetValue(why, out n); borrowedLand[why] = n + 1; }
+                if (eligible) { seaLandEligible++; if (!classTerrain) { string why = choice.Class + " -> " + row.Terrain + " (" + choice.Key + ", " + choice.Tier + ")"; int n; offClass.TryGetValue(why, out n); offClass[why] = n + 1; } }
+            }
+            ((Dictionary<string, object>)worlds[label])["seaTouchingLand"] = new Dictionary<string, object> { ["cells"] = seaLand, ["classTerrain"] = seaLandClass, ["eligible"] = seaLandEligible, ["offClass"] = offClass, ["borrowed"] = borrowedLand };
+            Check(offClass.Count == 0 && seaLand > 0, label + ": sea-touching land keeps its class's battle scene (RT-24): " + seaLandClass + " of " + seaLand + " sea-touching land cells on the class terrain; all " + seaLandEligible +
+                  " outside port rings whose class has an index resolving their sea; borrowed where none has: " + String.Join(", ", borrowedLand.Select(kv => kv.Key + " " + kv.Value)) +
+                  (offClass.Count == 0 ? "" : "; off class: " + String.Join(", ", offClass.Select(kv => kv.Key + " " + kv.Value))));
+            Check(portTowns.Count > 0 && ported >= portTowns.Count && ported < navInput.Settlements.Count(s => s.Kind == "town" || s.Kind == "castle" || s.Kind == "village"),
+                  label + ": the robust naval ring covers the " + ported + " settlements with a port (" + portTowns.Count + " port towns, " + (ported - portTowns.Count) + " harbour villages: Settlement.HasPort), not the other " +
+                  (navInput.Settlements.Count - ported) + " settlements (RT-24)");
             var biomesSeen = map.Biomes.Keys.ToList();
             Check(biomesSeen.Count >= 4 && map.Classes.Count >= 3 && map.Preferred * 10 >= map.Keys.Values.Sum() * 9,
                   label + ": representative geography: biomes " + String.Join(", ", map.Biomes.Select(b => b.Key + " " + b.Value)) + " -> classes " + String.Join(", ", map.Classes.Select(c => c.Key + " " + c.Value)) +
                   "; " + map.Preferred + " of " + map.Keys.Values.Sum() + " canonical cells take their class's preferred scenes", new { tiers = map.Tiers });
             Check(denseMisses == 0, label + ": dense check: " + densePoints + " land and sea party points (6 x 6 per cell) all resolve deterministically through the engine's rule for their cell's index", missExamples);
             Check(map.RobustCells > 0 && map.Robust == map.RobustCells && map.Relief > 0,
-                  label + ": the " + map.RobustCells + " cells around the " + navInput.Settlements.Count + " settlements take naval-robust indices; " + map.Relief + " cells take relief-preferred scenes (landforms " +
+                  label + ": the " + map.RobustCells + " cells around the " + portTowns.Count + " port towns take naval-robust indices; " + map.Relief + " cells take relief-preferred scenes (landforms " +
                   String.Join(", ", map.Landforms.Select(l => l.Key + " " + l.Value)) + ")");
             Check(stripMismatch == 0 && blockAtSeam, label + ": canonical patch sampling: every strip cell holds its canonical cell's bytes and a 16-cell block starts at the seam column " + originCell);
             // A seam-adjacent pair on the real map: images of the same canonical point read the same patch; the encounter direction points the short way.

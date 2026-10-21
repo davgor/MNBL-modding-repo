@@ -10,14 +10,14 @@ using MNBL.ProceduralWorld.Surface;
 
 namespace MNBL.ProceduralWorld.CampaignRegistry
 {
-    // MMR-34: every patch of installed code, in one place (docs/campaign-behavior-compatibility.md, "Patches"). Each one is pinned to the
-    // installed game version (RequireInstalledVersion runs before any of them is applied), names its owner ticket, its purpose and who
-    // applies and removes it, and is used only where the installed code offers no supported extension point. Bannerlord.Harmony is a
-    // declared module dependency (docs/decisions/002), never copied.
+    // MMR-34: every patch of installed code, in one place (docs/campaign-behavior-compatibility.md, "Patches"). Each one names its owner
+    // ticket, its purpose and who applies and removes it, and is used only where the installed code offers no supported extension point.
+    // MMR-284: no patch is pinned to a game build. Each locates its target by signature (PatchSignatures) or IL content, and is refused,
+    // named, when the installed member no longer matches (PatchSignatureException); RequireSupportedBuild only refuses a game or War Sails
+    // below this release's minimum (SupportedBuilds; no maximum). Verify checks every target without patching, for the setup screen and the
+    // loader. Bannerlord.Harmony is a declared module dependency (docs/decisions/002), never copied.
     internal static class GeneratedPatches
     {
-        public const string GameVersion = "v1.4.8.119303";
-        public const string NavalVersion = "v1.2.8";
         public const string StartupId = "mnbl.proceduralworld.startup";
         public const string WorldId = "mnbl.proceduralworld.world";
 
@@ -65,7 +65,7 @@ namespace MNBL.ProceduralWorld.CampaignRegistry
                 Lifetime = "applied once per process at the main menu (SubModule.OnBeforeInitialModuleScreenSetAsRoot), never removed" },
             new Descriptor { Id = MNBL.ProceduralWorld.Persistence.LoadRouting.GuardId, Kind = "prefix", Owner = "MMR-49",
                 Target = "TaleWorlds.Core.MBSaveLoad.LoadSaveGameData",
-                Purpose = "version-agnostic backstop: a generated save reaching the deserializer by any path but the world loader (the routing not applied on another game version, " +
+                Purpose = "version-agnostic backstop: a generated save reaching the deserializer by any path but the world loader (the routing refused by a changed patch signature, " +
                           "another mod's load) is refused with a message instead of being read onto the official world; every other save is unchanged",
                 Lifetime = "applied once per process at the main menu before the routing (SubModule.OnBeforeInitialModuleScreenSetAsRoot), never removed" },
             new Descriptor { Id = WorldId, Kind = "postfix", Owner = "MMR-42",
@@ -79,6 +79,28 @@ namespace MNBL.ProceduralWorld.CampaignRegistry
                           "introduction throws on a generated world; the one FindFirst call becomes FindFirstOrGenerated (the installed result, else the generated " +
                           "empire-culture town with the highest prosperity, else the highest-prosperity town)",
                 Lifetime = "applied when a generated campaign starts or loads (GeneratedGameManager.OnGameStart), removed when it ends (OnGameEnd)" },
+            new Descriptor { Id = WorldId, Kind = "transpiler", Owner = "MMR-287",
+                Target = IncidentCulturePatch.BehaviourType + ": the trigger conditions of incident_vedmaks_treasure, incident_the_deer_departed, " +
+                         "incident_kannic_splendors and incident_solider_is_wanted_criminal (IncidentCulturePatch: each condition is the first delegate after " +
+                         "its incident's ldstr id, and its comparisons are IFaction.get_StringId directly followed by an ldstr kingdom literal and " +
+                         "String.op_Equality; never a compiler-generated lambda name or a build string)",
+                Purpose = "the four conditions compare the last-visited settlement's MapFaction.StringId with vanilla kingdom ids (sturgia, khuzait, aserai, " +
+                          "empire / vlandia), which a generated kingdom never has, so the incidents never fire (RT-29); each comparison becomes one of the " +
+                          "faction's culture id (IncidentCulturePatch.FactionCultureId). A condition whose comparisons are not exactly the expected literals is " +
+                          "left as installed and logged: only that incident stays off",
+                Lifetime = "applied with the world patches (GeneratedGameManager.OnGameStart), removed when the generated campaign ends (OnGameEnd)" },
+            new Descriptor { Id = WorldId, Kind = "prefix", Owner = "MMR-281",
+                Target = CompanionsTickPatch.BehaviourType + ": its daily tick (CompanionsTickPatch: the listener RegisterEvents passes to CampaignEvents.DailyTickEvent, an " +
+                         "instance void() method whose body calls exactly a swap (LeaveSettlementAction and EnterSettlementAction.ApplyForCharacterOnly), a kill " +
+                         "(KillCharacterAction.ApplyByRemove) and a spawn (HeroCreator.CreateSpecialHero through its own method); AdjustEquipments located as the " +
+                         "instance void(Hero) method reading Hero.BattleEquipment and CivilianEquipment; never a build string; get__desiredTotalCompanionCount is never patched)",
+                Purpose = "the installed tick kills an unhired wanderer at 10% a day (TryKillCompanion) and spawns from random templates (many naming Calradian places) " +
+                          "against 0.6 x towns counted as templates; on a generated world with a population plan the prefix runs the swap as installed and then " +
+                          "GeneratedPopulationBehavior's wanderer tick (WandererRules: rotation of unmet, unhired wanderers at the same daily chance without a death " +
+                          "notice, a top-up below W heroes, FWGC++-style wanderers made in the installed four steps from the backstory-safe pool; RT-04, RT-33). " +
+                          "Unresolved: left as installed and logged; a world without a population plan runs the installed tick",
+                Lifetime = "applied with the world patches (GeneratedGameManager.OnGameStart), removed when the generated campaign ends (OnGameEnd); its handler is set " +
+                           "by the campaign's GeneratedPopulationBehavior and cleared when that campaign ends" },
             new Descriptor { Id = PeriodicPatches.HarmonyId, Kind = "postfix", Owner = "MMR-63",
                 Target = "TaleWorlds.CampaignSystem.Party.MobileParty.FindNextLocatable, TaleWorlds.CampaignSystem.Settlements.Settlement.FindNextLocatable",
                 Purpose = "a proximity search whose circle crosses the x seam continues at the query position's image, where the engine's planar filter finds the canonical objects",
@@ -123,7 +145,7 @@ namespace MNBL.ProceduralWorld.CampaignRegistry
                           "must equal the table's counts, else the periodic set is refused",
                 Lifetime = PeriodicLifetime } });
 
-        // The versions every patch target was read from: the running game must be exactly GameVersion, and War Sails NavalVersion.
+        // The running game and War Sails versions (diagnostics, the navigation cache key and the startup audit).
         public static string InstalledVersions()
         {
             string game = TaleWorlds.Engine.Utilities.GetApplicationVersionWithBuildNumber().ToString();
@@ -131,13 +153,36 @@ namespace MNBL.ProceduralWorld.CampaignRegistry
             return game + " / NavalDLC " + (naval == null ? "absent" : naval.Version.ToString());
         }
 
-        public static void RequireInstalledVersion(string patch)
+        // MMR-284: a game or War Sails below this release's minimum refuses the patch; any later build is accepted here (its targets are
+        // checked by signature where they are located).
+        public static void RequireSupportedBuild(string patch)
         {
             string game = TaleWorlds.Engine.Utilities.GetApplicationVersionWithBuildNumber().ToString();
             var naval = TaleWorlds.ModuleManager.ModuleHelper.GetModuleInfo("NavalDLC");
-            bool navalOk = naval == null || (naval.Version.Major == 1 && naval.Version.Minor == 2 && naval.Version.Revision == 8);
-            if (game != GameVersion || !navalOk)
-                throw new InvalidOperationException("The " + patch + " patches were read from Bannerlord " + GameVersion + " and War Sails " + NavalVersion + "; the running game is " + InstalledVersions() + ".");
+            if (!SupportedBuilds.Game(game) || (naval != null && !SupportedBuilds.Naval(naval.Version.ToString())))
+                throw new InvalidOperationException("The " + patch + " patches need Bannerlord " + SupportedBuilds.MinimumGame + " and War Sails " + SupportedBuilds.MinimumNaval + " or later; the running game is " + InstalledVersions() + ".");
+        }
+
+        // MMR-284: every patch target of this module against the installed game, without patching: each recorded signature (PatchSignatures)
+        // and the wanderer introduction's one Settlement.FindFirst call (its transpiler's IL content). Empty when every patch can be applied;
+        // the MMR-281 and MMR-287 patches are not listed (located by IL content, an unresolved one is left as installed and logged).
+        public static List<PatchSignatureException> Verify()
+        {
+            var failures = PatchSignatures.Verify();
+            if (failures.All(f => f.Patch != PatchSignatures.WandererIntroduction))
+            {
+                try
+                {
+                    var target = WandererIntroduction; var findFirst = InstalledFindFirst;
+                    int calls = PatchProcessor.GetOriginalInstructions(target).Count(i => i.Calls(findFirst));
+                    if (calls != 1) failures.Add(new PatchSignatureException(PatchSignatures.WandererIntroduction, target.DeclaringType.FullName + "::" + target.Name, calls + " Settlement.FindFirst calls, not one"));
+                }
+                catch (Exception error) when (!(error is PatchSignatureException))
+                {
+                    failures.Add(new PatchSignatureException(PatchSignatures.WandererIntroduction, "LordConversationsCampaignBehavior::conversation_wanderer_introduction_on_condition", "its IL cannot be read: " + error.Message));
+                }
+            }
+            return failures;
         }
 
         private static Harmony startup, world;
@@ -148,10 +193,9 @@ namespace MNBL.ProceduralWorld.CampaignRegistry
         public static void ApplyStartup(Action<string> trace)
         {
             if (startup != null) return;
-            RequireInstalledVersion("startup");
-            var notables = AccessTools.Method(typeof(NotablesCampaignBehavior), "SpawnNotablesAtGameStart");
-            var companions = AccessTools.Method(typeof(CompanionsCampaignBehavior), "OnNewGameCreated");
-            if (notables == null || companions == null) throw new InvalidOperationException("The startup patch targets are not the installed " + GameVersion + " methods.");
+            RequireSupportedBuild("startup");
+            var notables = PatchSignatures.Method(typeof(NotablesCampaignBehavior).FullName, "SpawnNotablesAtGameStart");
+            var companions = PatchSignatures.Method(typeof(CompanionsCampaignBehavior).FullName, "OnNewGameCreated");
             startup = new Harmony(StartupId);
             startup.Patch(notables, prefix: new HarmonyMethod(typeof(GeneratedStartupBehavior), nameof(GeneratedStartupBehavior.NotablesPrefix)));
             startup.Patch(companions, prefix: new HarmonyMethod(typeof(GeneratedStartupBehavior), nameof(GeneratedStartupBehavior.CompanionsPrefix)));
@@ -165,36 +209,40 @@ namespace MNBL.ProceduralWorld.CampaignRegistry
             trace("startup_patches_removed");
         }
 
-        public static MethodInfo WandererIntroduction { get { return AccessTools.Method(typeof(LordConversationsCampaignBehavior), "conversation_wanderer_introduction_on_condition"); } }
-        public static MethodInfo InstalledFindFirst { get { return AccessTools.Method(typeof(Settlement), nameof(Settlement.FindFirst), new[] { typeof(Func<Settlement, bool>) }); } }
+        // Located by signature (PatchSignatures); each throws PatchSignatureException when the installed member differs.
+        public static MethodInfo WandererIntroduction { get { return PatchSignatures.Method(typeof(LordConversationsCampaignBehavior).FullName, "conversation_wanderer_introduction_on_condition"); } }
+        public static MethodInfo InstalledFindFirst { get { return PatchSignatures.Method(typeof(Settlement).FullName, nameof(Settlement.FindFirst)); } }
         public static MethodInfo FindFirstOrGeneratedMethod { get { return AccessTools.Method(typeof(GeneratedPatches), nameof(FindFirstOrGenerated)); } }
-        public static MethodInfo BattleSceneForMapPatch { get { return AccessTools.Method(typeof(TaleWorlds.CampaignSystem.GameComponents.DefaultSceneModel), "GetBattleSceneForMapPatch"); } }
+        public static MethodInfo BattleSceneForMapPatch { get { return PatchSignatures.Method(typeof(TaleWorlds.CampaignSystem.GameComponents.DefaultSceneModel).FullName, "GetBattleSceneForMapPatch"); } }
 
         // The world-lifetime patches of a generated campaign (new game or load).
         public static void ApplyWorld(Action<string> trace)
         {
             if (world != null) return;
-            RequireInstalledVersion("world");
+            RequireSupportedBuild("world");
             var target = WandererIntroduction;
-            if (target == null || InstalledFindFirst == null) throw new InvalidOperationException("The world patch target is not the installed " + GameVersion + " method.");
+            var findFirst = InstalledFindFirst;   // the transpiler's operand, checked by signature before anything is patched
             int before = worldReplaced;
             world = new Harmony(WorldId);
             world.Patch(target, transpiler: new HarmonyMethod(typeof(GeneratedPatches), nameof(WorldTranspiler)));
             if (worldReplaced - before != 1)
             {
                 world.UnpatchAll(WorldId); world = null;
-                throw new InvalidOperationException("The world patch found " + (worldReplaced - before) + " Settlement.FindFirst calls in " + target.Name + ", not the installed one.");
+                throw new PatchSignatureException(PatchSignatures.WandererIntroduction, target.DeclaringType.FullName + "::" + target.Name, (worldReplaced - before) + " Settlement.FindFirst calls, not one");
             }
             // MMR-42: the observe-only battle scene guard.
             // All or nothing: a failure here removes the transpiler above too.
             try
             {
                 var scene = BattleSceneForMapPatch;
-                if (scene == null) throw new InvalidOperationException("DefaultSceneModel.GetBattleSceneForMapPatch is not the installed " + GameVersion + " method.");
                 MNBL.ProceduralWorld.Missions.MissionScenePatches.Clear();
                 world.Patch(scene, postfix: new HarmonyMethod(typeof(MNBL.ProceduralWorld.Missions.MissionScenePatches), nameof(MNBL.ProceduralWorld.Missions.MissionScenePatches.BattleScenePostfix)));
             }
             catch (Exception) { world.UnpatchAll(WorldId); world = null; throw; }
+            // MMR-287: the incident conditions, located by IL content; an unresolved one only leaves its incident off (never throws).
+            IncidentCulturePatch.Apply(world, trace);
+            // MMR-281: the wanderer tick, located by IL content; an unresolved one leaves the installed tick (never throws).
+            CompanionsTickPatch.Apply(world, trace);
             trace("world_patches_applied");
         }
 
@@ -202,6 +250,7 @@ namespace MNBL.ProceduralWorld.CampaignRegistry
         {
             if (world == null) return;
             world.UnpatchAll(WorldId); world = null;
+            CompanionsTickPatch.Removed();
             trace("world_patches_removed");
         }
 

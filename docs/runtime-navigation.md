@@ -32,7 +32,7 @@ The navmesh follows R07's native path (`docs/runtime-backend-decision.md`): it i
 - The fixture routes cross the interior chunk lines (x and y = 800) and the seam lines (x = 400 and 1200). Lines y = 400 and y = 1200 lie in the pole padding.
 
 **Vertices, faces and container**
-- Lattice vertices are grounded at max(collision reference, sea datum 0) + 0.2. The collision reference is the native height answer (MMR-37).
+- Lattice vertices are grounded at max(collision reference, sea datum 0) + 0.2. The collision reference is the native height answer (MMR-37), on the shaped surface since MMR-278: the travel cells stay 6.25 units, two surface samples of 3.125, and the builder accepts a travel spacing that is a whole multiple of the surface spacing.
 - Faces carry the campaign-map metadata: 2, 0, group, 0, −1, flag 0.
 - The container is RNM1, compression 3. It holds one LZ4 block with a single literal run, the form the surface encoder's `terrain.bin` already proved in game.
 
@@ -46,13 +46,13 @@ The navmesh follows R07's native path (`docs/runtime-backend-decision.md`): it i
 
 ## Face semantics
 
-The playability policy names each cell class's TerrainType. Names resolve through the installed `TaleWorlds.Core.TerrainType`; a numeral is refused.
+The playability policy names each cell class's TerrainType; a land cell's is its `cells.bin` v2 land type (MMR-254), the shared biome table's face compiled by the travel compiler (`docs/travel-graph.md` "Land face types"). Names resolve through the installed `TaleWorlds.Core.TerrainType`; a numeral is refused.
 
 Each cell carries four attributes besides its TerrainType: domain, water class, terrain cost and passage. They are kept separately from the type, and the report records their combinations (`build.cellSemantics`).
 
 | Cell (MMR-28 class after repairs) | Domain (region) | Water class | Terrain cost | Passage | TerrainType |
 |---|---|---|---|---|---|
-| land | land (1) | | plain | open | Plain |
+| land | land (1) | | plain | open | its land type: Plain, Desert, Forest, Steppe, Snow or Swamp |
 | mountain | none | | mountain | impassable (invalid for All) | Mountain |
 | sea, at least 4 cells from another class | sea (0) | open sea | | open | OpenSea |
 | other sea | sea (0) | coastal sea | | open | CoastalSea |
@@ -60,12 +60,39 @@ Each cell carries four attributes besides its TerrainType: domain, water class, 
 | river | sea (0) | river | | open | River |
 | joining crossing cell | sea (0) under a land deck | its own | | under bridge | UnderBridge, with Bridge deck faces above |
 
-**Land types.** Biome land types (Forest, Steppe, Snow, Desert) are not applied; the playability policy is kept. They would not change validity, and Forest and Snow battle scenes need MMR-42's substitution rules (R09).
+**Land types (MMR-254).** `TravelCells.Read` takes `cells.bin` v2 only (`MNBLTC02`; a v1 file is refused): a land cell must carry an installed TerrainType, every other cell none, and the flags only the road bit. The builder gives each land cell's faces (its quad, or the fan beside a deck) the cell's land type. The validator checks:
+- every land type the cells carry is a land face (Default-valid, in the land region, Naval-invalid), once per type;
+- the cells per type equal the travel graph's `grid.landTypes`;
+- a `gateFace` or `settlementFace` point may resolve to any land type of the cells touching it (an edge or corner point touches two or four), a `pass` or `footprint` cell centre to the cell's own.
+
+The fixture world keeps one land face (the policy's `faceGroups.land`). The road bit is not navigation: flipping every one leaves the navmesh byte for byte (`NavigationContractTests`).
+
+**Seam images.** `GeneratedMapScene` answers a periodic path query from the target's image across the seam; the image's face must have the original's group. With biome faces an image point on a cell edge may resolve to the neighbouring cell of another type, so `ImageFace` then takes the image's face of the original's region (land or sea, by the installed navigation model's Default validity).
 
 **Validity per domain.** Every type is checked against the installed navigation model for its domain:
 - land and bridge: Default-valid and in the land region;
 - water: Naval-valid and in the sea region;
 - mountain: invalid for All.
+
+## Land face types and speed (MMR-254)
+
+Findings sections 3 and 8. Party speed follows the face type through one model, `GeneratedPartySpeedModel` (`Campaign/GeneratedPartySpeedModel.cs`, terms in `World/RoadSpeed.cs`):
+- **Registration.** `GeneratedGameManager.InitializeGameStarter` adds it with `CampaignGameStarter.AddModel<PartySpeedModel>` after War Sails' own (its AddModels ran in the base call), so the chain is GeneratedPartySpeedModel → NavalDLCPartySpeedCalculationModel → DefaultPartySpeedCalculatingModel (`roads.json speed.chain`). No Harmony.
+- **Terms.** On the installed chain's final speed, then the installed minimum again, for the party's current face (its TerrainType, read as every installed consumer reads it) and its cell's road bit; every factor is the module's `roads.json speed`:
+
+  | Term | When | Factor |
+  |---|---|---|
+  | terrain | on land, face Snow / Swamp (the engine has no term of its own) | `terrain.Snow` −0.15, `terrain.Swamp` −0.2 |
+  | road | on a road cell, not at sea (`roadAtSea` false) | `road` +0.2 |
+  | ford | on a road deck (a Bridge face on a road cell), with `cancelFordOnDecks` | the installed ford factor back (+0.3: `DefaultPartySpeedCalculatingModel.MovingAtWaterEffect`) |
+
+  Desert (−0.1) and Forest (−0.3) keep the engine's own terms, which now apply because the faces carry those types.
+- **Road cells.** `WorldReconstruction.Build` reads the world's road bits (`RoadSpeed.Cells`, from `cells.bin` v2 and `grid`); activation and the loader register them by scene with the battle terrain context (`GeneratedPartySpeedModel.RoadSources`), the map scene activates its own on `Load` and clears them on `Destroy`, and the game manager's teardown clears the sources (`WorldLifetimeScope` tracks them). A fixture slot has none.
+- **The hot path allocates nothing**: the terms are written into per-thread scratch arrays (`[ThreadStatic]`), since the engine computes party speeds on TWParallel workers (the parallel movement ticks of `CampaignTickCacheDataStore`).
+- **AI pathing ignores roads** (the engine has no per-face cost): the bonus helps the player more than the AI (findings section 8).
+- **Checks.** `tools/Test-PartySpeed.ps1` builds the chain as AddModel builds it and checks the terms against the policy (also a tuned one) and a bundle's road cells; the startup audit checks the live chain (`speedModelChain`).
+
+**Navigation caches.** Nothing here enters the navigation-cache key (`NavigationCacheKey.Sources`: every keyed input and its source, all fixed for a world; an unclassified input is refused). The land types are part of the navmesh, which the key hashes; the road bits, the speed terms and later live face overrides (MMR-260/261) are not.
 
 ## Rivers, bridges and coasts
 
@@ -193,7 +220,8 @@ For each world:
 `Prepare` refuses a world whose static plan has a diagnostic. Nothing is encoded, installed or registered.
 
 **The report.**
-- Production persists the engine report at `<store>/world-navigation/<scene>.json`, together with its hash.
+- Production persists the engine report at `<store>/world-navigation/<scene>.json`, together with its hash. The file is a gate record (`mnbl.navigation-gate-record`: `schema`, `version`, `reportSha256`, and `report`, the report's hashed text), not the report; an activation keeps a byte copy as `activations/<instance>/evidence/navigation.json`.
+- Code that reads the report's content reads it with `NavigationGate.ReadAt(path, scene)` (MMR-247): the record's schema and hash checked, the report returned as `Run` made it. The activation's BuildWorld and a load's rebuild hand that report to `WorldReconstruction.Build` (the map dressing reads `build.bridges`); handing it the record failed live acceptance run acc2 with "Missing object build".
 - The production activation (MMR-45) must run `NavigationValidator.Run` on the constructed world and persist the report, or find a persisted report that still passes the gate. Until then, a compiled world is refused.
 
 **The gate.** `NavigationGate.Require` (and `Check` for a report that is not persisted) allows activation only when:

@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Encode an MMR-26 compiled terrain into an owned scene bundle with the proven surface encoder.
 
-Offline only: never installs or launches. Copies the owned encoder template, renames its scene, and runs
-worldbridge --surface-* with the compiled heightfield (world units, scale 1) and the compiled rock_k weights.
+Offline only: never installs or launches. Copies the owned encoder template (the tracked one, materialized by
+tools/scenebin/make_surface_template.py --materialize build/surface-template), renames its scene, and runs worldbridge --surface-* with
+the compiled heightfield (world units, scale 1), the compiled layer weights (weights.bin v2) and, when present, the map trees (flora.bin).
 Usage: python tools/encode_compiled_terrain.py --compiled DIR --scene-name mnbl_... --out NEW_DIR
 """
 import argparse
@@ -21,7 +22,7 @@ def main():
     ap.add_argument('--compiled', required=True)
     ap.add_argument('--scene-name', required=True)
     ap.add_argument('--out', required=True)
-    ap.add_argument('--template', default=str(REPO / 'build/slots/mnbl_world_b'))
+    ap.add_argument('--template', default=str(REPO / 'build/surface-template'))
     ap.add_argument('--encoder', default=str(REPO / 'build/worldbridge/Release/worldbridge.exe'))
     a = ap.parse_args()
     compiled, out = Path(a.compiled).resolve(), Path(a.out).resolve()
@@ -29,7 +30,7 @@ def main():
         sys.exit('scene name must start with mnbl_ and equal the output folder name')
     if out.exists():
         sys.exit('output must not exist')
-    meta = json.loads((compiled / 'terrain.json').read_text(encoding='utf-8'))
+    meta = json.loads((compiled / 'terrain.json').read_text(encoding='utf-8')) if (compiled / 'terrain.json').exists() else None
     work = out.parent / (out.name + '.template')
     if work.exists():
         shutil.rmtree(work)
@@ -38,8 +39,10 @@ def main():
     tree.getroot().set('name', a.scene_name)
     tree.write(work / 'scene.xscene', encoding='utf-8', xml_declaration=True)
     command = [a.encoder, '--surface-heightfield', str(compiled / 'heightfield.bin'), '--surface-template', str(work),
-               '--surface-output', str(out), '--surface-extent', repr(meta['output']['extent']), '--surface-scale', '1',
+               '--surface-output', str(out), '--surface-extent', repr(meta['output']['extent'] if meta else json.loads((compiled / 'projection.json').read_text(encoding='utf-8'))['periodicLayout']['physicalWidth']), '--surface-scale', '1',
                '--surface-weights', str(compiled / 'weights.bin')]
+    if (compiled / 'flora.bin').exists():
+        command += ['--surface-flora', str(compiled / 'flora.bin')]
     result = subprocess.run(command, capture_output=True, text=True)
     (out.parent / (out.name + '.encoder.log')).write_text(' '.join(command) + '\n' + result.stdout + result.stderr, encoding='utf-8')
     if result.returncode != 0:

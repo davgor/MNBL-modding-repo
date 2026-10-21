@@ -139,7 +139,7 @@ The record, timings and events are deleted with the directory; durable logs are 
 - **Scene store:** after BuildingScene's copy, the content-addressed scene folder (about 7 MB) stays in the scene store (MMR-37: reused by name; an install of another world removes it unless this process used it).
 - **Navigation report:** after ValidatingRuntime, the persisted navigation report for that scene stays (`world-navigation/<scene>.json`).
 
-**Forward risk for MMR-45/49.** Every install sweeps other worlds' scene folders this process has not used, so loading a saved generated world must re-install its scene from its bundle.
+**Forward risk for MMR-45/49.** Every install sweeps other worlds' scene folders this process has not used, so loading a saved generated world must re-install its scene from its bundle. (MMR-282: no longer. The sweep keeps every scene a world package or save names; see `docs/save-compatibility.md`.)
 
 ## Evidence
 

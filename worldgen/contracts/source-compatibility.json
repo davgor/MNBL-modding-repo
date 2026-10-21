@@ -2,7 +2,7 @@
   "schema": "mnbl.source-compatibility",
   "version": 1,
   "producer_lock": "worldgen/producer.lock.json",
-  "note": "Versions the campaign compiler consumes from the pinned FWGC++ producer (commit ec5d1c10); heroes (realms and people) is pinned since MMR-27. Observed in that producer's split exports at sizes 129/257/513, seed 42. generator_version is descriptive metadata, not a build fingerprint. Unknown optional members are skipped; a missing or unsupported required member fails before any game file is written.",
+  "note": "Versions the campaign compiler consumes from the pinned FWGC++ producer (commit ec5d1c10); heroes (realms and people) is pinned since MMR-27; npcs (people, life spans) and nomads (groups) since MMR-279, for the population pass. Observed in that producer's split exports at sizes 129/257/513, seed 42. generator_version is descriptive metadata, not a build fingerprint. Unknown optional members are skipped; a missing or unsupported required member fails before any game file is written.",
   "root": {
     "schema": "fwg.world",
     "schema_version": 2,
@@ -50,6 +50,12 @@
       3
     ],
     "key_location_plans": [
+      1
+    ],
+    "npcs": [
+      3
+    ],
+    "nomads": [
       1
     ]
   },

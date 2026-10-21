@@ -22,17 +22,19 @@ namespace MNBL.ProceduralWorld.Surface
     //     sample grid gets one plane (the same material, physics and tag) at its lake's level: the largest source water_surface (metres)
     //     over the source lake cells its samples map to (the nearest source cell of each sample's canonical location, else a lake cell
     //     among that cell's 8 neighbours), projected as the terrain is (z = (level - datumM) x worldUnitsPerMetre, the vertical scale
-    //     that already carries the 2.5x exaggeration, docs/world-projection.md), over
-    //     the group's bounding box grown by half a sample, inside the terrain. The plane never rises above a sample that is not the lake's: its height is at
-    //     most the lowest other sample within one sample of the box, less 0.001 (the 257 sample grid resamples the 129 source grid, so a
-    //     shore sample can lie below the source level); a lake whose plane would then not clear its own bed is left out (counted). A
+    //     with its exaggeration, 1.25x since MMR-278, docs/world-projection.md), over
+    //     the group's bounding box grown by half a sample, inside the terrain. The plane never rises above a sample that is not lake: its height is at
+    //     most the lowest non-lake sample within one sample of the box, less 0.001 (the sample grid resamples the 129 source grid, so a
+    //     shore sample can lie below the source level). Other lakes' samples in the box are not shore (MMR-285: two groups in each other's
+    //     boxes could never both show under the old rule); MMR-278's shaping lowers every matched group's bed under the plane its shore
+    //     allows, so every lake shows. A lake whose plane would still not clear its own bed is left out (counted). A
     //     strip copy of a lake is its own group with the same level. A copy cut by the terrain's east or west edge holds only part of its
     //     lake, so it shows, or is left out, at its whole twin's level one width away (the group holding the copy of its first sample).
-    //     A river follows its slope, so a flat plane cannot carry it: rivers have no water surface of their
-    //     own (recorded in docs/water-climate.md).
+    //     A river follows its slope, so a flat plane cannot carry it: rivers are drawn as water decals along their travel cells (MMR-285,
+    //     MapDressing's water section, docs/map-dressing.md), with every impassable water cell no plane shows.
     public static class GeneratedWaterSystem
     {
-        public const string Version = "mmr39/2";
+        public const string Version = "mmr285/1";
         public const double DatumZ = 0;
         public const string Material = "naval_worldmap_water", Mesh = "editor_plane_high", Physics = "bo_editor_plane", Tag = "snapped_water_body";
 
@@ -99,7 +101,6 @@ namespace MNBL.ProceduralWorld.Surface
                 }
                 var lake = new Lake { Samples = group.Count, LevelM = double.NegativeInfinity, MinX = double.MaxValue, MinY = double.MaxValue, MaxX = double.MinValue, MaxY = double.MinValue,
                     BedMaxZ = double.MinValue, ShoreMinZ = double.MaxValue, FirstSampleX = (group[0] % side) * spacing, FirstSampleY = (group[0] / side) * spacing };
-                var members = new HashSet<int>(group);
                 foreach (int i in group)
                 {
                     int col = i % side, row = i / side; double x = col * spacing, y = row * spacing;
@@ -135,8 +136,9 @@ namespace MNBL.ProceduralWorld.Surface
                     {
                         int wrapped = cc < 0 ? cc + period : cc >= side ? cc - period : cc;
                         if (wrapped < 0 || wrapped >= side) continue;
-                        // Inside the terrain the lake's own samples are skipped; across the edge, the copy's lake samples (its continuation).
-                        if (cc == wrapped ? members.Contains(rr * side + cc) : surface.Intent(wrapped, rr) == 2) continue;
+                        // Every lake sample is skipped (MMR-285): its own, another group's in its box (water too, under its own plane or this
+                        // one), and across the edge the copy's (its continuation).
+                        if (surface.Intent(wrapped, rr) == 2) continue;
                         lake.ShoreMinZ = Math.Min(lake.ShoreMinZ, heights[rr * side + wrapped]);
                     }
                 // Grown by half a sample, inside the terrain (the scene's box is the campaign map's borders).

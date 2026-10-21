@@ -205,6 +205,13 @@ namespace MNBL.ProceduralWorld.Surface
         // Logical x wraps; the result is canonical.
         public double[] ToPhysical(double logicalX, double logicalY) { return new[] { CanonicalX(OriginX + logicalX), OriginY + logicalY }; }
 
+        // MMR-278 (RT-19): a physical y held between the pole lines (the camera never looks past a pole).
+        public double ClampY(double physicalY)
+        {
+            if (Double.IsNaN(physicalY)) throw new ArgumentException("A coordinate must be finite.");
+            return Math.Max(OriginY, Math.Min(OriginY + Height, physicalY));
+        }
+
         // ---- poles and identity ----
         public Pole PoleOf(double physicalY)
         {

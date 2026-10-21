@@ -19,7 +19,7 @@ using Path = System.IO.Path;
 namespace MNBL.ProceduralWorld.Automation
 {
     // MMR-45: a generated world activated in the running game (world_activation; seed=<n>, culture=<id>, fault=<boundary>, stopInside=<boundary>,
-    // secondFault=<boundary>, gameplayDays=<d>, campaignTimeoutSeconds=<s>):
+    // secondFault=<boundary>, gameplayDays=<d>, campaignTimeoutSeconds=<s>, waterVisibility=1 (MMR-285: Diagnostics/WaterVisibilityProbe on the committed world)):
     //   1. the startup pass's activation recovery as this process found it (a previous run's stopped activation);
     //   2. a generation job to review (MMR-44), then its commit through ActivationCommitStage: the world's campaign graph built and validated at
     //      the main menu, its package promoted, the new game started on the world's scene (character creation driven by the diagnostic
@@ -97,6 +97,15 @@ namespace MNBL.ProceduralWorld.Automation
                 failures.AddRange(((List<string>)gameplay["failures"]).Select(f => "gameplay: " + f));
                 string shot = Path.Combine(context.Directory, "world-activation-" + context.ProcessId + "-map.bmp");
                 try { TaleWorlds.Engine.Utilities.TakeScreenshot(shot); first["screenshot"] = shot; } catch (Exception) { }
+                context.Checkpoint();
+            }
+            // MMR-285 (for MMR-247): every lake shown, every river drawn, no impassable water drawn as dry land, on the live map.
+            if (context.Int("waterVisibility", 0) != 0 && failures.Count == 0)
+            {
+                var water = new Dictionary<string, object>(); first["waterVisibility"] = water;
+                var steps = MNBL.ProceduralWorld.Diagnostics.WaterVisibilityProbe.Run(context, water);
+                while (steps.MoveNext()) yield return steps.Current;
+                failures.AddRange(((List<string>)water["failures"]).Select(f => "waterVisibility: " + f));
                 context.Checkpoint();
             }
             // The committed job is final (Playing): released, its directory goes; the package, the bundle and the scene stay with the world.

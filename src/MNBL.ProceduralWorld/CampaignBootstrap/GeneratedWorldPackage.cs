@@ -38,8 +38,10 @@ namespace MNBL.ProceduralWorld.CampaignBootstrap
 
         public static string Root { get { return Path.Combine(SubModule.Store, "worlds"); } }
 
+        // MMR-283: extraFiles, more immutable files by package path (a compiled world's frozen catalog, catalog/), hashed in the manifest
+        // like every other file.
         public static GeneratedWorldPackage Write(string worldId, string sceneName, uint seed, string placementPath,
-            IEnumerable<GeneratedCampaignDataset.Document> documents, string adapterSha256, Dictionary<string, object> datasetFingerprint)
+            IEnumerable<GeneratedCampaignDataset.Document> documents, string adapterSha256, Dictionary<string, object> datasetFingerprint, IDictionary<string, byte[]> extraFiles = null)
         {
             MNBL.ProceduralWorld.Persistence.SaveBindingRuntime.RequireWriter();   // MMR-62: only the store lock holder writes staging
             var docs = documents.ToList();
@@ -67,6 +69,11 @@ namespace MNBL.ProceduralWorld.CampaignBootstrap
                 if (Sha256(bytes) != document.Sha256) throw new InvalidDataException("Generated document bytes differ from their recorded hash: " + document.Id);
                 files["documents/" + document.Id + ".xml"] = bytes;
                 documentRows.Add(new Dictionary<string, object> { ["id"] = document.Id, ["file"] = "documents/" + document.Id + ".xml", ["sha256"] = document.Sha256 });
+            }
+            foreach (var extra in extraFiles ?? new Dictionary<string, byte[]>())
+            {
+                if (files.ContainsKey(extra.Key) || extra.Key.StartsWith("documents/", StringComparison.Ordinal) || extra.Key == "world.json" || extra.Key.Contains("..")) throw new InvalidDataException("A package file collides or escapes: " + extra.Key);
+                files[extra.Key] = extra.Value;
             }
             var sceneHashes = (Dictionary<string, object>)placement["sceneFiles"];
             var manifest = new Dictionary<string, object> {

@@ -129,10 +129,58 @@ struct Realm {          // heroes.realms[] (MMR-27): a generated polity; source 
     std::vector<std::string> city_uids;
 };
 
-struct Person {         // heroes.people[] (MMR-27): only the identity fields the campaign compiler joins on
+struct Person {         // heroes.people[] (MMR-27; MMR-279 adds the population fields)
     std::string uid, role, status, name, display_name, civilization_id, race_id, home_kind, home_uid;
     std::string presence_kind, presence_uid;  // where the person is found (presence.site_kind, presence.uid)
     std::optional<std::string> realm_uid;
+    // MMR-279: council seat, fame tier and fame, epithet, the lost ruin (lost.uid, lost.name), the companion join condition,
+    // the org (heroes.orgs uid) and the presence situation (presence.situation).
+    std::string seat, tier, epithet, lost_uid, lost_name, join_condition, org_uid, situation;
+    double fame = 0;
+};
+
+struct Org {            // heroes.orgs[] (MMR-279): councils, remnant orders, living orders, dynasties
+    std::string uid, kind, name, home_kind, home_uid;
+    std::vector<std::string> members;
+};
+
+struct Camp {           // heroes.camps[] (MMR-279): ruin camps, an outlaw clan source
+    std::string uid, ruin_uid, name, civilization_id, origin;
+    std::int64_t node = 0, x = 0, z = 0;
+};
+
+struct CastellanRoll {  // heroes.rolls[] of kind castellan (MMR-279): the ledger's candidate for each fortress
+    std::string candidate_uid, fortress_uid;
+    bool precipitated = false;
+};
+
+struct Band {           // nomads.groups[] classified bandits or deserters (MMR-279): outlaw clan sources
+    std::string uid, classification;
+    std::int64_t node = 0, x = 0, z = 0, size = 0;
+};
+
+// npcs.people[] (MMR-279). A hero-linked record (hero_uid set) gives the hero's sex and age; a resident of one of the posts the
+// population pass names synthesized people after (magistrate, commander, garrison_officer, sergeant, soldier, garrison_trooper)
+// joins the pools.
+struct Npc {
+    std::string uid, name, site_uid, site_kind, post, civilization_id, age_band, hero_uid;
+    bool female = false, known_sex = false;
+    std::int64_t age_years = -1;
+};
+
+struct LifeSpan {       // npcs.life_spans.peoples[] and parent_races[] (MMR-279): age bands per people
+    std::string id, parent_race_id;
+    std::int64_t adult = 0, max = 0;
+    std::map<std::string, std::pair<std::int64_t, std::int64_t>> bands;   // young, middle, old -> [from, to]
+};
+
+struct HeritageEntry {  // civilizations.entities[].heritage (MMR-279): the naming pattern and lexicon roots
+    std::string civilization_id, naming_pattern;
+    std::vector<std::pair<std::string, std::string>> lexicon;   // concept -> root, sorted by concept
+};
+
+struct Ruin {           // ruins[] (MMR-286): a ruined city, for its display name
+    std::string uid, name, civilization_id;
 };
 
 struct CultureEntry {   // humans.cultures[] (MMR-27)
@@ -174,11 +222,24 @@ struct SourceWorld {
     std::vector<Realm> realms;            // heroes.realms; empty when absent
     std::vector<Person> people;           // heroes.people; empty when absent
     std::vector<CultureEntry> cultures;   // humans.cultures; empty when absent
+    // MMR-279, the population pass's sources; each empty when absent.
+    std::vector<Org> orgs;                       // heroes.orgs
+    std::vector<Camp> camps;                     // heroes.camps
+    std::vector<CastellanRoll> castellan_rolls;  // heroes.rolls of kind castellan
+    std::vector<Band> bands;                     // nomads.groups classified bandits or deserters
+    std::vector<Npc> npc_links;                  // npcs.people with a hero_uid
+    std::vector<Npc> residents;                  // npcs.people of the naming posts, without a hero_uid
+    std::vector<LifeSpan> life_spans;            // npcs.life_spans peoples, then parent_races
+    std::vector<HeritageEntry> heritage;         // civilizations.entities heritage
+    std::vector<Ruin> ruins;                     // ruins (MMR-286)
     std::vector<std::string> landforms;   // terrain.landforms; empty when absent
     std::vector<PlanFile> plans;
     Statistics statistics;
     // Materializes one validated layer (side * side doubles) by seeking to its recorded offset.
     Layer read_layer(const std::string& name) const;
+    // Map epic 2 (MMR-254): per sample (side * side, row-major), the months of seasonal_environment.months[*].snow at or above threshold
+    // (0..12), the snow-month count the permanent-white mask reads. Refuses a world without the block or with other than 12 months.
+    std::vector<std::uint8_t> snow_months(double threshold) const;
 };
 
 struct ReadOptions {

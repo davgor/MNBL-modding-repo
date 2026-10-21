@@ -94,7 +94,7 @@ internal static class WorldSetupTests
               && refused(() => WorldSetupContract.FromDocuments(Edit(docs, "one-shot.json", "\"qualityAttempts\":\\s*3", "\"qualityAttempts\": 4")))
               && refused(() => WorldSetupContract.FromDocuments(Edit(docs, "producer-seed-width.json", "\"verified\":\\s*true", "\"verified\": false")))
               && refused(() => WorldSetupContract.FromDocuments(Edit(docs, "producer-seed-width.json", "\"maxSeed\":\\s*4294967295", "\"maxSeed\": 4294967296")))
-              && refused(() => WorldSetupContract.FromDocuments(Edit(docs, "producer.lock.json", "564c2629b5b92d49", "000c2629b5b92d49")))
+              && refused(() => WorldSetupContract.FromDocuments(Edit(docs, "producer.lock.json", "7058dbdceec88f5b", "0008dbdceec88f5b")))
               && refused(() => WorldSetupContract.FromDocuments(Edit(docs, "product-policy.json", "\"coverage\":\\s*\"full-globe\"", "\"coverage\": \"region\"")))
               && refused(() => WorldSetupContract.FromDocuments(Edit(docs, "culture-presentations.json", "\"officialCultures\":\\s*\\[", "\"officialCultures\": [\"rhodok\", ")))
               && refused(() => WorldSetupContract.FromDocuments(Edit(docs, "culture-presentations.json", "\"culture\":\\s*\"aserai\"", "\"culture\": \"rhodok\""))),
@@ -124,34 +124,40 @@ internal static class WorldSetupTests
               "only the producer controls the profile fixes are shown, each locked with why; world size is explained as content (a different world), never as quality");
         var wait = WaitTime.Variables(contract);
         var noGenerate = WorldSetupContract.FromDocuments(Edit(docs, "one-shot-budget.json", "\"generateWorld\"", "\"otherPhase\""));
-        var noStart = WorldSetupContract.FromDocuments(Edit(docs, "one-shot-budget.json", "\"startCampaign\"", "\"otherStartPhase\""));
-        string waitText = WaitTime.Text(contract, (t, v) => v.Aggregate(t, (x, kv) => x.Replace("{" + kv.Key + "}", kv.Value)));
-        // The expected values from the budget itself: its largest generation measurement rounded up to roundToSeconds, its largest first campaign
-        // start in whole minutes rounded up.
-        var budgetDoc = (IDictionary<string, object>)new System.Web.Script.Serialization.JavaScriptSerializer().DeserializeObject(Encoding.UTF8.GetString(docs["one-shot-budget.json"]).TrimStart('﻿'));
+        var noModel = WorldSetupContract.FromDocuments(Edit(docs, "one-shot-budget.json", "\"navigationCacheBuild\"", "\"otherSection\""));
+        Func<string, Dictionary<string, string>, string> plain = (t, v) => v.Aggregate(t, (x, kv) => x.Replace("{" + kv.Key + "}", kv.Value));
+        string waitText = WaitTime.Text(contract, plain);
+        // The expected values from the budget itself: its largest generation measurement rounded up to roundToSeconds. MMR-282: no fixed
+        // campaign-start time (MMR-56's "about 7 minutes" for every world); the preview states each world's own.
+        var budgetDoc = (IDictionary<string, object>)new System.Web.Script.Serialization.JavaScriptSerializer().DeserializeObject(Encoding.UTF8.GetString(docs["one-shot-budget.json"]).TrimStart('\uFEFF'));
         var budgetPhases = (IDictionary<string, object>)budgetDoc["phases"];
         Func<string, double> largest = id => ((object[])((IDictionary<string, object>)budgetPhases[id])["seconds"]).Select(v => Convert.ToDouble(v, CultureInfo.InvariantCulture)).Max();
         int round = Convert.ToInt32(budgetDoc["roundToSeconds"], CultureInfo.InvariantCulture);
         string expectGenerate = (Math.Ceiling(largest("generateWorld") / round) * round).ToString("0", CultureInfo.InvariantCulture);
-        string expectStart = Math.Max(1, Math.Ceiling(largest("startCampaign") / 60)).ToString("0", CultureInfo.InvariantCulture);
-        Check(wait.Count == 2 && wait["GENERATE"] == expectGenerate && wait["START"] == expectStart && WaitTime.Available(contract) && !WaitTime.Available(noGenerate) && contract.BudgetStatus == "provisional"
-              && !WaitTime.Variables(noStart).ContainsKey("START") && waitText.Contains("about " + expectGenerate + " seconds") && waitText.Contains("about " + expectStart + " minutes") && waitText.Contains("may stop responding")
-              && !WaitTime.Text(noStart, (t, v) => t).Contains(WorldSetupText.WaitStart),
-              "the waiting time is the budget's largest generation measurement rounded up to 5 s (" + expectGenerate + " s) and its largest first campaign start in whole minutes (" + expectStart + "), with the warning that the game may stop responding; nothing is promised without a measurement: " + waitText);
+        Check(wait.Count == 1 && wait["GENERATE"] == expectGenerate && WaitTime.Available(contract) && !WaitTime.Available(noGenerate) && contract.BudgetStatus == "provisional"
+              && waitText.Contains("about " + expectGenerate + " seconds") && waitText.Contains("the preview says how long") && !waitText.Contains("minutes")
+              && !WaitTime.Text(noModel, plain).Contains("preview") && WorldSetupText.All().All(t => !t.Contains("{START}")),
+              "the waiting time is the budget's largest generation measurement rounded up to 5 s (" + expectGenerate + " s); no fixed campaign-start time remains, the preview gives each world's: " + waitText);
+        var navA = WaitTime.Navigation(contract, 45, 26, 215); var navB = WaitTime.Navigation(contract, 66, 39, 305);
+        string navText = plain(WorldSetupText.WaitNavigation, navA);
+        Check(navA["MINUTES"] == "7" && navA["SETTLEMENTS"] == "286" && navB["MINUTES"] == "14" && navB["SETTLEMENTS"] == "410" && WaitTime.Navigation(noModel, 45, 26, 215) == null
+              && navText.Contains("about 7 minutes for its 286 settlements") && navText.Contains("may stop responding"),
+              "MMR-282: the preview's first-start wait is the world's own, from its settlement count (world A 7 min, world B 14 min, the measured 381 s and 829 s): " + navText);
 
         // Host and generation error categories.
-        var ok = GenerationErrors.Host("v1.4.8.119303", "v1.4.8.119303", "v1.2.8", "v1.2.8", true, null);
-        var noNaval = GenerationErrors.Host("v1.4.8.119303", "v1.4.8.119303", null, "v1.2.8", false, null);
-        var disabled = GenerationErrors.Host("v1.4.8.119303", "v1.4.8.119303", "v1.2.8", "v1.2.8", false, null);
-        var oldGame = GenerationErrors.Host("v1.3.0.1", "v1.4.8.119303", "v1.2.8", "v1.2.8", true, null);
-        var oldNaval = GenerationErrors.Host("v1.4.8.119303", "v1.4.8.119303", "v1.2.7", "v1.2.8", true, null);
-        var tool = GenerationErrors.Host("v1.4.8.119303", "v1.4.8.119303", "v1.2.8", "v1.2.8", true, new[] { new KeyValuePair<string, string>("fwg", "hash differs") });
-        var both = GenerationErrors.Host("v1.3.0.1", "v1.4.8.119303", null, "v1.2.8", false, null);
+        var ok = GenerationErrors.Host("v1.4.8.119303", "v1.4.8", "v1.2.8", "v1.2.8", true, null);
+        var noNaval = GenerationErrors.Host("v1.4.8.119303", "v1.4.8", null, "v1.2.8", false, null);
+        var disabled = GenerationErrors.Host("v1.4.8.119303", "v1.4.8", "v1.2.8", "v1.2.8", false, null);
+        var oldGame = GenerationErrors.Host("v1.3.0.1", "v1.4.8", "v1.2.8", "v1.2.8", true, null);
+        var oldNaval = GenerationErrors.Host("v1.4.8.119303", "v1.4.8", "v1.2.7", "v1.2.8", true, null);
+        var tool = GenerationErrors.Host("v1.4.8.119303", "v1.4.8", "v1.2.8", "v1.2.8", true, new[] { new KeyValuePair<string, string>("fwg", "hash differs") });
+        var both = GenerationErrors.Host("v1.3.0.1", "v1.4.8", null, "v1.2.8", false, null);
+        var newer = GenerationErrors.Host("v1.5.0.150000", "v1.4.8", "v1.3.0", "v1.2.8", true, null);   // MMR-284: no maximum
         Check(ok.Count == 0 && noNaval.Single().Category == GenerationErrorCategory.MissingToolOrDlc && noNaval[0].Code == "host.war_sails_missing" && disabled.Single().Code == "host.war_sails_missing"
-              && oldGame.Single().Category == GenerationErrorCategory.IncompatibleBuild && oldGame[0].Variables["EXPECTED"] == "v1.4.8.119303" && oldGame[0].Variables["ACTUAL"] == "v1.3.0.1"
+              && oldGame.Single().Category == GenerationErrorCategory.IncompatibleBuild && oldGame[0].Variables["MINIMUM"] == "v1.4.8" && newer.Count == 0 && oldGame[0].Variables["ACTUAL"] == "v1.3.0.1"
               && oldNaval.Single().Code == "host.war_sails_version" && tool.Single().Category == GenerationErrorCategory.MissingToolOrDlc && tool[0].Detail.StartsWith("fwg:") && !tool[0].Message.Contains("fwg")
               && both.Count == 2 && both.Select(p => p.Action).Distinct().Count() == 2,
-              "host refusals use the MMR-47 categories: War Sails missing or disabled (missing tool or DLC), another game or War Sails build (incompatible build, naming both), changed generator files (missing tool; the executable named only in the detail); several problems keep each action");
+              "host refusals use the MMR-47 categories: War Sails missing or disabled (missing tool or DLC), a game or War Sails build below the minimum (incompatible build, naming the minimum; MMR-284: a newer build passes), changed generator files (missing tool; the executable named only in the detail); several problems keep each action");
         var cancelled = GenerationErrors.FromGeneration("cancelled", new OperationCanceledException(), null, "d");
         var refusedRecipe = GenerationErrors.FromGeneration("producer_refused", new InvalidOperationException("x"), "INVALID_INPUT", "d");
         var reader = GenerationErrors.FromGeneration("reader_failed", new InvalidDataException("x"), null, "d");
@@ -307,7 +313,7 @@ internal static class WorldSetupTests
         // MMR-47: every failure shown gets a reference (correlation id) with its diagnostics retained; the details stay behind a toggle.
         string diagRoot = Path.Combine(Path.GetTempPath(), "mnbl-diag-" + Guid.NewGuid().ToString("N"));
         var diagnostics = new GenerationDiagnostics(diagRoot);
-        var hostModel = new WorldSetupModel(contract, new ScriptedRunner { Split = split }, GenerationErrors.Host("v1.4.8.119303", "v1.4.8.119303", null, "v1.2.8", false, null), null, diagnostics);
+        var hostModel = new WorldSetupModel(contract, new ScriptedRunner { Split = split }, GenerationErrors.Host("v1.4.8.119303", "v1.4.8", null, "v1.2.8", false, null), null, diagnostics);
         var failingRun = new ScriptedRunner { Split = split, AutoRun = true, Fail = new InvalidDataException("reader detail C:\\path\\to\\job") };
         var failModel = new WorldSetupModel(contract, failingRun, null, null, diagnostics);
         failModel.Generate(); Wait(failModel);
@@ -408,6 +414,7 @@ internal static class WorldSetupTests
             && pv.Markers.All(x => x.PositionX + x.MarkerSize / 2 >= 0 && x.PositionX + x.MarkerSize / 2 <= WorldPreviewViewModel.PreviewWidth && x.PositionY + x.MarkerSize / 2 >= 0 && x.PositionY + x.MarkerSize / 2 <= WorldPreviewViewModel.PreviewHeight)
             && pv.Markers.Count(x => x.ShowLabel) == previewA.Markers.Count(x => x.Kind == "town") && pv.Regions.All(r => r.Region.Towns + r.Region.Castles >= 2)
             && hover.StartsWith(town.FullName, StringComparison.Ordinal) && pv.HoverText == backToSelection && vm.PreviewTitleText.Contains("364610") && pv.CountsText.Contains(previewA.Counts["towns"].ToString(CultureInfo.InvariantCulture))
+            && pv.CountsText.Contains("for its " + (previewA.Counts["towns"] + previewA.Counts["castles"] + previewA.Counts["villages"]).ToString(CultureInfo.InvariantCulture) + " settlements")
             && longMarker.Name.Length == WorldPreviewViewModel.LabelLength && longMarker.Name.EndsWith("\u2026", StringComparison.Ordinal) && longMarker.ShowLabelLeft && !longMarker.ShowLabelRight && longMarker.LabelX < 0;
         mv.Back(); vm.Refresh();
         bool reuseNotice = vm.IsEditing && !vm.IsPreviewShown && vm.HasNotice && vm.NoticeText.Contains("364610");
@@ -545,12 +552,12 @@ internal static class WorldSetupTests
     {
         var json = new JavaScriptSerializer { MaxJsonLength = Int32.MaxValue };
         Func<byte[], IDictionary<string, object>> parse = bytes => (IDictionary<string, object>)json.DeserializeObject(new UTF8Encoding(false).GetString(bytes).TrimStart('\uFEFF'));
-        var bundle = WorldDataBundle.Open(bundleDir, new WorldDataBundle.HostProfile("v1.4.8.119303", "v1.2.8.119303", new[] { "R01", "R02", "R03", "R04", "R05", "R06", "R07", "R08", "R09", "R10" }));
+        var bundle = WorldDataBundle.Open(bundleDir, new WorldDataBundle.HostProfile("v1.4.8.119303", "v1.2.8.119303", WorldDataBundle.HostCapabilities));
         var campaign = parse(bundle.ReadVerified("compiled/campaign/campaign.json"));
         var idMap = parse(bundle.ReadVerified("compiled/campaign/id-map.json"));
         var templates = Directory.GetFiles(Path.Combine(repo, "worldgen/templates/cultures"), "*.json").Where(f => Path.GetFileName(f) != "contract.json")
             .ToDictionary(f => Path.GetFileNameWithoutExtension(f), f => parse(File.ReadAllBytes(f)), StringComparer.Ordinal);
-        var factions = FactionFactory.Build(campaign, idMap, parse(File.ReadAllBytes(Path.Combine(repo, "worldgen/policies/factions.json"))), parse(File.ReadAllBytes(Path.Combine(repo, "worldgen/policies/culture-presentations.json"))), templates);
+        var factions = FactionFactory.Build(campaign, idMap, parse(File.ReadAllBytes(Path.Combine(repo, "worldgen/policies/factions.json"))), parse(File.ReadAllBytes(Path.Combine(repo, "worldgen/policies/culture-presentations.json"))), templates, parse(File.ReadAllBytes(Path.Combine(repo, "worldgen/policies/population.json"))));
         var binding = VillageBinding.FromRecords(parse(File.ReadAllBytes(Path.Combine(repo, "worldgen/policies/economy.json"))), campaign, parse(bundle.ReadVerified("compiled/travel/travel-graph.json")), new List<string>());
         return WorldPreview.Build(WorldSurface.FromBundle(bundle), layout, campaign, factions, "scene of " + bundle.WorldContentId.Substring(0, 12), binding.BoundOf);
     }

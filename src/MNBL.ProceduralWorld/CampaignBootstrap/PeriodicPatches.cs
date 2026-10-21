@@ -73,7 +73,7 @@ namespace MNBL.ProceduralWorld.CampaignBootstrap
         public static void Apply()
         {
             if (harmony != null) return;
-            MNBL.ProceduralWorld.CampaignRegistry.GeneratedPatches.RequireInstalledVersion("periodic");   // MMR-34: every patch is version pinned
+            MNBL.ProceduralWorld.CampaignRegistry.GeneratedPatches.RequireSupportedBuild("periodic");   // MMR-284: a minimum build; each target by signature
             harmony = new Harmony(HarmonyId);
             Applied.Clear(); LastError = null; imagePasses = 0; canonicalPicks = 0; canonicalPlacements = 0;
             try { ApplyAll(); }
@@ -100,38 +100,36 @@ namespace MNBL.ProceduralWorld.CampaignBootstrap
 
         private static void ApplyAll()
         {
-            Postfix(AccessTools.Method(typeof(MobileParty), nameof(MobileParty.FindNextLocatable)), nameof(PartyNextPostfix),
+            Postfix(Target(typeof(MobileParty), nameof(MobileParty.FindNextLocatable)), nameof(PartyNextPostfix),
                 "MobileParty.FindNextLocatable: continue at the seam image");
-            Postfix(AccessTools.Method(typeof(Settlement), nameof(Settlement.FindNextLocatable)), nameof(SettlementNextPostfix),
+            Postfix(Target(typeof(Settlement), nameof(Settlement.FindNextLocatable)), nameof(SettlementNextPostfix),
                 "Settlement.FindNextLocatable: continue at the seam image");
-            Transpile(AccessTools.Method(typeof(PartyBase), "TaleWorlds.CampaignSystem.Map.IInteractablePoint.CanPartyInteract"),
+            Transpile(Target(typeof(PartyBase), "TaleWorlds.CampaignSystem.Map.IInteractablePoint.CanPartyInteract"),
                 "PartyBase.CanPartyInteract: Vec2 subtraction -> periodic difference");
-            Transpile(AccessTools.Method(typeof(PartyBase), "CalculateVisibilityRangeOfMapPoint"),
+            Transpile(Target(typeof(PartyBase), "CalculateVisibilityRangeOfMapPoint"),
                 "PartyBase.CalculateVisibilityRangeOfMapPoint: Vec2 subtraction -> periodic difference");
-            Transpile(AccessTools.Method(typeof(Helpers.MenuHelper), "EncounterAttackConsequence"),
+            Transpile(Target(typeof(Helpers.MenuHelper), "EncounterAttackConsequence"),
                 "MenuHelper.EncounterAttackConsequence: encounter direction -> periodic difference");
-            Transpile(AccessTools.Method(typeof(TaleWorlds.CampaignSystem.MapEvents.MapEvent), "GetEventDirection"),
+            Transpile(Target(typeof(TaleWorlds.CampaignSystem.MapEvents.MapEvent), "GetEventDirection"),
                 "MapEvent.GetEventDirection: leader direction -> periodic difference");
             DistanceModel(typeof(TaleWorlds.CampaignSystem.GameComponents.DefaultMapDistanceModel));
             DistanceModel(AccessTools.TypeByName("NavalDLC.GameComponents.NavalDLCMapDistanceModel"));  // absent without War Sails
-            Postfix(AccessTools.Method(typeof(Helpers.NavigationHelper), nameof(Helpers.NavigationHelper.FindReachablePointAroundPosition),
-                    new[] { typeof(CampaignVec2), typeof(int[]), typeof(float), typeof(float), typeof(bool) }), nameof(CanonicalPlacementPostfix),
+            Postfix(Target(typeof(Helpers.NavigationHelper), nameof(Helpers.NavigationHelper.FindReachablePointAroundPosition)), nameof(CanonicalPlacementPostfix),
                 "NavigationHelper.FindReachablePointAroundPosition: result -> canonical image");
-            var travel = AccessTools.Method(typeof(MapState), nameof(MapState.ProcessTravel));
+            var travel = Target(typeof(MapState), nameof(MapState.ProcessTravel));
             Prefix(travel, nameof(CanonicalTravelPrefix), "MapState.ProcessTravel: display point -> canonical point");
             Transpile(travel, "MapState.ProcessTravel: click direction -> periodic difference");
             ClosestSettlementOrder();
             DistanceHelpers();
             // MMR-65: the remaining random-point helpers return canonical points, and the audited spatial consumers become periodic.
-            Postfix(AccessTools.Method(typeof(Helpers.NavigationHelper), nameof(Helpers.NavigationHelper.FindPointAroundPosition),
-                    new[] { typeof(CampaignVec2), typeof(MobileParty.NavigationType), typeof(float), typeof(float), typeof(bool), typeof(bool) }), nameof(CanonicalPlacementPostfix),
+            Postfix(Target(typeof(Helpers.NavigationHelper), nameof(Helpers.NavigationHelper.FindPointAroundPosition)), nameof(CanonicalPlacementPostfix),
                 "NavigationHelper.FindPointAroundPosition: result -> canonical image");
-            Postfix(AccessTools.Method(typeof(Helpers.NavigationHelper), nameof(Helpers.NavigationHelper.FindPointInsideArea),
-                    new[] { typeof(Vec2), typeof(Vec2), typeof(MobileParty.NavigationType) }), nameof(CanonicalPlacementPostfix),
-                "NavigationHelper.FindPointInsideArea(min, max, type): result -> canonical image");
-            Postfix(AccessTools.Method(typeof(Helpers.NavigationHelper), nameof(Helpers.NavigationHelper.FindPointInsideArea),
-                    new[] { typeof(Vec2), typeof(Vec2), typeof(CampaignVec2), typeof(MobileParty.NavigationType), typeof(float), typeof(float), typeof(bool) }), nameof(CanonicalPlacementPostfix),
-                "NavigationHelper.FindPointInsideArea(min, max, centre, ...): result -> canonical image");
+            const string area = "static TaleWorlds.CampaignSystem.CampaignVec2(TaleWorlds.Library.Vec2,TaleWorlds.Library.Vec2,";
+            Postfix(Target(typeof(Helpers.NavigationHelper), nameof(Helpers.NavigationHelper.FindPointInsideArea), area + "TaleWorlds.CampaignSystem.Party.MobileParty/NavigationType)"),
+                nameof(CanonicalPlacementPostfix), "NavigationHelper.FindPointInsideArea(min, max, type): result -> canonical image");
+            Postfix(Target(typeof(Helpers.NavigationHelper), nameof(Helpers.NavigationHelper.FindPointInsideArea),
+                    area + "TaleWorlds.CampaignSystem.CampaignVec2,TaleWorlds.CampaignSystem.Party.MobileParty/NavigationType,System.Single,System.Single,System.Boolean)"),
+                nameof(CanonicalPlacementPostfix), "NavigationHelper.FindPointInsideArea(min, max, centre, ...): result -> canonical image");
             PeriodicSpatialQueries.ApplyAll(harmony, Applied);
             // MMR-66: the map presentation (camera, visuals, nameplates, settlement display copies).
             MNBL.ProceduralWorld.World.PeriodicMapPresentation.ApplyAll(harmony, Applied);
@@ -140,12 +138,11 @@ namespace MNBL.ProceduralWorld.CampaignBootstrap
         // MMR-64: the planar distance calls of the installed distance helpers (PeriodicDistanceModel.HelperCoverage).
         private static void DistanceHelpers()
         {
-            var party = typeof(MobileParty); var navigation = typeof(MobileParty.NavigationType); var single = typeof(float).MakeByRefType();
-            Transpile(AccessTools.Method(typeof(Helpers.DistanceHelper), "FindClosestDistanceFromMobilePartyToMobileParty", new[] { party, party, navigation, single }),
+            Transpile(Target(typeof(Helpers.DistanceHelper), "FindClosestDistanceFromMobilePartyToMobileParty"),
                 "DistanceHelper.FindClosestDistanceFromMobilePartyToMobileParty: bird-fly test CampaignVec2.DistanceSquared -> periodic", nameof(CampaignDistanceSquaredToPeriodic));
-            Transpile(AccessTools.Method(typeof(Helpers.DistanceHelper), "GetDistanceBetweenMobilePartyToMobileParty", new[] { party, party, navigation, single }),
+            Transpile(Target(typeof(Helpers.DistanceHelper), "GetDistanceBetweenMobilePartyToMobileParty"),
                 "DistanceHelper.GetDistanceBetweenMobilePartyToMobileParty: straight legs CampaignVec2.Distance -> periodic", nameof(DistanceToPeriodic));
-            Transpile(AccessTools.Method(typeof(Helpers.SettlementHelper), nameof(Helpers.SettlementHelper.FindNearestSettlementToPoint)),
+            Transpile(Target(typeof(Helpers.SettlementHelper), nameof(Helpers.SettlementHelper.FindNearestSettlementToPoint)),
                 "SettlementHelper.FindNearestSettlementToPoint: CampaignVec2.Distance -> periodic", nameof(DistanceToPeriodic));
         }
 
@@ -157,7 +154,7 @@ namespace MNBL.ProceduralWorld.CampaignBootstrap
                 .SelectMany(t => t.GetMethods(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly))
                 .Where(m => m.Name.StartsWith("<GetClosestSettlementsToPositionInCache>", StringComparison.Ordinal) && m.ReturnType == typeof(float))
                 .OrderBy(m => m.Name, StringComparer.Ordinal).ToList();
-            if (lambdas.Count != 2) throw new MissingMethodException("Periodic patch target missing: SandBoxNavigationCache.GetClosestSettlementsToPositionInCache's two ordering lambdas (found " + lambdas.Count + ")");
+            if (lambdas.Count != 2) throw new MNBL.ProceduralWorld.CampaignRegistry.PatchSignatureException(Patch, "SandBoxNavigationCache.GetClosestSettlementsToPositionInCache's two ordering lambdas", lambdas.Count + " found");
             foreach (var lambda in lambdas)
                 Transpile(lambda, "SandBoxNavigationCache.GetClosestSettlementsToPositionInCache " + lambda.Name + ": ordering Vec2.DistanceSquared -> periodic",
                     nameof(Vec2DistanceSquaredToPeriodic));
@@ -174,27 +171,31 @@ namespace MNBL.ProceduralWorld.CampaignBootstrap
         // Removes every patch owned by HarmonyId, whichever Harmony instance applied it.
         private static void UnpatchById() { new Harmony(HarmonyId).UnpatchAll(HarmonyId); }
 
+        // MMR-284: a target by its recorded signature (PatchSignatures; PatchSignatureException names the periodic patch and the member).
+        private const string Patch = MNBL.ProceduralWorld.CampaignRegistry.PatchSignatures.Periodic;
+        private static MethodInfo Target(Type type, string name, string signature = null) { return MNBL.ProceduralWorld.CampaignRegistry.PatchSignatures.Method(type.FullName, name, signature); }
+
         private static void Prefix(MethodBase target, string prefix, string label)
         {
-            if (target == null) throw new MissingMethodException("Periodic patch target missing: " + label);
+            if (target == null) throw new MNBL.ProceduralWorld.CampaignRegistry.PatchSignatureException(Patch, label, "missing");
             harmony.Patch(target, prefix: new HarmonyMethod(typeof(PeriodicPatches), prefix));
             Applied.Add(new Dictionary<string, object> { ["target"] = target.DeclaringType.FullName + "::" + target.Name, ["patch"] = label, ["kind"] = "prefix" });
         }
 
         private static void Postfix(MethodBase target, string postfix, string label)
         {
-            if (target == null) throw new MissingMethodException("Periodic patch target missing: " + label);
+            if (target == null) throw new MNBL.ProceduralWorld.CampaignRegistry.PatchSignatureException(Patch, label, "missing");
             harmony.Patch(target, postfix: new HarmonyMethod(typeof(PeriodicPatches), postfix));
             Applied.Add(new Dictionary<string, object> { ["target"] = target.DeclaringType.FullName + "::" + target.Name, ["patch"] = label, ["kind"] = "postfix" });
         }
 
         private static void Transpile(MethodBase target, string label, string transpiler = nameof(SubtractionToPeriodic))
         {
-            if (target == null) throw new MissingMethodException("Periodic patch target missing: " + label);
+            if (target == null) throw new MNBL.ProceduralWorld.CampaignRegistry.PatchSignatureException(Patch, label, "missing");
             int before = replaced;
             harmony.Patch(target, transpiler: new HarmonyMethod(typeof(PeriodicPatches), transpiler));
             Applied.Add(new Dictionary<string, object> { ["target"] = target.DeclaringType.FullName + "::" + target.Name, ["patch"] = label, ["kind"] = "transpiler", ["replacedCalls"] = replaced - before });
-            if (replaced == before) throw new InvalidOperationException("Periodic patch found nothing to replace: " + label);
+            if (replaced == before) throw new MNBL.ProceduralWorld.CampaignRegistry.PatchSignatureException(Patch, label, "its IL has nothing to replace");
         }
 
         private static void DistanceModel(Type model)
@@ -208,7 +209,7 @@ namespace MNBL.ProceduralWorld.CampaignBootstrap
             }
             Applied.Add(new Dictionary<string, object> { ["target"] = model.FullName + "::GetDistance", ["patch"] = "party legs: CampaignVec2.Distance -> periodic distance",
                 ["kind"] = "transpiler", ["overloads"] = overloads, ["replacedCalls"] = replaced - before });
-            if (replaced == before) throw new InvalidOperationException("Periodic patch found nothing to replace: " + model.FullName + "::GetDistance");
+            if (replaced == before) throw new MNBL.ProceduralWorld.CampaignRegistry.PatchSignatureException(Patch, model.FullName + "::GetDistance", "its IL has nothing to replace");
         }
 
         private static IEnumerable<CodeInstruction> DistanceToPeriodic(IEnumerable<CodeInstruction> instructions)

@@ -4,11 +4,15 @@
 #include <windows.h>
 #include <algorithm>
 #include <cctype>
+#include <functional>
+#include <optional>
 #include <set>
+#include "worldbridge/json_stream.hpp"
 #include "worldbridge/world_identity.hpp"
 
 // The validation rules here are the ones the C# host (CampaignBootstrap/WorldDataBundle.cs) and tools/summarize_bundle.py
-// apply; tools/test_bundle_parity.py runs one set of damaged bundles through all three (docs/world-bundle.md).
+// apply; tools/test_bundle_parity.py runs one set of damaged bundles through all three (docs/world-bundle.md). The city preservation
+// check (MMR-251) is this validator's alone: the travel compiler asserts the same before a bundle is written.
 namespace worldbridge::bundle {
 namespace {
 using cjson::Value;
@@ -30,6 +34,62 @@ bool count_of(const Value* v, std::uint64_t& out) {
 fs::path native(const std::string& bundle_path) { return fs::path(std::u8string(bundle_path.begin(), bundle_path.end())); }
 std::string relative_name(const fs::path& path, const fs::path& top) { const auto s = path.lexically_relative(top).generic_u8string(); return std::string(s.begin(), s.end()); }
 DWORD attributes(const fs::path& path) { return GetFileAttributesW(path.c_str()); }
+
+// The FWGC++ cities of the bundled split: settlements.sites[].uid and settlements.founding.placed_cities, streamed (world.json runs to
+// tens of MB, past kMaxDocument).
+struct SourceCities { std::vector<std::string> uids; std::optional<std::int64_t> placed; };
+SourceCities source_cities(const fs::path& world_json) {
+    using json::Token;
+    json::Stream s(world_json);
+    SourceCities out;
+    auto object = [&](const auto& on_key) {   // at BeginObject: each member's value is the current token when on_key runs
+        while (s.next() != Token::EndObject) { const std::string key = s.text(); s.next(); on_key(key); }
+    };
+    if (s.next() != Token::BeginObject) return out;
+    object([&](const std::string& key) {
+        if (key != "settlements" || s.token() != Token::BeginObject) { s.skip(); return; }
+        object([&](const std::string& k) {
+            if (k == "sites" && s.token() == Token::BeginArray) {
+                while (s.next() != Token::EndArray) {
+                    if (s.token() != Token::BeginObject) { s.skip(); continue; }
+                    object([&](const std::string& f) { if (f == "uid" && s.token() == Token::String) out.uids.push_back(s.text()); else s.skip(); });
+                }
+            } else if (k == "founding" && s.token() == Token::BeginObject) {
+                object([&](const std::string& f) {
+                    if (f == "placed_cities" && s.token() == Token::Number && s.text().find_first_not_of("0123456789") == std::string::npos && s.text().size() < 10) out.placed = std::stoll(s.text());
+                    else s.skip();
+                });
+            } else s.skip();
+        });
+    });
+    return out;
+}
+
+// City preservation (MMR-251, docs/travel-graph.md "City preservation"): the split's sites, its founding.placed_cities, the compiled
+// towns, the id-map's towns and the travel graph's towns are one count and one uid set.
+void check_cities(const fs::path& directory, const Value& graph, const std::function<void(const std::string&)>& problem) {
+    const SourceCities source = source_cities(directory / "source/world.json");
+    std::vector<std::string> sites = source.uids;
+    std::sort(sites.begin(), sites.end());
+    if (std::adjacent_find(sites.begin(), sites.end()) != sites.end()) problem("city preservation: the split repeats a site uid");
+    if (!source.placed || *source.placed != static_cast<std::int64_t>(sites.size()))
+        problem("city preservation: settlements.founding.placed_cities differs from the " + std::to_string(sites.size()) + " sites");
+    auto towns_of = [](const Value* list, const char* kind_key) {
+        std::vector<std::string> out;
+        if (list && list->kind == Value::Kind::Array)
+            for (const auto& item : list->items)
+                if (!kind_key || text_of(item, kind_key) == "town") out.push_back(text_of(item, "uid"));
+        std::sort(out.begin(), out.end());
+        return out;
+    };
+    const Value campaign = cjson::parse(directory / "compiled/campaign/campaign.json", kMaxDocument);
+    const Value id_map = cjson::parse(directory / "compiled/campaign/id-map.json", kMaxDocument);
+    const std::pair<const char*, std::vector<std::string>> stages[] = {{"compiled towns", towns_of(member(campaign, "towns"), nullptr)},
+                                                                       {"id-map towns", towns_of(member(id_map, "entries"), "kind")},
+                                                                       {"travel towns", towns_of(member(graph, "settlements"), "kind")}};
+    for (const auto& [stage, uids] : stages)
+        if (uids != sites) problem("city preservation: " + std::to_string(sites.size()) + " FWGC++ sites but " + std::to_string(uids.size()) + " " + stage + " (or another uid set)");
+}
 }  // namespace
 
 Report validate(const fs::path& given, bool name_must_match) {
@@ -166,14 +226,16 @@ Report validate(const fs::path& given, bool name_must_match) {
             auto expect = [&](const char* key, const char* file) {
                 if (!in || text_of(*in, key) != listed.at(file).second) problem(std::string("travel-graph inputs.") + key + " does not match " + file);
             };
-            expect("terrainMasksSha256", "compiled/terrain/masks.bin");
-            expect("terrainHeightfieldSha256", "compiled/terrain/heightfield.bin");
+            // The travel graph's terrain is the navigation field (scaled, unshaped); the shaped surface sits beside it (MMR-278).
+            expect("terrainMasksSha256", "compiled/terrain/navigation-masks.bin");
+            expect("terrainHeightfieldSha256", "compiled/terrain/navigation-heightfield.bin");
             expect("idMapSha256", "compiled/campaign/id-map.json");
             expect("projectionSha256", "compiled/terrain/projection.json");
             const Value* g = member(graph, "grid");
             if (!g || text_of(*g, "cellsSha256") != listed.at("compiled/travel/cells.bin").second) problem("travel-graph cellsSha256 does not match cells.bin");
             const Value* pin = member(ports, "inputs");
             if (!pin || !in || cjson::canonical(*pin) != cjson::canonical(*in)) problem("ports.json inputs differ from travel-graph.json inputs");
+            check_cities(directory, graph, problem);
         }
     } catch (const json::Error& e) {
         problem(e.code + ": " + e.message);

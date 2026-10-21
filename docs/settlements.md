@@ -60,33 +60,23 @@ The XML lists every town and castle before the villages bound to them (the MMR-3
 
 ## Binding
 
-Distances are on the periodic world (columns wrap at 800). The **spacing** is the mean distance from each town to its nearest town: 42.5 at size 129, against 66.9 for the installed map.
+Distances are on the periodic world (columns wrap at 800). The **spacing** is the mean distance from each town to its nearest town: 42.5 on world A (seed 42, size 129), against 66.9 for the installed map.
 
-The binding runs in four steps (`economy.json` binding). Since MMR-46 it lives in `Campaign/VillageBinding.cs`, a pure function over the records, the travel positions and the policy. `SettlementFactory` calls it, and so does the world preview (`docs/world-preview.md`), which shows each village in its bound settlement's kingdom as the campaign has it:
-1. **Start:** every village starts at the compiler's bound town.
-2. **Distance:**
-   - The preferred limit is 1.02× the spacing (43.3). That is the installed maximum ratio, 0.82, plus 25%.
-   - A village beyond the limit moves to the nearest town or castle of its land group within the limit. One with room comes first, and one of its own kingdom before another.
-   - With none within the limit, the village is *remote*. It binds to the nearest fortification with room inside the engine limit: 3× the spacing (127.5), which is the engine's trade limit.
-   - Results: the compiler's binding reached 3.61× (153 units). 5 villages were rebound, 3 of them to another kingdom's castle or town. 2 villages are remote, the farthest at 2.32×.
-3. **Castles from their garrison town:** each castle of a town, in id order, takes its nearest remaining village within the limit, until it has 2 or the town is down to 2. This rebinds 39 villages.
-4. **Short castles:** a castle still short takes a village from the fullest town of its kingdom that has more than 2, within the limit. No candidate exists at size 129.
-5. **Evening out**, only where steps 1–4 leave a fortification outside its limits. World A needs none, so its binding is unchanged byte for byte. This step is in `VillageBinding.cs`; `economy.json`'s rule text describes steps 1–4.
-   - A town above 5 villages, or a castle above 2, gives villages to a town or castle of the village's land group that has room, within the engine limit, the nearest move first. A village that is not remote goes first, then one within the preferred limit, then a fortification without a village, then one of its own kingdom.
-   - Then a town or castle below its floor takes the nearest village from a town above 2 or a castle above 1, within the preferred limit first and its own kingdom first. The floor is one village, or 2 for a town the compiler gave at least 2.
-   - A village moved beyond the preferred limit is remote; one moved within it is not.
-   - Seed 73's world (B) left towns with 6–8 villages and towns and castles with none. Seed 66's left a castle with 4.
+**The village quota decides the binding** (map epic 2, MMR-252; [travel-graph.md](travel-graph.md), "Village quota"). The travel compiler binds exactly 3 villages to every town and 2 to every castle, castle villages included, and writes it into `campaign.json` version 2 (`bound`, `boundKind`, `sourceTown`, `origin`). `Campaign/VillageBinding.cs` passes it through and rebinds nothing; `SettlementFactory` calls it, and so does the world preview (`docs/world-preview.md`), which shows each village in its bound settlement's kingdom as the campaign has it. The four-step rebinding and the evening-out of MMR-33 and MMR-46 are gone, and so are `economy.json`'s `townMinimum` and `townMaximum` (clean break).
 
-| | Generated (size 129) | Installed | Bound |
+- **Limits.** A village farther from its bound settlement than the preferred limit, 1.02× the spacing (43.3 on world A; the installed maximum ratio 0.82 plus 25%), is *remote*. It must stay within the engine limit, 3× the spacing (127.5), the engine's trade limit. World A: 185 villages within the limit, 2 remote, the farthest at 1.57×.
+- **Counts.** `SettlementFactory.Validate` refuses a town without exactly `townVillages` (3) and a castle without exactly `castleVillages` (2) bound villages. A fortification with none is refused with its crash paths named: `SnareTheWealthyIssueQuest`, `incident_the_quiet_life` and `incident_wages_of_war_and_diseases` throw on it (RT-31). The graph validator refuses one too (`graph.village_binding`).
+- **Campaign records of version 1 are refused** ("not mnbl.campaign-records version 2").
+
+| | Generated (world A, size 129) | Installed | Bound |
 |---|---|---|---|
-| Villages per town | 1: 1, 2: 9, 3: 9, 4: 5, 5: 21 | 2-4 | 2-5. The maximum is the installed one plus one, because there are fewer castles per town (0.58 against 1.33). A town the source gave only 1 village is reported, not refused. |
-| Villages per castle | 1: 8, 2: 18 | 1-2 (74 of 76 have 2) | 1-2 |
-| Villages per fief | 3.03 (1.31×) | 2.31 | 0.75-1.5× installed |
-| Hearth per fief | 968.8 (1.31×) | 740.4 | 0.75-1.5× installed |
+| Villages per town | 3: 45 | 2-4 | exactly 3 |
+| Villages per castle | 2: 26 | 1-2 (74 of 76 have 2) | exactly 2 |
+| Villages per fief | 2.63 (1.14×) | 2.31 | 0.75-1.5× installed |
 
-The source fixes the village and fief counts, so the per-fief ratios follow from it.
+The exact 3/2 rule is the owner's; it cuts a town's trade area from vanilla's median of 5 villages to 3, and MMR-247 records the economy effect (RT-42). acc6's 30-day soak (world 1 against the vanilla War Sails sandbox): mean town prosperity 3,186 → 3,213 (+0.9%) against vanilla's 3,483 → 3,448 (−1.0%), town food rising (+25%) where vanilla's fell (−31%), village hearths growing at vanilla's pace (+7.6% against +9.3%). The cost is a prosperity level 7-9% under vanilla's that does not erode; the balance pass changed nothing (`evidence/map-epic-2/balance-pass.json`).
 
-**Castle villages.** Each of the 44 castle villages has a town of its castle's kingdom within the engine's trade limit. The intents record it as `tradeTown`, and the farthest is 91 of 127.5. A castle village without one is refused.
+**Castle villages.** Each castle village has a town of its castle's kingdom within the engine's trade limit. The intents record it as `tradeTown`. A castle village without one is refused.
 
 ## Economy
 
@@ -96,11 +86,13 @@ Every value is a quantile of the installed settlements' own distribution, taken 
 |---|---|---|
 | Town prosperity | the installed town values split into terciles (1700-3100, 3100-4000, 4000-5600) for the compiler classes small, medium and capital | log population within the class |
 | Castle prosperity | installed castles, 420-1100 | the garrison town's log population among all towns |
-| Village hearth | installed villages, 100-825 | the village's share of its compiler town's rural population |
-| Village type | the culture's installed village types of the source production class (farming, fishing, resource, harbor), weighted by installed counts, from the villageTypes stream. A fishing type needs a port (all 36 installed fishing villages have one), so a village without a port draws from its class without them, else from its culture's farming types. | — |
+| Village hearth | installed villages, 100-825 | the village's share of its source town's rural population (`sourceTown`: the compiler town, or the garrison town for a castle's synthesized village; RT-10), shared among the villages of that source town |
+| Village type | the culture's installed village types of the source production class (farming, fishing, resource, harbor), weighted by installed counts, from the villageTypes stream. A fishing type needs a port (all 36 installed fishing villages have one), so a village without a port draws from its class without them, else from its culture's farming types. A coastal village (one with a port) draws a fishing type of its culture with probability `villageMix.coastalFishingShare` (0.5, the installed share among villages with a port; the stream's draw 1), else a non-fishing type of its class (RT-08). | — |
 | Buildings | median installed level per building, by prosperity tercile (towns) and for castles. A larger tier is never lower than a smaller one. Port towns add `building_shipyard`. | — |
 
-Means at size 129: town prosperity 3,278, castle prosperity 847, hearth 320. A missing population estimate or rural population is refused.
+A missing population estimate or rural population is refused. World A: castle villages' hearth median 253 (17 values, none at the minimum 100) against town villages' quartiles 233/311/427; before the source-town share every castle village would have taken the minimum (RT-10).
+
+**Village mix floors (RT-08, RT-09).** Every culture keeps a world-level floor of horse-ranch villages (its installed `*_horse_ranch` type) and wheat farms: `max(1 when its installed pool has the type, floor(share × the culture's generated villages))`, with the shares of `villageMix.floors`. After the draw, a culture below a floor redraws villages to the floor type: villages without a port first, then of the farming class, then the type with the least food, then id; never one whose own type is at its floor. The food pass never redraws a village whose type is at its culture's floor, and `Validate` refuses a culture below one. World A: 8 floor redraws, every culture at or above both floors (nord has no horse ranch); its 61 coastal villages of cultures with fishing types drew a fishing type at 0.459.
 
 **Food.** Town food stocks change with consumption, the bound villages' hearth levels and the food items sold in the market (`DefaultSettlementFoodModel`). Those items come from the villages' production.
 
@@ -113,7 +105,7 @@ From the installed IL (`DefaultVillageTypes`, `NavalVillageTypes`):
 
 A town's trade-area supply is the daily food production of its own villages plus the castle villages that trade with it. The smallest installed supply is 10; the median is 86.
 - Every generated town must reach 10. One below it has its least-food village redrawn to the most food-producing type its culture allows.
-- At size 129, one lumberjack village became a wheat farm. The generated minimum is then 19, and the median 78.
+- World A (seed 42, after the village quota): no village needed a redraw; the generated minimum is 11, and the median 64.
 - The fixture probe checks this food table in game.
 
 **Starting values the engine derives at new game.** These follow from prosperity, hearth, buildings and bound villages through the installed behaviours. The fixtures show them in game:

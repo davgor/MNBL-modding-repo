@@ -12,7 +12,7 @@ foreach ($item in @(@{path=$producer;sha256=$lock.producer.sha256},@{path=$bridg
     if ((Get-FileHash -LiteralPath $item.path).Hash.ToLowerInvariant() -ne $item.sha256) { throw "Binary differs from accepted pin: $($item.path)" }
 }
 $csc = 'C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/MSBuild/Current/Bin/Roslyn/csc.exe'
-& $csc /nologo /target:exe /platform:x64 /langversion:7.3 /warnaserror "/out:$output/GenerationProbeTests.exe" /reference:System.Web.Extensions.dll "$repo/tests/GenerationProbeTests.cs" "$repo/src/MNBL.ProceduralWorld/Diagnostics/GenerationProbe.cs" "$repo/src/MNBL.ProceduralWorld/Diagnostics/OwnedProcessJob.cs"
+& $csc /nologo /target:exe /platform:x64 /langversion:7.3 /warnaserror "/out:$output/GenerationProbeTests.exe" /reference:System.Web.Extensions.dll "$repo/tests/GenerationProbeTests.cs" "$repo/src/MNBL.ProceduralWorld/Diagnostics/GenerationProbe.cs" "$repo/src/MNBL.ProceduralWorld/Diagnostics/OwnedProcessJob.cs" "$repo/tests/GenerationProbeHarnessStubs.cs"
 if ($LASTEXITCODE) { throw 'Harness build failed' }
 Copy-Item -LiteralPath $producer -Destination "$output/fwg.exe"
 [IO.File]::WriteAllText("$output/fwg.sha256", $lock.producer.sha256)

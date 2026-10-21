@@ -13,13 +13,15 @@ namespace MNBL.ProceduralWorld.Surface
 {
     // MMR-37: the surface a world bundle defines, as RuntimeWorldBackend builds and queries it (docs/runtime-surface.md). Pure managed:
     // the offline contract tests and the in-game backend share it.
-    //   * Inputs: the bundle's compiled terrain (heightfield.bin, the encoder input at scale 1; weights.bin, rock_k per sample; masks.bin)
+    //   * Inputs: the bundle's compiled terrain (heightfield.bin, the encoder input at scale 1; weights.bin v2, one alpha plane per material
+    //     layer, MMR-255; masks.bin)
     //     and projection.json. The physical domain is the projection's square periodic layout (physicalWidth = physicalHeight); campaign
     //     XY (logical, strip-free) is kept separate from it and from source metres, and the vertical exaggeration is recorded.
     //   * Encoding model: exactly the surface encoder's (src/WorldBridge/surface.cpp make_grid): bounds floor/ceil at 0.001, 16-bit
     //     round-half-even quantization; RuntimeWorldBackend refuses an encoding whose published quantized heights differ from this model.
     //   * Chunks: the native terrain nodes, 4 x 4, each (cells + 1)^2 samples sharing its border samples with its neighbours; bounds,
-    //     height range and material layers (grass base, rock_k when any sample carries rock) are deterministic.
+    //     height range and material layers (the base, and every other layer with a nonzero sample in the node, as the encoder masks them)
+    //     are deterministic.
     //   * Queries: the quantized height is the main-diagonal (x,y)-(x+1,y+1) interpolation of the encoded samples; the collision reference
     //     interpolates the samples truncated toward zero at 0.03 (MMR-16 calibration) the same way, and is what the engine's terrain,
     //     ground and ray queries return (to 1e-5 in the MMR-37 runs; within 0.03 of the quantized height); normals are the main-diagonal
@@ -32,9 +34,8 @@ namespace MNBL.ProceduralWorld.Surface
     {
         public sealed class Chunk
         {
-            public int X, Y, FirstColumn, FirstRow, Cells, Mask;
+            public int X, Y, FirstColumn, FirstRow, Cells, Mask;   // Mask: bit k set when layer k is present in the node (the base always)
             public double MinX, MinY, MaxX, MaxY, MinHeight, MaxHeight;
-            public bool Rock;
         }
         public sealed class Landmark { public string Name, Kind; public double X, Y; }
 
@@ -60,9 +61,12 @@ namespace MNBL.ProceduralWorld.Surface
         public SortedDictionary<string, object> Scale { get; private set; }
         public string InputsSha256 { get; private set; }
         public List<Chunk> Chunks { get; private set; }
+        // MMR-255: the material layers weights.bin v2 names, in slot order (terrain-materials.json layerSet).
+        public IList<string> LayerNames { get; private set; }
         private double[] source, quantized, collision;
         private int[] q;
-        private byte[] weights, intent, biome, landform;
+        private byte[][] weights;
+        private byte[] intent, biome, landform;
 
         public double[] Quantized { get { return (double[])quantized.Clone(); } }
 
@@ -91,9 +95,11 @@ namespace MNBL.ProceduralWorld.Surface
             var s = new WorldSurface { WorldContentId = contentId };
             s.source = ReadHeights(heightfield, "MNBLHF01");
             int side = (int)BitConverter.ToUInt32(heightfield, 8);
-            if (side != 129 && side != 257) throw new InvalidDataException("The surface encoder takes a 129 or 257 sample heightfield, not " + side + ".");
-            s.Side = side; s.Cells = (side - 1) / Nodes; s.HeightmapLevel = s.Cells == 32 ? 5 : 6;
-            s.weights = Plane(weightBytes, "MNBLWT01", side, 1, 0);
+            if (side != 129 && side != 257 && side != 513) throw new InvalidDataException("The surface encoder takes a 129, 257 or 513 sample heightfield, not " + side + ".");
+            s.Side = side; s.Cells = (side - 1) / Nodes; s.HeightmapLevel = s.Cells == 32 ? 5 : s.Cells == 64 ? 6 : 7;   // MMR-278: the shaped surface is 513 (level 7)
+            string[] names;
+            s.weights = Weights(weightBytes, side, out names);
+            s.LayerNames = Array.AsReadOnly(names);
             s.intent = Plane(masks, "MNBLMK01", side, 4, 1);
             s.biome = Plane(masks, "MNBLMK01", side, 4, 0);   // MMR-42: the biome plane (terrain-materials.json biome ids)
             s.landform = Plane(masks, "MNBLMK01", side, 4, 2);   // MMR-42: the landform plane (terrain-materials.json landforms)
@@ -133,13 +139,14 @@ namespace MNBL.ProceduralWorld.Surface
             s.Chunks = new List<Chunk>();
             for (int iy = 0; iy < Nodes; iy++) for (int ix = 0; ix < Nodes; ix++)
             {
-                int qmin = 65535, qmax = 0; bool rock = false;
+                int qmin = 65535, qmax = 0, mask = 1;
                 for (int r = 0; r <= s.Cells; r++) for (int c = 0; c <= s.Cells; c++)
                 {
                     int i = (iy * s.Cells + r) * side + ix * s.Cells + c;
-                    qmin = Math.Min(qmin, s.q[i]); qmax = Math.Max(qmax, s.q[i]); rock |= s.weights[i] != 0;
+                    qmin = Math.Min(qmin, s.q[i]); qmax = Math.Max(qmax, s.q[i]);
+                    for (int k = 1; k < s.weights.Length; k++) if (s.weights[k][i] != 0) mask |= 1 << k;
                 }
-                s.Chunks.Add(new Chunk { X = ix, Y = iy, FirstColumn = ix * s.Cells, FirstRow = iy * s.Cells, Cells = s.Cells, Rock = rock, Mask = rock ? 3 : 1,
+                s.Chunks.Add(new Chunk { X = ix, Y = iy, FirstColumn = ix * s.Cells, FirstRow = iy * s.Cells, Cells = s.Cells, Mask = mask,
                     MinX = ix * s.NodeSize, MinY = iy * s.NodeSize, MaxX = (ix + 1) * s.NodeSize, MaxY = (iy + 1) * s.NodeSize,
                     MinHeight = s.Low + qmin * s.Step, MaxHeight = s.Low + qmax * s.Step });
             }
@@ -164,7 +171,8 @@ namespace MNBL.ProceduralWorld.Surface
 
         public double Sample(int column, int row) { return quantized[Index(column, row)]; }
         public int Code(int column, int row) { return q[Index(column, row)]; }
-        public byte Rock(int column, int row) { return weights[Index(column, row)]; }
+        // The stored alpha of material layer `layer` (slot order) at a sample.
+        public byte Weight(int layer, int column, int row) { return weights[layer][Index(column, row)]; }
         public byte Intent(int column, int row) { return intent[Index(column, row)]; }
         private int Index(int column, int row)
         {
@@ -204,12 +212,12 @@ namespace MNBL.ProceduralWorld.Surface
             double nx = -dx / Spacing, ny = -dy / Spacing, length = Math.Sqrt(nx * nx + ny * ny + 1);
             return new[] { nx / length, ny / length, 1 / length };
         }
-        // The rock_k weight interpolated like heights (the engine blends per sample; the chunk seam check compares samples).
-        public double RockWeight(double x, double y)
+        // A material layer's alpha interpolated like heights (the engine blends per sample; the chunk seam check compares samples).
+        public double LayerWeight(int layer, double x, double y)
         {
             int ix, iy; double u, v; Cell(x, y, out ix, out iy, out u, out v);
-            int i = iy * Side + ix;
-            return MainTriangle(weights[i], weights[i + 1], weights[i + Side], weights[i + Side + 1], u, v);
+            int i = iy * Side + ix; var w = weights[layer];
+            return MainTriangle(w[i], w[i + 1], w[i + Side], w[i + Side + 1], u, v);
         }
 
         // The earliest intersection of a segment with the collision reference (both triangles of every cell), as a fraction of it.
@@ -315,11 +323,16 @@ namespace MNBL.ProceduralWorld.Surface
             return list;
         }
 
-        // Every sample column c and c + seamColumns that the strips duplicate, whole columns compared; the number that differ.
+        // Every sample column c and c + seamColumns that the strips duplicate, whole columns compared (heights and every material layer
+        // plane); the number of samples that differ.
         public int SeamMismatches()
         {
             int bad = 0;
-            for (int c = 0; c + SeamColumns < Side; c++) for (int r = 0; r < Side; r++) if (q[r * Side + c] != q[r * Side + c + SeamColumns]) bad++;
+            for (int c = 0; c + SeamColumns < Side; c++) for (int r = 0; r < Side; r++)
+            {
+                int a = r * Side + c, b = a + SeamColumns;
+                if (q[a] != q[b] || weights.Any(w => w[a] != w[b])) bad++;
+            }
             return bad;
         }
 
@@ -332,6 +345,29 @@ namespace MNBL.ProceduralWorld.Surface
             Buffer.BlockCopy(bytes, 12, values, 0, values.Length * 8);
             foreach (double v in values) if (double.IsNaN(v) || double.IsInfinity(v)) throw new InvalidDataException(magic + " holds a non-finite height.");
             return values;
+        }
+        // weights.bin v2 (MMR-255): "MNBLWT02", u32 side, u32 N, N x (u32 length, UTF-8 name), N planes of side^2 alpha bytes; plane 0 is
+        // the base at 255 everywhere.
+        private static byte[][] Weights(byte[] bytes, int side, out string[] names)
+        {
+            if (bytes == null || bytes.Length < 16 || Encoding.ASCII.GetString(bytes, 0, 8) != "MNBLWT02" || BitConverter.ToUInt32(bytes, 8) != side)
+                throw new InvalidDataException("weights.bin is not MNBLWT02 at the heightfield's " + side + " samples (pre-epic MNBLWT01 bundles are refused).");
+            int count = (int)BitConverter.ToUInt32(bytes, 12), p = 16;
+            if (count < 1 || count > 16) throw new InvalidDataException("weights.bin holds " + count + " layers, not 1 to 16.");
+            names = new string[count];
+            for (int k = 0; k < count; k++)
+            {
+                if (p + 4 > bytes.Length) throw new InvalidDataException("weights.bin's layer names are truncated.");
+                int length = (int)BitConverter.ToUInt32(bytes, p); p += 4;
+                if (length < 1 || length > 64 || p + length > bytes.Length) throw new InvalidDataException("weights.bin's layer name " + k + " is malformed.");
+                names[k] = Encoding.UTF8.GetString(bytes, p, length); p += length;
+            }
+            long n = (long)side * side;
+            if (bytes.Length != p + count * n || names.Distinct(StringComparer.Ordinal).Count() != count) throw new InvalidDataException("weights.bin's planes do not match its layer table.");
+            var planes = new byte[count][];
+            for (int k = 0; k < count; k++) { planes[k] = new byte[n]; Buffer.BlockCopy(bytes, p + (int)(k * n), planes[k], 0, (int)n); }
+            if (planes[0].Any(v => v != 255)) throw new InvalidDataException("weights.bin's base layer is not 255 everywhere.");
+            return planes;
         }
         private static byte[] Plane(byte[] bytes, string magic, int side, int planes, int plane)
         {

@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -45,12 +46,13 @@ internal static class SettlementTests
 
     private static void Run(string bundleDir, string repo, string outJson)
     {
-        var host = new WorldDataBundle.HostProfile("v1.4.8.119303", "v1.2.8.119303", new[] { "R01", "R02", "R03", "R04", "R05", "R06", "R07", "R08", "R09", "R10" });
+        var host = new WorldDataBundle.HostProfile("v1.4.8.119303", "v1.2.8.119303", WorldDataBundle.HostCapabilities);
         var bundle = WorldDataBundle.Open(bundleDir, host);
         Func<string, IDictionary<string, object>> read = path => Parse(new UTF8Encoding(false).GetString(bundle.ReadVerified(path)));
         var campaign = read("compiled/campaign/campaign.json"); var idMap = read("compiled/campaign/id-map.json");
         var travel = read("compiled/travel/travel-graph.json"); var ports = read("compiled/travel/ports.json");
         var rosters = Load(Path.Combine(repo, "worldgen/policies/rosters.json"));
+        var populationPolicy = Load(Path.Combine(repo, "worldgen/policies/population.json"));
         var economy = Load(Path.Combine(repo, "worldgen/policies/economy.json"));
         var prototypes = Load(Path.Combine(repo, "worldgen/templates/settlements/prototypes.json"));
         var templates = Directory.GetFiles(Path.Combine(repo, "worldgen/templates/cultures"), "*.json").Where(f => Path.GetFileName(f) != "contract.json")
@@ -68,11 +70,11 @@ internal static class SettlementTests
         var defaultsRun = Load(Path.Combine(repo, S(O(rosters, "provenance"), "defaultReferences")));
         var defaults = L(O(Records(O(defaultsRun, "outputs"), "worlds").First(), "registration"), "verifiedLiveDefaultReferences");
         var resolver = new CharacterTemplateResolver(catalog, defaults, O(rosters, "troops"));
-        Func<IDictionary<string, object>, FactionFactory.Result> factionsOf = c => FactionFactory.Build(c, idMap, Load(Path.Combine(repo, "worldgen/policies/factions.json")), Load(Path.Combine(repo, "worldgen/policies/culture-presentations.json")), templates);
+        Func<IDictionary<string, object>, FactionFactory.Result> factionsOf = c => FactionFactory.Build(c, idMap, Load(Path.Combine(repo, "worldgen/policies/factions.json")), Load(Path.Combine(repo, "worldgen/policies/culture-presentations.json")), templates, Load(Path.Combine(repo, "worldgen/policies/population.json")));
         Func<IDictionary<string, object>, IDictionary<string, object>, IDictionary<string, object>, IDictionary<string, object>, SettlementFactory.Result> build = (c, t, p, e) => {
-            var f = factionsOf(c); var h = HeroFactory.Build(c, idMap, f, rosters, resolver);
+            var f = factionsOf(c); var h = HeroFactory.Build(c, idMap, f, rosters, resolver, populationPolicy);
             return new SettlementFactory(e, prototypes, catalog["Settlements"], resolver.Exists).Build(c, t, p, f, h); };
-        var factions = factionsOf(campaign); var heroes = HeroFactory.Build(campaign, idMap, factions, rosters, resolver);
+        var factions = factionsOf(campaign); var heroes = HeroFactory.Build(campaign, idMap, factions, rosters, resolver, populationPolicy);
         var r = new SettlementFactory(economy, prototypes, catalog["Settlements"], resolver.Exists).Build(campaign, travel, ports, factions, heroes);
 
         var towns = Records(campaign, "towns").ToList(); var castles = Records(campaign, "castles").ToList(); var villages = Records(campaign, "villages").ToList();
@@ -117,13 +119,29 @@ internal static class SettlementTests
         var tiers = new[] { "small", "medium", "capital" };
         Check(tIntents.All(s => townBuildings.All(b => elements[s.Id].SelectSingleNode("Components/Town/Buildings/Building[@id='" + b + "']") != null) &&
                   (elements[s.Id].SelectSingleNode("Components/Town/Buildings/Building[@id='building_shipyard']") != null) == s.Port &&
-                  townBuildings.All(b => s.Buildings[b] == I(O(O(O(economy, "buildings"), "towns"), s.CityClass), b))) &&
+                  townBuildings.All(b => b == "building_settlement_fortifications" || s.Buildings[b] == I(O(O(O(economy, "buildings"), "towns"), s.CityClass), b))) &&
               r.Settlements.Where(s => s.Kind == "castle").All(s => castleBuildings.All(b => elements[s.Id].SelectSingleNode("Components/Town/Buildings/Building[@id='" + b + "']") != null)) &&
               elements.Values.SelectMany(e => e.SelectNodes(".//Building").OfType<XmlElement>()).All(b => resolver.Exists("BuildingType." + b.GetAttribute("id"))) &&
               townBuildings.All(b => I(O(O(O(economy, "buildings"), "towns"), "small"), b) <= I(O(O(O(economy, "buildings"), "towns"), "medium"), b) &&
                                      I(O(O(O(economy, "buildings"), "towns"), "medium"), b) <= I(O(O(O(economy, "buildings"), "towns"), "capital"), b)),
               "towns have all " + townBuildings.Count + " installed town buildings at their class tier's levels (never lower for a larger class) and a shipyard exactly when they have a port, castles all " +
-              castleBuildings.Count + " castle buildings, every one a registered building type");
+              castleBuildings.Count + " castle buildings, every one a registered building type");        // MMR-258 (RT-14): the initial wall level (the fortifications building) is drawn from the installed levels of the settlement's prosperity
+        // tercile (economy.json walls: towns by class, castles by prosperity rank), never a level its tercile lacks, and not every wall at level 1.
+        var wallsPolicy = O(economy, "walls");
+        var castlesRanked = r.Settlements.Where(x => x.Kind == "castle").OrderBy(x => x.Prosperity).ThenBy(x => x.Id, StringComparer.Ordinal).ToList();
+        Func<SettlementFactory.SettlementIntent, string> wallTier = x => x.Kind == "town" ? x.CityClass : castlesRanked.IndexOf(x) < castlesRanked.Count / 3 ? "low" : castlesRanked.IndexOf(x) < 2 * castlesRanked.Count / 3 ? "middle" : "high";
+        Func<SettlementFactory.SettlementIntent, int> wallLevel = x => x.Buildings[x.Kind == "town" ? "building_settlement_fortifications" : "building_castle_fortifications"];
+        var fortified = r.Settlements.Where(x => x.Kind == "town" || x.Kind == "castle").ToList();
+        Check(fortified.All(x => { int level = wallLevel(x); object weight; return O(O(wallsPolicy, x.Kind == "town" ? "towns" : "castles"), wallTier(x)).TryGetValue(level.ToString(CultureInfo.InvariantCulture), out weight) && Convert.ToInt32(weight, CultureInfo.InvariantCulture) > 0; })
+              && fortified.Count(x => wallLevel(x) > 1) > 0,
+              "initial wall levels are drawn from the installed distribution of each settlement's prosperity tercile (RT-14): " + String.Join(", ", fortified.GroupBy(wallLevel).OrderBy(g => g.Key).Select(g => g.Count() + " at level " + g.Key)) + " of " + fortified.Count + ", not all level 1");
+        // MMR-258: the village types the scene's look plan reads before the campaign is built (PlanVillageTypes, from the records alone) are the
+        // records' types, floors and food pass included.
+        var planned = new SettlementFactory(economy, prototypes, catalog["Settlements"], resolver.Exists).PlanVillageTypes(campaign, travel, ports);
+        var builtTypes = r.Settlements.Where(x => x.Kind == "village").ToDictionary(x => x.Id, x => x.VillageType, StringComparer.Ordinal);
+        Check(planned.Count == builtTypes.Count && planned.All(kv => builtTypes.ContainsKey(kv.Key) && builtTypes[kv.Key] == kv.Value),
+              "the look plan's village types (SettlementFactory.PlanVillageTypes, without factions or heroes) are the records' for all " + planned.Count + " villages (" + r.Settlements.Count(x => x.FloorRedraw != null || x.FoodRedraw != null) + " redrawn by the floors or the food pass)");
+
         var complexes = catalog["LocationComplexTemplates"].DocumentElement.ChildNodes.OfType<XmlElement>().ToDictionary(e => "LocationComplexTemplate." + e.GetAttribute("id"));
         Func<XmlElement, bool> locationsResolve = e => {
             var l = e.SelectSingleNode("Locations") as XmlElement; if (l == null) return false;
@@ -143,21 +161,45 @@ internal static class SettlementTests
         var remote = vIntents.Where(v => v.Remote).ToList();
         Check(Math.Abs(spacing - r.Spacing) < 1e-6 &&
               vIntents.All(s => byId.ContainsKey(s.Bound) && byId[s.Bound].Kind != "village" && byId[s.Bound].LandGroup == s.LandGroup && Math.Abs(between(s, byId[s.Bound]) - s.BoundDistance) < 1e-6) &&
-              vIntents.Where(v => !v.Remote).All(v => v.BoundDistance <= preferred) && vIntents.All(v => v.BoundDistance <= engine) &&
-              // A remote village has no town or castle of its land group within the limit, or was evened out beyond it (VillageBinding (5)).
-              remote.All(v => (r.ReboundReason.ContainsKey(v.Id) && r.ReboundReason[v.Id] == "even") || forts.Where(f => f.LandGroup == v.LandGroup).All(f => between(v, f) > preferred)),
-              "every village is bound to a town or castle of its land group within " + D(distance, "preferredRatio") + " x the town spacing " + Math.Round(spacing, 1) + " (" + Math.Round(preferred, 1) +
-              "; installed maximum " + D(distance, "installedMaxRatio") + " x): the compiler's binding reached " + Math.Round(compilerFar, 2) + " x, " + r.ReboundReason.Count(x => x.Value == "distance") + " villages were rebound for distance (" +
-              Json.Serialize(((IDictionary<string, object>)r.Balance["binding"])["crossKingdom"]) + " to another kingdom's fortification), and the " + remote.Count + " remote villages, with no town or castle of their land group within the limit, stay within the engine's trade limit " +
-              Math.Round(engine, 1) + " (farthest " + (remote.Count == 0 ? 0 : Math.Round(remote.Max(v => v.BoundDistance / spacing), 2)) + " x)");
-        var sourceCount = villages.GroupBy(v => S(v, "bound")).ToDictionary(g => g.Key, g => g.Count());
-        Check(r.Settlements.Where(s => s.Kind == "castle").All(s => count(s.Id) >= 1 && count(s.Id) <= I(binding, "castleVillages")) &&
-              tIntents.All(s => count(s.Id) >= 1 && count(s.Id) <= I(binding, "townMaximum") && (count(s.Id) >= I(binding, "townMinimum") || (sourceCount.ContainsKey(s.Id) ? sourceCount[s.Id] : 0) < I(binding, "townMinimum"))) &&
-              r.ReboundReason.Where(x => x.Value == "castle").All(x => S(castles.Single(c => S(c, "id") == r.Rebound[x.Key]), "garrisonTown") == byId[x.Key].SourceBound) &&
-              r.ReboundReason.Where(x => x.Value == "balance").All(x => byId[r.Rebound[x.Key]].Kind == "castle" && byId[r.Rebound[x.Key]].Kingdom == byId[byId[x.Key].SourceBound].Kingdom),
-              "every castle has 1-" + I(binding, "castleVillages") + " villages (from its garrison town, " + r.ReboundReason.Count(x => x.Value == "castle") + ", then from fuller towns of its kingdom, " + r.ReboundReason.Count(x => x.Value == "balance") +
-              ") and every town 2-" + I(binding, "townMaximum") + " (installed " + String.Join("-", L(O(binding, "installed"), "townVillages")) + "; fewer only where the source gave fewer): " +
-              Json.Serialize(r.Balance["villagesPerTown"]) + " per town, " + Json.Serialize(r.Balance["villagesPerCastle"]) + " per castle");
+              villages.All(v => byId[S(v, "id")].Bound == S(v, "bound") && byId[S(v, "bound")].Kind == S(v, "boundKind") && byId[S(v, "id")].SourceBound == S(v, "sourceTown")) && r.Rebound.Count == 0 &&
+              vIntents.Where(v => !v.Remote).All(v => v.BoundDistance <= preferred) && vIntents.All(v => v.BoundDistance <= engine) && remote.All(v => v.BoundDistance > preferred),
+              "every village keeps its campaign v2 binding (the village quota, MMR-252; VillageBinding passes it through and rebinds none) to a town or castle of its land group; " +
+              (vIntents.Count - remote.Count) + " are within " + D(distance, "preferredRatio") + " x the town spacing " + Math.Round(spacing, 1) + " (" + Math.Round(preferred, 1) + "; installed maximum " + D(distance, "installedMaxRatio") +
+              " x; farthest " + Math.Round(compilerFar, 2) + " x) and the " + remote.Count + " remote ones stay within the engine's trade limit " + Math.Round(engine, 1));
+        var quota = O(campaign, "villageQuota");
+        Check(r.Settlements.Where(s => s.Kind == "castle").All(s => count(s.Id) == I(binding, "castleVillages")) && tIntents.All(s => count(s.Id) == I(binding, "townVillages")) &&
+              forts.All(f => count(f.Id) > 0) && I(quota, "townVillages") == I(binding, "townVillages") && I(quota, "castleVillages") == I(binding, "castleVillages") && I(quota, "passes") == 2 && (bool)quota["stable"],
+              "every town has exactly " + I(binding, "townVillages") + " and every castle exactly " + I(binding, "castleVillages") + " villages, so no fortification has none (SnareTheWealthy, incident_the_quiet_life and incident_wages_of_war_and_diseases throw on one): " +
+              Json.Serialize(r.Balance["villagesPerTown"]) + " per town, " + Json.Serialize(r.Balance["villagesPerCastle"]) + " per castle; the quota kept " + I(quota, "kept") + ", reassigned " + I(quota, "reassigned") +
+              ", dropped " + I(quota, "dropped") + " and synthesized " + I(quota, "synthesized") + " (stable over its two passes)");
+        // RT-10: hearth from the source town's rural population, shared among its villages; castle villages are not all at the minimum.
+        var rural = towns.ToDictionary(t => S(t, "id"), t => Convert.ToDouble(O(t, "population")["rural"]));
+        var perSource = villages.GroupBy(v => S(v, "sourceTown")).ToDictionary(g => g.Key, g => g.Count());
+        var shares = villages.ToDictionary(v => S(v, "id"), v => rural[S(v, "sourceTown")] / perSource[S(v, "sourceTown")]);
+        var hearthValues = L(O(economy, "hearth"), "values").Select(int.Parse).OrderBy(x => x).ToList();
+        Func<double, int> quantileAt = x => { int below = shares.Values.Count(v => v < x), equal = shares.Values.Count(v => v == x);
+            double pct = shares.Count <= 1 ? 0.5 : (below + (equal - 1) / 2.0) / (shares.Count - 1);
+            return hearthValues[(int)Math.Round(Math.Max(0, Math.Min(1, pct)) * (hearthValues.Count - 1), MidpointRounding.AwayFromZero)]; };
+        var castleHearths = vIntents.Where(v => byId[v.Bound].Kind == "castle").Select(v => v.Hearth).OrderBy(x => x).ToList();
+        var townHearths = vIntents.Where(v => byId[v.Bound].Kind == "town").Select(v => v.Hearth).OrderBy(x => x).ToList();
+        Check(vIntents.All(v => v.Hearth == quantileAt(shares[v.Id])) && castleHearths.Count > 0 && castleHearths.Distinct().Count() > 1 &&
+              castleHearths[castleHearths.Count / 2] >= townHearths[townHearths.Count / 10] && castleHearths.Count(h => h == hearthValues[0]) * 4 < castleHearths.Count,
+              "village hearth is the installed quantile at its share of its source town's rural population (sourceTown; the garrison town for a castle's synthesized village, RT-10): castle villages' hearth median " +
+              castleHearths[castleHearths.Count / 2] + " (" + castleHearths.Distinct().Count() + " values, " + castleHearths.Count(h => h == hearthValues[0]) + " of " + castleHearths.Count + " at the minimum " + hearthValues[0] +
+              ") against town villages' 10th percentile " + townHearths[townHearths.Count / 10] + " and quartiles " + townHearths[townHearths.Count / 4] + "/" + townHearths[townHearths.Count / 2] + "/" + townHearths[3 * townHearths.Count / 4] +
+              " (a castle's villages share their garrison town's rural population with the town's own)");
+        // RT-08: coastal villages draw a fishing type at the installed coastal share; every culture keeps its horse-ranch and wheat floors.
+        var mix = O(economy, "villageMix");
+        var coastal = vIntents.Where(v => v.Port && O(O(economy, "villageTypes"), "pools").ContainsKey(v.Culture) &&
+                                          O(O(O(economy, "villageTypes"), "pools"), v.Culture).Values.Cast<IDictionary<string, object>>().Any(pool => pool.Keys.Any(t => L(O(economy, "villageTypes"), "fishingTypes").Contains(t)))).ToList();
+        double fishedShare = coastal.Count == 0 ? 0 : coastal.Count(v => L(O(economy, "villageTypes"), "fishingTypes").Contains(v.FloorRedraw ?? v.FoodRedraw ?? v.VillageType)) / (double)coastal.Count;
+        var floorCounts = (IDictionary<string, object>)((IDictionary<string, object>)r.Balance["villageMix"])["floors"];
+        Check(coastal.Count > 0 && Math.Abs(fishedShare - D(mix, "coastalFishingShare")) <= 0.2 &&
+              floorCounts.All(f => I(O(floorCounts, f.Key), "horseRanch") >= I(O(floorCounts, f.Key), "horseRanchFloor") && I(O(floorCounts, f.Key), "wheat") >= I(O(floorCounts, f.Key), "wheatFloor")) &&
+              floorCounts.Where(f => O(O(O(economy, "villageTypes"), "pools"), f.Key).Values.Cast<IDictionary<string, object>>().Any(pool => pool.Keys.Any(t => t.EndsWith("_horse_ranch")))).All(f => I(O(floorCounts, f.Key), "horseRanchFloor") >= 1),
+              "the " + coastal.Count + " coastal villages of cultures with fishing types drew a fishing type at " + Math.Round(fishedShare, 3) + " (the installed coastal share " + D(mix, "coastalFishingShare") +
+              "), and every culture keeps its horse-ranch and wheat floors after the food pass (" + String.Join(", ", floorCounts.Select(f => f.Key + " " + I(O(floorCounts, f.Key), "horseRanch") + "/" + I(O(floorCounts, f.Key), "horseRanchFloor") +
+              " ranch, " + I(O(floorCounts, f.Key), "wheat") + "/" + I(O(floorCounts, f.Key), "wheatFloor") + " wheat")) + "; " + vIntents.Count(v => v.FloorRedraw != null) + " floor redraws)");
         var castleVillages = vIntents.Where(v => byId[v.Bound].Kind == "castle").ToList();
         Check(castleVillages.All(v => v.TradeTown != null && byId[v.TradeTown].Kind == "town" && byId[v.TradeTown].Kingdom == v.Kingdom && between(v, byId[v.TradeTown]) <= engine &&
                                       tIntents.Where(t => t.Kingdom == v.Kingdom).All(t => between(v, t) >= between(v, byId[v.TradeTown]))),
@@ -220,11 +262,14 @@ internal static class SettlementTests
         // Positions (staged) and XML order for the registry.
         var portMax = Convert.ToDouble(O(travel, "engine")["installedPortGateMax"]);
         var portTowns = tIntents.Where(s => s.Port).ToList();
-        Check(r.Settlements.All(s => !double.IsNaN(s.X) && s.GateX == s.X && s.GateY == s.Y) && portTowns.All(s => s.PortX.HasValue && Math.Sqrt(Math.Pow(s.PortX.Value - s.GateX, 2) + Math.Pow(s.PortY.Value - s.GateY, 2)) <= portMax + cell) &&
+        // Periodic distance: a port across the seam column from its town is one cell away, not a world width (MMR-251 sweep, seeds 43 and 44).
+        double seamWidth = Convert.ToDouble(O(travel, "grid")["cols"]) * Convert.ToDouble(O(travel, "grid")["spacing"]);
+        Func<double, double, double, double, double> gap = (x1, y1, x2, y2) => { double dx = Math.Abs(x1 - x2); dx = Math.Min(dx, seamWidth - dx); return Math.Sqrt(dx * dx + (y1 - y2) * (y1 - y2)); };
+        Check(r.Settlements.All(s => !double.IsNaN(s.X) && s.GateX == s.X && s.GateY == s.Y) && portTowns.All(s => s.PortX.HasValue && gap(s.PortX.Value, s.PortY.Value, s.GateX, s.GateY) <= portMax + cell) &&
               portTowns.Count == towns.Count(t => (bool)t["port"]) && r.Settlements.Where(s => !s.Port).All(s => !elements[s.Id].HasAttribute("port_posX")),
               "every settlement has its staged MMR-28 centre, and gate at the centre until MMR-40 places gates; the " + portTowns.Count + " port towns have their port candidate's sea point within the installed port-gate maximum " + portMax +
-              " plus one cell of that staged gate (farthest " + Math.Round(portTowns.Max(s => Math.Sqrt(Math.Pow(s.PortX.Value - s.GateX, 2) + Math.Pow(s.PortY.Value - s.GateY, 2))), 2) + "; the installed port-centre maximum " +
-              D(O(economy, "positions"), "installedTownPortCentreMax") + " is not reached by " + portTowns.Count(s => Math.Sqrt(Math.Pow(s.PortX.Value - s.X, 2) + Math.Pow(s.PortY.Value - s.Y, 2)) > D(O(economy, "positions"), "installedTownPortCentreMax")) + " until gates are placed)");
+              " plus one cell of that staged gate (farthest " + Math.Round(portTowns.Max(s => gap(s.PortX.Value, s.PortY.Value, s.GateX, s.GateY)), 2) + "; the installed port-centre maximum " +
+              D(O(economy, "positions"), "installedTownPortCentreMax") + " is not reached by " + portTowns.Count(s => gap(s.PortX.Value, s.PortY.Value, s.X, s.Y) > D(O(economy, "positions"), "installedTownPortCentreMax")) + " until gates are placed)");
         var order = doc2.DocumentElement.ChildNodes.OfType<XmlElement>().Select(e => e.GetAttribute("id")).ToList();
         Check(vIntents.All(s => order.IndexOf(s.Bound) < order.IndexOf(s.Id)) &&
               r.DeclaredKeys.Count == 2 * r.Settlements.Count && r.Settlements.All(s => CampaignIdentity.Problem(s.Id, r.WorldPrefix) == null),
@@ -271,14 +316,19 @@ internal static class SettlementTests
 
         // Determinism and refusals.
         var again = new SettlementFactory(economy, prototypes, catalog["Settlements"], resolver.Exists).Build(campaign, travel, ports, factions, heroes);
-        var shuffled = Copy(campaign); foreach (var key in new[] { "towns", "castles", "villages", "heroes", "kingdoms", "clans" }) shuffled[key] = ((IEnumerable)shuffled[key]).Cast<object>().Reverse().ToArray();
+        var shuffled = Copy(campaign); foreach (var key in new[] { "towns", "castles", "villages", "heroes", "kingdoms", "houses" }) shuffled[key] = ((IEnumerable)shuffled[key]).Cast<object>().Reverse().ToArray();
         Check(again.IntentsSha256 == r.IntentsSha256 && again.Documents[0].Value.OuterXml == r.Documents[0].Value.OuterXml && build(shuffled, travel, ports, economy).IntentsSha256 == r.IntentsSha256,
               "building twice, or from reordered records, gives the same intents (" + r.IntentsSha256.Substring(0, 12) + ") and XML");
         var noPrototype = Copy(prototypes); O(O(noPrototype, "cultures"), "nord").Remove("castle");
         var foreignOwner = Copy(campaign); Records(foreignOwner, "towns").First()["owner"] = "mnbl_ffffffff_l_0000000000";
-        var crossGroup = Copy(travel); var vrec = Records(crossGroup, "settlements").First(s => S(s, "kind") == "village"); vrec["group"] = 999;
-        var tightEngine = Copy(economy); O(O(tightEngine, "binding"), "distance")["engineTradeRatio"] = 1.2;
-        var tightBand = Copy(economy); O(tightBand, "balance")["band"] = new object[] { 0.75, 1.2 };
+        var crossGroup = Copy(travel); var vrec = Records(crossGroup, "settlements").First(s => S(s, "kind") == "village" && villages.Any(v => S(v, "id") == S(s, "id"))); vrec["group"] = 999;
+        var tightEngine = Copy(economy); O(O(tightEngine, "binding"), "distance")["preferredRatio"] = 0.1; O(O(tightEngine, "binding"), "distance")["engineTradeRatio"] = 0.2;
+        var version1 = Copy(campaign); version1["version"] = 1;
+        var emptyCastle = Copy(campaign);
+        foreach (var v in Records(emptyCastle, "villages").Where(v => S(v, "boundKind") == "castle" && S(v, "bound") == S(Records(emptyCastle, "castles").First(c => Records(campaign, "villages").Any(x => S(x, "bound") == S(c, "id"))), "id")).ToList())
+        { v["bound"] = S(v, "sourceTown"); v["boundKind"] = "town"; }
+        var floorless = Copy(economy); foreach (var f in O(O(floorless, "villageMix"), "floors").Values.Cast<IDictionary<string, object>>()) f["horseRanchShare"] = 5.0;
+        var tightBand = Copy(economy); O(tightBand, "balance")["band"] = new object[] { 0.75, 0.8 };   // the 3/2 quota gives 0.87-1.3 x the installed villages per fief
         var noPopulation = Copy(campaign); O(Records(noPopulation, "towns").First(), "population").Remove("estimate");
         var hungry = Copy(economy); O(hungry, "food")["townMinimum"] = 100000;
         var refusals = new[] {
@@ -288,15 +338,19 @@ internal static class SettlementTests
             Refusal(() => new SettlementFactory(tightEngine, prototypes, catalog["Settlements"], resolver.Exists).Build(campaign, travel, ports, factions, heroes)),
             Refusal(() => new SettlementFactory(tightBand, prototypes, catalog["Settlements"], resolver.Exists).Build(campaign, travel, ports, factions, heroes)),
             Refusal(() => new SettlementFactory(economy, prototypes, catalog["Settlements"], resolver.Exists).Build(noPopulation, travel, ports, factions, heroes)),
-            Refusal(() => new SettlementFactory(hungry, prototypes, catalog["Settlements"], resolver.Exists).Build(campaign, travel, ports, factions, heroes)) };
-        var expected = new[] { "castle prototype", "is not a clan intent", "bound across land groups", "beyond the engine trade limit", "outside the band", "has no population estimate", "food supply" };
+            Refusal(() => new SettlementFactory(hungry, prototypes, catalog["Settlements"], resolver.Exists).Build(campaign, travel, ports, factions, heroes)),
+            Refusal(() => new SettlementFactory(economy, prototypes, catalog["Settlements"], resolver.Exists).Build(version1, travel, ports, factions, heroes)),
+            Refusal(() => build(emptyCastle, travel, ports, economy)),
+            Refusal(() => new SettlementFactory(floorless, prototypes, catalog["Settlements"], resolver.Exists).Build(campaign, travel, ports, factions, heroes)) };
+        var expected = new[] { "castle prototype", "is not a house intent", "bound across land groups", "beyond the engine trade limit", "outside the band", "has no population estimate", "food supply",
+                               "version 2", "has no bound village", "horse ranches (floor" };
         Check(refusals.Zip(expected, (m, e) => m != null && m.Contains(e)).All(x => x),
-              "each is refused: a culture without a castle prototype, a town owned by no clan intent, a village bound across land groups, a remote village beyond the engine trade limit, villages per fief outside the balance band, a town without a population estimate and a town below the food minimum (" +
+              "each is refused: a culture without a castle prototype, a town owned by no house intent, a village bound across land groups, a remote village beyond the engine trade limit, villages per fief outside the balance band, a town without a population estimate, a town below the food minimum, campaign records of version 1, a castle left with no village (RT-31) and a culture whose horse-ranch floor no redraw can reach (" +
               String.Join(" | ", refusals.Zip(expected, (m, e) => e + ": " + (m != null && m.Contains(e) ? "refused" : "NOT refused (" + m + ")"))) + ")");
 
         var evidence = new SortedDictionary<string, object>(StringComparer.Ordinal) {
             ["schema"] = "mnbl.evidence.settlements", ["version"] = 2, ["ticket"] = "MMR-33", ["worldPrefix"] = r.WorldPrefix, ["intentsSha256"] = r.IntentsSha256,
-            ["balance"] = r.Balance, ["rebound"] = r.ReboundReason.GroupBy(x => x.Value).ToDictionary(g => g.Key, g => g.Count()), ["portTowns"] = portTowns.Count, ["adaptedPrototypes"] = r.Settlements.Count(s => s.AdaptedPrototype),
+            ["balance"] = r.Balance, ["villageQuota"] = quota, ["portTowns"] = portTowns.Count, ["adaptedPrototypes"] = r.Settlements.Count(s => s.AdaptedPrototype),
             ["castellanCastles"] = castellanCastles.Count, ["slots"] = owned.Count, ["compilerBindingMaxRatio"] = Math.Round(compilerFar, 3),
             ["registrationPlan"] = new SortedDictionary<string, object>(StringComparer.Ordinal) { ["problems"] = planProblems.Count, ["heroFamilyForwardReferences"] = heroFamily.Count, ["fromCompilerRecordsStaleOwners"] = staleOwners, ["fromCompilerRecordsStaleBounds"] = staleBounds },
             ["villageTypes"] = vIntents.GroupBy(s => s.VillageType).OrderBy(g => g.Key).ToDictionary(g => g.Key, g => g.Count()),

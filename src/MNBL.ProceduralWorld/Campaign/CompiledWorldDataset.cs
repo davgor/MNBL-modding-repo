@@ -43,6 +43,8 @@ namespace MNBL.ProceduralWorld.CampaignRegistry
         public GeneratedCampaignInitializer.Result Start;
         public NavalContentFactory.Result Naval;
         public NavalContentFactory.NavalPlan NavalPlan;
+        public PopulationPlan Population;   // MMR-281: what the runtime keeps of the population pass
+        public List<string> WandererTemplates = new List<string>();   // MMR-262: the backstory-safe wanderer templates the new game registers
         public CampaignGraphValidator.Report Graph;
         public string WorldPrefix, WorldId, LayoutSha256;
         public List<string> Declared = new List<string>();
@@ -78,10 +80,18 @@ namespace MNBL.ProceduralWorld.CampaignRegistry
 
             var d = new CompiledWorldDataset();
             var resolver = new CharacterTemplateResolver(s.Catalog, s.Defaults, (IDictionary<string, object>)rosters["troops"]);
-            d.Factions = FactionFactory.Build(campaign, idMap, policy("worldgen/policies/factions.json"), policy("worldgen/policies/culture-presentations.json"), templates);
-            d.Heroes = HeroFactory.Build(campaign, idMap, d.Factions, rosters, resolver);
+            d.Factions = FactionFactory.Build(campaign, idMap, policy("worldgen/policies/factions.json"), policy("worldgen/policies/culture-presentations.json"), templates, policy(WandererPool.PolicyPath));
+            d.Heroes = HeroFactory.Build(campaign, idMap, d.Factions, rosters, resolver, policy(WandererPool.PolicyPath));
+            d.Population = PopulationPlan.From(campaign, d.Factions, policy(WandererPool.PolicyPath));
             var factory = new SettlementFactory(economy, prototypes, s.Catalog["Settlements"], resolver.Exists, s.MissionScenes);
+            // MMR-258: each record takes the prototype its scene look was built from, and a village's type must be the one its production
+            // pieces show.
+            var looks = Looks(s.Layout);
+            factory.LookPrototypes = looks.ToDictionary(kv => kv.Key, kv => kv.Value.Key, StringComparer.Ordinal);
             d.World = factory.Build(campaign, travel, ports, d.Factions, d.Heroes, NavalContentFactory.ShipyardLevels(naval, ports));
+            var lookMismatches = d.World.Settlements.Where(x => x.Kind == "village" && looks.ContainsKey(x.Id) && looks[x.Id].Value != x.VillageType)
+                .Select(x => x.Id + " is " + x.VillageType + ", its scene look shows " + looks[x.Id].Value).ToList();
+            if (lookMismatches.Count > 0) throw new InvalidOperationException("The settlement layout's village looks are not the records' village types: " + String.Join("; ", lookMismatches.Take(5)));
             d.WorldPrefix = d.World.WorldPrefix; d.WorldId = d.WorldPrefix.TrimEnd('_');
 
             // MMR-40: the records take the placement the scene's entities were built from, before startup and naval content read them.
@@ -92,7 +102,8 @@ namespace MNBL.ProceduralWorld.CampaignRegistry
             if (missing.Count > 0) throw new InvalidOperationException("The settlement layout places no position for " + missing.Count + " settlements (first " + missing[0] + ").");
             SettlementFactory.RewritePositions(d.World.Documents.Single(x => x.Key == "Settlements").Value, d.World.Settlements);
 
-            d.Start = new GeneratedCampaignInitializer(startup, factory, s.Catalog["Settlements"], s.Catalog["Factions"], s.Catalog["SPCultures"]).Build(travel, ports, cells, d.Factions, d.Heroes, d.World);
+            d.Start = new GeneratedCampaignInitializer(startup, factory, s.Catalog["Settlements"], s.Catalog["Factions"], s.Catalog["SPCultures"]).Build(travel, ports, cells, d.Factions, d.Heroes, d.World,
+                GeneratedCampaignInitializer.CellBiomes(s.Bundle("compiled/terrain/masks.bin"), Utf8(s.Bundle("compiled/terrain/projection.json")), Utf8(s.Bundle("policies/terrain-materials.json"))));
             d.Naval = new NavalContentFactory(naval, s.Catalog["Factions"], s.Catalog["SPCultures"], s.Catalog["ShipHulls"], s.Catalog["MissionShips"], s.Catalog["ShipSlots"], s.Catalog["partyTemplates"])
                 .Build(campaign, travel, ports, cells, d.Factions, d.World, d.Start);
             d.NavalPlan = d.Naval.Plan;   // the fleet rule and the pirate spawn points (logical: the naval scene wrapper places them)
@@ -123,7 +134,14 @@ namespace MNBL.ProceduralWorld.CampaignRegistry
             }
             if (d.FamilyProblems.Count > 0) throw new InvalidOperationException("The heroes' spouses do not name each other: " + String.Join("; ", d.FamilyProblems.Take(5)));
             d.Defaults = s.Defaults.ToList();
-            var planTemplates = d.Start.Plan.Notables.Concat(d.Start.Plan.Companions).Select(h => h.Template);
+            // The startup plan's templates, and the whole backstory-safe wanderer pool this catalog resolves (MMR-262 F05): a template registers
+            // only when something roots it, and the runtime top-up and rotation pick only registered ones (GeneratedPopulationBehavior's
+            // TemplateUsable), so rooting the day-0 wanderers' templates alone left them repeating those. The pool is filtered by HeroFactory's
+            // own predicate (CharacterTemplateResolver.WandererTemplates: an is_template Wanderer whose references resolve).
+            var resolvable = new HashSet<string>(WandererPool.Cultures.Concat(d.Population.Pool.Safe.Select(t => t.Culture)).Distinct(StringComparer.Ordinal)
+                .SelectMany(c => resolver.WandererTemplates(c, new List<string>())), StringComparer.Ordinal);
+            d.WandererTemplates = d.Population.Pool.Safe.Select(t => t.Id).Where(resolvable.Contains).Distinct(StringComparer.Ordinal).OrderBy(x => x, StringComparer.Ordinal).ToList();
+            var planTemplates = d.Start.Plan.Notables.Concat(d.Start.Plan.Companions).Select(h => h.Template).Concat(d.WandererTemplates);
             List<GeneratedCampaignDataset.Provenance> reemitted; List<string> optionalAbsent;
             d.LogicalDocuments = GeneratedCampaignDataset.CompiledWorldDocuments(s.Catalog, s.Defaults, merged, d.Declared, planTemplates, out reemitted, out optionalAbsent);
             d.Templates = reemitted; d.OptionalAbsent = optionalAbsent;
@@ -204,6 +222,20 @@ namespace MNBL.ProceduralWorld.CampaignRegistry
             return result;
         }
 
+        // MMR-258: the layout report's looks: settlement id -> (the record's prototype, null for phase 0 or a variant; the village type its
+        // production pieces show). A report without looks (no selection ran) gives none.
+        public static Dictionary<string, KeyValuePair<string, string>> Looks(IDictionary<string, object> report)
+        {
+            var result = new Dictionary<string, KeyValuePair<string, string>>(StringComparer.Ordinal);
+            foreach (var row in ((IEnumerable)report["settlements"]).Cast<IDictionary<string, object>>())
+            {
+                object v; var look = row.TryGetValue("look", out v) ? v as IDictionary<string, object> : null;
+                if (look == null) continue;
+                result[Text(row, "id")] = new KeyValuePair<string, string>(Text(look, "prototype"), Text(look, "villageType"));
+            }
+            return result;
+        }
+
         // The registration Settlements document against the layout report (centre, a fortification's gate, a town's port), physical, within 1e-6.
         public static List<string> PhysicalMismatches(XmlDocument settlements, IDictionary<string, object> report)
         {
@@ -249,13 +281,14 @@ namespace MNBL.ProceduralWorld.CampaignRegistry
             return new Dictionary<string, object> {
                 ["worldId"] = WorldId, ["worldPrefix"] = WorldPrefix, ["layoutSha256"] = LayoutSha256, ["declared"] = Declared.Count,
                 ["settlements"] = World.Settlements.GroupBy(x => x.Kind).ToDictionary(g => g.Key, g => (object)g.Count()), ["hideouts"] = Start.Hideouts.Count,
-                ["heroes"] = Heroes.XmlHeroes.Count(), ["clans"] = Factions.Clans.Count, ["kingdoms"] = Factions.Kingdoms.Count, ["creationCultures"] = CreationCultures,
-                ["reemittedTemplates"] = Templates.Count, ["optionalAbsent"] = OptionalAbsent.Count, ["positionsMoved"] = PositionsMoved, ["positionMismatches"] = PositionMismatches, ["familyProblems"] = FamilyProblems,
+                ["heroes"] = Heroes.XmlHeroes.Count(), ["clans"] = Factions.Clans.Count, ["minorClans"] = Factions.MinorClans.Count, ["kingdoms"] = Factions.Kingdoms.Count, ["creationCultures"] = CreationCultures,
+                ["reemittedTemplates"] = Templates.Count, ["wandererTemplates"] = WandererTemplates.Count, ["optionalAbsent"] = OptionalAbsent.Count, ["positionsMoved"] = PositionsMoved, ["positionMismatches"] = PositionMismatches, ["familyProblems"] = FamilyProblems,
                 ["documents"] = DocumentSha256, ["landlocked"] = NavalPlan.Landlocked.Count, ["pirateSpawnPoints"] = NavalPlan.PirateSpawnPoints.Count,
                 ["graph"] = Graph.Record(25) };
         }
 
         private static double Number(string text) { return Double.Parse(text, NumberStyles.Float, CultureInfo.InvariantCulture); }
+        private static string Utf8(byte[] bytes) { return new UTF8Encoding(false).GetString(bytes); }
         private static IDictionary<string, object> Parse(byte[] bytes) { return (IDictionary<string, object>)Json.DeserializeObject(new UTF8Encoding(false).GetString(bytes).TrimStart('﻿')); }
         private static string Text(IDictionary<string, object> o, string key) { object v; return o.TryGetValue(key, out v) ? v as string : null; }
         private static IEnumerable<string> Strings(IDictionary<string, object> o, string key) { return ((IEnumerable)o[key]).Cast<object>().Select(x => Convert.ToString(x, CultureInfo.InvariantCulture)); }

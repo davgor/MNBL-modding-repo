@@ -358,7 +358,7 @@ Every save of a generated campaign carries two groups of header keys, written by
 |---|---|
 | `contract` | `mnbl.save-binding.v1` (`worldgen/contracts/save-binding.schema.json`) |
 | `module`, `moduleAssemblySha256` | the module's version and assembly hash |
-| `game`, `naval` | the game version with its build number; War Sails' version or `absent` |
+| `game`, `naval` | the game version with its build number; War Sails' version or `absent` (MMR-284: diagnostics, checked only against the release's minimum) |
 | `backend` | the runtime world backend and the producer lock it runs (worldbridge and encoder hashes) |
 | `navigationCache` | the navigation cache key's schema and adapter |
 | `saveIds` | the module's fixed save id base and version (`7910000/v1`) |
@@ -418,7 +418,7 @@ Before anything is written, each save must be bound and whole, each package must
 
 `worldgen/contracts/save-type-ledger.json` lists the module's fixed save definitions:
 - the `SaveableTypeDefiner` base and ids: base `7910000`, reserved to `7919999`, version 1; the module defines no saveable types, since a binding is header strings;
-- the `SyncData` keys: `_mnblStartupIntentIds` and `_mnblStartupIntentHeroes` (MMR-34);
+- the `SyncData` keys: `_mnblStartupIntentIds` and `_mnblStartupIntentHeroes` (MMR-34); entry 2 adds `GeneratedPopulationBehavior`'s `_mnblPopulationPendingHouses`, `_mnblPopulationReserveKeys`, `_mnblPopulationReserveCounts`, `_mnblPopulationRotated` and `_mnblPopulationToppedUp` (MMR-281: strings and integers only);
 - the header keys (`mnbl.world.*`, `mnbl.save.*`).
 
 They are module constants, never derived from a world, seed or campaign. Per-world generated object ids (`mnbl_<8 hex>_...`) are StringIds inside a campaign's game data and never appear in the ledger.

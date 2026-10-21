@@ -46,7 +46,7 @@ $exit = Invoke-Bridge 'success' @('--produce','--lock',$lock,'--producer',$produ
 $o = Read-Outcome "$work/success-job"
 $worldHash = if (Test-Path "$work/success-world/world.json") { (Get-FileHash "$work/success-world/world.json").Hash.ToLowerInvariant() } else { $null }
 $results.success = [ordered]@{ exit=$exit; outcome=$o.outcome; published=[bool](Test-Path "$work/success-world/world.json"); stagingRemaining=[bool](Test-Path "$work/success-job/staging/split");
-    worldSha256=$worldHash; matchesAcceptedSeed42Root=($worldHash -eq 'e9264b8d1e0ad5b45af40dca3dcdd54128c22c856a7c11d7acdef3043e5f5c69'); stray=$o.strayProcessesTerminated }
+    worldSha256=$worldHash; matchesAcceptedSeed42Root=($worldHash -eq (Get-Content "$repo/evidence/fwg/producer-verification.json" -Raw | ConvertFrom-Json).rootSha256.'42'); stray=$o.strayProcessesTerminated }
 
 $exit = Invoke-Bridge 'refusal' @('--produce','--lock',$lock,'--producer',$producer,'--request',(New-Request 'refusal' 2),'--job',"$work/refusal-job",'--publish',"$work/refusal-world")
 $o = Read-Outcome "$work/refusal-job"

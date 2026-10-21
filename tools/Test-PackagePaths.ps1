@@ -25,7 +25,7 @@ function Test-Case([string]$name, [bool]$ExpectWorld) {
     $inputs = Join-Path $root 'job/inputs'
     $files = @('worldgen/producer.lock.json','worldgen/contracts/producer-seed-width.json','worldgen/contracts/source-compatibility.json','worldgen/policies/product-policy.json',
         'worldgen/policies/world-quality.json','worldgen/policies/projection.json','worldgen/policies/terrain-materials.json','worldgen/policies/campaign-content.json',
-        'worldgen/policies/culture-presentations.json','worldgen/policies/playability.json','worldgen/calibration/terrain-import/terrain-import.json',
+        'worldgen/policies/culture-presentations.json','worldgen/policies/playability.json','worldgen/policies/terrain-shaping.json','worldgen/policies/population.json','worldgen/calibration/terrain-import/terrain-import.json',
         'worldgen/calibration/axis-sea-datum/calibration.json','worldgen/calibration/naval-transitions/naval-transitions.json','config/runtime-api-lock.json')
     foreach ($f in $files) { $d = Join-Path $inputs $f; New-Item -ItemType Directory -Force (Split-Path $d) | Out-Null; Copy-Item -LiteralPath (Join-Path $repo $f) -Destination $d }
     $job = Join-Path $root 'job'
@@ -34,7 +34,7 @@ function Test-Case([string]$name, [bool]$ExpectWorld) {
     function In([string]$f) { Join-Path $inputs $f }
     $policies = 'product-policy=' + (In 'worldgen/policies/product-policy.json') + ',world-quality=' + (In 'worldgen/policies/world-quality.json') + ',source-compatibility=' + (In 'worldgen/contracts/source-compatibility.json') +
         ',projection=' + (In 'worldgen/policies/projection.json') + ',terrain-materials=' + (In 'worldgen/policies/terrain-materials.json') + ',terrain-import=' + (In 'worldgen/calibration/terrain-import/terrain-import.json') +
-        ',campaign-content=' + (In 'worldgen/policies/campaign-content.json') + ',culture-presentations=' + (In 'worldgen/policies/culture-presentations.json') + ',playability=' + (In 'worldgen/policies/playability.json')
+        ',campaign-content=' + (In 'worldgen/policies/campaign-content.json') + ',culture-presentations=' + (In 'worldgen/policies/culture-presentations.json') + ',playability=' + (In 'worldgen/policies/playability.json') + ',population=' + (In 'worldgen/policies/population.json')
     $steps = [ordered]@{}
     function Run-Step([string]$Name, [string[]]$Arguments) {
         $ErrorActionPreference = 'Continue'
@@ -56,7 +56,7 @@ function Test-Case([string]$name, [bool]$ExpectWorld) {
         $bundles = Join-Path $root 'bundles'
         $ok = (Run-Step 'bundle' @('--bundle',$world,'--contract',(In 'worldgen/contracts/source-compatibility.json'),'--projection-policy',(In 'worldgen/policies/projection.json'),'--materials',(In 'worldgen/policies/terrain-materials.json'),
             '--import',(In 'worldgen/calibration/terrain-import/terrain-import.json'),'--content',(In 'worldgen/policies/campaign-content.json'),'--cultures',(In 'worldgen/policies/culture-presentations.json'),
-            '--playability',(In 'worldgen/policies/playability.json'),'--producer-lock',(In 'worldgen/producer.lock.json'),'--runtime-lock',(In 'config/runtime-api-lock.json'),'--recipe',(Join-Path $run 'request.json'),
+            '--playability',(In 'worldgen/policies/playability.json'),'--shaping',(In 'worldgen/policies/terrain-shaping.json'),'--population',(In 'worldgen/policies/population.json'),'--producer-lock',(In 'worldgen/producer.lock.json'),'--runtime-lock',(In 'config/runtime-api-lock.json'),'--recipe',(Join-Path $run 'request.json'),
             '--root',$bundles,'--diagnostics',(Join-Path $job 'diagnostics'))) -eq 0
         if ($ok) { try { $bundle = ($steps['bundle'].stdout | ConvertFrom-Json) } catch { $bundle = $null } }
     }

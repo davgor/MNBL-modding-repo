@@ -31,8 +31,10 @@ namespace MNBL.ProceduralWorld.Surface
     //     work (modelling, encoding, hashing) off it; EngineWork carries a worker's continuation onto the engine thread (pumped every tick).
     //   * Ownership: each world's resources are in its ResourceLedger with who releases them: the scene and agent renderer (the world, or
     //     for a campaign map the installed engine objects), screen objects, the scene store entry and the engine's scene-name pairing.
-    //     The staging job is deleted once installed or refused. The scene store keeps one folder per world encoding; an install removes
-    //     the store's other folders this process has not used (a later process re-installs a world it needs from its bundle).
+    //     The staging job is deleted once installed or refused. The scene store keeps one folder per world encoding, and (MMR-282) a copy of
+    //     each in the per-user scene archive (WorldSceneArchive), outside the module folder a module update replaces. A generation's sweep
+    //     removes only the scenes, archives, settlement reports and navigation caches no world package, bound save or this process names
+    //     (WorldStoreSweep), and keeps everything when it cannot tell.
     //   * Generations: every world carries a generation token (WorldGenerations); Prepare, Install and Construct refuse a token a later
     //     world superseded, so a late callback cannot attach old resources; queries through a superseded world are refused.
     //   * Navigation (MMR-38, docs/runtime-navigation.md): Prepare builds the campaign navmesh from the bundle's travel cells
@@ -100,8 +102,11 @@ namespace MNBL.ProceduralWorld.Surface
         public List<GeneratedWaterSystem.Lake> Lakes;   // MMR-39: the lake planes in the encoded scene
         public int UnmatchedLakes, HiddenLakes;
         public SettlementLayout Settlements;            // MMR-40: the resolved settlement placement the scene's entities were built from
+        public FrozenLooks Looks;                       // MMR-258: the looks the scene's entities were built from (frozen into the world package)
         public IPlacementGround SettlementGround;
         public string SettlementReportPath;
+        public string Archive;                          // MMR-282: the scene archive's copy ("archived", "kept" or why it failed)
+        public string SnowTextureName;                  // MMR-256: the snow texture the scene's terrain names (null on the permanent-white route)
         public bool JobDeleted;
         public string JobDeleteError;
         // Deletes the staging job (the encoder's output and inputs). Idempotent.
@@ -121,6 +126,8 @@ namespace MNBL.ProceduralWorld.Surface
         public static string RefusedSettlementReportPath(string worldContentId) { return Path.Combine(SubModule.Store, "world-settlements", "refused-" + worldContentId + ".json"); }
         // The installed War Sails campaign map, read for the helper scripts and icon meshes the settlement entities reference (MMR-40).
         public static string InstalledCampaignMap() { return Path.Combine(TaleWorlds.ModuleManager.ModuleHelper.GetModuleFullPath("NavalDLC"), "SceneObj", "Main_map", "scene.xscene"); }
+        // MMR-258: the installed prefab folders a look's nested prefab instances resolve in (the first definition wins).
+        public static IEnumerable<string> InstalledPrefabFolders() { return new[] { "NavalDLC", "SandBox", "Native" }.Select(m => Path.Combine(TaleWorlds.ModuleManager.ModuleHelper.GetModuleFullPath(m), "Prefabs")); }
         public const string TemplateSceneName = "mnbl_runtime_surface";
         public static readonly string[] NativeFiles = { "scene.xscene", "terrain.bin", "navmesh.bin", "flora.bin", "atmosphere.xml" };
         private static readonly HashSet<string> usedThisProcess = new HashSet<string>(StringComparer.Ordinal);
@@ -128,6 +135,9 @@ namespace MNBL.ProceduralWorld.Surface
         public static string ModuleRoot() { return new FileInfo(typeof(RuntimeWorldBackend).Assembly.Location).Directory.Parent.Parent.FullName; }
         public static string SceneStore() { return Path.Combine(ModuleRoot(), "SceneObj"); }
         public static string SceneFolder(string sceneName) { return Path.Combine(SceneStore(), sceneName); }
+        // MMR-282: the per-user copy of every installed world scene (<store>/world-scenes/<name>).
+        public static string SceneArchive() { return Path.Combine(SubModule.Store, "world-scenes"); }
+        public static string SceneArchiveFolder(string sceneName) { return Path.Combine(SceneArchive(), sceneName); }
         private static void MarkUsed(string sceneName) { lock (usedThisProcess) usedThisProcess.Add(sceneName); }
         // MMR-49: a loaded world's installed scene is in use in this process: a later generation job's sweep keeps it.
         internal static void Use(string sceneName) { MarkUsed(sceneName); }
@@ -144,7 +154,9 @@ namespace MNBL.ProceduralWorld.Surface
 
         // Worker thread. No native call. `navigationVariant` selects the production navigation (null), the navigation fixture or a fault
         // (NavigationVariants); a world whose navigation is refused throws NavigationRefusedException before anything is encoded.
-        public static PreparedSurface Prepare(WorldDataBundle bundle, GenerationToken token, CancellationToken cancel, string navigationVariant = null)
+        // MMR-258: frozenLooks, a world package's frozen looks (a load re-encoding its swept scene); null selects them from the installed
+        // campaign map (generation), and the prepared surface keeps them for the package (PreparedSurface.Looks).
+        public static PreparedSurface Prepare(WorldDataBundle bundle, GenerationToken token, CancellationToken cancel, string navigationVariant = null, FrozenLooks frozenLooks = null)
         {
             if (bundle == null || token == null) throw new ArgumentNullException();
             MNBL.ProceduralWorld.Persistence.SaveBindingRuntime.RequireWriter();   // MMR-62: only the store lock holder writes staging
@@ -162,15 +174,24 @@ namespace MNBL.ProceduralWorld.Surface
             var contract = SettlementEntityContract.Installed(InstalledCampaignMap());
             placementPolicy.RequireSource(contract.SourceSha256);
             var settlementGround = new NavigationGround(navigation);
-            var settlements = SettlementPositionResolver.Resolve(SettlementPositionResolver.SitesFromBundle(navigationInput, bundle.ReadVerified("compiled/campaign/campaign.json"), bundle.ReadVerified("compiled/travel/ports.json")),
-                plan, settlementGround, placementPolicy);
+            // MMR-258: every town's, castle's and village's look (the installed catalog, or the package's frozen looks), then the placement.
+            var looksPolicy = MNBL.ProceduralWorld.World.SettlementLooksPolicy.Installed();
+            byte[] campaignJson = bundle.ReadVerified("compiled/campaign/campaign.json"), portsJson = bundle.ReadVerified("compiled/travel/ports.json");
+            var lookInputs = SettlementLookPlan.ForCampaign(campaignJson, bundle.ReadVerified("compiled/travel/travel-graph.json"), portsJson, MNBL.ProceduralWorld.World.StrictJson.Embedded("economy.json"),
+                MNBL.ProceduralWorld.World.StrictJson.Embedded("settlement-prototypes.json"), new HashSet<string>(Generation.CatalogPin.Pin.FromBytes(MNBL.ProceduralWorld.World.StrictJson.Embedded("campaign-catalog.json")).Defaults, StringComparer.Ordinal).Contains, looksPolicy);
+            lookInputs.Frozen = frozenLooks;
+            if (frozenLooks == null) lookInputs.Catalog = SettlementLookCatalog.Installed(InstalledCampaignMap(), InstalledPrefabFolders(), MNBL.ProceduralWorld.World.StrictJson.Embedded("settlement-prototypes.json"), looksPolicy);
+            var missionScenes = MNBL.ProceduralWorld.Missions.MissionScenes.Installed();
+            lookInputs.Conforms = (prototype, kind, port) => missionScenes.PrototypeProblems(prototype, kind, port).Count == 0;
+            FrozenLooks looks;
+            var settlements = SettlementLookPlan.Resolve(SettlementPositionResolver.SitesFromBundle(navigationInput, campaignJson, portsJson), plan, settlementGround, placementPolicy, lookInputs, out looks);
             if (!settlements.Activatable)
             {
                 // The refused layout is kept as evidence under the world's content id (no scene name exists yet); Sweep removes it with the rest.
                 MNBL.ProceduralWorld.Persistence.DurableFile.WriteAllText(RefusedSettlementReportPath(bundle.WorldContentId), new JavaScriptSerializer { MaxJsonLength = Int32.MaxValue }.Serialize(settlements.Report(settlementGround)));
                 throw new SettlementPlacementRefusedException("World " + bundle.WorldContentId.Substring(0, 12), settlements.Problems);
             }
-            string settlementXml = SettlementEntityFactory.ToXml(SettlementEntityFactory.Build(settlements, settlementGround, contract, placementPolicy, HelperPrefix, surface.Extent, surface.High + 100));
+            string settlementXml = SettlementEntityFactory.ToXml(SettlementEntityFactory.Build(settlements, settlementGround, contract, placementPolicy, looksPolicy, HelperPrefix, surface.Extent, SettlementEntityFactory.MapMaximumHeight(surface.High)));
             string module = ModuleRoot(), template = MNBL.ProceduralWorld.World.SurfaceTemplateSource.Ensure(), encoderPath = Path.Combine(Path.GetDirectoryName(typeof(RuntimeWorldBackend).Assembly.Location), "worldbridge.exe");
             PlainPath(template);
             // MMR-39: the water bodies inserted after encoding (the sea plane and the lake planes, GeneratedWaterSystem) are part of the
@@ -179,34 +200,41 @@ namespace MNBL.ProceduralWorld.Surface
             GeneratedClimateSystem.Source source;
             using (var stream = new MemoryStream(worldJson)) source = GeneratedClimateSystem.ReadSource(stream, GeneratedClimateSystem.Sha(worldJson));
             worldJson = null;
+            // MMR-256: the world's snow texture (GeneratedSnowTexture): its name goes into the terrain, so it is part of the scene name.
+            var climate = GeneratedClimateSystem.Synthesize(source, PeriodicWorldCoordinates.FromSurface(surface), GeneratedClimateSystem.Policy.Installed());
+            string snowName = climate.SnowTextureName;
             int unmatchedLakes, hiddenLakes;
             var lakes = GeneratedWaterSystem.Lakes(surface, source, PeriodicWorldCoordinates.FromSurface(surface), out unmatchedLakes, out hiddenLakes);
             string entitiesXml = GeneratedWaterSystem.WithWaterBodies("<scene><entities>\n</entities></scene>", "scene_water", surface.Extent, lakes);
             string templateSha = String.Join("\n", NativeFiles.Select(f => f + " " + GenerationProbe.Hash(Path.Combine(template, f)))) + "\nwater " + GeneratedWaterSystem.Version
                 + " " + GeneratedClimateSystem.Sha(new UTF8Encoding(false).GetBytes(entitiesXml))
-                + "\nsettlements " + SettlementEntityFactory.Version + " " + GeneratedClimateSystem.Sha(new UTF8Encoding(false).GetBytes(settlementXml)) + " " + contract.Sha256;
+                + "\nsettlements " + SettlementEntityFactory.Version + " " + GeneratedClimateSystem.Sha(new UTF8Encoding(false).GetBytes(settlementXml)) + " " + contract.Sha256
+                + "\nsnow " + GeneratedClimateSystem.Version + " " + climate.SnowRoute + " " + (snowName ?? "none");
             string sceneName = SceneNames.ForWorld(bundle.WorldContentId, GenerationProbe.Hash(encoderPath), templateSha, surface.Extent, navigation.Sha256);
             string root = Path.Combine(SubModule.Store, "world-surfaces", Guid.NewGuid().ToString("N"));
             PlainPath(root);
             if (Directory.Exists(root)) throw new IOException("Fresh surface job already exists: " + root);
             var prepared = new PreparedSurface { SceneName = sceneName, JobRoot = root, Output = Path.Combine(root, "surface"), WorldContentId = bundle.WorldContentId, Surface = surface, Token = token, ThreadId = Thread.CurrentThread.ManagedThreadId,
                 Navigation = navigation, NavigationPlan = plan, Lakes = lakes, UnmatchedLakes = unmatchedLakes, HiddenLakes = hiddenLakes,
-                Settlements = settlements, SettlementGround = settlementGround };
+                Settlements = settlements, SettlementGround = settlementGround, Looks = looks, SnowTextureName = snowName };
             try
             {
                 string input = Path.Combine(root, "input"), localTemplate = Path.Combine(root, "template");
                 Directory.CreateDirectory(input); Directory.CreateDirectory(localTemplate);
                 File.WriteAllBytes(Path.Combine(input, "heightfield.bin"), bundle.ReadVerified("compiled/terrain/heightfield.bin"));
                 File.WriteAllBytes(Path.Combine(input, "weights.bin"), bundle.ReadVerified("compiled/terrain/weights.bin"));
+                File.WriteAllBytes(Path.Combine(input, "flora.bin"), bundle.ReadVerified("compiled/terrain/flora.bin"));   // MMR-255: map trees
                 foreach (string file in NativeFiles) File.Copy(Path.Combine(template, file), Path.Combine(localTemplate, file), false);
                 string xmlPath = Path.Combine(localTemplate, "scene.xscene"), xml = File.ReadAllText(xmlPath), original = "<scene name=\"" + TemplateSceneName + "\"";
                 int at = xml.IndexOf(original, StringComparison.Ordinal);
                 if (at < 0 || xml.IndexOf(original, at + original.Length, StringComparison.Ordinal) >= 0) throw new InvalidDataException("The surface template must name the template scene exactly once.");
-                File.WriteAllText(xmlPath, xml.Replace(original, "<scene name=\"" + sceneName + "\""), new UTF8Encoding(false));
+                xml = xml.Replace(original, "<scene name=\"" + sceneName + "\"");
+                if (snowName != null) xml = GeneratedClimateSystem.WithSnowTexture(xml, snowName);   // MMR-256: the encoder keeps terrain attributes
+                File.WriteAllText(xmlPath, xml, new UTF8Encoding(false));
                 cancel.ThrowIfCancellationRequested();
                 token.Require("encoding world " + bundle.WorldContentId);
                 string[] arguments = { "--surface-heightfield", Path.Combine(input, "heightfield.bin"), "--surface-template", localTemplate, "--surface-output", prepared.Output,
-                    "--surface-extent", surface.Extent.ToString("R", CultureInfo.InvariantCulture), "--surface-scale", "1", "--surface-weights", Path.Combine(input, "weights.bin") };
+                    "--surface-extent", surface.Extent.ToString("R", CultureInfo.InvariantCulture), "--surface-scale", "1", "--surface-weights", Path.Combine(input, "weights.bin"), "--surface-normals", "smoothed", "--surface-flora", Path.Combine(input, "flora.bin") };   // MMR-278: normals from a smoothed copy
                 prepared.Encoder = GenerationProbe.RunSurfaceEncoder(arguments, root, cancel);
                 if (Convert.ToInt32(prepared.Encoder["exitCode"], CultureInfo.InvariantCulture) != 0) throw new InvalidDataException("The surface encoder failed: " + root);
                 foreach (string file in NativeFiles) if (!File.Exists(Path.Combine(prepared.Output, file))) throw new FileNotFoundException("The surface encoder omitted " + file, Path.Combine(prepared.Output, file));
@@ -222,8 +250,8 @@ namespace MNBL.ProceduralWorld.Surface
                 // MMR-39: the water body on the datum (GeneratedWaterSystem): the encoder keeps template entities empty.
                 string scenePath = Path.Combine(prepared.Output, "scene.xscene");
                 // Each lake keeps its own level (GeneratedWaterSystem.Lakes, from the source's water layers through the canonical location).
-                // No colour-grade manager: its Init reads Calradia's grid natively (and an inspection scene's read of it hung, run 15744); a
-                // production campaign map gets it with its generated grid at activation (MMR-45, GeneratedColorGrade).
+                // No colour-grade manager: its Init reads Calradia's grid natively (and an inspection scene's read of it hung, run 15744); the
+                // campaign map's grade and season threshold are GeneratedMapAtmosphere's (MMR-256).
                 // MMR-40: the settlement entities and the installed campaign map's scene levels they name (SettlementEntityFactory.DeclareSceneLevels).
                 File.WriteAllText(scenePath, SettlementEntityFactory.DeclareSceneLevels(SettlementEntityFactory.Splice(GeneratedWaterSystem.WithWaterBodies(File.ReadAllText(scenePath), sceneName + "_water", surface.Extent, prepared.Lakes), settlementXml)), new UTF8Encoding(false));
                 var entityProblems = SettlementEntityFactory.Validate(File.ReadAllText(scenePath), settlements, settlementGround, placementPolicy, HelperPrefix);
@@ -237,6 +265,8 @@ namespace MNBL.ProceduralWorld.Surface
                 foreach (string file in NativeFiles) prepared.Files[file] = GenerationProbe.Hash(Path.Combine(prepared.Output, file));
                 string folder = SceneFolder(sceneName);
                 prepared.InstalledAlready = Directory.Exists(folder) && NativeFiles.All(f => File.Exists(Path.Combine(folder, f)) && GenerationProbe.Hash(Path.Combine(folder, f)) == prepared.Files[f]);
+                if (GeneratedClimateSystem.SnowTextureOf(File.ReadAllText(scenePath)) != snowName) throw new InvalidDataException("The encoded scene does not name the world's snow texture " + (snowName ?? "(none)") + ".");
+                if (snowName != null) GeneratedSnowTexture.Ensure(snowName, climate.SnowTexture);
                 prepared.EncodeSeconds = watch.Elapsed.TotalSeconds;
                 return prepared;
             }
@@ -253,7 +283,7 @@ namespace MNBL.ProceduralWorld.Surface
                 EngineThread.Require("scene registration");
                 bool reused = InstallFiles(prepared);
                 var record = Register(prepared, reused);
-                foreach (var kv in Sweep()) record[kv.Key] = kv.Value;
+                foreach (var kv in Sweep(References())) record[kv.Key] = kv.Value;
                 return record;
             }
             finally { prepared.Discard(); }
@@ -271,6 +301,7 @@ namespace MNBL.ProceduralWorld.Surface
             {
                 var differs = NativeFiles.Where(f => !File.Exists(Path.Combine(target, f)) || GenerationProbe.Hash(Path.Combine(target, f)) != prepared.Files[f]).ToList();
                 if (differs.Count > 0) throw new IOException("The installed scene " + prepared.SceneName + " differs from its encoding (" + String.Join(", ", differs) + "); scenes are never rewritten.");
+                prepared.Archive = KeepArchive(prepared.SceneName, prepared.Files);
                 return true;
             }
             Directory.CreateDirectory(target);
@@ -280,7 +311,30 @@ namespace MNBL.ProceduralWorld.Surface
                 File.Copy(Path.Combine(prepared.Output, file), to, false);
                 if (GenerationProbe.Hash(to) != prepared.Files[file]) throw new IOException("Installed scene file differs from the encoding: " + file);
             }
+            prepared.Archive = KeepArchive(prepared.SceneName, prepared.Files);
             return false;
+        }
+
+        // MMR-282 (any thread, no engine call): the installed scene's copy in the scene archive, made unless the identical one is there.
+        // Returns "archived", "kept" or why it failed: the installed world works without it; it is what a module update would cost.
+        internal static string KeepArchive(string sceneName, IDictionary<string, string> files)
+        {
+            try
+            {
+                PlainPath(SceneArchive());
+                Directory.CreateDirectory(SceneArchive());
+                return Persistence.WorldSceneArchive.Keep(SceneArchiveFolder(sceneName), SceneFolder(sceneName), files);
+            }
+            catch (Exception error) when (error is IOException || error is UnauthorizedAccessException) { return "failed: " + error.GetType().Name + ": " + error.Message; }
+        }
+
+        // MMR-282 (any thread, no engine call): copies an archived scene back into the scene store (each file verified against the package's
+        // scene files; a partial copy is removed). The caller registers it (UseInstalled).
+        internal static void RestoreArchived(string sceneName, IDictionary<string, string> files)
+        {
+            string target = SceneFolder(sceneName);
+            PlainPath(target); PlainPath(SceneArchiveFolder(sceneName));
+            Persistence.WorldSceneArchive.Restore(SceneArchiveFolder(sceneName), target, files);
         }
 
         // Engine thread: registers the installed scene's name and checks the engine resolves it to its folder.
@@ -295,31 +349,32 @@ namespace MNBL.ProceduralWorld.Surface
                 ["files"] = prepared.Files, ["threadId"] = Thread.CurrentThread.ManagedThreadId };
         }
 
-        // Any thread: removes the scene store's world folders this process has not used (a later process re-installs a world from its bundle).
-        public static Dictionary<string, object> Sweep()
+        // MMR-282 (engine thread: the game's save list): every scene a world package, a bound or pending save, or this process names. A
+        // failure to read any of them is a gap, and a sweep with a gap deletes no scene or cache.
+        public static Persistence.WorldSceneReferences References()
         {
-            var swept = new List<string>(); var retained = new List<string>();
-            foreach (var folder in Directory.GetDirectories(SceneStore()))
+            Persistence.WorldReferenceIndex index = null;
+            string failure = null;
+            try
             {
-                string name = Path.GetFileName(folder);
-                if (!SceneNames.IsWorldScene(name) || Used(name)) continue;
-                try { Directory.Delete(folder, true); swept.Add(name); }
-                catch (Exception error) { retained.Add(name + ": " + error.GetType().Name); }
+                var store = Persistence.SaveBindingRuntime.Store;
+                index = Persistence.WorldReferenceIndex.Build(store.Saves, store, null, Persistence.WorldReferenceIndex.SaveKindsBound, Persistence.SaveBindingRuntime.Later);
             }
-            // MMR-40: a world's settlement report goes with its scene folder (a later process re-derives it), and refused layouts with them.
-            var reports = new List<string>();
-            string reportFolder = Path.Combine(SubModule.Store, "world-settlements");
-            if (Directory.Exists(reportFolder))
-                foreach (var file in Directory.GetFiles(reportFolder, "*.json"))
-                {
-                    string name = Path.GetFileNameWithoutExtension(file);
-                    if (!name.StartsWith("refused-", StringComparison.Ordinal) && (!SceneNames.IsWorldScene(name) || Used(name))) continue;
-                    try { File.Delete(file); reports.Add(name); }
-                    catch (Exception error) { retained.Add("world-settlements/" + name + ": " + error.GetType().Name); }
-                }
-            // MMR-41: navigation caches of the swept scenes, and staging left by an earlier process.
-            var caches = WorldNavigationCache.Sweep(swept);
-            return new Dictionary<string, object> { ["sweptUnusedScenes"] = swept, ["retainedUnusedScenes"] = retained, ["sweptSettlementReports"] = reports, ["sweptNavigationCaches"] = caches };
+            catch (Exception error) { failure = "the saves could not be indexed: " + error.GetType().Name + ": " + error.Message; }
+            List<string> used; lock (usedThisProcess) used = usedThisProcess.ToList();
+            var references = Persistence.WorldSceneReferences.Discover(index, GeneratedWorldPackage.Root, used);
+            if (failure != null) references.Gaps.Add(failure);
+            return references;
+        }
+
+        // Any thread (file work only): removes the world scenes (installed and archived), settlement reports and navigation caches no reference
+        // names, and staging an earlier process left; keeps the rest, recorded with why (<store>/world-scenes/sweep.json). MMR-282: before
+        // it, every scene this process had not used went, with its caches, so generating a world cost every other campaign a rebuild.
+        public static Dictionary<string, object> Sweep(Persistence.WorldSceneReferences references)
+        {
+            var layout = new Persistence.WorldStoreLayout { SceneStore = SceneStore(), SceneArchive = SceneArchive(),
+                SettlementReports = Path.Combine(SubModule.Store, "world-settlements"), NavigationCaches = WorldNavigationCache.Root(), ReportPath = Path.Combine(SceneArchive(), "sweep.json") };
+            return Persistence.WorldStoreSweep.Run(layout, references, SceneNames.IsWorldScene);
         }
 
         // The installed scene path the engine resolves for a name; throws unless it is the name's scene store folder and that folder holds
@@ -348,7 +403,7 @@ namespace MNBL.ProceduralWorld.Surface
             {
                 if (SceneNames.IsWorldScene(sceneName))
                 {
-                    world.Ledger.Acquire("scene store entry SceneObj/" + sceneName, "RuntimeWorldBackend scene store (one folder per world encoding, reused; an install removes the folders this process did not use)", null);
+                    world.Ledger.Acquire("scene store entry SceneObj/" + sceneName, "RuntimeWorldBackend scene store (one folder per world encoding, reused; a sweep removes only folders nothing references)", null);
                     world.Ledger.Acquire("scene name pairing", "engine scene index (no unregister API; the name always pairs to the same folder)", null);
                 }
                 var scene = Scene.CreateNewScene(true, true, DecalAtlasGroup.All, "mono_renderscene");
@@ -359,6 +414,7 @@ namespace MNBL.ProceduralWorld.Surface
                 if (SceneNames.IsWorldScene(sceneName)) world.NavigationSetup = RuntimeNavigation.PrepareScene(scene, navigation ?? NavigationModel.Installed(NavigationModel.InstalledCalibration()));
                 var init = new SceneInitializationData(true);
                 init.InitPhysicsWorld = true;
+                world.SnowTexture = GeneratedSnowTexture.Acquire(sceneName, world.Ledger);   // MMR-256: the texture the terrain names, before the read
                 scene.Read(sceneName, ModuleId, ref init, "");
                 if (!String.Equals(scene.GetName(), sceneName, StringComparison.Ordinal)) throw new InvalidDataException("The scene read is not the owned scene " + sceneName + ".");
                 scene.SetUseConstantTime(true); scene.SetOcclusionMode(true);
@@ -394,6 +450,7 @@ namespace MNBL.ProceduralWorld.Surface
             init.UsePhysicsMaterials = false; init.EnableFloraPhysics = false; init.UseTerrainMeshBlending = false; init.CreateOros = false;
             scene.SetFetchCrcInfoOfScene(true);
             if (beforeRead != null) beforeRead(scene);
+            world.SnowTexture = GeneratedSnowTexture.Acquire(sceneName, world.Ledger);   // MMR-256: the texture the terrain names, before the read
             scene.Read(sceneName, ModuleId, ref init, "");
             if (!String.Equals(scene.GetName(), sceneName, StringComparison.Ordinal)) throw new InvalidDataException("Loaded campaign scene identity differs from the requested owned scene.");
             world.Bind(scene, null);
@@ -428,6 +485,7 @@ namespace MNBL.ProceduralWorld.Surface
         public ResourceLedger Ledger { get; private set; }
         public List<string> DisposeFailures { get; private set; }
         public Dictionary<string, object> NavigationSetup { get; internal set; }
+        public Dictionary<string, object> SnowTexture { get; internal set; }   // MMR-256: GeneratedSnowTexture.Acquire's record (before the read)
         public int ConstructedOnThread { get; private set; }
         public bool IsDisposed { get { return disposed; } }
 
@@ -509,7 +567,7 @@ namespace MNBL.ProceduralWorld.Surface
         public Dictionary<string, object> Record()
         {
             return new Dictionary<string, object> { ["sceneName"] = SceneName, ["resolved"] = ResolvedPath, ["profile"] = Profile, ["generation"] = Token.Id, ["constructedOnThread"] = ConstructedOnThread,
-                ["navigationSetup"] = NavigationSetup, ["disposed"] = disposed, ["ledger"] = Ledger.Record(), ["outstanding"] = Ledger.Outstanding, ["disposeFailures"] = DisposeFailures };
+                ["navigationSetup"] = NavigationSetup, ["snowTexture"] = SnowTexture, ["disposed"] = disposed, ["ledger"] = Ledger.Record(), ["outstanding"] = Ledger.Outstanding, ["disposeFailures"] = DisposeFailures };
         }
     }
     // MMR-38: the engine side of navigation for constructed worlds.

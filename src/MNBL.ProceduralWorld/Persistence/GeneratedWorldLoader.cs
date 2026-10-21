@@ -26,13 +26,17 @@ namespace MNBL.ProceduralWorld.Persistence
     //      program), its mnbl.world.* binding, the whole file (SaveFileCheck), the recorded build against the running one
     //      (LoadPolicy.Compatibility); the immutable world: the package the binding names (every file against its manifest, the header's scene
     //      and seed) and, for a compiled world, the data bundle by its content id (WorldDataBundle.OpenForSave);
-    //   2. check the derived resources: the installed scene (paired with this module and resolved to its folder) or, when a sweep removed it,
-    //      its re-encoding from the bundle by the surface encoder (never the generator) into staging, which must be the package's byte for
-    //      byte; the navigation, playability and settlement layout reports, installed or kept with the campaign at its activation, through
-    //      their gates; then the campaign rebuilt from the bundle (WorldReconstruction), whose documents, coordinate frame and climate must
-    //      be the saved world's, its replay plan, the map scene and the periodic patches;
+    //   2. check the derived resources: the installed scene (paired with this module and resolved to its folder) or, when it is gone from
+    //      the module (MMR-282: a module update replaced the folder), its copy in the per-user scene archive, or else its re-encoding from the
+    //      bundle by the surface encoder (never the generator) into staging; either must be the package's byte for byte; the navigation,
+    //      playability and settlement layout reports, installed or kept with the campaign at its activation, through their gates; then the
+    //      campaign rebuilt from the bundle (WorldReconstruction), whose documents, coordinate frame and climate must be the saved world's,
+    //      its replay plan, the map scene and the periodic patches;
+    //   2b. MMR-282 (RT-38): when the navigation caches will be rebuilt (no published cache of the scene from this module build and game,
+    //      CacheForecast), the player is told how long first (CacheBuildModel, or this world's last build on this computer) and may cancel;
     //   3. end the running campaign, if any, through the installed exit (only one on its map; its teardown releases the old world);
-    //   4. install what the checks proved: the re-encoded scene and the reports restored from the campaign's copies;
+    //   4. install what the checks proved: the archived or re-encoded scene (an installed one is archived if it was not) and the reports
+    //      restored from the campaign's copies;
     //   5. deserialize the save (MBSaveLoad.LoadSaveGameData, which LoadRouting lets only this loader open for a generated save);
     //   6. start the load (GeneratedLoadManager): the documents replay onto the deserialized objects in RegisterSubModuleObjects(true), the map
     //      scene loads with its periodic frame, climate and colour grade, the navigation caches and the battle terrain install, and the
@@ -46,7 +50,7 @@ namespace MNBL.ProceduralWorld.Persistence
     // encoder only to re-encode a swept scene.
     internal sealed class GeneratedWorldLoader
     {
-        public enum Phase { Planning, Reconstructing, EndingGame, Installing, Deserializing, Starting, Loading, Loaded, Refused, Failed }
+        public enum Phase { Planning, Reconstructing, EndingGame, Installing, Deserializing, Starting, Loading, Loaded, Refused, Failed, Declined }
         private const int ReportsKept = 20;
         private static readonly TimeSpan EncodeTimeout = TimeSpan.FromMinutes(20);
         private static readonly JavaScriptSerializer Json = new JavaScriptSerializer { MaxJsonLength = Int32.MaxValue };
@@ -105,7 +109,7 @@ namespace MNBL.ProceduralWorld.Persistence
         {
             if (Busy)
             {
-                InformationManager.DisplayMessage(new InformationMessage("A campaign is already loading."));
+                InformationManager.DisplayMessage(new InformationMessage(Localized(LoadPolicy.Texts.AlreadyLoading, null)));
                 if (onCancel != null) onCancel();
                 return null;
             }
@@ -113,11 +117,12 @@ namespace MNBL.ProceduralWorld.Persistence
             if (busy != null)
             {
                 var refusal = LoadPolicy.Refuse(LoadPolicy.Busy, busy);
-                ShowRefusal(refusal.Title, refusal.Message + "\n\n(" + refusal + ")", onCancel);
+                ShowRefusal(Localized(refusal.Title, null), Localized(refusal.Message, refusal.Variables) + "\n\n(" + refusal + ")", onCancel);
                 return null;
             }
             var loader = new GeneratedWorldLoader(saveName, onCancel, trace);
             Current = loader;
+            WorldMutationBehavior.CancelForLoad();   // MMR-261: a running fwg apply never runs into a load
             loader.Report["saveName"] = saveName; loader.Report["processId"] = Process.GetCurrentProcess().Id; loader.Report["utc"] = DateTime.UtcNow.ToString("o", CultureInfo.InvariantCulture);
             // As the installed load does (SandBoxSaveHelper's Start and LoadGame states): the loading window, which also keeps the player from
             // acting meanwhile; a running campaign's time stops while its successor is checked.
@@ -160,6 +165,7 @@ namespace MNBL.ProceduralWorld.Persistence
                 bool scenePresent = work == null || work.State == LoadPolicy.SceneState.Installed;
                 if (scenePresent) CheckStart(plan, restored);
                 Phases("checked");
+                if (plan.Compiled) ConfirmCacheBuild(plan);
                 EndRunningGame();
                 if (work != null) { Enter(Phase.Installing); InstallCompiled(plan, work); }
                 if (!scenePresent) CheckStart(plan, restored);
@@ -173,6 +179,10 @@ namespace MNBL.ProceduralWorld.Persistence
                 var manager = Engine("start the load", () =>
                 {
                     if (restored.Terrain != null) GeneratedBattleTerrain.ContextSources[plan.Scene] = restored.Terrain;
+                    if (restored.Dressing != null) MNBL.ProceduralWorld.World.MapDressingRuntime.Plans[plan.Scene] = restored.Dressing;
+                    if (restored.Overlay != null) MNBL.ProceduralWorld.World.MagicGroundRuntime.Overlays[plan.Scene] = restored.Overlay;
+                    if (restored.Mutation != null) WorldMutationBehavior.Contexts[plan.Scene] = restored.Mutation;   // MMR-261
+                    if (restored.Roads != null) GeneratedPartySpeedModel.RoadSources[plan.Scene] = restored.Roads;
                     return GeneratedLoadManager.Start(new GeneratedLoadManager.LoadStart { World = restored.World, SceneName = plan.Scene, SupportReport = support, Trace = trace,
                         Periodic = restored.Periodic, Climate = restored.Climate, Saved = saved, Identity = plan.Identity });
                 });
@@ -186,15 +196,26 @@ namespace MNBL.ProceduralWorld.Persistence
                     Thread.Sleep(250);
                 }
                 if (progress != "map") throw new InvalidOperationException(progress);
+                // MMR-283: the map's AfterLoad never throws; what failed there (the navigation caches, the battle map) ends the load here.
+                object afterLoad; support.TryGetValue("afterLoadFailure", out afterLoad);
+                var battleMap = support.ContainsKey("battleSceneSelection") ? support["battleSceneSelection"] as Dictionary<string, object> : null;
+                if (afterLoad == null && battleMap != null && Equals(battleMap["status"], "failed"))
+                {
+                    afterLoad = "the battle map: " + battleMap["error"];
+                    // A battle table the map refused is named as a content conflict (module and scene), as CheckStart would have.
+                    if (battleMap.ContainsKey("lost")) Refusal = ContentRefusal(new List<CatalogPin.Conflict> { ContentCompatibility.BattleConflict(Engine("check the battle table", () => GeneratedBattleTerrain.CheckModuleTables())) });
+                }
+                if (afterLoad != null) throw new InvalidOperationException("the campaign map could not be completed: " + afterLoad);
                 Report["loadSeconds"] = loading.Elapsed.TotalSeconds;
                 Enter(Phase.Loaded);
-                Engine("loaded message", () => { InformationManager.DisplayMessage(new InformationMessage("The campaign is restored.")); return true; });
+                Engine("loaded message", () => { InformationManager.DisplayMessage(new InformationMessage(Localized(LoadPolicy.Texts.Restored, null))); return true; });
             }
             catch (Exception raw)
             {
                 var error = raw is AggregateException && raw.InnerException != null ? raw.InnerException : raw;
                 var refused = error as Refused;
-                if (refused != null) { Refusal = refused.Refusal; Enter(Phase.Refused); }
+                if (error is Declined) Enter(Phase.Declined);
+                else if (refused != null) { Refusal = refused.Refusal; Enter(Phase.Refused); }
                 else if (!started && !(error is EngineStopped))
                 {
                     // Before the start an unexpected error is a refusal too: nothing started, and nothing of the world was written.
@@ -203,8 +224,10 @@ namespace MNBL.ProceduralWorld.Persistence
                     Enter(Phase.Refused);
                 }
                 else { Error = error.GetType().Name + ": " + error.Message; Report["exception"] = error.ToString(); Enter(Phase.Failed); }
-                // A stopped engine answers nothing more; anything else shows why and, for a game that reached its map, returns to the menu.
-                if (!(error is EngineStopped))
+                // A stopped engine answers nothing more; anything else shows why and, for a game that reached its map, returns to the menu. A
+                // player who cancelled at the navigation warning goes back to where the load was started, with nothing changed.
+                if (state == Phase.Declined) { try { Engine("leave the declined load", () => { Dismissed(onCancel); return true; }); } catch (Exception) { } }
+                else if (!(error is EngineStopped))
                 {
                     if (state == Phase.Failed) ReturnToMenu();
                     try { Engine("show the outcome", () => { ShowOutcome(); return true; }); } catch (Exception) { }
@@ -258,6 +281,10 @@ namespace MNBL.ProceduralWorld.Persistence
             var savedBuild = SaveBindingContract.CompatibilityFrom(header.Metadata);
             var refusal = savedBuild.Count == 0 ? LoadPolicy.LegacyCompatibility(LoadPolicy.LegacyBuild(header.Metadata), running, Notes) : LoadPolicy.Compatibility(savedBuild, running, Notes);
             if (refusal != null) throw new Refused(refusal);
+            // MMR-284: a supported build loads only when every patch the campaign needs still finds its target (by signature and, for the
+            // wanderer introduction, IL content); a game update that changed one refuses here, naming the patch, before anything changes.
+            var patch = Engine("check the patch signatures", () => GeneratedPatches.Verify()).FirstOrDefault();
+            if (patch != null) throw new Refused(LoadPolicy.Patch(patch.Patch, patch.Target, patch.Message));
             var plan = new LoadPlan { Compiled = binding.ContentId != WorldBinding.NoContent, Instance = binding.Instance, PackageDirectory = Path.Combine(GeneratedWorldPackage.Root, binding.PackageName) };
             if (plan.Compiled && !ActivationRequest.ValidInstance(binding.Instance)) throw Refuse(LoadPolicy.DamagedSave, "its campaign instance '" + binding.Instance + "' is not a campaign instance id");
             plan.Header = header.Metadata.Where(kv => kv.Key.StartsWith(WorldBinding.Prefix, StringComparison.Ordinal)).ToDictionary(kv => kv.Key.Substring(WorldBinding.Prefix.Length), kv => kv.Value, StringComparer.Ordinal);
@@ -303,16 +330,21 @@ namespace MNBL.ProceduralWorld.Persistence
             public PeriodicWorld Periodic;
             public GeneratedClimate Climate;
             public Func<double, double, GeneratedBattleTerrain.TerrainContext> Terrain;
+            public MapDressingPlan Dressing;   // MMR-257
+            public WorldSurfaceOverlay Overlay;   // MMR-260
+            public MutationModel.Context Mutation;   // MMR-261
+            public MNBL.ProceduralWorld.World.RoadSpeed.Cells Roads;
         }
 
         // What a compiled world's scene and reports need, from the checks to the install.
         private sealed class SceneWork
         {
             public LoadPolicy.SceneState State;
-            public bool Deferred, Installed, SettlementWritten;
+            public bool Deferred, Installed, SettlementWritten, FromArchive;
             public GenerationToken Token;
             public PreparedSurface Prepared;
             public string LayoutSha256;
+            public string NavigationReportPath;   // MMR-257: the report CheckReports read (the scene's, or the copy kept with the campaign)
             public readonly List<KeyValuePair<string, byte[]>> Restore = new List<KeyValuePair<string, byte[]>>();
             public readonly List<string> RestoredNames = new List<string>(), Rederived = new List<string>();
 
@@ -344,6 +376,10 @@ namespace MNBL.ProceduralWorld.Persistence
                 try { Report["sceneResolved"] = Engine("pair the installed scene", () => RuntimeWorldBackend.UseInstalled(plan.Scene)); }
                 catch (IOException error) { throw Refuse(LoadPolicy.NotRebuildable, "the installed scene: " + error.Message); }
             }
+            // MMR-282: the archived copy, when it is the package's, is copied back at the install (no encoder, so a later encoder that would
+            // name the world differently does not matter).
+            else if (LoadPolicy.Scene(plan.SceneFiles, WorldSceneArchive.Hashes(RuntimeWorldBackend.SceneArchiveFolder(plan.Scene), plan.SceneFiles.Keys)) == LoadPolicy.SceneState.Installed)
+            { work.FromArchive = true; Report["sceneSource"] = "archive"; }
             else if (WorldGenerations.LiveCampaignMap == 0) Encode(plan, work);
             else { work.Deferred = true; Report["encodeDeferred"] = "another campaign's map is live: the swept scene is re-encoded after it ends"; }
             // The derived reports.
@@ -356,16 +392,25 @@ namespace MNBL.ProceduralWorld.Persistence
             string savedFrame; plan.Header.TryGetValue("coordinatePolicy", out savedFrame);
             var refusal = LoadPolicy.Rebuilt("coordinate frame", savedFrame, coordinates.FrameIdentity);
             if (refusal != null) throw new Refused(refusal);
+            // MMR-283: rebuilt from the catalog frozen in the package at activation, so later stat changes never change the world; the live
+            // catalog is then checked only for the installed objects the world references (and stock objects added since).
+            WorldReconstruction.Frozen frozen;
+            try { frozen = WorldReconstruction.PackageCatalog(plan.PackageDirectory); }
+            catch (Exception error) when (!(error is Refused)) { throw Refuse(LoadPolicy.DamagedWorld, "package " + Binding.PackageName + ": " + error.Message); }
+            // MMR-247: the report inside the navigation record CheckReports chose (the scene's, or the copy kept with the campaign: both records).
+            IDictionary<string, object> navigationReport;
+            try { navigationReport = NavigationGate.ReadAt(work.NavigationReportPath, plan.Scene); }
+            catch (NavigationRefusedException error) { throw Refuse(LoadPolicy.NotRebuildable, "navigation: " + error.Message); }
             WorldReconstruction.World world;
-            try
-            {
-                byte[] pin;
-                var catalog = WorldReconstruction.Catalog((label, step) => Engine(label, step), out pin);
-                world = WorldReconstruction.Build(plan.Bundle, layout, coordinates, surface, catalog, pin);
-            }
+            try { world = WorldReconstruction.Build(plan.Bundle, layout, coordinates, surface, frozen, navigationReport); }
             catch (Exception error) when (!(error is Refused)) { throw Refuse(LoadPolicy.NotRebuildable, "the campaign rebuild failed: " + error.Message); }
             refusal = LoadPolicy.RebuiltDocuments(plan.Documents, world.Dataset.DocumentSha256);
             if (refusal != null) throw new Refused(refusal);
+            List<CatalogPin.Conflict> conflicts;
+            try { conflicts = WorldReconstruction.LoadConflicts((label, step) => Engine(label, step), world, frozen); }
+            catch (Exception error) when (!(error is Refused)) { throw Refuse(LoadPolicy.NotRebuildable, "the installed content could not be checked: " + error.Message); }
+            Report["contentConflicts"] = conflicts.Select(c => c.ToString()).Take(20).ToList();
+            if (conflicts.Count > 0) throw new Refused(ContentRefusal(conflicts));
             if (world.Dataset.WorldId != Binding.WorldId) throw Refuse(LoadPolicy.NotRebuildable, "the rebuilt world is " + world.Dataset.WorldId);
             string savedClimate; plan.Header.TryGetValue("climate", out savedClimate);
             refusal = LoadPolicy.Rebuilt("climate", savedClimate, world.Climate == null ? "none" : world.Climate.Pattern);
@@ -383,7 +428,8 @@ namespace MNBL.ProceduralWorld.Persistence
             catch (Exception error) when (!(error is Refused)) { throw Refuse(LoadPolicy.NotRebuildable, "the replay plan: " + error.Message); }
             if (preflight.Count > 0) throw Refuse(LoadPolicy.NotRebuildable, "the replay plan: " + String.Join("; ", preflight.Take(5)));
             Phases("replay plan checked");
-            return new Restored { World = registration, Periodic = new PeriodicWorld(coordinates), Climate = world.Climate, Terrain = world.TerrainContext };
+            return new Restored { World = registration, Periodic = new PeriodicWorld(coordinates), Climate = world.Climate, Terrain = world.TerrainContext, Dressing = world.Dressing,
+                Roads = world.Roads, Overlay = world.Overlay, Mutation = world.Mutation };
         }
 
         // A swept scene, re-encoded from the bundle by the surface encoder into staging; it must be the package's, byte for byte.
@@ -393,7 +439,11 @@ namespace MNBL.ProceduralWorld.Persistence
             work.Token = WorldGenerations.Begin("load " + plan.Scene);
             using (var cancel = new CancellationTokenSource(EncodeTimeout))
             {
-                try { work.Prepared = RuntimeWorldBackend.Prepare(plan.Bundle, work.Token, cancel.Token); }
+                // MMR-258: the package's frozen looks, not the installed campaign map (a patch since generation leaves the scene as built).
+                FrozenLooks looks;
+                try { looks = FrozenLooks.Read(file => File.ReadAllBytes(Path.Combine(plan.PackageDirectory, file.Replace('/', Path.DirectorySeparatorChar))), MNBL.ProceduralWorld.World.SettlementLooksPolicy.Installed()); }
+                catch (Exception error) when (error is IOException || error is InvalidDataException || error is UnauthorizedAccessException) { throw Refuse(LoadPolicy.DamagedWorld, "package " + Binding.PackageName + ": its settlement looks: " + error.Message); }
+                try { work.Prepared = RuntimeWorldBackend.Prepare(plan.Bundle, work.Token, cancel.Token, null, looks); }
                 catch (OperationCanceledException) { throw Refuse(LoadPolicy.NotRebuildable, "the surface encoder did not finish within " + EncodeTimeout.TotalMinutes + " min"); }
                 catch (Exception error) when (!(error is Refused)) { throw Refuse(LoadPolicy.NotRebuildable, "the scene could not be re-encoded: " + error.GetType().Name + ": " + error.Message); }
                 finally { work.SettlementWritten = !settlementExisted && File.Exists(RuntimeWorldBackend.SettlementReportPath(plan.Scene)); }
@@ -428,6 +478,7 @@ namespace MNBL.ProceduralWorld.Persistence
                 catch (IOException error) { throw Refuse(LoadPolicy.NotRebuildable, "the campaign's kept " + row.Kept + " cannot be read: " + error.Message); }
                 work.RestoredNames.Add(row.Kept);
             }
+            work.NavigationReportPath = source["navigation.json"];   // MMR-257: the map dressing's bridges
             IDictionary<string, object> layout = ReadReport(source["settlement-layout.json"], "settlement layout report");
             if (!Equals(Value(layout, "worldContentId"), Binding.ContentId) || !Equals(Value(layout, "activatable"), true)) throw Refuse(LoadPolicy.NotRebuildable, "the settlement layout report is not this world's");
             string keptLayout = Path.Combine(evidence, "settlement-layout.json");
@@ -437,7 +488,8 @@ namespace MNBL.ProceduralWorld.Persistence
             string layoutSha = Convert.ToString(Value(layout, "layoutSha256"), CultureInfo.InvariantCulture);
             if (work.LayoutSha256 != null && work.LayoutSha256 != layoutSha) throw Refuse(LoadPolicy.NotRebuildable, "the re-encoded scene's settlement layout is not the one the campaign was rebuilt with");
             work.LayoutSha256 = layoutSha;
-            string navmesh = work.Prepared != null ? Path.Combine(work.Prepared.Output, "navmesh.bin") : work.Deferred ? null : Path.Combine(RuntimeWorldBackend.SceneFolder(plan.Scene), "navmesh.bin");
+            string navmesh = work.Prepared != null ? Path.Combine(work.Prepared.Output, "navmesh.bin") : work.FromArchive ? Path.Combine(RuntimeWorldBackend.SceneArchiveFolder(plan.Scene), "navmesh.bin")
+                : work.Deferred ? null : Path.Combine(RuntimeWorldBackend.SceneFolder(plan.Scene), "navmesh.bin");
             if (navmesh != null)
             {
                 try { NavigationGate.RequireAt(source["navigation.json"], plan.Scene, navmesh, NavigationPolicy.Installed().Sha256); }
@@ -476,9 +528,20 @@ namespace MNBL.ProceduralWorld.Persistence
             return new Restored { World = registration, Periodic = registration.Periodic, Climate = registration.Climate };
         }
 
-        // What GeneratedLoadManager.Start would refuse on, checked first: the map scene's files and the periodic patch targets.
+        // MMR-283: the first conflict as the player's refusal (its module and object), the rest in the detail.
+        private static LoadPolicy.Refusal ContentRefusal(List<CatalogPin.Conflict> conflicts)
+        {
+            var c = conflicts[0];
+            return LoadPolicy.Content(c.Kind, c.Key, c.Module, c.Official, c.Target, String.Join("; ", conflicts.Take(10)) + (conflicts.Count > 10 ? " (" + (conflicts.Count - 10) + " more)" : ""));
+        }
+
+        // What GeneratedLoadManager.Start would refuse on, checked first: the map scene's files and the periodic patch targets; MMR-283: and
+        // the battle table the campaign will load, before its navigation caches are built.
         private void CheckStart(LoadPlan plan, Restored restored)
         {
+            var battle = Engine("check the battle table", () => GeneratedBattleTerrain.CheckModuleTables());
+            Report["battleTable"] = battle.Record();
+            if (!battle.Ok) throw new Refused(ContentRefusal(new List<CatalogPin.Conflict> { ContentCompatibility.BattleConflict(battle) }));
             try
             {
                 Engine("check the map scene and the periodic patches", () =>
@@ -488,8 +551,71 @@ namespace MNBL.ProceduralWorld.Persistence
                     return true;
                 });
             }
+            catch (PatchSignatureException error) { throw new Refused(LoadPolicy.Patch(error.Patch, error.Target, error.Message)); }   // MMR-284
             catch (Exception error) when (!(error is Refused)) { throw Refuse(LoadPolicy.NotRebuildable, "the map scene or the periodic patches: " + error.Message); }
             Phases("start checked");
+        }
+
+        // ---------------------------------------------------------------- 2b. the navigation caches (MMR-282, RT-38)
+
+        private sealed class Declined : Exception { public Declined() : base("The player cancelled the load at the navigation warning.") { } }
+
+        // Before anything changes: a load whose caches will be rebuilt (CacheForecast) says how long first and waits for the player's answer;
+        // Cancel ends the load with nothing changed. A probe run (AutorunHost) is answered for it and recorded. The forecast is advice: when it
+        // cannot be made, the load goes on and the report says why.
+        private void ConfirmCacheBuild(LoadPlan plan)
+        {
+            CacheForecast forecast; int settlements; double seconds;
+            try
+            {
+                string game = Engine("the running game and War Sails versions", () => GeneratedPatches.InstalledVersions());
+                forecast = CacheForecast.Predict(WorldNavigationCache.PublishedManifests(), plan.Scene, WorldNavigationCache.ModuleSha256(), game);
+                settlements = Settlements(plan.Bundle);
+                var model = UI.WorldSetupContract.Installed().CacheBuild;
+                seconds = forecast.MeasuredSeconds ?? (model == null ? 0 : model.Seconds(settlements));
+            }
+            catch (Exception error) when (!(error is Refused))
+            {
+                Report["cacheForecast"] = new Dictionary<string, object> { ["error"] = error.GetType().Name + ": " + error.Message };
+                return;
+            }
+            var record = forecast.Report();
+            record["settlements"] = settlements; record["estimateSeconds"] = Math.Round(seconds, 1);
+            Report["cacheForecast"] = record;
+            if (forecast.Reuse || seconds <= 0) return;
+            if (Automation.AutorunHost.Busy) { record["warning"] = "answered by the running probe: load"; trace("generated_load_cache_warning:probe"); return; }
+            var vars = new Dictionary<string, string> { ["SAVE"] = SaveName, ["MINUTES"] = CacheBuildModel.Minutes(seconds).ToString(CultureInfo.InvariantCulture),
+                ["SETTLEMENTS"] = settlements.ToString(CultureInfo.InvariantCulture) };
+            var answer = new TaskCompletionSource<bool>();
+            Engine("warn of the navigation rebuild", () =>
+            {
+                vars["REASON"] = Localized(CacheBuildText.Reason(forecast.Kind), null);
+                string text = Localized(forecast.MeasuredSeconds.HasValue ? CacheBuildText.LoadMeasured : CacheBuildText.Load, vars);
+                TaleWorlds.Engine.LoadingWindow.DisableGlobalLoadingWindow();
+                InformationManager.ShowInquiry(new InquiryData(Localized(CacheBuildText.LoadTitle, null), text, true, true, Localized(CacheBuildText.LoadContinue, null), Localized(CacheBuildText.LoadCancel, null),
+                    () => { TaleWorlds.Engine.LoadingWindow.EnableGlobalLoadingWindow(); answer.TrySetResult(true); }, () => answer.TrySetResult(false)), false, false);
+                return true;
+            });
+            trace("generated_load_cache_warning:" + forecast.Kind);
+            bool go = answer.Task.Result;
+            record["warning"] = go ? "shown: load" : "shown: cancelled";
+            if (!go) throw new Declined();
+        }
+
+        // The world's towns, castles and villages (the compiled campaign's counts), the model's settlement count.
+        private static int Settlements(WorldDataBundle bundle)
+        {
+            var campaign = (IDictionary<string, object>)Json.DeserializeObject(new System.Text.UTF8Encoding(false).GetString(bundle.ReadVerified("compiled/campaign/campaign.json")).TrimStart('\uFEFF'));
+            var counts = (IDictionary<string, object>)campaign["counts"];
+            Func<string, int> n = key => Convert.ToInt32(counts[key], CultureInfo.InvariantCulture);
+            return CacheBuildModel.Settlements(n("towns"), n("castles"), n("villages"));
+        }
+
+        private static string Localized(string text, Dictionary<string, string> variables)
+        {
+            var t = new TaleWorlds.Localization.TextObject(text);
+            if (variables != null) foreach (var kv in variables) t.SetTextVariable(kv.Key, kv.Value);
+            return t.ToString();
         }
 
         // ---------------------------------------------------------------- 3. the running campaign
@@ -522,6 +648,18 @@ namespace MNBL.ProceduralWorld.Persistence
                 CheckReports(plan, work);
             }
             string folder = RuntimeWorldBackend.SceneFolder(plan.Scene);
+            if (work.FromArchive)
+            {
+                // MMR-282: the archived copy back into the module (each file verified; a partial copy is removed), then registered.
+                try { RuntimeWorldBackend.RestoreArchived(plan.Scene, plan.SceneFiles); }
+                catch (Exception error) when (error is IOException || error is UnauthorizedAccessException) { throw Refuse(LoadPolicy.NotRebuildable, "the archived scene could not be restored: " + error.Message); }
+                work.Installed = true;
+                try { Report["sceneResolved"] = Engine("register the restored scene", () => RuntimeWorldBackend.UseInstalled(plan.Scene)); }
+                catch (IOException error) { throw Refuse(LoadPolicy.NotRebuildable, "the restored scene: " + error.Message); }
+                Report["sceneRestoredFromArchive"] = true;
+            }
+            // An installed scene not archived yet (installed before MMR-282, or its copy failed) is archived now.
+            else if (work.State == LoadPolicy.SceneState.Installed) Report["sceneArchive"] = RuntimeWorldBackend.KeepArchive(plan.Scene, plan.SceneFiles);
             if (work.Prepared != null)
             {
                 bool existed = Directory.Exists(folder), reused;
@@ -549,18 +687,28 @@ namespace MNBL.ProceduralWorld.Persistence
         // Engine thread.
         private void ShowOutcome()
         {
-            string title = Refusal != null ? Refusal.Title : "The campaign could not be loaded";
-            string message = Refusal != null ? Refusal.Message : LoadPolicy.Refuse(LoadPolicy.Failed, Error).Message;
-            if (Report.ContainsKey("endedRunningGame")) message += " The campaign that was running had been closed for this load; load one of its saves to return to it.";
-            if (Equals(Report.ContainsKey("returnedToMenu") ? Report["returnedToMenu"] : null, true)) message += " You are back at the main menu.";
+            var shown = Refusal ?? LoadPolicy.Refuse(LoadPolicy.Failed, Error);
+            string title = Localized(shown.Title, null);
+            string message = Localized(shown.Message, shown.Variables);
+            if (Report.ContainsKey("endedRunningGame")) message += " " + Localized(LoadPolicy.Texts.EndedRunning, null);
+            if (Equals(Report.ContainsKey("returnedToMenu") ? Report["returnedToMenu"] : null, true)) message += " " + Localized(LoadPolicy.Texts.BackAtMenu, null);
             ShowRefusal(title, message + "\n\n(" + (Refusal != null ? Refusal.Code + ": " + Refusal.Detail : Error) + ")", onCancel);
+        }
+
+        // MMR-283: a "{=id}text" refusal through TextObject with its variables; plain text as it is (MMR-286: every load message has an id).
+        private static string Localized(string text, IDictionary<string, string> variables)
+        {
+            if (text == null || !text.StartsWith("{=", StringComparison.Ordinal)) return text;
+            var t = new TaleWorlds.Localization.TextObject(text);
+            if (variables != null) foreach (var kv in variables) t.SetTextVariable(kv.Key, kv.Value);
+            return t.ToString();
         }
 
         // Engine thread: a refusal's message over a hidden loading window. OK runs Dismissed.
         private static void ShowRefusal(string title, string text, Action onCancel)
         {
             TaleWorlds.Engine.LoadingWindow.DisableGlobalLoadingWindow();
-            InformationManager.ShowInquiry(new InquiryData(title, text, true, false, "OK", null, () => Dismissed(onCancel), null), false, false);
+            InformationManager.ShowInquiry(new InquiryData(title, text, true, false, Localized(LoadPolicy.Texts.Ok, null), null, () => Dismissed(onCancel), null), false, false);
         }
 
         // The player read the refusal: behind Continue, the preload state that waits for a game that will not start goes (back to the main

@@ -1,21 +1,24 @@
-param([Parameter(Mandatory=$true)][string]$BundleA, [Parameter(Mandatory=$true)][string]$BundleB, [string]$GameRoot='D:\SteamLibrary\steamapps\common\Mount & Blade II Bannerlord', [string]$Evidence, [string]$Log)
+param([Parameter(Mandatory=$true)][string]$BundleA, [Parameter(Mandatory=$true)][string]$BundleB, [string]$GameRoot='D:\SteamLibrary\steamapps\common\Mount & Blade II Bannerlord', [string]$Evidence, [string]$Log,
+      [string]$OfficialScene='D:\SteamLibrary\steamapps\common\Mount & Blade II Bannerlord\Modules\SandBoxCore\SceneObj\battle_terrain_001')
 # MMR-37: compiles the pure managed surface model (World/WorldSurface.cs), the lifetime primitives (World/WorldLifetime.cs) and the bundle
 # verifier with tests/World/SurfaceContractTests.cs against the pinned framework assemblies, and runs them on two real compiled world bundles:
 # the model against each bundle, the pinned surface encoder (build/worldbridge/Release/worldbridge.exe, the deployed module's
 # SurfaceTemplate) against the model, the encoded terrain.bin's chunk seams (tools/check_terrain_seams.py), landmarks, model queries, and the
-# generation tokens and resource ledger. No game.
+# generation tokens and resource ledger. No game. MMR-255: -GameRoot may be a folder holding Modules/MNBL.ProceduralWorld/SurfaceTemplate
+# materialized by tools/scenebin/make_surface_template.py --materialize; with the installed -OfficialScene the managed template derivation is
+# checked against the tracked recipe.
 $ErrorActionPreference='Stop'
 $repo=Split-Path $PSScriptRoot
 $out=Join-Path $repo ('build/research-surface37/test-'+[Guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Path $out | Out-Null
 $csc='C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/MSBuild/Current/Bin/Roslyn/csc.exe'
-$sources=@('src/MNBL.ProceduralWorld/World/WorldSurface.cs','src/MNBL.ProceduralWorld/World/WorldLifetime.cs','src/MNBL.ProceduralWorld/CampaignBootstrap/WorldDataBundle.cs','tests/World/SurfaceContractTests.cs')
+$sources=@('src/MNBL.ProceduralWorld/World/WorldSurface.cs','src/MNBL.ProceduralWorld/World/WorldLifetime.cs','src/MNBL.ProceduralWorld/CampaignBootstrap/WorldDataBundle.cs','src/MNBL.ProceduralWorld/World/SurfaceTemplateRecipe.cs','tests/World/SurfaceContractTests.cs')
 $bridge=Join-Path $repo 'build/worldbridge/Release/worldbridge.exe'
 $template=Join-Path $GameRoot 'Modules/MNBL.ProceduralWorld/SurfaceTemplate'
 $pin=Join-Path $GameRoot 'Modules/MNBL.ProceduralWorld/bin/Win64_Shipping_Client/worldbridge.sha256'
 $bridgeHash=(Get-FileHash -LiteralPath $bridge).Hash.ToLowerInvariant()
 if((Test-Path -LiteralPath $pin) -and ((Get-Content -LiteralPath $pin -Raw).Trim() -ne $bridgeHash)){throw "The repository surface encoder differs from the deployed pin: $bridgeHash"}
-$inputs=@(($sources+@('tools/Test-WorldSurface.ps1','tools/check_terrain_seams.py','tools/scenebin/terrain_bin.py'))|ForEach-Object { @{path=$_;sha256=(Get-FileHash -LiteralPath (Join-Path $repo $_)).Hash.ToLowerInvariant()} })
+$inputs=@(($sources+@('tools/Test-WorldSurface.ps1','tools/check_terrain_seams.py','tools/scenebin/terrain_bin.py','Modules/MNBL.ProceduralWorld/SurfaceTemplate/template-recipe.json'))|ForEach-Object { @{path=$_;sha256=(Get-FileHash -LiteralPath (Join-Path $repo $_)).Hash.ToLowerInvariant()} })
 $inputs+=@{path=$bridge;sha256=$bridgeHash}
 foreach($f in Get-ChildItem -LiteralPath $template -File){$inputs+=@{path=$f.FullName;sha256=(Get-FileHash -LiteralPath $f.FullName).Hash.ToLowerInvariant()}}
 $lock=Get-Content "$repo/config/runtime-api-lock.json" -Raw|ConvertFrom-Json
@@ -31,7 +34,9 @@ $exe=Join-Path $out 'SurfaceContractTests.exe'
 & $csc /nologo /noconfig /nostdlib+ /target:exe /platform:x64 /langversion:7.3 /warnaserror "/out:$exe" @references @($sources|ForEach-Object { Join-Path $repo $_ })
 if($LASTEXITCODE){throw 'Surface contract harness compilation failed'}
 if(-not $Evidence){$Evidence=Join-Path $out 'surface-contract.json'}
-$lines=@(& $exe $repo (Resolve-Path -LiteralPath $BundleA).Path (Resolve-Path -LiteralPath $BundleB).Path $template $bridge (Join-Path $out 'work') $Evidence 2>&1|ForEach-Object { "$_" })
+$harnessArgs=@($repo,(Resolve-Path -LiteralPath $BundleA).Path,(Resolve-Path -LiteralPath $BundleB).Path,$template,$bridge,(Join-Path $out 'work'),$Evidence)
+if(Test-Path -LiteralPath (Join-Path $OfficialScene 'scene.xscene')){$harnessArgs+=$OfficialScene}
+$lines=@(& $exe @harnessArgs 2>&1|ForEach-Object { "$_" })
 $failed=$LASTEXITCODE
 $lines|ForEach-Object { Write-Output $_ }
 [IO.File]::WriteAllLines("$out/checks.log",[string[]]$lines,(New-Object Text.UTF8Encoding($false)))

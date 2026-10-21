@@ -1,22 +1,23 @@
-param([Parameter(Mandatory=$true)][string]$BundleA, [Parameter(Mandatory=$true)][string]$BundleB, [string]$GameRoot='D:\SteamLibrary\steamapps\common\Mount & Blade II Bannerlord', [string]$Evidence, [string]$Report, [string]$Log)
+param([Parameter(Mandatory=$true)][string]$BundleA, [Parameter(Mandatory=$true)][string]$BundleB, [string]$GameRoot='D:\SteamLibrary\steamapps\common\Mount & Blade II Bannerlord', [string]$Evidence, [string]$Report, [string]$Log, [string]$Looks)
 # MMR-40: compiles the settlement placement resolver and entity factory (World/SettlementPositionResolver.cs, SettlementEntityFactory.cs) with
 # the navigation builder and validator, the surface model, the bundle verifier and the settlement factory, and tests/World/
 # SettlementPlacementTests.cs against the pinned framework assemblies and the pinned TaleWorlds.Core (the installed TerrainType enum), and runs
 # them on two real compiled world bundles and the installed War Sails campaign map: sites, the resolved layout re-checked independently,
 # determinism, the scene entities against the structural contract, the refusals raised before activation, the records' positions from the
-# layout. Writes the tests' evidence and the settlement position report (both worlds' layouts with provenance). No game process.
+# layout; MMR-258: the look catalog from the installed campaign map and prefabs, the look plan, the relaxed contract, the frozen looks. Writes the
+# tests' evidence, the settlement position report (both worlds' layouts with provenance) and the look evidence (-Looks). No game process.
 $ErrorActionPreference='Stop'
 $repo=Split-Path $PSScriptRoot
 $out=Join-Path $repo ('build/research-settlements40/test-'+[Guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Path $out | Out-Null
 $csc='C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/MSBuild/Current/Bin/Roslyn/csc.exe'
-$sources=@('src/MNBL.ProceduralWorld/World/SettlementPositionResolver.cs','src/MNBL.ProceduralWorld/World/SettlementEntityFactory.cs',
+$sources=@('src/MNBL.ProceduralWorld/World/SettlementPositionResolver.cs','src/MNBL.ProceduralWorld/World/SettlementEntityFactory.cs','src/MNBL.ProceduralWorld/World/SettlementLooks.cs','src/MNBL.ProceduralWorld/World/SettlementEntityRules.cs','src/MNBL.ProceduralWorld/World/Map2Policies.cs',
     'src/MNBL.ProceduralWorld/World/RuntimeNavigationBuilder.cs','src/MNBL.ProceduralWorld/World/NavigationValidator.cs','src/MNBL.ProceduralWorld/World/NavigationFixtures.cs',
     'src/MNBL.ProceduralWorld/World/WorldSurface.cs','src/MNBL.ProceduralWorld/World/WorldLifetime.cs','src/MNBL.ProceduralWorld/World/PeriodicWorldCoordinates.cs','src/MNBL.ProceduralWorld/World/PeriodicDistanceModel.cs',
     'src/MNBL.ProceduralWorld/CampaignBootstrap/WorldDataBundle.cs','src/MNBL.ProceduralWorld/Campaign/CampaignIdentity.cs','src/MNBL.ProceduralWorld/Campaign/FactionFactory.cs',
     'src/MNBL.ProceduralWorld/Campaign/CharacterTemplateResolver.cs','src/MNBL.ProceduralWorld/Campaign/HeroFactory.cs','src/MNBL.ProceduralWorld/Campaign/SettlementFactory.cs','src/MNBL.ProceduralWorld/Campaign/VillageBinding.cs','src/MNBL.ProceduralWorld/Missions/MissionScenes.cs',
     'src/MNBL.ProceduralWorld/Campaign/RegistrationPlan.cs','tests/World/SettlementPlacementTests.cs')
-$data=@('worldgen/policies/settlement-placement.json','worldgen/policies/naval-content.json','worldgen/policies/navigation.json','worldgen/calibration/naval-transitions/naval-transitions.json',
+$data=@('worldgen/policies/settlement-placement.json','worldgen/policies/naval-content.json','worldgen/policies/settlement-looks.json','worldgen/policies/economy.json','worldgen/policies/mission-scenes.json','worldgen/policies/campaign-catalog.json','worldgen/templates/settlements/prototypes.json','worldgen/policies/navigation.json','worldgen/calibration/naval-transitions/naval-transitions.json',
     'tools/make_settlement_placement_policy.py','tools/Test-SettlementPlacement.ps1')
 $inputs=@(($sources+$data)|ForEach-Object { @{path=$_;sha256=(Get-FileHash -LiteralPath (Join-Path $repo $_)).Hash.ToLowerInvariant()} })
 $lock=Get-Content "$repo/config/runtime-api-lock.json" -Raw|ConvertFrom-Json
@@ -40,7 +41,8 @@ if($LASTEXITCODE){throw 'Settlement placement harness compilation failed'}
 Copy-Item $core (Join-Path $out 'TaleWorlds.Core.dll')
 if(-not $Evidence){$Evidence=Join-Path $out 'settlement-placement-tests.json'}
 if(-not $Report){$Report=Join-Path $out 'settlement-position-report.json'}
-$lines=@(& $exe $repo (Resolve-Path -LiteralPath $BundleA).Path (Resolve-Path -LiteralPath $BundleB).Path $GameRoot $Evidence $Report 2>&1|ForEach-Object { "$_" })
+if(-not $Looks){$Looks=Join-Path $out 'settlement-looks.json'}
+$lines=@(& $exe $repo (Resolve-Path -LiteralPath $BundleA).Path (Resolve-Path -LiteralPath $BundleB).Path $GameRoot $Evidence $Report $Looks 2>&1|ForEach-Object { "$_" })
 $failed=$LASTEXITCODE
 $lines|ForEach-Object { Write-Output $_ }
 [IO.File]::WriteAllLines("$out/checks.log",[string[]]$lines,(New-Object Text.UTF8Encoding($false)))

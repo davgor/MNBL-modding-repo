@@ -29,6 +29,7 @@ POLICY_FILES = {
     'projection': 'worldgen/policies/projection.json', 'terrain-materials': 'worldgen/policies/terrain-materials.json',
     'terrain-import': 'worldgen/calibration/terrain-import/terrain-import.json', 'campaign-content': 'worldgen/policies/campaign-content.json',
     'culture-presentations': 'worldgen/policies/culture-presentations.json', 'playability': 'worldgen/policies/playability.json',
+    'population': 'worldgen/policies/population.json',
     'source-compatibility': 'worldgen/contracts/source-compatibility.json',
     'calibration/axis-sea-datum': 'worldgen/calibration/axis-sea-datum/calibration.json',
     'calibration/naval-transitions': 'worldgen/calibration/naval-transitions/naval-transitions.json',
@@ -64,10 +65,30 @@ def tree(root):
 # ---- the bundle validation rules (worldbridge validate(), the C# WorldDataBundle; tools/test_bundle_parity.py) ----
 ROOTS = ('source', 'compiled', 'policies')
 DEVICES = {'con', 'prn', 'aux', 'nul'} | {'com%d' % i for i in range(1, 10)} | {'lpt%d' % i for i in range(1, 10)}
-REQUIRED = ['compiled/campaign/campaign.json', 'compiled/campaign/id-map.json', 'compiled/compatibility.json', 'compiled/terrain/height-q16.bin',
-            'compiled/terrain/heightfield.bin', 'compiled/terrain/masks.bin', 'compiled/terrain/projection.json', 'compiled/terrain/weights.bin',
+REQUIRED = ['compiled/campaign/campaign.json', 'compiled/campaign/id-map.json', 'compiled/compatibility.json', 'compiled/terrain/flora.bin', 'compiled/terrain/height-q16.bin',
+            'compiled/terrain/heightfield.bin', 'compiled/terrain/masks.bin', 'compiled/terrain/navigation-heightfield.bin', 'compiled/terrain/navigation-masks.bin',
+            'compiled/terrain/projection.json', 'compiled/terrain/shaping.json', 'compiled/terrain/weights.bin',
             'compiled/travel/cells.bin', 'compiled/travel/ports.json', 'compiled/travel/travel-graph.json', 'compiled/validation.json', 'source/world.json']
 HOST = {'gameVersion': 'v1.4.8.119303', 'navalVersion': 'v1.2.8.119303', 'capabilities': {'R%02d' % i for i in range(1, 11)}}
+# MMR-284: the C# SupportedBuilds rule: a minimum per MNBL release and no maximum, compared as TaleWorlds' ApplicationVersion orders them
+# (type letter a < b < e < v < d, then major, minor, revision, change set; absent: 0).
+MINIMUM = {'gameVersion': 'v1.4.8', 'navalVersion': 'v1.2.8'}
+
+
+def parse_build(text):
+    if not isinstance(text, str) or not text.strip(): return None
+    rest, kind = text.strip(), 'abevd'.index('v')
+    if rest[0].isalpha():
+        if rest[0] not in 'abevd': return None
+        kind, rest = 'abevd'.index(rest[0]), rest[1:]
+    parts = rest.split('.')
+    if not 3 <= len(parts) <= 4 or not all(x.isdigit() and x.isascii() for x in parts): return None
+    return [kind] + [int(x) for x in parts] + [0] * (4 - len(parts))
+
+
+def at_least(build, minimum):
+    b, m = parse_build(build), parse_build(minimum)
+    return b is not None and m is not None and b >= m
 
 
 def safe_path(p):
@@ -193,8 +214,11 @@ def verify_bundle(directory, name_must_match=True, host=None):
                     or versions.get('gameVersion') != eng['gameVersion'] or versions.get('navalVersion') != eng['navalVersion'] or ccaps != required):
                 problems.append('manifest engine or requiredCapabilities differ from compiled/compatibility.json')
             elif host:
-                if versions['gameVersion'] != host['gameVersion']: problems.append('built for Bannerlord %s, installed %s' % (versions['gameVersion'], host['gameVersion']))
-                if versions['navalVersion'] != host['navalVersion']: problems.append('built for War Sails %s, installed %s' % (versions['navalVersion'], host['navalVersion']))
+                for key, product in (('gameVersion', 'Bannerlord'), ('navalVersion', 'War Sails')):
+                    if not at_least(versions[key], MINIMUM[key]):
+                        problems.append('built for %s %s, below the minimum %s this MNBL release supports' % (product, versions[key], MINIMUM[key]))
+                    elif not at_least(host[key], MINIMUM[key]):
+                        problems.append('built for %s %s or later, installed %s' % (product, MINIMUM[key], host[key]))
                 for cid, name in ccaps:
                     if cid not in host['capabilities']: problems.append('requires runtime capability %s (%s), which this host does not provide' % (cid, name))
     except (OSError, ValueError, UnicodeDecodeError, KeyError, TypeError, AttributeError) as e:
@@ -287,7 +311,9 @@ def main():
     check('every bundle path is at most 120 bytes', max(len(p.encode()) for p in listed) <= 120, str(max(len(p.encode()) for p in listed)))
 
     # The stage outputs accepted separately.
-    pairs = [('compiled/terrain/' + f, os.path.join(a.terrain, f)) for f in ('heightfield.bin', 'masks.bin', 'weights.bin', 'height-q16.bin', 'projection.json')]
+    # MMR-278: the stage artifact of --compile-terrain is the navigation field; the bundle's surface files are the shaped fine terrain.
+    pairs = [('compiled/terrain/navigation-heightfield.bin', os.path.join(a.terrain, 'heightfield.bin')), ('compiled/terrain/navigation-masks.bin', os.path.join(a.terrain, 'masks.bin')),
+             ('compiled/terrain/projection.json', os.path.join(a.terrain, 'projection.json'))]
     pairs += [('compiled/campaign/id-map.json', os.path.join(a.campaign, 'id-map.json')), ('compiled/campaign/campaign.json', os.path.join(a.travel, 'campaign.json'))]
     pairs += [('compiled/travel/' + f, os.path.join(a.travel, f)) for f in ('travel-graph.json', 'ports.json', 'cells.bin')]
     differ = [p for p, f in pairs if listed.get(p, (0, ''))[1] != sha(f)]

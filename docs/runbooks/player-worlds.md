@@ -9,13 +9,13 @@ How to install the MNBL Procedural World module, make a world from New Campaign,
 
 | | |
 |---|---|
-| Game | Mount & Blade II: Bannerlord **v1.4.8.119303** with War Sails (NavalDLC) **v1.2.8**. Other versions are refused before generating: "This version does not match" |
+| Game | Mount & Blade II: Bannerlord **v1.4.8** or later with War Sails (NavalDLC) **v1.2.8** or later. Tested on v1.4.8.119303 with War Sails v1.2.8.119303. Older versions are refused before generating: "This version does not match". See [Game updates](#game-updates) |
 | Harmony | Bannerlord.Harmony v2.4.2, from the Steam Workshop (item 2859188632), enabled |
 | Windows runtime | Microsoft Visual C++ 2015-2022 Redistributable (x64). The world generator needs it; the game does not install it |
 | Game folder | Writable. Each world's map is installed in the module's own folder. A read-only installation cannot make or load worlds |
 | Windows user name | Letters your system's ANSI code page can spell (on Western systems, the accented Latin letters work). A name in, for example, CJK letters cannot generate a world |
-| Disk | About 200 MB per world kept (its data bundle is 137-185 MB, its navigation caches about 7 MB per module version), plus 136-184 MB of temporary space while generating. Navigation caches of earlier module versions are never removed (438 MB had built up on the test PC) |
-| Time | About 60 s to generate. Then about **7 minutes** on the first start of each world's campaign, and again on the first start or load after a module update, while the game prepares the world's navigation. The game does not respond during that time; Windows may call it "not responding". Do not close it |
+| Disk | About 210 MB per world kept (its data bundle is 137-185 MB, its navigation caches about 7 MB per module version, its map 6-10 MB in the module folder plus the same again in its per-user copy), plus 136-184 MB of temporary space while generating. Navigation caches of earlier module versions of a world that is still played are not removed (438 MB had built up on the test PC) |
+| Time | About 60 s to generate. Then, on the first start of each world's campaign, the game prepares the world's navigation. That takes longer the more settlements the world has, about with the square of their number: on the test PC about **7 minutes** for seed 42's world (286 towns, castles and villages) and about **14 minutes** for seed 73's (410). The preview states each world's own estimate. It happens once more for each world on its first start or load after a module update, or after a game or War Sails update; such a load warns first, with the estimate, and can be cancelled. The game does not respond during that time; Windows may call it "not responding". Do not close it |
 
 The measured times come from one PC (Core Ultra 9, RTX 5080, 32 GB, 60 fps cap). Yours may differ. The game also shows them on the setup screen.
 
@@ -36,12 +36,12 @@ The tests start the game with a module list directly, so the launcher itself was
 2. **Seed**: a whole number from 0 to 4294967295, digits only, no leading zeros. The default is 42. **Random World** (R) picks one for you.
    World size (129) and generation stages (16 of 16) are fixed for this world type. There is no region to choose: the whole globe is generated.
 3. **Generate** (Enter). The stages are shown as it runs: shaping the globe, building the campaign data, verifying it, building the world map, checking travel by land and sea. **Cancel** (Escape) stops it and leaves nothing running.
-4. **Preview**: the world map, the counts of towns, castles, villages, ports, kingdoms and clans, and the cultures you can pick in character creation. Previous/Next (Q/E) step through places.
+4. **Preview**: the world map, the counts of towns, castles, villages, ports, kingdoms and clans, how long this world's first start will take, and the cultures you can pick in character creation. Previous/Next (Q/E) step through places.
    - **Back** keeps the world: Generate shows it again without making it twice.
    - **New Seed** (R) draws a new seed and generates it. The reviewed world is released.
    - **Start Campaign** (Enter) starts the campaign in this world.
 5. The campaign intro and character creation follow. Character creation offers only this world's cultures. Leaving it with Back returns you to the same world.
-6. **The first start takes about 7 minutes** while navigation is prepared (see above). The campaign's first save is then written automatically. You cannot save before that point ("The campaign can be saved once it has started.").
+6. **The first start takes the time the preview stated** while navigation is prepared (see above). The campaign's first save is then written automatically. You cannot save before that point ("The campaign can be saved once it has started.").
 
 ## Seeds
 
@@ -95,7 +95,12 @@ The tests start the game with a module list directly, so the launcher itself was
 - On the campaign map every town and castle uses the same keep model, and villages use the empire village models.
 - Snowy land uses steppe battle scenes, because the game has no snow battle scene. Snow weather works; snow on the terrain does not.
 
-**Nothing from Calradia survives.** No official settlement, clan, kingdom or position is left in a generated campaign. The story mode and the War Sails storyline are not active.
+**Nothing from Calradia survives.** No official settlement, clan, kingdom or position is left in a generated campaign.
+
+**Sandbox only.** A generated campaign is a Sandbox campaign, as if you had picked Sandbox in the game's own menu:
+- there is no story mode (no tutorial and no main quest);
+- there is no War Sails storyline. War Sails' seas, ports, ships and naval battles are all there; its story quests are not;
+- there are no achievements. The game grants achievements only in its story mode campaign, never in Sandbox, and so never in a generated campaign.
 
 **Tested so far.**
 - Trade, recruitment, wars, ownership, successions, siege preparation, land battles and hideouts.
@@ -113,10 +118,11 @@ The tests start the game with a module list directly, so the launcher itself was
 | Saves | `Documents\Mount and Blade II Bannerlord\Game Saves\*.sav`, as for any campaign |
 | Worlds (immutable) | `%LOCALAPPDATA%\MNBL.ProceduralWorld\worlds\` (world packages) and `bundles\` (each world's data) |
 | Activation records | `%LOCALAPPDATA%\MNBL.ProceduralWorld\activations\` |
-| Navigation caches | `%LOCALAPPDATA%\MNBL.ProceduralWorld\navigation-caches\` (rebuilt when missing, about 7 minutes) |
+| Navigation caches | `%LOCALAPPDATA%\MNBL.ProceduralWorld\navigation-caches\` (built on a world's first start; rebuilt once per world when missing or after a module, game or War Sails update, which the load warns about first) |
 | Failure reports | `%LOCALAPPDATA%\MNBL.ProceduralWorld\diagnostics\<reference>\` (the newest 100) |
 | Temporary jobs | `%LOCALAPPDATA%\MNBL.ProceduralWorld\jobs\` (removed when finished) |
-| Each world's map | `<Bannerlord>\Modules\MNBL.ProceduralWorld\SceneObj\mnbl_world_<id>\` (rebuilt from the world's data in about 15 s when missing) |
+| Each world's map | `<Bannerlord>\Modules\MNBL.ProceduralWorld\SceneObj\mnbl_world_<id>\`, the only place the game reads maps from. A module update or reinstall replaces the module folder and removes it |
+| A copy of each world's map | `%LOCALAPPDATA%\MNBL.ProceduralWorld\world-scenes\mnbl_world_<id>\`. When the map is missing from the module, the next load copies it back from here in seconds. Only when this copy is missing too is the map rebuilt from the world's data (about 15 s), and that works only if this module version builds it exactly as before |
 | Module log | `%LOCALAPPDATA%\MNBL.ProceduralWorld\module.log` |
 
 **A save knows its world.** The world's identity is written into the save itself (its header), not into a file beside it. Renamed and copied saves, autosaves, quick saves and Ironman saves all keep it.
@@ -130,24 +136,47 @@ The tests start the game with a module list directly, so the launcher itself was
 
 **Deleting worlds** is not supported. Nothing in the module deletes a world. A world deleted by hand cannot be regenerated for its saves: they are refused as "This campaign's world is missing".
 
+**Generating a world never costs another campaign its map or navigation.** Generating or previewing a world removes only the maps, map copies and navigation caches that no world package, no save and no running game uses: in practice, worlds you previewed but never started. Every started campaign has a world package, so its map and caches stay. When a save or a world file cannot be read, nothing is removed. What was kept, and why, is written to `%LOCALAPPDATA%\MNBL.ProceduralWorld\world-scenes\sweep.json`.
+
 ## Compatibility
 
 - **Vanilla saves** are passed to the game's own loader unchanged. Loading one with the module enabled was not tested.
 - **While the module is enabled**, a generated save can only be opened through its loader. Any other path refuses it, and nothing is loaded.
 - **Before anything is loaded**, a generated save is checked against its world, the game and War Sails versions, the save contract and the module:
-  - A different world, game or War Sails version, or save contract is refused, and the game is not simulated.
+  - A different world or save contract is refused, and the game is not simulated.
+  - A game or War Sails version is refused only when it is older than this module supports (see [Game updates](#game-updates)).
   - A different module build is not refused outright. The world is rebuilt and compared with what was saved.
-- **A module update** may load an older campaign, but only when it rebuilds that campaign's world exactly as saved. Otherwise the campaign is refused as "This campaign's map cannot be rebuilt". An update that changes the save contract gives "This campaign needs another version". Either way you need the module version the campaign was made with. There is no save converter.
+- **A module update** removes the maps from the module folder; each campaign's next load copies its map back from the per-user copy and rebuilds its navigation once (it warns first). The update may load an older campaign, but only when it rebuilds that campaign's world exactly as saved. Otherwise the campaign is refused as "This campaign's map cannot be rebuilt". An update that changes the save contract gives "This campaign needs another version". Either way you need the module version the campaign was made with. There is no save converter.
 - **Rolling back a module update.**
   1. Remove the `Modules\MNBL.ProceduralWorld` folder.
   2. Extract the older version's zip into `Modules\`.
   3. Leave the store and the saves alone.
 
-  Campaigns made with the newer version then load only if they rebuild exactly and share the save contract; otherwise they are refused as above. The first start or load after the change rebuilds the navigation caches (about 7 minutes). Rolling back to an older version has not itself been tested: only removing and reinstalling the same version has.
-- **Other mods.**
-  - A mod that changes the game's campaign XML stops a generated campaign from starting.
-  - A mod that changes the battle-scene table stops one from loading.
-  - Both are refused before play (fail-closed). Other combinations were not tested.
+  Campaigns made with the newer version then load only if they rebuild exactly and share the save contract; otherwise they are refused as above. Each world's first start or load after the change rebuilds its navigation caches; the load warns first with the estimate. Rolling back to an older version has not itself been tested: only removing and reinstalling the same version has.
+- **Other mods (MMR-283).**
+  - Mods that add items, troops, cultures or battle scenes, or change stats, equipment, names or texts, work with generated worlds.
+  - The setup screen checks the other active mods before Generate. If a mod changes what generated worlds read from a game object (a
+    culture's troop lists, a troop's culture or upgrade tree, an item's type), removes one, or adds content that names something not
+    installed, Generate is blocked. The message names the mod and the object.
+  - A battle-scene pack that leaves some ground without a battle scene is refused the same way, before any wait.
+  - Each campaign keeps the game data it was made with. A mod added or updated later never changes its world.
+  - A campaign does not load if a mod it uses is gone, or one added since conflicts with it. The message names the mod and the object.
+    Enable the mods the campaign was played with.
+  - Mods that change the game only through code are not checked. Combinations with real Workshop mods were not tested in game.
+
+### Game updates
+
+Steam updates Bannerlord and War Sails on its own. A game update does not strand your generated campaigns (MMR-284):
+- **This module supports Bannerlord v1.4.8 and War Sails v1.2.8 or later, with no upper limit.** It was tested on v1.4.8.119303 and v1.2.8.119303.
+- **After an update, your campaigns keep loading** when two checks pass:
+  - the game objects your world uses are unchanged in what the world reads from them (the same check as for other mods);
+  - every piece of the game this module patches is still there with the same shape (each patch is checked by its method's signature, never by the game's version number).
+- **The first load of each world after an update rebuilds its navigation** once. The load warns first, with that world's time estimate, and you can cancel.
+- **When an update changes something this module patches**, New Procedural Campaign shows "This version does not match" naming the patch, and loading a generated campaign is refused with "This game version changes ..., which this mod patches (...)". Nothing is changed. Wait for a module update made for the new game version, or, where Steam offers the earlier version (the game's Properties, Betas), roll the game back. Campaigns are never converted.
+- **When an update changes a game object your world uses**, the load is refused naming the object, as for a mod ("This game version changes ...").
+- **A game older than the minimum** (for example after rolling back too far) is refused before generating and at every load, naming the minimum.
+- **Vanilla campaigns** are not affected by any of this.
+- Only the checks were tested, offline, against simulated newer and older versions. No real game update has happened since this module was made, so no campaign has yet been loaded after one.
 
 ### When a load is refused
 
@@ -156,7 +185,8 @@ The tests start the game with a module list directly, so the launcher itself was
 | This campaign's world is missing | `missing-world` | The save's world package or bundle is not in the store | Restore the store folders from a backup, or import the export the campaign came with |
 | This campaign's world is damaged | `damaged-world` | The world's files fail their checks | Restore them from a backup or an export |
 | This save is damaged | `damaged-save` | The save file is torn or unreadable | Load an earlier save of the campaign |
-| This campaign needs another version | `incompatible-build` | Another game or War Sails version, another save contract, or War Sails missing | Load it with the versions it was made with |
+| This campaign needs another version | `incompatible-build` | A game or War Sails older than this module supports, a game update that changed something this module patches (named in the message), another save contract, or War Sails missing | Update the game; or wait for a module version made for this game; or load it with the module version it was made with |
+| A mod conflicts with this campaign | `content-conflict` | A mod the campaign uses is gone, or another mod changes or adds content its world cannot use (named in the message) | Enable the mods the campaign was played with, or disable the named one |
 | This campaign's map cannot be rebuilt | `not-rebuildable` | This module version rebuilds the world differently, or the map cannot be written (read-only game folder) | Use the module version it was made with; make the game folder writable |
 | Not a generated campaign | `not-generated` | The save is a normal campaign | Load it as usual |
 | Not now | `busy` | Another load, generation or campaign start is in progress, or the campaign is not on its map | Wait, or return to the campaign map |
@@ -172,23 +202,26 @@ Every failure on the setup screen shows a **Reference** (for example `MNBL-20261
 | What you see | Codes | Cause | What to do |
 |---|---|---|---|
 | Something required is missing | `host.war_sails_missing`, `host.tool`, `generation.tool`, `generate.producer_changed` | War Sails is not enabled, or the module's generator files are missing or changed | Enable War Sails; reinstall the module from its zip |
-| This version does not match | `host.game_version`, `host.war_sails_version`, `generate.changed_inputs`, `request.mismatch`, `resume.other_generator`, `data.rejected` (version problems) | The game or War Sails is not v1.4.8.119303 / v1.2.8, or an unfinished world came from another module version | Install the versions the module was made for, or a module made for your game; discard the unfinished world |
+| This version does not match | `host.game_version`, `host.war_sails_version`, `host.patch_signature`, `generate.changed_inputs`, `request.mismatch`, `resume.other_generator`, `data.rejected` (version problems) | The game or War Sails is older than v1.4.8 / v1.2.8; or a game update changed something this module patches (the message names it); or an unfinished world came from another module version | Update the game; or wait for a module made for your game version; discard the unfinished world |
 | No playable world for this seed | `generate.exhausted`, `generation.quality_exhausted` | Every attempt failed the quality checks: common today (see Seeds) | Try another seed; seed 42 works |
 | The generator refused these settings | `generate.refused`, `generate.request_refused`, `generation.refused`, `request.refused` | The generator refused the request. **By the code, a store path your system's code page cannot spell also lands here** (`unrepresentable_path`), for example a Windows user name in CJK letters; this was observed in the path test, not on the screen | Try another seed. For the user-name case there is no fix in this version |
 | Not enough disk space | `generate.disk_full`, `generation.disk_full`, `request.disk_full`, `compile.failed` or `compile.travel_rejected` (disk) | The disk filled while writing the world | Free space and generate again. The budget's provisional figure is 768 MB free before generating; it is not checked in advance |
 | The generated world could not be read | `generate.crashed`, `generate.exit_<n>`, `generation.producer_*`, `generation.reader_failed`, `generation.failed`, `generate.split_missing`, `compile.failed`, `compile.travel_rejected`, `data.rejected`, `job.failed` | The generator or the data step stopped, or the world's files could not be written. **A read-only game folder also lands here**, with "Access to the path …\SceneObj\… is denied" in the details | Generate again. If it repeats, reinstall the module, and make sure the game folder is writable |
 | The game could not build this world | `runtime.navigation_refused`, `runtime.settlement_entities`, `runtime.playability`, `runtime.<error>`, `generate.engine`, `activation.failed` | The game could not build the map, travel or the campaign for this world. By the code, seed 73's refused start gives `activation.failed` (not observed on the screen) | Generate again, or try another seed; check that the game and War Sails are up to date |
+| Another mod conflicts with generated worlds | `content.missing`, `content.changed`, `content.unresolved`, `content.battle`, `content.scene`, `content.document`, `content.unchecked` | Another active mod removes or changes a game object generated worlds read, adds content naming something not installed, or leaves ground without a battle scene (the message names the mod and the object) | Disable or update the named mod, then restart the game |
 | Generation was interrupted | `generate.cancelled`, `generation.cancelled`, `generation.busy` | You cancelled; or an earlier world is still being finished; or another running copy of the game holds the store | Generate again; close any other running copy of the game |
 | A world from an earlier session was not finished | | The game closed during a generation | **Continue it** or **Discard it**. Only discard is offered when it came from another module version, stopped while its campaign was starting, or cannot be read |
 | The campaign started, but its first save could not be confirmed | `activation.unresolved` | The game stopped while writing the first save | Restart the game: it checks the campaign at start-up and keeps or undoes it |
-| The game does not respond for minutes after Start Campaign, or on a load | | The first start of each world, and the first start or load after a module update, prepares navigation for about 7 minutes | Wait. Later loads of the same world take about 15 s |
+| The game does not respond for minutes after Start Campaign, or on a load | | The first start of each world, and its first start or load after a module, game or War Sails update, prepares navigation: about 7 minutes for seed 42's world and 14 for seed 73's on the test PC. The preview, and the warning before such a load, give each world's estimate | Wait. Later loads of the same world take about 15 s |
 | New Procedural Campaign is greyed out | | A world is being generated or released | Wait a moment |
 
 ## Known limits
 
 All of these are listed with their evidence in `evidence/one-shot/acceptance-index.json` and `docs/packaging.md`.
 - **Seeds:** not every seed makes a playable world (see Seeds); world size 129 only.
-- **First start:** about 7 minutes without response, for each new world and after each module update.
+- **Sandbox only:** no story mode, no War Sails storyline and no achievements, as in the game's own Sandbox.
+- **Game updates:** a newer game is accepted when its checks pass, but no real update has been tried yet (see [Game updates](#game-updates)).
+- **First start:** no response while navigation is prepared, for each new world and once per world after each module, game or War Sails update: about 7 minutes for seed 42's world and 14 for seed 73's on the test PC, more for larger worlds and slower PCs.
 - **Folders:** a read-only game folder cannot make or load worlds, and a Windows user name outside the ANSI code page cannot generate.
 - **Untested:** the launcher, other mods, long campaigns and many seeds. Performance was measured on one PC only.
 - **Edge of the map:** the few leftovers described under The world you get.

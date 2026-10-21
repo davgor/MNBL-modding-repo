@@ -206,6 +206,40 @@ namespace MNBL.ProceduralWorld.Diagnostics
             return actual;
         }
 
+        // MMR-261: fwg apply for a cast (MutationRunner's worker, during play), an owned child counted in ProcessStarts as "producer_apply", so
+        // a load's audit (GeneratedWorldLoader.Report["generatorStarted"]) counts it with the generator's. Refused while a load runs.
+        internal static Surface.ApplyOutcome RunProducerApply(Surface.ApplyJob job, CancellationToken token)
+        {
+            if (Persistence.GeneratedWorldLoader.Busy) throw new InvalidOperationException("A load is running: no generator process starts during a load.");
+            var processes = new List<Dictionary<string, object>>();
+            using (var timeout = CancellationTokenSource.CreateLinkedTokenSource(token))
+            {
+                timeout.CancelAfter(TimeSpan.FromSeconds(job.TimeoutSeconds));
+                Dictionary<string, object> receipt;
+                try
+                {
+                    receipt = Execute(job.Producer, job.ProducerSha256, job.Arguments.ToArray(), job.Directory, "producer_apply", timeout.Token, false,
+                        stage => File.AppendAllText(Path.Combine(job.Directory, "stages.log"), DateTime.UtcNow.ToString("O") + " " + stage + Environment.NewLine), processes);
+                }
+                catch (OperationCanceledException) when (!token.IsCancellationRequested) { receipt = new Dictionary<string, object>(); }   // the timeout fired before the start
+                finally { try { WriteJson(Path.Combine(job.Directory, "processes.json"), processes); } catch (Exception) { } }
+                string delta = Path.Combine(job.Directory, "delta.json");
+                int exit = receipt.ContainsKey("exitCode") ? (int)receipt["exitCode"] : -1;
+                // MMR-262: only the caller's token cancels; the timeout is a failure, held until the next daily batch (MutationModel.Applied).
+                bool timedOut = timeout.IsCancellationRequested && !token.IsCancellationRequested;
+                var outcome = Surface.ApplyOutcome.Finished(job, exit, token.IsCancellationRequested, timedOut, File.Exists(delta));
+                if (outcome.Succeeded) outcome.Delta = File.ReadAllText(delta, new UTF8Encoding(false));
+                else
+                {
+                    string err = Path.Combine(job.Directory, "producer_apply-stderr.log"), output = Path.Combine(job.Directory, "producer_apply-stdout.log");
+                    string reason = File.Exists(err) ? File.ReadAllText(err).Trim() : "";
+                    string state; var failure = File.Exists(output) ? ParseFailureDocument(output, out state) : null;
+                    outcome.Error += failure != null ? ": " + failure["code"] + " " + failure["field"] + ": " + failure["message"] : reason.Length > 0 ? ": " + reason.Substring(0, Math.Min(300, reason.Length)) : "";
+                }
+                return outcome;
+            }
+        }
+
         internal static void RequireEmptyOutput(string output)
         {
             if (File.Exists(output) || (Directory.Exists(output) && Directory.EnumerateFileSystemEntries(output).Any()))

@@ -32,16 +32,24 @@ There is no migration. No converter is implemented, so a save or world this buil
 - its installed scene, and the navigation, playability and settlement layout reports.
 
 Some differences are reported but not refused; the load verifies them by rebuilding:
-- **Another module build** (module version, assembly hash): the campaign is rebuilt from the frozen bundle, and its documents, coordinate frame and climate must be the saved world's (MMR-49).
+- **Another module build** (module version, assembly hash): the campaign is rebuilt from the frozen bundle and, since MMR-283, the catalog frozen in its package, and its documents, coordinate frame and climate must be the saved world's (MMR-49).
+- **Other content mods (MMR-283):** only the installed objects the world references are checked, by key, element and the fields the world reads; a refusal (`content-conflict`) names the mod and the object (`docs/world-activation.md`, "Content mods").
 - **Another backend or producer.** A new generator build makes new worlds with its own producer lock. It reads an old world's bundle as it is, and must re-encode its scene to the package's bytes.
-- **A save made before MMR-48** has no build keys. Its header's game version (`ApplicationVersion`) and War Sails version (`Module_NavalDLC`, absent when the save was made without it) are compared instead (`LoadPolicy.LegacyBuild`), and its reconstruction is verified the same way.
+- **Another game or War Sails build (MMR-284, RT-41).** The save's `game` and `naval` keys are diagnostics. A build at or above this release's minimum (`SupportedBuilds`: Bannerlord v1.4.8, War Sails v1.2.8, any change set) loads, the saved one and the running one alike, and there is no maximum: a build newer than any known at release loads. What keeps that safe is the world's catalog check (MMR-283) and every patch's signature check (`PatchSignatures`, `GeneratedPatches.Verify`), which refuse naming the object or the patch.
+- **A save made before MMR-48** has no build keys. Its header's game version (`ApplicationVersion`) and War Sails version (`Module_NavalDLC`, absent when the save was made without it) are checked by the same minimum rule instead (`LoadPolicy.LegacyBuild`, `LoadPolicy.BuildCheck`), and its reconstruction is verified the same way.
 
 **Rebuildable derived cache.** As supported, but a derived resource must be rebuilt first from the frozen world, and only by a tested deterministic adapter:
-- **A swept scene** is re-encoded from the bundle by the surface encoder. It is installed only when every file equals the package's scene files: MMR-49's cold run, 14 s.
+- **A scene missing from the module with its archived copy** (MMR-282: `<store>/world-scenes/<scene>`, kept for every world a package or save names) is copied back when every file equals the package's scene files. No encoder runs, so this works under any later build. Not conditional.
+- **A swept scene** with no archived copy is re-encoded from the bundle by the surface encoder. It is installed only when every file equals the package's scene files: MMR-49's cold run, 14 s.
 
   This is tested when the build is the one that encoded the world: the save's module, assembly and backend equal the running ones. Under another build, or for a save that recorded none, the encoder may encode differently, so the row is marked **conditional**: the re-encoding is verified at load and refused (`not-rebuildable`) if it differs. Confirming run 24328 shows a conditional rebuild of a pre-MMR-48 save verified and loaded.
 - **The navigation and playability reports** are restored from the copies the campaign's activation kept (`activations/<instance>/evidence/`).
-- **The settlement layout** is re-derived by the encoder with the scene, and checked against the kept one.
+- **The settlement layout** is re-derived by the encoder with a re-encoded scene, and checked against the kept one. Since MMR-282 the sweep keeps the layout report of every referenced scene, and an archived scene uses that report or the kept copy.
+
+**What the sweep keeps (MMR-282, RT-35).** A generation's sweep (`RuntimeWorldBackend.Sweep`, `Persistence/WorldStoreSweep.cs`) used to delete every content-addressed scene this process had not used, with its settlement report and navigation caches. The next load of such a campaign then re-encoded its scene and rebuilt its caches (about 6.4 minutes), and after a WorldBridge change the re-encoding got another name and the load was refused for good.
+- **Now it deletes** only the scenes, archived scenes, settlement reports and caches that nothing names. The names come from three places: every world package in the package store (`world.json` `sceneName`); every bound save, pending initial save and save in flight (`WorldReferenceIndex`: the header's `mnbl.world.scene`, and its package's); and this process.
+- **It fails closed.** An unreadable save header, journal, save list or package manifest is a gap, and with a gap it deletes nothing but staging debris.
+- **What it kept, and why,** is in the job's install record and `<store>/world-scenes/sweep.json`.
 - **A new navigation cache key** means the engine rebuilds its caches from the frozen navmesh.
 
 **Unsupported world.** Refused, with the refusal the loader gives:
@@ -50,11 +58,13 @@ Some differences are reported but not refused; the load verifies them by rebuild
 |---|---|
 | no save, a torn header, torn game data, a malformed binding or campaign instance, a header naming another world (scene, seed) than its package | `damaged-save` |
 | a header or game data another program holds | `save-unavailable` |
-| another binding contract, save id version, identity schema or game version | `incompatible-build` |
-| **a War Sails save on a game without War Sails active**, or one needing a War Sails version that is not installed (for a save made before MMR-48, the versions its header records) | `incompatible-build` |
+| another binding contract, save id version or identity schema | `incompatible-build` |
+| a save made with, or a game running, a Bannerlord or War Sails build below the minimum (`mnbl_load_build_saved_old`, `mnbl_load_build_running_old`; for a save made before MMR-48, the versions its header records) | `incompatible-build` |
+| **a War Sails save on a game without War Sails active** | `incompatible-build` |
+| a patch target whose installed signature changed (`mnbl_load_patch_signature`, naming the patch and the member) | `incompatible-build` |
 | no world package, no data bundle | `missing-world` |
 | a package or bundle whose bytes are not their hashes; a package manifest without its scene, seed, scene files or documents | `damaged-world` |
-| a bundle built for another game or War Sails version, or needing other capabilities | `incompatible-build` |
+| a bundle built for a game or War Sails below the minimum, opened on one below it, or needing other capabilities | `incompatible-build` |
 | an installed scene that differs from the package's; a report neither installed nor kept; a settlement layout of another world; a fixture world's missing scene | `not-rebuildable` |
 | a world file another program holds | `load-failed` (nothing changed) |
 
@@ -66,6 +76,37 @@ The loader also runs the navigation and playability gates and rebuilds the campa
 - **A missing data bundle is a missing world, never a cache miss.** The bundle holds the world's definitions, and a world is never regenerated from its seed.
 - **Derived caches are rebuilt only from the frozen bundle**, through the adapters above.
 - **Native data is never carried over.** Nothing is read from another build: no scene, navmesh or cache of another encoding. A scene name carries its encoder, template and navmesh identity (`SceneNames.ForWorld`).
+
+## Map epic 2: clean break (owner decision 1, 2026-10-18)
+
+Worlds generated, and campaigns saved, before map epic 2 **stop loading**. Nothing converts them, and no code path keeps reading their formats (findings section 12). Keeping them would need dual paths in five subsystems:
+- cells.bin v1/v2 and the validator version;
+- `MNBLWT01` and the 4-layer template (MMR-255 replaced both: `MNBLWT02` and the generated 15-layer template; the encoder and
+  `WorldSurface` read only `MNBLWT02`);
+- climate `mmr39/1`;
+- the legacy `VillageBinding` and `economy.json` binding;
+- the settlement builder `mmr40/2`.
+
+Even then, a swept scene could not be rescued. So every map epic 2 change replaces its format or identity outright. The epic lands as one build with one scene rename before its live test.
+
+**What refuses an old world**, in the order a load reaches it:
+- **Generation-bound policies.** `playability.json`, `terrain-materials.json` (now version 2) and `projection.json` changed in MMR-248. A generation request bound to the old policies is refused as `policy_changed` (MMR-47), never resumed.
+- **The bundle capability.** Every bundle written from MMR-248 on requires `R11`, the one capability for the epic's three format bumps:
+  - cells.bin v2 `MNBLTC02` (MMR-253/254; landed in MMR-254: classes, OpenSea, land face types, the road bit. `TravelCells.Read`, `GeneratedSpawnModel.CellMap` and `RoadSpeed.Cells` refuse `MNBLTC01`);
+  - weights.bin v2 `MNBLWT02` (MMR-255);
+  - campaign.json v2 (MMR-252/279).
+
+  The constant is `worldbridge::capabilities::kFormatsV2` and `WorldDataBundle.FormatsV2Capability` (`docs/biome-presentation.md`). A host without R11, an older module, refuses a new bundle at `WorldDataBundle.Open` with `incompatible-build`, before activation.
+- **The formats.** A pre-epic bundle does not require R11, so the capability alone does not refuse it on a new host. The readers of the three formats do: each format ticket replaces its reader with a version-2-only one (`TravelCells.Read`, `WorldSurface`, the campaign factories), which refuses a version-1 file (`damaged-world` or `incompatible-build`). None falls back to a version-1 path.
+- **The producer (MMR-261).** The pinned FWGC++ build moved to `0ae1f3e` (`fwg apply`, and the generation baseline fix that changes the magic layers, key locations and the founding definition of every world), so every world's source, ids and bundle change; every bundle also requires `source/request.json`, which a pre-epic bundle lacks (`WorldDataBundle.Open` refuses it as missing a required file).
+- **Save ids v2 (MMR-261).** `SaveIds.Version` is 2: the save type ledger's entry 3 adds the live mutation's `SyncData` string (`_mnblWorldMutations`) and the header key `mnbl.campaign.mutationProducer`. A save that records `7910000/v1` is refused as `incompatible-build` (strict key `saveIds`; no converter).
+- **Scene and identity.** The encoder, template, policies, climate identity (MMR-256) and `SettlementEntityFactory.Version` (MMR-258, `mmr258/1`) all change. An old campaign's installed scene no longer matches what this build encodes, so it is `not-rebuildable`. A package written before MMR-258 also has no frozen settlement looks (`looks/`); a re-encode of its swept scene refuses it as `damaged-world`.
+
+**Live mutation and later producer updates (MMR-261, RT-37).** A campaign's live mutations are one `SyncData` string: the canonical `mnbl.world-mutations` v1 document (`docs/magic-ground.md` "Live mutation"). A load replays its stored cells only; no producer runs during a load. The campaign casts only with the producer build that generated its world (the bundle's `source.producer.binarySha256`, recorded in the document and in the header key `mnbl.campaign.mutationProducer`). The package keeps every such build by hash (`Producers/<sha256>/fwg.exe`, `worldgen/producer-archive.json`), so a later producer update leaves old campaigns casting with their own build. A new cast is refused only when that build is missing; the stored mutations always load. A document whose digest does not verify, or one of another world or request, disables only the live cells and the casts (the generated magic ground stays drawn) and is saved back unchanged.
+
+**What this costs players.** A pre-epic campaign cannot be continued on a map epic 2 build. To finish one, keep the older module build. The store keeps old bundles and packages untouched, because bundles are never rewritten (below). The first map epic 2 release notes must say this.
+
+**Between MMR-248 and the format tickets.** MMR-248 freezes the policies and the capability; the three formats arrive later. Until then a pre-epic bundle still opens in the offline harnesses. That keeps worlds A and B usable as test inputs until the tickets that change the compiler regenerate them. Once a version-2 format lands, its version-1 reader is gone.
 
 ## The report
 

@@ -1,7 +1,8 @@
 // Immutable world data bundle (MMR-29). One directory per world, named by its WorldContentId:
 //
 //   source/      the producer split, byte for byte (world.json, scene.json, plans/...)
-//   compiled/    terrain/ (heightfield, masks, weights, height-q16, projection.json), campaign/ (id-map, the records after
+//   compiled/    terrain/ (the shaped surface: heightfield, masks, weights, height-q16 at the fine side; the navigation field:
+//                navigation-heightfield, navigation-masks, the travel compile; projection.json; shaping.json, MMR-278), campaign/ (id-map, the records after
 //                the travel exclusions), travel/ (travel-graph, ports, cells.bin), validation.json (the static report),
 //                compatibility.json (game and War Sails versions, required runtime capabilities: part of the identity)
 //   policies/    every policy, contract and calibration the compilers read, byte for byte
@@ -89,13 +90,14 @@ std::vector<fs::path> list_ready(const fs::path& root);
 struct Sources {
     fs::path split, contract, producer_lock, runtime_lock;
     travel::Policies policies;
-    std::optional<fs::path> recipe;   // the attempt's request.json, when the bundle comes from a generation attempt
+    fs::path shaping;                 // worldgen/policies/terrain-shaping.json (MMR-278)
+    std::optional<fs::path> recipe;   // the attempt's request.json; required (MMR-261 keeps it as source/request.json)
 };
 struct Built { Content content; travel::Result travel; };
 Built build(const Sources& sources);
 
 // worldbridge --bundle SPLIT --contract FILE --projection-policy FILE --materials FILE --import FILE --content FILE
-//   --cultures FILE --playability FILE --producer-lock FILE --runtime-lock FILE [--recipe FILE] --root DIR --diagnostics DIR
+//   --cultures FILE --playability FILE --shaping FILE --population FILE --producer-lock FILE --runtime-lock FILE --recipe FILE --root DIR --diagnostics DIR
 int bundle_main(int argc, char** argv);
 // worldbridge --inspect-bundle DIR   (validation and a summary, no Bannerlord; exit 0 valid, 2 invalid)
 int inspect_main(int argc, char** argv);

@@ -1,0 +1,247 @@
+{
+  "schema": "mnbl.roads",
+  "version": 1,
+  "decals": {
+    "families": {
+      "empire": ["decal_empire_path_a", "decal_empire_path_b"],
+      "khuzait": ["decal_khuzait_path_a", "decal_khuzait_path_b"],
+      "battania": ["decal_battania_path_a", "decal_battania_path_b"]
+    },
+    "cultureFamilies": {"aserai": "khuzait", "battania": "battania", "empire": "empire", "khuzait": "khuzait", "nord": "battania", "sturgia": "battania", "vlandia": "empire"},
+    "spacing": 1.4,
+    "size": 0.4,
+    "smoothingPasses": 2,
+    "gateClip": 1.0,
+    "maxDecals": 3000,
+    "seam": "nearestImage"
+  },
+  "bridges": {
+    "prefabs": ["map_bridge_b", "map_bridge_c", "map_bridge_d", "map_bridge_e"],
+    "source": "navigation.json build.bridges",
+    "z": "bankGround",
+    "lShaped": "rotate",
+    "scale": 2.885
+  },
+  "water": {
+    "material": "mnbl_water_surface",
+    "atlas": {"columns": 2, "rows": 2, "riverColumn": 0, "poolColumn": 1},
+    "tint": [255, 255, 255],
+    "fallback": {"material": "mainmap_decal_undervillage", "texture": "mainmap_decal_undervillage_d", "atlas": [1, 1, 0, 0], "tint": [77, 137, 216]},
+    "riverWidth": 6.0,
+    "riverSpacing": 2.5,
+    "smoothingPasses": 2,
+    "fillScale": 1.0,
+    "opaqueCore": 0.5,
+    "maxDecals": 1500,
+    "minHalfDepth": 0,
+    "seam": "nearestImage",
+    "note": "MMR-247 (cluster W) supersedes the water sentences of notes; decalAtlas (MMR-247 D) decides when the fallback draws, and minHalfDepth (MMR-247 D; 0: W's own boxes) is the least half depth the engine target draws a water box with, for the case the decal lab finds a box a few centimetres deep (FitBox on flat ground: BoxPad 0.05) missing the rendered terrain. Stamps use material (mnbl_water_surface, published from tools/art/water_decal.py: a smooth water albedo, ripple normal and gloss; docs/map-dressing.md) at atlas cell (1 / columns, 1 / rows, column / columns, row / rows): river strips in riverColumn, pools (lone river cells, patches and fills) in poolColumn, the row a variant by a hash of the point; tint is SetFactor1 (white: as published). While material does not resolve, the engine target draws fallback (the vanilla stamp at its atlas, tinted so its core lands on the water colour, evidence/art/water-decal.json). River strips run along the river graph's chains (ends and junctions split them), smoothed with smoothingPasses Chaikin passes, one every riverSpacing units, riverWidth wide and 1.5 steps long either way; a river centre no strip covers gets a pool. A fill is a pool fillScale x its cell (1: within the cell). Every decal box stays above the water planes under it (MapDressing.WaterPlanes, applied by the engine target), and road decals under a plane are dropped. Defaults taken; MMR-247 judges the look."
+  },
+  "magic": {
+    "materialPrefix": "mnbl_magic_",
+    "schools": ["weave", "umbral", "infernal", "radiant", "fire", "water", "earth", "air"],
+    "atlas": {
+      "rows": [
+        {"group": "arid", "cores": ["desert"]},
+        {"group": "verdant", "cores": ["grassland", "forest", "rainforest", "marsh"]},
+        {"group": "rock", "cores": ["exposed_rock"]},
+        {"group": "cold", "cores": ["boreal_forest", "cold_tundra", "land_ice", "tundra", "snow"]}
+      ],
+      "columns": {"trunk": 0, "fork": 1, "tip": 2, "burst": 3},
+      "flipV": false,
+      "flipU": false
+    },
+    "veins": {"spacing": 7.5, "stampLength": 8.0, "width": 7.0, "minWidth": 2.0, "forkExponent": 2.0, "burstScale": 1.6, "sourceSpacing": 48.0, "minStamps": 4, "fadeBand": 0.1, "minAlpha": 0.35, "edgeSamples": 2.0},
+    "revealHours": 48.0,
+    "maxDecals": 2500,
+    "seam": "nearestImage",
+    "node": {"particles": {"fire": "psys_fire_smoke_env_point", "infernal": "psys_fire_smoke_env_point", "default": "psys_mapicon_lightclouds"}, "lightRadius": 8.0, "lightIntensity": 40.0, "height": 1.5},
+    "colourGrade": "faceType",
+    "fallback": {
+      "stroke": {"material": "decal_khuzait_path_a", "texture": "decal_map_khuzait_path_d", "atlas": [0.53, 0.53, 0.5, 0.01], "core": [191, 168, 146], "turn": true, "along": 1.1, "across": 4.5},
+      "burst": {"material": "mainmap_decal_undervillage", "texture": "mainmap_decal_undervillage_d", "atlas": [1, 1, 0, 0], "core": [156, 133, 95], "turn": false, "along": 1.0, "across": 1.0},
+      "colours": {"weave": [160, 120, 220], "umbral": [126, 76, 170], "infernal": [214, 52, 38], "radiant": [232, 196, 110], "fire": [240, 120, 50], "water": [60, 160, 170], "earth": [180, 110, 50], "air": [120, 170, 205]},
+      "note": "MMR-247 (D): what a vein stamp draws while its material's textures are not in the campaign map's decal atlas (decalAtlas): a listed vanilla stamp tinted toward the school's colour. Trunks, forks and tips draw the khuzait path stroke (its right stroke runs along v and fills about 0.22 of its cell across and 0.9 along, measured on decal_atlas_worldmap), turned a quarter (turn) so it runs along the vein, the box across x the vein's width and along x its length; bursts draw the soft vanilla village stamp, the box as the stamp's. The tint (SetFactor1, which multiplies in linear light) is per channel 255 x the linear school colour / the linear core of the stamp (core: the mean of its texels with alpha >= 0.9 in the atlas), clamped at 255, with the stamp's own alpha. The colours are the vein art's core colours (tools/art/magic_ground.py VEINS), weave's and air's deepened (a multiply cannot tint the light stroke toward a paler colour than its core). MMR-290's water stamps take the same fallback by kind, with magicWater's opacity. Defaults taken; the decal lab (map2_acceptance phase decallab) checks the stroke's orientation and the look."
+    }
+  },
+  "decalAtlas": {
+    "group": "worldmap",
+    "unresident": "fallback",
+    "note": "MMR-247 (D, acc5): the campaign map's tiled decal loops (terrain and water shaders) sample only the scene's decal atlas, the prebaked decal_atlas_worldmap of Native's core.tpac at the rects of Native's ModuleData/decal_textures_<group>.xml, which the engine reads from the Native module alone; a texture another module publishes has no rect and its decals draw nothing (World/DecalAtlas.cs). The engine targets read that list at run time and judge each material by its diffuse texture: unresident fallback draws the decal's fallback (water: the tinted vanilla stamp; magic veins and magic water: magic.fallback), and nothing when it has none; unresident draw draws the material anyway (for a build whose textures the atlas holds). A list that cannot be read judges nothing."
+  },
+  "magicFeatures": {
+    "meshes": {
+      "icicle": {"min": [-0.09, -0.056, -0.522], "max": [0.088, 0.057, 0.521], "flip": false},
+      "map_peak_a": {"min": [-4.133, -3.36, -1.11], "max": [4.383, 4.557, 3.614], "flip": false},
+      "map_rock_big_a": {"min": [-1.006, -0.904, -0.181], "max": [0.951, 0.889, 0.886], "flip": false},
+      "map_rock_big_b": {"min": [-0.96, -0.896, -0.181], "max": [0.854, 0.851, 0.449], "flip": false},
+      "map_rock_big_c": {"min": [-0.826, -0.622, -0.185], "max": [0.906, 0.707, 0.592], "flip": false},
+      "map_rock_big_a_snow": {"min": [-1.006, -0.904, -0.181], "max": [0.951, 0.889, 0.886], "flip": false},
+      "map_mountain_rock_b": {"min": [-0.568, -0.205, -0.249], "max": [0.432, 0.238, 1.052], "flip": false},
+      "map_mountain_rock_d": {"min": [-0.964, -1.194, -0.766], "max": [0.683, 0.866, 1.587], "flip": false},
+      "map_rock_groups_a": {"min": [-0.332, -0.231, -0.035], "max": [0.394, 0.221, 0.17], "flip": false},
+      "map_rock_groups_b": {"min": [-0.266, -0.184, -0.027], "max": [0.233, 0.131, 0.199], "flip": false},
+      "waterfall_rock_c": {"min": [-1.075, -1.074, -0.427], "max": [0.976, 1.263, 0.799], "flip": false},
+      "mi_saltpool_a": {"min": [-0.229, -0.229, 0.005], "max": [0.229, 0.229, 0.144], "flip": false},
+      "mi_saltpool_b": {"min": [-0.229, -0.229, 0.005], "max": [0.229, 0.229, 0.144], "flip": false},
+      "mi_tuz_prop": {"min": [-0.385, -0.37, -0.021], "max": [0.385, 0.37, 0.131], "flip": false},
+      "dry_tree_a": {"min": [-2.36, -1.039, -0.338], "max": [2.802, 2.914, 7.968], "flip": false},
+      "dry_tree_b": {"min": [-1.749, -1.843, -0.454], "max": [3.524, 2.685, 7.62], "flip": false},
+      "dry_tree_c": {"min": [-1.294, -1.26, -0.171], "max": [1.258, 0.777, 3.52], "flip": false},
+      "dry_tree_d": {"min": [-0.638, -0.682, -0.359], "max": [0.713, 0.56, 3.183], "flip": false},
+      "dry_tree_e": {"min": [-2.501, -2.466, -1.328], "max": [1.932, 2.204, 1.275], "flip": false},
+      "tree_root_b_dry": {"min": [-2.292, -3.723, -0.63], "max": [2.221, 0.413, 0.23], "flip": false},
+      "burned_wood_a": {"min": [-0.568, -0.496, -0.011], "max": [0.679, 0.544, 0.478], "flip": false},
+      "roman_column_a": {"min": [-1.538, -1.538, 0.0], "max": [1.538, 1.538, 15.448], "flip": false},
+      "roman_column_b": {"min": [-1.777, -1.777, 0.0], "max": [1.777, 1.777, 15.662], "flip": false},
+      "roman_column_c": {"min": [-1.371, -1.371, -0.002], "max": [1.371, 1.371, 15.635], "flip": false},
+      "roman_column_d": {"min": [-1.464, -1.464, 0.0], "max": [1.464, 1.464, 15.998], "flip": false},
+      "empire_obelisk_a": {"min": [-1.079, -1.078, -1.874], "max": [1.081, 1.078, 15.15], "flip": false},
+      "empire_obelisk_b": {"min": [-1.083, -1.082, -1.439], "max": [1.08, 1.081, 19.156], "flip": false},
+      "empire_hippodrome_middle_monolith_a": {"min": [-1.079, -1.079, -0.29], "max": [1.079, 1.079, 19.156], "flip": false},
+      "empire_hippodrome_middle_monolith_b": {"min": [-0.609, -0.696, -0.01], "max": [0.609, 0.696, 6.64], "flip": false},
+      "terrain_ambush_cliff_detail_01": {"min": [-0.438, -1.0, -1.579], "max": [0.696, 0.656, 1.559], "flip": false},
+      "cave_desert_rock_wall_c": {"min": [-0.873, -0.591, -2.691], "max": [0.873, 0.175, 2.691], "flip": false},
+      "cave_desert_rock_wall_e": {"min": [-0.925, -0.439, -1.708], "max": [0.925, 0.439, 1.708], "flip": false},
+      "rock_cliff_bridge_a": {"min": [-9.837, -28.743, -8.599], "max": [10.073, 2.733, 20.664], "flip": false},
+      "bd_skull_antilope_b": {"min": [-0.259, -0.344, -0.452], "max": [0.226, -0.023, 0.539], "flip": false},
+      "desert_bones_c": {"min": [-0.225, -0.411, -0.195], "max": [0.229, 0.46, 0.099], "flip": false}
+    },
+    "schools": {
+      "fire": {
+        "lean": "outward",
+        "source": {"name": "ember vent", "parts": [
+          {"meshes": ["map_peak_a"], "scale": [0.45, 0.45], "count": [1, 1], "ring": [0, 0], "lean": [0, 0], "tints": ["FF2B2522"]},
+          {"meshes": ["icicle"], "scale": [2.4, 2.4], "count": [3, 3], "ring": [1.5, 1.9], "lean": [10, 25], "tints": ["FF141016"]}],
+          "particles": ["psys_blaze_small_1"], "light": {"colour": [1.0, 0.40, 0.10], "radius": 5, "intensity": 60, "flicker": true}},
+        "trunk": [
+          {"name": "obsidian spikes", "parts": [{"meshes": ["icicle"], "scale": [1.8, 2.6], "count": [2, 3], "ring": [0.15, 0.35], "lean": [10, 25], "tints": ["FF141016"]}]},
+          {"name": "ember-cracked boulder", "parts": [{"meshes": ["map_rock_big_a", "map_rock_big_b", "map_rock_big_c"], "scale": [1.4, 1.6], "count": [1, 1], "ring": [0, 0], "lean": [0, 0], "tints": ["FF3A2A22"]}]},
+          {"name": "charred tree", "parts": [{"meshes": ["dry_tree_a", "dry_tree_b"], "scale": [0.24, 0.26], "count": [1, 1], "ring": [0, 0], "lean": [0, 4], "tints": ["FF1E1A18"]}]},
+          {"name": "charred snag", "parts": [{"meshes": ["dry_tree_c"], "scale": [0.5, 0.55], "count": [1, 1], "ring": [0, 0], "lean": [0, 6], "tints": ["FF1E1A18"]}]}],
+        "debris": [
+          {"name": "burnt logs", "parts": [{"meshes": ["burned_wood_a"], "scale": [1.4, 1.6], "count": [1, 1], "ring": [0, 0], "lean": [0, 0], "tints": ["FFFFFFFF"]}]}]
+      },
+      "weave": {
+        "lean": "outward",
+        "source": {"name": "prismatic crystal cluster", "parts": [
+          {"meshes": ["icicle"], "scale": [2.0, 3.2], "count": [5, 7], "ring": [0.2, 0.6], "lean": [10, 35], "tints": ["FFE6DCF5", "FFC9E8F2", "FFF2D9E6", "FFB98AE0"]}],
+          "particles": ["firefly_a"], "light": {"colour": [0.85, 0.75, 1.0], "radius": 6, "intensity": 30, "flicker": false}},
+        "trunk": [
+          {"name": "glass shard", "parts": [{"meshes": ["icicle"], "scale": [1.5, 2.2], "count": [1, 1], "ring": [0, 0], "lean": [25, 50], "tints": ["FFE8E0F0", "FFC9B2EA"]}]},
+          {"name": "shard fan", "parts": [{"meshes": ["icicle"], "scale": [1.0, 1.4], "count": [3, 3], "ring": [0.15, 0.3], "lean": [15, 35], "tints": ["FFE8E0F0", "FFC9B2EA"]}]}],
+        "debris": [
+          {"name": "glassy rubble", "parts": [{"meshes": ["map_rock_groups_a"], "scale": [2.8, 3.2], "count": [1, 1], "ring": [0, 0], "lean": [0, 0], "tints": ["FFD8CFE6"]}]}]
+      },
+      "radiant": {
+        "lean": "outward",
+        "source": {"name": "crystal column ring", "parts": [
+          {"meshes": ["icicle"], "scale": [3.5, 3.5], "count": [1, 1], "ring": [0, 0], "lean": [0, 0], "tints": ["FFFFFFFF"]},
+          {"meshes": ["roman_column_a", "roman_column_b", "roman_column_c", "roman_column_d"], "scale": [0.12, 0.12], "count": [5, 5], "ring": [1.5, 1.5], "lean": [0, 0], "tints": ["FFFFF6E0"]}],
+          "particles": ["psys_game_sparkle_b"], "light": {"colour": [1.0, 0.94, 0.78], "radius": 8, "intensity": 40, "flicker": false}},
+        "trunk": [
+          {"name": "white crystal column", "parts": [{"meshes": ["icicle"], "scale": [2.4, 3.0], "count": [2, 3], "ring": [0.1, 0.25], "lean": [0, 8], "tints": ["FFFFFFFF", "FFFFF0C8"]}]},
+          {"name": "pale needle", "parts": [{"meshes": ["empire_obelisk_a", "empire_obelisk_b"], "scale": [0.11, 0.13], "count": [1, 1], "ring": [0, 0], "lean": [0, 0], "tints": ["FFFFF8EC"]}]}],
+        "debris": [
+          {"name": "bleached boulder", "parts": [{"meshes": ["map_rock_big_a_snow"], "scale": [1.2, 1.4], "count": [1, 1], "ring": [0, 0], "lean": [0, 0], "tints": ["FFFFF6E0"]}]}]
+      },
+      "umbral": {
+        "lean": "outward",
+        "source": {"name": "monolith circle", "parts": [
+          {"meshes": ["empire_hippodrome_middle_monolith_a"], "scale": [0.17, 0.17], "count": [1, 1], "ring": [0, 0], "lean": [0, 0], "tints": ["FF1E1610"]},
+          {"meshes": ["empire_hippodrome_middle_monolith_b"], "scale": [0.4, 0.4], "count": [3, 3], "ring": [1.2, 1.2], "lean": [0, 4], "tints": ["FF1E1610"]}],
+          "particles": ["ground_fog_a"], "light": {"colour": [0.45, 0.30, 0.25], "radius": 6, "intensity": 15, "flicker": false}},
+        "trunk": [
+          {"name": "dark monolith", "parts": [{"meshes": ["empire_hippodrome_middle_monolith_b"], "scale": [0.35, 0.45], "count": [1, 1], "ring": [0, 0], "lean": [0, 6], "tints": ["FF241A14"]}]},
+          {"name": "withered tree", "parts": [{"meshes": ["dry_tree_c", "dry_tree_d"], "scale": [0.5, 0.5], "count": [1, 1], "ring": [0, 0], "lean": [0, 5], "tints": ["FF4A4038"]}]}],
+        "debris": [
+          {"name": "shadow slab", "parts": [{"meshes": ["map_mountain_rock_b"], "scale": [1.3, 1.5], "count": [1, 1], "ring": [0, 0], "lean": [8, 12], "tints": ["FF2A201A"]}]}]
+      },
+      "earth": {
+        "lean": "outward",
+        "source": {"name": "geode", "parts": [
+          {"meshes": ["map_rock_big_a"], "scale": [1.0, 1.0], "count": [4, 4], "ring": [1.0, 1.0], "lean": [0, 0], "tints": ["FF6B5A48"]},
+          {"meshes": ["icicle"], "scale": [1.2, 1.6], "count": [4, 4], "ring": [0.2, 0.5], "lean": [10, 30], "tints": ["FF9B6BD0", "FFE0B040"]}],
+          "particles": ["psys_game_stone_dust_a"], "light": {"colour": [1.0, 0.75, 0.35], "radius": 5, "intensity": 20, "flicker": false}},
+        "trunk": [
+          {"name": "stone spire", "parts": [{"meshes": ["terrain_ambush_cliff_detail_01"], "scale": [0.75, 0.85], "count": [1, 1], "ring": [0, 0], "lean": [0, 6], "tints": ["FF8A7A66", "FF6F8A55"]}]},
+          {"name": "cleft spire", "parts": [{"meshes": ["cave_desert_rock_wall_c"], "scale": [0.45, 0.55], "count": [1, 1], "ring": [0, 0], "lean": [0, 6], "tints": ["FF8A7A66", "FF6F8A55"]}]},
+          {"name": "jutting slab", "parts": [{"meshes": ["map_mountain_rock_d"], "scale": [0.85, 0.95], "count": [1, 1], "ring": [0, 0], "lean": [0, 8], "tints": ["FF8A7A66"]}]}],
+        "debris": [
+          {"name": "roots", "parts": [{"meshes": ["tree_root_b_dry"], "scale": [0.5, 0.5], "count": [1, 1], "ring": [0, 0], "lean": [0, 0], "tints": ["FF5E7A44"]}]}]
+      },
+      "water": {
+        "lean": "outward",
+        "source": {"name": "brine spring", "parts": [
+          {"meshes": ["mi_saltpool_a", "mi_saltpool_b"], "scale": [4.0, 4.0], "count": [2, 2], "ring": [0.6, 0.6], "lean": [0, 0], "tints": ["FF7FD6D0"]},
+          {"meshes": ["waterfall_rock_c"], "scale": [0.8, 0.8], "count": [1, 1], "ring": [0, 0], "lean": [0, 0], "tints": ["FF5A7A86"]}],
+          "particles": ["psys_mist_env_on_water"], "light": {"colour": [0.35, 0.86, 0.82], "radius": 6, "intensity": 25, "flicker": false}},
+        "trunk": [
+          {"name": "coral crystal", "parts": [{"meshes": ["dry_tree_e"], "scale": [0.5, 0.5], "count": [1, 1], "ring": [0, 0], "lean": [0, 0], "tints": ["FF3FA9A0", "FFD07A8A"]}]},
+          {"name": "coral spikes", "parts": [{"meshes": ["icicle"], "scale": [1.4, 1.8], "count": [3, 3], "ring": [0.15, 0.3], "lean": [10, 25], "tints": ["FF66CCC4", "FF6FA8DC"]}]}],
+        "debris": [
+          {"name": "salt crust", "parts": [{"meshes": ["mi_tuz_prop"], "scale": [2.5, 2.5], "count": [1, 1], "ring": [0, 0], "lean": [0, 0], "tints": ["FFFFFFFF"]}]}]
+      },
+      "air": {
+        "lean": "wind",
+        "source": {"name": "wind-carved arch", "parts": [
+          {"meshes": ["rock_cliff_bridge_a"], "scale": [0.09, 0.09], "count": [1, 1], "ring": [0, 0], "lean": [0, 0], "tints": ["FFC8C8BC"]}],
+          "particles": ["prt_wm_exponential_dust"], "light": null},
+        "trunk": [
+          {"name": "leaning stone", "parts": [{"meshes": ["cave_desert_rock_wall_e"], "scale": [0.6, 0.7], "count": [1, 1], "ring": [0, 0], "lean": [15, 25], "tints": ["FFB8B4A8"]}]},
+          {"name": "leaning slab", "parts": [{"meshes": ["map_mountain_rock_b"], "scale": [1.4, 1.6], "count": [1, 1], "ring": [0, 0], "lean": [18, 22], "tints": ["FFB0C8CC"]}]}],
+        "debris": [
+          {"name": "wind-scoured spur", "parts": [{"meshes": ["map_rock_groups_b"], "scale": [2.8, 3.2], "count": [1, 1], "ring": [0, 0], "lean": [0, 0], "tints": ["FFC0C4BC"]}]}]
+      },
+      "infernal": {
+        "lean": "inward",
+        "source": {"name": "ash cone", "parts": [
+          {"meshes": ["map_peak_a"], "scale": [0.4, 0.4], "count": [1, 1], "ring": [0, 0], "lean": [0, 0], "tints": ["FF4A4644"]},
+          {"meshes": ["bd_skull_antilope_b"], "scale": [2.0, 2.0], "count": [2, 2], "ring": [1.9, 1.9], "lean": [0, 0], "tints": ["FFD8CCB0"]}],
+          "particles": ["psys_blaze_small_1", "psys_fire_smoke_env_point"], "light": {"colour": [0.86, 0.16, 0.08], "radius": 6, "intensity": 60, "flicker": true}},
+        "trunk": [
+          {"name": "bone spire", "parts": [{"meshes": ["icicle"], "scale": [2.4, 3.0], "count": [2, 3], "ring": [0.25, 0.45], "lean": [15, 30], "tints": ["FFE6DCC4", "FFB06060"]}]},
+          {"name": "horned skull totem", "parts": [{"meshes": ["bd_skull_antilope_b"], "scale": [2.0, 2.0], "count": [1, 1], "ring": [0, 0], "lean": [0, 0], "tints": ["FFD8CCB0"]}]}],
+        "debris": [
+          {"name": "bone litter", "parts": [{"meshes": ["desert_bones_c"], "scale": [2.8, 3.2], "count": [1, 1], "ring": [0, 0], "lean": [0, 0], "tints": ["FFD8CCB0"]}]}]
+      }
+    },
+    "placement": {"trunkWidth": 3.25, "liveTrunkWidth": 2.0, "trunkSpacing": 4.0, "edgeThinning": 1.0, "lateral": [0.3, 0.7], "debrisWidth": 3.25, "minGap": 3.0, "sourceSearch": 8, "sink": 0.05, "effectHeight": 1.5},
+    "clearance": {"settlement": 5.0, "ruin": 2.0, "road": 0.8, "bridge": 2.0, "water": 0.5},
+    "budget": {"roots": 1200, "entities": 2400, "lights": 48, "particles": 48, "window": [116, 74], "windowRoots": 200, "windowEntities": 400, "windowLights": 8, "windowParticles": 8},
+    "seam": "nearestImage"
+  },
+  "magicWater": {
+    "material": "mnbl_magicwater",
+    "atlas": {"columns": 4, "rows": 8, "schoolRows": {"weave": 0, "umbral": 1, "infernal": 2, "radiant": 3, "fire": 4, "water": 5, "earth": 6, "air": 7}, "widthScale": 1.07},
+    "fallback": {"materialPrefix": "mnbl_magic_", "row": 3},
+    "mode": "surface",
+    "halfDepth": 0.2,
+    "opacity": 1.0,
+    "bedMaxDepth": 0.3,
+    "maxDecals": 2500,
+    "seam": "nearestImage"
+  },
+  "overlayMeshes": {
+    "enabled": true,
+    "chunk": 64,
+    "segment": {"max": 1.0, "min": 0.25, "maxError": 0.05},
+    "budget": {"vertices": 800000, "triangles": 1200000, "entities": 2500, "view": {"width": 116, "height": 74, "entities": 200, "triangles": 250000}, "entityMicroseconds": 0.36},
+    "flipV": false,
+    "alphaTest": 0.3,
+    "veins": {"mode": "mesh", "material": "mnbl_overlay_vein_{look}", "template": "torch_flame_base", "textures": "mnbl_magic_{look}", "lift": 0.08, "pass": "blend", "burst": {"segments": 16, "rings": 3},
+      "glow": {"weave": 0.35, "umbral": 0.2, "infernal": 0.45, "radiant": 0.5, "fire": 0.6, "water": 0.3, "earth": 0.2, "air": 0.3}},
+    "magicWater": {"mode": "mesh", "material": "mnbl_overlay_magicwater", "template": "torch_flame_base", "textures": "mnbl_magicwater", "lift": 0.04, "pass": "depth", "glow": 1.0},
+    "rivers": {"mode": "mesh", "materials": ["naval_worldmap_water", "worldmap_water"], "width": 4.0, "depth": 0.4, "dip": 0.15, "lift": 0.03, "poolScale": 1.25, "fills": true, "discSegments": 12},
+    "seam": "chunkImage",
+    "note": "MMR-291 (docs/overlay-meshes.md; route C:/Users/davgo/m2/results/MMR-291-route.md): the campaign map draws scene decals only from Native's prebaked decal atlas (MMR-247 D, acc5lab), so veins, rivers and magic water are runtime meshes on separate root entities, one per (layer, material, chunk x chunk units of the canonical frame, reveal band), moved whole to the periodic image nearest the camera (seam chunkImage). veins: every drawn MMR-288 land stamp as a quad grid draped on the terrain (bursts as discs) with its atlas cell of textures (mnbl_magic_{look}_d/_n/_s), lifted lift units; material: the published material (mnbl_overlay_vein_{look}) when it resolves, else a runtime copy of template (vanilla torch_flame_base: pbr_shading, modulate, forward, use_vertex_colors, self_illumination) with the textures, glow the self-illumination per look school (the mesh's vector argument w). magicWater: every other MMR-290 water stamp as a quad of mnbl_magicwater's 4 x 8 atlas, flat on its plane + lift (sea, lake) or draped (bed, coast); inland and glow stamps join the vein meshes. rivers: the river chains as ribbons width units wide, the inner three of five vertices across on a level surface depth over the centre's ground (never under a shown plane there, plus lift), the edges at min(level, ground - dip) so the water shader's depth fade blends the banks; pools (poolScale x the half width) and fills (by policy) as discs; materials in order (naval_worldmap_water: our lake planes' material). Draping: segment.max units per grid cell, halved while the surface rises over the mesh by more than segment.maxError, to segment.min. mode decal (or enabled false) draws the layer's decals as before (the switch back); mode mesh leaves them out. flipV mirrors the textures' rows for the meshes. budget: whole world and in a view window; entityMicroseconds is MMR-249's main-thread cost per decal, the stand-in per entity for the frame-cost estimate. Defaults taken; MMR-247 judges the look and the cost (c33). pass (MMR-291-W; docs/overlay-meshes.md \"Over the water\"): how a layer's material draws against the map's water, which the engine draws after its alpha-blended forward meshes and which paints over any mesh that wrote no depth (acc6lab: the copies drew on land and nothing on the sea): blend the template as it is; depth the template writing depth behind the shader flag alpha_test at alphaTest (the texels past the test keep the water off, as the opaque map meshes do; the rest stays water); forward adds needs_forward_rendering and alpha_blend_sort (Native's worldmap_cloud); afterPostfx adds render_after_postfx (the crosshair's queue). magicWater lies on the water planes: depth; the veins lie on land: blend. alphaTest 0.3 keeps the art's cores (alpha 0.5 to 1) and drops the halos (at most 0.25). Defaults taken; the decal lab's mesh rows show every pass on land and on the sea."
+  },
+  "speed": {
+    "chain": ["Road", "Naval", "Default"],
+    "road": 0.2,
+    "roadAtSea": false,
+    "cancelFordOnDecks": true,
+    "terrain": {"Snow": -0.15, "Swamp": -0.2}
+  },
+  "notes": "Map epic 2 road presentation and speed policy (MMR-248; findings sections 3 and 8). Module-embedded, read by the runtime (RoadsPolicy). decals (MMR-257): road decals along the travel compiler's road cells (playability.json roads, travel-graph.json roads[]) in the family of the road's culture (cultureFamilies maps each presentation culture to one of the three installed path-decal families of the War Sails campaign map; default taken), one decal every spacing map units of smoothed path at size units, clipped gateClip units from gates, at most maxDecals per world (past it the spacing is stretched by the drawn length: the road the decals at spacing cover after the water, gate and overlap drops, MMR-247), refreshed to the image nearest the camera at the seam; spacing, size and maxDecals are starting values MMR-249 measures. bridges (MMR-257): runs of the installed map bridge pieces along each straight leg of each existing deck, read from the kept navigation.json build.bridges, z from the higher bank's ground, L-shaped decks turned at their corner cell (rotate) or skipped (skip), scale the vanilla campaign map's measured stone_bridge scale (2.885; its pieces stand 0.42 local units apart, MapDressing.BridgeSegmentLocal); river decks use the wooden piece (prefabs[0]), others the stone end, side and middle pieces (prefabs[3], [2], [1]). Decals (MMR-257, defaults taken): a decal is size units wide and 1.1 x spacing long along the smoothed path, so neighbours meet; each road keeps one material of its family (road index modulo the family's materials). speed (MMR-254): the one GeneratedPartySpeedModel registered with AddModel<PartySpeedModel> over NavalDLC's model (chain); road is the bonus on road cells when the party is not at sea (roadAtSea), cancelFordOnDecks removes the -0.3 ford factor on road decks, and terrain adds a factor per face TerrainType (Snow and Swamp have no engine term). Every factor is a starting value for MMR-247's balance pass. Feeder generation rules are in playability.json roads.feeders, because the travel compiler that builds them reads only that policy (default taken). water (MMR-285): water decals on the travel cells parties cannot cross, so every river cell and every sea or lake cell no water plane shows is drawn as water: a stamp at each River cell centre and stamps every riverSpacing units (stretched past maxDecals) along the edges joining neighbouring river cells (8-neighbours; a diagonal only where no river cell shares an edge with both ends) and from a river end to the sea or lake cell beside it, riverWidth units wide; then a fill stamp fillScale x the cell at the centre of every other sea, lake or river cell whose centre neither the sea plane (ground below the datum), a shown lake plane nor a river stamp covers. Stamps use material (vanilla, published: the probe drew it; runtime textures never draw on decals) at atlas, tinted with SetFactor1 (tint, alpha 255, a multiply of the stamp); a stamp counts as covering a point inside opaqueCore x its half extents (the measured alpha of mainmap_decal_undervillage_d is opaque to about half its half extent). Water decals share the decal budget with the road decals (maxDecals each, both under MMR-249's 5,000) and MMR-260's overlay. Defaults taken; MMR-247 judges the look. magic (MMR-260, veins MMR-288): entity-less scene decals along a deterministic vein graph per magic zone (World/MagicVeins.cs; docs/magic-ground.md): a zone is 8-connected source samples of one look school (a hidden school takes terrain-materials.json mutation.hiddenLooks) and one origin (generated biome_variant or live mutation), water samples included; sources are a generated zone's potency maxima (at least veins.sourceSpacing units apart) or a live zone's cast nodes; veins grow by space colonisation toward the zone's samples (weighted by potency) in steps of 0.75 x veins.stampLength, branches about veins.spacing apart, smoothed (a continuing vein turns at most 45 degrees per step, a branch leaves at most 75 degrees off its parent), widths the smallest of a pipe model in which each node adds its own flow (veins.minWidth^forkExponent + the sum of its children's, so tips are veins.minWidth), a taper by the node's place along its longest path and an edge cap rising over veins.edgeSamples samples from the zone's rim, at most veins.width, never wider outward (MMR-288 gaps fix); a stamp's alpha (SetFactor1, white) fades from veins.minAlpha at the mutation threshold over veins.fadeBand of potency and toward the rim over the same edgeSamples; generated zones come from the generated variants alone (a live cell hides the generated veins under it). Stamps: a burst at each source (veins.burstScale x its width, square, one ray along its widest vein), a trunk on each edge into a node with children, a tip on each edge into a tip node, a fork at each branching node whose two widest children open at most 40 degrees each side and whose parent comes in within 40 degrees (its length fitted so the art's children open at the children's angle; elsewhere the trunks meet on their own); box length stampLength along the vein (yaw along the growth, +u; flipU turns it by 180 degrees if the decal's u runs against +x), width the vein's width across. Material materialPrefix + the look, atlas cell (0.25, 0.25, column / 4, row / 4): row by the owner node's core group (atlas.rows, row 0 the image top; flipV uses (3 - row) / 4), column by kind (atlas.columns). Stamps on water nodes or water cells are not drawn here (MMR-290 draws them). A live cast's veins appear outward by graph order over revealHours campaign hours from the cast's batch day. Only drawn components of at least veins.minStamps stamps that reach a burst are drawn (a land branch off a water node, with no water layer drawing the water veins, is re-rooted at a shore burst or dropped). At most maxDecals land stamps per world (past it generated stamps go outermost first, so no vein breaks; live stamps and bursts stay); 2500 keeps the magic ground below MMR-249's 5,000 budget, the whole-world total with roads, water and magic water is open until MMR-247 measures out-of-view cost. A missing material draws nothing. node: a live mutation node is a separate root entity with a point light of the variant colour (lightRadius, lightIntensity) and a vanilla campaign-map particle (particles by school, else default), height units above the ground. colourGrade faceType: a live mutation cell takes the colour grade of the shared table's first land biome with its remapped face type (MMR-256's managed atmosphere tick). Defaults taken; MMR-247 judges the look. magicFeatures (MMR-289; docs/magic-features.md): school-specific features standing in magic zones along MMR-288's vein graph: per visible school (hidden schools take their look's set) a source feature (with the school's only light and particles), trunk features and debris, each built from installed vanilla meta meshes (meshes: their .tpac bounding boxes in metres at scale 1, flip for a mesh modelled upside down) with multiply tints (AARRGGBB); placement: one source feature per vein source (a source on water or inside a clearance moves to the first clear land node of its tree within sourceSearch edges, nearest first; where the source feature fits nowhere, the school's trunk features in turn carry its light and particles), trunk features on nodes at least trunkWidth wide (liveTrunkWidth on a live cast's young veins, whose tips take features too), trunkSpacing apart along each branch (closer with potency and width, farther toward the zone edge by edgeThinning), offset across the vein by lateral x its half width, debris at forks at least debrisWidth wide, every feature minGap from the others, sunk sink x its height, the effects effectHeight above the ground; clearance (map units beyond each feature's footprint radius): settlement (every settlement point; covers the terrain-shaping pads plus flora padMargin and the ruin markers' minGap), ruin (every ruin marker of the map dressing), road (beyond each road decal's half width), bridge (each bridge segment and bank), water (water travel cells, water cores, ground below the datum, shown lake planes, and the opaque core of every water decal, water.opaqueCore x its half extents); budget: world and in-view (window, quarter-window steps) caps on feature roots, entities, point lights and particle systems, live features included (taken first, so a cast's effects take the lowest-priority generated sources' slots; past a light or particle cap a feature loses those effects, past a root or entity cap it is thinned). Every value is a starting value for MMR-247's look and frame-cost check (c30). magicWater (MMR-290; docs/magic-water.md): the vein graph's water stamps (World/MagicVeins.cs nodes and stamps with OnWater: ocean and lake cores, samples on sea, lake and river travel cells), so the land veins carry on across the shore. They are entity-less scene decals of material (one published decal material for every school; the campaign map's water shader draws decals whose box holds the water surface, additively), atlas columns x rows cells (SetVectorArgument(1 / columns, 1 / rows, column / columns, row / rows): column by kind as magic.atlas.columns, row by the look school, schoolRows; magic.atlas.flipV and flipU apply), the box widthScale x the vein's width across (the cell's inner height is a smaller share of the box than a ground cell's), tinted white with alpha opacity (SetFactor1). A stamp whose centre the sea plane (ground below the datum) or a shown lake plane covers is centred on that plane with halfDepth (mode sea, lake); one on another water cell (a river, or a sea or lake cell no plane shows) is centred on the ground with the slope depth (bed); one whose centre is on land beside the water it crosses into is centred on the ground (coast). Until material is published a stamp draws with fallback.materialPrefix + the look (MMR-288's ground cells; row the owner node's core group, else fallback.row); with neither, nothing draws and nothing throws. A stamp centred on the ground (bed, coast, inland, glow) keeps its box above the water planes its footprint shows (MMR-247's WaterPlanes: the plan's Floor, the engine target's clip); sea and lake boxes stay whole. In mode surface the layer declares IMagicWaterVeins, so the ground plans with the water veins drawn, and it skips the water stamps of the components the ground drops below magic.veins.minStamps. mode surface draws the above; bed (fallback F1) draws sea and lake stamps only where the bed lies at most bedMaxDepth below the plane, centred on the bed; shore (F1 + F2) also puts a ground-material tip at every shore crossing on its land side, ending at the shoreline. At most maxDecals water stamps per world (past it the thinnest outermost generated stamps go; live stamps and bursts stay); they share the decal budget with roads, water and the magic ground. A live cast's water veins appear with its land veins (magic.revealHours). seam nearestImage as the ground stamps. Defaults taken; MMR-247 confirms the route in game (the toggle check). overlayMeshes (MMR-291): veins, rivers and magic water drawn as runtime meshes instead of decals (the campaign map draws decals from Native's decal atlas only); see its note; each layer's mode decal brings its decals back."
+}

@@ -31,7 +31,7 @@ foreach($n in @('mscorlib','System','System.Core','System.Web.Extensions')){
 $exe=Join-Path $work 'WorldSaveTransfer.exe'
 $compile=@(& $csc /nologo /noconfig /nostdlib+ /target:exe /platform:x64 /langversion:7.3 /warnaserror "/out:$exe" @references @($sources|ForEach-Object { Join-Path $repo $_ }) 2>&1|ForEach-Object { "$_" })
 if($LASTEXITCODE){$compile|ForEach-Object { Write-Output $_ }; throw 'Transfer-WorldSave compilation failed'}
-$arguments=@($Action,'--game',$GameVersion,'--naval',$NavalVersion,'--capabilities','R01,R02,R03,R04,R05,R06,R07,R08,R09,R10')
+$arguments=@($Action,'--game',$GameVersion,'--naval',$NavalVersion,'--capabilities','R01,R02,R03,R04,R05,R06,R07,R08,R09,R10,R11')
 switch($Action){
     'export' { if(-not $Save -or -not $To -or -not $Name){throw '-Save, -To and -Name are required'}; $arguments+=@('--store',$Store,'--saves',$Saves,'--to',$To,'--name',$Name); foreach($s in $Save){$arguments+=@('--save',$s)} }
     'verify' { if(-not $From){throw '-From is required'}; $arguments+=@('--from',$From) }

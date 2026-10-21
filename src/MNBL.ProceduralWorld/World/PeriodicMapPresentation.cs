@@ -91,10 +91,9 @@ namespace MNBL.ProceduralWorld.World
             foreach (var method in new[] { "SetSettlementLevelVisibility", "RefreshWallState", "RefreshSiegePreparations", "ValidateIsDirty" })
                 Postfix(harmony, applied, "SandBox.View.Map.Visuals.SettlementVisual", method, nameof(SettlementSyncPostfix), true, "display copy mirrors the settlement's entity visibility (" + method + ")");
             Postfix(harmony, applied, "SandBox.View.Map.Visuals.SettlementVisual", "OnPartyRemoved", nameof(SettlementRemovedPostfix), true, "display copy removed with the settlement visual's party");
-            var managerType = AccessTools.TypeByName("SandBox.View.Map.Managers.SettlementVisualManager");
-            var intersected = managerType == null ? null : AccessTools.Method(managerType, "OnVisualIntersected");
+            var intersected = MNBL.ProceduralWorld.CampaignRegistry.PatchSignatures.Method("SandBox.View.Map.Managers.SettlementVisualManager", "OnVisualIntersected");   // MMR-284: by signature
             visibleOrFading = AccessTools.Method(AccessTools.TypeByName("SandBox.View.Map.Visuals.MapEntityVisual"), "IsVisibleOrFadingOut");
-            if (intersected == null || visibleOrFading == null) throw new MissingMethodException("SandBox.View.Map.Managers.SettlementVisualManager", "OnVisualIntersected or MapEntityVisual.IsVisibleOrFadingOut");
+            if (visibleOrFading == null) throw new MNBL.ProceduralWorld.CampaignRegistry.PatchSignatureException(MNBL.ProceduralWorld.CampaignRegistry.PatchSignatures.Presentation, "SandBox.View.Map.Visuals.MapEntityVisual::IsVisibleOrFadingOut", "missing");
             harmony.Patch(intersected, prefix: new HarmonyMethod(typeof(PeriodicMapPresentation), nameof(SettlementIntersectedPrefix)));
             applied.Add(new Dictionary<string, object> { ["target"] = "SandBox.View.Map.Managers.SettlementVisualManager::OnVisualIntersected", ["patch"] = "settlement hover and selection -> the settlement the ray meets first", ["kind"] = "prefix" });
             // Visuals framed on their own changes, refreshed when the camera wraps or has moved far.
@@ -121,11 +120,19 @@ namespace MNBL.ProceduralWorld.World
         public static int NameplateCalls { get { return nameplateCalls; } }
         public static int Refreshes { get { return refreshes; } }
 
+        // MMR-284: targets by their recorded signature (PatchSignatures: a War Sails view absent without War Sails is skipped; one whose signature
+        // changed refuses the set, naming the patch). Transpilers also refuse when their IL has nothing to replace.
+        private static MethodInfo Target(string typeName, string method, bool required)
+        {
+            var target = MNBL.ProceduralWorld.CampaignRegistry.PatchSignatures.Method(typeName, method);
+            if (target == null && required) throw new MNBL.ProceduralWorld.CampaignRegistry.PatchSignatureException(MNBL.ProceduralWorld.CampaignRegistry.PatchSignatures.Presentation, typeName + "::" + method, "missing");
+            return target;
+        }
+
         private static void Postfix(Harmony harmony, List<Dictionary<string, object>> applied, string typeName, string method, string postfix, bool required, string label)
         {
-            var type = AccessTools.TypeByName(typeName);
-            var target = type == null ? null : AccessTools.Method(type, method);
-            if (target == null) { if (required) throw new MissingMethodException(typeName, method); return; }   // War Sails views are optional
+            var target = Target(typeName, method, required);
+            if (target == null) return;   // War Sails views are optional
             harmony.Patch(target, postfix: new HarmonyMethod(typeof(PeriodicMapPresentation), postfix));
             applied.Add(new Dictionary<string, object> { ["target"] = typeName + "::" + method, ["patch"] = label, ["kind"] = "postfix" });
         }
@@ -133,12 +140,11 @@ namespace MNBL.ProceduralWorld.World
         private static int replacedNow;
         private static void Transpile(Harmony harmony, List<Dictionary<string, object>> applied, string typeName, string method, string transpiler, string label, bool required = true)
         {
-            var type = AccessTools.TypeByName(typeName);
-            var target = type == null ? null : AccessTools.Method(type, method);
-            if (target == null) { if (required) throw new MissingMethodException(typeName, method); return; }
+            var target = Target(typeName, method, required);
+            if (target == null) return;
             replacedNow = 0;
             harmony.Patch(target, transpiler: new HarmonyMethod(typeof(PeriodicMapPresentation), transpiler));
-            if (replacedNow == 0) throw new InvalidOperationException("Periodic presentation patch found nothing to replace: " + label);
+            if (replacedNow == 0) throw new MNBL.ProceduralWorld.CampaignRegistry.PatchSignatureException(MNBL.ProceduralWorld.CampaignRegistry.PatchSignatures.Presentation, typeName + "::" + method + " (" + label + ")", "its IL has nothing to replace");
             applied.Add(new Dictionary<string, object> { ["target"] = typeName + "::" + method, ["patch"] = label, ["kind"] = "transpiler", ["replacedCalls"] = replacedNow });
         }
 
@@ -318,8 +324,14 @@ namespace MNBL.ProceduralWorld.World
             catch (Exception e) { if (CopyErrors.Count < 20) CopyErrors.Add(e.GetType().Name + ": " + e.Message); }   // an exception here would end the process
         }
 
+        // MMR-247 X: the hang repro's bisect switch (Map2AcceptanceDecalLab): false stops the display copies mirroring the settlement visual
+        // (counted in SyncsSkipped). The product never changes it.
+        internal static bool CopySyncEnabled = true;
+        internal static int SyncsSkipped;
+
         private static void SettlementSyncPostfix(object __instance)
         {
+            if (!CopySyncEnabled) { SyncsSkipped++; return; }
             try { var copy = Copies.FirstOrDefault(c => c.Visual == __instance); if (copy != null) Sync(copy); }
             catch (Exception e) { if (CopyErrors.Count < 20) CopyErrors.Add("sync " + e.GetType().Name + ": " + e.Message); }
         }

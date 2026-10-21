@@ -1,16 +1,21 @@
 // Static travel graph tests (MMR-28): travel_graph_tests PLAYABILITY_POLICY WORK_DIR
 // Cell classification rules, policy strictness, and every topology outcome on small cell maps:
-//   '.' land  '^' mountain  '~' sea  'L' lake  'R' river      (settlements and nodes sit at cell centres)
+//   '.' land  '^' mountain  '~' sea  'L' lake  'R' river      (settlements and nodes sit at cell centres; every sample is grassland)
 // two islands with ports, an island without a port, closed basins (lake-only, too small), river bridge candidates
 // (with and without the producer's report), road passes and their bound, footprints with access passes, snaps and
-// unplaceable towns, town repairs (coast ports, mountain joins, moves),
-// village and castle exclusions and their bounds, harbour shifts, seam wrap, OpenSea, pole passages, determinism.
+// unplaceable towns, town repairs (town snaps, carves, mountain joins, forced ports, moves) and city preservation, the village quota
+// (pins, keeps, castle takes, drops, protected classes, synthesis, clearance, notables, forced-port harbour villages, determinism),
+// village and castle exclusions and their bounds, harbour shifts, seam wrap, OpenSea, pole passages, determinism, and the road network
+// (route pieces and banks, decks, feeders, seam, pole, maxCells; MMR-253; gate spurs, a drawn road at every gate: MMR-247-R), and the land
+// face types and cells.bin v2 (MMR-254).
 #include <algorithm>
 #include <cmath>
 #include <filesystem>
 #include <fstream>
 #include <functional>
 #include <iostream>
+#include <map>
+#include <set>
 #include <sstream>
 #include <string>
 #include "worldbridge/travel_graph.hpp"
@@ -45,6 +50,9 @@ World map(const std::vector<std::string>& rows) {
     w.in.grid.spacing = kSpacing;
     w.in.grid.z.assign(static_cast<std::size_t>(w.in.grid.rows + 1) * w.in.grid.cols, 1.0);
     w.in.grid.intent.assign(w.in.grid.z.size(), 0);
+    w.in.grid.biome.assign(w.in.grid.z.size(), 3);
+    w.in.grid.white.assign(w.in.grid.z.size(), 0);
+    w.in.biome_core = {{0, "ocean"}, {2, "desert"}, {3, "grassland"}, {4, "forest"}, {8, "lake"}, {13, "marsh"}, {15, "boreal_forest"}, {16, "cold_tundra"}, {17, "land_ice"}};
     for (const auto& row : rows)
         for (char ch : row) w.cls.push_back(ch == '.' ? Land : ch == '^' ? Mountain : ch == '~' ? Sea : ch == 'L' ? Lake : River);
     return w;
@@ -94,7 +102,7 @@ void classification_tests(const Policy& policy) {
     check(classify(g, policy)[0] == Sea, "sea: the main-diagonal centre is below the datum, whatever the other corners");
     g = grid(); set(g, 0, 0, -1); set(g, 1, 1, 0.5);
     check(classify(g, policy)[0] == Sea, "sea when the diagonal mean is negative even with one corner above the datum");
-    g = grid(); set(g, 0, 1, -3);
+    g = grid(); set(g, 0, 1, -1);
     check(classify(g, policy)[0] == Land, "an off-diagonal low corner does not make a sea cell");
     g = grid(); set(g, 1, 1, 1, 2);
     check(classify(g, policy)[0] == Lake && classify(g, policy)[5] == Lake, "lake: a main-diagonal corner carries lake intent (both cells sharing it)");
@@ -102,9 +110,9 @@ void classification_tests(const Policy& policy) {
     check(classify(g, policy)[0] == River, "river: a main-diagonal corner carries river intent");
     g = grid(); set(g, 0, 0, -2, 2); set(g, 1, 1, -2);
     check(classify(g, policy)[0] == Sea, "below-datum lake corners still give sea (the datum rule comes first)");
-    g = grid(); set(g, 0, 1, 1 + 1.01 * kSpacing);
+    g = grid(); set(g, 0, 1, 1 + 1.01 * policy.mountain_slope * kSpacing);
     check(classify(g, policy)[0] == Mountain, "mountain: (max - min corner) / spacing above mountainSlope");
-    g = grid(); set(g, 0, 1, 1 + 0.99 * kSpacing);
+    g = grid(); set(g, 0, 1, 1 + 0.99 * policy.mountain_slope * kSpacing);
     check(classify(g, policy)[0] == Land, "slope at or below mountainSlope stays land");
     g = grid(); g.z.pop_back();
     refused("a grid with the wrong sample count", "grid_mismatch", [&] { classify(g, policy); });
@@ -114,7 +122,7 @@ void policy_tests(const Policy& policy) {
     check(policy.calibration.invalid.at("Default").count(18) && policy.calibration.invalid.at("All").count(7) && policy.calibration.land_to_sea == 50 &&
           policy.calibration.embark_threshold == 0.5 && policy.calibration.evidence_sha256.size() == 64 && policy.calibration.port_gate_envelope_max == 10.97,
           "the calibration carries the MMR-17 invalid-terrain sets, region switch costs, embark threshold and the installed port-gate envelope");
-    check(policy.side == 257 && policy.mountain_slope == 1.0 && policy.open_sea_cells == 4 && policy.max_access_cells == 6 && policy.bridge_kinds.size() == 2 && policy.max_bridge_cells == 2 && policy.max_port_gate_cells == 2 && policy.sha256.size() == 64, "the policy loads with its pinned values");
+    check(policy.side == 257 && policy.mountain_slope == 0.5 && policy.open_sea_cells == 4 && policy.max_access_cells == 6 && policy.bridge_kinds.size() == 2 && policy.max_bridge_cells == 2 && policy.max_port_gate_cells == 2 && policy.sha256.size() == 64, "the policy loads with its pinned values");
     const fs::path calibration = policy_file.parent_path() / ".." / "calibration" / "naval-transitions" / "naval-transitions.json";
     spit(work / "calibration" / "naval-transitions" / "naval-transitions.json", slurp(calibration));
     const std::string text = slurp(policy_file);
@@ -130,12 +138,27 @@ void policy_tests(const Policy& policy) {
     check(load_policy(work / "policies" / "same.json").sha256 == policy.sha256, "a byte-identical copy with its calibration loads with the same hash");
     mutated("land_as_sea", "\"land\": \"Plain\"", "\"land\": \"CoastalSea\"", "face_group_mismatch");
     mutated("mountain_walkable", "\"mountain\": \"Mountain\"", "\"mountain\": \"Plain\"", "face_group_mismatch");
-    mutated("unknown_face_group", "\"lake\": \"Lake\"", "\"lake\": \"Steppe\"", "unmapped_category");
-    mutated("calibration_altered", "2cf08bceca6d7fd089b4ef99fcb77f8c06c247534dd3e5d4b5864233b38f4e85", std::string(64, '0'), "calibration_mismatch");
+    mutated("unknown_face_group", "\"lake\": \"Lake\"", "\"lake\": \"Dune\"", "unmapped_category");
+    mutated("calibration_altered", "9dd9604566d15394dcb644712c26b508e25f3f97d47e38860c5aaf0bb60030e3", std::string(64, '0'), "calibration_mismatch");
     mutated("unknown_member", "\"version\": 1,", "\"version\": 1, \"extra\": 1,", "unknown_field");
     mutated("bridge_kind", "\"river\",", "\"ford\",", "unmapped_category");
     mutated("port_gate_zero", "\"maxPortGateCells\": 2", "\"maxPortGateCells\": 0", "out_of_range");
     mutated("fraction_range", "\"maxPassFraction\": 0.1", "\"maxPassFraction\": 1.5", "out_of_range");
+    // Map epic 2 keys (MMR-248): the biome face table, the town repairs, the village quota and the road rules.
+    check(policy.land_face_groups.at("desert") == "Desert" && policy.land_face_groups.at("cold_tundra") == "Steppe" && policy.land_face_groups.at("land_ice") == "Snow" &&
+          policy.land_face_groups.at("marsh") == "Swamp" && policy.land_face_groups.count("ocean") == 0 && policy.land_face_default == "Plain" && policy.permanent_white_months == 12 &&
+          policy.permanent_white_face == "Snow", "cells.landFaceGroups: the shared table's face per land biome, Plain by default, Snow for permanent white");
+    check(policy.max_town_snap_cells >= policy.max_snap_cells && policy.town_carve && policy.forced_ports && policy.villages.town == 3 && policy.villages.castle == 2 &&
+          policy.villages.clearance == 4 && policy.villages.tiers.size() == 3 && policy.villages.uid_prefix == "mnbl-quota-village:" && policy.roads.feeder_water == "decksOnly" &&
+          policy.roads.feeder_from.size() == 3 && policy.roads.cell_flag, "town repairs, the 3/2 village quota with its 4-unit clearance, and the road rules load");
+    mutated("land_face_dune", "\"desert\": \"Desert\"", "\"desert\": \"Dune\"", "unmapped_category");
+    mutated("land_face_sea", "\"forest\": \"Forest\"", "\"forest\": \"CoastalSea\"", "face_group_mismatch");
+    mutated("land_face_unknown_member", "\"default\": \"Plain\",", "\"default\": \"Plain\", \"extra\": 1,", "unknown_field");
+    mutated("village_unknown_member", "\"townVillages\": 3,", "\"townVillages\": 3, \"extra\": 1,", "unknown_field");
+    mutated("village_tier_range", "\"maxSpacing\": 0.65", "\"maxSpacing\": 1.65", "out_of_range");
+    mutated("feeder_new_crossings", "\"water\": \"decksOnly\"", "\"water\": \"anywhere\"", "out_of_range");
+    mutated("road_unknown_member", "\"cellFlag\": true,", "\"cellFlag\": true, \"extra\": 1,", "unknown_field");
+    mutated("town_snap_below_snap", "\"maxTownSnapCells\": 6", "\"maxTownSnapCells\": 1", "out_of_range");
 }
 
 void topology_tests(const Policy& strict) {
@@ -247,12 +270,19 @@ void topology_tests(const Policy& strict) {
     check(placement(rf, "t1")->method == "footprint" && rf.cls[1 * 8 + 1] == Land && repairs(rf, "footprint") == 1, "a town on a mountain cell gets it as its footprint");
     check(placement(rf, "t2")->method == "snap" && placement(rf, "t2")->cell == Cell{1, 4} && placement(rf, "t2")->shift == 1 && repairs(rf, "snap") == 1 && rf.status == "ok",
           "a town on a sea cell snaps to the nearest land cell within maxSnapCells");
-    check(run(f, strict).status == "rejected" && has_reason(run(f, strict), "quality.repair_bound_exceeded"), "footprints and snaps beyond their fractions reject the world");
+    check(run(f, strict).status == "ok", "a town's footprint and snap are town repairs outside maxFootprintFraction and maxSnapFraction");
+    World fk = map({"~~~~~~~~", "~^.....~", "~......~", "~~~~~~~~"});
+    town(fk, "t1", 1, 4); castle(fk, "k1", 1, 1); village(fk, "v1", "t1", 0, 5);
+    const Result rfk = run(fk, strict);
+    check(rfk.status == "rejected" && has_reason(rfk, "quality.repair_bound_exceeded", "uid-k1") && has_reason(rfk, "quality.repair_bound_exceeded", "uid-v1") &&
+          placement(rfk, "k1")->method == "footprint" && placement(rfk, "v1")->method == "snap",
+          "a castle's footprint and a village's snap beyond their fractions reject the world, naming them");
     World fa = map({"~~~~~~~~~~", "~^^^......", "~^^^......", "~~~~~~~~~~"});
     town(fa, "t1", 1, 1); town(fa, "t2", 1, 7);
     const Result rfa = run(fa, lenient);
     check(rfa.status == "ok" && repairs(rfa, "access") == 2 && placement(rfa, "t1")->land == placement(rfa, "t2")->land && rfa.cls[1 * 10 + 2] == Land && rfa.cls[1 * 10 + 3] == Land,
           "a footprint walled in by mountains gets a two-cell access pass to the nearest land");
+    check(run(fa, strict).status == "ok", "a town's footprint and its access passes (2 of 6 mountain cells) sit outside maxFootprintFraction and maxPassFraction");
     Policy short_access = lenient; short_access.max_access_cells = 1;
     const Result rfb = run(fa, short_access);
     check(rfb.status == "rejected" && repairs(rfb, "access") == 0 && has_reason(rfb, "quality.unreachable_town") && placement(rfb, "t1")->land != placement(rfb, "t2")->land,
@@ -413,7 +443,8 @@ void topology_tests(const Policy& strict) {
 
     // Bound reasons name UIDs; harbour shifts are capped; footprints on roads are not passes.
     check(has_reason(run(e, strict), "quality.repair_bound_exceeded", "uid-t1") && has_reason(run(e, strict), "quality.repair_bound_exceeded", "uid-t2"), "a pass bound reason names the road's towns");
-    check(has_reason(run(f, strict), "quality.repair_bound_exceeded", "uid-t1") && has_reason(run(f, strict), "quality.repair_bound_exceeded", "uid-t2"), "footprint and snap bound reasons name the settlements");
+    check(!has_reason(run(f, strict), "quality.repair_bound_exceeded", "uid-t1") && !has_reason(run(f, strict), "quality.repair_bound_exceeded", "uid-t2"),
+          "a town's footprint and snap are town repairs outside the bounds and are never named in a bound reason");
     check(has_reason(ri, "quality.repair_bound_exceeded", "uid-v1"), "1 harbour shift of 2 harbours exceeds maxHarbourShiftFraction 0.1, naming the village");
     const Repair* shift = nullptr;
     for (const auto& x : ri.repairs) if (x.kind == "harbour_shift") shift = &x;
@@ -452,10 +483,505 @@ void topology_tests(const Policy& strict) {
     Identity id; id.world_sha256 = std::string(64, 'a'); id.side = 257;
     const Result ra2 = run(a, strict);
     check(graph_document(a.in, ra, id) == graph_document(a.in, ra2, id) && ports_document(a.in, ra, id) == ports_document(a.in, ra2, id), "the documents are deterministic");
-    check(cells_bytes(a.in, ra).size() == 16 + 2 * 64 && graph_document(a.in, ra, id).find("\"engineValidation\":\"pending\"") != std::string::npos, "cells.bin holds classes and OpenSea flags; the graph is pending engine validation");
+    check(cells_bytes(a.in, ra).size() == 16 + 4 * 64 && cells_bytes(a.in, ra).compare(0, 8, "MNBLTC02") == 0 && graph_document(a.in, ra, id).find("\"engineValidation\":\"pending\"") != std::string::npos,
+          "cells.bin v2 holds classes, OpenSea flags, land types and flags; the graph is pending engine validation");
     refused("a village bound to an unknown town", "broken_join", [&] { World x = map(kTwoIslands); town(x, "t1", 1, 2); village(x, "v1", "nope", 2, 2); run(x, strict); });
     refused("a road naming an unknown town", "broken_join", [&] { World x = map(kTwoIslands); town(x, "t1", 1, 2); road(x, "t1", "nope", {{{1, 2}}}); run(x, strict); });
     refused("duplicate settlement ids", "duplicate_id", [&] { World x = map(kTwoIslands); town(x, "t1", 1, 2); town(x, "t1", 1, 3); run(x, strict); });
+}
+
+// MMR-251: towns are repaired, never dropped, and the forced port comes last before a move.
+void town_repair_tests(const Policy& strict) {
+    // A town 4 cells out to sea: beyond maxSnapCells, within maxTownSnapCells. A town snap, outside maxSnapFraction (one snap of two
+    // settlements would exceed 0.05).
+    World ts = map({"~~~~~~~~~~", "~~~~~~~~~~", "~~~~~~~~~~", "~~~~~~~~~~", ".........."});
+    town(ts, "t1", 4, 0); town(ts, "t2", 0, 8);
+    const Result rts = run(ts, strict);
+    check(rts.status == "ok" && placement(rts, "t2")->method == "snap" && placement(rts, "t2")->cell == Cell{4, 8} && repairs(rts, "town_snap") == 1 && repairs(rts, "move") == 0,
+          "a town with no land within maxSnapCells snaps within maxTownSnapCells (a town_snap), outside the snap bound");
+    World tn = map({"~~~~~~~~~~", ".........."});
+    town(tn, "t1", 1, 0); town(tn, "t2", 0, 8);
+    check(run(tn, strict).status == "ok" && repairs(run(tn, strict), "snap") == 1, "a town's snap within maxSnapCells keeps the kind snap and does not count toward maxSnapFraction");
+
+    // A town on a lake cell with no land within its snap radius: the cell under it is carved to land, with a footprint host check. A town
+    // out at sea is never carved.
+    Policy no_snap = strict; no_snap.max_snap_cells = 0; no_snap.max_town_snap_cells = 0;
+    World tc = map({"......", ".LLL..", "......"});
+    town(tc, "t1", 0, 5); town(tc, "t2", 1, 2);
+    const Result rtc = run(tc, no_snap);
+    check(rtc.status == "ok" && placement(rtc, "t2")->method == "carve" && placement(rtc, "t2")->cell == Cell{1, 2} && rtc.cls[1 * 6 + 2] == Land && repairs(rtc, "carve") == 1 &&
+          checks_of(rtc, "footprint") == 1 && placement(rtc, "t2")->group == placement(rtc, "t1")->group,
+          "a town on a lake cell with no land within reach carves that cell to land (a recorded carve with a footprint host check) and joins the land around it");
+    Policy no_carve = no_snap; no_carve.town_carve = false;
+    check(placement(run(tc, no_carve), "t2")->method == "move", "without townCarve that town moves instead");
+    World tsea = map({"~~~~~~", "~~~~~~", "......"});
+    town(tsea, "t1", 2, 0); town(tsea, "t2", 0, 4);
+    check(placement(run(tsea, no_snap), "t2")->method == "move" && repairs(run(tsea, no_snap), "carve") == 0, "a sea cell is never carved: the town moves");
+
+    // Forced ports come only after a join failed. Two islands split by a two-cell ridge, the second with a kept village and no harbour:
+    // the ridge is carved (a join), and no forced port is laid.
+    World tj = map({"~~~~~~~~~~~~", "~....^^....~", "~....^^....~", "~~~~~~~~~~~~"});
+    town(tj, "t1", 1, 2); town(tj, "t2", 1, 9);
+    village(tj, "v1", "t1", 2, 2); village(tj, "v2", "t2", 2, 9); harbour(tj, "v1", "t1", 3, 2);
+    const Result rtj = run(tj, strict);
+    check(rtj.status == "ok" && repairs(rtj, "join") == 2 && repairs(rtj, "coast_port") == 0 && !port(rtj, "t2") && placement(rtj, "t2")->group == placement(rtj, "t1")->group,
+          "a town whose group can join a player-safe group through a pass gets the join, not a forced port");
+    Policy wide_ridge = strict; wide_ridge.max_access_cells = 1;
+    const Result rtw = run(tj, wide_ridge);
+    const Port* forced = port(rtw, "t2");
+    check(rtw.status == "ok" && repairs(rtw, "join") == 0 && repairs(rtw, "coast_port") == 1 && forced && forced->valid && forced->forced && forced->chosen.kind == "coast" &&
+          !port(rtw, "t1")->forced && placement(rtw, "t2")->method == "direct",
+          "when the ridge is too wide to join, the island town takes a forced port (marked forced) and stays where it is");
+    Identity pid; pid.world_sha256 = std::string(64, 'a'); pid.side = 257;
+    check(ports_document(tj.in, rtw, pid).find("\"forced\":true") != std::string::npos && ports_document(tj.in, rtj, pid).find("\"forced\"") == std::string::npos,
+          "ports.json marks a forced port \"forced\": true for MMR-252, and only that port");
+    Policy no_forced = wide_ridge; no_forced.forced_ports = false;
+    check(placement(run(tj, no_forced), "t2")->method == "move" && repairs(run(tj, no_forced), "coast_port") == 0, "without forcedPorts the island town moves instead");
+    // Two towns on one island that cannot join: one forced port serves the group (RT-43: as few as possible).
+    World tt = map({"~~~~~~~~~~~~~~~~", "~....~~~~~~....~", "~....~~~~~~....~", "~~~~~~~~~~~~~~~~"});
+    town(tt, "t1", 1, 2); town(tt, "t4", 2, 3); town(tt, "t5", 1, 4); town(tt, "t2", 1, 12); town(tt, "t3", 2, 14);
+    village(tt, "v1", "t1", 2, 2); village(tt, "v2", "t2", 2, 12); village(tt, "v3", "t3", 1, 14); harbour(tt, "v1", "t1", 3, 2);
+    const Result rtt = run(tt, strict);
+    check(rtt.status == "ok" && repairs(rtt, "coast_port") == 1 && placement(rtt, "t3")->group == placement(rtt, "t2")->group && rtt.groups[static_cast<std::size_t>(placement(rtt, "t3")->group)].safe,
+          "one forced port makes an island of two towns player-safe; the second town gets none");
+
+    // City preservation: sites = placed_cities = compiled towns = id-map towns = travel towns, one uid set.
+    source::SourceWorld world;
+    campaign::Compiled compiled;
+    for (const char* uid : {"uid-t1", "uid-t2"}) {
+        source::City c; c.uid = uid; world.cities.push_back(c);
+        campaign::Town t; t.uid = uid; compiled.towns.push_back(t);
+        compiled.id_map.push_back({std::string("id-") + uid, "town", uid});
+    }
+    world.metadata.founding_placed_cities = 2;
+    World pw = map(kTwoIslands);
+    town(pw, "t1", 1, 2); town(pw, "t2", 1, 12);
+    village(pw, "v1", "t1", 2, 2); village(pw, "v2", "t2", 2, 12);
+    harbour(pw, "v1", "t1", 3, 2); harbour(pw, "v2", "t2", 3, 12);
+    const Result rp = run(pw, strict);
+    bool kept = true;
+    try { check_preservation(world, compiled, rp); } catch (const std::exception&) { kept = false; }
+    check(kept, "a world whose every city is one town at every stage passes the city preservation assertion");
+    refused("a compiled town missing", "city_not_preserved", [&] { auto c = compiled; c.towns.pop_back(); check_preservation(world, c, rp); });
+    refused("an id-map town of another uid", "city_not_preserved", [&] { auto c = compiled; c.id_map.back().uid = "uid-other"; check_preservation(world, c, rp); });
+    refused("placed_cities differing from the sites", "city_not_preserved", [&] { auto w = world; w.metadata.founding_placed_cities = 3; check_preservation(w, compiled, rp); });
+    refused("a town without a cell in an accepted world", "city_not_preserved", [&] { auto r = rp; r.placements[1].cell = Cell{}; check_preservation(world, compiled, r); });
+}
+
+// The village quota (MMR-252) on small worlds: a hand-built campaign over a cell map, through analyze and village_quota.
+struct QuotaWorld {
+    World w;
+    campaign::Compiled c;
+    ids::Registry reg{"mnbl_0000a252"};
+    std::map<std::string, std::string> id;   // short name -> game id
+};
+campaign::ContentPolicy quota_content() {
+    campaign::ContentPolicy p;
+    p.hamlet_roles["farming"] = {"farming", {"field"}, false};
+    p.hamlet_roles["resource"] = {"resource", {"stone"}, false};
+    p.hamlet_roles["harbor"] = {"harbor", {"harbour"}, true};
+    return p;
+}
+QuotaWorld quota_world(const std::vector<std::string>& rows) {
+    QuotaWorld q;
+    q.w = map(rows);
+    q.c.prefix = "mnbl_0000a252";
+    campaign::Kingdom k; k.uid = "u-k1"; k.id = q.reg.assign("kingdom", k.uid); k.culture_uid = "cA"; k.presentation = "empire";
+    campaign::House l; l.uid = "u-l1"; l.id = q.reg.assign("clan", l.uid); l.kingdom_id = k.id;
+    campaign::Hero h; h.uid = "u-h0"; h.id = q.reg.assign("hero", h.uid); h.name = "Ruler"; h.role = "sovereign"; h.occupation = "Lord"; h.affiliation = "clan"; h.clan_id = l.id; h.kingdom_id = k.id; h.ruler = true;
+    k.ruling_house_id = l.id; k.ruler_id = h.id; l.leader_id = h.id; l.members = {h.id};
+    q.c.kingdoms.push_back(k); q.c.houses.push_back(l); q.c.heroes.push_back(h);
+    return q;
+}
+void q_town(QuotaWorld& q, const std::string& name, int r, int c, const std::string& culture = "cA", const std::string& presentation = "empire") {
+    campaign::Town t; t.uid = "u-" + name; t.id = q.reg.assign("town", t.uid); t.name = "Town " + name; t.culture_uid = culture; t.presentation = presentation;
+    t.kingdom_id = q.c.kingdoms[0].id; t.owner_clan_id = q.c.houses[0].id;
+    if (q.c.kingdoms[0].capital_id.empty()) { q.c.kingdoms[0].capital_id = t.id; q.c.houses[0].home_id = t.id; }
+    q.c.kingdoms[0].towns.push_back(t.id); q.c.houses[0].fiefs.push_back(t.id);
+    q.c.towns.push_back(t);
+    q.id[name] = t.id;
+    q.w.in.settlements.push_back({t.id, t.uid, "town", "", at(r, c)});
+}
+void q_castle(QuotaWorld& q, const std::string& name, const std::string& garrison, int r, int c) {
+    campaign::Castle k; k.uid = "u-" + name; k.id = q.reg.assign("castle", k.uid); k.name = "Castle " + name; k.kingdom_id = q.c.kingdoms[0].id; k.owner_clan_id = q.c.houses[0].id;
+    k.garrison_town_id = q.id.at(garrison); k.culture_uid = "cA";
+    q.c.kingdoms[0].castles.push_back(k.id); q.c.houses[0].fiefs.push_back(k.id);
+    for (auto& t : q.c.towns) if (t.id == k.garrison_town_id) t.castles.push_back(k.id);
+    q.c.castles.push_back(k);
+    q.id[name] = k.id;
+    q.w.in.settlements.push_back({k.id, k.uid, "castle", "", at(r, c)});
+}
+void q_village(QuotaWorld& q, const std::string& name, const std::string& town, const std::string& production, int r, int c, int hr = -1, int hc = -1, const std::string& culture = "cA") {
+    campaign::Village v; v.uid = "u-" + name; v.id = q.reg.assign("village", v.uid); v.name = "Village " + name; v.bound_id = q.id.at(town); v.source_town = v.bound_id;
+    v.production = production; v.role = production == "harbor" ? "harbor" : production; v.harbour = hr >= 0; v.culture_uid = culture;
+    v.slots = {{"villageType", "pending", "MMR-33", production}, {"hearth", "pending", "MMR-33", ""}, {"position", "pending", "MMR-28", ""}};
+    if (hr >= 0) v.sea_node = static_cast<std::int64_t>(q.c.villages.size());
+    for (auto& t : q.c.towns) if (t.id == v.bound_id) t.villages.push_back(v.id);
+    q.c.villages.push_back(v);
+    q.id[name] = v.id;
+    q.w.in.settlements.push_back({v.id, v.uid, "village", v.bound_id, at(r, c)});
+    if (hr >= 0) {
+        q.w.in.harbours.push_back({v.id, v.uid, v.bound_id, *v.sea_node, at(hr, hc), 0.5});
+        auto port = std::find_if(q.c.ports.begin(), q.c.ports.end(), [&](const campaign::Port& p) { return p.town_id == v.bound_id; });
+        if (port == q.c.ports.end()) { campaign::Port p; p.town_id = v.bound_id; q.c.ports.push_back(p); port = q.c.ports.end() - 1; for (auto& t : q.c.towns) if (t.id == v.bound_id) t.port = true; }
+        port->village_ids.push_back(v.id);
+    }
+}
+void q_notable(QuotaWorld& q, const std::string& name, const std::string& village) {
+    campaign::Hero h; h.uid = "u-" + name; h.id = q.reg.assign("hero", h.uid); h.name = "Reeve " + name; h.role = "reeve"; h.occupation = "RuralNotable"; h.affiliation = "settlement";
+    h.settlement_id = q.id.at(village); h.settlement_kind = "village"; h.kingdom_id = q.c.kingdoms[0].id;
+    q.c.heroes.push_back(h);
+}
+// The pass-1 analysis, the campaign exclusions and port records as travel::run applies them, then the quota.
+Result quota_run(QuotaWorld& q, const Policy& p) {
+    q.c.id_map = q.reg.entries();
+    Result r = analyze_cells(q.w.in, p, q.w.cls);
+    for (const auto& e : r.exclusions) campaign::exclude(q.c, e.id, e.reason);
+    std::set<std::string> valid;
+    for (const auto& port : r.ports) if (port.valid) valid.insert(port.town_id);
+    for (auto it = q.c.ports.begin(); it != q.c.ports.end();) { if (!valid.count(it->town_id)) it = q.c.ports.erase(it); else ++it; }
+    for (const auto& port : r.ports)
+        if (port.valid && port.forced && std::none_of(q.c.ports.begin(), q.c.ports.end(), [&](const campaign::Port& x) { return x.town_id == port.town_id; })) {
+            campaign::Port record; record.town_id = port.town_id; record.forced = true; q.c.ports.push_back(record);
+            for (auto& t : q.c.towns) if (t.id == port.town_id) t.port = true;
+        }
+    if (r.status == "ok") village_quota(q.c, q.w.in, r, p, quota_content());
+    return r;
+}
+bool closure_free(const campaign::Compiled& c) { return campaign::closure_problems(c).empty(); }
+int bound_count(const campaign::Compiled& c, const std::string& fort) { int n = 0; for (const auto& v : c.villages) n += v.bound_id == fort; return n; }
+const campaign::Village* village_of(const campaign::Compiled& c, const std::string& id) { for (const auto& v : c.villages) if (v.id == id) return &v; return nullptr; }
+// r4: no kept village within the clearance of a fortification (exceptions aside), no two kept settlements on one point.
+bool clear_of_forts(const Result& r, const campaign::Compiled& c, double clearance, double width) {
+    std::set<std::string> excluded_ids, excepted;
+    for (const auto& e : r.exclusions) excluded_ids.insert(e.id);
+    if (c.quota) for (const auto& e : c.quota->exceptions) excepted.insert(e.village);
+    auto d = [&](Point a, Point b) { double dx = std::abs(a.x - b.x); dx = std::min(dx, width - dx); return std::hypot(dx, a.y - b.y); };
+    std::vector<const Placement*> kept;
+    for (const auto& pl : r.placements) if (pl.cell.valid() && !excluded_ids.count(pl.id)) kept.push_back(&pl);
+    for (const auto* a : kept)
+        for (const auto* b : kept) {
+            if (a == b) continue;
+            if (d(a->point, b->point) < 1e-9) return false;
+            if (a->kind == "village" && b->kind != "village" && d(a->point, b->point) < clearance && !excepted.count(a->id)) return false;
+        }
+    return true;
+}
+
+void quota_tests(const Policy& strict) {
+    const std::vector<std::string> rows = {
+        "~~~~~~~~~~~~~~~~~~~~~~~~",
+        "~......................~",
+        "~......................~",
+        "~......................~",
+        "~......................~",
+        "~......................~",
+        "~......................~",
+        "~~~~~~~~~~~~~~~~~~~~~~~~"};
+    auto build = [&]() {
+        QuotaWorld q = quota_world(rows);
+        q_town(q, "t1", 2, 4); q_town(q, "t2", 2, 18); q_castle(q, "k1", "t1", 2, 10);
+        q_village(q, "v1", "t1", "harbor", 6, 4, 7, 4);     // the port's harbour village (pinned)
+        q_village(q, "v2", "t1", "harbor", 6, 5, 7, 5);     // one more harbour village
+        q_village(q, "v3", "t1", "harbor", 6, 2, 7, 2);     // a third: beyond the harbour cap
+        q_village(q, "v4", "t1", "farming", 1, 1);           // the farthest: dropped
+        q_village(q, "v5", "t1", "farming", 2, 4);           // on the town's own point: moves clear
+        q_village(q, "v6", "t1", "resource", 1, 7);
+        q_village(q, "v7", "t1", "farming", 1, 9);
+        q_village(q, "w1", "t2", "farming", 4, 19);
+        q_notable(q, "n4", "v4");
+        return q;
+    };
+    QuotaWorld q = build();
+    const Result r = quota_run(q, strict);
+    const double width = q.w.in.grid.cols * q.w.in.grid.spacing;
+    const auto& quota = *q.c.quota;
+    check(r.status == "ok" && bound_count(q.c, q.id["t1"]) == 3 && bound_count(q.c, q.id["t2"]) == 3 && bound_count(q.c, q.id["k1"]) == 2 &&
+          quota.passes == 2 && quota.stable && closure_free(q.c),
+          "every town has exactly 3 and the castle exactly 2 bound villages, the records stay closed and the second analysis is stable");
+    const auto* v1 = village_of(q.c, q.id["v1"]);
+    const auto* t1port = std::find_if(q.c.ports.begin(), q.c.ports.end(), [&](const campaign::Port& p) { return p.town_id == q.id["t1"]; }).operator->();
+    check(v1 && v1->pinned && v1->bound_id == q.id["t1"] && t1port->village_ids.front() == v1->id && port(r, q.id["t1"])->valid,
+          "the port's chosen harbour village is pinned to its town and leads its port record; the port survives");
+    check(village_of(q.c, q.id["v2"])->bound_id == q.id["t1"] && village_of(q.c, q.id["v5"])->bound_id == q.id["t1"] && !village_of(q.c, q.id["v4"]) &&
+          excluded(r, q.id["v4"], "quota:"),
+          "the town keeps its pinned village, one more harbour village and its nearest land village of a new class; its farthest is dropped with a quota: exclusion");
+    const auto* v7 = village_of(q.c, q.id["v7"]);
+    const auto* v6 = village_of(q.c, q.id["v6"]);
+    check(v7 && v6 && v7->bound_id == q.id["k1"] && v6->bound_id == q.id["k1"] && v7->bound_kind == "castle" && v7->origin == "reassigned" && v7->source_town == q.id["t1"],
+          "the castle takes its garrison town's two nearest remaining villages (boundKind castle, origin reassigned, sourceTown the town)");
+    int synth = 0; bool synth_ok = true;
+    for (const auto& v : q.c.villages)
+        if (v.origin == "synthesized") {
+            ++synth;
+            const auto* pl = placement(r, v.id);
+            const auto* t2 = placement(r, q.id["t2"]);
+            const double d = std::hypot(pl->point.x - t2->point.x, pl->point.y - t2->point.y);
+            synth_ok &= v.bound_id == q.id["t2"] && v.source_town == q.id["t2"] && v.uid.rfind(strict.villages.uid_prefix + "u-t2:", 0) == 0 && v.tier == "preferred" &&
+                        v.production == "farming" && !v.harbour && pl->method == "synthesized" && d >= 4 && d >= 0.12 * quota.spacing && d <= 0.35 * quota.spacing &&
+                        std::any_of(q.c.id_map.begin(), q.c.id_map.end(), [&](const ids::Entry& e) { return e.id == v.id && e.kind == "village"; });
+        }
+    check(synth == 2 && synth_ok && quota.synthesized == 2,
+          "the short town gets two synthesized villages: uid prefix + town uid, in the preferred tier of the town spacing, clear of every fortification, of the largest-deficit class (farming), with id-map entries");
+    const Placement* v5 = placement(r, q.id["v5"]);
+    check(v5->point.x != at(2, 4).x || v5->point.y != at(2, 4).y, "the village on the town's point moves");
+    check(clear_of_forts(r, q.c, strict.villages.clearance, width) && quota.exceptions.empty() && repairs(r, "clearance") >= 1 && quota.clearance_moves >= 1 && r.collisions.empty(),
+          "no village sits within 4 units of a fortification and no two settlements share a point; the move is a recorded clearance repair (RT-13)");
+    bool moved = !quota.moved.empty();
+    for (const auto& h : q.c.heroes) if (h.uid == "u-n4") moved &= h.settlement_kind == "village" && village_of(q.c, h.settlement_id) && village_of(q.c, h.settlement_id)->bound_id == q.id["t1"];
+    check(moved, "the notable of the dropped village moves to a kept village of the same town, recorded in movedNotables (RT-11)");
+    const std::string doc = campaign::records_document(q.c, quota_content(), campaign::CulturePolicy{});
+    check(doc.find("\"version\":2") != std::string::npos && doc.find("\"villageQuota\":{") != std::string::npos && doc.find("\"sourceTown\":") != std::string::npos &&
+          doc.find("\"origin\":\"synthesized\"") != std::string::npos && doc.find("\"boundKind\":\"castle\"") != std::string::npos && doc.find("\"pinned\":true") != std::string::npos,
+          "campaign.json v2 records boundKind, sourceTown, origin, pinned and the villageQuota block");
+    // Determinism: the same world twice gives the same records and travel graph.
+    QuotaWorld again = build();
+    const Result r2 = quota_run(again, strict);
+    Identity qid; qid.world_sha256 = std::string(64, 'a'); qid.side = 257;
+    check(campaign::records_document(again.c, quota_content(), campaign::CulturePolicy{}) == doc && graph_document(again.w.in, r2, qid) == graph_document(q.w.in, r, qid),
+          "the quota is deterministic: two runs give byte-identical campaign records and travel graphs");
+    bool zero = false;
+    for (const auto& t : q.c.towns) zero |= bound_count(q.c, t.id) == 0;
+    for (const auto& k : q.c.castles) zero |= bound_count(q.c, k.id) == 0;
+    check(!zero, "no fortification has 0 villages (RT-31)");
+
+    // RT-09: a presentation culture's last farming village is never dropped. A town of another culture with a pinned and an extra harbour
+    // village and two resource villages nearer than its only farming village keeps that farming village in place of its farthest.
+    QuotaWorld p = quota_world(rows);
+    q_town(p, "t1", 2, 4); q_town(p, "t3", 2, 18, "cB", "battania");
+    q_village(p, "a1", "t1", "farming", 2, 3); q_village(p, "a2", "t1", "farming", 4, 6); q_village(p, "a3", "t1", "resource", 2, 6);
+    q_village(p, "h1", "t3", "harbor", 6, 18, 7, 18, "cB"); q_village(p, "h2", "t3", "harbor", 6, 19, 7, 19, "cB");
+    q_village(p, "r1", "t3", "resource", 4, 18, -1, -1, "cB"); q_village(p, "f1", "t3", "farming", 1, 21, -1, -1, "cB");
+    const Result rp = quota_run(p, strict);
+    check(rp.status == "ok" && village_of(p.c, p.id["f1"]) && village_of(p.c, p.id["f1"])->bound_id == p.id["t3"] && p.c.quota->protected_kept == 1 && bound_count(p.c, p.id["t3"]) == 3,
+          "a culture's last farming village (horse ranches and wheat farms, RT-09) is kept in place of its town's farthest unprotected village");
+
+    // RT-12: a forced-port town gets a synthesized harbour village, pinned, on the coast within two cells of its port cell; its port record
+    // and ports.json name it.
+    Policy wide_ridge = strict; wide_ridge.max_access_cells = 1;
+    QuotaWorld f = quota_world({"~~~~~~~~~~~~", "~....^^....~", "~....^^....~", "~~~~~~~~~~~~"});
+    q_town(f, "t1", 1, 2); q_town(f, "t2", 1, 9);
+    q_village(f, "v1", "t1", "harbor", 2, 2, 3, 2); q_village(f, "v2", "t2", "farming", 2, 9);
+    const Result rf = quota_run(f, wide_ridge);
+    const Port* fp = port(rf, f.id["t2"]);
+    const campaign::Village* harbour = nullptr;
+    for (const auto& v : f.c.villages) if (v.origin == "synthesized" && v.harbour && v.bound_id == f.id["t2"]) harbour = &v;
+    const auto record = std::find_if(f.c.ports.begin(), f.c.ports.end(), [&](const campaign::Port& x) { return x.town_id == f.id["t2"]; });
+    bool near_port = false;
+    if (harbour && fp) { const auto* pl = placement(rf, harbour->id); near_port = std::hypot(pl->point.x - (fp->chosen.sea_cell.col + 0.5) * kSpacing, pl->point.y - (fp->chosen.sea_cell.row + 0.5) * kSpacing) <= 2 * kSpacing; }
+    check(rf.status == "ok" && fp && fp->forced && harbour && harbour->pinned && harbour->role == "harbor" && near_port && record != f.c.ports.end() && record->village_ids == std::vector<std::string>{harbour->id} &&
+          fp->chosen.village_id == harbour->id && fp->chosen.harbour_cell == fp->chosen.sea_cell && bound_count(f.c, f.id["t2"]) == 3 && f.c.quota->stable &&
+          ports_document(f.w.in, rf, qid).find("\"village\":\"" + harbour->id + "\"") != std::string::npos,
+          "a forced-port town gets a pinned, synthesized harbour village within two cells of its port cell, named by its port record and ports.json (RT-12)");
+}
+// The road network (MMR-253): route pieces cut at crossings without a deck, decks kept, feeders on land travel cells and decks only,
+// seam and pole safety, castles to their garrison town, road-less towns, maxCells, the summary and determinism.
+bool edge_path(int cols, const std::vector<Cell>& path) {
+    for (std::size_t k = 0; k + 1 < path.size(); ++k) {
+        int dc = std::abs(path[k].col - path[k + 1].col);
+        dc = std::min(dc, cols - dc);
+        if (dc + std::abs(path[k].row - path[k + 1].row) != 1) return false;
+    }
+    return !path.empty();
+}
+const RoadResult* feeder_of(const Result& r, const std::string& id) { for (const auto& x : r.roads) if (x.kind == "feeder" && x.settlement == id) return &x; return nullptr; }
+bool on_road(const Result& r, int cols, int row, int col) { return r.road[static_cast<std::size_t>(row) * cols + col] != 0; }
+// The kept settlements on a road cell that are not the gate end (at their placement point) of a piece leaving their cell over land
+// (MMR-247-R, acc4 c6: a drawn road reaches every gate); empty when all are. Settlements off every road are unconnected or islets.
+std::string gates_unreached(const Result& r, int cols) {
+    std::set<std::string> gone;
+    for (const auto& e : r.exclusions) gone.insert(e.id);
+    auto land = [&](Cell c) { return r.cls[static_cast<std::size_t>(c.row) * cols + c.col] == Land; };
+    std::string missing;
+    for (const auto& pl : r.placements) {
+        if (gone.count(pl.id) || !pl.cell.valid() || !on_road(r, cols, pl.cell.row, pl.cell.col)) continue;
+        bool reached = false;
+        auto at_gate = [&](const RoadEnd& e, Cell next) { return e.kind == "gate" && e.settlement == pl.id && e.cell == pl.cell && e.point.x == pl.point.x && e.point.y == pl.point.y && land(next); };
+        for (const auto& x : r.roads)
+            for (const auto& p : x.pieces)
+                if (p.path.size() >= 2) reached = reached || at_gate(p.start, p.path[1]) || at_gate(p.end, p.path[p.path.size() - 2]);
+        if (!reached) missing += " " + pl.id;
+    }
+    return missing;
+}
+
+void road_network_tests(const Policy& strict) {
+    // An undecked river crossing (one land component on both sides): the route stops at both banks; the village across the river from its
+    // town's piece goes round by land and never over the river.
+    World a = map({std::string(24, '~'), "~....R" + std::string(17, '.') + "~", "~....R" + std::string(17, '.') + "~", "~" + std::string(22, '.') + "~", std::string(24, '~')});
+    town(a, "t1", 1, 1); town(a, "t2", 1, 10); village(a, "v1", "t1", 2, 7); village(a, "v2", "t2", 3, 10);
+    road(a, "t1", "t2", {{{1, 1}, {1, 10}}});
+    Result ra = run(a, strict);
+    lay_roads(a.in, ra, strict, {});
+    const auto& route = ra.roads[0];
+    const RoadResult* fa = feeder_of(ra, "v1");
+    bool land_only = fa != nullptr;
+    if (fa) for (const auto& c : fa->path) land_only = land_only && a.cls[static_cast<std::size_t>(a.in.grid.cols * c.row + c.col)] == Land;
+    check(ra.status == "ok" && route.kind == "route" && route.pieces.size() == 2 && route.decks.empty() && route.pieces[0].start.kind == "gate" && route.pieces[0].start.settlement == "t1" &&
+          route.pieces[0].end.kind == "bank" && route.pieces[0].end.water == Cell{1, 5} && route.pieces[0].end.point.x == 5 * kSpacing && route.pieces[1].start.kind == "bank" &&
+          route.pieces[1].end.kind == "gate" && route.pieces[1].end.settlement == "t2" && !on_road(ra, 24, 1, 5) && route.path.size() == 10,
+          "a route stops at the bank of a crossing without a deck, on both sides, with the bank edge and its water cell (RT-17)");
+    check(fa && land_only && edge_path(24, fa->path) && fa->path.size() >= 6 && fa->to_id == "t1" && fa->pieces[0].start.kind == "gate" && fa->pieces[0].end.kind == "junction" &&
+          fa->pieces[0].end.road == 0 && ra.network.water_without_deck == 0 && ra.network.connected.at("village").first == 2 && ra.network.unconnected.empty(),
+          "the village's feeder goes round the river by land to its town's piece; no road cell is on water without a deck");
+
+    // A decked crossing (two land components joined by the route's bridge): the deck stays on the piece; a feeder from the far side reaches
+    // its town over the route, and the deck is entered only along the route.
+    World b = map({std::string(22, '~'), "~....R" + std::string(15, '.') + "~", "~....R" + std::string(15, '.') + "~", std::string(22, '~')});
+    town(b, "t1", 1, 1); town(b, "t2", 1, 9); village(b, "v1", "t1", 2, 8); castle(b, "k1", 2, 2); village(b, "v2", "k1", 2, 3);
+    road(b, "t1", "t2", {{{1, 1}, {1, 9}}});
+    Result rb = run(b, strict);
+    lay_roads(b.in, rb, strict, {{"k1", "t2"}});
+    const RoadResult* fk = feeder_of(rb, "k1");
+    bool via_deck = true;
+    for (const auto& x : rb.roads) if (x.kind == "feeder") for (const auto& c : x.path) via_deck = via_deck && (b.cls[static_cast<std::size_t>(b.in.grid.cols * c.row + c.col)] == Land || c == Cell{1, 5});
+    check(rb.status == "ok" && rb.roads[0].pieces.size() == 1 && rb.roads[0].decks == std::vector<Cell>{{1, 5}} && on_road(rb, 22, 1, 5) && !on_road(rb, 22, 2, 5) && via_deck &&
+          rb.network.deck_cells == 1 && rb.network.water_without_deck == 0 && fk && fk->to_id == "t2" && feeder_of(rb, "v2") && feeder_of(rb, "v2")->to_id == "k1" &&
+          rb.network.connected.at("castle").first == 1 && rb.network.connected.at("village").first == 2,
+          "a joining crossing's deck stays on the route; feeders cross water only there, the castle reaches its garrison town and its village the castle");
+
+    // Seam: a feeder takes the short way across the wrapped columns. Road-less town: the nearest town of its land group.
+    World c = map({"~~~~~~~~~~~~", "............", "............", "~~~~~~~~~~~~"});
+    town(c, "t1", 1, 1); town(c, "t2", 2, 4); village(c, "v1", "t1", 2, 10); village(c, "v2", "t2", 1, 5);
+    Result rc = run(c, strict);
+    lay_roads(c.in, rc, strict, {});
+    const RoadResult* fc = feeder_of(rc, "v1");
+    bool seam = false;
+    if (fc) for (std::size_t k = 0; k + 1 < fc->path.size(); ++k) seam |= std::abs(fc->path[k].col - fc->path[k + 1].col) == 11;
+    check(rc.status == "ok" && fc && seam && fc->path.size() <= 5 && edge_path(12, fc->path) && feeder_of(rc, "t1") && !feeder_of(rc, "t2") &&
+          feeder_of(rc, "t1")->pieces[0].end.kind == "gate" && feeder_of(rc, "t1")->to_id == "t2" && rc.network.connected.at("town").first == 2,
+          "a feeder crosses the seam the short way; the first road-less town feeds to the nearest town and the second is then on the network");
+
+    // Pole: a route through a pole passage is two pieces with pole ends; maxCells: a village beyond it is recorded unconnected.
+    World d = map({"............", "............", "~~~~~~~~~~~~", "............"});
+    town(d, "t1", 0, 1); town(d, "t2", 0, 8); village(d, "v1", "t1", 1, 5); village(d, "v2", "t2", 1, 8);
+    road(d, "t1", "t2", {{{0, 1}, {0, 3}}, {{0, 6}, {0, 8}}});
+    Result rd = run(d, strict);
+    Policy tight = strict; tight.roads.feeder_max_cells = 2;
+    lay_roads(d.in, rd, tight, {});
+    check(rd.roads[0].pieces.size() == 2 && rd.roads[0].pieces[0].end.kind == "pole" && rd.roads[0].pieces[1].start.kind == "pole" && rd.roads[0].pieces[0].end.cell == Cell{0, 3} &&
+          !on_road(rd, 12, 0, 4) && !feeder_of(rd, "v1") && feeder_of(rd, "v2") && !rd.network.unconnected.empty() && rd.network.unconnected[0].id == "v1" &&
+          rd.network.connected.at("village").first == 1,
+          "a pole passage cuts a route into pieces with pole ends; a village beyond feeders.maxCells is recorded unconnected");
+
+    // An islet: a town and its village on one cell, no road in their land group, have no network to join and count as connected.
+    World e = map({"~~~~~~~~~~", "~.~~~~~..~", "~~~~~~~~~~"});
+    town(e, "t1", 1, 1); town(e, "t3", 1, 1); village(e, "v1", "t1", 1, 1); town(e, "t2", 1, 8); village(e, "v2", "t2", 1, 7);
+    Result re = run(e, strict);
+    lay_roads(e.in, re, strict, {});
+    check(re.network.connected.at("town").first == 3 && re.network.connected.at("village").first == 2 && placement(re, "t1")->method == "direct" && re.network.unconnected.empty() && !on_road(re, 10, 1, 1) && feeder_of(re, "v2"),
+          "an islet (two towns and a village on one cell, the main group) counts as connected without a road; the other town's village feeds to it");
+
+    // Gate spurs (MMR-247-R, acc4 c6): a village, a castle and a town on a route cell no piece ends at, and a village on its town's route-end
+    // cell, each get a two-cell feeder from the gate to the land road cell beside it nearest the gate; no road cell is added. The village's
+    // gate sits east of its cell centre, so its spur turns east. A village off the road keeps its ordinary feeder and gets no spur.
+    World f = map({std::string(24, '~'), "~" + std::string(22, '.') + "~", "~" + std::string(22, '.') + "~", std::string(24, '~')});
+    town(f, "t1", 1, 1); town(f, "t2", 1, 10); town(f, "t3", 1, 8); castle(f, "k1", 1, 7); village(f, "v2", "t1", 1, 1); village(f, "v3", "t2", 2, 9);
+    f.in.settlements.push_back({"v1", "uid-v1", "village", "t1", Point{4.75 * kSpacing, 1.75 * kSpacing}});
+    road(f, "t1", "t2", {{{1, 1}, {1, 10}}});
+    Result rf = run(f, strict);
+    lay_roads(f.in, rf, strict, {{"k1", "t2"}});
+    const std::size_t laid = rf.network.cells, feeder_only = rf.network.feeder_only_cells, feeders = rf.network.feeders;
+    lay_roads(f.in, rf, strict, {{"k1", "t2"}});
+    auto spur = [&](const std::string& id, Cell to, const std::string& end_kind, const std::string& to_id) {
+        const RoadResult* x = feeder_of(rf, id);
+        const Placement* pl = placement(rf, id);
+        return x && pl && x->pieces.size() == 1 && x->pieces[0].path.size() == 2 && x->pieces[0].path[0] == pl->cell && x->pieces[0].path[1] == to &&
+               x->pieces[0].start.kind == "gate" && x->pieces[0].start.point.x == pl->point.x && x->pieces[0].start.point.y == pl->point.y && x->pieces[0].end.kind == end_kind &&
+               (end_kind != "junction" || (x->pieces[0].end.road == 0 && x->pieces[0].end.point.x == (to.col + 0.5) * kSpacing)) && x->to_id == to_id;
+    };
+    check(rf.status == "ok" && placement(rf, "v1")->cell == Cell{1, 4} && placement(rf, "v1")->point.x == 4.75 * kSpacing && spur("v1", {1, 5}, "junction", "t1") &&
+          spur("k1", {1, 6}, "junction", "t2") && spur("t3", {1, 7}, "junction", "t1") && spur("v2", {1, 2}, "junction", "t1") &&
+          feeder_of(rf, "v3") && feeder_of(rf, "v3")->pieces[0].path.size() == 2 && feeder_of(rf, "v3")->pieces[0].path[1] == Cell{1, 9} && rf.network.feeders == 5,
+          "a village, a castle and a town on a route cell, and a village on its town's cell, get a gate spur to the land road cell beside them nearest the gate (the off-centre gate turns east; ties to the lower cell)");
+    check(laid == rf.network.cells && feeder_only == rf.network.feeder_only_cells && feeders == rf.network.feeders && rf.network.cells == 11 && rf.network.feeder_only_cells == 1 && rf.network.unconnected.empty(),
+          "gate spurs add no road cell (11 road cells, 1 feeder-only cell), and laying the roads again replaces them");
+    // A town whose only route leaves its cell over a deck (the decals stop at the bank) gets a spur to the land road cell beside it, here another
+    // route's end cell, so the spur ends at that town's gate.
+    World g = map({std::string(13, '~'), "~....R......~", "~....R......~", std::string(13, '~')});
+    town(g, "t1", 1, 1); town(g, "t2", 1, 6); town(g, "t3", 2, 10); town(g, "t4", 2, 6);
+    road(g, "t1", "t2", {{{1, 1}, {1, 6}}}); road(g, "t3", "t4", {{{2, 10}, {2, 6}}});
+    Result rg = run(g, strict);
+    lay_roads(g.in, rg, strict, {});
+    const RoadResult* fg = feeder_of(rg, "t2");
+    check(rg.status == "ok" && rg.roads[0].decks == std::vector<Cell>{{1, 5}} && fg && fg->pieces[0].path.size() == 2 && fg->pieces[0].path[1] == Cell{2, 6} &&
+          fg->pieces[0].end.kind == "gate" && fg->pieces[0].end.settlement == "t4" && fg->to_id == "t4" && !feeder_of(rg, "t1") && !feeder_of(rg, "t3") && !feeder_of(rg, "t4"),
+          "a town whose route leaves its cell over a deck gets a gate spur to the land road cell beside it (another route's end, so it ends at that town's gate)");
+    check(gates_unreached(ra, 24).empty() && gates_unreached(rb, 22).empty() && gates_unreached(rc, 12).empty() && gates_unreached(rd, 12).empty() && gates_unreached(re, 10).empty() &&
+          gates_unreached(rf, 24).empty() && gates_unreached(rg, 13).empty(),
+          "every kept settlement on a road cell is the gate end, at its placement point, of a piece that leaves its cell over land (a drawn road reaches every gate)" +
+          gates_unreached(ra, 24) + gates_unreached(rb, 22) + gates_unreached(rc, 12) + gates_unreached(rd, 12) + gates_unreached(re, 10) + gates_unreached(rf, 24) + gates_unreached(rg, 13));
+
+    // Determinism, and the graph document carries pieces, ends and the network.
+    Result ra2 = run(a, strict);
+    lay_roads(a.in, ra2, strict, {});
+    lay_roads(a.in, ra2, strict, {});
+    Identity id; id.world_sha256 = std::string(64, 'a'); id.side = 257;
+    const std::string doc = graph_document(a.in, ra, id);
+    check(doc == graph_document(a.in, ra2, id) && ra2.road == ra.road && doc.find("\"roadNetwork\":") != std::string::npos && doc.find("\"kind\":\"bank\"") != std::string::npos &&
+          doc.find("\"water\":[1,5]") != std::string::npos && doc.find("\"roadCells\":") != std::string::npos && doc.find("\"kind\":\"feeder\"") != std::string::npos,
+          "road cells are deterministic and laying them again replaces the feeders; the document carries the pieces, their ends and the network");
+}
+
+// MMR-254: land face types from the shared table (corner majority, water excluded, main-diagonal ties, permanent white, the default), their
+// counts and host checks, and the cells.bin v2 planes.
+void land_type_tests(const Policy& strict) {
+    const auto& faces = strict.calibration.face_groups;
+    const int plain = faces.at("Plain"), desert = faces.at("Desert"), forest = faces.at("Forest"), steppe = faces.at("Steppe"), snow = faces.at("Snow"), swamp = faces.at("Swamp");
+    World w = map({"....", "...."});
+    auto set = [&](int r, int c, int biome, bool white = false) { const auto i = w.in.grid.sample(r, c); w.in.grid.biome[i] = static_cast<std::uint8_t>(biome); w.in.grid.white[i] = white ? 1 : 0; };
+    auto type = [&](int r, int c) { return land_types(w.in, strict, w.cls)[static_cast<std::size_t>(r) * 4 + c]; };
+    check(type(0, 0) == plain, "a grassland cell is Plain (the shared table)");
+    set(0, 0, 2); set(0, 1, 2); set(1, 0, 2); set(1, 1, 2);
+    check(type(0, 0) == desert, "four desert corners give a Desert face");
+    set(0, 0, 4); set(1, 1, 4); set(0, 1, 4);
+    check(type(0, 0) == forest, "three forest corners against one desert give Forest (majority)");
+    set(0, 0, 2); set(1, 1, 2); set(0, 1, 15); set(1, 0, 4);
+    check(type(0, 0) == desert, "two desert corners on the main diagonal against two forest corners off it: the main diagonal wins the tie");
+    set(0, 0, 0); set(1, 1, 8); set(0, 1, 13); set(1, 0, 2);
+    check(type(0, 0) == swamp, "water corners do not vote; a tie between the off-diagonal corners goes to the NE one (marsh: Swamp)");
+    set(0, 0, 4); set(1, 1, 0); set(0, 1, 0); set(1, 0, 0);
+    check(type(0, 0) == forest, "one land corner among three water corners decides alone");
+    set(0, 0, 0);
+    check(type(0, 0) == plain, "a land cell whose corners are all water biomes takes the default face");
+    set(0, 0, 16); set(1, 1, 16); set(0, 1, 16); set(1, 0, 16);
+    check(type(0, 0) == steppe, "cold tundra is Steppe where its snow melts");
+    set(0, 0, 16, true); set(1, 1, 16, true); set(0, 1, 16, true);
+    check(type(0, 0) == snow, "cold tundra is Snow in the permanent-white mask (12 snow months)");
+    set(0, 0, 17); set(1, 1, 17); set(0, 1, 17, true); set(1, 0, 17, true);
+    check(type(0, 0) == snow, "land ice is Snow");
+    // The seam: cell (0, 3) reads column 0 as its east corners.
+    w = map({"....", "...."});
+    set(0, 0, 4); set(1, 0, 4); set(0, 3, 2); set(1, 3, 4);
+    check(type(0, 3) == forest && type(0, 0) == forest, "the seam cell's east corners are column 0's samples (columns wrap)");
+    w.cls[1] = Mountain;
+    check(land_types(w.in, strict, w.cls)[1] == 0, "a cell that is not land has no land type");
+    refused("a corner biome the world's catalogue does not name", "unmapped_category", [&] { World x = map({"....", "...."}); x.in.grid.biome[0] = 99; land_types(x.in, strict, x.cls); });
+    refused("a grid without biome samples", "grid_mismatch", [&] { World x = map({"....", "...."}); x.in.grid.biome.clear(); land_types(x.in, strict, x.cls); });
+
+    // A world: counts, host checks naming the touching cells' types, and the cells.bin v2 planes.
+    World a = map({"~~~~~~~~", "~......~", "~......~", "~~~~~~~~"});
+    for (int r = 0; r <= 4; ++r) for (int c = 4; c < 8; ++c) a.in.grid.biome[a.in.grid.sample(r, c)] = 2;
+    town(a, "t1", 1, 1); town(a, "t2", 1, 6); village(a, "v1", "t1", 2, 2);
+    road(a, "t1", "t2", {{{1, 1}, {1, 2}, {1, 3}, {1, 4}, {1, 5}, {1, 6}}});
+    Result r = run(a, strict);
+    lay_roads(a.in, r, strict, {});
+    std::size_t land = 0; for (auto k : a.cls) land += k == Land;
+    const std::size_t plains = r.land_type_counts.count("Plain") ? r.land_type_counts.at("Plain") : 0, deserts = r.land_type_counts.count("Desert") ? r.land_type_counts.at("Desert") : 0;
+    check(r.status == "ok" && plains + deserts == land && deserts > 0 && plains > 0, "per-type counts cover every land cell (" + std::to_string(plains) + " Plain, " + std::to_string(deserts) + " Desert)");
+    auto expected = [&](const std::string& check_name, const std::string& subject) { for (const auto& h : r.host_checks) if (h.check == check_name && h.subject == subject) return h.expected; return std::string(); };
+    check(expected("gateFace", "t1").find("(Plain)") != std::string::npos && expected("gateFace", "t2").find("(Desert)") != std::string::npos && expected("settlementFace", "v1").find("(Plain)") != std::string::npos,
+          "gate and settlement host checks name the land types of the cells touching the point");
+    const std::string bytes = cells_bytes(a.in, r);
+    const std::size_t n = 32;
+    bool planes = bytes.size() == 16 + 4 * n;
+    for (std::size_t i = 0; planes && i < n; ++i)
+        planes = static_cast<std::uint8_t>(bytes[16 + i]) == r.cls[i] && static_cast<std::uint8_t>(bytes[16 + n + i]) == r.open_sea[i] && static_cast<std::uint8_t>(bytes[16 + 2 * n + i]) == r.land_type[i] &&
+                 static_cast<std::uint8_t>(bytes[16 + 3 * n + i]) == (r.road[i] ? 1 : 0) && (r.land_type[i] != 0) == (r.cls[i] == Land);
+    std::size_t roads = 0; for (std::size_t i = 0; i < n; ++i) roads += bytes[16 + 3 * n + i] == 1;
+    check(planes && roads == r.network.cells && roads >= 6, "cells.bin v2: class, OpenSea, land type (exactly on land cells) and the road bit (" + std::to_string(roads) + " road cells, the network's count)");
+    Identity id; id.world_sha256 = std::string(64, 'a'); id.side = 257;
+    check(graph_document(a.in, r, id).find("\"landTypes\":{\"Desert\":" + std::to_string(deserts) + ",\"Plain\":" + std::to_string(plains) + "}") != std::string::npos, "travel-graph.json grid.landTypes holds the per-type counts");
 }
 }  // namespace
 
@@ -468,6 +994,10 @@ int main(int argc, char** argv) {
         classification_tests(policy);
         policy_tests(policy);
         topology_tests(policy);
+        town_repair_tests(policy);
+        quota_tests(policy);
+        road_network_tests(policy);
+        land_type_tests(policy);
     } catch (const std::exception& e) { check(false, std::string("unexpected exception: ") + e.what()); }
     std::cout << checks - failures << "/" << checks << " checks passed\n";
     return failures == 0 ? 0 : 1;

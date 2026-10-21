@@ -2,6 +2,8 @@
 
 Every campaign settlement of a compiled world gets one scene entity, named its id, with the hierarchy the installed campaign map gives its kind: siege camps, siege engines, breachable walls and wall engines per wall level, ports, blockade arcs and drop-offs. The entities are baked into the world's scene before it is encoded, and checked in the engine before the world can be activated.
 
+**MMR-258: looks.** A town, castle or village now takes its look from a vanilla settlement of its culture (`docs/settlement-looks.md`). Its markers stand at that look's own offsets at the look's scale, not at the installed medians below, which only phase-0 settlements (no look fits) and the run-time path still use. Its visual tree sits under `<id>_look`, and the contract is relaxed: at most one solid and one broken piece per wall section, and a look's banner placeholders under parents with wall level bits. The builder version is `mmr258/1`.
+
 Their positions come from one resolved placement, the settlement layout. It is resolved against:
 - the world's navigation: MMR-38's points are binding;
 - the world's surface (W01).
@@ -12,14 +14,15 @@ The settlement records are bound to the same layout (`SettlementFactory.ApplyRes
 |---|---|
 | Placement (sites, ground, policy, resolver, layout, blockade ship replay, refusal) | `World/SettlementPositionResolver.cs` |
 | Hierarchy and scene XML, scene levels, installed contract, structural validation | `World/SettlementEntityFactory.cs` |
-| In-engine check of a read world scene (production and the world_surface probe) | `World/SettlementEntityChecks.cs`, called by `Generation/GenerationStages.cs` (`RuntimeStage`) |
+| Looks: catalog, selector, frozen looks, look builder (MMR-258) | `World/SettlementLooks.cs`, `docs/settlement-looks.md` |
+| In-engine check of a read world scene (production and the world_surface probe) | `World/SettlementEntityRules.cs` (the rules, over `ICheckedScene`; MMR-247), run by `World/SettlementEntityChecks.cs` over the engine's read, called by `Generation/GenerationStages.cs` (`RuntimeStage`) |
 | Live hierarchy for a settlement the scene lacks (MMR-34 hideouts) | `World/SettlementEntityRuntime.cs`, `World/GeneratedMapScene.cs` (`AddNewEntityToMapScene`) |
 | Siege prefab cache for the campaign map | `World/GeneratedMapScene.cs` (`AddSiegePrefabCache`) |
 | Production integration | `World/RuntimeWorldBackend.cs` (`Prepare`, `Sweep`) |
 | Records | `Campaign/SettlementFactory.cs` (`ApplyResolvedPositions`, `CheckResolvedPositions`), `SettlementLayout.Positions` |
 | Placement policy | `worldgen/policies/settlement-placement.json` version 2 (`tools/make_settlement_placement_policy.py`, from the installed War Sails campaign map); the blockade arc and script parameters come from `worldgen/policies/naval-content.json` (MMR-35) |
 | Fixture worlds | `tools/settlements/FixtureSettlementEntities.cs`, `tools/Build-FixtureSettlements.ps1` (run after a scenebin build, before `Deploy-SceneSlots.ps1`) |
-| Offline tests | `tests/World/SettlementPlacementTests.cs`, `tools/Test-SettlementPlacement.ps1` |
+| Offline tests | `tests/World/SettlementPlacementTests.cs`, `tools/Test-SettlementPlacement.ps1`; `tests/World/SettlementEntityRulesTests.cs`, `tools/Test-SettlementEntityRules.ps1` (MMR-247: the production check's rules over the baked scene XML of A' and B', as authored and under the engine read model in `docs/settlement-looks.md`) |
 | Campaign probe | `Diagnostics/SettlementEntityProbe.cs` (generated_campaign `settlementEntityProbe=1`, `factoryEntities=1`) |
 | Evidence | `evidence/world/settlement-position-report.json` (both worlds' layouts with provenance), `evidence/world/settlement-placement-tests.json` and `.txt`, `evidence/world/settlement-entities.json` (in game), `evidence/fwg/settlement-entities-review.md` |
 
@@ -107,6 +110,19 @@ Every child is named `<id>_<suffix>`. Every gate-frame marker and wall faces the
 
 **Borders and helpers.**
 - The borders (`border_min`, `border_max`: the scene's box; `GeneratedMapScene.Load` refuses a scene without them) are added.
+- **`border_max` z** is the campaign's `MapMaximumHeight`: `SettlementEntityFactory.MapMaximumHeight(high)` = max(the terrain's highest
+  point + 100, 180), a code constant (MMR-262), not a policy key. Its only reader is `MapCameraView` (installed 1.4.8 IL):
+  - `MaximumCameraHeight` is the larger of `_customMaximumCameraHeight` (nothing sets it) and `MapMaximumHeight`;
+  - the camera distance is clamped to [2.5, that], and the far clip plane is 4 times it.
+
+  Before, z was the highest point + 100. That tied the zoom-out to the vertical scale: about 154-178 on worlds A and B at 0.01, but only
+  117-119 on A' and B' at 0.005. The floor of 180 keeps the pre-epic zoom-out, and a world with higher terrain keeps 100 above it.
+
+  It is not vanilla's 620 (SandBox) or 756 (War Sails). From a distance of about 161 the camera looks nearly straight down (elevation
+  0.35 + 0.0075 × distance, at most 1.555 rad; a 40° vertical field). At 180, a 16:9 screen shows about 233 units across, and 21:9 about 306.
+  That is under W/2 = 400, the strip beside the seam, so the nearest-image presentation holds (`PeriodicMapCameraView`). At 756 it would
+  be about 980, wider than the world. With the camera target held at a pole line (MMR-278), it shows about 65 units of the 600-unit polar
+  padding. The value is in the entity XML, so it enters the scene name.
 - So is the `Town Scene Manager` helper (`mnbl_world_helper_town_scene_manager`, the installed script copied verbatim as variable definitions).
 - **The siege prefab cache.** No scene bakes `CampaignMapSiegePrefabEntityCache`. Its `OnInit` reads the campaign's map scene, and an inspection read of a scene carrying one throws (run 25412). `MapScreen.OnInitialize` dereferences it with no null guard. So `GeneratedMapScene.Load` adds it to the campaign map after the read, when the scene has none:
   - a helper entity with the script (`CreateAndAddScriptComponent`, callbacks off);
@@ -123,15 +139,17 @@ Every child is named `<id>_<suffix>`. Every gate-frame marker and wall faces the
 - **Drop-offs.** War Sails' `NavalMapSceneWrapper.InitializeDropOffLocations` scans `main_map_village_dropoff` entities when its wrapper initializes, and sets each village's port from them. That is why the entities are baked into the scene and not made at `OnStartup`.
 - **Display copies.** MMR-66's display copies clone the settlement entity at `OnStartup`. The baked hierarchy is complete by then.
 
-**The production check.** `SettlementEntityChecks.Run` runs on the engine thread over the inspection world in the generation job's runtime stage, after the navigation validation; a failure refuses the world (`runtime.settlement_entities`). It checks:
+**The production check.** `SettlementEntityChecks.Steps` runs on the engine thread over the inspection world in the generation job's runtime stage, after the navigation validation, one settlement per step in slices of about 25 ms (MMR-258); a failure refuses the world (`runtime.settlement_entities`). It checks:
 - the borders and the baked helper, and no baked siege cache;
 - one root per settlement by `GetCampaignEntityWithName`, with its tag and script, at the layout's centre;
 - every marker, wall section and wall engine by name at its layout position (the image beside the centre), with the wall level bits of its levels;
-- each wall section's solid and broken child, and a village's four icons;
+- each wall section's solid and broken child (MMR-258: a look's wall at most one of each), and a village's four icons;
 - gates, markers, walls and wall engines over a land navigation face; ports, arc ends, every replayed blockade ship and drop-offs over a sea face;
 - `BlockadePositionScript` exactly on the port towns with an arc;
 - the root census (the engine's own seven roots are listed);
 - the persisted report.
+
+MMR-247: the rules are `SettlementEntityRules.Steps` over an `ICheckedScene`. `SettlementEntityChecks` passes the engine's read scene. `tools/Test-SettlementEntityRules.ps1` passes the baked scene XML (`XmlEntityScene`, with faces from the offline navigation mesh and no persisted-report check).
 
 **A settlement without a scene entity.** For example an MMR-34 hideout. `AddNewEntityToMapScene` builds its kind's full hierarchy from its record (`SettlementEntityFactory.Unresolved`, built live by `SettlementEntityRuntime`), instead of the installed prefab-by-name fallback (MMR-33's run 36452 crashed there):
 - the record's centre, gate and port;
@@ -225,4 +243,4 @@ The first confirming run (34096) found the plain-sphere wall colliders answering
 - **Hideouts are outside the layout.** Production hideouts come from the campaign build (MMR-34), after the scene is encoded. They get their hierarchy at run time from their record. Placing them as layout sites with the bundle's hideout positions is MMR-45's.
 - **Production records are not built yet.** `ApplyResolvedPositions` and `CheckResolvedPositions` are tested offline. MMR-45 builds the records with them and refuses a world whose records differ from its scene or whose map lists a `MissingBakedEntities` entry.
 - **A run-time fortification is not checked against the ground.** Its markers stand at their installed offsets from its record, with no ground checks. Only hideouts take this path on a world's scene.
-- **The wall meshes and icon meshes are the empire's.** Culture-specific meshes and the installed icon scales are not used.
+- **The wall meshes and icon meshes are the empire's** only on the run-time path and in fixture worlds. A world's scene takes its looks' pieces, or its culture's phase-0 pieces (MMR-258).

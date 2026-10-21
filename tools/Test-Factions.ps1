@@ -1,5 +1,5 @@
 param([Parameter(Mandatory=$true)][string]$Bundle, [string]$Evidence, [string]$Log)
-# MMR-31: compiles the pure managed FactionFactory with tests/Campaign/FactionTests.cs against the pinned framework assemblies
+# MMR-31, MMR-280: compiles the pure managed FactionFactory with tests/Campaign/FactionTests.cs against the pinned framework assemblies
 # and runs it on the real bundle's compiler records with the repository's faction policy and culture templates. No game.
 $ErrorActionPreference='Stop'
 $repo=Split-Path $PSScriptRoot
@@ -8,7 +8,7 @@ New-Item -ItemType Directory -Path $out | Out-Null
 $csc='C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/MSBuild/Current/Bin/Roslyn/csc.exe'
 $sources=@('src/MNBL.ProceduralWorld/Campaign/CampaignIdentity.cs','src/MNBL.ProceduralWorld/Campaign/FactionFactory.cs','src/MNBL.ProceduralWorld/CampaignBootstrap/WorldDataBundle.cs','tests/Campaign/FactionTests.cs')
 $templates=@(Get-ChildItem -LiteralPath (Join-Path $repo 'worldgen/templates/cultures') -Filter *.json|Sort-Object Name|ForEach-Object { 'worldgen/templates/cultures/'+$_.Name })
-$inputs=@(($sources+@('tools/Test-Factions.ps1','worldgen/policies/factions.json','worldgen/policies/culture-presentations.json')+$templates)|ForEach-Object { @{path=$_;sha256=(Get-FileHash -LiteralPath (Join-Path $repo $_)).Hash.ToLowerInvariant()} })
+$inputs=@(($sources+@('tools/Test-Factions.ps1','worldgen/policies/factions.json','worldgen/policies/culture-presentations.json','worldgen/policies/population.json')+$templates)|ForEach-Object { @{path=$_;sha256=(Get-FileHash -LiteralPath (Join-Path $repo $_)).Hash.ToLowerInvariant()} })
 $lock=Get-Content "$repo/config/runtime-api-lock.json" -Raw|ConvertFrom-Json
 $references=@()
 foreach($name in @('mscorlib','System','System.Core','System.Xml','System.Web.Extensions')){

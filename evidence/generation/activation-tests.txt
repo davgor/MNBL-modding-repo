@@ -197,7 +197,7 @@ ok    the initial save is torn: no ambiguous save binding (every bound save has 
 ok    the initial save is torn: the world package is removed
 ok    the initial save is torn: recovery is idempotent (a second pass finds nothing and changes nothing)
 ok    another campaign's save holds the reserved name: the activation fails at PublishSave and is undone
-ok    another campaign's save holds the reserved name: the activation ends failed (failed: IOException: A save named mnbl_4500001f_start_61373eb0c190 exists; an initial save never replaces one.)
+ok    another campaign's save holds the reserved name: the activation ends failed (failed: IOException: A save named mnbl_4500001f_start_f8fb8bfc2b25 exists; an initial save never replaces one.)
 ok    another campaign's save holds the reserved name: every earlier committed world (6) keeps its package, receipt, save and committed journal byte for byte
 ok    another campaign's save holds the reserved name: no ambiguous save binding (every bound save has one committed, receipted instance; this instance: 0 save(s), receipt False)
 ok    another campaign's save holds the reserved name: the world package is removed
@@ -229,7 +229,7 @@ ok    same world, second campaign: recovery is idempotent (a second pass finds n
 ok    same world, second campaign: the receipt is the v1 contract, verifies against its runtime-derived record and is rebuilt byte for byte from the journal
 ok    same world: identical world content backs two campaign instances, each with its own receipt (the content id is unchanged)
 ok    admit: a second activation while one is active (unrecovered) is refused and writes nothing
-ok    admit: an unreadable activation journal refuses the next activation (fail closed); recovery reports it and moves it aside as evidence (3425ff830dea47d7a1726270cdef3ce6.json.quarantined)
+ok    admit: an unreadable activation journal refuses the next activation (fail closed); recovery reports it and moves it aside as evidence (961bd0161e15447ba09e5563005cbfc6.json.quarantined)
 ok    recovery: after the unreadable journal was moved aside and a stuck one quarantined, the next activation commits
 ok    activation after quarantine: the activation ends committed (committed)
 ok    activation after quarantine: every earlier committed world (8) keeps its package, receipt, save and committed journal byte for byte
@@ -238,4 +238,8 @@ ok    activation after quarantine: the world package is present
 ok    activation after quarantine: recovery is idempotent (a second pass finds nothing and changes nothing)
 ok    activation after quarantine: the receipt is the v1 contract, verifies against its runtime-derived record and is rebuilt byte for byte from the journal
 ok    receipt: a receipt whose runtime-derived record was altered does not verify
-240/240 checks passed
+ok    battle map: Preflight's failed record (BattleTableCheck.Record, status, error) gives one problem naming its error, is kept with the error, and is refused as the battle table's (no KeyNotFoundException)
+ok    battle map: Guarded's failed record (status and error only) gives one problem naming its error, and is not a battle table refusal (no KeyNotFoundException)
+ok    battle map: Install's report passes and is kept; one with a cell lacking its scene fails, naming the counts
+ok    battle map: no record (AfterLoad failed before writing one) gives one problem naming the AfterLoad failure
+244/244 checks passed

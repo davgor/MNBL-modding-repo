@@ -8,7 +8,7 @@ namespace MNBL.ProceduralWorld.CampaignRegistry
 {
     // MMR-34: where a generated world's parties may spawn (docs/campaign-behavior-compatibility.md). Pure managed; the in-game
     // counterpart is GeneratedSpawnAssertions, which checks live parties against the engine navmesh.
-    //   * CellMap: the MMR-28 travel cells (cells.bin after repairs: "MNBLTC01", u32 cols, u32 rows, cols*rows class bytes); a cell
+    //   * CellMap: the MMR-28 travel cells (cells.bin v2 after repairs: "MNBLTC02", u32 cols, u32 rows, cols*rows class bytes first); a cell
     //     (r, c) covers logical [c, c+1] x [r, r+1] * spacing, columns wrap. Passable cells are the policy's classes (land); land
     //     components are 4-neighbour connected passable cells, wrapping east-west. A component belongs to the MMR-28 land group of the
     //     settlements on it (the compiler's groups join components across its required bridges); a component with no settlement has
@@ -39,10 +39,10 @@ namespace MNBL.ProceduralWorld.CampaignRegistry
             // travelSettlements: the travel graph's settlements (point, group), which give each component its MMR-28 land group.
             public CellMap(IDictionary<string, object> grid, byte[] cellsBin, IEnumerable<string> passableClasses, IEnumerable<IDictionary<string, object>> travelSettlements)
             {
-                if (cellsBin == null || cellsBin.Length < 16 || Encoding.ASCII.GetString(cellsBin, 0, 8) != "MNBLTC01") throw new ArgumentException("cells.bin is not MNBLTC01");
+                if (cellsBin == null || cellsBin.Length < 16 || Encoding.ASCII.GetString(cellsBin, 0, 8) != "MNBLTC02") throw new ArgumentException("cells.bin is not MNBLTC02");
                 Cols = BitConverter.ToInt32(cellsBin, 8); Rows = BitConverter.ToInt32(cellsBin, 12);
                 Spacing = Convert.ToDouble(grid["spacing"], CultureInfo.InvariantCulture);
-                if (Cols != Convert.ToInt32(grid["cols"], CultureInfo.InvariantCulture) || Rows != Convert.ToInt32(grid["rows"], CultureInfo.InvariantCulture) || cellsBin.Length < 16 + Cols * Rows)
+                if (Cols != Convert.ToInt32(grid["cols"], CultureInfo.InvariantCulture) || Rows != Convert.ToInt32(grid["rows"], CultureInfo.InvariantCulture) || cellsBin.Length != 16 + 4 * Cols * Rows)
                     throw new ArgumentException("cells.bin does not match the travel grid");
                 classes = new byte[Cols * Rows]; Array.Copy(cellsBin, 16, classes, 0, classes.Length);
                 var allowed = new HashSet<int>(passableClasses.Select(n => Array.IndexOf(ClassNames, n)).Where(i => i >= 0));
@@ -89,6 +89,16 @@ namespace MNBL.ProceduralWorld.CampaignRegistry
             // The MMR-28 land group of a position's component, or -1 (not passable, or a component without settlements).
             public int Group(double x, double y) { int c = Component(x, y), g; return c >= 0 && groupOf.TryGetValue(c, out g) ? g : -1; }
             public string ClassOf(double x, double y) { int i = Index(x, y); return i < 0 ? "outside" : classes[i] < ClassNames.Length ? ClassNames[classes[i]] : "class " + classes[i]; }
+            // MMR-287: whether a cell of the class lies within radius cells (rows and columns, columns wrap) of a cell.
+            public bool Near(int row, int col, int radius, string className)
+            {
+                int wanted = Array.IndexOf(ClassNames, className);
+                if (wanted < 0) return false;
+                for (int r = Math.Max(0, row - radius); r <= Math.Min(Rows - 1, row + radius); r++)
+                    for (int d = -radius; d <= radius; d++)
+                        if (classes[r * Cols + ((col + d) % Cols + Cols) % Cols] == wanted) return true;
+                return false;
+            }
             // The passable cells of a land group (every component that belongs to it).
             public IEnumerable<Cell> Cells(int landGroup)
             {
@@ -119,7 +129,7 @@ namespace MNBL.ProceduralWorld.CampaignRegistry
             foreach (var s in startup.Starts) add("player", s.Culture + ":" + s.Town, s.X, s.Y);
             foreach (var t in world.Settlements.Where(s => s.Kind == "town")) add("caravan", t.Id, t.GateX, t.GateY);
             foreach (var v in world.Settlements.Where(s => s.Kind == "village")) add("villager", v.Id, v.X, v.Y);
-            foreach (var c in factions.Clans.OrderBy(c => c.Id, StringComparer.Ordinal))
+            foreach (var c in factions.AllClans.OrderBy(c => c.Id, StringComparer.Ordinal))
             {
                 SettlementFactory.SettlementIntent home;
                 if (c.HomeId == null || !byId.TryGetValue(c.HomeId, out home)) { list.Add(new Anchor { Kind = "lord", Subject = c.Id, Problem = "lord spawn anchor of clan " + c.Id + " has no generated home settlement (" + c.HomeId + "): MMR-31 must give it one" }); continue; }

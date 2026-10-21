@@ -1043,7 +1043,8 @@ def build_terrain(heights_2d: Sequence[Sequence[float]], node_dimension_x: int, 
                   max_height: Optional[float] = None, compress: bool = True,
                   write_normals: bool = True, write_weights: bool = True,
                   midx_value: int = 255,
-                  physics_layers: Optional[Iterable[int]] = None) -> Tuple[bytes, Dict[str, object]]:
+                  physics_layers: Optional[Iterable[int]] = None,
+                  normal_heights: Optional[Sequence[Sequence[float]]] = None) -> Tuple[bytes, Dict[str, object]]:
     """Synthesise a new ZGR6RTRN terrain.bin (no official bytes are used).
 
     heights_2d: rows (+Y) x columns (+X) of world heights, size
@@ -1060,6 +1061,9 @@ def build_terrain(heights_2d: Sequence[Sequence[float]], node_dimension_x: int, 
     min_height/max_height: quantisation range; MUST be written to scene.xscene
         <terrain min_height=".." max_height=".."> exactly (official files use 3
         decimals).  Default = data range snapped outward to multiples of 0.001.
+    normal_heights: an optional second grid of the same shape that NRML is built
+        from instead of heights_2d (e.g. a smoothed copy; MMR-249 probe), quantised
+        with the same range.  Geometry (HGHT) is unaffected.
     write_normals/write_weights: False writes an empty NRML/WGHT section (the
         layout used by both campaign Main_map files, which texture through a
         tileset); battle-style scenes in the install always carry both.
@@ -1094,7 +1098,13 @@ def build_terrain(heights_2d: Sequence[Sequence[float]], node_dimension_x: int, 
     del flat
     scale = (hi - lo) / 65535.0
     spacing = float(node_size) / C
-    normals = compute_normals(q, W, H, spacing, scale) if write_normals else None
+    if normal_heights is not None:
+        if len(normal_heights) != H or any(len(row) != W for row in normal_heights):
+            raise ValueError("normal_heights must be %dx%d" % (W, H))
+        qn = array.array("H", (_quantize(float(v), lo, hi) for row in normal_heights for v in row))
+    else:
+        qn = q
+    normals = compute_normals(qn, W, H, spacing, scale) if write_normals else None
 
     weights_flat: Dict[int, bytes] = {}
     if layer_weights:

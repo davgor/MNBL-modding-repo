@@ -3,3 +3,11 @@
 # bytes, and those files mix LF and CRLF. Normalization (text=auto with
 # core.autocrlf) would change the bytes on checkout and break every such pin.
 * -text
+
+# MMR-259: the magic-ground decal texture sources and the module's published packs (with the editor's working packages) are
+# release inputs: binary, large, kept in Git LFS. (Pointer files are LF text written by git-lfs; the receipts above do not pin them.)
+Modules/MNBL.ProceduralWorld/AssetSources/** filter=lfs diff=lfs merge=lfs -text
+Modules/MNBL.ProceduralWorld/AssetPackages/** filter=lfs diff=lfs merge=lfs -text
+Modules/MNBL.ProceduralWorld/Assets/** filter=lfs diff=lfs merge=lfs -text
+# MMR-261 (RT-37): every producer build a campaign may cast with, by SHA-256 (worldgen/producer-archive.json). Release inputs: kept, never rebuilt.
+Modules/MNBL.ProceduralWorld/Producers/** filter=lfs diff=lfs merge=lfs -text

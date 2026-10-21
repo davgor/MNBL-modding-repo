@@ -1,0 +1,1494 @@
+{
+ "schema": "mnbl.wanderer-backstory-census",
+ "version": 1,
+ "ticket": "MMR-287 (RT-32)",
+ "rule": "a template is unsafe when one of its lines (prebackstory, backstory_a, backstory_b, backstory_c, backstory_d, response_1, response_2, generic_backstory, keyed \"<line>.<template id>\") names, as a whole case-sensitive word, a noun of the lexicon: installed settlement, realm (name and title, except the culture words Aserai, Khuzait, Nord), non-bandit clan and XML hero names, Calradia/Calradian, the emperor or empress, and the reviewed lore nouns (Beinland, Beinlandings, Brothers of the Woods, Company of the Boar, Empire, Jumne, Ladimos, Nordlands, Nordvyg, Sturgland, Svalfjord, Throndelag, Vaegirs, Vanni). Story-only personal names stay. The safe pool is every other template; population.json wanderers.backstoryUnsafe lists the unsafe ones",
+ "catalog": "evidence/runtime/in-game/campaign_catalog-10212.json",
+ "catalogSha256": "27bca57ee00ae08ab628d049b3409380ea9f1188b2b2aeba9706610fc481f80e",
+ "strings": [
+  "NavalDLC/ModuleData/naval_dialog_strings.xml",
+  "SandBox/ModuleData/wanderer_strings.xml"
+ ],
+ "lexicon": {
+  "clan": 97,
+  "emperor": 6,
+  "hero": 452,
+  "lore": 14,
+  "realm": 12,
+  "settlement": 443,
+  "world": 3
+ },
+ "templates": 78,
+ "unsafeCount": 38,
+ "safeCount": 40,
+ "withEpithet": 78,
+ "byCulture": {
+  "aserai": {
+   "templates": 12,
+   "safe": 9,
+   "safeFemale": 2,
+   "safeMale": 7
+  },
+  "battania": {
+   "templates": 10,
+   "safe": 7,
+   "safeFemale": 3,
+   "safeMale": 4
+  },
+  "empire": {
+   "templates": 13,
+   "safe": 4,
+   "safeFemale": 1,
+   "safeMale": 3
+  },
+  "khuzait": {
+   "templates": 11,
+   "safe": 5,
+   "safeFemale": 2,
+   "safeMale": 3
+  },
+  "nord": {
+   "templates": 8,
+   "safe": 0,
+   "safeFemale": 0,
+   "safeMale": 0
+  },
+  "sturgia": {
+   "templates": 10,
+   "safe": 7,
+   "safeFemale": 3,
+   "safeMale": 4
+  },
+  "vlandia": {
+   "templates": 14,
+   "safe": 8,
+   "safeFemale": 2,
+   "safeMale": 6
+  }
+ },
+ "unsafe": [
+  "spc_wanderer_empire_0",
+  "spc_wanderer_empire_2",
+  "spc_wanderer_empire_3",
+  "spc_wanderer_empire_6",
+  "spc_wanderer_empire_7",
+  "spc_wanderer_empire_9",
+  "spc_wanderer_empire_10",
+  "spc_wanderer_empire_11",
+  "spc_wanderer_sturgia_0",
+  "spc_wanderer_sturgia_1",
+  "spc_wanderer_sturgia_3",
+  "spc_wanderer_battania_3",
+  "spc_wanderer_battania_5",
+  "spc_wanderer_battania_6",
+  "spc_wanderer_vlandia_1",
+  "spc_wanderer_vlandia_5",
+  "spc_wanderer_vlandia_7",
+  "spc_wanderer_vlandia_11",
+  "spc_wanderer_vlandia_12",
+  "spc_wanderer_aserai_2",
+  "spc_wanderer_aserai_8",
+  "spc_wanderer_khuzait_0",
+  "spc_wanderer_khuzait_1",
+  "spc_wanderer_khuzait_3",
+  "spc_wanderer_khuzait_6",
+  "spc_wanderer_khuzait_7",
+  "spc_wanderer_khuzait_10",
+  "spc_wanderer_nord_0n",
+  "spc_wanderer_nord_1n",
+  "spc_wanderer_nord_2n",
+  "spc_wanderer_nord_3n",
+  "spc_wanderer_nord_4n",
+  "spc_wanderer_nord_5n",
+  "spc_wanderer_nord_6n",
+  "spc_wanderer_nord_7n",
+  "spc_wanderer_empire_0n",
+  "spc_wanderer_aserai_0n",
+  "spc_wanderer_vlandia_0n"
+ ],
+ "rows": [
+  {
+   "id": "spc_wanderer_empire_0",
+   "culture": "empire",
+   "female": false,
+   "epithet": "the Scholar",
+   "lines": 8,
+   "missingLines": [],
+   "unsafe": true,
+   "hits": [
+    {
+     "line": "backstory_a",
+     "noun": "emperor",
+     "kind": "emperor"
+    }
+   ]
+  },
+  {
+   "id": "spc_wanderer_empire_1",
+   "culture": "empire",
+   "female": false,
+   "epithet": "the Bull",
+   "lines": 8,
+   "missingLines": [],
+   "unsafe": false,
+   "hits": []
+  },
+  {
+   "id": "spc_wanderer_empire_2",
+   "culture": "empire",
+   "female": false,
+   "epithet": "the Silent",
+   "lines": 8,
+   "missingLines": [],
+   "unsafe": true,
+   "hits": [
+    {
+     "line": "backstory_c",
+     "noun": "emperor",
+     "kind": "emperor"
+    }
+   ]
+  },
+  {
+   "id": "spc_wanderer_empire_3",
+   "culture": "empire",
+   "female": false,
+   "epithet": "the Boar",
+   "lines": 8,
+   "missingLines": [],
+   "unsafe": true,
+   "hits": [
+    {
+     "line": "backstory_b",
+     "noun": "Neretzes",
+     "kind": "clan"
+    }
+   ]
+  },
+  {
+   "id": "spc_wanderer_empire_4",
+   "culture": "empire",
+   "female": false,
+   "epithet": "the Robber",
+   "lines": 8,
+   "missingLines": [],
+   "unsafe": false,
+   "hits": []
+  },
+  {
+   "id": "spc_wanderer_empire_5",
+   "culture": "empire",
+   "female": false,
+   "epithet": "the Butcher",
+   "lines": 8,
+   "missingLines": [],
+   "unsafe": false,
+   "hits": []
+  },
+  {
+   "id": "spc_wanderer_empire_6",
+   "culture": "empire",
+   "female": false,
+   "epithet": "of the Hills",
+   "lines": 8,
+   "missingLines": [],
+   "unsafe": true,
+   "hits": [
+    {
+     "line": "backstory_a",
+     "noun": "Emperor",
+     "kind": "emperor"
+    },
+    {
+     "line": "backstory_a",
+     "noun": "Ladimos",
+     "kind": "lore"
+    },
+    {
+     "line": "backstory_b",
+     "noun": "Ladimos",
+     "kind": "lore"
+    },
+    {
+     "line": "backstory_c",
+     "noun": "emperor",
+     "kind": "emperor"
+    }
+   ]
+  },
+  {
+   "id": "spc_wanderer_empire_7",
+   "culture": "empire",
+   "female": true,
+   "epithet": "the Wanderer",
+   "lines": 8,
+   "missingLines": [],
+   "unsafe": true,
+   "hits": [
+    {
+     "line": "backstory_a",
+     "noun": "Neretzes",
+     "kind": "clan"
+    }
+   ]
+  },
+  {
+   "id": "spc_wanderer_empire_8",
+   "culture": "empire",
+   "female": true,
+   "epithet": "the Exile",
+   "lines": 8,
+   "missingLines": [],
+   "unsafe": false,
+   "hits": []
+  },
+  {
+   "id": "spc_wanderer_empire_9",
+   "culture": "empire",
+   "female": true,
+   "epithet": "the Black",
+   "lines": 8,
+   "missingLines": [],
+   "unsafe": true,
+   "hits": [
+    {
+     "line": "generic_backstory",
+     "noun": "Calradia",
+     "kind": "world"
+    }
+   ]
+  },
+  {
+   "id": "spc_wanderer_empire_10",
+   "culture": "empire",
+   "female": false,
+   "epithet": "the Surgeon",
+   "lines": 8,
+   "missingLines": [],
+   "unsafe": true,
+   "hits": [
+    {
+     "line": "backstory_a",
+     "noun": "Empire",
+     "kind": "lore"
+    },
+    {
+     "line": "backstory_c",
+     "noun": "Emperor",
+     "kind": "emperor"
+    }
+   ]
+  },
+  {
+   "id": "spc_wanderer_empire_11",
+   "culture": "empire",
+   "female": true,
+   "epithet": "the Dispossessed",
+   "lines": 8,
+   "missingLines": [],
+   "unsafe": true,
+   "hits": [
+    {
+     "line": "generic_backstory",
+     "noun": "Calradia",
+     "kind": "world"
+    }
+   ]
+  },
+  {
+   "id": "spc_wanderer_sturgia_0",
+   "culture": "sturgia",
+   "female": true,
+   "epithet": "Willowbark",
+   "lines": 8,
+   "missingLines": [],
+   "unsafe": true,
+   "hits": [
+    {
+     "line": "generic_backstory",
+     "noun": "Calradia",
+     "kind": "world"
+    }
+   ]
+  },
+  {
+   "id": "spc_wanderer_sturgia_1",
+   "culture": "sturgia",
+   "female": false,
+   "epithet": "Breakskull",
+   "lines": 8,
+   "missingLines": [],
+   "unsafe": true,
+   "hits": [
+    {
+     "line": "backstory_c",
+     "noun": "Skolderbroda",
+     "kind": "clan"
+    },
+    {
+     "line": "generic_backstory",
+     "noun": "Skolderbroda",
+     "kind": "clan"
+    },
+    {
+     "line": "generic_backstory",
+     "noun": "Vaegirs",
+     "kind": "lore"
+    }
+   ]
+  },
+  {
+   "id": "spc_wanderer_sturgia_2",
+   "culture": "sturgia",
+   "female": false,
+   "epithet": "the Lucky",
+   "lines": 8,
+   "missingLines": [],
+   "unsafe": false,
+   "hits": []
+  },
+  {
+   "id": "spc_wanderer_sturgia_3",
+   "culture": "sturgia",
+   "female": false,
+   "epithet": "Bloodaxe",
+   "lines": 8,
+   "missingLines": [],
+   "unsafe": true,
+   "hits": [
+    {
+     "line": "prebackstory",
+     "noun": "Emperor",
+     "kind": "emperor"
+    },
+    {
+     "line": "backstory_b",
+     "noun": "emperor",
+     "kind": "emperor"
+    },
+    {
+     "line": "response_2",
+     "noun": "Emperor",
+     "kind": "emperor"
+    },
+    {
+     "line": "generic_backstory",
+     "noun": "Calradians",
+     "kind": "world"
+    },
+    {
+     "line": "generic_backstory",
+     "noun": "Emperor",
+     "kind": "emperor"
+    }
+   ]
+  },
+  {
+   "id": "spc_wanderer_sturgia_4",
+   "culture": "sturgia",
+   "female": false,
+   "epithet": "the Fish",
+   "lines": 8,
+   "missingLines": [],
+   "unsafe": false,
+   "hits": []
+  },
+  {
+   "id": "spc_wanderer_sturgia_5",
+   "culture": "sturgia",
+   "female": false,
+   "epithet": "Coalbiter",
+   "lines": 8,
+   "missingLines": [],
+   "unsafe": false,
+   "hits": []
+  },
+  {
+   "id": "spc_wanderer_sturgia_6",
+   "culture": "sturgia",
+   "female": false,
+   "epithet": "Frostbeard",
+   "lines": 8,
+   "missingLines": [],
+   "unsafe": false,
+   "hits": []
+  },
+  {
+   "id": "spc_wanderer_sturgia_7",
+   "culture": "sturgia",
+   "female": true,
+   "epithet": "the Accursed",
+   "lines": 8,
+   "missingLines": [],
+   "unsafe": false,
+   "hits": []
+  },
+  {
+   "id": "spc_wanderer_sturgia_8",
+   "culture": "sturgia",
+   "female": true,
+   "epithet": "the Shieldmaiden",
+   "lines": 8,
+   "missingLines": [],
+   "unsafe": false,
+   "hits": []
+  },
+  {
+   "id": "spc_wanderer_sturgia_9",
+   "culture": "sturgia",
+   "female": true,
+   "epithet": "Longknife",
+   "lines": 8,
+   "missingLines": [],
+   "unsafe": false,
+   "hits": []
+  },
+  {
+   "id": "spc_wanderer_battania_0",
+   "culture": "battania",
+   "female": true,
+   "epithet": "the Healer",
+   "lines": 8,
+   "missingLines": [],
+   "unsafe": false,
+   "hits": []
+  },
+  {
+   "id": "spc_wanderer_battania_1",
+   "culture": "battania",
+   "female": false,
+   "epithet": "the Red",
+   "lines": 8,
+   "missingLines": [],
+   "unsafe": false,
+   "hits": []
+  },
+  {
+   "id": "spc_wanderer_battania_2",
+   "culture": "battania",
+   "female": false,
+   "epithet": "Fairhair",
+   "lines": 8,
+   "missingLines": [],
+   "unsafe": false,
+   "hits": []
+  },
+  {
+   "id": "spc_wanderer_battania_3",
+   "culture": "battania",
+   "female": false,
+   "epithet": "Ironbelly",
+   "lines": 8,
+   "missingLines": [],
+   "unsafe": true,
+   "hits": [
+    {
+     "line": "backstory_a",
+     "noun": "Empire",
+     "kind": "lore"
+    },
+    {
+     "line": "backstory_b",
+     "noun": "Battania",
+     "kind": "realm"
+    },
+    {
+     "line": "backstory_b",
+     "noun": "Caladog",
+     "kind": "hero"
+    },
+    {
+     "line": "backstory_b",
+     "noun": "Empire",
+     "kind": "lore"
+    },
+    {
+     "line": "generic_backstory",
+     "noun": "Empire",
+     "kind": "lore"
+    }
+   ]
+  },
+  {
+   "id": "spc_wanderer_battania_4",
+   "culture": "battania",
+   "female": false,
+   "epithet": "Horsethief",
+   "lines": 8,
+   "missingLines": [],
+   "unsafe": false,
+   "hits": []
+  },
+  {
+   "id": "spc_wanderer_battania_5",
+   "culture": "battania",
+   "female": false,
+   "epithet": "the Ragged",
+   "lines": 8,
+   "missingLines": [],
+   "unsafe": true,
+   "hits": [
+    {
+     "line": "backstory_a",
+     "noun": "Wolfskins",
+     "kind": "clan"
+    },
+    {
+     "line": "backstory_b",
+     "noun": "Wolfskins",
+     "kind": "clan"
+    }
+   ]
+  },
+  {
+   "id": "spc_wanderer_battania_6",
+   "culture": "battania",
+   "female": false,
+   "epithet": "Blacktooth",
+   "lines": 8,
+   "missingLines": [],
+   "unsafe": true,
+   "hits": [
+    {
+     "line": "backstory_a",
+     "noun": "Empire",
+     "kind": "lore"
+    },
+    {
+     "line": "generic_backstory",
+     "noun": "Empire",
+     "kind": "lore"
+    }
+   ]
+  },
+  {
+   "id": "spc_wanderer_battania_7",
+   "culture": "battania",
+   "female": true,
+   "epithet": "the Wanderer",
+   "lines": 8,
+   "missingLines": [],
+   "unsafe": false,
+   "hits": []
+  },
+  {
+   "id": "spc_wanderer_battania_8",
+   "culture": "battania",
+   "female": true,
+   "epithet": "the Ill-Starred",
+   "lines": 8,
+   "missingLines": [],
+   "unsafe": false,
+   "hits": []
+  },
+  {
+   "id": "spc_wanderer_battania_9",
+   "culture": "battania",
+   "female": false,
+   "epithet": "Cowthief",
+   "lines": 8,
+   "missingLines": [],
+   "unsafe": false,
+   "hits": []
+  },
+  {
+   "id": "spc_wanderer_vlandia_0",
+   "culture": "vlandia",
+   "female": false,
+   "epithet": "Bitterdraught",
+   "lines": 8,
+   "missingLines": [],
+   "unsafe": false,
+   "hits": []
+  },
+  {
+   "id": "spc_wanderer_vlandia_1",
+   "culture": "vlandia",
+   "female": false,
+   "epithet": "the Loud",
+   "lines": 8,
+   "missingLines": [],
+   "unsafe": true,
+   "hits": [
+    {
+     "line": "backstory_a",
+     "noun": "Derthert",
+     "kind": "hero"
+    },
+    {
+     "line": "backstory_a",
+     "noun": "Empire",
+     "kind": "lore"
+    }
+   ]
+  },
+  {
+   "id": "spc_wanderer_vlandia_2",
+   "culture": "vlandia",
+   "female": false,
+   "epithet": "the Brave",
+   "lines": 8,
+   "missingLines": [],
+   "unsafe": false,
+   "hits": []
+  },
+  {
+   "id": "spc_wanderer_vlandia_3",
+   "culture": "vlandia",
+   "female": false,
+   "epithet": "the Grizzled",
+   "lines": 8,
+   "missingLines": [],
+   "unsafe": false,
+   "hits": []
+  },
+  {
+   "id": "spc_wanderer_vlandia_4",
+   "culture": "vlandia",
+   "female": false,
+   "epithet": "the Shark",
+   "lines": 8,
+   "missingLines": [],
+   "unsafe": false,
+   "hits": []
+  },
+  {
+   "id": "spc_wanderer_vlandia_5",
+   "culture": "vlandia",
+   "female": false,
+   "epithet": "Barrelchest",
+   "lines": 8,
+   "missingLines": [],
+   "unsafe": true,
+   "hits": [
+    {
+     "line": "backstory_a",
+     "noun": "Charas",
+     "kind": "settlement"
+    },
+    {
+     "line": "backstory_d",
+     "noun": "Charas",
+     "kind": "settlement"
+    },
+    {
+     "line": "generic_backstory",
+     "noun": "Charas",
+     "kind": "settlement"
+    }
+   ]
+  },
+  {
+   "id": "spc_wanderer_vlandia_6",
+   "culture": "vlandia",
+   "female": false,
+   "epithet": "of the Hills",
+   "lines": 8,
+   "missingLines": [],
+   "unsafe": false,
+   "hits": []
+  },
+  {
+   "id": "spc_wanderer_vlandia_7",
+   "culture": "vlandia",
+   "female": true,
+   "epithet": "the Huntress",
+   "lines": 8,
+   "missingLines": [],
+   "unsafe": true,
+   "hits": [
+    {
+     "line": "backstory_a",
+     "noun": "Usanc",
+     "kind": "settlement"
+    },
+    {
+     "line": "backstory_b",
+     "noun": "Brotherhood of the Woods",
+     "kind": "clan"
+    },
+    {
+     "line": "generic_backstory",
+     "noun": "Brotherhood of the Woods",
+     "kind": "clan"
+    }
+   ]
+  },
+  {
+   "id": "spc_wanderer_vlandia_8",
+   "culture": "vlandia",
+   "female": false,
+   "epithet": "the Smith",
+   "lines": 8,
+   "missingLines": [],
+   "unsafe": false,
+   "hits": []
+  },
+  {
+   "id": "spc_wanderer_vlandia_9",
+   "culture": "vlandia",
+   "female": true,
+   "epithet": "the Black",
+   "lines": 8,
+   "missingLines": [],
+   "unsafe": false,
+   "hits": []
+  },
+  {
+   "id": "spc_wanderer_vlandia_10",
+   "culture": "vlandia",
+   "female": true,
+   "epithet": "the Wainwright",
+   "lines": 8,
+   "missingLines": [],
+   "unsafe": false,
+   "hits": []
+  },
+  {
+   "id": "spc_wanderer_vlandia_11",
+   "culture": "vlandia",
+   "female": false,
+   "epithet": "Bellowsbreath",
+   "lines": 8,
+   "missingLines": [],
+   "unsafe": true,
+   "hits": [
+    {
+     "line": "backstory_a",
+     "noun": "Company of the Boar",
+     "kind": "lore"
+    },
+    {
+     "line": "generic_backstory",
+     "noun": "Company of the Boar",
+     "kind": "lore"
+    }
+   ]
+  },
+  {
+   "id": "spc_wanderer_vlandia_12",
+   "culture": "vlandia",
+   "female": false,
+   "epithet": "the Tracker",
+   "lines": 8,
+   "missingLines": [],
+   "unsafe": true,
+   "hits": [
+    {
+     "line": "backstory_b",
+     "noun": "Brothers of the Woods",
+     "kind": "lore"
+    }
+   ]
+  },
+  {
+   "id": "spc_wanderer_aserai_0",
+   "culture": "aserai",
+   "female": false,
+   "epithet": "the Scholar",
+   "lines": 8,
+   "missingLines": [],
+   "unsafe": false,
+   "hits": []
+  },
+  {
+   "id": "spc_wanderer_aserai_1",
+   "culture": "aserai",
+   "female": false,
+   "epithet": "the Golden",
+   "lines": 8,
+   "missingLines": [],
+   "unsafe": false,
+   "hits": []
+  },
+  {
+   "id": "spc_wanderer_aserai_2",
+   "culture": "aserai",
+   "female": false,
+   "epithet": "the Falcon",
+   "lines": 8,
+   "missingLines": [],
+   "unsafe": true,
+   "hits": [
+    {
+     "line": "backstory_b",
+     "noun": "Banu Sarran",
+     "kind": "clan"
+    },
+    {
+     "line": "backstory_b",
+     "noun": "Banu Qild",
+     "kind": "clan"
+    }
+   ]
+  },
+  {
+   "id": "spc_wanderer_aserai_3",
+   "culture": "aserai",
+   "female": false,
+   "epithet": "the Swordsman",
+   "lines": 8,
+   "missingLines": [],
+   "unsafe": false,
+   "hits": []
+  },
+  {
+   "id": "spc_wanderer_aserai_4",
+   "culture": "aserai",
+   "female": false,
+   "epithet": "the Prince",
+   "lines": 8,
+   "missingLines": [],
+   "unsafe": false,
+   "hits": []
+  },
+  {
+   "id": "spc_wanderer_aserai_5",
+   "culture": "aserai",
+   "female": false,
+   "epithet": "the Hyena",
+   "lines": 8,
+   "missingLines": [],
+   "unsafe": false,
+   "hits": []
+  },
+  {
+   "id": "spc_wanderer_aserai_6",
+   "culture": "aserai",
+   "female": false,
+   "epithet": "of the Wastes",
+   "lines": 8,
+   "missingLines": [],
+   "unsafe": false,
+   "hits": []
+  },
+  {
+   "id": "spc_wanderer_aserai_7",
+   "culture": "aserai",
+   "female": true,
+   "epithet": "the Wanderer",
+   "lines": 8,
+   "missingLines": [],
+   "unsafe": false,
+   "hits": []
+  },
+  {
+   "id": "spc_wanderer_aserai_8",
+   "culture": "aserai",
+   "female": true,
+   "epithet": "the Spicevendor",
+   "lines": 8,
+   "missingLines": [],
+   "unsafe": true,
+   "hits": [
+    {
+     "line": "backstory_a",
+     "noun": "Calradia",
+     "kind": "world"
+    }
+   ]
+  },
+  {
+   "id": "spc_wanderer_aserai_9",
+   "culture": "aserai",
+   "female": true,
+   "epithet": "the Leopardess",
+   "lines": 8,
+   "missingLines": [],
+   "unsafe": false,
+   "hits": []
+  },
+  {
+   "id": "spc_wanderer_aserai_10",
+   "culture": "aserai",
+   "female": false,
+   "epithet": "the Engineer",
+   "lines": 8,
+   "missingLines": [],
+   "unsafe": false,
+   "hits": []
+  },
+  {
+   "id": "spc_wanderer_khuzait_0",
+   "culture": "khuzait",
+   "female": false,
+   "epithet": "the Knowing",
+   "lines": 8,
+   "missingLines": [],
+   "unsafe": true,
+   "hits": [
+    {
+     "line": "backstory_a",
+     "noun": "Urkhun",
+     "kind": "hero"
+    },
+    {
+     "line": "backstory_b",
+     "noun": "Urkhun",
+     "kind": "hero"
+    },
+    {
+     "line": "backstory_c",
+     "noun": "Urkhun",
+     "kind": "hero"
+    },
+    {
+     "line": "generic_backstory",
+     "noun": "Urkhun",
+     "kind": "hero"
+    }
+   ]
+  },
+  {
+   "id": "spc_wanderer_khuzait_1",
+   "culture": "khuzait",
+   "female": false,
+   "epithet": "the Hawk",
+   "lines": 8,
+   "missingLines": [],
+   "unsafe": true,
+   "hits": [
+    {
+     "line": "backstory_a",
+     "noun": "Monchug",
+     "kind": "hero"
+    }
+   ]
+  },
+  {
+   "id": "spc_wanderer_khuzait_2",
+   "culture": "khuzait",
+   "female": false,
+   "epithet": "the Fatherless",
+   "lines": 8,
+   "missingLines": [],
+   "unsafe": false,
+   "hits": []
+  },
+  {
+   "id": "spc_wanderer_khuzait_3",
+   "culture": "khuzait",
+   "female": false,
+   "epithet": "Ironeye",
+   "lines": 8,
+   "missingLines": [],
+   "unsafe": true,
+   "hits": [
+    {
+     "line": "backstory_a",
+     "noun": "Monchug",
+     "kind": "hero"
+    },
+    {
+     "line": "backstory_a",
+     "noun": "Urkhun",
+     "kind": "hero"
+    }
+   ]
+  },
+  {
+   "id": "spc_wanderer_khuzait_4",
+   "culture": "khuzait",
+   "female": false,
+   "epithet": "the Outcast",
+   "lines": 8,
+   "missingLines": [],
+   "unsafe": false,
+   "hits": []
+  },
+  {
+   "id": "spc_wanderer_khuzait_5",
+   "culture": "khuzait",
+   "female": false,
+   "epithet": "the Mad",
+   "lines": 8,
+   "missingLines": [],
+   "unsafe": false,
+   "hits": []
+  },
+  {
+   "id": "spc_wanderer_khuzait_6",
+   "culture": "khuzait",
+   "female": false,
+   "epithet": "the Grey Falcon",
+   "lines": 8,
+   "missingLines": [],
+   "unsafe": true,
+   "hits": [
+    {
+     "line": "prebackstory",
+     "noun": "Urkhun",
+     "kind": "hero"
+    },
+    {
+     "line": "backstory_a",
+     "noun": "Urkhun",
+     "kind": "hero"
+    },
+    {
+     "line": "backstory_b",
+     "noun": "Karakhergit",
+     "kind": "clan"
+    },
+    {
+     "line": "backstory_c",
+     "noun": "Urkhun",
+     "kind": "hero"
+    },
+    {
+     "line": "response_2",
+     "noun": "Urkhun",
+     "kind": "hero"
+    },
+    {
+     "line": "generic_backstory",
+     "noun": "Urkhun",
+     "kind": "hero"
+    }
+   ]
+  },
+  {
+   "id": "spc_wanderer_khuzait_7",
+   "culture": "khuzait",
+   "female": true,
+   "epithet": "the She-Wolf",
+   "lines": 8,
+   "missingLines": [],
+   "unsafe": true,
+   "hits": [
+    {
+     "line": "backstory_a",
+     "noun": "Empire",
+     "kind": "lore"
+    }
+   ]
+  },
+  {
+   "id": "spc_wanderer_khuzait_8",
+   "culture": "khuzait",
+   "female": true,
+   "epithet": "the Alone",
+   "lines": 8,
+   "missingLines": [],
+   "unsafe": false,
+   "hits": []
+  },
+  {
+   "id": "spc_wanderer_khuzait_9",
+   "culture": "khuzait",
+   "female": true,
+   "epithet": "the Swift",
+   "lines": 8,
+   "missingLines": [],
+   "unsafe": false,
+   "hits": []
+  },
+  {
+   "id": "spc_wanderer_khuzait_10",
+   "culture": "khuzait",
+   "female": false,
+   "epithet": "the Ragged",
+   "lines": 8,
+   "missingLines": [],
+   "unsafe": true,
+   "hits": [
+    {
+     "line": "backstory_c",
+     "noun": "Chaikand",
+     "kind": "settlement"
+    }
+   ]
+  },
+  {
+   "id": "spc_wanderer_nord_0n",
+   "culture": "nord",
+   "female": false,
+   "epithet": "Wave-Breaker",
+   "lines": 8,
+   "missingLines": [],
+   "unsafe": true,
+   "hits": [
+    {
+     "line": "backstory_b",
+     "noun": "Sturgia",
+     "kind": "realm"
+    }
+   ]
+  },
+  {
+   "id": "spc_wanderer_nord_1n",
+   "culture": "nord",
+   "female": true,
+   "epithet": "Trolldaughter",
+   "lines": 8,
+   "missingLines": [],
+   "unsafe": true,
+   "hits": [
+    {
+     "line": "backstory_a",
+     "noun": "Svalfjord",
+     "kind": "lore"
+    },
+    {
+     "line": "generic_backstory",
+     "noun": "Nordlands",
+     "kind": "lore"
+    },
+    {
+     "line": "generic_backstory",
+     "noun": "Svalfjord",
+     "kind": "lore"
+    }
+   ]
+  },
+  {
+   "id": "spc_wanderer_nord_2n",
+   "culture": "nord",
+   "female": true,
+   "epithet": "of the River",
+   "lines": 8,
+   "missingLines": [],
+   "unsafe": true,
+   "hits": [
+    {
+     "line": "prebackstory",
+     "noun": "Throndelag",
+     "kind": "lore"
+    },
+    {
+     "line": "prebackstory",
+     "noun": "Jumne",
+     "kind": "lore"
+    },
+    {
+     "line": "backstory_a",
+     "noun": "Jumne",
+     "kind": "lore"
+    },
+    {
+     "line": "backstory_a",
+     "noun": "Vanni",
+     "kind": "lore"
+    },
+    {
+     "line": "backstory_b",
+     "noun": "Vanni",
+     "kind": "lore"
+    },
+    {
+     "line": "backstory_c",
+     "noun": "Sturgland",
+     "kind": "lore"
+    },
+    {
+     "line": "backstory_c",
+     "noun": "Vanni",
+     "kind": "lore"
+    },
+    {
+     "line": "backstory_d",
+     "noun": "Vanni",
+     "kind": "lore"
+    },
+    {
+     "line": "generic_backstory",
+     "noun": "Jumne",
+     "kind": "lore"
+    },
+    {
+     "line": "generic_backstory",
+     "noun": "Vanni",
+     "kind": "lore"
+    }
+   ]
+  },
+  {
+   "id": "spc_wanderer_nord_3n",
+   "culture": "nord",
+   "female": false,
+   "epithet": "Empty-Pockets",
+   "lines": 8,
+   "missingLines": [],
+   "unsafe": true,
+   "hits": [
+    {
+     "line": "prebackstory",
+     "noun": "Beinlandings",
+     "kind": "lore"
+    },
+    {
+     "line": "backstory_a",
+     "noun": "Beinland",
+     "kind": "lore"
+    },
+    {
+     "line": "backstory_a",
+     "noun": "Nordvyg",
+     "kind": "lore"
+    },
+    {
+     "line": "backstory_d",
+     "noun": "Beinland",
+     "kind": "lore"
+    },
+    {
+     "line": "response_1",
+     "noun": "Beinland",
+     "kind": "lore"
+    },
+    {
+     "line": "generic_backstory",
+     "noun": "Beinland",
+     "kind": "lore"
+    },
+    {
+     "line": "generic_backstory",
+     "noun": "Nordvyg",
+     "kind": "lore"
+    }
+   ]
+  },
+  {
+   "id": "spc_wanderer_nord_4n",
+   "culture": "nord",
+   "female": false,
+   "epithet": "the Restless",
+   "lines": 8,
+   "missingLines": [],
+   "unsafe": true,
+   "hits": [
+    {
+     "line": "backstory_a",
+     "noun": "Grykka",
+     "kind": "hero"
+    }
+   ]
+  },
+  {
+   "id": "spc_wanderer_nord_5n",
+   "culture": "nord",
+   "female": false,
+   "epithet": "the Easterling",
+   "lines": 8,
+   "missingLines": [],
+   "unsafe": true,
+   "hits": [
+    {
+     "line": "backstory_a",
+     "noun": "Gauksdal",
+     "kind": "settlement"
+    },
+    {
+     "line": "backstory_a",
+     "noun": "Jumne",
+     "kind": "lore"
+    },
+    {
+     "line": "backstory_c",
+     "noun": "Empire",
+     "kind": "lore"
+    }
+   ]
+  },
+  {
+   "id": "spc_wanderer_nord_6n",
+   "culture": "nord",
+   "female": false,
+   "epithet": "the Boatswain",
+   "lines": 8,
+   "missingLines": [],
+   "unsafe": true,
+   "hits": [
+    {
+     "line": "backstory_a",
+     "noun": "Thronderlag",
+     "kind": "settlement"
+    },
+    {
+     "line": "backstory_a",
+     "noun": "Neretzes",
+     "kind": "clan"
+    },
+    {
+     "line": "backstory_a",
+     "noun": "Diathma",
+     "kind": "settlement"
+    },
+    {
+     "line": "backstory_a",
+     "noun": "Empire",
+     "kind": "lore"
+    },
+    {
+     "line": "backstory_c",
+     "noun": "Neretzes",
+     "kind": "clan"
+    },
+    {
+     "line": "backstory_c",
+     "noun": "Pendraic",
+     "kind": "settlement"
+    },
+    {
+     "line": "backstory_c",
+     "noun": "Empire",
+     "kind": "lore"
+    },
+    {
+     "line": "backstory_d",
+     "noun": "Empire",
+     "kind": "lore"
+    },
+    {
+     "line": "response_2",
+     "noun": "Empire",
+     "kind": "lore"
+    }
+   ]
+  },
+  {
+   "id": "spc_wanderer_nord_7n",
+   "culture": "nord",
+   "female": false,
+   "epithet": "the Sea-Raider",
+   "lines": 8,
+   "missingLines": [],
+   "unsafe": true,
+   "hits": [
+    {
+     "line": "backstory_b",
+     "noun": "Beinland",
+     "kind": "lore"
+    }
+   ]
+  },
+  {
+   "id": "spc_wanderer_empire_0n",
+   "culture": "empire",
+   "female": false,
+   "epithet": "the Shipwright",
+   "lines": 8,
+   "missingLines": [],
+   "unsafe": true,
+   "hits": [
+    {
+     "line": "backstory_a",
+     "noun": "Zeonica",
+     "kind": "settlement"
+    },
+    {
+     "line": "backstory_a",
+     "noun": "Garios",
+     "kind": "hero"
+    },
+    {
+     "line": "backstory_c",
+     "noun": "emperor",
+     "kind": "emperor"
+    },
+    {
+     "line": "backstory_c",
+     "noun": "Garios",
+     "kind": "hero"
+    },
+    {
+     "line": "generic_backstory",
+     "noun": "Zeonica",
+     "kind": "settlement"
+    }
+   ]
+  },
+  {
+   "id": "spc_wanderer_aserai_0n",
+   "culture": "aserai",
+   "female": false,
+   "epithet": "the Navigator",
+   "lines": 8,
+   "missingLines": [],
+   "unsafe": true,
+   "hits": [
+    {
+     "line": "backstory_a",
+     "noun": "Quyaz",
+     "kind": "settlement"
+    },
+    {
+     "line": "backstory_b",
+     "noun": "Revyl",
+     "kind": "settlement"
+    },
+    {
+     "line": "backstory_c",
+     "noun": "Danustica",
+     "kind": "settlement"
+    },
+    {
+     "line": "backstory_c",
+     "noun": "Zeonica",
+     "kind": "settlement"
+    },
+    {
+     "line": "backstory_c",
+     "noun": "Charas",
+     "kind": "settlement"
+    },
+    {
+     "line": "generic_backstory",
+     "noun": "Quyaz",
+     "kind": "settlement"
+    }
+   ]
+  },
+  {
+   "id": "spc_wanderer_vlandia_0n",
+   "culture": "vlandia",
+   "female": false,
+   "epithet": "the Fisherman",
+   "lines": 8,
+   "missingLines": [],
+   "unsafe": true,
+   "hits": [
+    {
+     "line": "prebackstory",
+     "noun": "Charas",
+     "kind": "settlement"
+    },
+    {
+     "line": "backstory_a",
+     "noun": "Brotherhood of the Woods",
+     "kind": "clan"
+    },
+    {
+     "line": "backstory_a",
+     "noun": "Charas",
+     "kind": "settlement"
+    },
+    {
+     "line": "backstory_b",
+     "noun": "dey Cortain",
+     "kind": "clan"
+    },
+    {
+     "line": "backstory_b",
+     "noun": "Charas",
+     "kind": "settlement"
+    },
+    {
+     "line": "response_2",
+     "noun": "Charas",
+     "kind": "settlement"
+    },
+    {
+     "line": "generic_backstory",
+     "noun": "Calradia",
+     "kind": "world"
+    },
+    {
+     "line": "generic_backstory",
+     "noun": "Charas",
+     "kind": "settlement"
+    }
+   ]
+  }
+ ]
+}

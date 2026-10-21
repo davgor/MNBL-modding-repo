@@ -10,6 +10,7 @@ New-Item -ItemType Directory -Path $out | Out-Null
 $csc='C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/MSBuild/Current/Bin/Roslyn/csc.exe'
 $sources=@('src/MNBL.ProceduralWorld/Generation/JobStateMachine.cs','src/MNBL.ProceduralWorld/Generation/ProgressEvents.cs','src/MNBL.ProceduralWorld/Generation/EngineWorkScheduler.cs',
     'src/MNBL.ProceduralWorld/Generation/GenerationCoordinator.cs','src/MNBL.ProceduralWorld/Generation/GenerationErrors.cs','src/MNBL.ProceduralWorld/UI/WorldSetupModel.cs',
+    'src/MNBL.ProceduralWorld/World/NavigationCacheForecast.cs','src/MNBL.ProceduralWorld/World/NavigationCacheKey.cs',
     # MMR-46: the setup model names the world preview (and what it is built from).
     'src/MNBL.ProceduralWorld/UI/WorldPreview.cs','src/MNBL.ProceduralWorld/World/WorldSurface.cs','src/MNBL.ProceduralWorld/World/WorldLifetime.cs','src/MNBL.ProceduralWorld/World/PeriodicWorldCoordinates.cs',
     'src/MNBL.ProceduralWorld/World/PeriodicDistanceModel.cs','src/MNBL.ProceduralWorld/CampaignBootstrap/WorldDataBundle.cs','src/MNBL.ProceduralWorld/Campaign/CampaignIdentity.cs','src/MNBL.ProceduralWorld/Campaign/FactionFactory.cs','src/MNBL.ProceduralWorld/Campaign/VillageBinding.cs',
@@ -60,7 +61,7 @@ $files=@($layout|ForEach-Object { $_.name })
 # Each embedded input is the repository file at its layout path (the job writes it there).
 $wrongSource=@($layout|Where-Object { $project -notmatch [regex]::Escape('Include="..\..\'+($_.path -replace '/','\')+'" LogicalName="MNBL.ProceduralWorld.'+$_.name+'"') })
 $missing=@($files|Where-Object { $project -notmatch [regex]::Escape('LogicalName="MNBL.ProceduralWorld.'+$_+'"') })
-$embedOk=$files.Count -eq 14 -and $missing.Count -eq 0 -and $wrongSource.Count -eq 0
+$embedOk=$files.Count -eq 16 -and $missing.Count -eq 0 -and $wrongSource.Count -eq 0
 $lines+=@(($(if($embedOk){'ok    '}else{'FAIL  '}))+"every job input the production stages write is embedded from the repository file at the path the job writes it to, keeping the layout policies resolve their calibration receipts in ($($files.Count): $($files -join ', '))"+$(if($missing.Count){' missing: '+($missing -join ', ')}else{''})+$(if($wrongSource.Count){' wrong source: '+(($wrongSource|ForEach-Object { $_.name }) -join ', ')}else{''}))
 if(-not $embedOk){$failed=1}
 

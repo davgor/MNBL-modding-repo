@@ -44,20 +44,24 @@ internal static class CompiledWorldTests
 
     private static void Run(string bundleDir, string repo, SortedDictionary<string, object> evidence)
     {
-        var host = new WorldDataBundle.HostProfile("v1.4.8.119303", "v1.2.8.119303", new[] { "R01", "R02", "R03", "R04", "R05", "R06", "R07", "R08", "R09", "R10" });
+        var host = new WorldDataBundle.HostProfile("v1.4.8.119303", "v1.2.8.119303", WorldDataBundle.HostCapabilities);
         var bundle = WorldDataBundle.Open(bundleDir, host);
         var pin = Load(Path.Combine(repo, "worldgen/policies/campaign-catalog.json"));
-        // The catalog: the captured documents the pin names, each verified against its pinned hash (in game: the live merged XML).
+        // The catalog: the captured documents the pin names (MMR-283: v2 lists them by id), each verified against its capture receipt's hash
+        // (in game: the live merged XML, checked against the reduced pin).
         var receipt = Load(Path.Combine(repo, S(O(pin, "provenance"), "catalogReceipt")));
         var catalog = new Dictionary<string, XmlDocument>(StringComparer.Ordinal);
         foreach (var d in ((IEnumerable)O(receipt, "outputs")["documents"]).Cast<IDictionary<string, object>>())
         {
             var bytes = File.ReadAllBytes(S(d, "path"));
-            if (Sha(bytes) != S(O(pin, "documents"), S(d, "id"))) throw new InvalidOperationException("catalog " + S(d, "id") + " differs from the pin");
+            if (Sha(bytes) != S(d, "sha256") || !((IEnumerable)pin["documents"]).Cast<object>().Contains(S(d, "id"))) throw new InvalidOperationException("catalog " + S(d, "id") + " differs from its capture or the pin");
             var doc = new XmlDocument { XmlResolver = null }; doc.LoadXml(new UTF8Encoding(false).GetString(bytes).TrimStart('﻿')); catalog[S(d, "id")] = doc;
         }
         var defaults = ((IEnumerable)pin["defaults"]).Cast<object>().Select(x => (string)x).ToList();
-        var layoutReport = O(O(Load(Path.Combine(repo, "evidence/world/settlement-position-report.json")), "worlds"), "A");
+        // MMR-262: the layout of this bundle's world (the report holds A' and B'), found by its world content id.
+        var layoutReport = O(Load(Path.Combine(repo, "evidence/world/settlement-position-report.json")), "worlds").Values.Cast<IDictionary<string, object>>()
+            .FirstOrDefault(w => S(w, "worldContentId") == bundle.WorldContentId);
+        if (layoutReport == null) throw new InvalidDataException("evidence/world/settlement-position-report.json has no layout for world " + bundle.WorldContentId);
         var grid = O((IDictionary<string, object>)Json.DeserializeObject(new UTF8Encoding(false).GetString(bundle.ReadVerified("compiled/travel/travel-graph.json"))), "grid");
         double spacing = D(grid["spacing"]), originX = D(grid["columnOffset"]) * spacing, originY = D(grid["rowOffset"]) * spacing;
         var missionScenes = MNBL.ProceduralWorld.Missions.MissionScenes.FromBytes(File.ReadAllBytes(Path.Combine(repo, MNBL.ProceduralWorld.Missions.MissionScenes.PolicyPath)));
@@ -74,6 +78,28 @@ internal static class CompiledWorldTests
               " installed records re-emitted) passes the whole-graph validation in the logical frame: " + world.Graph.Summary(30) + " (" + Math.Round(seconds, 1) + " s)");
         var census = world.Graph.Census;
         evidence["census"] = census; evidence["graphSha256"] = world.Graph.Sha256; evidence["record"] = world.Record(); evidence["buildSeconds"] = Math.Round(seconds, 2);
+        // MMR-280: the staged population (houses, companies, outlaw clans, adult lords, minors, dead parents, members, wanderers) equals the
+        // campaign v2 census the population pass wrote, counted by the graph validator from the staged documents and by HeroFactory from its intents.
+        var campaignCensus = O((IDictionary<string, object>)Json.DeserializeObject(new UTF8Encoding(false).GetString(bundle.ReadVerified("compiled/campaign/campaign.json"))), "census");
+        var staged = census.ContainsKey("population") ? (SortedDictionary<string, int>)census["population"] : new SortedDictionary<string, int>();
+        Check(staged.Count == 9 && staged.All(c => Convert.ToInt32(campaignCensus[c.Key]) == c.Value) && world.Heroes.Census.Where(c => campaignCensus.ContainsKey(c.Key)).All(c => Convert.ToInt32(campaignCensus[c.Key]) == c.Value) &&
+              world.Factions.MinorClans.Count == staged["mercenaryCompanies"] + staged["outlawClans"] && world.Heroes.Census["wanderers"] == staged["wanderers"],
+              "the staged population equals the campaign v2 census: " + String.Join(", ", staged.Select(c => c.Value + " " + c.Key)) + " (dead parents outside every other count)");
+
+        // MMR-262 (F05): the new game registers every backstory-safe wanderer template the catalog resolves, by HeroFactory's own predicate, not
+        // only the ones the day-0 wanderers drew: the runtime top-up and rotation pick only registered templates.
+        var registeredIds = new HashSet<string>(world.Documents.Single(x => x.Key == "NPCCharacters").Value.DocumentElement.ChildNodes.OfType<XmlElement>().Select(e => e.GetAttribute("id")), StringComparer.Ordinal);
+        var resolver = new CharacterTemplateResolver(catalog, defaults, O(Load(Path.Combine(repo, "worldgen/policies/rosters.json")), "troops"));
+        var resolvable = new HashSet<string>(WandererPool.Cultures.SelectMany(c => resolver.WandererTemplates(c, new List<string>())), StringComparer.Ordinal);
+        var safe = world.Population.Pool.Safe.ToList();
+        var safeRegistered = safe.Where(t => registeredIds.Contains(t.Id)).ToList();
+        var dayZero = world.Heroes.Wanderers.Select(w => w.Template).Distinct().ToList();
+        var groups = safe.Where(t => resolvable.Contains(t.Id)).GroupBy(t => t.Culture + (t.Female ? " women" : " men")).OrderBy(g => g.Key, StringComparer.Ordinal).ToList();
+        Check(safeRegistered.Count == safe.Count(t => resolvable.Contains(t.Id)) && safeRegistered.Select(t => t.Id).OrderBy(x => x, StringComparer.Ordinal).SequenceEqual(world.WandererTemplates) &&
+              dayZero.All(registeredIds.Contains) && safeRegistered.Count > dayZero.Count && groups.All(g => g.All(t => registeredIds.Contains(t.Id))),
+              "the new game registers all " + safeRegistered.Count + " backstory-safe wanderer templates the catalog resolves (of " + safe.Count + " safe; the day-0 wanderers use " + dayZero.Count + "): " +
+              String.Join(", ", groups.Select(g => g.Key + " " + g.Count(t => dayZero.Contains(t.Id)) + "->" + g.Count())) + " (day-0 -> registered)");
+        evidence["wandererTemplates"] = new Dictionary<string, object> { ["safe"] = safe.Count, ["registered"] = safeRegistered.Count, ["dayZero"] = dayZero.Count };
 
         // The records on the scene's placement.
         var physical = world.Documents.Single(x => x.Key == "Settlements").Value;
@@ -140,6 +166,16 @@ internal static class CompiledWorldTests
         var mismatch = SettlementFactory.CheckResolvedPositions(world.World.Settlements, id => placed.ContainsKey(id) ? placed[id] : null);
         moved.GateX -= 0.5;
         Check(mismatch.Count == 1 && mismatch[0].StartsWith(moved.Id + " gate"), "a record moved off the layout (a castle gate by half a unit) is found: " + String.Join("; ", mismatch));
+        // MMR-258 (RT-14): each record takes the prototype its scene look was built from, so the map look matches the scene the player enters;
+        // a layout whose village look shows another type than the record's is refused.
+        var looks = CompiledWorldDataset.Looks(layoutReport);
+        int looked = looks.Count(kv => kv.Value.Key != null);
+        bool prototypes = looked > 0 && looks.Where(kv => kv.Value.Key != null).All(kv => world.World.Settlements.First(x => x.Id == kv.Key).Prototype == kv.Value.Key);
+        var otherType = (IDictionary<string, object>)Json.DeserializeObject(Json.Serialize(layoutReport));
+        var village = ((IEnumerable)otherType["settlements"]).Cast<IDictionary<string, object>>().First(x => (string)x["kind"] == "village");
+        var villageLook = (IDictionary<string, object>)village["look"]; villageLook["villageType"] = (string)villageLook["villageType"] == "wheat_farm" ? "lumberjack" : "wheat_farm";
+        string typeError = Refusal(() => CompiledWorldDataset.Build(sources(otherType)));
+        Check(prototypes && typeError != null && typeError.Contains("village looks"), "every record whose layout look names a prototype takes it (" + looked + " of " + looks.Count + " settlements; the rest phase 0 or variants pick from their pool), and a village look of another type than the record's is refused (" + typeError + ")");
         evidence["documents"] = world.DocumentSha256; evidence["origin"] = new[] { originX, originY };
     }
 

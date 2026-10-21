@@ -48,6 +48,23 @@ if (Test-Path -LiteralPath $gui) {
         @{source='Modules/MNBL.ProceduralWorld/' + $relative; relative=$relative}
     })
 }
+# MMR-286: the module's localization strings (ModuleData/Languages, tools/make_module_strings.py).
+$languages = Join-Path $repo 'Modules/MNBL.ProceduralWorld/ModuleData/Languages'
+if (Test-Path -LiteralPath $languages) {
+    $files += @(Get-ChildItem -LiteralPath $languages -Filter *.xml -File | Sort-Object Name | ForEach-Object { @{source="Modules/MNBL.ProceduralWorld/ModuleData/Languages/$($_.Name)"; relative="ModuleData/Languages/$($_.Name)"} })
+}
+# MMR-259: the published magic-ground packs, when the owner's editor publish has landed them (docs/magic-ground-textures.md).
+$packs = Join-Path $repo 'Modules/MNBL.ProceduralWorld/AssetPackages'
+if (Test-Path -LiteralPath $packs) {
+    $files += @(Get-ChildItem -LiteralPath $packs -Filter *.tpac -File | Sort-Object Name | ForEach-Object { @{source="Modules/MNBL.ProceduralWorld/AssetPackages/$($_.Name)"; relative="AssetPackages/$($_.Name)"} })
+}
+# MMR-261 (RT-37): every producer build a campaign may cast with, by hash (worldgen/producer-archive.json; Git LFS release inputs).
+$archive = Get-Content (Join-Path $repo 'worldgen/producer-archive.json') -Raw | ConvertFrom-Json
+foreach ($build in @($archive.builds)) {
+    $source = "Modules/MNBL.ProceduralWorld/$($build.path)"
+    if ((Get-FileHash -LiteralPath (Join-Path $repo $source)).Hash.ToLowerInvariant() -ne $build.sha256) { throw "Archived producer differs from its hash: $source" }
+    $files += @{source=$source; relative=$build.path}
+}
 $manifest = @($files | ForEach-Object {
     $source = Join-Path $repo $_.source
     $destination = [IO.Path]::GetFullPath((Join-Path $target $_.relative))

@@ -38,13 +38,15 @@ Averages of a settlement and its port (and the besieger) are formed with every t
 
 **Height, zoom and the poles.**
 - Camera height, zoom and bearing are untouched.
-- North and south do not wrap: the rebase acts on x only, and the camera's y clamp is the engine's.
+- North and south do not wrap: the rebase acts on x only.
+- **Pole lines (MMR-278, RT-19).** In the same prefix the camera target and the ideal target are held between the pole lines (`PeriodicWorldCoordinates.ClampY`), and the camera frame moves with the target, so the view stops at a pole instead of panning over the polar padding. `PeriodicMapCameraView.PoleClamps` counts the held ticks.
+- **Known limit (RT-19): polar land.** East-west distance is stretched by 1/cos(latitude). On A' 33.6% of the land cells lie where the stretch is at least 2, 14.7% at least 3 and 1.5% at least 6; on B' 45.8%, 36.4% and 17.1% (`evidence/fwg/terrain-shaping.json` `polarLandShare`). The projection keeps this; only the camera is clamped.
 
 ## What is drawn where
 
 **The display rule.** Every visual that follows a campaign object is drawn at the object's image nearest the camera target (`PeriodicMapPresentation.Display`):
 - **Parties and ships** (postfixes on `GetVisualPosition`): their frame is set from the visual position on every visible tick.
-- **Tracks** (`MapTracksVisualManager.CalculateTrackFrame`) and **anchors** (`AnchorVisual.GetVisualPosition`): the engine frames these only when they change, so they are also refreshed when the camera wraps or has moved more than 50 units (`RefreshImages`: the tracks are marked dirty, the anchor cache cleared).
+- **Tracks** (`MapTracksVisualManager.CalculateTrackFrame`) and **anchors** (`AnchorVisual.GetVisualPosition`): the engine frames these only when they change, so they are also refreshed when the camera wraps or has moved more than 50 units (`RefreshImages`: the tracks are marked dirty, the anchor cache cleared). The refresh (with the map dressing's and the magic ground's) waits while `MapScreen`'s scene view is disabled (MMR-247 X: its first frames after an activation and during a conversation, when nothing is drawn; `docs/map-dressing.md` "Seam" says why).
 - **Storms** (`StormVisual.VisualTick`'s position).
 - **Selection and hover decals** (`MapScreen.TickCircles`: the move target, a targeted party, the town circle and hover outlines, the village outline), **blockade arcs and visuals** (`BlockadeVisualHelper`), **battle facings** (`GetMapEventVisualRotation`), **anchor frames** (`AnchorVisual.CalculateAnchorFrame`) and **quest arrows** (`QuestHelper.AddMapArrowFromPointToTarget`). These take their positions at the same images and their directions as periodic differences (through MMR-65's position gate).
 

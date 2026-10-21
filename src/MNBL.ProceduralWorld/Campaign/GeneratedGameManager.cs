@@ -29,6 +29,9 @@ namespace MNBL.ProceduralWorld.CampaignRegistry
         // MMR-35: the world's fleet rule (the clans that may not hold ships), or null for a world without naval content; known before
         // OnGameStart (new game: the registration's dataset plan; load: the package).
         NavalContentFactory.NavalPlan NavalPlan { get; }
+        // MMR-281: the population the runtime keeps (W, the minor-faction heroes, the houses, the wanderer reserve), or null for a world
+        // without the population pass (the fixture world): the installed wanderer tick then runs.
+        PopulationPlan Population { get; }
     }
 
     // MMR-30: the game manager of a generated campaign, promoted from the MMR-18/19 diagnostic manager (runs 31308, 23192,
@@ -70,6 +73,12 @@ namespace MNBL.ProceduralWorld.CampaignRegistry
         public GeneratedShipDistributionModel ShipDistribution { get; private set; }
         // MMR-39: War Sails' storms on generated geography (every generated world with War Sails).
         public GeneratedStormModel Storms { get; private set; }
+        // MMR-254: the one party speed model of a generated world (terrain, road and road-deck terms over the installed chain).
+        public GeneratedPartySpeedModel Speed { get; private set; }
+        // MMR-281: houses, companies and wanderers in play (worlds with a population plan).
+        public GeneratedPopulationBehavior Population { get; private set; }
+        // MMR-261: the live landscape mutation (compiled worlds with magic layers).
+        public WorldMutationBehavior Mutations { get; private set; }
         internal static bool NavalPresent { get { return TaleWorlds.ModuleManager.ModuleHelper.GetModuleInfo("NavalDLC") != null; } }
         public List<Dictionary<string, object>> RegistryCensuses { get; private set; }
 
@@ -108,6 +117,7 @@ namespace MNBL.ProceduralWorld.CampaignRegistry
         {
             base.InitializeGameStarter(game, starterObject);
             if (World == null) return;
+            Traced("InitializeGameStarter:speed", () => RegisterSpeedModel(starterObject));
             if (NavalPresent) Traced("InitializeGameStarter:storms", () => RegisterStormModel(starterObject));
             if (World.NavalPlan == null) return;
             Traced("InitializeGameStarter", () => {
@@ -131,6 +141,24 @@ namespace MNBL.ProceduralWorld.CampaignRegistry
             GeneratedStormModel.ResetCounters();
             campaignStarter.AddModel<NavalDLC.ComponentInterfaces.MapStormModel>(Storms);
             Trace("storm_model_registered:base=" + (Storms.Installed == null ? "none" : Storms.Installed.GetType().FullName));
+        }
+
+        // MMR-254: chained over War Sails' speed model (its AddModels ran in the base InitializeGameStarter): Road -> Naval -> Default, the
+        // roads.json speed chain; no Harmony. Every factor is the module's roads.json speed (RoadsPolicy).
+        private void RegisterSpeedModel(IGameStarter starterObject)
+        {
+            var campaignStarter = starterObject as CampaignGameStarter;
+            if (campaignStarter == null) throw new InvalidOperationException("Generated world requires CampaignGameStarter.");
+            Speed = new GeneratedPartySpeedModel(MNBL.ProceduralWorld.World.RoadsPolicy.Installed());
+            campaignStarter.AddModel<TaleWorlds.CampaignSystem.ComponentInterfaces.PartySpeedModel>(Speed);
+            var chain = new List<string>();
+            for (object m = Speed; m != null && chain.Count < 8; )
+            {
+                chain.Add(m.GetType().FullName);
+                var p = m.GetType().GetProperty("BaseModel", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic);
+                m = p == null ? null : p.GetValue(m);
+            }
+            Trace("speed_model_registered:chain=" + String.Join(">", chain));
         }
 
         private static void ReleaseNavalWrapper() { GeneratedNavalMapSceneWrapper.Release(); }
@@ -193,6 +221,20 @@ namespace MNBL.ProceduralWorld.CampaignRegistry
                 if (!LoadMode) Startup.Activate();
                 Trace("startup_behavior_registered:" + (LoadMode ? "load" : "new_game"));
             }
+            if (World.Population != null)
+            {
+                Population = new GeneratedPopulationBehavior(World.Population, Trace);
+                campaignStarter.AddBehavior(Population);   // a load needs it too: the wanderer tick, the homeless houses, the re-assert
+                Trace("population_behavior_registered:" + (LoadMode ? "load" : "new_game") + ":W=" + World.Population.Wanderers + ":minor_faction_heroes=" + World.Population.MinorFactionHeroes.Count);
+            }
+            var compiled = World as CompiledWorldRegistration;
+            MNBL.ProceduralWorld.Surface.MutationModel.Context mutation;
+            if (compiled != null && WorldMutationBehavior.Contexts.TryGetValue(compiled.SceneName, out mutation))
+            {
+                Mutations = new WorldMutationBehavior(mutation, compiled.SceneName, Trace);
+                campaignStarter.AddBehavior(Mutations);   // a load needs it too: its SyncData restores the live cells before the map loads
+                Trace("world_mutation_behavior_registered:" + (LoadMode ? "load" : "new_game") + ":producer " + mutation.ProducerSha256.Substring(0, 12));
+            }
             if (SpawnAssertions)
             {
                 SpawnChecks = new GeneratedSpawnAssertions();
@@ -222,7 +264,7 @@ namespace MNBL.ProceduralWorld.CampaignRegistry
             MNBL.ProceduralWorld.Persistence.WorldSaveBinding.Detach();   // MMR-48: neither does the save binding
             MNBL.ProceduralWorld.Persistence.GeneratedWorldLoader.ReleaseEnded(this);   // MMR-49: nor the loader's reference to its game
             if (World != null) Teardown();
-            else GeneratedStartupBehavior.Deactivate(Trace);
+            else { GeneratedStartupBehavior.Deactivate(Trace); GeneratedPopulationBehavior.Deactivate(); WorldMutationBehavior.Deactivate(); }
             base.OnGameEnd(game);
         }
 
@@ -232,6 +274,8 @@ namespace MNBL.ProceduralWorld.CampaignRegistry
             try
             {
                 GeneratedStartupBehavior.Deactivate(Trace);
+                GeneratedPopulationBehavior.Deactivate();
+                WorldMutationBehavior.Deactivate();   // MMR-261: a running fwg apply is killed with its world
                 GeneratedPatches.RemoveWorld(Trace);
                 GeneratedCharacterCreation.Release(Trace);
                 var campaign = Campaign.Current;
@@ -258,6 +302,10 @@ namespace MNBL.ProceduralWorld.CampaignRegistry
                 // MMR-49: the battle terrain context and the battle scene observations belong to this world too (they outlived a committed
                 // campaign before: WorldLifetimeScope).
                 GeneratedBattleTerrain.ContextSources.Clear(); MNBL.ProceduralWorld.Missions.MissionScenePatches.Clear();
+                MNBL.ProceduralWorld.World.MapDressingRuntime.Plans.Clear();   // MMR-257: the map dressing plan (its drawn objects go with the map scene)
+                MNBL.ProceduralWorld.World.MagicGroundRuntime.Forget();   // MMR-260: the magic overlays and their stored live cells
+                WorldMutationBehavior.Contexts.Clear();   // MMR-261: the worlds' mutation contexts
+                GeneratedPartySpeedModel.RoadSources.Clear(); GeneratedPartySpeedModel.Deactivate();   // MMR-254: so do its road cells
                 record.StartupActiveLeft = GeneratedStartupBehavior.Active != null;
                 record.StartupAppliedLeft = GeneratedPatches.StartupApplied; record.WorldAppliedLeft = GeneratedPatches.WorldApplied;
                 Trace("generated_teardown:own_listeners=" + record.OwnListenersBefore + "->" + record.OwnListenersLeft + ":patches_left=" + record.PatchesLeft.Count);
@@ -317,6 +365,8 @@ namespace MNBL.ProceduralWorld.CampaignRegistry
                         throw new RegistrationException("Generated world not closed after every submodule registered, before the default lists publish", closure);
                     }
                     Trace("generated_registry_closed");
+                    // MMR-281: the companies' and outlaw clans' heroes are minor-faction heroes before any new-game handler runs.
+                    if (!LoadMode && Population != null) Population.MarkAtRegistration();
                 });
             OnPhase("after_submodule_post_registration");
         }

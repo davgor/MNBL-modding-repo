@@ -45,8 +45,7 @@ namespace MNBL.ProceduralWorld.Persistence
             if (guard == null)
                 try
                 {
-                    var deserialize = AccessTools.Method(typeof(MBSaveLoad), "LoadSaveGameData", new[] { typeof(string) });
-                    if (deserialize == null) throw new MissingMethodException("MBSaveLoad.LoadSaveGameData(string) is missing");
+                    var deserialize = CampaignRegistry.PatchSignatures.Method(typeof(MBSaveLoad).FullName, "LoadSaveGameData");   // MMR-284: by signature
                     var g = new Harmony(GuardId);
                     g.Patch(deserialize, prefix: new HarmonyMethod(typeof(LoadRouting), nameof(LoadSaveGameDataPrefix)));
                     guard = g;
@@ -55,11 +54,12 @@ namespace MNBL.ProceduralWorld.Persistence
             if (harmony != null) return;
             try
             {
-                CampaignRegistry.GeneratedPatches.RequireInstalledVersion("load routing");
-                var tryLoad = AccessTools.Method(typeof(SandBox.SandBoxSaveHelper), "TryLoadSave", new[] { typeof(SaveGameFileInfo), typeof(Action<LoadResult>), typeof(Action) });
-                var loadAction = AccessTools.Method(typeof(SandBox.SandBoxSaveHelper), "LoadGameAction", new[] { typeof(SaveGameFileInfo), typeof(Action<LoadResult>), typeof(Action) });
-                if (tryLoad == null || loadAction == null || InquiryActive == null)
-                    throw new InvalidOperationException("SandBoxSaveHelper.TryLoadSave, LoadGameAction or _isInquiryActive is not the installed " + CampaignRegistry.GeneratedPatches.GameVersion + " member.");
+                CampaignRegistry.GeneratedPatches.RequireSupportedBuild("load routing");
+                // MMR-284: by signature (PatchSignatureException names the patch); the guard above refuses generated saves meanwhile.
+                var helper = typeof(SandBox.SandBoxSaveHelper).FullName;
+                var tryLoad = CampaignRegistry.PatchSignatures.Method(helper, "TryLoadSave");
+                var loadAction = CampaignRegistry.PatchSignatures.Method(helper, "LoadGameAction");
+                CampaignRegistry.PatchSignatures.Field(helper, "_isInquiryActive");
                 var h = new Harmony(HarmonyId);
                 h.Patch(tryLoad, prefix: new HarmonyMethod(typeof(LoadRouting), nameof(TryLoadSavePrefix)));
                 h.Patch(loadAction, prefix: new HarmonyMethod(typeof(LoadRouting), nameof(LoadGameActionPrefix)));
@@ -111,8 +111,9 @@ namespace MNBL.ProceduralWorld.Persistence
             if (!generated) return true;
             Guarded++;
             __result = null;
-            InformationManager.DisplayMessage(new InformationMessage("The save " + __0 + " belongs to a generated world; only the world loader of MNBL Procedural World opens it"
-                + (Applied ? "" : " (its load routing is not installed: " + (ApplyError ?? "unknown") + ")") + ". Nothing was loaded."));
+            var text = new TaleWorlds.Localization.TextObject(Applied ? LoadPolicy.Texts.Routed : LoadPolicy.Texts.RoutedUnapplied);
+            text.SetTextVariable("SAVE", __0 ?? "?"); text.SetTextVariable("REASON", ApplyError ?? "unknown");
+            InformationManager.DisplayMessage(new InformationMessage(text.ToString()));
             return false;
         }
     }

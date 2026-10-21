@@ -11,6 +11,7 @@
 #include <stdexcept>
 #include "worldbridge/canonical_json.hpp"
 #include "worldbridge/projected_world.hpp"
+#include "worldbridge/terrain_layers.hpp"
 
 namespace worldbridge::terrain {
 namespace {
@@ -203,7 +204,8 @@ Import load_import(const fs::path& file) {
     if (!(k.extent_min > 0 && k.extent_max > k.extent_min && k.height_limit > 0 && k.zero_range_span > 0 && k.engine_truncation >= 0) ||
         k.node_size_decimals < 0 || k.node_size_decimals > 6 || k.range_decimals < 0 || k.range_decimals > 6)
         throw Error("out_of_range", "Terrain import numeric limits are inconsistent", doc.at);
-    for (const auto& l : need(need(doc, "materials", Value::Kind::Object, "Terrain import"), "templateLayers", Value::Kind::Array, "materials").items) k.template_layers.push_back(l.text);
+    k.weight_slots = std::atoi(need(need(doc, "materials", Value::Kind::Object, "Terrain import"), "slots", Value::Kind::Number, "materials").text.c_str());
+    if (k.weight_slots < 2 || k.weight_slots > 16) throw Error("out_of_range", "materials.slots must be 2..16", doc.at);
     if (k.nodes_x <= 0 || k.nodes_x != k.nodes_y || k.grid_sides.empty() || k.grid_sides.size() != k.node_cells.size()) throw Error("out_of_range", "Terrain import grid description is inconsistent", t.at);
     for (std::size_t i = 0; i < k.grid_sides.size(); ++i)
         if (k.grid_sides[i] != k.nodes_x * k.node_cells[i] + 1) throw Error("out_of_range", "gridSides must equal nodes * nodeCells + 1", t.at);
@@ -211,7 +213,7 @@ Import load_import(const fs::path& file) {
     return k;
 }
 
-SourceLayers layers_of(const source::SourceWorld& world) {
+SourceLayers layers_of(const source::SourceWorld& world, double snow_threshold) {
     SourceLayers L;
     L.side = static_cast<std::int64_t>(world.metadata.grid_side);
     L.height = world.read_layer("height").values;
@@ -219,8 +221,13 @@ SourceLayers layers_of(const source::SourceWorld& world) {
     L.water_type = world.read_layer("water_type").values;
     L.river = world.read_layer("river").values;
     L.landform = world.read_layer("landform").values;
+    L.temperature = world.read_layer("temperature").values;
+    L.moisture = world.read_layer("moisture").values;
+    L.ice_cap = world.read_layer("ice_cap").values;
+    L.rocky_coast = world.read_layer("rocky_coast").values;
     L.biomes = world.biomes;
     L.landforms = world.landforms;
+    L.snow_months = world.snow_months(snow_threshold);
     return L;
 }
 
@@ -243,10 +250,11 @@ Quantized quantize(const std::vector<double>& z, int bits, int decimals, double 
 Compiled compile(const SourceLayers& L, const projection::Projection& p, const MaterialPolicy& policy, const Import& import, int side) {
     const auto at_side = std::find(import.grid_sides.begin(), import.grid_sides.end(), side);
     if (at_side == import.grid_sides.end()) refuse("out_of_range", "Output side " + std::to_string(side) + " is not one the terrain import calibration lists");
-    if (policy.channels != import.template_layers) refuse("unmapped_category", "Material policy channels differ from the proven template layers");
+    if (static_cast<int>(policy.layer_set.size()) > import.weight_slots) refuse("out_of_range", "The layer set has more layers than the engine's weight slots");
     const std::int64_t n = L.side;
     const auto samples = static_cast<std::size_t>(n * n);
-    if (n != p.grid().side() || L.height.size() != samples || L.biome.size() != samples || L.water_type.size() != samples || L.river.size() != samples || L.landform.size() != samples)
+    if (n != p.grid().side() || L.height.size() != samples || L.biome.size() != samples || L.water_type.size() != samples || L.river.size() != samples || L.landform.size() != samples ||
+        L.temperature.size() != samples || L.moisture.size() != samples || L.ice_cap.size() != samples || L.rocky_coast.size() != samples || L.snow_months.size() != samples)
         refuse("broken_join", "Source layers do not match the projection's grid");
     check_taxonomy(policy, L.biomes, L.landforms);
     std::set<std::int64_t> exported;
@@ -265,8 +273,9 @@ Compiled compile(const SourceLayers& L, const projection::Projection& p, const M
     if (std::abs(period - static_cast<double>(t.period)) > 1e-9 || t.period < 1 || t.period > side - 1)
         refuse("seam_not_on_grid", "W is not a whole number of output columns, so seam pairs cannot match exactly");
     const auto out = static_cast<std::size_t>(side) * static_cast<std::size_t>(side);
-    t.z.resize(out); t.biome.resize(out); t.intent.resize(out); t.landform.resize(out); t.rock.resize(out); t.padding.resize(out);
-    std::vector<int> base(out);
+    t.z.resize(out); t.biome.resize(out); t.intent.resize(out); t.landform.resize(out); t.padding.resize(out); t.white.resize(out);
+    t.temperature.resize(out); t.moisture.resize(out); t.ice_cap.resize(out); t.rocky_coast.resize(out); t.snow_months.resize(out);
+    const auto& white = policy.permanent_white;
     // Logical x from the canonical column when the strip is a whole number of columns, so seam pairs share bits even
     // when W is not a dyadic number; otherwise the physical position (seam pairs then rely on exact arithmetic).
     const double strip_columns = p.strip() / t.spacing;
@@ -283,7 +292,8 @@ Compiled compile(const SourceLayers& L, const projection::Projection& p, const M
             const int biome = code_of(L.biome[s], "biome"), landform = code_of(L.landform[s], "landform");
             if (!exported.count(biome)) refuse("unmapped_category", "Biome " + std::to_string(biome) + " in the raster is not in the exported terrain.biomes catalogue");
             const int purpose = intent(policy, code_of(L.water_type[s], "water_type"), code_of(L.river[s], "river"));
-            base[i] = biome_rock(policy, biome);
+            t.temperature[i] = L.temperature[s]; t.moisture[i] = L.moisture[s]; t.ice_cap[i] = L.ice_cap[s]; t.rocky_coast[i] = L.rocky_coast[s];
+            t.snow_months[i] = L.snow_months[s];
             if (static_cast<std::size_t>(landform) >= policy.landforms.size()) refuse("unmapped_category", "landform " + std::to_string(landform) + " has no mapping");
             if (purpose == policy.ocean && z > -policy.coast_epsilon) { t.max_adjustment = std::max(t.max_adjustment, z + policy.coast_epsilon); z = -policy.coast_epsilon; ++t.lowered; }
             else if ((purpose == policy.land || purpose == policy.river) && z < policy.coast_epsilon) { t.max_adjustment = std::max(t.max_adjustment, policy.coast_epsilon - z); z = policy.coast_epsilon; ++t.raised; }
@@ -291,19 +301,14 @@ Compiled compile(const SourceLayers& L, const projection::Projection& p, const M
             if (std::abs(z) > import.height_limit) refuse("out_of_range", "Height beyond the import calibration's limit");
             t.z[i] = z; t.biome[i] = static_cast<std::uint8_t>(biome); t.landform[i] = static_cast<std::uint8_t>(landform); t.intent[i] = static_cast<std::uint8_t>(purpose);
             t.padding[i] = (y < 0 || y > p.height()) ? 1 : 0;
+            // Permanent white (MMR-254): a listed biome, or land (and river) whose snow never melts (snowMonths months at the threshold).
+            const auto core = policy.biome_core.find(biome);
+            t.white[i] = (core != policy.biome_core.end() && std::find(white.biomes.begin(), white.biomes.end(), core->second) != white.biomes.end()) ||
+                         ((purpose == policy.land || purpose == policy.river) && L.snow_months[s] >= white.snow_months) ? 1 : 0;
             ++t.intent_counts[purpose]; ++t.biome_counts[biome];
         }
-    // Rock: the slope rule on the output grid, periodic in x so seam pairs see the same neighbours.
-    for (int r = 0; r < side; ++r)
-        for (int c = 0; c < side; ++c) {
-            const auto P = static_cast<int>(t.period);
-            const int left = c - 1 >= 0 ? c - 1 : c - 1 + P, right = c + 1 <= side - 1 ? c + 1 : c + 1 - P;
-            const int up = std::max(r - 1, 0), down = std::min(r + 1, side - 1);
-            const auto at = [&](int rr, int cc) { return t.z[static_cast<std::size_t>(rr) * side + cc]; };
-            const double sx = (at(r, right) - at(r, left)) / (2 * t.spacing), sy = (at(down, c) - at(up, c)) / ((down - up) * t.spacing);
-            const auto i = static_cast<std::size_t>(r) * side + c;
-            t.rock[i] = static_cast<std::uint8_t>(std::max(base[i], slope_rock(policy, std::hypot(sx, sy))));
-        }
+    // The layer weights (MMR-255), periodic in x so seam pairs see the same neighbours.
+    compile_layers(t, policy);
     t.height = quantize(t.z, import.height_bits, import.range_decimals, import.zero_range_span);
     for (std::size_t i = 0; i < out; ++i) {
         const double v = t.height.value(i);
@@ -319,10 +324,11 @@ Compiled compile(const SourceLayers& L, const projection::Projection& p, const M
     for (int r = 0; r < side; ++r)
         for (int c = 0; c + t.period < side; ++c) {
             const auto a = static_cast<std::size_t>(r) * side + c, b = a + static_cast<std::size_t>(t.period);
-            if (t.z[a] != t.z[b] || t.height.q[a] != t.height.q[b] || t.rock[a] != t.rock[b] || t.biome[a] != t.biome[b] || t.intent[a] != t.intent[b] || t.landform[a] != t.landform[b])
+            if (t.z[a] != t.z[b] || t.height.q[a] != t.height.q[b] || t.biome[a] != t.biome[b] || t.intent[a] != t.intent[b] || t.landform[a] != t.landform[b] || t.white[a] != t.white[b])
                 refuse("seam_mismatch", "Seam pair differs at row " + std::to_string(r) + ", columns " + std::to_string(c) + " and " + std::to_string(c + t.period));
             ++t.seam_pairs;
         }
+    check_layer_seams(t);
     for (int r = 0; r < side; ++r) t.padding_rows += t.padding[static_cast<std::size_t>(r) * side];
     // The pole lines themselves: the first and last rows inside the logical domain.
     const auto pole_row = [&](double y) { return std::clamp(static_cast<int>(std::llround((y + p.pole_margin()) / t.spacing)), 0, side - 1); };
@@ -340,10 +346,32 @@ std::string heightfield_bytes(const Compiled& t) {
 }
 
 std::string weights_bytes(const Compiled& t) {
-    std::string weights = "MNBLWT01";
+    std::string weights = "MNBLWT02";
     append32(weights, static_cast<std::uint32_t>(t.side));
-    weights.append(reinterpret_cast<const char*>(t.rock.data()), t.rock.size());
+    append32(weights, static_cast<std::uint32_t>(t.weights.size()));
+    for (const auto& name : t.layer_names) { append32(weights, static_cast<std::uint32_t>(name.size())); weights += name; }
+    for (const auto& plane : t.weights) weights.append(reinterpret_cast<const char*>(plane.data()), plane.size());
     return weights;
+}
+
+Value layers_value(const Compiled& t) {
+    Value out; out.kind = Value::Kind::Array;
+    for (std::size_t k = 0; k < t.layer_names.size(); ++k) {
+        Value v = Value::object();
+        v.set("slot", Value::integer(static_cast<std::uint64_t>(k)));
+        v.set("name", Value::string(t.layer_names[k]));
+        v.set("coverage", number(t.layers.dominant[k]));
+        out.items.push_back(v);
+    }
+    return out;
+}
+
+Value permanent_white_value(const Compiled& t) {
+    Value v = Value::object();
+    v.set("samples", Value::integer(t.layers.white_samples));
+    v.set("biomeSamples", Value::integer(t.layers.white_biome));
+    v.set("seasonSamples", Value::integer(t.layers.white_season));
+    return v;
 }
 
 std::string q16_bytes(const Compiled& t) {
@@ -383,7 +411,7 @@ int compile_terrain_main(int argc, char** argv) {
     const auto import = load_import(o["--import"]);
     const int side = std::atoi(o["--side"].c_str());
     const auto read = std::chrono::steady_clock::now();
-    const auto t = compile(layers_of(world), proj, materials, import, side);
+    const auto t = compile(layers_of(world, materials.permanent_white.snow_threshold), proj, materials, import, side);
     const auto compiled = std::chrono::steady_clock::now();
 
     const std::string hf = heightfield_bytes(t), masks = masks_bytes(t), weights = weights_bytes(t), q16 = q16_bytes(t);
@@ -447,6 +475,8 @@ int compile_terrain_main(int argc, char** argv) {
     doc.set("poles", poles);
     doc.set("intentSamples", counts(t.intent_counts));
     doc.set("biomeSamples", counts(t.biome_counts));
+    doc.set("layers", layers_value(t));
+    doc.set("permanentWhite", permanent_white_value(t));
     Value fid = Value::object();
     fid.set("sourceCellWorldUnits", pair(f.source_cell_x, f.source_cell_y));
     fid.set("outputSpacing", number(f.output_spacing));

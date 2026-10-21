@@ -10,7 +10,7 @@
   "rule": "water cells are the travel cells of class sea, lake or river (cells.bin), joined by shared edges with columns wrapping; a water component takes the MMR-28 basin id of the port and coast transitions on it; a component is open when it holds a sea cell and at least minOpenCells cells (the MMR-28 rule). A sea cell is open sea when every cell within openSeaCells (Chebyshev) is sea",
   "minOpenCells": 16,
   "openSeaCells": 4,
-  "playabilitySha256": "67343ec09ad3fee82022f007462b7e295fc72d04b67759c8b5114d713a66efc1"
+  "playabilitySha256": "6269c9db66e9a52f514d5bc78a1552b552d2e17899038d184663118b3957e54d"
  },
  "shipyards": {
   "rule": "every port town on an open basin gets building_shipyard (BuildingsCampaignBehavior adds it at game start for IsTown && HasPort anyway, at its start level 1, and CanTownCreateShipFromHull dereferences it); its level follows the installed port towns' shares, assigned in order of the port's harbour quality (the MMR-28 chosen candidate), best first: the top share level 3, then 2, the rest 1. The 3 installed port towns without a shipyard in XML count at level 1, the level the game gives them at start (town_A7, town_S2, town_V7)",

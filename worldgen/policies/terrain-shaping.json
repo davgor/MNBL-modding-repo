@@ -1,0 +1,60 @@
+{
+  "schema": "mnbl.terrain-shaping",
+  "version": 1,
+  "stage": "afterTravelPlacement",
+  "despike": {
+    "enabled": true,
+    "maxSlopeDeg": 50,
+    "keepRidges": true,
+    "ridgeNeighbours": 2,
+    "sweeps": 8
+  },
+  "coast": {
+    "enabled": true,
+    "landMaxSlopeDeg": 35,
+    "seaMaxSlopeDeg": 35,
+    "bandSamples": 3
+  },
+  "pads": {
+    "enabled": true,
+    "radius": {"town": 3.7, "castle": 2.85, "village": 2.0},
+    "maxSlopeDeg": 8,
+    "blendSamples": 1,
+    "mergeTouching": true
+  },
+  "lakes": {
+    "enabled": true,
+    "bedBelowLevel": 0.05,
+    "shoreAboveLevel": 0.05
+  },
+  "coherence": {
+    "order": ["lakes", "coast", "pads", "despike"]
+  },
+  "lowPass": {
+    "enabled": true,
+    "kernel": [1, 4, 1],
+    "keep": ["sea", "lake", "coast"]
+  },
+  "normals": {
+    "smoothedField": true,
+    "kernel": [1, 4, 6, 4, 1]
+  },
+  "resolution": {
+    "side": 257,
+    "fineSide": 513,
+    "fine": true,
+    "spline": "cubicBSpline"
+  },
+  "gates": {
+    "interiorSlopeP95Deg": 45,
+    "interiorSlopeMaxDeg": 60,
+    "coastSlopeP95Deg": 50,
+    "isolatedSpikes": 0,
+    "steepPadDeg": 25,
+    "steepPadsMax": 10,
+    "travelClassesIdentical": true,
+    "noLakeNewlyHidden": true,
+    "seamPairsIdentical": true
+  },
+  "notes": "Map epic 2 terrain shaping (MMR-248 freezes the keys; MMR-278 implements the stage in terrain_compiler.cpp and tunes every value by its gates; findings section 15). The stage runs on the canonical periodic grid after travel placement, so pads use the final settlement positions; navigation keeps its own scaled, unshaped field. despike: a land sample steeper than maxSlopeDeg above all its neighbours is lowered, ridges and valleys (at least ridgeNeighbours opposite neighbours within the bound) kept, at most sweeps passes in a fixed order. coast: land and sea rise caps from the shoreline over bandSamples samples. pads: each settlement's pad (radius in map units: the vanilla footprint radius at the 0.5 look scale) flattened to at most maxSlopeDeg, blended over blendSamples, touching pads merged. lakes: beds flattened bedBelowLevel world units below the lake level and shores kept shoreAboveLevel above it, so no lake is newly hidden. coherence fixes the order. lowPass: a mild separable low-pass at 257 samples, masked to keep sea, lakes and coast. normals: surface.cpp builds the normal map from a copy of the field smoothed with kernel. resolution: the 513-sample cubic B-spline output (level 7) is used only when fine is true, which MMR-249's go decides. gates: the offline gates on worlds A and B (evidence/fwg/terrain-shaping.json)."
+}

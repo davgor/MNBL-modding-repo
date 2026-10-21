@@ -36,7 +36,7 @@ function Policies([string]$Playability) {
       "source-compatibility=$(P 'worldgen/contracts/source-compatibility.json')", "projection=$(P 'worldgen/policies/projection.json')",
       "terrain-materials=$(P 'worldgen/policies/terrain-materials.json')", "terrain-import=$(P 'worldgen/calibration/terrain-import/terrain-import.json')",
       "campaign-content=$(P 'worldgen/policies/campaign-content.json')", "culture-presentations=$(P 'worldgen/policies/culture-presentations.json')",
-      "playability=$Playability") -join ','
+      "playability=$Playability", "population=$(P 'worldgen/policies/population.json')") -join ','
 }
 function Invoke-Bridge([string[]]$Arguments, [string]$Name) {
     $ErrorActionPreference = 'Continue'

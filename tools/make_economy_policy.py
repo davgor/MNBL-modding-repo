@@ -135,6 +135,35 @@ def main():
     fishing_all = sum(1 for s, c in villages if c.get('village_type').split('.', 1)[1] in FISHING)
     port_centre = max(math.hypot(float(s.get('port_posX')) - float(s.get('posX')), float(s.get('port_posY')) - float(s.get('posY')))
                       for s, c in towns if s.get('port_posX') is not None)
+    # MMR-248 (map epic 2, RT-08 and RT-14): the coastal village mix, the per-culture horse-ranch and wheat floors, and the initial wall
+    # levels per prosperity tercile.
+    coastal = collections.OrderedDict()
+    for s, c in sorted(villages, key=lambda x: x[0].get('culture')):
+        if s.get('port_posX') is None:
+            continue
+        row = coastal.setdefault(s.get('culture').split('.', 1)[1], [0, 0])
+        row[0] += 1
+        row[1] += c.get('village_type').split('.', 1)[1] in FISHING
+    coastal_all = sum(v[0] for v in coastal.values())
+    coastal_fishing = sum(v[1] for v in coastal.values())
+    floors = collections.OrderedDict()
+    for s, c in sorted(villages, key=lambda x: x[0].get('culture')):
+        row = floors.setdefault(s.get('culture').split('.', 1)[1], collections.Counter())
+        vt = c.get('village_type').split('.', 1)[1]
+        row['villages'] += 1
+        row['horseRanch'] += vt.endswith('_horse_ranch')
+        row['wheat'] += vt == 'wheat_farm'
+
+    def walls(items, building, names):
+        ranked = sorted(items, key=lambda x: int(x[1].get('prosperity')))
+        k = len(ranked)
+        out = od()
+        for name, part in zip(names, (ranked[:k // 3], ranked[k // 3:2 * k // 3], ranked[2 * k // 3:])):
+            levels_ = collections.Counter(int(b.get('level')) for s, c in part for b in c.iter('Building') if b.get('id') == building)
+            if sum(levels_.values()) != len(part):
+                raise SystemExit('a fortification has no %s level' % building)
+            out[name] = od(*[(str(lv), n) for lv, n in sorted(levels_.items())])
+        return out
 
     policy = od(
         ('schema', 'mnbl.economy'), ('version', 2),
@@ -159,19 +188,32 @@ def main():
                                      'a village without a port draws from its class without the fishing types, else from its culture\'s farming types'
                                      % (fishing_ports, fishing_all)),
                             ('classes', PRODUCTION), ('fishingTypes', FISHING), ('pools', pools))),
+        ('villageMix', od(('rule', 'map epic 2 (MMR-252, RT-08): a coastal (harbour-capable) village draws a fishing type with probability '
+                                   'coastalFishingShare, the installed share of fishing types among the installed villages with a port, else a '
+                                   'non-fishing type of its class; every culture keeps a world-level floor of horse-ranch villages and wheat farms: at '
+                                   'least max(1 when its installed pool has the type, floor(share x the generated villages of the culture)) of each, which '
+                                   'VillagePool enforces and FoodPass never breaks'),
+                          ('coastalFishingShare', round(coastal_fishing / float(coastal_all), 4)),
+                          ('coastal', od(*[(k, od(('villages', v[0]), ('fishing', v[1]), ('share', round(v[1] / float(v[0]), 4)))) for k, v in coastal.items()])),
+                          ('floors', od(*[(k, od(('villages', v['villages']), ('horseRanch', v['horseRanch']), ('wheat', v['wheat']),
+                                                 ('horseRanchShare', round(v['horseRanch'] / float(v['villages']), 4)), ('wheatShare', round(v['wheat'] / float(v['villages']), 4))))
+                                          for k, v in floors.items()])))),
+        ('walls', od(('rule', 'map epic 2 (MMR-258, RT-14): the initial wall level of a town or castle (the fortifications building) is drawn from the '
+                              'installed level counts of its prosperity tercile (towns small, medium, capital; castles low, middle, high, by castle '
+                              'prosperity), weighted by count, from the settlement stream; not every wall starts at level 1'),
+                     ('towns', walls(towns, 'building_settlement_fortifications', ('small', 'medium', 'capital'))),
+                     ('castles', walls(castles, 'building_castle_fortifications', ('low', 'middle', 'high'))))),
         ('buildings', od(('rule', 'towns take the median installed building levels of their prosperity tercile (small, medium, capital); castles the median '
                                   'castle levels; a port town adds building_shipyard at the median installed port-town level, an inland town never has one'),
                          ('towns', town_levels), ('castles', levels(castles)), ('shipyard', int(round(statistics.median(shipyard)))))),
-        ('binding', od(('rule', 'in order: (1) every village starts at the compiler\'s bound town; (2) a village farther from its bound settlement than '
-                                'distance.preferredRatio x the world\'s town spacing is rebound to the nearest town or castle of its land group within that '
-                                'limit, one of its own kingdom first, else of any kingdom; with none it binds to the nearest town or castle of its land group '
-                                '(remote) and must stay within distance.engineTradeRatio x spacing; (3) each castle of a town, in id order, takes its '
-                                'nearest remaining village of that town within the limit and of its land group in turn, until it has castleVillages or the '
-                                'town is down to townMinimum; (4) a castle still below castleVillages takes a village within the limit and of its land group '
-                                'from the towns of its kingdom with more than townMinimum, from the town with the most villages first, then the nearest. A castle without a '
-                                'village, a town without one, a remote village beyond the engine limit, and a castle village with no town of its kingdom '
-                                'within the engine limit (its trade bound) are problems'),
-                       ('castleVillages', 2), ('townMinimum', 2), ('townMaximum', max(town_counts) + 1),
+        ('binding', od(('rule', 'map epic 2 (MMR-252): the travel compiler\'s village quota binds exactly townVillages villages to every town and '
+                                'castleVillages to every castle (campaign.json v2 bound, boundKind, sourceTown and villageQuota; playability.json villages; '
+                                'docs/travel-graph.md "Village quota"), and the binding passes it through. A village farther from its bound settlement than '
+                                'distance.preferredRatio x the world\'s town spacing is remote and must stay within distance.engineTradeRatio x spacing. A '
+                                'town or castle without exactly its count (none at all crashes SnareTheWealthyIssueQuest, incident_the_quiet_life and '
+                                'incident_wages_of_war_and_diseases), a remote village beyond the engine limit, and a castle village with no town of its '
+                                'kingdom within the engine limit (its trade bound) are problems'),
+                       ('castleVillages', 2), ('townVillages', 3),
                        ('distance', od(('rule', 'spacing: the mean periodic distance from each town to its nearest town in the generated world; '
                                                 'preferredRatio = installedMaxRatio x tolerance; engineTradeRatio: the engine trade-binds a castle\'s '
                                                 'village to a town within 3 x the average distance between the closest two towns '
@@ -180,10 +222,10 @@ def main():
                                        ('preferredRatio', round(ratio * DISTANCE_TOLERANCE, 4)), ('engineTradeRatio', ENGINE_TRADE_RATIO))),
                        ('installed', od(('townVillages', [min(town_counts), max(town_counts)]), ('castleVillages', [min(castle_counts), max(castle_counts)]),
                                         ('castlesWithTwo', castle_counts.count(2)), ('castles', len(castle_counts)),
-                                        ('note', 'townMaximum is the installed maximum plus one: a generated world has fewer castles per town to take '
-                                                 'villages (installed %.2f)' % (len(castles) / float(len(towns)))))))),
+                                        ('note', 'the installed counts are only roughly 3 and 2 (castles per town %.2f); the exact 3/2 rule is the '
+                                                 'owner\'s (map epic 2), and its trade-area cost is recorded by MMR-247' % (len(castles) / float(len(towns)))))))),
         ('balance', od(('rule', 'a generated world\'s villages per fief and hearth per fief stay within band x the installed values, and every town and '
-                                'castle within the binding counts (a town the source gave fewer than townMinimum villages is reported, not refused)'),
+                                'castle has exactly its binding count'),
                        ('band', BAND),
                        ('installed', od(('villagesPerFief', round(len(villages) / float(fiefs), 3)),
                                         ('hearthPerFief', round(sum(int(c.get('hearth')) for s, c in villages) / float(fiefs), 1)))))),
@@ -207,7 +249,8 @@ def main():
                                              ('allowance', 6.25), ('installedCoastalVillages', len(village_ports)))),
                          ('installedTownPortCentreMax', round(port_centre, 2)))),
         ('texts', od(('town', 'The {kind} of {name}, in the {realm}.'), ('castle', 'The castle of {name}, in the {realm}.'),
-                     ('village', 'The village of {name}, near {bound}.'), ('hideout', 'An outlaw hideout in the wilds.'))),
+                     ('village', 'The village of {name}, near {bound}.'), ('hideout', 'An outlaw hideout in the wilds.'),
+                     ('sourceNote', ' Its old records name it {source}.'))),
         ('hideouts', od(('rule', 'SettlementFactory builds a hideout from a placed specification (bandit culture, position) with a prototype of that bandit '
                                  'culture; placing hideouts across a world is MMR-34\'s (bandits and hideouts)'),
                         ('cultures', sorted({s.get('culture').split('.', 1)[1] for s in root if s.find('Components') is not None and len(s.find('Components')) and s.find('Components')[0].tag == 'Hideout'})))),

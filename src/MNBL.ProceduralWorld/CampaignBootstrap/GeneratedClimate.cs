@@ -15,6 +15,8 @@ namespace MNBL.ProceduralWorld.CampaignBootstrap
     // the same files plus the colour-grade grid (512 x 512 grade bytes, MapColorGradeManager's layout, bound by GeneratedColorGrade), and the
     // synthesis identity, which is checked against the policy text and the files' hashes. FromSynthesis binds a synthesis in memory (a
     // production world's bundle).
+    // MMR-256: v2 also carries the snow texture (512 x 512 RGBA, GeneratedSnowTexture loads it by name before the scene read) and the
+    // policy's snow route; the identity covers its hash.
     public sealed class GeneratedClimate
     {
         public const int WindDimension = 512, WeatherDimension = 32, ColorGradeDimension = 512;
@@ -26,6 +28,12 @@ namespace MNBL.ProceduralWorld.CampaignBootstrap
         private byte[] colorGrade;
         public bool HasColorGrade { get { return colorGrade != null; } }
         public byte[] CopyColorGrade() { return colorGrade == null ? null : (byte[])colorGrade.Clone(); }
+        // MMR-256: the snow texture (v2 and FromSynthesis; null for a diagnostic pattern), its hash, its name (null on the permanent-white route).
+        private byte[] snowTexture;
+        public string SnowTextureSha256 { get; private set; }
+        public string SnowTextureName { get; private set; }
+        public string SnowRoute { get; private set; }
+        public byte[] CopySnowTexture() { return snowTexture == null ? null : (byte[])snowTexture.Clone(); }
         public readonly Vec2 WindVector;
         public readonly float Extent;
         private readonly float[] wind;
@@ -71,7 +79,13 @@ namespace MNBL.ProceduralWorld.CampaignBootstrap
                 byte[] gradeBytes = Read(folder, gradeSpec);
                 if (gradeBytes.Length != ColorGradeDimension * ColorGradeDimension) throw new InvalidDataException("Generated colour-grade file size differs from the declared layout.");
                 result.colorGrade = gradeBytes; result.ColorGradeSha256 = Text(gradeSpec, "sha256");
-                string identity = Sha256(new System.Text.UTF8Encoding(false).GetBytes(MNBL.ProceduralWorld.Surface.GeneratedClimateSystem.IdentityText(Text(climate, "policy"), result.WindSha256, result.PrecipitationSha256, result.ColorGradeSha256)));
+                var snowSpec = (Dictionary<string, object>)climate["snowTexture"];
+                if (Convert.ToInt32(snowSpec["dimension"], CultureInfo.InvariantCulture) != MNBL.ProceduralWorld.Surface.GeneratedClimateSystem.SnowTextureDimension) throw new InvalidDataException("Generated snow texture dimension differs from the code's.");
+                byte[] snowBytes = Read(folder, snowSpec);
+                if (snowBytes.Length != MNBL.ProceduralWorld.Surface.GeneratedClimateSystem.SnowTextureDimension * MNBL.ProceduralWorld.Surface.GeneratedClimateSystem.SnowTextureDimension * 4) throw new InvalidDataException("Generated snow texture file size differs from the declared layout.");
+                result.snowTexture = snowBytes; result.SnowTextureSha256 = Text(snowSpec, "sha256"); result.SnowRoute = Text(snowSpec, "route");
+                result.SnowTextureName = result.SnowRoute == MNBL.ProceduralWorld.Surface.GeneratedClimateSystem.Policy.NamedTexture ? MNBL.ProceduralWorld.Surface.GeneratedClimateSystem.SnowTextureName(result.SnowTextureSha256) : null;
+                string identity = Sha256(new System.Text.UTF8Encoding(false).GetBytes(MNBL.ProceduralWorld.Surface.GeneratedClimateSystem.IdentityText(Text(climate, "policy"), result.WindSha256, result.PrecipitationSha256, result.ColorGradeSha256, result.SnowTextureSha256)));
                 if (identity != Text(climate, "identity")) throw new InvalidDataException("The synthesized climate's identity does not match its policy and files.");
                 if (Text(climate, "version") != MNBL.ProceduralWorld.Surface.GeneratedClimateSystem.Version) throw new InvalidDataException("The synthesized climate is version " + Text(climate, "version") + ", not this code's.");
                 var coordinates = MNBL.ProceduralWorld.Surface.PeriodicWorldCoordinates.FromPlacement(placement);
@@ -89,7 +103,8 @@ namespace MNBL.ProceduralWorld.CampaignBootstrap
             return new GeneratedClimate("source:" + MNBL.ProceduralWorld.Surface.GeneratedClimateSystem.Version + ":" + synthesis.Identity.Substring(0, 16),
                 (float[])synthesis.Wind.Clone(), (byte[])synthesis.Precipitation.Clone(), synthesis.WindSha256, synthesis.PrecipitationSha256,
                 new Vec2((float)MNBL.ProceduralWorld.Surface.GeneratedClimateSystem.WindScale, 0), extent)
-                { Schema = SchemaV2, Identity = synthesis.Identity, colorGrade = (byte[])synthesis.ColorGrade.Clone(), ColorGradeSha256 = synthesis.ColorGradeSha256 };
+                { Schema = SchemaV2, Identity = synthesis.Identity, colorGrade = (byte[])synthesis.ColorGrade.Clone(), ColorGradeSha256 = synthesis.ColorGradeSha256,
+                  snowTexture = (byte[])synthesis.SnowTexture.Clone(), SnowTextureSha256 = synthesis.SnowTextureSha256, SnowTextureName = synthesis.SnowTextureName, SnowRoute = synthesis.SnowRoute };
         }
 
         private static byte[] Read(string folder, Dictionary<string, object> spec)

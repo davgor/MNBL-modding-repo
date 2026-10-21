@@ -53,7 +53,7 @@ internal static class NavigationContractTests
     {
         string repo = args[0], outDir = args[4];
         Directory.CreateDirectory(outDir);
-        var host = new WorldDataBundle.HostProfile("v1.4.8.119303", "v1.2.8.119303", new[] { "R01", "R02", "R03", "R04", "R05", "R06", "R07", "R08", "R09", "R10" });
+        var host = new WorldDataBundle.HostProfile("v1.4.8.119303", "v1.2.8.119303", WorldDataBundle.HostCapabilities);
         var policy = NavigationPolicy.FromBytes(File.ReadAllBytes(Path.Combine(repo, NavigationPolicy.PolicyPath)));
         var calibration = (IDictionary<string, object>)Serializer.DeserializeObject(File.ReadAllText(Path.Combine(repo, "worldgen/calibration/naval-transitions/naval-transitions.json")).TrimStart('﻿'));
         evidence["policySha256"] = policy.Sha256;
@@ -141,6 +141,32 @@ internal static class NavigationContractTests
             }
             Check(typed && strips && grounded && mesh.Groups.All(g => TerrainTypes.Name(g) != null) && build.Cells.Where(c => c.Class == TravelCells.River && c.Passage != "underBridge").All(c => c.TerrainType == TerrainTypes.Id(input.FaceGroupNames["river"])),
                   label + ": every face carries its cell's installed TerrainType (" + String.Join(", ", build.FaceGroups.Select(kv => kv.Key + " " + TerrainTypes.Name(kv.Value))) + "), deck faces Bridge over UnderBridge cells, rivers River elsewhere (no fording); strip cells repeat their canonical cell; lattice vertices are grounded on the collision reference (max with the sea datum) + " + policy.ZOffset);
+
+            // MMR-254: land faces follow the shared biome table: each land cell's faces (cell quads and bank fans) carry the cell's cells.bin land
+            // type, every land type is one of the table's land faces, and the per-type counts are the travel graph's.
+            var tableFaces = new HashSet<string>(((System.Collections.IEnumerable)((IDictionary<string, object>)Serializer.DeserializeObject(File.ReadAllText(Path.Combine(repo, "worldgen/policies/terrain-materials.json"))))["biomes"])
+                .Cast<IDictionary<string, object>>().Where(b => b["terrainType"] != null).Select(b => (string)b["terrainType"]), StringComparer.Ordinal);
+            bool landFaces = true; var faceTypes = new SortedDictionary<string, int>(StringComparer.Ordinal); var cellTypes = new SortedDictionary<string, int>(StringComparer.Ordinal);
+            for (int i = 0; i < t.Classes.Length; i++)
+            {
+                if (t.Classes[i] != TravelCells.Land) continue;
+                string name = TerrainTypes.Name(t.LandTypes[i]); int n; cellTypes.TryGetValue(name, out n); cellTypes[name] = n + 1;
+                if (build.Cells[i].TerrainType != t.LandTypes[i] || !tableFaces.Contains(name)) landFaces = false;
+            }
+            for (int f = 0; f < mesh.FaceCount; f++)
+            {
+                string name = TerrainTypes.Name(mesh.Groups[f]);
+                if (!model.IsLand(mesh.Groups[f]) || mesh.Roles[f] == NavMesh.RoleDeck) continue;
+                int n; faceTypes.TryGetValue(name, out n); faceTypes[name] = n + 1;
+            }
+            record["landCellsByType"] = cellTypes; record["landFacesByType"] = faceTypes;
+            Check(landFaces && cellTypes.Count >= 3 && cellTypes.Keys.SequenceEqual(input.LandTypeCounts.Keys.OrderBy(k => k, StringComparer.Ordinal)) && cellTypes.All(kv => input.LandTypeCounts[kv.Key] == kv.Value) && faceTypes.Keys.All(tableFaces.Contains),
+                  label + ": land faces follow the shared biome table: cells " + String.Join(", ", cellTypes.Select(kv => kv.Key + " " + kv.Value)) + " (the travel graph's landTypes), faces " + String.Join(", ", faceTypes.Select(kv => kv.Key + " " + kv.Value)));
+            // MMR-254 (a3): the road bits are not navigation: flipping every one leaves the navmesh (navmeshSha256 of the cache key) unchanged.
+            var flipped = input.Shallow(); flipped.Cells = input.Cells.Clone();
+            for (int i = 0; i < flipped.Cells.Flags.Length; i++) flipped.Cells.Flags[i] ^= TravelCells.RoadFlag;
+            Check(RuntimeNavigationBuilder.Build(flipped, policy).Sha256 == build.Sha256 && t.Flags.Count(x => x != 0) > 0,
+                  label + ": the navmesh does not depend on the road cells (" + t.Flags.Count(x => x != 0) + " road cells flipped: same " + build.Sha256.Substring(0, 12) + ")");
 
             var plan = NavigationPlan.Create(build, model);
             record["static"] = plan.StaticRecord();
@@ -230,6 +256,8 @@ internal static class NavigationContractTests
         int lr = open / lt.Cols, lc = open % lt.Cols;
         lt.Classes[lt.Index(lr, lc)] = TravelCells.River; lt.Classes[lt.Index(lr - 1, lc - 1)] = TravelCells.River;
         lt.Classes[lt.Index(lr, lc - 1)] = TravelCells.Land; lt.Classes[lt.Index(lr - 1, lc)] = TravelCells.Land;
+        byte lPlain = (byte)TerrainTypes.Id(lInput.FaceGroupNames["land"]);
+        lt.LandTypes[lt.Index(lr, lc)] = 0; lt.LandTypes[lt.Index(lr - 1, lc - 1)] = 0; lt.LandTypes[lt.Index(lr, lc - 1)] = lPlain; lt.LandTypes[lt.Index(lr - 1, lc)] = lPlain;
         var lLand = lt.Label(k => k == TravelCells.Land);
         lInput.Crossings = new List<CrossingRecord> { new CrossingRecord { Subject = "test L bridge", Kind = "river", Cells = new List<int[]> { new[] { lr, lc } }, LandA = lLand[lt.Index(lr, lc - 1)], LandB = lLand[lt.Index(lr - 1, lc)] } };
         var lBuild = RuntimeNavigationBuilder.Build(lInput, policy);

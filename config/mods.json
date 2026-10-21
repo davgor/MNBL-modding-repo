@@ -35,9 +35,11 @@
           "bin/Win64_Shipping_Client/worldbridge.sha256",
           "bin/Win64_Shipping_Client/fwg.exe",
           "bin/Win64_Shipping_Client/fwg.sha256",
+          "Producers/*/fwg.exe",
           "SurfaceTemplate/terrain.bin",
           "SurfaceTemplate/navmesh.bin",
-          "SurfaceTemplate/template-recipe.json"
+          "SurfaceTemplate/template-recipe.json",
+          "AssetPackages/*.tpac"
         ],
         "provenance": {
           "SubModule.xml": "Modules/MNBL.ProceduralWorld/SubModule.xml (repository file)",
@@ -46,8 +48,10 @@
           "bin/Win64_Shipping_Client/worldbridge.exe": "built from src/WorldBridge",
           "bin/Win64_Shipping_Client/fwg.exe": "the FWGC++ world producer pinned by tools.lock.json (producer.sourceCommit, producer.sha256)",
           "bin/Win64_Shipping_Client/*.sha256": "pins written at staging; the module refuses a producer or bridge whose hash differs",
+          "Producers/*/fwg.exe": "Modules/MNBL.ProceduralWorld/Producers (repository files, Git LFS): every FWGC++ producer build a campaign may cast with (MMR-261, RT-37), named by its SHA-256 and listed in worldgen/producer-archive.json; the pinned build is one of them. Kept, never rebuilt (MSVC output is not byte-reproducible); a campaign casts only with the build that generated its world",
           "SurfaceTemplate/*.bin": "this module's own surface template binaries (tools/scenebin/build_slot.py's writers; copied by tools/scenebin/make_surface_template.py)",
-          "SurfaceTemplate/template-recipe.json": "tools/scenebin/make_surface_template.py: this module's values and the SHA-256 of every template file; scene.xscene and atmosphere.xml are derived from the player's installed SandBoxCore battle_terrain_001 at run time (World/SurfaceTemplateSource.cs), never shipped"
+          "SurfaceTemplate/template-recipe.json": "tools/scenebin/make_surface_template.py: this module's values and the SHA-256 of every template file; scene.xscene and atmosphere.xml are derived from the player's installed SandBoxCore battle_terrain_001 at run time (World/SurfaceTemplateSource.cs), never shipped",
+          "AssetPackages/*.tpac": "Modules/MNBL.ProceduralWorld/AssetPackages (repository files, Git LFS): the Modding Kit publish of this module's decal materials and textures: the magic-ground vein stamps mnbl_magic_<school> (MMR-259, MMR-288; docs/magic-ground-textures.md), made from AssetSources/magic_ground by tools/art/magic_ground.py; the magic water decal mnbl_magicwater (MMR-290; docs/magic-water.md), from AssetSources/magic_water by tools/art/magic_water.py; the water surface decal mnbl_water_surface (MMR-247; docs/map-dressing.md), from AssetSources/water_surface by tools/art/water_decal.py; checked by tools/art/check_magic_packs.py (--water for the magic water) and tools/art/water_decal.py check"
         },
         "licenses": {
           "module": "No license file: the module, WorldBridge and their sources are the repository owner's, all rights reserved; this archive is for local installation by its testers.",
@@ -59,12 +63,14 @@
           "Harmony (0Harmony.dll)",
           "development caches, research outputs and user worlds (the per-user store under %LOCALAPPDATA%\\MNBL.ProceduralWorld)",
           "generated scenes (SceneObj/), made at run time in the installed module folder",
+          "the decal texture sources (AssetSources/: magic ground, magic water, water surface) and the editor's working packages (Assets/): only their published packs ship",
           "the surface template's scene.xscene and atmosphere.xml (derived from the installed SandBoxCore battle_terrain_001 on the player's machine) and its empty flora.bin (written there)"
         ],
         "runtimeRequirements": [
           "Microsoft Visual C++ 2015-2022 Redistributable (x64): worldbridge.exe and fwg.exe import MSVCP140.dll, VCRUNTIME140.dll and VCRUNTIME140_1.dll, which the game does not ship (tools/Package.ps1 records the imports)."
         ],
         "contentNotes": [
+          "The magic-ground, magic water and water surface decal textures (AssetPackages; MMR-259/288, MMR-290, MMR-247) are derived from TaleWorlds terrain, world-map decal and water textures (owner decision 4): recoloured, recomposed and re-encoded, never byte-identical (evidence/art/magic-textures.json, magic-veins.json, magic-water.json and water-decal.json list every vanilla input). They are game-derived art inside a mod package for the same game.",
           "The module assembly embeds worldgen/templates/cultures/*.json, which carry about 1,051 name and lore strings with their localisation ids copied from the game's culture definitions (spcultures.xml), 7 of them culture lore paragraphs. They are not game files, but they are copied official text; whether to resolve them from the player's installation instead is an open decision (MMR-57)."
         ]
       }

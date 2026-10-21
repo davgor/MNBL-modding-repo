@@ -133,7 +133,9 @@ namespace MNBL.ProceduralWorld.CampaignRegistry
         // object is a declared generated object.
         public static RegistrationPlan FromCompilerRecords(IDictionary<string, object> campaign)
         {
-            var heroes = Records(campaign, "heroes"); var clans = Records(campaign, "clans"); var kingdoms = Records(campaign, "kingdoms");
+            // campaign.json v2: the clans are the noble houses, the mercenary companies and the outlaw clans (MMR-279/280).
+            var heroes = Records(campaign, "heroes"); var clans = Records(campaign, "houses").Concat(Records(campaign, "mercenaryCompanies")).Concat(Records(campaign, "outlawClans")).ToList();
+            var kingdoms = Records(campaign, "kingdoms");
             var towns = Records(campaign, "towns"); var castles = Records(campaign, "castles"); var villages = Records(campaign, "villages");
             string any = heroes.Concat(clans).Concat(towns).Select(r => Text(r, "id")).FirstOrDefault(id => CampaignIdentity.WorldPrefix(id) != null);
             var plan = new RegistrationPlan(CampaignIdentity.WorldPrefix(any), NewGameOrder, false, new string[0]);
@@ -141,6 +143,8 @@ namespace MNBL.ProceduralWorld.CampaignRegistry
             var clanOf = new Dictionary<string, string>(StringComparer.Ordinal);
             foreach (var clan in clans)
                 foreach (var member in List(clan, "members")) clanOf[Convert.ToString(member, CultureInfo.InvariantCulture)] = Text(clan, "id");
+            // A dead parent (alive false) belongs to its house without being a member.
+            foreach (var hero in heroes.Where(h => Equals(h.ContainsKey("alive") ? h["alive"] : true, false) && Text(h, "clan") != null)) clanOf[Text(hero, "id")] = Text(hero, "clan");
             foreach (var hero in heroes) plan.Declare("NPCCharacters", "NPCCharacter", Text(hero, "id"), null);
             foreach (var hero in heroes)
             {

@@ -2,8 +2,8 @@
 // static plan and the validator over the managed stand-in engine, as activation runs them (RuntimeNavigationBuilder, NavigationPlan,
 // NavigationValidator), with no game process. One JSON line per bundle: the build's diagnostics, the plan's, the validator's verdict, and the
 // host-check and transition flags the playability validator resolves from that report (RuntimePlayabilityValidator.ResolveFlags), and
-// the settlement placement activation resolves right after the plan (SettlementPositionResolver over the navigation, as
-// RuntimeWorldBackend.Prepare does; 2026-10-19: seeds 56 and 67 passed the sweep and were refused there in game, settlement.port_far).
+// the settlement placement activation resolves right after the plan (SettlementLookPlan: the looks, then SettlementPositionResolver over the
+// navigation, as RuntimeWorldBackend.Prepare does; 2026-10-19: seeds 56 and 67 passed the sweep and were refused there in game, settlement.port_far).
 // With --placement-only (before the bundles) the validator and the flags are skipped.
 // Usage: NavigationSweep REPO GAME_ROOT OUT_JSONL [--placement-only] BUNDLE...
 using System;
@@ -43,12 +43,19 @@ internal static class NavigationSweep
     private static int Run(string[] args)
     {
         string repo = args[0];
-        var host = new WorldDataBundle.HostProfile("v1.4.8.119303", "v1.2.8.119303", new[] { "R01", "R02", "R03", "R04", "R05", "R06", "R07", "R08", "R09", "R10" });
+        var host = new WorldDataBundle.HostProfile("v1.4.8.119303", "v1.2.8.119303", WorldDataBundle.HostCapabilities);
         var policy = NavigationPolicy.FromBytes(File.ReadAllBytes(Path.Combine(repo, NavigationPolicy.PolicyPath)));
         var calibration = (IDictionary<string, object>)Serializer.DeserializeObject(File.ReadAllText(Path.Combine(repo, "worldgen/calibration/naval-transitions/naval-transitions.json")).TrimStart('﻿'));
         NavigationModel model;
         try { model = NavigationModel.Installed(calibration); } catch (Exception) { model = NavigationModel.FromCalibration(calibration); }
         var placementPolicy = SettlementPlacementPolicy.FromBytes(File.ReadAllBytes(Path.Combine(repo, SettlementPlacementPolicy.PolicyPath)), File.ReadAllBytes(Path.Combine(repo, SettlementPlacementPolicy.NavalPath)));
+        // MMR-258: the placement at the looks' offsets, as RuntimeWorldBackend.Prepare places it (the installed catalog, once).
+        var looksPolicy = MNBL.ProceduralWorld.World.SettlementLooksPolicy.FromBytes(File.ReadAllBytes(Path.Combine(repo, MNBL.ProceduralWorld.World.SettlementLooksPolicy.PolicyPath)));
+        byte[] prototypesBytes = File.ReadAllBytes(Path.Combine(repo, "worldgen/templates/settlements/prototypes.json")), economyBytes = File.ReadAllBytes(Path.Combine(repo, "worldgen/policies/economy.json"));
+        var pinDefaults = new HashSet<string>(((object[])((IDictionary<string, object>)Serializer.DeserializeObject(File.ReadAllText(Path.Combine(repo, "worldgen/policies/campaign-catalog.json")).TrimStart('﻿')))["defaults"]).Cast<string>(), StringComparer.Ordinal);
+        var missionScenes = MNBL.ProceduralWorld.Missions.MissionScenes.FromBytes(File.ReadAllBytes(Path.Combine(repo, "worldgen/policies/mission-scenes.json")));
+        var lookCatalog = SettlementLookCatalog.FromInstalled(File.ReadAllBytes(Path.Combine(gameRoot, "Modules", "NavalDLC", "SceneObj", "Main_map", "scene.xscene")),
+            SettlementLookCatalog.PrefabResolver(new[] { "NavalDLC", "SandBox", "Native" }.Select(m => Path.Combine(gameRoot, "Modules", m, "Prefabs"))), prototypesBytes, looksPolicy);
         bool placementOnly = args[3] == "--placement-only";
         var paths = args.Skip(placementOnly ? 4 : 3).ToList();
         int refused = 0;
@@ -66,8 +73,12 @@ internal static class NavigationSweep
                     var plan = NavigationPlan.Create(build, model);
                     row["planActivatable"] = plan.Activatable;
                     row["planDiagnostics"] = plan.Diagnostics.Select(d => (object)(d.Code + " " + d.Subject + ": " + d.Detail)).Take(12).ToList();
-                    var layout = SettlementPositionResolver.Resolve(SettlementPositionResolver.SitesFromBundle(input, bundle.ReadVerified("compiled/campaign/campaign.json"), bundle.ReadVerified("compiled/travel/ports.json")),
-                        plan, new NavigationGround(build), placementPolicy);
+                    var lookInputs = SettlementLookPlan.ForCampaign(bundle.ReadVerified("compiled/campaign/campaign.json"), bundle.ReadVerified("compiled/travel/travel-graph.json"), bundle.ReadVerified("compiled/travel/ports.json"),
+                        economyBytes, prototypesBytes, pinDefaults.Contains, looksPolicy);
+                    lookInputs.Catalog = lookCatalog; lookInputs.Conforms = (prototype, kind, port) => missionScenes.PrototypeProblems(prototype, kind, port).Count == 0;
+                    FrozenLooks looks;
+                    var layout = SettlementLookPlan.Resolve(SettlementPositionResolver.SitesFromBundle(input, bundle.ReadVerified("compiled/campaign/campaign.json"), bundle.ReadVerified("compiled/travel/ports.json")),
+                        plan, new NavigationGround(build), placementPolicy, lookInputs, out looks);
                     row["placementActivatable"] = layout.Activatable; row["layoutSha256"] = layout.Sha256;
                     row["placementProblems"] = layout.Problems.Where(p => p.Refusal).Take(12).Select(p => (object)p.ToString()).ToList();
                     var refusedIds = new HashSet<string>(layout.Problems.Where(p => p.Refusal).Select(p => p.Subject), StringComparer.Ordinal);

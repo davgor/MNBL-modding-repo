@@ -22,7 +22,7 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["index", "seed", "derivationCounter", "runs", "recipeSha256", "sourceInputId", "state", "failure", "producerOutcome", "reasons", "worldContentId", "history"],
+        "required": ["index", "seed", "derivationCounter", "runs", "recipeSha256", "sourceInputId", "state", "failure", "producerOutcome", "reasons", "worldContentId", "cities", "history"],
         "properties": {
           "index": { "type": "integer", "minimum": 0 },
           "seed": { "type": "integer", "minimum": 0, "maximum": 4294967295 },
@@ -35,6 +35,7 @@
           "producerOutcome": { "type": "string" },
           "reasons": { "type": "array", "items": { "type": "object", "additionalProperties": false, "required": ["code", "message"], "properties": { "code": { "type": "string" }, "message": { "type": "string" } } } },
           "worldContentId": { "type": "string" },
+          "cities": { "type": ["integer", "null"], "minimum": 0, "description": "MMR-251: the FWGC++ city count (settlements.sites) of this attempt's world, recorded for every attempt that produced a readable world, accepted or rejected; null otherwise. Every city of an accepted world is one town (the travel compiler's city preservation assertion)." },
           "history": {
             "type": "array",
             "description": "Earlier runs of this attempt, oldest first: the record a run had when it was interrupted (state 'running' after a hard kill or work collision, 'cancelled' after cancellation).",

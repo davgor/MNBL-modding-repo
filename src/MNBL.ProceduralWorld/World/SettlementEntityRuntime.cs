@@ -23,6 +23,8 @@ namespace MNBL.ProceduralWorld.Surface
 
         private static GameEntity Build(Scene scene, EntitySpec spec, GameEntity parent, List<string> notes)
         {
+            // MMR-258: a look's entities exist only as scene XML (the run-time path builds MMR-40's pieces from a record, never a look).
+            if (spec.Raw.Count > 0) throw new InvalidOperationException("The run-time settlement " + spec.Name + " carries look entities, which only a baked scene holds.");
             var entity = GameEntity.CreateEmpty(scene, false, true, true);
             entity.Name = spec.Name;
             foreach (var tag in spec.Tags) entity.AddTag(tag);

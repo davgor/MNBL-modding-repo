@@ -11,7 +11,8 @@ namespace MNBL.ProceduralWorld.Persistence
     // runtime backend made a save without opening it (MMR-49 decides what a difference means; this increment records and reports them):
     //   contract              this binding contract (worldgen/contracts/save-binding.schema.json)
     //   module                the module's version; moduleAssemblySha256 the module assembly's hash (the world package records it too)
-    //   game, naval           the game version with its build number, and War Sails' version or "absent"
+    //   game, naval           the game version with its build number, and War Sails' version or "absent" (MMR-284: diagnostics and the
+    //                         minimum check only; no exact build is required)
     //   backend               the runtime world backend and the producer lock it runs (worldbridge and encoder hashes, MMR-21)
     //   navigationCache       the navigation cache key's schema and adapter (derived caches are versioned apart from the world, MMR-41)
     //   saveIds               the module's fixed save definition id base and version (SaveIds; worldgen/contracts/save-type-ledger.json),

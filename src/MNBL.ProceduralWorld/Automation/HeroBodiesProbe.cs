@@ -27,7 +27,7 @@ namespace MNBL.ProceduralWorld.Automation
                 var json = new JavaScriptSerializer { MaxJsonLength = Int32.MaxValue };
                 Func<string, IDictionary<string, object>> parse = text => (IDictionary<string, object>)json.DeserializeObject(text.TrimStart('﻿'));
                 Func<string, IDictionary<string, object>> load = path => parse(File.ReadAllText(Path.Combine(repo, path)));
-                var host = new WorldDataBundle.HostProfile("v1.4.8.119303", "v1.2.8.119303", new[] { "R01", "R02", "R03", "R04", "R05", "R06", "R07", "R08", "R09", "R10" });
+                var host = new WorldDataBundle.HostProfile("v1.4.8.119303", "v1.2.8.119303", WorldDataBundle.HostCapabilities);
                 var bundle = WorldDataBundle.Open(bundleDir, host);
                 var campaign = parse(new UTF8Encoding(false).GetString(bundle.ReadVerified("compiled/campaign/campaign.json")));
                 var idMap = parse(new UTF8Encoding(false).GetString(bundle.ReadVerified("compiled/campaign/id-map.json")));
@@ -45,8 +45,8 @@ namespace MNBL.ProceduralWorld.Automation
                 }
                 var run = load((string)provenance["defaultReferences"]);
                 var defaults = ((IEnumerable)((IDictionary<string, object>)((IDictionary<string, object>)((IEnumerable)((IDictionary<string, object>)run["outputs"])["worlds"]).Cast<object>().First())["registration"])["verifiedLiveDefaultReferences"]).Cast<object>().Select(x => (string)x).ToList();
-                var factions = FactionFactory.Build(campaign, idMap, load("worldgen/policies/factions.json"), load("worldgen/policies/culture-presentations.json"), templates);
-                var heroes = HeroFactory.Build(campaign, idMap, factions, rosters, new CharacterTemplateResolver(catalog, defaults, (IDictionary<string, object>)rosters["troops"]));
+                var factions = FactionFactory.Build(campaign, idMap, load("worldgen/policies/factions.json"), load("worldgen/policies/culture-presentations.json"), templates, load(WandererPool.PolicyPath));
+                var heroes = HeroFactory.Build(campaign, idMap, factions, rosters, new CharacterTemplateResolver(catalog, defaults, (IDictionary<string, object>)rosters["troops"]), load(WandererPool.PolicyPath));
                 var problems = new List<string>();
                 var xml = heroes.XmlHeroes.ToList();
                 var drawn = HeroBodies.Draw(xml, problems);

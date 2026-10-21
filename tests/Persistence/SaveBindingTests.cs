@@ -410,7 +410,7 @@ internal static class SaveBindingTests
     private static void Contract(SortedDictionary<string, object> evidence)
     {
         var c = Compat();
-        Check(c.Keys.OrderBy(k => k, StringComparer.Ordinal).SequenceEqual(SaveBindingContract.Keys.OrderBy(k => k, StringComparer.Ordinal)) && c["contract"] == SaveBindingContract.Contract && c["saveIds"] == "7910000/v1",
+        Check(c.Keys.OrderBy(k => k, StringComparer.Ordinal).SequenceEqual(SaveBindingContract.Keys.OrderBy(k => k, StringComparer.Ordinal)) && c["contract"] == SaveBindingContract.Contract && c["saveIds"] == "7910000/v2",
             "compatibility: every mnbl.save.* key, the contract version and the fixed save id base");
         Check(Throws(() => SaveBindingContract.Compatibility("", "x", "x", "x", "x", "x", "x", "x")) && Throws(() => SaveBindingContract.Compatibility("v\n1", "x", "x", "x", "x", "x", "x", "x")),
             "compatibility: an empty or multi-line value is refused");
@@ -449,8 +449,12 @@ internal static class SaveBindingTests
         var headerKeys = (Dictionary<string, object>)last["headerKeys"];
         var identitySource = sources.First(s => Path.GetFileName(s.Key) == "WorldIdentity.cs").Value;
         var identityKeys = Regex.Matches(Regex.Match(identitySource, @"Keys\s*=\s*\{([^}]*)\}").Groups[1].Value, "\"([^\"]+)\"").Cast<Match>().Select(m => m.Groups[1].Value).ToList();
-        Check(identityKeys.SequenceEqual(((IList)headerKeys["mnbl.world."]).Cast<string>()) && SaveBindingContract.Keys.SequenceEqual(((IList)headerKeys["mnbl.save."]).Cast<string>()),
-            "ledger: the header keys (WorldIdentity.Keys, SaveBindingContract.Keys) are the ledger's");
+        // MMR-261: mnbl.campaign.* (WorldMutationBehavior.HeaderKeys).
+        var mutationSource = sources.First(s => Path.GetFileName(s.Key) == "WorldMutationBehavior.cs").Value;
+        var campaignKeys = Regex.Matches(Regex.Match(mutationSource, @"HeaderKeys\s*=\s*\{([^}]*)\}").Groups[1].Value, "\"([^\"]+)\"").Cast<Match>().Select(m => m.Groups[1].Value).ToList();
+        Check(identityKeys.SequenceEqual(((IList)headerKeys["mnbl.world."]).Cast<string>()) && SaveBindingContract.Keys.SequenceEqual(((IList)headerKeys["mnbl.save."]).Cast<string>())
+              && headerKeys.ContainsKey("mnbl.campaign.") && campaignKeys.Count > 0 && campaignKeys.SequenceEqual(((IList)headerKeys["mnbl.campaign."]).Cast<string>()),
+            "ledger: the header keys (WorldIdentity.Keys, SaveBindingContract.Keys, WorldMutationBehavior.HeaderKeys) are the ledger's");
         var worldId = new Regex("mnbl_[0-9a-f]{8}_", RegexOptions.CultureInvariant);
         Check(!worldId.IsMatch(File.ReadAllText(ledgerPath)), "ledger: no per-world generated object id appears among the fixed save definitions");
         evidence["ledger"] = new Dictionary<string, object> { ["entries"] = entries.Count, ["syncDataKeys"] = keys, ["definers"] = definers.Count };

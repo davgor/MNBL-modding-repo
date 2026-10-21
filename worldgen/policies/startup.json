@@ -61,6 +61,51 @@
     "sea_raiders": 6
    }
   },
+  "biome": {
+   "rule": "map epic 2 (MMR-248 keys, MMR-287 RT-28): the bandit culture weights of a hideout are (1 - share) x its nearest town culture's cultureWeights + share x biomeWeights of the natural biome of its cell (both normalized to 1), and a hideout whose cell is within coastCells cells of sea adds coastWeight to coastCulture before normalizing; requiredCultures still each get a hideout. Every value is a starting value MMR-287 checks with its hideout census on worlds A and B",
+   "share": 0.6,
+   "biomeWeights": {
+    "boreal_forest": {
+     "forest_bandits": 1.0
+    },
+    "cold_tundra": {
+     "forest_bandits": 0.5,
+     "mountain_bandits": 0.5
+    },
+    "desert": {
+     "desert_bandits": 1.0
+    },
+    "exposed_rock": {
+     "mountain_bandits": 1.0
+    },
+    "forest": {
+     "forest_bandits": 1.0
+    },
+    "grassland": {
+     "forest_bandits": 0.3,
+     "mountain_bandits": 0.2,
+     "steppe_bandits": 0.5
+    },
+    "land_ice": {
+     "mountain_bandits": 1.0
+    },
+    "marsh": {
+     "forest_bandits": 1.0
+    },
+    "rainforest": {
+     "forest_bandits": 1.0
+    },
+    "snow": {
+     "mountain_bandits": 1.0
+    },
+    "tundra": {
+     "mountain_bandits": 1.0
+    }
+   },
+   "coastCells": 1,
+   "coastCulture": "sea_raiders",
+   "coastWeight": 1.0
+  },
   "installed": {
    "hideouts": 99,
    "towns": 57,
@@ -190,6 +235,6 @@
   "settlementsSha256": "9183ca8d67e545ab7c25bdab3618cf4155d234c11c8efccd5e21756962c51d1e",
   "factionsSha256": "475abbc0bb59bbc3432ad9b570901e9693a7ba19d3d66bab2488cb0c63cf9a1d",
   "culturesSha256": "dd46f888a88ead9332dff93b86b514f480ce0611f590c4d740d651db6db89df6",
-  "economySha256": "30fecc08f226411c1d04bafe75ba757b91a1af345642450c5ad40df2cfe7efa4"
+  "economySha256": "73366f26f34b409f1129eeba228546739e4ff855cbeb413cd0e535a038751bda"
  }
 }

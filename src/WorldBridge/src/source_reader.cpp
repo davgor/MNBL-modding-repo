@@ -299,9 +299,17 @@ private:
             arrays.insert("settlements.sites"); cities(); return true;
         });
         else if (key == "heroes") versioned(key, [&](const std::string& k) {
-            if (k == "realms") realms(); else if (k == "people") people(); else return false;
+            if (k == "realms") realms(); else if (k == "people") people(); else if (k == "orgs") orgs(); else if (k == "camps") camps();
+            else if (k == "rolls") rolls(); else return false;
             return true;
         });
+        else if (key == "npcs") versioned(key, [&](const std::string& k) {
+            if (k == "people") npc_people(); else if (k == "life_spans") life_spans(); else return false;
+            return true;
+        });
+        else if (key == "nomads") versioned(key, [&](const std::string& k) { if (k != "groups") return false; bands(); return true; });
+        else if (key == "ruins") ruins();
+        else if (key == "civilizations") versioned(key, [&](const std::string& k) { if (k != "entities") return false; heritage(); return true; });
         else if (key == "humans") versioned(key, [&](const std::string& k) {
             if (k == "cultures") { culture_entries(); return true; }
             if (k == "cores") read_cores(); else if (k == "hamlets") hamlets(); else if (k == "fortresses") castles(); else return false;
@@ -635,6 +643,23 @@ private:
                     cursor.object([&](const std::string& h) {
                         if (h == "site_kind") { auto v = cursor.string_or_null(); if (v) p.presence_kind = keep(*v); }
                         else if (h == "uid") { auto v = cursor.string_or_null(); if (v) p.presence_uid = keep(*v); }
+                        else if (h == "situation") { auto v = cursor.string_or_null(); if (v) p.situation = keep(*v); }
+                        else cursor.skip();
+                    });
+                }
+                else if (k == "seat") { auto v = cursor.string_or_null(); if (v) p.seat = keep(*v); }
+                else if (k == "tier") { auto v = cursor.string_or_null(); if (v) p.tier = keep(*v); }
+                else if (k == "epithet") { auto v = cursor.string_or_null(); if (v) p.epithet = keep(*v); }
+                else if (k == "org_uid") { auto v = cursor.string_or_null(); if (v) p.org_uid = keep(*v); }
+                else if (k == "fame") { auto v = cursor.number_or_null(); if (v) p.fame = *v; }
+                else if (k == "lost" || k == "companion") {
+                    if (cursor.advance() == Token::Null) return true;
+                    cursor.primed = true;
+                    const bool lost = k == "lost";
+                    cursor.object([&](const std::string& h) {
+                        if (lost && h == "uid") { auto v = cursor.string_or_null(); if (v) p.lost_uid = keep(*v); }
+                        else if (lost && h == "name") { auto v = cursor.string_or_null(); if (v) p.lost_name = keep(*v); }
+                        else if (!lost && h == "join_condition") { auto v = cursor.string_or_null(); if (v) p.join_condition = keep(*v); }
                         else cursor.skip();
                     });
                 }
@@ -646,6 +671,220 @@ private:
             budget.add(sizeof(Person));
             world.people.push_back(std::move(p));
         }, contract.max_records);
+    }
+
+    // A {kind, uid, ...} object or null, as heroes write home and presence.
+    void site_ref(std::string& kind, std::string& uid) {
+        if (cursor.advance() == Token::Null) return;
+        cursor.primed = true;
+        cursor.object([&](const std::string& h) {
+            if (h == "kind") { auto v = cursor.string_or_null(); if (v) kind = keep(*v); }
+            else if (h == "uid") { auto v = cursor.string_or_null(); if (v) uid = keep(*v); }
+            else cursor.skip();
+        });
+    }
+
+    // heroes.orgs[]: uid, kind, name, home and members.
+    void orgs() {
+        cursor.array([&](std::size_t) {
+            Org o;
+            Record r(cursor, "heroes.orgs[] record");
+            r.read([&](const std::string& k) {
+                if (k == "uid") o.uid = keep(cursor.string());
+                else if (k == "kind") o.kind = keep(cursor.string());
+                else if (k == "name") { auto v = cursor.string_or_null(); if (v) o.name = keep(*v); }
+                else if (k == "home") site_ref(o.home_kind, o.home_uid);
+                else if (k == "members") o.members = strings(contract.max_records);
+                else return false;
+                return true;
+            });
+            r.require({"uid", "kind"});
+            budget.add(sizeof(Org));
+            world.orgs.push_back(std::move(o));
+        }, contract.max_records);
+    }
+
+    // heroes.camps[]: ruin camps with their position and civilization.
+    void camps() {
+        cursor.array([&](std::size_t) {
+            Camp c;
+            Record r(cursor, "heroes.camps[] record");
+            r.read([&](const std::string& k) {
+                if (k == "uid") c.uid = keep(cursor.string());
+                else if (k == "ruin_uid") { auto v = cursor.string_or_null(); if (v) c.ruin_uid = keep(*v); }
+                else if (k == "name") { auto v = cursor.string_or_null(); if (v) c.name = keep(*v); }
+                else if (k == "civilization_id") { auto v = cursor.string_or_null(); if (v) c.civilization_id = keep(*v); }
+                else if (k == "origin") { auto v = cursor.string_or_null(); if (v) c.origin = keep(*v); }
+                else if (k == "node") c.node = cursor.integer();
+                else if (k == "x") c.x = cursor.integer();
+                else if (k == "z") c.z = cursor.integer();
+                else return false;
+                return true;
+            });
+            r.require({"uid", "x", "z"});
+            budget.add(sizeof(Camp));
+            world.camps.push_back(std::move(c));
+        }, contract.max_records);
+    }
+
+    // heroes.rolls[]: only the castellan ledger (one candidate per fortress) is kept.
+    void rolls() {
+        cursor.array([&](std::size_t) {
+            CastellanRoll c; std::string kind;
+            Record r(cursor, "heroes.rolls[] record");
+            r.read([&](const std::string& k) {
+                if (k == "kind") kind = cursor.string();
+                else if (k == "candidate_uid") c.candidate_uid = cursor.string();
+                else if (k == "event_id") { auto v = cursor.string_or_null(); if (v) c.fortress_uid = *v; }
+                else if (k == "precipitated") c.precipitated = cursor.boolean();
+                else return false;
+                return true;
+            });
+            if (kind != "castellan") return;
+            r.require({"candidate_uid", "event_id"});
+            budget.add(c.candidate_uid); budget.add(c.fortress_uid);
+            world.castellan_rolls.push_back(std::move(c));
+        }, contract.max_records);
+    }
+
+    // nomads.groups[]: only bandit and deserter bands (outlaw clan sources) are kept.
+    void bands() {
+        cursor.array([&](std::size_t) {
+            Band b;
+            Record r(cursor, "nomads.groups[] record");
+            r.read([&](const std::string& k) {
+                if (k == "uid") b.uid = cursor.string();
+                else if (k == "classification") b.classification = cursor.string();
+                else if (k == "node") b.node = cursor.integer();
+                else if (k == "x") b.x = cursor.integer();
+                else if (k == "z") b.z = cursor.integer();
+                else if (k == "size") b.size = cursor.integer();
+                else return false;
+                return true;
+            });
+            if (b.classification != "bandits" && b.classification != "deserters") return;
+            r.require({"uid", "x", "z"});
+            budget.add(b.uid); budget.add(sizeof(Band));
+            world.bands.push_back(std::move(b));
+        }, contract.max_records);
+    }
+
+    // npcs.people[]: hero-linked records (sex and age of a hero) and residents of the naming posts (magistrates, fortress commanders,
+    // garrison officers, sergeants and soldiers, fortress garrison troopers included); every other post is skipped.
+    void npc_people() {
+        static const std::set<std::string> posts{"magistrate", "commander", "garrison_officer", "sergeant", "soldier", "garrison_trooper"};
+        cursor.array([&](std::size_t) {
+            Npc n; std::string gender;
+            Record r(cursor, "npcs.people[] record");
+            r.read([&](const std::string& k) {
+                if (k == "uid") n.uid = cursor.string();
+                else if (k == "name") n.name = cursor.string();
+                else if (k == "site_uid") { auto v = cursor.string_or_null(); if (v) n.site_uid = *v; }
+                else if (k == "site_kind") { auto v = cursor.string_or_null(); if (v) n.site_kind = *v; }
+                else if (k == "post") { auto v = cursor.string_or_null(); if (v) n.post = *v; }
+                else if (k == "hero_uid") { auto v = cursor.string_or_null(); if (v) n.hero_uid = *v; }
+                else if (k == "appearance") {
+                    if (cursor.advance() == Token::Null) return true;
+                    cursor.primed = true;
+                    cursor.object([&](const std::string& a) {
+                        if (a == "gender") { auto v = cursor.string_or_null(); if (v) gender = *v; }
+                        else if (a == "age_years") { auto v = cursor.integer_or_null(); if (v) n.age_years = *v; }
+                        else if (a == "age_band") { auto v = cursor.string_or_null(); if (v) n.age_band = *v; }
+                        else if (a == "civilization_id") { auto v = cursor.string_or_null(); if (v) n.civilization_id = *v; }
+                        else cursor.skip();
+                    });
+                }
+                else return false;
+                return true;
+            });
+            r.require({"uid", "name"});
+            n.known_sex = gender == "female" || gender == "male";
+            n.female = gender == "female";
+            if (!n.hero_uid.empty()) {
+                for (auto* s : {&n.uid, &n.name, &n.hero_uid, &n.civilization_id, &n.age_band}) budget.add(*s);
+                world.npc_links.push_back(std::move(n));
+            } else if (posts.count(n.post) && n.known_sex && !n.civilization_id.empty() && !n.name.empty()) {
+                for (auto* s : {&n.name, &n.site_uid, &n.post, &n.civilization_id, &n.age_band}) budget.add(*s);
+                world.residents.push_back(std::move(n));
+            }
+        }, contract.max_records);
+    }
+
+    // npcs.life_spans: the age bands of each people (peoples[]) and parent race (parent_races[]).
+    void life_spans() {
+        cursor.object([&](const std::string& list) {
+            if (list != "peoples" && list != "parent_races") { cursor.skip(); return; }
+            cursor.array([&](std::size_t) {
+                LifeSpan s;
+                Record r(cursor, "npcs.life_spans." + list + "[] record");
+                r.read([&](const std::string& k) {
+                    if (k == "id") s.id = keep(cursor.string());
+                    else if (k == "parent_race_id") { auto v = cursor.string_or_null(); if (v) s.parent_race_id = keep(*v); }
+                    else if (k == "adult_years") s.adult = cursor.integer();
+                    else if (k == "max_years") s.max = cursor.integer();
+                    else if (k == "bands") cursor.object([&](const std::string& band) {
+                        std::pair<std::int64_t, std::int64_t> range{0, 0};
+                        cursor.object([&](const std::string& f) { if (f == "from") range.first = cursor.integer(); else if (f == "to") range.second = cursor.integer(); else cursor.skip(); });
+                        s.bands[keep(band)] = range;
+                    });
+                    else return false;
+                    return true;
+                });
+                r.require({"id", "adult_years", "max_years"});
+                budget.add(sizeof(LifeSpan) + 128);
+                world.life_spans.push_back(std::move(s));
+            }, 4096);
+        });
+    }
+
+    // civilizations.entities[]: each civilization's naming pattern and lexicon roots.
+    // ruins[] (MMR-286): a top-level array of ruined cities; only the uid, name and civilization are kept (their display names).
+    void ruins() {
+        cursor.array([&](std::size_t) {
+            Ruin x;
+            Record r(cursor, "ruins[] record");
+            r.read([&](const std::string& k) {
+                if (k == "uid") x.uid = keep(cursor.string());
+                else if (k == "name") { auto v = cursor.string_or_null(); if (v) x.name = keep(*v); }
+                else if (k == "civilization_id") { auto v = cursor.string_or_null(); if (v) x.civilization_id = keep(*v); }
+                else return false;
+                return true;
+            });
+            r.require({"uid"});
+            budget.add(sizeof(Ruin));
+            world.ruins.push_back(std::move(x));
+        }, contract.max_records);
+    }
+
+    void heritage() {
+        cursor.array([&](std::size_t) {
+            HeritageEntry h;
+            Record r(cursor, "civilizations.entities[] record");
+            r.read([&](const std::string& k) {
+                if (k == "id") h.civilization_id = keep(cursor.string());
+                else if (k == "heritage") {
+                    if (cursor.advance() == Token::Null) return true;
+                    cursor.primed = true;
+                    cursor.object([&](const std::string& part) {
+                        if (part == "culture") cursor.object([&](const std::string& c) {
+                            if (c != "household") { cursor.skip(); return; }
+                            cursor.object([&](const std::string& f) { if (f == "naming_pattern") h.naming_pattern = keep(cursor.string()); else cursor.skip(); });
+                        });
+                        else if (part == "genome") cursor.object([&](const std::string& g) {
+                            if (g != "lexicon") { cursor.skip(); return; }
+                            cursor.object([&](const std::string& concept_name) { h.lexicon.emplace_back(keep(concept_name), keep(cursor.string())); });
+                        });
+                        else cursor.skip();
+                    });
+                }
+                else return false;
+                return true;
+            });
+            r.require({"id"});
+            std::sort(h.lexicon.begin(), h.lexicon.end());
+            budget.add(sizeof(HeritageEntry));
+            world.heritage.push_back(std::move(h));
+        }, 4096);
     }
 
     // humans.cultures[]: generated cultures and their civilization.
@@ -1033,6 +1272,37 @@ Layer SourceWorld::read_layer(const std::string& name) const {
     }, layer.side + 1);
     if (layer.values.size() != layer.side * layer.side) throw Error("bad_dimensions", "Layer changed since validation", info->second.start);
     return layer;
+}
+
+std::vector<std::uint8_t> SourceWorld::snow_months(double threshold) const {
+    const auto member = members.find("seasonal_environment");
+    if (member == members.end())
+        throw Error("missing_field", "world.json has no seasonal_environment (the monthly snow the permanent-white mask reads)", Location{json::utf8((root / "world.json")), 0, 1, 1, "$.seasonal_environment"});
+    const std::size_t side = metadata.grid_side;
+    std::vector<std::uint8_t> months(side * side, 0);
+    std::size_t monthly = 0;
+    Stream s(root / "world.json");
+    s.seek(member->second.start, {".seasonal_environment"});
+    Cursor c(s);
+    c.object([&](const std::string& key) {
+        if (key != "months") { c.skip(); return; }
+        monthly = c.array([&](std::size_t) {
+            bool snow = false;
+            c.object([&](const std::string& field) {
+                if (field != "snow") { c.skip(); return; }
+                snow = true;
+                std::size_t i = 0;
+                const std::size_t rows = c.array([&](std::size_t) {
+                    const std::size_t columns = c.array([&](std::size_t) { if (c.finite() >= threshold) ++months[i]; ++i; }, side + 1);
+                    if (columns != side) c.fail("bad_dimensions", "A monthly snow grid row is not " + std::to_string(side) + " samples");
+                }, side + 1);
+                if (rows != side) c.fail("bad_dimensions", "A monthly snow grid is not " + std::to_string(side) + " rows");
+            });
+            if (!snow) c.fail("missing_field", "A seasonal_environment month has no snow grid");
+        }, 13);
+    });
+    if (monthly != 12) throw Error("bad_dimensions", "seasonal_environment.months holds " + std::to_string(monthly) + " months, not 12", member->second.start);
+    return months;
 }
 
 namespace {

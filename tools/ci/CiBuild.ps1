@@ -41,6 +41,18 @@ function Copy-MnblProceduralWorldStage([string]$Repo, [string]$Stage, [string]$M
     if (Test-Path -LiteralPath "$Repo/Modules/MNBL.ProceduralWorld/GUI") { Copy-Item -LiteralPath "$Repo/Modules/MNBL.ProceduralWorld/GUI" -Destination "$Stage/GUI" -Recurse }
     # The surface template's own files and its recipe; its official-derived files are made on the player's machine (SurfaceTemplateSource).
     Copy-Item -LiteralPath "$Repo/Modules/MNBL.ProceduralWorld/SurfaceTemplate" -Destination "$Stage/SurfaceTemplate" -Recurse
+    # MMR-259: the published magic-ground packs (the sources and the editor's working packages never ship); mods.py refuses a
+    # package without them.
+    $packs = "$Repo/Modules/MNBL.ProceduralWorld/AssetPackages"
+    if (Test-Path -LiteralPath $packs) { New-Item -ItemType Directory -Path "$Stage/AssetPackages" -Force | Out-Null; Copy-Item -Path "$packs/*.tpac" -Destination "$Stage/AssetPackages" }
+    # MMR-261 (RT-37): every producer build a campaign may cast with (worldgen/producer-archive.json), at Producers/<sha256>/fwg.exe.
+    $archive = Get-Content "$Repo/worldgen/producer-archive.json" -Raw | ConvertFrom-Json
+    foreach ($build in @($archive.builds)) {
+        $kept = "$Repo/Modules/MNBL.ProceduralWorld/$($build.path)"
+        if ((Get-FileHash -LiteralPath $kept -Algorithm SHA256).Hash.ToLowerInvariant() -ne $build.sha256) { throw "Archived producer differs from its hash: $kept" }
+        New-Item -ItemType Directory -Path (Split-Path "$Stage/$($build.path)") -Force | Out-Null
+        Copy-Item -LiteralPath $kept -Destination "$Stage/$($build.path)"
+    }
     Copy-Item -LiteralPath $ModuleDll -Destination $bin
     Copy-Item -LiteralPath $Producer -Destination "$bin/fwg.exe"
     Copy-Item -LiteralPath $Bridge -Destination "$bin/worldbridge.exe"

@@ -138,7 +138,7 @@ std::uint64_t max_quality_attempts(const fs::path& product_policy) {
 const char* const required_policies[] = {"product-policy", "world-quality", "source-compatibility"};
 // Optional static travel gate (MMR-28): a request that binds "playability" binds all six and each attempt's world is
 // compiled in memory; a travel rejection is a quality reason, retried only when world-quality declares its code.
-const char* const travel_policies[] = {"projection", "terrain-materials", "terrain-import", "campaign-content", "culture-presentations", "playability"};
+const char* const travel_policies[] = {"projection", "terrain-materials", "terrain-import", "campaign-content", "culture-presentations", "playability", "population"};
 
 std::string summary(const State& s) {
     Value v = Value::object();
@@ -167,7 +167,7 @@ fs::path attempt_dir(const fs::path& work, const std::string& request_id, int in
 
 int generate_main(const std::vector<std::string>& args) {
     const char* usage = "Usage: worldbridge --generate --request REQ --state STATE --work DIR --lock LOCK --producer EXE --seed-width SEED_WIDTH "
-                        "--policies product-policy=P,world-quality=Q,source-compatibility=C[,projection=..,terrain-materials=..,terrain-import=..,campaign-content=..,culture-presentations=..,playability=..] "
+                        "--policies product-policy=P,world-quality=Q,source-compatibility=C[,projection=..,terrain-materials=..,terrain-import=..,campaign-content=..,culture-presentations=..,playability=..,population=..] "
                         "[--threads N] [--cancel-file F] [--timeout-ms N]";
     auto o = options(args, {"--request", "--state", "--work", "--lock", "--producer", "--seed-width", "--policies", "--threads", "--cancel-file", "--timeout-ms"}, usage);
     for (const char* k : {"--request", "--state", "--work", "--lock", "--producer", "--seed-width", "--policies"}) if (!o.count(k)) throw std::runtime_error(usage);
@@ -188,7 +188,7 @@ int generate_main(const std::vector<std::string>& args) {
         for (const char* name : travel_policies)
             if (!request.policy_sha256.count(name) || !policies.count(name))
                 throw json::Error("missing_field", std::string("A request that binds 'playability' must bind '") + name + "' too", json::Location{json::utf8(path_arg(o["--request"])), 0, 1, 1, "$.policies"});
-        travel_gate = travel::Policies{policies.at("projection"), policies.at("terrain-materials"), policies.at("terrain-import"), policies.at("campaign-content"), policies.at("culture-presentations"), policies.at("playability")};
+        travel_gate = travel::Policies{policies.at("projection"), policies.at("terrain-materials"), policies.at("terrain-import"), policies.at("campaign-content"), policies.at("culture-presentations"), policies.at("playability"), policies.at("population")};
     }
     if (fs::exists(state_file)) {
         const State existing = load_state(state_file);
@@ -258,6 +258,8 @@ int generate_main(const std::vector<std::string>& args) {
         if (result.producer_outcome != "succeeded") { result.failure = Failure::mechanical; result.reasons.push_back({"producer." + result.producer_outcome, message}); return result; }
         try {
             const auto world = source::read_source(dir / "world", contract);
+            // MMR-251: every attempt records its world's city count, accepted or not (a retry on a derived seed is another world's cities).
+            result.cities = world.cities.size();
             std::size_t harbours = 0;
             for (const auto& h : world.hamlets) harbours += h.harbour.has_value();
             if (world.cities.size() < quality.min_cities) result.reasons.push_back({"quality.too_few_cities", std::to_string(world.cities.size()) + " cities, need " + std::to_string(quality.min_cities)});
@@ -266,6 +268,8 @@ int generate_main(const std::vector<std::string>& args) {
             if (!result.reasons.empty()) { result.failure = Failure::quality; return result; }
             if (travel_gate) {
                 try {
+                    // travel::run asserts city preservation (sites = placed_cities = compiled = id-map = travel towns, one uid set) and
+                    // refuses city_not_preserved, a compiler refusal that fails the generation at once.
                     const auto travel = travel::run(world, dir / "world" / "world.json", *travel_gate);
                     // Every attempt keeps its travel outputs as evidence; a rejection names its UIDs there and in the reason.
                     const fs::path out_dir = dir / "travel";

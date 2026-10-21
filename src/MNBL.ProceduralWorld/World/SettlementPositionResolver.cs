@@ -22,7 +22,39 @@ namespace MNBL.ProceduralWorld.Surface
         public double[] Centre;        // logical; for sites without a navigation point (hideouts placed by MMR-34; fixture worlds)
         public double[] Port { get; set; }   // logical; a port town's given port when there is no navigation plan (fixture worlds)
         public int PortBasin = -1;
+        public LookChoice Look;        // MMR-258: the settlement's look (null: no selection ran; phase 0 at the policy's medians)
+        public SettlementFrame Frame;  // MMR-258: a fortification's markers from its look (null: the policy's installed medians)
         public bool Fortification { get { return Kind == SiteKind.Town || Kind == SiteKind.Castle; } }
+    }
+
+    // MMR-258: a fortification's gate and markers from its look (SettlementLook), at the look's scale in its gate frame: the gate distance, every
+    // gate-frame marker, wall section and wall engine the look holds (so the scene's markers stand where the look's do until a ground rule moves
+    // them), and for a port town whose look has a harbour the gate direction that turns the look's harbour to the world's port.
+    internal sealed class SettlementFrame
+    {
+        public double GateDistance;
+        public double? GateAngle;    // the first gate candidate's direction (logical radians); null: toward the road
+        public string GateRule;
+        public readonly List<SettlementPositionResolver.MarkerSlot> Slots = new List<SettlementPositionResolver.MarkerSlot>();
+
+        public static SettlementFrame FromLook(SettlementLook look, double scale)
+        {
+            var frame = new SettlementFrame { GateDistance = look.GateDistance * scale };
+            foreach (var s in look.Slots.Where(x => x.Level == null))
+                frame.Slots.Add(new SettlementPositionResolver.MarkerSlot { Tag = s.Tag, Suffix = SettlementPositionResolver.Suffix(s.Tag, s.Copy), Offset = new[] { s.Forward * scale, s.Side * scale },
+                                                                           LocalYaw = s.Yaw, LocalScale = s.Scale });
+            foreach (var level in SettlementPlacementPolicy.WallLevels)
+            {
+                foreach (var s in look.Slots.Where(x => x.Tag == "map_breachable_wall" && x.Level == level))
+                    frame.Slots.Add(new SettlementPositionResolver.MarkerSlot { Tag = s.Tag, Suffix = "wall_" + level.Substring(6) + "_" + s.Copy, Level = level, Offset = new[] { s.Forward * scale, s.Side * scale },
+                                                                               Wall = true, LocalYaw = s.Yaw, LocalScale = s.Scale, Children = s.Children });
+                for (int n = 0; n < 4; n++)
+                    foreach (var s in look.Slots.Where(x => x.Tag == "map_defensive_engine_" + n && x.Level == level))
+                        frame.Slots.Add(new SettlementPositionResolver.MarkerSlot { Tag = s.Tag, Suffix = "defender_" + n + "_" + level.Substring(6) + (s.Copy > 0 ? "_" + s.Copy : ""), Level = level, Offset = new[] { s.Forward * scale, s.Side * scale },
+                                                                                   LocalYaw = s.Yaw, LocalScale = s.Scale });
+            }
+            return frame;
+        }
     }
 
     internal sealed class PlacedMarker
@@ -35,6 +67,8 @@ namespace MNBL.ProceduralWorld.Surface
         public double Scale = 1;       // fraction of the installed offset kept
         public double Slope;           // degrees at its position
         public bool Steep;             // no candidate met the slope limit: the least steep valid one was taken
+        public double LocalYaw = -Math.PI / 2, LocalScale = 1;   // MMR-258: its look entity's yaw (the gate frame's forward is local +x) and scale
+        public string Children;        // MMR-258: a look wall section's solid and broken wall children (normalized XML)
     }
 
     // A settlement's resolved placement: the derived world artifact the scene entities and the settlement records are built from.
@@ -48,6 +82,7 @@ namespace MNBL.ProceduralWorld.Surface
         public int ArcTurns; public bool ArcMirrored; public double ArcScale = 1, ArcShift;   // ArcShift: cells the arc's frame moved seaward
         public List<double[]> ArcShips;                                                  // the ship positions BlockadePositionScript computes (logical)
         public double PadSlope;
+        public LookChoice Look;                                                          // MMR-258: its look (null: phase 0 without a selection)
         public readonly List<PlacedMarker> Markers = new List<PlacedMarker>();          // gate-frame markers and per-level wall engines
         public readonly List<PlacedMarker> Walls = new List<PlacedMarker>();            // breachable wall sections, two per wall level
         public readonly List<Dictionary<string, object>> Provenance = new List<Dictionary<string, object>>();
@@ -191,6 +226,7 @@ namespace MNBL.ProceduralWorld.Surface
         public string WorldContentId, PolicySha256, Sha256;
         public readonly List<ResolvedSettlement> Settlements = new List<ResolvedSettlement>();
         public readonly List<SettlementProblem> Problems = new List<SettlementProblem>();
+        public Dictionary<string, object> Looks;   // MMR-258: the look-usage and reuse report (SettlementLookSelector.Report), null without a selection
         public bool Activatable { get { return !Problems.Any(p => p.Refusal); } }
         public ResolvedSettlement Find(string id) { return Settlements.FirstOrDefault(s => s.Site.Id == id); }
 
@@ -221,12 +257,12 @@ namespace MNBL.ProceduralWorld.Surface
                 ["arcTurns"] = s.ArcTurns, ["arcMirrored"] = s.ArcMirrored, ["arcScale"] = s.ArcScale, ["arcShiftCells"] = s.ArcShift, ["arcShips"] = s.ArcShips == null ? 0 : s.ArcShips.Count,
                 ["padSlope"] = Math.Round(s.PadSlope, 3), ["gateSlope"] = Math.Round(s.GateSlope, 3), ["gateSteep"] = s.GateSteep,
                 ["markers"] = s.Markers.Select(m => marker(s, m)).ToList(), ["walls"] = s.Walls.Select(m => marker(s, m)).ToList(),
-                ["provenance"] = s.Provenance }).ToList();
+                ["look"] = s.Look == null ? null : s.Look.Record(), ["provenance"] = s.Provenance }).ToList();
             return new Dictionary<string, object> { ["schema"] = "mnbl.settlement-layout", ["version"] = 2, ["worldContentId"] = WorldContentId, ["policySha256"] = PolicySha256,
                 ["layoutSha256"] = Sha256, ["activatable"] = Activatable, ["counts"] = Settlements.GroupBy(s => s.Site.Kind.ToString().ToLowerInvariant()).ToDictionary(g => g.Key, g => (object)g.Count()),
                 ["harbourVillages"] = Settlements.Count(s => s.Site.Harbour), ["portTowns"] = Settlements.Count(s => s.Site.HasPort), ["blockadeArcs"] = Settlements.Count(s => s.ArcStart != null),
                 ["adjusted"] = Settlements.Sum(s => s.Markers.Concat(s.Walls).Count(m => m.Turns != 0 || m.Scale < 1 || m.Steep) + (s.GateRule != null && s.GateRule.Contains("turned") ? 1 : 0)),
-                ["problems"] = Problems.Select(p => p.Record()).ToList(), ["settlements"] = rows };
+                ["problems"] = Problems.Select(p => p.Record()).ToList(), ["looks"] = Looks, ["settlements"] = rows };
         }
     }
 
@@ -310,7 +346,7 @@ namespace MNBL.ProceduralWorld.Surface
             var placedMarkers = new List<KeyValuePair<string, double[]>>();   // (settlement, position) of every marker placed so far
             foreach (var site in sites.Where(s => centres.ContainsKey(s.Id)))
             {
-                var r = new ResolvedSettlement { Site = site, Centre = centres[site.Id] };
+                var r = new ResolvedSettlement { Site = site, Centre = centres[site.Id], Look = site.Look };
                 var point = plan == null ? null : plan.Point(site.Id);
                 r.Provenance.Add(Prov("centre", point != null ? "navigation point (" + point.Snap + ")" : "given centre (" + site.Source + ")", point != null ? point.Requested : site.Centre, r.Centre));
                 int land = ground.Land(r.Centre[0], r.Centre[1]);
@@ -336,8 +372,11 @@ namespace MNBL.ProceduralWorld.Surface
                 if (site.Fortification)
                 {
                     double road = RoadAngle(site, plan, centres, ground, out r.GateRule);
+                    // MMR-258: the look's gate distance (at its scale), and a harbour look's gate turned so the look's harbour faces the world's port.
+                    double gateDistance = site.Frame != null ? site.Frame.GateDistance : policy.GateDistance;
+                    if (site.Frame != null && site.Frame.GateAngle.HasValue) { road = site.Frame.GateAngle.Value; r.GateRule = site.Frame.GateRule; }
                     Dictionary<string, int> why;
-                    var gate = Place(r.Centre, road, new[] { policy.GateDistance, 0 }, q => landOk(q, true), ground, policy, out why);
+                    var gate = Place(r.Centre, road, new[] { gateDistance, 0 }, q => landOk(q, true), ground, policy, out why);
                     // A port town's gate keeps its port within the travel graph's port-to-gate limit. The navigation places the port toward the
                     // town's point (the centre), and the bridge bounds it from there; the gate stands GateDistance further, facing its road, so a
                     // road inland can put it beyond the limit (2026-10-19: 10 towns of 8 of the 19 swept worlds, ports 11.25 from the centre and
@@ -348,14 +387,14 @@ namespace MNBL.ProceduralWorld.Surface
                     if (gate != null && portForGate != null && portForGate.Resolved != null && Distance(ground, gate.Logical, portForGate.Resolved) > portGateLimit)
                     {
                         Dictionary<string, int> whyPort;
-                        var toward = Place(r.Centre, road, new[] { policy.GateDistance, 0 }, q => {
+                        var toward = Place(r.Centre, road, new[] { gateDistance, 0 }, q => {
                             string reason = landOk(q, false);
                             if (reason == null && Distance(ground, q, portForGate.Resolved) > portGateLimit) reason = "beyond its port's port-to-gate limit";
                             if (reason == null && ground.Slope(q[0], q[1]) > policy.MaxMarkerSlope) reason = "steep";
                             return reason; }, ground, policy, out whyPort);
                         if (toward != null) { gate = toward; r.GateRule = r.GateRule + "; turned to keep its port within " + portGateLimit; }
                     }
-                    if (gate == null) problem("settlement.gate_unplaced", site.Id, "no gate position within " + policy.GateDistance + " of the centre stands on passable land of component " + land + ", clear of other settlements (" + Reasons(why) + ")", true);
+                    if (gate == null) problem("settlement.gate_unplaced", site.Id, "no gate position within " + gateDistance + " of the centre stands on passable land of component " + land + ", clear of other settlements (" + Reasons(why) + ")", true);
                     else
                     {
                         r.GateSlope = gate.Slope; r.GateSteep = gate.Steep;
@@ -364,11 +403,11 @@ namespace MNBL.ProceduralWorld.Surface
                         r.GateRule = r.GateRule + (gate.Turns != 0 || gate.Scale < 1 ? "; turned " + gate.Turns + ", kept " + gate.Scale : "") + (gate.Steep ? "; least steep (no candidate within the slope limit)" : "");
                         r.Provenance.Add(Prov("gate", r.GateRule, gate.From, r.Gate));
                         placedMarkers.Add(new KeyValuePair<string, double[]>(site.Id, r.Gate));
-                        foreach (var slot in MarkerSlots(policy))
+                        foreach (var slot in site.Frame != null ? site.Frame.Slots : MarkerSlots(policy).ToList())
                         {
                             var m = place(slot.Tag, slot.Suffix, r.GateAngle, slot.Offset, slot.Level == null);   // walls and wall engines: no slope limit
                             if (m == null) continue;
-                            m.Level = slot.Level;
+                            m.Level = slot.Level; m.LocalYaw = slot.LocalYaw; m.LocalScale = slot.LocalScale; m.Children = slot.Children;
                             (slot.Wall ? r.Walls : r.Markers).Add(m);
                         }
                     }
@@ -422,6 +461,8 @@ namespace MNBL.ProceduralWorld.Surface
                 {
                     text.Append(s.Site.Id).Append('|').Append(s.Site.Harbour).Append('|').Append(P(s.Centre)).Append('|').Append(P(s.Gate)).Append('|').Append(P(s.Port)).Append('|').Append(P(s.Dropoff)).Append('|').Append(P(s.ArcStart)).Append('|').Append(P(s.ArcEnd));
                     foreach (var m in s.Markers.Concat(s.Walls)) text.Append('|').Append(m.Suffix).Append('=').Append(P(m.Logical));
+                    if (s.Look != null) text.Append("|look=").Append(s.Look.Look ?? "phase0").Append('/').Append(s.Look.Variant).Append('/').Append(s.Look.Scale.ToString("R", CultureInfo.InvariantCulture))
+                        .Append('/').Append(s.Look.VillageType).Append('/').Append(s.Look.Source == null ? "-" : s.Look.Source.Sha256);
                     text.Append('\n');
                 }
                 layout.Sha256 = BitConverter.ToString(sha.ComputeHash(new UTF8Encoding(false).GetBytes(policy.Sha256 + "\n" + text))).Replace("-", "").ToLowerInvariant();
@@ -429,7 +470,7 @@ namespace MNBL.ProceduralWorld.Surface
             return layout;
         }
 
-        internal struct MarkerSlot { public string Tag, Suffix, Level; public double[] Offset; public bool Wall; }
+        internal struct MarkerSlot { public string Tag, Suffix, Level, Children; public double[] Offset; public bool Wall; public double LocalYaw, LocalScale; }
 
         // A fortification's markers in the gate frame (forward, side from the centre): the gate-frame markers (the second siege tower mirrored),
         // then per wall level its two breachable wall sections and four wall engines.
@@ -438,13 +479,13 @@ namespace MNBL.ProceduralWorld.Surface
             int towers = 0;
             foreach (var kv in policy.Markers)
                 for (int copy = 0; copy < (kv.Key == "map_siege_tower" ? policy.SiegeTowers : 1); copy++)
-                    yield return new MarkerSlot { Tag = kv.Key, Suffix = Suffix(kv.Key, kv.Key == "map_siege_tower" ? towers++ : 0), Offset = new[] { kv.Value[0], kv.Value[1] * (copy == 1 ? -1 : 1) } };
+                    yield return new MarkerSlot { Tag = kv.Key, Suffix = Suffix(kv.Key, kv.Key == "map_siege_tower" ? towers++ : 0), Offset = new[] { kv.Value[0], kv.Value[1] * (copy == 1 ? -1 : 1) }, LocalYaw = -Math.PI / 2, LocalScale = 1 };
             foreach (var level in SettlementPlacementPolicy.WallLevels)
             {
                 for (int slot = 0; slot < 2; slot++)
-                    yield return new MarkerSlot { Tag = "map_breachable_wall", Suffix = "wall_" + level.Substring(6) + "_" + slot, Level = level, Offset = policy.Walls[level + "/" + slot], Wall = true };
+                    yield return new MarkerSlot { Tag = "map_breachable_wall", Suffix = "wall_" + level.Substring(6) + "_" + slot, Level = level, Offset = policy.Walls[level + "/" + slot], Wall = true, LocalYaw = -Math.PI / 2, LocalScale = 1 };
                 for (int n = 0; n < 4; n++)
-                    yield return new MarkerSlot { Tag = "map_defensive_engine_" + n, Suffix = "defender_" + n + "_" + level.Substring(6), Level = level, Offset = policy.WallEngines[n + "/" + level] };
+                    yield return new MarkerSlot { Tag = "map_defensive_engine_" + n, Suffix = "defender_" + n + "_" + level.Substring(6), Level = level, Offset = policy.WallEngines[n + "/" + level], LocalYaw = -Math.PI / 2, LocalScale = 1 };
             }
         }
 
@@ -470,17 +511,20 @@ namespace MNBL.ProceduralWorld.Surface
 
         private static string Reasons(Dictionary<string, int> why) { return String.Join(", ", why.OrderByDescending(k => k.Value).Select(k => k.Value + " " + k.Key)); }
 
+        // A marker's child name suffix; a look's further copies of a tag (MMR-258: most installed hierarchies have three map_camp_area_2) take
+        // _<copy> (the towers are numbered from 0, as before).
         public static string Suffix(string tag, int copy)
         {
+            string more = copy > 0 ? "_" + copy.ToString(CultureInfo.InvariantCulture) : "";
             switch (tag)
             {
-                case "main_map_castle_gate": return "outer_gate";
-                case "map_camp_area_1": return "camp_1";
-                case "map_camp_area_2": return "camp_2";
-                case "map_siege_ram": return "ram";
+                case "main_map_castle_gate": return "outer_gate" + more;
+                case "map_camp_area_1": return "camp_1" + more;
+                case "map_camp_area_2": return "camp_2" + more;
+                case "map_siege_ram": return "ram" + more;
                 case "map_siege_tower": return "tower_" + copy;
             }
-            if (tag.StartsWith("map_siege_engine_", StringComparison.Ordinal)) return "attacker_" + tag.Substring("map_siege_engine_".Length);
+            if (tag.StartsWith("map_siege_engine_", StringComparison.Ordinal)) return "attacker_" + tag.Substring("map_siege_engine_".Length) + more;
             throw new ArgumentException("No suffix for marker tag " + tag);
         }
 

@@ -28,7 +28,7 @@ after the job reached ReadyForReview):
   layout the scene was built from (`PreparedSurface.Settlements.Sha256`);
 - the bundle's **campaign records** (`compiled/campaign/campaign.json`, `id-map.json`, read verified);
 - **FactionFactory** over the module's embedded policies (`GameActivationHost.PolicyBytes`), the same factions the campaign registers;
-- **the village binding** (`VillageBinding.FromRecords`: MMR-33's binding over the records, the bundle's travel graph and `economy.json`),
+- **the village binding** (`VillageBinding.FromRecords`: since MMR-252 the campaign v2 binding of the village quota, passed through, with the limits from `economy.json`),
   the same function `SettlementFactory` binds the campaign's villages with.
 
 It records the world's content id, layout sha256 and scene name, so the preview names exactly the world it shows. A world whose preview
@@ -43,8 +43,9 @@ kingdom borders darkened. `RasterSha256` identifies it; building twice gives the
 
 **Markers**: every layout settlement at its layout position (the scene's placement), and every port at its port position. Names are the
 campaign records' (`FactionFactory.Clean`). A town's or castle's kingdom is its record's. A **village's is its bound settlement's** as the
-campaign binds it, which is the game's `MapFaction`. The binding moves some villages away from the compiler's town: in world A, 44 are
-rebound and 3 of them into another kingdom, the 3 that runs 43992 and 13920 found differing before the preview used the binding.
+campaign binds it, which is the game's `MapFaction`. The binding puts some villages away from the compiler's town: before MMR-252, in world A,
+44 were rebound and 3 of them into another kingdom, the 3 that runs 43992 and 13920 found differing before the preview used the binding; the
+village quota now binds them (castles included) and the preview reads that.
 **Harbour villages** (War Sails: fleets land there, and the game gives them a port) are flagged as such. **Regions**: each kingdom holding a
 fortification, labelled with the name the campaign registers (`KingdomIntent.Name`) at its fortifications' periodic mean.
 
@@ -210,7 +211,7 @@ archived results (`evidence/runtime/in-game/new_campaign_flow-<pid>.json`/`.log`
   40 %, and every string is a `{=mnbl_...}` TextObject.
 - **Names come from the generator.** Town and kingdom names such as "Korpor (Age 2)" are the generator's and the compiler's; the preview
   shows what the campaign registers.
-- **The start time** is stated by the setup screen since MMR-56 (`docs/first-test-profile.md`): about 7 minutes for a world's first start, while its navigation caches are generated on the engine thread and the game stops responding.
+- **The start time** is stated per world since MMR-282, in the counts line: the budget's `navigationCacheBuild` model at the world's towns + castles + villages (world A about 7 minutes, world B about 14), while its navigation caches are generated on the engine thread and the game stops responding. MMR-56's single "about 7 minutes" is gone.
 - **A recoverable failure after the initial save** (MMR-45: any failure once PublishSave completed) leaves the campaign running, with its
   saves allowed again. The pending model reopens the setup with `activation.unresolved` when the player next reaches the main menu.
 - **Hover is driven through the view model in game.** The probe calls the marker view model's hover commands as the widget does. The

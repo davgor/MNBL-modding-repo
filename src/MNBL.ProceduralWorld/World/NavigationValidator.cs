@@ -228,6 +228,11 @@ namespace MNBL.ProceduralWorld.Surface
             foreach (var kv in build.FaceGroups)
                 if (!(kv.Key == "mountain" ? !model.Valid(kv.Value, "All") : kv.Key == "land" || kv.Key == "bridge" ? model.Valid(kv.Value, "Default") && model.IsLand(kv.Value) : model.Valid(kv.Value, "Naval") && !model.IsLand(kv.Value)))
                     plan.Diagnostics.Add(new NavigationDiagnostic("navigation.face_group_invalid", kv.Key, TerrainTypes.Name(kv.Value) + " is not valid for its domain under the installed navigation model"));
+            // MMR-254: every land type the cells carry (the shared biome table's faces) is a land face: Default-valid, in the land region and
+            // Naval-invalid, so the land domain and the coasts stay what they were with one land face group.
+            foreach (int type in build.Input.Cells.LandTypes.Where(x => x != 0).Distinct().OrderBy(x => x))
+                if (!(model.Valid(type, "Default") && model.IsLand(type) && !model.Valid(type, "Naval")))
+                    plan.Diagnostics.Add(new NavigationDiagnostic("navigation.face_group_invalid", "land type " + TerrainTypes.Name(type), TerrainTypes.Name(type) + " is not a Default-valid, Naval-invalid land face under the installed navigation model"));
             if (build.Input.FixtureChecks != null) plan.AddFixture();
             else { plan.CheckTopology(); plan.AddPoints(); plan.AddHostChecks(); plan.AddForbidden(); }
             plan.EvaluateStatically();
@@ -268,6 +273,13 @@ namespace MNBL.ProceduralWorld.Surface
                 if (actual != expected) fail("grid", TravelCells.ClassNames[k] + " cells " + actual + " differ from the travel graph's " + expected, null);
             }
             if (!Build.OpenSeaComputed.SequenceEqual(t.OpenSea)) fail("grid", "the OpenSea flags differ from the MMR-28 rule recomputed (" + Build.OpenSeaComputed.Zip(t.OpenSea, (a, b) => a != b ? 1 : 0).Sum() + " cells)", null);
+            // MMR-254: the land types per TerrainType, as the travel graph counted them.
+            var landTypes = t.LandTypes.Where(x => x != 0).GroupBy(x => TerrainTypes.Name(x)).ToDictionary(g => g.Key, g => g.Count(), StringComparer.Ordinal);
+            foreach (var name in landTypes.Keys.Union(input.LandTypeCounts.Keys).OrderBy(k => k, StringComparer.Ordinal))
+            {
+                int expected, actual; input.LandTypeCounts.TryGetValue(name, out expected); landTypes.TryGetValue(name, out actual);
+                if (actual != expected) fail("grid", name + " land cells " + actual + " differ from the travel graph's " + expected, null);
+            }
             int lands = Build.LandOf.Max() + 1;
             if (lands != input.LandComponentCells.Count) fail("landComponents", lands + " land components, the travel graph has " + input.LandComponentCells.Count, null);
             for (int id = 0; id < lands; id++)
@@ -418,7 +430,12 @@ namespace MNBL.ProceduralWorld.Surface
         }
 
         // ---- the route matrix from the travel graph ----
-        private string LandName { get { return TerrainTypes.Name(Build.FaceGroups["land"]); } }
+        // MMR-254: the land faces a point may resolve to, the types of the land cells touching it (the default land face when none is land).
+        private string[] LandNames(double[] point)
+        {
+            var names = point == null ? new string[0] : T.LandNamesAt(point[0], point[1]);
+            return names.Length > 0 ? names : new[] { TerrainTypes.Name(Build.FaceGroups["land"]) };
+        }
         private void Face(string check, string subject, string id, double[] point, bool land, string[] expect, string[] sources, bool island = false, bool gating = true, bool physical = false)
         {
             if (point == null) return;
@@ -444,7 +461,7 @@ namespace MNBL.ProceduralWorld.Surface
         }
         private void AddHostChecks()
         {
-            var input = Build.Input; var t = T; string land = LandName;
+            var input = Build.Input; var t = T;
             var towns = input.Settlements.Where(s => s.Kind == "town" && !input.Excluded.Contains(s.Id)).ToDictionary(s => s.Id, StringComparer.Ordinal);
             var byUid = input.Settlements.ToDictionary(s => s.Uid ?? s.Id, StringComparer.Ordinal);
             var playerSafe = new HashSet<int>(input.Groups.Where(g => g.PlayerSafe).Select(g => g.Id));
@@ -458,7 +475,7 @@ namespace MNBL.ProceduralWorld.Surface
                         var p = Point(h.Subject);
                         if (p == null) { Diagnostics.Add(new NavigationDiagnostic("navigation.input_inconsistent", h.Check + " " + h.Subject, "the host check names a settlement with no required point", h.Subject)); break; }
                         var record = input.Settlements.First(s => s.Id == h.Subject);
-                        Face(h.Check, h.Subject, h.Check + " " + h.Subject, p.Resolved, true, new[] { land }, p.SourceIds, record.Kind != "village" && playerSafe.Contains(record.Group));
+                        Face(h.Check, h.Subject, h.Check + " " + h.Subject, p.Resolved, true, LandNames(p.Resolved), p.SourceIds, record.Kind != "village" && playerSafe.Contains(record.Group));
                         if (record.Kind != "village" && playerSafe.Contains(record.Group)) IslandMembers.Add(p.Id);
                         break;
                     }
@@ -526,7 +543,7 @@ namespace MNBL.ProceduralWorld.Surface
                     case "footprint":
                     {
                         var parts = h.Subject.Replace("cell ", "").Split(','); int r = Int32.Parse(parts[0], CultureInfo.InvariantCulture), c = Int32.Parse(parts[1], CultureInfo.InvariantCulture);
-                        Face(h.Check, h.Subject, h.Check + " " + h.Subject, CellCentre(r, c), true, new[] { land }, new[] { h.Subject });
+                        Face(h.Check, h.Subject, h.Check + " " + h.Subject, CellCentre(r, c), true, LandNames(CellCentre(r, c)), new[] { h.Subject });
                         break;
                     }
                     case "seaRoute":
@@ -1196,9 +1213,19 @@ namespace MNBL.ProceduralWorld.Surface
         // MMR-49: the same for a record at another path (a load checks a copy kept with the campaign before it restores it).
         public static IDictionary<string, object> RequireAt(string path, string sceneName, string navmeshPath, string policySha256)
         {
+            var report = ReadAt(path, sceneName);
+            Check(report, sceneName, navmeshPath, policySha256);
+            return report;
+        }
+
+        // The report inside the record at path (the scene's, or a byte copy kept with a campaign): the record's schema and the report's recorded
+        // hash checked, the report returned as NavigationValidator.Run made it (reportSha256 included). Not the activation gate: callers that
+        // read the report's content (MMR-247: WorldReconstruction's map dressing reads build.bridges) read it here, never the record itself.
+        // Throws NavigationRefusedException (navigation.no_report, navigation.report_invalid).
+        public static IDictionary<string, object> ReadAt(string path, string sceneName)
+        {
             Func<string, string, NavigationRefusedException> refuse = (code, detail) => new NavigationRefusedException("Activating " + sceneName, new[] { new NavigationDiagnostic(code, sceneName, detail) });
             if (!File.Exists(path)) throw refuse("navigation.no_report", "no navigation report was recorded for this scene (" + path + ")");
-            IDictionary<string, object> report;
             try
             {
                 var serializer = new JavaScriptSerializer { MaxJsonLength = Int32.MaxValue };
@@ -1206,14 +1233,15 @@ namespace MNBL.ProceduralWorld.Surface
                 if (Json.S(record, "schema") != RecordSchema) throw refuse("navigation.report_invalid", "the file is not an " + RecordSchema);
                 string text = Json.S(record, "report");
                 if (text == null || Json.Sha(text) != Json.S(record, "reportSha256")) throw refuse("navigation.report_invalid", "the report does not match its recorded hash");
-                report = (IDictionary<string, object>)serializer.DeserializeObject(text);
+                var report = (IDictionary<string, object>)serializer.DeserializeObject(text);
+                if (report == null) throw refuse("navigation.report_invalid", "the report is not a JSON object");
+                report["reportSha256"] = Json.S(record, "reportSha256");
+                return report;
             }
             catch (Exception error) when (!(error is NavigationRefusedException))
             {
                 throw refuse("navigation.report_invalid", "the report cannot be read: " + error.GetType().Name + ": " + error.Message);
             }
-            Check(report, sceneName, navmeshPath, policySha256);
-            return report;
         }
 
         // Throws NavigationRefusedException unless the report allows activating the scene (also used for a report that is not persisted).

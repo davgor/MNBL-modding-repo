@@ -3,7 +3,9 @@ $ErrorActionPreference = 'Stop'
 if (Get-Process Bannerlord,Bannerlord.Native -ErrorAction SilentlyContinue) { throw 'Close the game before indexing the owned runtime slot.' }
 $repo = Split-Path $PSScriptRoot
 $module = [IO.Path]::GetFullPath((Join-Path $GameRoot 'Modules/MNBL.ProceduralWorld'))
-$source = [IO.Path]::GetFullPath((Join-Path $repo 'build/slots/mnbl_world_b'))
+# MMR-255: the tracked template, materialized from the installed official scene (python tools/scenebin/make_surface_template.py --materialize build/surface-template).
+$source = [IO.Path]::GetFullPath((Join-Path $repo 'build/surface-template'))
+if (!(Test-Path -LiteralPath (Join-Path $source 'scene.xscene'))) { throw 'Materialize the surface template first: python tools/scenebin/make_surface_template.py --materialize build/surface-template' }
 if (!(Test-Path -LiteralPath (Join-Path $module 'SubModule.xml'))) { throw 'Deploy the diagnostic module first.' }
 function Assert-PlainSurfacePath([string]$Path) {
     $current = [IO.Path]::GetFullPath($Path)

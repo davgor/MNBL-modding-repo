@@ -19,14 +19,15 @@ R07 selected one runtime surface (`docs/runtime-backend-decision.md`): an owned 
 **Cold construction**, from a verified world bundle (`WorldDataBundle`), runs in three steps:
 1. `Prepare` (worker thread, no native call):
    - models the surface (`WorldSurface.FromBundle`);
-   - encodes `compiled/terrain/heightfield.bin` and `weights.bin` with the pinned surface encoder (`worldbridge.exe --surface-*`, hash-checked against `worldbridge.sha256`) into a staging job under the module store, using the module's `SurfaceTemplate`;
+   - encodes `compiled/terrain/heightfield.bin`, `weights.bin` (v2, every material layer) and `flora.bin` (map trees) with the pinned surface encoder (`worldbridge.exe --surface-*`, hash-checked against `worldbridge.sha256`) into a staging job under the module store, using the module's `SurfaceTemplate` (MMR-255: generated from `terrain-materials.json` layerSet);
    - names the encoding by content (`SceneNames.ForWorld`: `mnbl_world_<content id 16>_<12 hex>` over the encoder binary, the template files and the extent);
    - refuses the encoding unless its published quantized heights equal the model byte for byte and its bounds, step, node size and level equal the model's;
    - refuses a superseded generation before starting and again before encoding.
 2. `Install` (engine thread):
    - places the five native files in the scene store, `SceneObj/<name>`, checking every copy's hash. If the store already holds that name with identical files, it reuses them. If the files differ, it refuses: scenes are never rewritten.
    - registers the name (`PairSceneNameToModuleName`) and requires `TryGetFullFilePathOfScene` to resolve to that folder;
-   - removes the store's other `mnbl_world_*` folders that this process has not used;
+   - copies the scene into the per-user scene archive, `<store>/world-scenes/<name>` (MMR-282), unless the identical copy is there;
+   - sweeps the `mnbl_world_*` folders, archived copies, settlement reports and navigation caches that no world package, save or this process names (MMR-282, `docs/save-compatibility.md`);
    - deletes the staging job, whether the install succeeded or was refused.
 3. `Construct` (engine thread): checks that the name resolves to its store folder, reads the owned scene into an owned inspection scene with the physics world on, then optimizes it. On any failure it releases what it created and retires the generation before rethrowing.
 
@@ -45,20 +46,21 @@ R07 selected one runtime surface (`docs/runtime-backend-decision.md`): an owned 
 
 `WorldSurface` reads the bundle's compiled terrain and projection.
 
-**Layout.** The native terrain is the projection's square periodic domain: 1600 × 1600 units, with 257 samples at 6.25 units.
-- It is 4 × 4 nodes (the chunks) of 64 cells and 400 units each, at heightmap level 6.
-- Each chunk covers its own 65 × 65 samples, sharing its border samples with its neighbours.
-- Chunk bounds, height ranges and material layers are deterministic:
-  - grass base;
-  - rock_k from the compiled `weights.bin` when any sample carries rock. All 16 chunks of both test worlds carry rock.
+**Layout.** The native terrain is the projection's square periodic domain: 1600 × 1600 units, with 513 samples at 3.125 units: the shaped surface (MMR-278, `docs/terrain-compiler.md` "Shaping"). Navigation keeps the travel compile's 257 samples at 6.25 units (`navigation-heightfield.bin`), every second surface sample.
+- It is 4 × 4 nodes (the chunks) of 128 cells and 400 units each, at heightmap level 7 (MMR-249's go; 64 cells at level 6 before map epic 2).
+- Each chunk covers its own 129 × 129 samples, sharing its border samples with its neighbours.
+- Chunk bounds, height ranges and material layers are deterministic (MMR-255):
+  - the 15 material layers of `terrain-materials.json` layerSet, named in slot order by `weights.bin` v2 (`MNBLWT02`: u32 side, u32 N, N names, N alpha planes); the encoder refuses a template whose layers differ;
+  - a chunk carries the base (slot 0, 255 everywhere) and every layer with a nonzero sample in it: its WGHT plane, its bit in `layer_is_used_mask` (the same in all four seasons) and its weightmap level;
+  - PHYM is the dominant visible layer (alpha-over from the highest slot, `tools/scenebin/terrain_bin.py dominant_layers`), the same in all four seasons.
 
 **UVs.** The encoder writes the per-node height, normal, weight and physics images, and the engine derives the terrain mesh, its UVs and its collision from the node grid. Nothing in the bundle or the backend supplies UVs. What can be checked is that the geometry, normals and materials the engine builds agree with the model, which the evidence shows.
 
 **Scale record.** Campaign XY stays separate from both source metres and physical terrain coordinates, and the record states all of it:
 - logical 800 × 400, wrapping every 800;
 - physical = logical + (strip 400, pole margin 600);
-- source metres: 0.004 units/m horizontal, 0.01 vertical;
-- vertical exaggeration 2.5, sea datum 0.
+- source metres: 0.004 units/m horizontal, 0.005 vertical (0.01 before map epic 2);
+- vertical exaggeration 1.25 (2.5 before), sea datum 0.
 
 **Encoding model.** Bounds are floor/ceil at 0.001, with 16-bit round-half-even quantization (`surface.cpp make_grid`), bit for bit. It also equals the compiler's own `height-q16.bin` codes.
 
@@ -66,15 +68,16 @@ R07 selected one runtime surface (`docs/runtime-backend-decision.md`): an owned 
 - In the MMR-37 runs they match it to 1e-5.
 - They are checked against it at 0.001, and against the untruncated quantized height at 0.031 (the truncation bound).
 
-**Normals.** Native normals are checked against the main-diagonal triangle normal of the quantized samples, within 1°. The summary records the worst angle observed.
+**Normals.** Native normals are checked against the main-diagonal triangle normal of the quantized samples, within 1°. The summary records the worst angle observed. Since MMR-278 the backend encodes with `--surface-normals smoothed`: the normal map is the Sobel of the codes smoothed by [1,4,6,4,1]/16, so on the B-spline surface the 1° check is re-measured by the acceptance run (MMR-247).
 
 A query outside the domain throws: no shortcut returns Calradia's heights or another world's.
 
 **Budgets.** MMR-21 recorded no chunk, LOD, texture or memory budget, so this ticket uses the calibrated, natively validated limits:
 - 4 × 4 nodes;
-- grid side 257 at most (the encoder takes 129 or 257);
-- heightmap level 6;
-- two material layers.
+- grid side 513 at most (the encoder takes 129, 257 or 513);
+- heightmap level 7 (level 6 at 257);
+- 15 material layers (slot 15 free; MMR-249 loaded 15 per node at the frame cap with no layer-count trend in main-thread time);
+- map trees: `flora.maxTrees` 88,000, the count MMR-249 measured at +0.24 ms of main thread (MMR-247; it was 200,000).
 
 MMR-56 measures and refines them. 75% of the square is polar padding (MMR-26). A rectangular terrain would need encoder support and is not attempted here.
 
@@ -128,7 +131,7 @@ For a campaign map, the ledger hands the scene to the installed `MapScreen.OnFin
 **Disk.**
 - Staging jobs are deleted once installed or refused.
 - The scene store keeps one folder per world encoding, never rewritten.
-- An install removes the store folders that this process did not use. It touches only the content-addressed form `mnbl_world_<16 hex>_<12 hex>`, never a fixture slot such as `mnbl_world_a` or `mnbl_generated_*`. A later process re-installs any world it needs from its bundle under the same name.
+- A sweep removes only the store folders that no world package, save or this process names, and nothing while a save or package cannot be read (MMR-282; before, it removed every folder this process had not used). It touches only the content-addressed form `mnbl_world_<16 hex>_<12 hex>`, never a fixture slot such as `mnbl_world_a` or `mnbl_generated_*`. A load whose folder is gone copies it back from the scene archive, or re-encodes it from its bundle under the same name.
 - Loaded folders are file-locked and are not removed in the process that read them.
 
 **World switch.** Disposing a world and constructing another in the same process is this ticket's; the evidence below covers it. The campaign keeps the installed sequence: `EndGame`, then the next world binds everything in its own `Load`. The previous map scene's queries and native scene access are then refused.

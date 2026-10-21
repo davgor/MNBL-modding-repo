@@ -57,6 +57,8 @@ namespace MNBL.ProceduralWorld.Automation
                 var playability = (IDictionary<string, object>)json.DeserializeObject(File.ReadAllText(Path.Combine(repo, "worldgen/policies/playability.json")));
                 Func<string, string> status = type => { object v; return inventory.TryGetValue(type, out v) ? (string)((IDictionary<string, object>)v)["status"] : null; };
                 report["installedVersions"] = GeneratedPatches.InstalledVersions();
+                // MMR-284: the patch signature check the setup screen and the loader run, in game (empty: every target resolves).
+                report["patchSignatureFailures"] = GeneratedPatches.Verify().Select(f => f.Message).ToList();
                 // Roster: every behaviour and every registered model, whatever its assembly.
                 var behaviors = Campaign.Current.GetCampaignBehaviors<CampaignBehaviorBase>().ToList();
                 var own = behaviors.Where(b => b.GetType().Assembly == typeof(StartupAuditProbe).Assembly).ToList();
@@ -89,6 +91,18 @@ namespace MNBL.ProceduralWorld.Automation
                 check(effectiveUnlisted.Count == 0, "effective models missing from the compatibility inventory: " + String.Join(", ", effectiveUnlisted));
                 check(effective.Values.All(t => status(t) != "excluded"), "an excluded model won selection");
                 check(effective.ContainsKey("NotableSpawnModel") && effective.ContainsKey("MapDistanceModel"), "effective models were not read");
+                // MMR-254: one party speed model, chained Road -> Naval -> Default (roads.json speed.chain), no Harmony.
+                var speedChain = new List<string>();
+                for (object m = Campaign.Current.Models.PartySpeedCalculatingModel; m != null && speedChain.Count < 8; )
+                {
+                    speedChain.Add(m.GetType().FullName);
+                    var baseModel = m.GetType().GetProperty("BaseModel", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+                    m = baseModel == null ? null : baseModel.GetValue(m);
+                }
+                report["speedModelChain"] = speedChain;
+                check(speedChain.SequenceEqual(new[] { typeof(GeneratedPartySpeedModel).FullName, "NavalDLC.GameComponents.NavalDLCPartySpeedCalculationModel", "TaleWorlds.CampaignSystem.GameComponents.DefaultPartySpeedCalculatingModel" }),
+                      "the party speed chain is not GeneratedPartySpeedModel -> War Sails' -> the default model: " + String.Join(" -> ", speedChain));
+                report["roadCells"] = GeneratedPartySpeedModel.Active == null ? 0 : GeneratedPartySpeedModel.Active.RoadCells;
                 // Listeners.
                 var counts = CampaignListeners.Of(CampaignListeners.EventsOf(Campaign.Current));
                 var ownCounts = own.ToDictionary(b => b.GetType().Name, b => counts.Where(c => c.Key.Value == b).ToDictionary(c => c.Key.Key, c => c.Value));
@@ -167,6 +181,31 @@ namespace MNBL.ProceduralWorld.Automation
                       "the periodic patches are " + (registration.Periodic != null ? "missing on a periodic world" : "applied on a non-periodic world"));
                 check(GeneratedColorGrade.Applied && GeneratedPatches.Patched().Any(p => p.StartsWith(GeneratedColorGrade.HarmonyId + ":", StringComparison.Ordinal)),
                       "the colour-grade patch (MMR-39) is not applied on a generated map");
+                // MMR-287: the four incident conditions compare the faction's culture id (the world transpiler, located by IL content).
+                var incidents = new Dictionary<string, object>();
+                foreach (var r in IncidentCulturePatch.Resolve(AccessTools.TypeByName(IncidentCulturePatch.BehaviourType), IncidentCulturePatch.Instructions))
+                {
+                    var info = r.Condition == null ? null : Harmony.GetPatchInfo(r.Condition);
+                    bool patched = r.Resolved && info != null && info.Transpilers.Any(p => p.owner == GeneratedPatches.WorldId) &&
+                                   PatchProcessor.GetCurrentInstructions(r.Condition).Count(i => i.Calls(IncidentCulturePatch.FactionCultureIdMethod)) == r.Incident.Literals.Length;
+                    incidents[r.Incident.Id] = r.Resolved ? (patched ? "culture comparison" : "resolved, not patched") : "off: " + r.Problem;
+                    check(patched, "the incident condition of " + r.Incident.Id + " does not compare the faction's culture id");
+                }
+                report["incidentConditions"] = incidents;
+                // MMR-281: the wanderer tick carries the world prefix, and a world with a population plan has its behaviour and its census.
+                var tick = CompanionsTickPatch.Current;
+                var tickInfo = tick == null ? null : Harmony.GetPatchInfo(tick.DailyTick);
+                bool tickPatched = tickInfo != null && tickInfo.Prefixes.Any(p => p.owner == GeneratedPatches.WorldId);
+                report["wandererTick"] = tick == null ? "not patched" : tick.DailyTick.Name + (tickPatched ? " prefixed" : " resolved, not prefixed");
+                check(tickPatched, "CompanionsCampaignBehavior's daily tick does not carry the world prefix (MMR-281)");
+                var population = boot == null ? null : boot.Population;
+                if (boot != null && boot.World != null && boot.World.Population != null)
+                {
+                    report["population"] = GeneratedPopulationBehavior.Census();
+                    check(population != null && population.MinorFactionMarks != null && population.MinorFactionMarks.Missing.Count == 0 && population.MinorFactionMarkedAt != null &&
+                          population.MinorFactionMarkedAt.StartsWith("after_registration", StringComparison.Ordinal),
+                          "the companies' and outlaw clans' heroes were not all marked IsMinorFactionHero right after registration (MMR-281)");
+                }
                 // The storyline is inactive, or not even added (null: no NavalStorylineCampaignBehavior in the roster).
                 var storyline = StorylineActive();
                 report["storylineActive"] = storyline; report["storylineBehavior"] = storyline == null ? "absent" : "present";

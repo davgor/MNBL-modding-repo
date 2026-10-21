@@ -12,12 +12,59 @@ using Microsoft.Win32.SafeHandles;
 
 namespace MNBL.ProceduralWorld.CampaignBootstrap
 {
+    // MMR-284 (findings §17 RT-41): the game builds this MNBL release supports: a minimum per release and no maximum, so a Bannerlord or War
+    // Sails update never strands a campaign by its build string. A newer build than any known at release is accepted; what keeps it safe is
+    // the world's catalog check (MMR-283, CatalogPin) and every patch's signature check (PatchSignatures), which refuse naming the object or
+    // the patch. Below the minimum is refused: the setup host (GenerationErrors.Host), a bundle (built for, and the host it opens on), a
+    // save's recorded build and the running one (LoadPolicy.Compatibility). Bundles and saves keep recording the build they were made with,
+    // for diagnostics only. Builds compare as TaleWorlds.Library.ApplicationVersion orders them (installed IL, IsOlderThan): the type letter
+    // (a alpha < b beta < e early access < v release < d development), then major, minor, revision and change set (absent: 0). Pure (tested
+    // offline by tests/Campaign/GameUpdateTests.cs).
+    internal static class SupportedBuilds
+    {
+        // The minimum of this release (default taken, MMR-284: the 1.4.8 / 1.2.8 release lines, any change set, which every patch signature and
+        // the catalog pin were read from), and the builds known at release (KnownGame: the runtime lock's; diagnostics and the docs only).
+        public const string MinimumGame = "v1.4.8", MinimumNaval = "v1.2.8";
+        public const string KnownGame = "v1.4.8.119303", KnownNaval = "v1.2.8.119303";
+        private const string Types = "abevd";
+
+        // (type, major, minor, revision, change set), or null when the text is not a version ("v1.4.8", "v1.4.8.119303", "1.2.8.0").
+        public static int[] Parse(string text)
+        {
+            if (String.IsNullOrEmpty(text)) return null;
+            int type = Types.IndexOf('v');
+            string rest = text.Trim();
+            if (rest.Length > 0 && Char.IsLetter(rest[0])) { type = Types.IndexOf(rest[0]); rest = rest.Substring(1); }
+            if (type < 0) return null;
+            var parts = rest.Split('.');
+            if (parts.Length < 3 || parts.Length > 4) return null;
+            var result = new int[5]; result[0] = type;
+            for (int i = 0; i < parts.Length; i++)
+                if (!Int32.TryParse(parts[i], NumberStyles.None, CultureInfo.InvariantCulture, out result[i + 1])) return null;
+            return result;
+        }
+
+        // Negative when a is older than b, zero when the same, positive when newer; null when either is not a version.
+        public static int? Compare(string a, string b)
+        {
+            var x = Parse(a); var y = Parse(b);
+            if (x == null || y == null) return null;
+            for (int i = 0; i < x.Length; i++) if (x[i] != y[i]) return x[i] < y[i] ? -1 : 1;
+            return 0;
+        }
+
+        public static bool AtLeast(string build, string minimum) { var c = Compare(build, minimum); return c.HasValue && c.Value >= 0; }
+        public static bool Game(string build) { return AtLeast(build, MinimumGame); }
+        public static bool Naval(string build) { return AtLeast(build, MinimumNaval); }
+    }
+
     // MMR-29: the host side of an immutable world data bundle written by worldbridge --bundle (worldgen/contracts/
     // bundle-manifest.schema.json, docs/world-bundle.md). Before any resource is constructed from a bundle the host checks
     // it is sealed (DATA_READY names this manifest), hash-complete (every inventory file present with its size and SHA-256,
     // nothing unlisted, no links, every required file), that its WorldContentId recomputes from the files, and that it is
-    // compatible with this host: compiled/compatibility.json (inside the identity) names the installed Bannerlord and War
-    // Sails versions and only runtime capabilities the host provides. The rules are worldbridge validate()'s; one set of
+    // compatible with this host: compiled/compatibility.json (inside the identity) names the Bannerlord and War Sails builds it
+    // was made for (at or above SupportedBuilds' minimum, on a host at or above it too; MMR-284) and only runtime capabilities
+    // the host provides. The rules are worldbridge validate()'s; one set of
     // damaged bundles runs through both, and through tools/summarize_bundle.py (tools/test_bundle_parity.py).
     // A verified bundle is only DATA_READY. Activation is a separate step: U03 writes an activation receipt outside the
     // bundle after W02-W05 and C07, so this class never activates anything and a bundle holding a receipt is refused. Pure
@@ -29,6 +76,11 @@ namespace MNBL.ProceduralWorld.CampaignBootstrap
         public const string Schema = "mnbl.world-bundle";
         public const string ReadySchema = "mnbl.data-ready";
         public const string CompatibilitySchema = "mnbl.bundle-compatibility";
+        // Map epic 2 (MMR-248): the one capability covering cells.bin v2 (MNBLTC02), weights.bin v2 (MNBLWT02) and campaign.json v2; worldbridge
+        // writes it from capabilities::kFormatsV2 (src/WorldBridge/include/worldbridge/capabilities.hpp), which must agree.
+        public const string FormatsV2Capability = "R11";
+        // Every runtime capability this module provides, for the host profiles of the setup screen, the probes and the harnesses.
+        public static readonly string[] HostCapabilities = { "R01", "R02", "R03", "R04", "R05", "R06", "R07", "R08", "R09", "R10", FormatsV2Capability };
         public const string ContentIdPrefix = "mnbl.world-content-id/1\n";
         public const string SaveIdentitySchema = "mnbl.world-bundle-binding.v1";
         private const long MaxDocumentBytes = 64L << 20;
@@ -36,11 +88,11 @@ namespace MNBL.ProceduralWorld.CampaignBootstrap
         private static readonly string[] Roots = { "source", "compiled", "policies" };
         private static readonly string[] Devices = { "con", "prn", "aux", "nul", "com1", "com2", "com3", "com4", "com5", "com6", "com7", "com8", "com9",
                                                      "lpt1", "lpt2", "lpt3", "lpt4", "lpt5", "lpt6", "lpt7", "lpt8", "lpt9" };
-        // worldbridge required_files(): the documented layout.
+        // worldbridge required_files(): the documented layout (MMR-261: source/request.json, the request fwg apply regenerates the world from).
         public static readonly string[] RequiredFiles = {
-            "compiled/campaign/campaign.json", "compiled/campaign/id-map.json", "compiled/compatibility.json", "compiled/terrain/height-q16.bin",
-            "compiled/terrain/heightfield.bin", "compiled/terrain/masks.bin", "compiled/terrain/projection.json", "compiled/terrain/weights.bin",
-            "compiled/travel/cells.bin", "compiled/travel/ports.json", "compiled/travel/travel-graph.json", "compiled/validation.json", "source/world.json" };
+            "compiled/campaign/campaign.json", "compiled/campaign/id-map.json", "compiled/compatibility.json", "compiled/terrain/flora.bin", "compiled/terrain/height-q16.bin",
+            "compiled/terrain/heightfield.bin", "compiled/terrain/masks.bin", "compiled/terrain/navigation-heightfield.bin", "compiled/terrain/navigation-masks.bin",
+            "compiled/terrain/projection.json", "compiled/terrain/shaping.json", "compiled/terrain/weights.bin", "compiled/travel/cells.bin", "compiled/travel/ports.json", "compiled/travel/travel-graph.json", "compiled/validation.json", "source/request.json", "source/world.json" };
 
         public sealed class HostProfile
         {
@@ -136,7 +188,7 @@ namespace MNBL.ProceduralWorld.CampaignBootstrap
         private static string Advice(IList<string> problems)
         {
             if (problems.Any(p => p.StartsWith("built for", StringComparison.Ordinal)))
-                return "Install the Bannerlord and War Sails versions it was built for; there is no migration, and bundles are never rewritten at load.";
+                return "Install Bannerlord and War Sails at or above the minimum named, or an MNBL release that supports this bundle; there is no migration, and bundles are never rewritten at load.";
             if (problems.Any(p => p.StartsWith("requires runtime capability", StringComparison.Ordinal)))
                 return "Update MNBL to a version that provides the listed capabilities.";
             return "Restore an intact copy of the bundle; MNBL never repairs or regenerates a bundle at load.";
@@ -252,8 +304,12 @@ namespace MNBL.ProceduralWorld.CampaignBootstrap
                         problems.Add("manifest engine or requiredCapabilities differ from compiled/compatibility.json");
                     else
                     {
-                        if (Text(versions, "gameVersion") != host.GameVersion) problems.Add("built for Bannerlord " + Text(versions, "gameVersion") + ", installed " + host.GameVersion);
-                        if (Text(versions, "navalVersion") != host.NavalVersion) problems.Add("built for War Sails " + Text(versions, "navalVersion") + ", installed " + host.NavalVersion);
+                        // MMR-284: the recorded build is diagnostics; only a minimum refuses (the bundle's and the host's), never a newer host.
+                        string game = Text(versions, "gameVersion"), naval = Text(versions, "navalVersion");
+                        if (!SupportedBuilds.Game(game)) problems.Add("built for Bannerlord " + game + ", below the minimum " + SupportedBuilds.MinimumGame + " this MNBL release supports");
+                        else if (!SupportedBuilds.Game(host.GameVersion)) problems.Add("built for Bannerlord " + SupportedBuilds.MinimumGame + " or later, installed " + (host.GameVersion ?? "(unknown)"));
+                        if (!SupportedBuilds.Naval(naval)) problems.Add("built for War Sails " + naval + ", below the minimum " + SupportedBuilds.MinimumNaval + " this MNBL release supports");
+                        else if (!SupportedBuilds.Naval(host.NavalVersion)) problems.Add("built for War Sails " + SupportedBuilds.MinimumNaval + " or later, installed " + (host.NavalVersion ?? "(none)"));
                         foreach (var capability in compatibleCapabilities)
                             if (!host.Capabilities.Contains(capability.Key))
                                 problems.Add("requires runtime capability " + capability.Key + " (" + capability.Value + "), which this host does not provide");

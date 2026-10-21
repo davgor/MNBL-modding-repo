@@ -26,6 +26,8 @@ namespace MNBL.ProceduralWorld.UI
     //    rebases itself when its target crosses the cut. This replaces MMR-63's camera shift on the party's rebase.
     //  * When the camera wraps or has moved far, visuals that are framed only on their own changes (tracks, anchors) are refreshed
     //    (PeriodicMapPresentation.RefreshImages).
+    //  * MMR-278 (RT-19): the camera target and the ideal target are held between the pole lines (PeriodicWorldCoordinates.ClampY), in the
+    //    same prefix, and the camera frame moves with the target, so the view stops at a pole instead of panning over the polar padding.
     internal static class PeriodicMapCameraView
     {
         private const BindingFlags Members = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
@@ -34,11 +36,13 @@ namespace MNBL.ProceduralWorld.UI
         private static AccessTools.FieldRef<object, CampaignVec2> lastIdeal, animationTarget;
         private static AccessTools.FieldRef<object, MatrixFrame> frame;
         private static AccessTools.FieldRef<object, Vec3> clickedPosition;   // MapScreen._clickedPosition (the drag pivot)
+        private static AccessTools.FieldRef<object, bool> sceneViewEnabled;  // MapScreen._isSceneViewEnabled (HandleIfSceneIsReady, MMR-247 X)
         private static PropertyInfo nativeCamera, screenInstance;
         private static object current;   // the live MapCameraView (the last one ticked)
         private static float refreshedAtX = float.NaN;
 
         public static int Rebases { get; private set; }        // the camera's own rebases (its target left the canonical range)
+        public static int PoleClamps { get; private set; }     // ticks whose target was held at a pole line (MMR-278)
         public static double TotalShift { get; private set; }  // every shift applied to the camera, summed (probes difference it)
         public static readonly List<Dictionary<string, object>> Events = new List<Dictionary<string, object>>();   // the first 200 camera moves
         // Probe trace: per camera tick, before it and after it (phase, time, target x/y, ideal x, last ideal x, frame x, native camera x).
@@ -55,11 +59,11 @@ namespace MNBL.ProceduralWorld.UI
             if (View == null || screen == null) throw new MissingMemberException("SandBox.View.Map.MapCameraView/MapScreen is not loaded.");
             target = Field<Vec3>(View, "_cameraTarget"); ideal = Field<Vec3>(View, "<IdealCameraTarget>k__BackingField");
             lastIdeal = Field<CampaignVec2>(View, "_lastUsedIdealCameraTarget"); animationTarget = Field<CampaignVec2>(View, "_cameraAnimationTarget");
-            frame = Field<MatrixFrame>(View, "_cameraFrame"); clickedPosition = Field<Vec3>(screen, "_clickedPosition");
+            frame = Field<MatrixFrame>(View, "_cameraFrame"); clickedPosition = Field<Vec3>(screen, "_clickedPosition"); sceneViewEnabled = Field<bool>(screen, "_isSceneViewEnabled");
             nativeCamera = View.GetProperty("Camera", Members);
             screenInstance = screen.GetProperty("Instance", BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
             if (nativeCamera == null || screenInstance == null) throw new MissingMemberException("MapCameraView.Camera or MapScreen.Instance is not installed.");
-            Rebases = 0; TotalShift = 0; Events.Clear(); Trace.Clear(); Tracing = false; TargetX = float.NaN; current = null; refreshedAtX = float.NaN;
+            Rebases = 0; PoleClamps = 0; TotalShift = 0; Events.Clear(); Trace.Clear(); Tracing = false; TargetX = float.NaN; current = null; refreshedAtX = float.NaN;
             Patch(harmony, applied, "OnBeforeTick", nameof(BeforeTickPrefix), nameof(BeforeTickPostfix), "camera target kept canonical (named fields); probe trace");
             Patch(harmony, applied, "UpdateMapCamera", nameof(UpdateMapCameraPrefix), null, "camera target kept canonical before the native camera frame is written");
             Patch(harmony, applied, "GetCameraTargetForPosition", null, nameof(NearestTargetPostfix), "a position the camera goes to -> its image nearest the camera");
@@ -82,8 +86,7 @@ namespace MNBL.ProceduralWorld.UI
 
         private static void Patch(Harmony harmony, List<Dictionary<string, object>> applied, string method, string prefix, string postfix, string label)
         {
-            var targetMethod = AccessTools.Method(View, method);
-            if (targetMethod == null) throw new MissingMethodException(View.FullName, method);
+            var targetMethod = MNBL.ProceduralWorld.CampaignRegistry.PatchSignatures.Method(View.FullName, method);   // MMR-284: by signature (PatchSignatureException names the patch)
             harmony.Patch(targetMethod, prefix: prefix == null ? null : new HarmonyMethod(typeof(PeriodicMapCameraView), prefix),
                 postfix: postfix == null ? null : new HarmonyMethod(typeof(PeriodicMapCameraView), postfix));
             applied.Add(new Dictionary<string, object> { ["target"] = View.FullName + "::" + method, ["patch"] = label, ["kind"] = prefix != null ? "prefix" : "postfix" });
@@ -93,8 +96,9 @@ namespace MNBL.ProceduralWorld.UI
         private static void Transpile(Harmony harmony, List<Dictionary<string, object>> applied, string method, string transpiler, string label, int expected)
         {
             replacedNow = 0;
-            harmony.Patch(AccessTools.Method(View, method), transpiler: new HarmonyMethod(typeof(PeriodicMapCameraView), transpiler));
-            if (replacedNow != expected) throw new InvalidOperationException("MapCameraView." + method + ": " + replacedNow + " sites replaced, " + expected + " audited (" + label + ").");
+            harmony.Patch(MNBL.ProceduralWorld.CampaignRegistry.PatchSignatures.Method(View.FullName, method), transpiler: new HarmonyMethod(typeof(PeriodicMapCameraView), transpiler));
+            if (replacedNow != expected)
+                throw new MNBL.ProceduralWorld.CampaignRegistry.PatchSignatureException(MNBL.ProceduralWorld.CampaignRegistry.PatchSignatures.Presentation, "MapCameraView::" + method + " (" + label + ")", replacedNow + " sites replaced, " + expected + " audited");
             applied.Add(new Dictionary<string, object> { ["target"] = View.FullName + "::" + method, ["patch"] = label, ["kind"] = "transpiler", ["replacedCalls"] = replacedNow });
         }
 
@@ -129,12 +133,41 @@ namespace MNBL.ProceduralWorld.UI
                 x += shift;
             }
             TargetX = x;
-            // Visuals framed only on their own changes take their images again after a wrap or a long move.
-            if (float.IsNaN(refreshedAtX) || Math.Abs(world.DeltaX(refreshedAtX, x)) > 50)
+            // The pole lines bound y: the target, the ideal target and the frame (which trails the target) move back together.
+            float y = target(view).y, held = world.ClampY(y);
+            if (held != y)
+            {
+                target(view).y = held; frame(view).origin.y += held - y;
+                PoleClamps++;
+            }
+            float idealY = ideal(view).y, idealHeld = world.ClampY(idealY);
+            if (idealHeld != idealY) ideal(view).y = idealHeld;
+            // Visuals framed only on their own changes take their images again after a wrap or a long move. MMR-247 X: only while the map's
+            // scene view is enabled (nothing is drawn while it is not): MapScreen.BeforeTick enables it in HandleIfSceneIsReady, with the
+            // Scene.CheckResources that rebuilds the occlusion rasterizer, before it ticks this camera, so the dressing entities a refresh
+            // instantiates again take their occluder records from the rebuilt one.
+            if ((float.IsNaN(refreshedAtX) || Math.Abs(world.DeltaX(refreshedAtX, x)) > 50) && SceneViewEnabled())
             {
                 refreshedAtX = x;
+                // MMR-247: each refresh marked for the hang capture (HangWatchdog), then the camera tick left as unmarked engine work.
+                MNBL.ProceduralWorld.Automation.EngineMarks.Enter("PeriodicMapPresentation.RefreshImages");
                 MNBL.ProceduralWorld.World.PeriodicMapPresentation.RefreshImages();
+                MNBL.ProceduralWorld.Automation.EngineMarks.Enter("MapDressingRuntime.RefreshImages");
+                MNBL.ProceduralWorld.World.MapDressingRuntime.RefreshImages();   // MMR-257: road decals, bridges and ruin markers
+                MNBL.ProceduralWorld.Automation.EngineMarks.Enter("MagicGroundRuntime.RefreshImages");
+                MNBL.ProceduralWorld.World.MagicGroundRuntime.RefreshImages();   // MMR-260: magic ground decals and node effects
+                MNBL.ProceduralWorld.Automation.EngineMarks.Leave();
             }
+        }
+
+        // The live map screen's scene view is enabled (true with no map screen: nothing to wait for). Refreshes waited for it in RefreshesHeld.
+        public static int RefreshesHeld { get; private set; }
+        private static bool SceneViewEnabled()
+        {
+            var screen = screenInstance.GetValue(null);
+            if (screen == null || sceneViewEnabled(screen)) return true;
+            RefreshesHeld++;
+            return false;
         }
 
         private static void Record(object view, int phase)

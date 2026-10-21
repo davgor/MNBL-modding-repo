@@ -7,7 +7,7 @@ $repo=Split-Path $PSScriptRoot
 $out=Join-Path $repo ('build/world-loader49/test-'+[Guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Path $out | Out-Null
 $csc='C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/MSBuild/Current/Bin/Roslyn/csc.exe'
-$sources=@('src/MNBL.ProceduralWorld/Persistence/LoadPolicy.cs','src/MNBL.ProceduralWorld/World/WorldLifetimeScope.cs','tests/Persistence/LoaderTests.cs')
+$sources=@('src/MNBL.ProceduralWorld/Persistence/LoadPolicy.cs','src/MNBL.ProceduralWorld/CampaignBootstrap/WorldDataBundle.cs','src/MNBL.ProceduralWorld/World/WorldLifetimeScope.cs','tests/Persistence/LoaderTests.cs')
 $inputs=@(($sources+@('tools/Test-WorldLoader.ps1'))|ForEach-Object { @{path=$_;sha256=(Get-FileHash -LiteralPath (Join-Path $repo $_)).Hash.ToLowerInvariant()} })
 $lock=Get-Content "$repo/config/runtime-api-lock.json" -Raw|ConvertFrom-Json
 $references=@();$referenceEvidence=@()

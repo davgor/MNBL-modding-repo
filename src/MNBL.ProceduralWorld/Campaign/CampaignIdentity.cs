@@ -83,6 +83,8 @@ namespace MNBL.ProceduralWorld.CampaignRegistry
     internal static class SaveIds
     {
         public const int Base = 7_910_000;
-        public const int Version = 1;
+        // 2 (MMR-261): the live mutation's SyncData document (_mnblWorldMutations) and the mnbl.campaign.* header key; a version 1 save is
+        // refused (incompatible-build: the map epic 2 clean break, no converter).
+        public const int Version = 2;
     }
 }

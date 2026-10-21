@@ -7,7 +7,10 @@ namespace MNBL.ProceduralWorld.Persistence
     // MMR-49: what a generated save's load decides before anything native opens, as pure functions (tested offline). The loader
     // (GeneratedWorldLoader) gathers the facts; these say whether the load may go on, and if not, which refusal the player sees.
     //   Compatibility: the save's recorded build (mnbl.save.*, SaveBindingContract) against the running one. A different binding contract,
-    //     save id base, world identity schema, game or War Sails version refuses: the patches and the save definitions are pinned to them.
+    //     save id base or world identity schema refuses: the save definitions are pinned to them. MMR-284: the game and War Sails builds
+    //     refuse only below this release's minimum (SupportedBuilds; the saved build or the running one) or when a War Sails save meets a game
+    //     without War Sails; any other difference, a newer build than any known included, is noted and the load goes on to the checks that
+    //     keep it safe: the world's catalog (MMR-283) and every patch's signature (PatchSignatures, refused naming the patch: Patch).
     //     A different module build, backend or navigation cache key does not: the load rebuilds the world from its immutable bundle and
     //     requires every rebuilt artifact (documents, scene, coordinate frame, climate) to be the saved world's, so a module update that
     //     changes none of them loads, and one that changes any refuses there. A save made before MMR-48 records none of the keys; its
@@ -24,34 +27,135 @@ namespace MNBL.ProceduralWorld.Persistence
     internal static class LoadPolicy
     {
         public const string MissingWorld = "missing-world", DamagedWorld = "damaged-world", DamagedSave = "damaged-save", IncompatibleBuild = "incompatible-build",
-            NotRebuildable = "not-rebuildable", NotGenerated = "not-generated", Busy = "busy", Unavailable = "save-unavailable", Failed = "load-failed";
-        public static readonly string[] StrictKeys = { "contract", "saveIds", "worldIdentity", "game", "naval" };
+            NotRebuildable = "not-rebuildable", NotGenerated = "not-generated", Busy = "busy", Unavailable = "save-unavailable", Failed = "load-failed", ContentConflict = "content-conflict";
+        public static readonly string[] StrictKeys = { "contract", "saveIds", "worldIdentity" };
+        public static readonly string[] BuildKeys = { "game", "naval" };   // MMR-284: refused below the minimum only (BuildCheck)
         public static readonly string[] RebuiltKeys = { "module", "moduleAssemblySha256", "backend", "navigationCache" };
 
         internal sealed class Refusal
         {
             public string Code, Detail;
-            public string Title { get { return Titles.ContainsKey(Code) ? Titles[Code] : "The campaign could not be loaded"; } }
-            public string Message { get { return Messages.ContainsKey(Code) ? Messages[Code] : Messages[Failed]; } }
+            // MMR-283: a refusal with its own localizable text ("{=id}text" with {NAME} variables, rendered through TextObject).
+            public string Text;
+            public Dictionary<string, string> Variables = new Dictionary<string, string>(StringComparer.Ordinal);
+            public string Title { get { return Titles.ContainsKey(Code) ? Titles[Code] : Titles[Failed]; } }
+            public string Message { get { return Text ?? (Messages.ContainsKey(Code) ? Messages[Code] : Messages[Failed]); } }
             public override string ToString() { return Code + ": " + Detail; }
         }
 
+        // MMR-286: every title and message is a localizable "{=id}text" (GeneratedWorldLoader renders it through TextObject; the strings are in
+        // ModuleData/Languages/std_mnbl_procedural_world.xml).
         private static readonly Dictionary<string, string> Titles = new Dictionary<string, string> {
-            [MissingWorld] = "This campaign's world is missing", [DamagedWorld] = "This campaign's world is damaged", [DamagedSave] = "This save is damaged", [IncompatibleBuild] = "This campaign needs another version",
-            [NotRebuildable] = "This campaign's map cannot be rebuilt", [NotGenerated] = "Not a generated campaign", [Busy] = "Not now", [Unavailable] = "This save is in use",
-            [Failed] = "The campaign could not be loaded" };
+            [MissingWorld] = "{=mnbl_load_missing_world_title}This campaign's world is missing", [DamagedWorld] = "{=mnbl_load_damaged_world_title}This campaign's world is damaged",
+            [DamagedSave] = "{=mnbl_load_damaged_save_title}This save is damaged", [IncompatibleBuild] = "{=mnbl_load_build_title}This campaign needs another version",
+            [NotRebuildable] = "{=mnbl_load_not_rebuildable_title}This campaign's map cannot be rebuilt", [NotGenerated] = "{=mnbl_load_not_generated_title}Not a generated campaign",
+            [Busy] = "{=mnbl_load_busy_title}Not now", [Unavailable] = "{=mnbl_load_unavailable_title}This save is in use",
+            [Failed] = "{=mnbl_load_failed_title}The campaign could not be loaded", [ContentConflict] = "{=mnbl_load_content_title}A mod conflicts with this campaign" };
         private static readonly Dictionary<string, string> Messages = new Dictionary<string, string> {
-            [MissingWorld] = "The world this campaign was played in is not on this computer. Copy the save together with its world (tools/Transfer-WorldSave.ps1), then load it again. Nothing was changed.",
-            [DamagedWorld] = "The world this campaign was played in is damaged on this computer. Copy it again together with the save (tools/Transfer-WorldSave.ps1), then load it again. Nothing was changed.",
-            [DamagedSave] = "The save file cannot be read whole. Load an earlier save of this campaign. Nothing was changed.",
-            [IncompatibleBuild] = "This campaign was saved with another version of the game, War Sails or this mod's save format. Load it with the version it was made with. Nothing was changed.",
-            [NotRebuildable] = "This version of the mod cannot rebuild this campaign's world exactly as it was saved. Load it with the version it was made with. Nothing was changed.",
-            [NotGenerated] = "This save does not belong to a generated world.",
-            [Busy] = "A campaign cannot be loaded now: another load, a world being generated or activated, or a campaign that is not on its map. Wait for it to finish, or return to the campaign map, then load again. Nothing was changed.",
-            [Unavailable] = "Another program is using the save file, so it cannot be checked. Close it, then load again. Nothing was changed.",
-            [Failed] = "The campaign could not be loaded. Your saves and worlds were not changed." };
+            [MissingWorld] = "{=mnbl_load_missing_world}The world this campaign was played in is not on this computer. Copy the save together with its world (tools/Transfer-WorldSave.ps1), then load it again. Nothing was changed.",
+            [DamagedWorld] = "{=mnbl_load_damaged_world}The world this campaign was played in is damaged on this computer. Copy it again together with the save (tools/Transfer-WorldSave.ps1), then load it again. Nothing was changed.",
+            [DamagedSave] = "{=mnbl_load_damaged_save}The save file cannot be read whole. Load an earlier save of this campaign. Nothing was changed.",
+            [IncompatibleBuild] = "{=mnbl_load_build}This campaign needs another version of the game, War Sails or this mod's save format. Load it with a version that supports it. Nothing was changed.",
+            [NotRebuildable] = "{=mnbl_load_not_rebuildable}This version of the mod cannot rebuild this campaign's world exactly as it was saved. Load it with the version it was made with. Nothing was changed.",
+            [NotGenerated] = "{=mnbl_load_not_generated}This save does not belong to a generated world.",
+            [Busy] = "{=mnbl_load_busy}A campaign cannot be loaded now: another load, a world being generated or activated, or a campaign that is not on its map. Wait for it to finish, or return to the campaign map, then load again. Nothing was changed.",
+            [Unavailable] = "{=mnbl_load_unavailable}Another program is using the save file, so it cannot be checked. Close it, then load again. Nothing was changed.",
+            [Failed] = "{=mnbl_load_failed}The campaign could not be loaded. Your saves and worlds were not changed." };
+
+        // MMR-286: the loader's other player messages, localizable ("{=id}text", {NAME} variables filled through TextObject).
+        internal static class Texts
+        {
+            public const string AlreadyLoading = "{=mnbl_load_already}A campaign is already loading.";
+            public const string Restored = "{=mnbl_load_restored}The campaign is restored.";
+            public const string EndedRunning = "{=mnbl_load_ended_running}The campaign that was running had been closed for this load; load one of its saves to return to it.";
+            public const string BackAtMenu = "{=mnbl_load_back_at_menu}You are back at the main menu.";
+            public const string Ok = "{=mnbl_load_ok}OK";
+            // LoadRouting: a generated save the installed load was asked to open (SAVE; REASON: why the routing is not installed).
+            public const string Routed = "{=mnbl_load_routed}The save {SAVE} belongs to a generated world; only the world loader of MNBL Procedural World opens it. Nothing was loaded.";
+            public const string RoutedUnapplied = "{=mnbl_load_routed_unapplied}The save {SAVE} belongs to a generated world; only the world loader of MNBL Procedural World opens it, and its load routing is not installed ({REASON}). Nothing was loaded.";
+            // PeriodicSeam: a loaded periodic world whose patches did not apply is frozen (REASON: the patch error's first line).
+            public const string PeriodicFrozen = "{=mnbl_load_periodic_frozen}This periodic world cannot run: its periodic patches did not apply ({REASON}).";
+            public static IEnumerable<string> All() { return typeof(Texts).GetFields().Where(f => f.IsLiteral).Select(f => (string)f.GetRawConstantValue()); }
+        }
+        // Every localizable title and message of a load (the module strings harness checks each has an id and is in the language file).
+        public static IEnumerable<string> AllTexts() { return Titles.Values.Concat(Messages.Values).Concat(Texts.All()); }
 
         public static Refusal Refuse(string code, string detail) { return new Refusal { Code = code, Detail = detail }; }
+
+        // MMR-283: the installed content refuses the load (the conflict's kind as CatalogPin names it, its object and module; official: the
+        // module is the game's own). Localizable, naming the module and the object.
+        public static Refusal Content(string kind, string obj, string module, bool official, string target, string detail)
+        {
+            string who = module == null ? "unknown" : official ? "game" : "mod", text;
+            switch (kind)
+            {
+                case "missing-document": text = "{=mnbl_load_content_document}The game data {OBJECT} cannot be read, and this campaign's world is checked against it. Nothing was changed."; break;
+                case "missing":
+                    text = who == "mod" ? "{=mnbl_load_content_missing_mod}This campaign uses {OBJECT}, which is missing: the module {MODULE} provided it and is not active, or removes or replaces it. Enable the mods this campaign was played with, then load it again. Nothing was changed."
+                                        : "{=mnbl_load_content_missing}This campaign uses {OBJECT}, which is missing from the installed game and mods. Enable the mods this campaign was played with, then load it again. Nothing was changed.";
+                    break;
+                case "retyped":
+                case "changed":
+                    text = who == "mod" ? "{=mnbl_load_content_changed_mod}The module {MODULE} changes {OBJECT}, which this campaign uses, in what its world reads. Disable it, or load the campaign with the mods it was played with. Nothing was changed."
+                         : who == "game" ? "{=mnbl_load_content_changed_game}This game version changes {OBJECT} (in {MODULE}), which this campaign uses, in what its world reads. Nothing was changed."
+                                         : "{=mnbl_load_content_changed}{OBJECT}, which this campaign uses, differs in what its world reads. Load the campaign with the mods it was played with. Nothing was changed.";
+                    break;
+                case "added":
+                    text = who == "mod" ? "{=mnbl_load_content_added_mod}The module {MODULE} adds {OBJECT}, which names {TARGET}; this campaign's world was made without it and cannot supply that. Disable the module to load this campaign. Nothing was changed."
+                                        : "{=mnbl_load_content_added}{OBJECT} was added after this campaign was made and names {TARGET}, which this campaign's world cannot supply. Nothing was changed.";
+                    break;
+                case "battle":
+                    text = who == "unknown" ? "{=mnbl_load_content_battle}The installed battle scenes ({OBJECT}) leave some ground of this campaign's world without a battle scene. Nothing was changed."
+                                            : "{=mnbl_load_content_battle_mod}The battle scenes of the module {MODULE} ({OBJECT}) leave some ground of this campaign's world without a battle scene. Disable it, then load again. Nothing was changed.";
+                    break;
+                default: text = "{=mnbl_load_content_other}{OBJECT} cannot be used by this campaign's world. Nothing was changed."; break;
+            }
+            var refusal = new Refusal { Code = ContentConflict, Detail = detail, Text = text };
+            refusal.Variables["OBJECT"] = obj ?? "?"; refusal.Variables["MODULE"] = module ?? ""; refusal.Variables["TARGET"] = target ?? "";
+            return refusal;
+        }
+
+        // MMR-284: a game or War Sails build below this release's minimum (the saved one: made with an older game; the running one: the game is
+        // older than this mod supports). Localizable, naming the product, the builds and the minimum.
+        public static Refusal BelowMinimum(string key, bool saved, string build, string minimum, string detail)
+        {
+            var refusal = new Refusal { Code = IncompatibleBuild, Detail = detail,
+                Text = saved ? "{=mnbl_load_build_saved_old}This campaign was saved with {PRODUCT} {BUILD}, older than {MINIMUM}, the oldest this version of the mod supports. Load it with the version of the mod it was made with. Nothing was changed."
+                             : "{=mnbl_load_build_running_old}This version of the mod needs {PRODUCT} {MINIMUM} or later; this game has {BUILD}. Update the game, then load again. Nothing was changed." };
+            refusal.Variables["PRODUCT"] = key == "naval" ? "War Sails" : "Bannerlord"; refusal.Variables["BUILD"] = build ?? "?"; refusal.Variables["MINIMUM"] = minimum;
+            return refusal;
+        }
+
+        // MMR-284: a patch this game build no longer accepts (PatchSignatureException: the patch, its target, what is installed). Localizable,
+        // naming the patch and the member.
+        public static Refusal Patch(string patch, string target, string detail)
+        {
+            var refusal = new Refusal { Code = IncompatibleBuild, Detail = detail,
+                Text = "{=mnbl_load_patch_signature}This game version changes {TARGET}, which this mod patches ({PATCH}), so this campaign cannot be loaded with this version of the mod. Nothing was changed." };
+            refusal.Variables["PATCH"] = patch ?? "?"; refusal.Variables["TARGET"] = target ?? "?";
+            return refusal;
+        }
+
+        // MMR-284: one build key (game, naval), saved against running: a refusal below the minimum or for a War Sails save without War Sails,
+        // else null, with a note when the builds differ. source: where the saved value came from (" (from the header)" for a pre-MMR-48 save).
+        public static Refusal BuildCheck(string key, string saved, string running, string source, out string note)
+        {
+            note = null;
+            bool naval = key == "naval";
+            string minimum = naval ? CampaignBootstrap.SupportedBuilds.MinimumNaval : CampaignBootstrap.SupportedBuilds.MinimumGame;
+            bool savedAbsent = saved == null || saved == "absent", runningAbsent = running == null || running == "absent";
+            if (naval && !savedAbsent && runningAbsent) return Refuse(IncompatibleBuild, "this campaign was saved with War Sails " + saved + ", which is not installed");
+            if (naval && savedAbsent && runningAbsent) return null;
+            if (!naval || !savedAbsent)
+            {
+                if (!CampaignBootstrap.SupportedBuilds.AtLeast(saved, minimum))
+                    return BelowMinimum(key, true, saved, minimum, key + ": saved " + (saved ?? "(none)") + source + ", below the minimum " + minimum);
+            }
+            if (!CampaignBootstrap.SupportedBuilds.AtLeast(running, minimum))
+                return BelowMinimum(key, false, running, minimum, key + ": running " + (running ?? "(none)") + ", below the minimum " + minimum);
+            if (saved != running) note = key + " differs (saved " + (saved ?? "(none)") + source + ", running " + running + "): a supported build (minimum " + minimum + ", no maximum); the catalog and the patch signatures are verified instead";
+            return null;
+        }
 
         // ---------------------------------------------------------------- routing
 
@@ -119,6 +223,13 @@ namespace MNBL.ProceduralWorld.Persistence
                 else strict.Add(key + ": saved " + (a ?? "(none)") + ", running " + (b ?? "(none)"));
             }
             if (strict.Count > 0) return Refuse(IncompatibleBuild, String.Join("; ", strict));
+            foreach (var key in BuildKeys)
+            {
+                string a, b, note; saved.TryGetValue(key, out a); running.TryGetValue(key, out b);
+                var refusal = BuildCheck(key, a, b, "", out note);
+                if (refusal != null) return refusal;
+                if (note != null && notes != null) notes.Add(note);
+            }
             foreach (var key in RebuiltKeys)
             {
                 string a, b; saved.TryGetValue(key, out a); running.TryGetValue(key, out b);
@@ -137,20 +248,20 @@ namespace MNBL.ProceduralWorld.Persistence
             return new Dictionary<string, string>(StringComparer.Ordinal) { ["game"] = game, ["naval"] = naval };
         }
 
-        // MMR-50: the refusal, or null, for a save without build keys: its header's game and War Sails versions against the running ones.
+        // MMR-50: the refusal, or null, for a save without build keys: its header's game and War Sails versions against the running ones
+        // (MMR-284: by the same minimum rule, BuildCheck).
         public static Refusal LegacyCompatibility(IDictionary<string, string> legacy, IDictionary<string, string> running, List<string> notes)
         {
             if (notes != null) notes.Add("saved before MMR-48: no build keys recorded; the header's game and War Sails versions are compared and the world's reconstruction is verified");
             if (legacy == null) return null;
-            var strict = new List<string>();
-            foreach (var key in new[] { "game", "naval" })
+            foreach (var key in BuildKeys)
             {
-                string a, b; legacy.TryGetValue(key, out a); running.TryGetValue(key, out b);
-                if (a == b) continue;
-                if (key == "naval" && (b == "absent" || b == null) && a != null && a != "absent") strict.Add("this campaign was saved with War Sails " + a + ", which is not installed");
-                else strict.Add(key + ": saved " + (a ?? "(none)") + " (from the header), running " + (b ?? "(none)"));
+                string a, b, note; legacy.TryGetValue(key, out a); running.TryGetValue(key, out b);
+                var refusal = BuildCheck(key, a, b, " (from the header)", out note);
+                if (refusal != null) return refusal;
+                if (note != null && notes != null) notes.Add(note);
             }
-            return strict.Count == 0 ? null : Refuse(IncompatibleBuild, String.Join("; ", strict));
+            return null;
         }
 
         // The documents rebuilt from the bundle against the package's (id -> SHA-256): a refusal when they differ.

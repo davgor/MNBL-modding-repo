@@ -38,7 +38,30 @@ CURATED = {
                     '(GeneratedStartupBehavior, Harmony prefix mnbl.proceduralworld.startup); its daily replenishment is kept'),
     'TaleWorlds.CampaignSystem.CampaignBehaviors.CompanionsCampaignBehavior':
         ('adapted', 'its game-start companions (OnNewGameCreated, 0.6 x towns from random templates and towns) are replaced by the MMR-32 '
-                    'companion intents (GeneratedStartupBehavior, Harmony prefix); its daily spawning and item-modifier lookups are kept'),
+                    'companion intents (GeneratedStartupBehavior, Harmony prefix); its daily tick is replaced (MMR-281, world-lifetime prefix '
+                    'mnbl.proceduralworld.world located by IL content, CompanionsTickPatch): SwapCompanions runs as installed, TryKillCompanion '
+                    'never runs; GeneratedPopulationBehavior rotates unmet, unhired wanderers at the installed 10% daily chance without a death '
+                    'notice and tops up below W (campaign census, hired included, heroes counted) with FWGC++-style wanderers made in the '
+                    'installed four steps (CreateSpecialHero from a backstory-safe template, AdjustEquipments, ChangeState(Active), '
+                    'EnterSettlementAction); get__desiredTotalCompanionCount is never patched; its item-modifier lookups are kept'),
+    'TaleWorlds.CampaignSystem.CampaignBehaviors.HeroSpawnCampaignBehavior':
+        ('retained', 'kept as installed (MMR-281): its minor-clan refill (SpawnMinorFactionHeroes) tops a minor clan up to MinorFactionHeroLimit 4 '
+                     'alive lords, and every generated mercenary company starts with 6 to 10 and every outlaw clan with 4 to 6 XML lords, so it '
+                     'adds none at new game; it spawns the clans\' parties in its new-game follow-ups, after the module marks the companies\' and '
+                     'outlaw clans\' heroes IsMinorFactionHero (right after registration, GeneratedPopulationBehavior); no world literal, id '
+                     'lookup, map extent or coordinate in its IL', None),
+    'TaleWorlds.CampaignSystem.CampaignBehaviors.FactionDiscontinuationCampaignBehavior':
+        ('retained', 'kept as installed (MMR-281): a kingdom without a settlement is dissolved and its clans have 28 days to join another before '
+                     'they are destroyed; the homeless-house rule (GeneratedPopulationBehavior, RT-07) moves a generated house that left a '
+                     'destroyed kingdom into the nearest kingdom of its culture (else the nearest) at the next daily tick through '
+                     'ChangeKingdomAction.ApplyByJoinToKingdom, never the player\'s clan; no world literal, id lookup, map extent or coordinate '
+                     'in its IL', None),
+    'TaleWorlds.CampaignSystem.CampaignBehaviors.InitialChildGenerationCampaignBehavior':
+        ('retained', 'kept on as in vanilla (owner decision 15, MMR-281): its one new-game run adds ceil(adults / 2) less the existing children to '
+                     'each noble clan, cloned from a same-sex adult of the clan; the generated houses\' lords are XML heroes registered before '
+                     'it runs, every house has an adult of each sex and lord cultures are the 7 vanilla cultures with child and teen equipment '
+                     '(MMR-279/280), and nothing the module creates later is assigned to a house before it runs; no world literal, id lookup, '
+                     'map extent or coordinate in its IL', None),
     'TaleWorlds.CampaignSystem.CampaignBehaviors.WorkshopsCampaignBehavior':
         ('adapted', "its new-game workshop initialization (InitializeWorkshopAction.ApplyByNewGame) regenerates each owner's whole name "
                     "(NameGenerator), which would discard the world's source names; the startup restores the intent names once the new game's "
@@ -69,9 +92,12 @@ CURATED = {
         ('adapted', 'finds the bandit clans by id (aliases supplied); its empire_s/empire_w literals are kingdom-id comparisons that are never true '
                     'in a generated world, so those branches never run'),
     'TaleWorlds.CampaignSystem.CampaignBehaviors.IncidentsCampaignBehaviour':
-        ('adapted', 'finds desert_bandits and steppe_bandits by id (aliases supplied); its empire_s literal and the MapFaction.StringId comparisons with '
-                    'sturgia, khuzait, aserai, empire and vlandia (lambdas b__25_113/116/126/130) are kingdom-id checks that are never true in a generated '
-                    'world (generated kingdoms have world-prefixed ids), so those incidents never fire there; its item lookups are installed templates'),
+        ('adapted', "finds desert_bandits and steppe_bandits by id (aliases supplied); the trigger conditions of Vedmak's Treasure, The Deer Departed, "
+                    'Kannic Splendors and Soldier is Wanted Criminal compare MapFaction.StringId with the kingdom ids sturgia, khuzait, aserai, empire and '
+                    'vlandia, never true for a generated kingdom (world-prefixed ids): the world-lifetime transpiler mnbl.proceduralworld.world '
+                    "(IncidentCulturePatch, MMR-287) makes each compare the faction's culture id, locating the conditions by IL content (incident id, "
+                    'first delegate, kingdom literal), and leaves an unresolved one off; its empire_s culture literal is never true (no such culture, '
+                    'as in vanilla); its item lookups are installed templates'),
     'TaleWorlds.CampaignSystem.CampaignBehaviors.LordConversationsCampaignBehavior':
         ('adapted', 'conversation_wanderer_introduction_on_condition sets IMPERIALCAPITAL from Settlement.FindFirst(s => s.StringId == "town_ES4").Name '
                     'without a null check (a NullReferenceException at every wanderer introduction on a generated world); the world-lifetime transpiler '

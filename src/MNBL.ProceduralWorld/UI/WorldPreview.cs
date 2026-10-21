@@ -171,7 +171,7 @@ namespace MNBL.ProceduralWorld.UI
             }
             foreach (var kind in new[] { "town", "castle", "village", "port" }) p.Counts[kind + "s"] = p.Markers.Count(m => m.Kind == kind);
             p.Counts["harbourVillages"] = p.Markers.Count(m => m.Kind == "village" && m.Harbour);
-            p.Counts["kingdoms"] = factions.Kingdoms.Count; p.Counts["clans"] = factions.Clans.Count; p.Counts["regions"] = p.Regions.Count;
+            p.Counts["kingdoms"] = factions.Kingdoms.Count; p.Counts["clans"] = factions.Clans.Count; p.Counts["minorClans"] = factions.MinorClans.Count; p.Counts["regions"] = p.Regions.Count;
             p.Counts["heroes"] = ((IEnumerable)campaign["heroes"]).Cast<object>().Count();
             return p;
         }
@@ -214,16 +214,20 @@ namespace MNBL.ProceduralWorld.UI
         }
 
         // The raster as a PNG (8-bit RGBA, no interlace): evidence, and the file the in-game texture is made from.
-        public byte[] Png()
+        public byte[] Png() { return EncodePng(Rgba, Width, Height); }
+
+        // 8-bit RGBA pixels (row-major, row 0 first) as a PNG; MMR-256's snow texture file uses it too.
+        public static byte[] EncodePng(byte[] rgba, int width, int height)
         {
+            if (rgba == null || width <= 0 || height <= 0 || rgba.Length != width * height * 4) throw new ArgumentException("RGBA pixels of the given size are required.");
             using (var output = new MemoryStream())
             {
                 output.Write(new byte[] { 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A }, 0, 8);
                 var header = new byte[13];
-                WriteBig(header, 0, (uint)Width); WriteBig(header, 4, (uint)Height); header[8] = 8; header[9] = 6;
+                WriteBig(header, 0, (uint)width); WriteBig(header, 4, (uint)height); header[8] = 8; header[9] = 6;
                 Chunk(output, "IHDR", header);
-                byte[] raw = new byte[(Width * 4 + 1) * Height];
-                for (int j = 0; j < Height; j++) { raw[j * (Width * 4 + 1)] = 0; Buffer.BlockCopy(Rgba, j * Width * 4, raw, j * (Width * 4 + 1) + 1, Width * 4); }
+                byte[] raw = new byte[(width * 4 + 1) * height];
+                for (int j = 0; j < height; j++) { raw[j * (width * 4 + 1)] = 0; Buffer.BlockCopy(rgba, j * width * 4, raw, j * (width * 4 + 1) + 1, width * 4); }
                 using (var z = new MemoryStream())
                 {
                     z.WriteByte(0x78); z.WriteByte(0x9C);

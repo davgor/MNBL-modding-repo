@@ -17,7 +17,7 @@ using Bundle = MNBL.ProceduralWorld.CampaignBootstrap.WorldDataBundle;
 internal static class WorldDataBundleTests
 {
     private static int checks, failures;
-    private static readonly string[] AllCapabilities = { "R01", "R02", "R03", "R04", "R05", "R06", "R07", "R08", "R09", "R10" };
+    private static readonly string[] AllCapabilities = Bundle.HostCapabilities;
     private static readonly Bundle.HostProfile Host = new Bundle.HostProfile("v1.4.8.119303", "v1.2.8.119303", AllCapabilities);
 
     private static void Check(bool condition, string label) { checks++; if (!condition) failures++; Console.WriteLine((condition ? "ok    " : "FAIL  ") + label); }
@@ -77,11 +77,15 @@ internal static class WorldDataBundleTests
         finally { Thread.CurrentThread.CurrentCulture = culture; }
 
         // Compatibility with the host: versions and capabilities.
+        // MMR-284: a minimum per release, no maximum: an older change set at the minimum and newer builds open the bundle; below it refuses.
         var oldGame = Bundle.Problems(real, new Bundle.HostProfile("v1.4.7.118000", "v1.2.8.119303", AllCapabilities), true);
-        Check(Has(oldGame, "built for Bannerlord v1.4.8.119303, installed v1.4.7.118000"), "a different Bannerlord version is refused");
+        Check(Has(oldGame, "built for Bannerlord v1.4.8 or later, installed v1.4.7.118000"), "a Bannerlord below the minimum is refused");
         var oldNaval = Rejection(() => Bundle.Open(real, new Bundle.HostProfile("v1.4.8.119303", "v1.2.7.0", AllCapabilities)));
-        Check(oldNaval != null && oldNaval.Contains("built for War Sails v1.2.8.119303, installed v1.2.7.0") && oldNaval.Contains("there is no migration") && !oldNaval.Contains("migration tool"),
-              "a different War Sails version is refused with an actionable message (MMR-50: install the versions it was built for; no migration is offered)");
+        Check(oldNaval != null && oldNaval.Contains("built for War Sails v1.2.8 or later, installed v1.2.7.0") && oldNaval.Contains("there is no migration") && !oldNaval.Contains("migration tool")
+              && oldNaval.Contains("at or above the minimum"), "a War Sails below the minimum is refused with an actionable message (install at least the minimum; no migration is offered)");
+        Check(Bundle.Problems(real, new Bundle.HostProfile("v1.4.8.100000", "v1.2.8.0", AllCapabilities), true).Count == 0, "an older change set at the minimum opens the bundle (its recorded build is diagnostics)");
+        Check(Bundle.Problems(real, new Bundle.HostProfile("v1.5.0.150000", "v1.3.0.120000", AllCapabilities), true).Count == 0 && Bundle.Problems(real, new Bundle.HostProfile("v2.0.0.0", "v2.0.0", AllCapabilities), true).Count == 0,
+              "a game and War Sails newer than any known at release open the bundle (no maximum)");
         var noR08 = Rejection(() => Bundle.Open(real, new Bundle.HostProfile("v1.4.8.119303", "v1.2.8.119303", AllCapabilities.Where(c => c != "R08"))));
         Check(noR08 != null && noR08.Contains("requires runtime capability R08") && noR08.Contains("Update MNBL"), "a host without a required capability is refused");
 
@@ -164,8 +168,9 @@ internal static class WorldDataBundleTests
         var other = new Dictionary<string, string>(identity) { ["worldContentId"] = new string('a', 64) };
         var otherWorld = Rejection(() => Bundle.OpenForSave(root, other, Host));
         Check(otherWorld != null && otherWorld.Contains("is missing from"), "a save naming other content never resolves this bundle");
-        var incompatible = Rejection(() => Bundle.OpenForSave(root, identity, new Bundle.HostProfile("v1.4.9.0", "v1.2.8.119303", AllCapabilities)));
-        Check(incompatible != null && incompatible.Contains("built for Bannerlord") && incompatible.Contains("Install the Bannerlord and War Sails versions"), "a save on an incompatible host is refused with what to install");
+        var incompatible = Rejection(() => Bundle.OpenForSave(root, identity, new Bundle.HostProfile("v1.4.7.0", "v1.2.8.119303", AllCapabilities)));
+        Check(incompatible != null && incompatible.Contains("built for Bannerlord") && incompatible.Contains("Install Bannerlord and War Sails at or above the minimum"), "a save on a host below the minimum is refused with what to install");
+        Check(Bundle.OpenForSave(root, identity, new Bundle.HostProfile("v1.4.9.0", "v1.2.9.0", AllCapabilities)).WorldContentId == expectedId, "a save resolves its bundle on a newer game and War Sails (MMR-284)");
         var damaged = Rejection(() => { File.WriteAllText(extra, "x"); try { Bundle.OpenForSave(root, identity, Host); } finally { File.Delete(extra); } });
         Check(damaged != null && damaged.Contains("unlisted file") && damaged.Contains("Restore an intact copy"), "a save whose bundle is damaged is refused");
         var truncated = Rejection(() => { File.WriteAllBytes(ready, new byte[0]); try { Bundle.OpenForSave(root, identity, Host); } finally { File.WriteAllBytes(ready, readyBytes); } });

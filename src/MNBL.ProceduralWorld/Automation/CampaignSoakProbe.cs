@@ -106,6 +106,8 @@ namespace MNBL.ProceduralWorld.Automation
             soak.Expect(Count(initA, "invalid") == 0 && Count(initA, "unexpected") == 0 && Count(initA, "offNavigation") == 0, "A.init",
                 "a coherent initial state (" + Count(initA, "invalid") + " invalid references, " + Count(initA, "unexpected") + " unexpected objects, " + Count(initA, "offNavigation") + " parties off navigation)");
             a["playability"] = Playability((string)a["worldId"], null, context);
+            // MMR-281: the population census at day 0 (and below, after populationDays campaign days; MMR-247 runs 30 or more).
+            var population = new Dictionary<string, object> { ["day0"] = PopulationCensus() }; a["population"] = population;
             context.Checkpoint();
             var visit = new Dictionary<string, object>(); a["visit"] = visit;
             yield return Visit(context, soak, prefixA, visit);
@@ -124,6 +126,12 @@ namespace MNBL.ProceduralWorld.Automation
             var finalA = Audit(prefixA); a["final"] = finalA;
             soak.Expect(Count(finalA, "invalid") == 0 && Count(finalA, "offNavigation") == 0, "A.after",
                 "the state stays coherent after the diagnostic actions (" + Count(finalA, "invalid") + " invalid references, " + Count(finalA, "offNavigation") + " parties off navigation)");
+            int populationDays = context.Int("populationDays", 0);
+            if (populationDays > 0)
+            {
+                yield return RunDays(context, population, populationDays);
+                population["later"] = PopulationCensus();
+            }
             a["endDays"] = CampaignTime.Now.ToDays;
             var idsA = Ids();
             context.Checkpoint();
@@ -162,6 +170,41 @@ namespace MNBL.ProceduralWorld.Automation
             context.Outputs["completed"] = true;
             context.Checkpoint();
             if (soak.Failures.Count > 0) throw new InvalidOperationException("Campaign soak expectations failed: " + String.Join("; ", soak.Failures.Take(12)));
+        }
+
+        // MMR-281: kingdoms and wars, houses and their sizes, engine children per house (apart), minor clans by kind, IsMinorFactionHero, and
+        // wanderers (free, hired, rotated, topped up) against W (GeneratedPopulationBehavior.Census); MMR-262: per house (kingdom, size, engine
+        // children, eliminated) and per minor clan (kind, heroes, flags, kingdom, mercenary service), the fief owners and every kingdom change
+        // since the start, which day0 and later both carry (MMR-247's c18 and c20). A failure is recorded, never thrown.
+        private static Dictionary<string, object> PopulationCensus()
+        {
+            try { return GeneratedPopulationBehavior.Census(); }
+            catch (Exception error) { return new Dictionary<string, object> { ["error"] = error.GetType().Name + ": " + error.Message }; }
+        }
+
+        // MMR-281: campaign days for the later census, fast-forwarded with the player sheltered, holding and provisioned with grain (a
+        // starving party would end the run); stalls are left as the player would and recorded.
+        private static IEnumerator RunDays(ProbeContext context, Dictionary<string, object> report, int days)
+        {
+            var campaign = Campaign.Current; var main = MobileParty.MainParty;
+            main.IgnoreByOtherPartiesTill(CampaignTime.Now + CampaignTime.Days(days + 30));
+            if (main.CurrentSettlement == null) main.SetMoveModeHold();
+            var grain = TaleWorlds.ObjectSystem.MBObjectManager.Instance.GetObject<ItemObject>("grain");
+            if (grain != null) main.ItemRoster.AddToCounts(grain, 20 * days);
+            double start = CampaignTime.Now.ToDays, begun = context.Seconds, lastProgress = context.Seconds, last = start;
+            int stalls = 0;
+            DiagnosticSandboxBootstrap.Run(campaign, CampaignTimeControlMode.UnstoppableFastForward);
+            while (CampaignTime.Now.ToDays - start < days && context.Seconds - begun < 120.0 * days)
+            {
+                double now = CampaignTime.Now.ToDays;
+                if (now > last) { last = now; lastProgress = context.Seconds; }
+                else if (context.Seconds - lastProgress > 15) { stalls++; lastProgress = context.Seconds; DiagnosticSandboxBootstrap.Run(campaign, CampaignTimeControlMode.UnstoppableFastForward); }
+                else if (campaign.TimeControlMode == CampaignTimeControlMode.Stop) DiagnosticSandboxBootstrap.Run(campaign, CampaignTimeControlMode.UnstoppableFastForward);
+                yield return null;
+            }
+            campaign.TimeControlMode = CampaignTimeControlMode.Stop;
+            report["daysRequested"] = days; report["daysAdvanced"] = Math.Round(CampaignTime.Now.ToDays - start, 2); report["realSeconds"] = Math.Round(context.Seconds - begun, 1);
+            report["stalls"] = stalls; report["grainProvisioned"] = grain != null;
         }
 
         // MMR-41's semantic routes against the live campaign (IMapScene paths, the registered navigation caches); the summary kept.

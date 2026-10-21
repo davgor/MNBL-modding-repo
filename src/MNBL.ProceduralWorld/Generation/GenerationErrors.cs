@@ -12,7 +12,8 @@ namespace MNBL.ProceduralWorld.Generation
     // Messages are localisation-ready: "{=id}default text", with {NAME} placeholders the caller fills (TextObject.SetTextVariable). A
     // GenerationError's Detail is for the diagnostics view only (paths, hashes, raw statuses, producer codes, executable names); the
     // ordinary flow shows Title, Message and Action, which name only what a player can act on (the game, War Sails and their versions).
-    internal enum GenerationErrorCategory { MissingToolOrDlc, IncompatibleBuild, RefusedRecipe, ExhaustedQualityAttempts, DiskFull, BadSource, RuntimeCapabilityFailure, InterruptedGeneration }
+    // MMR-283: ContentConflict, another active module's content that generated worlds cannot use (named with its object).
+    internal enum GenerationErrorCategory { MissingToolOrDlc, IncompatibleBuild, RefusedRecipe, ExhaustedQualityAttempts, DiskFull, BadSource, RuntimeCapabilityFailure, InterruptedGeneration, ContentConflict }
 
     internal sealed class GenerationError
     {
@@ -49,6 +50,7 @@ namespace MNBL.ProceduralWorld.Generation
                 case GenerationErrorCategory.DiskFull: return "{=mnbl_err_disk_title}Not enough disk space";
                 case GenerationErrorCategory.BadSource: return "{=mnbl_err_source_title}The generated world could not be read";
                 case GenerationErrorCategory.RuntimeCapabilityFailure: return "{=mnbl_err_runtime_title}The game could not build this world";
+                case GenerationErrorCategory.ContentConflict: return "{=mnbl_err_content_title}Another mod conflicts with generated worlds";
                 default: return "{=mnbl_err_interrupted_title}Generation was interrupted";
             }
         }
@@ -58,32 +60,47 @@ namespace MNBL.ProceduralWorld.Generation
             switch (category)
             {
                 case GenerationErrorCategory.MissingToolOrDlc: return "{=mnbl_err_missing_action}Install or enable what is named above, then restart the game.";
-                case GenerationErrorCategory.IncompatibleBuild: return "{=mnbl_err_build_action}Install the game and War Sails versions this mod was made for, or a version of this mod made for your game.";
+                case GenerationErrorCategory.IncompatibleBuild: return "{=mnbl_err_build_action}Install a game and War Sails version this mod supports (a minimum is named above), or a version of this mod made for your game.";
                 case GenerationErrorCategory.RefusedRecipe: return "{=mnbl_err_recipe_action}Try another seed. If it happens again, reinstall the mod.";
                 case GenerationErrorCategory.ExhaustedQualityAttempts: return "{=mnbl_err_quality_action}Try another seed (Random World picks a new one).";
                 case GenerationErrorCategory.DiskFull: return "{=mnbl_err_disk_action}Free some disk space, then generate again.";
                 case GenerationErrorCategory.BadSource: return "{=mnbl_err_source_action}Generate again. If it happens again, reinstall the mod.";
                 case GenerationErrorCategory.RuntimeCapabilityFailure: return "{=mnbl_err_runtime_action}Generate again. If it happens again, check that the game and War Sails are up to date.";
+                case GenerationErrorCategory.ContentConflict: return "{=mnbl_err_content_action}Disable or update the module named above, then restart the game. Mods that only add items, troops, cultures or battle scenes, or change stats, work with generated worlds.";
                 default: return "{=mnbl_err_interrupted_action}Generate again when you are ready; the same seed makes the same world.";
             }
         }
 
-        // The host the setup screen runs on: War Sails installed and enabled, the exact game and War Sails builds the mod was made for, and the
+        // The host the setup screen runs on: War Sails installed and enabled, game and War Sails builds at or above this release's minimum
+        // (MMR-284: no maximum; a newer build is checked by the patch signatures and the catalog instead, PatchProblems and MMR-283), and the
         // pinned generator binaries. Empty when compatible.
-        public static List<GenerationError> Host(string installedGame, string expectedGame, string installedNaval, string expectedNaval, bool navalEnabled, IEnumerable<KeyValuePair<string, string>> toolProblems)
+        public static List<GenerationError> Host(string installedGame, string minimumGame, string installedNaval, string minimumNaval, bool navalEnabled, IEnumerable<KeyValuePair<string, string>> toolProblems)
         {
             var problems = new List<GenerationError>();
             if (installedNaval == null || !navalEnabled)
                 problems.Add(new GenerationError(GenerationErrorCategory.MissingToolOrDlc, "host.war_sails_missing",
                     "{=mnbl_err_war_sails_missing}War Sails is required: procedural worlds use its seas, ports and ships.", installedNaval == null ? "NavalDLC not installed" : "NavalDLC not enabled"));
-            if (installedGame != expectedGame)
+            if (!CampaignBootstrap.SupportedBuilds.AtLeast(installedGame, minimumGame))
                 problems.Add(new GenerationError(GenerationErrorCategory.IncompatibleBuild, "host.game_version",
-                    "{=mnbl_err_game_version}This mod was made for Bannerlord {EXPECTED}; this game is {ACTUAL}.", installedGame + " != " + expectedGame, "EXPECTED", expectedGame, "ACTUAL", installedGame ?? "?"));
-            if (installedNaval != null && installedNaval != expectedNaval)
+                    "{=mnbl_err_game_version}This mod needs Bannerlord {MINIMUM} or later; this game is {ACTUAL}.", (installedGame ?? "?") + " is below " + minimumGame, "MINIMUM", minimumGame, "ACTUAL", installedGame ?? "?"));
+            if (installedNaval != null && !CampaignBootstrap.SupportedBuilds.AtLeast(installedNaval, minimumNaval))
                 problems.Add(new GenerationError(GenerationErrorCategory.IncompatibleBuild, "host.war_sails_version",
-                    "{=mnbl_err_war_sails_version}This mod was made for War Sails {EXPECTED}; installed is {ACTUAL}.", installedNaval + " != " + expectedNaval, "EXPECTED", expectedNaval, "ACTUAL", installedNaval));
+                    "{=mnbl_err_war_sails_version}This mod needs War Sails {MINIMUM} or later; installed is {ACTUAL}.", installedNaval + " is below " + minimumNaval, "MINIMUM", minimumNaval, "ACTUAL", installedNaval));
             foreach (var tool in toolProblems ?? Enumerable.Empty<KeyValuePair<string, string>>())
                 problems.Add(new GenerationError(GenerationErrorCategory.MissingToolOrDlc, "host.tool", "{=mnbl_err_tool}The world generator files of this mod are missing or changed.", tool.Key + ": " + tool.Value));
+            return problems;
+        }
+
+        // MMR-284: the patches this game build no longer accepts (PatchSignatures.Verify: patch, target, what is installed), one error per patch
+        // (its first target), named by the patch and the installed member. Code host.patch_signature; the detail says what is installed.
+        public static List<GenerationError> PatchProblems(IEnumerable<Tuple<string, string, string>> failures)
+        {
+            var problems = new List<GenerationError>();
+            foreach (var failure in failures ?? Enumerable.Empty<Tuple<string, string, string>>())
+                if (problems.All(p => p.Variables["PATCH"] != failure.Item1))
+                    problems.Add(new GenerationError(GenerationErrorCategory.IncompatibleBuild, "host.patch_signature",
+                        "{=mnbl_err_patch_signature}This game version changes {TARGET}, which this mod patches ({PATCH}). Generated worlds need a version of this mod made for this game.",
+                        failure.Item2 + ": " + failure.Item3, "PATCH", failure.Item1, "TARGET", failure.Item2));
             return problems;
         }
 
@@ -126,6 +143,40 @@ namespace MNBL.ProceduralWorld.Generation
                 case GenerationErrorCategory.RuntimeCapabilityFailure: return new GenerationError(category, code, "{=mnbl_err_runtime_world}The game could not build the map or travel for this world.", detail);
                 default: return new GenerationError(GenerationErrorCategory.BadSource, code, "{=mnbl_err_source}The generator stopped before the world was complete.", detail);
             }
+        }
+
+        // MMR-283: a conflict of the installed content (a CatalogPin.Conflict's kind, object key, module and target; ContentCompatibility.Errors),
+        // named by its object and, when one provides it, its module (official: the game's own module, an update). The detail is for diagnostics.
+        public static GenerationError Content(string kind, string obj, string module, bool official, string target, string detail)
+        {
+            string who = module == null ? "unknown" : official ? "game" : "mod";
+            Func<string, string, GenerationError> error = (code, message) => new GenerationError(GenerationErrorCategory.ContentConflict, "content." + code, message, detail, "MODULE", module ?? "", "OBJECT", obj ?? "?", "TARGET", target ?? "");
+            switch (kind)
+            {
+                case "missing-document": return error("document", "{=mnbl_err_content_document}The game data {OBJECT} cannot be read, and generated worlds are built from it.");
+                case "missing":
+                    return who == "mod" ? error("missing", "{=mnbl_err_content_missing_mod}{OBJECT}, which generated worlds use, is missing: the module {MODULE} removes or replaces it.")
+                                        : error("missing", "{=mnbl_err_content_missing}{OBJECT}, which generated worlds use, is missing from the installed game.");
+                case "retyped":
+                case "changed":
+                    return who == "mod" ? error("changed", "{=mnbl_err_content_changed_mod}The module {MODULE} changes {OBJECT} in what generated worlds read from it.")
+                         : who == "game" ? error("changed", "{=mnbl_err_content_changed_game}This game version changes {OBJECT} (in {MODULE}) in what generated worlds read from it.")
+                                         : error("changed", "{=mnbl_err_content_changed}{OBJECT} differs in what generated worlds read from it.");
+                case "unresolved":
+                    return who == "mod" ? error("unresolved", "{=mnbl_err_content_unresolved_mod}The module {MODULE} adds or changes {OBJECT}, which names {TARGET}, and that is not installed.")
+                                        : error("unresolved", "{=mnbl_err_content_unresolved}{OBJECT} names {TARGET}, which is not installed.");
+                case "battle":
+                    return who == "unknown" ? error("battle", "{=mnbl_err_content_battle}The installed battle scenes ({OBJECT}) leave some ground of a generated world without a battle scene.")
+                                            : error("battle", "{=mnbl_err_content_battle_mod}The battle scenes of the module {MODULE} ({OBJECT}) leave some ground of a generated world without a battle scene.");
+                case "scene": return error("scene", "{=mnbl_err_content_scene}The scene {OBJECT}, which generated worlds use, is not installed.");
+                default: return error("other", "{=mnbl_err_content_other}{OBJECT} cannot be used by generated worlds.");
+            }
+        }
+
+        // MMR-283: the content check itself could not run (the setup screen never generates unchecked).
+        public static GenerationError ContentUnchecked(string detail)
+        {
+            return new GenerationError(GenerationErrorCategory.ContentConflict, "content.unchecked", "{=mnbl_err_content_unchecked}The installed mods could not be checked against generated worlds.", detail);
         }
 
         // MMR-46: starting the campaign in a reviewed world failed and was undone (MMR-45's rollback); and the case after the initial save, which

@@ -1,0 +1,1403 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mnbl.local/contracts/campaign.schema.json",
+  "title": "MNBL campaign records v2",
+  "description": "compiled/campaign/campaign.json version 2 (map epic 2; MMR-248 freezes the shape, MMR-252 writes the village quota, MMR-279 the population blocks, MMR-286 sourceName and ruins). Covered by the one map epic 2 bundle capability R11 with cells.bin v2 and weights.bin v2. Houses replace the one-ruling-clan-per-realm clans of version 1 (clean break: version 1 is refused). Every id is a world-prefixed game id of the id map; every uid a stable source uid.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "version",
+    "worldSha256",
+    "contentPolicySha256",
+    "culturePolicySha256",
+    "idMapSha256",
+    "layoutSeed",
+    "counts",
+    "producer",
+    "rules",
+    "kingdoms",
+    "wars",
+    "houses",
+    "mercenaryCompanies",
+    "outlawClans",
+    "wanderers",
+    "wandererReserve",
+    "ruins",
+    "heroes",
+    "towns",
+    "castles",
+    "villages",
+    "ports",
+    "exclusions",
+    "notInstantiated",
+    "villageQuota",
+    "census"
+  ],
+  "properties": {
+    "schema": {
+      "const": "mnbl.campaign-records"
+    },
+    "version": {
+      "const": 2
+    },
+    "worldSha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "contentPolicySha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "culturePolicySha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "idMapSha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "layoutSeed": {
+      "type": "string"
+    },
+    "counts": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "integer",
+        "minimum": 0
+      }
+    },
+    "producer": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "integer"
+      }
+    },
+    "rules": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "rule",
+          "minimum",
+          "actual",
+          "status",
+          "evidence"
+        ],
+        "properties": {
+          "rule": {
+            "type": "string"
+          },
+          "minimum": {
+            "type": "integer"
+          },
+          "actual": {
+            "type": "integer"
+          },
+          "status": {
+            "enum": [
+              "ok",
+              "refused",
+              "deferred"
+            ]
+          },
+          "evidence": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "kingdoms": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "uid",
+          "capital",
+          "castles",
+          "towns",
+          "civilization",
+          "civilizationName",
+          "cultureUid",
+          "englishName",
+          "parentRaceId",
+          "presentation",
+          "ruler",
+          "rulingHouse",
+          "memberRealms",
+          "mergeSteps",
+          "slots",
+          "name",
+          "nameLocalized",
+          "nameLocalizedXml",
+          "nameProvenance",
+          "nameXml"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "uid": {
+            "type": "string"
+          },
+          "capital": {
+            "type": "string"
+          },
+          "castles": {
+            "$ref": "#/$defs/ids"
+          },
+          "towns": {
+            "$ref": "#/$defs/ids"
+          },
+          "civilization": {
+            "type": "string"
+          },
+          "civilizationName": {
+            "type": "string"
+          },
+          "cultureUid": {
+            "type": "string"
+          },
+          "englishName": {
+            "type": "string"
+          },
+          "parentRaceId": {
+            "type": "string"
+          },
+          "presentation": {
+            "type": "string"
+          },
+          "ruler": {
+            "type": "string"
+          },
+          "rulingHouse": {
+            "type": "string"
+          },
+          "memberRealms": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1,
+            "description": "FWGC++ realm uids merged into this kingdom, highest-ranked first (MMR-279, RT-01)"
+          },
+          "mergeSteps": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "realm",
+                "step"
+              ],
+              "properties": {
+                "realm": {
+                  "type": "string"
+                },
+                "step": {
+                  "enum": [
+                    "seed",
+                    "civilizationLand",
+                    "presentationProximity",
+                    "splitAboveMax"
+                  ]
+                },
+                "crossesWater": {
+                  "type": "boolean"
+                }
+              }
+            }
+          },
+          "slots": {
+            "$ref": "#/$defs/slots"
+          },
+          "name": {
+            "type": "string"
+          },
+          "nameLocalized": {
+            "type": "string"
+          },
+          "nameLocalizedXml": {
+            "type": "string"
+          },
+          "nameProvenance": {
+            "type": "string"
+          },
+          "nameXml": {
+            "type": "string"
+          },
+          "sourceName": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "wars": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "a",
+          "b",
+          "partner"
+        ],
+        "properties": {
+          "a": {
+            "type": "string"
+          },
+          "b": {
+            "type": "string"
+          },
+          "partner": {
+            "enum": [
+              "landBorder",
+              "nearestBySea"
+            ]
+          }
+        },
+        "description": "starting wars (MMR-279, RT-06): each pair becomes isAtWar relationships on both kingdoms (MMR-280)"
+      }
+    },
+    "houses": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "uid",
+          "kingdom",
+          "home",
+          "seat",
+          "fiefs",
+          "leader",
+          "members",
+          "presentation",
+          "cultureUid",
+          "origin",
+          "slots",
+          "name",
+          "nameLocalized",
+          "nameLocalizedXml",
+          "nameProvenance",
+          "nameXml"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "uid": {
+            "type": "string"
+          },
+          "kingdom": {
+            "type": "string"
+          },
+          "home": {
+            "type": "string"
+          },
+          "seat": {
+            "type": "string"
+          },
+          "fiefs": {
+            "$ref": "#/$defs/ids"
+          },
+          "leader": {
+            "type": "string"
+          },
+          "members": {
+            "$ref": "#/$defs/ids"
+          },
+          "presentation": {
+            "type": "string"
+          },
+          "cultureUid": {
+            "type": "string"
+          },
+          "origin": {
+            "enum": [
+              "kingdomRuler",
+              "realmRuler",
+              "castellan",
+              "pretender",
+              "magistrate",
+              "forcedSeat"
+            ]
+          },
+          "slots": {
+            "$ref": "#/$defs/slots"
+          },
+          "name": {
+            "type": "string"
+          },
+          "nameLocalized": {
+            "type": "string"
+          },
+          "nameLocalizedXml": {
+            "type": "string"
+          },
+          "nameProvenance": {
+            "type": "string"
+          },
+          "nameXml": {
+            "type": "string"
+          },
+          "sourceName": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "mercenaryCompanies": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "uid",
+          "home",
+          "leader",
+          "members",
+          "presentation",
+          "partyTemplate",
+          "characterTemplates",
+          "tier",
+          "source",
+          "slots",
+          "name",
+          "nameLocalized",
+          "nameLocalizedXml",
+          "nameProvenance",
+          "nameXml"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "uid": {
+            "type": "string"
+          },
+          "home": {
+            "type": "string"
+          },
+          "leader": {
+            "type": "string"
+          },
+          "members": {
+            "$ref": "#/$defs/ids"
+          },
+          "presentation": {
+            "type": "string"
+          },
+          "partyTemplate": {
+            "type": "string"
+          },
+          "characterTemplates": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 4,
+            "maxItems": 4
+          },
+          "tier": {
+            "type": "integer"
+          },
+          "source": {
+            "type": "string"
+          },
+          "slots": {
+            "$ref": "#/$defs/slots"
+          },
+          "name": {
+            "type": "string"
+          },
+          "nameLocalized": {
+            "type": "string"
+          },
+          "nameLocalizedXml": {
+            "type": "string"
+          },
+          "nameProvenance": {
+            "type": "string"
+          },
+          "nameXml": {
+            "type": "string"
+          },
+          "sourceName": {
+            "type": "string"
+          },
+          "cultureUid": {
+            "type": "string",
+            "description": "the home town's source culture uid (MMR-279)"
+          }
+        }
+      }
+    },
+    "outlawClans": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "uid",
+          "home",
+          "leader",
+          "members",
+          "presentation",
+          "kind",
+          "partyTemplate",
+          "characterTemplates",
+          "tier",
+          "wars",
+          "source",
+          "slots",
+          "name",
+          "nameLocalized",
+          "nameLocalizedXml",
+          "nameProvenance",
+          "nameXml"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "uid": {
+            "type": "string"
+          },
+          "home": {
+            "type": "string"
+          },
+          "leader": {
+            "type": "string"
+          },
+          "members": {
+            "$ref": "#/$defs/ids"
+          },
+          "presentation": {
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "mafia",
+              "nomad",
+              "sect"
+            ]
+          },
+          "partyTemplate": {
+            "type": "string"
+          },
+          "characterTemplates": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 4,
+            "maxItems": 4
+          },
+          "tier": {
+            "type": "integer"
+          },
+          "wars": {
+            "$ref": "#/$defs/ids",
+            "description": "kingdoms of the clan culture it is at war with (the outlaw war guard)"
+          },
+          "source": {
+            "type": "string"
+          },
+          "slots": {
+            "$ref": "#/$defs/slots"
+          },
+          "name": {
+            "type": "string"
+          },
+          "nameLocalized": {
+            "type": "string"
+          },
+          "nameLocalizedXml": {
+            "type": "string"
+          },
+          "nameProvenance": {
+            "type": "string"
+          },
+          "nameXml": {
+            "type": "string"
+          },
+          "sourceName": {
+            "type": "string"
+          },
+          "cultureUid": {
+            "type": "string",
+            "description": "the home town's source culture uid (MMR-279)"
+          }
+        }
+      }
+    },
+    "wanderers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "hero",
+          "presentation",
+          "female"
+        ],
+        "properties": {
+          "hero": {
+            "type": "string"
+          },
+          "presentation": {
+            "type": "string"
+          },
+          "female": {
+            "type": "boolean"
+          },
+          "epithet": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "wandererReserve": {
+      "description": "MMR-281: the names the runtime wanderer tick (rotation and top-up) gives the wanderers it makes: population.json wanderers.reserve FWGC++ residents per presentation culture of the towns, with the resident's sex, a name no hero carries and an archetypal FWGC++ epithet (absent: the template's)",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "presentation",
+          "civilization",
+          "female"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "presentation": {
+            "type": "string"
+          },
+          "civilization": {
+            "type": "string"
+          },
+          "female": {
+            "type": "boolean"
+          },
+          "epithet": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "ruins": {
+      "description": "MMR-286: every FWGC++ ruin (ruins[]) with its cleaned display name (the shared name cleaner: no Age tag, unique among the ruins by a lexicon suffix, never a numeral) and its source name when it differs; the map's ruin markers and the ruins encyclopedia page show name",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "uid",
+          "name"
+        ],
+        "properties": {
+          "uid": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "sourceName": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "heroes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "uid",
+          "affiliation",
+          "civilization",
+          "occupation",
+          "presentation",
+          "raceId",
+          "role",
+          "ruler",
+          "bucket",
+          "female",
+          "age",
+          "alive",
+          "slots",
+          "name",
+          "nameLocalized",
+          "nameLocalizedXml",
+          "nameProvenance",
+          "nameXml"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "uid": {
+            "type": "string"
+          },
+          "affiliation": {
+            "type": "string"
+          },
+          "civilization": {
+            "type": "string"
+          },
+          "occupation": {
+            "type": "string"
+          },
+          "presentation": {
+            "type": "string"
+          },
+          "raceId": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string"
+          },
+          "ruler": {
+            "type": "boolean"
+          },
+          "bucket": {
+            "enum": [
+              "house",
+              "company",
+              "outlaw",
+              "wanderer",
+              "notable"
+            ]
+          },
+          "female": {
+            "type": "boolean"
+          },
+          "age": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "alive": {
+            "type": "boolean"
+          },
+          "clan": {
+            "type": "string"
+          },
+          "kingdom": {
+            "type": "string"
+          },
+          "settlement": {
+            "type": "string"
+          },
+          "settlementKind": {
+            "enum": [
+              "town",
+              "castle",
+              "village"
+            ]
+          },
+          "spouse": {
+            "type": "string"
+          },
+          "father": {
+            "type": "string"
+          },
+          "mother": {
+            "type": "string"
+          },
+          "synthesized": {
+            "type": "boolean"
+          },
+          "slots": {
+            "$ref": "#/$defs/slots"
+          },
+          "name": {
+            "type": "string"
+          },
+          "nameLocalized": {
+            "type": "string"
+          },
+          "nameLocalizedXml": {
+            "type": "string"
+          },
+          "nameProvenance": {
+            "type": "string"
+          },
+          "nameXml": {
+            "type": "string"
+          },
+          "sourceName": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "towns": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "uid",
+          "capital",
+          "castles",
+          "cityClass",
+          "civilization",
+          "cultureProvenance",
+          "cultureUid",
+          "kingdom",
+          "owner",
+          "population",
+          "port",
+          "presentation",
+          "villages",
+          "slots",
+          "name",
+          "nameLocalized",
+          "nameLocalizedXml",
+          "nameProvenance",
+          "nameXml"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "uid": {
+            "type": "string"
+          },
+          "capital": {
+            "type": "boolean"
+          },
+          "castles": {
+            "$ref": "#/$defs/ids"
+          },
+          "cityClass": {
+            "enum": [
+              "small",
+              "medium",
+              "capital"
+            ]
+          },
+          "civilization": {
+            "type": "string"
+          },
+          "cultureProvenance": {
+            "type": "string"
+          },
+          "cultureUid": {
+            "type": "string"
+          },
+          "kingdom": {
+            "type": "string"
+          },
+          "owner": {
+            "type": "string",
+            "description": "the owning house (MMR-279)"
+          },
+          "population": {
+            "type": "object"
+          },
+          "port": {
+            "type": "boolean"
+          },
+          "presentation": {
+            "type": "string"
+          },
+          "villages": {
+            "$ref": "#/$defs/ids"
+          },
+          "repairs": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "slots": {
+            "$ref": "#/$defs/slots"
+          },
+          "name": {
+            "type": "string"
+          },
+          "nameLocalized": {
+            "type": "string"
+          },
+          "nameLocalizedXml": {
+            "type": "string"
+          },
+          "nameProvenance": {
+            "type": "string"
+          },
+          "nameXml": {
+            "type": "string"
+          },
+          "sourceName": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "castles": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "uid",
+          "cultureUid",
+          "garrisonTown",
+          "kingdom",
+          "owner",
+          "ownerProvenance",
+          "villages",
+          "slots",
+          "name",
+          "nameLocalized",
+          "nameLocalizedXml",
+          "nameProvenance",
+          "nameXml"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "uid": {
+            "type": "string"
+          },
+          "cultureUid": {
+            "type": "string"
+          },
+          "garrisonTown": {
+            "type": "string"
+          },
+          "kingdom": {
+            "type": "string"
+          },
+          "owner": {
+            "type": "string"
+          },
+          "ownerProvenance": {
+            "type": "string"
+          },
+          "villages": {
+            "$ref": "#/$defs/ids"
+          },
+          "slots": {
+            "$ref": "#/$defs/slots"
+          },
+          "name": {
+            "type": "string"
+          },
+          "nameLocalized": {
+            "type": "string"
+          },
+          "nameLocalizedXml": {
+            "type": "string"
+          },
+          "nameProvenance": {
+            "type": "string"
+          },
+          "nameXml": {
+            "type": "string"
+          },
+          "sourceName": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "villages": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "uid",
+          "bound",
+          "boundKind",
+          "sourceTown",
+          "origin",
+          "cultureUid",
+          "harbour",
+          "production",
+          "role",
+          "slots",
+          "name",
+          "nameLocalized",
+          "nameLocalizedXml",
+          "nameProvenance",
+          "nameXml"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "uid": {
+            "type": "string"
+          },
+          "bound": {
+            "type": "string"
+          },
+          "boundKind": {
+            "enum": [
+              "town",
+              "castle"
+            ]
+          },
+          "sourceTown": {
+            "type": "string",
+            "description": "the town whose rural population gives the hearth share (the garrison town for synthesized villages, RT-10)"
+          },
+          "origin": {
+            "enum": [
+              "source",
+              "reassigned",
+              "synthesized"
+            ]
+          },
+          "tier": {
+            "type": "string"
+          },
+          "cultureUid": {
+            "type": "string"
+          },
+          "harbour": {
+            "type": "boolean"
+          },
+          "pinned": {
+            "type": "boolean"
+          },
+          "production": {
+            "enum": [
+              "farming",
+              "fishing",
+              "resource",
+              "harbor",
+              "landing"
+            ]
+          },
+          "role": {
+            "type": "string"
+          },
+          "seaNode": {
+            "type": "integer"
+          },
+          "slots": {
+            "$ref": "#/$defs/slots"
+          },
+          "name": {
+            "type": "string"
+          },
+          "nameLocalized": {
+            "type": "string"
+          },
+          "nameLocalizedXml": {
+            "type": "string"
+          },
+          "nameProvenance": {
+            "type": "string"
+          },
+          "nameXml": {
+            "type": "string"
+          },
+          "sourceName": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "ports": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "town",
+          "villages",
+          "seaNodes",
+          "bestHarbourQuality",
+          "slots"
+        ],
+        "properties": {
+          "town": {
+            "type": "string"
+          },
+          "villages": {
+            "$ref": "#/$defs/ids"
+          },
+          "seaNodes": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            }
+          },
+          "bestHarbourQuality": {
+            "type": "number"
+          },
+          "forced": {
+            "type": "boolean",
+            "description": "MMR-251: a forced port (a town repair; written only when true). The village quota (MMR-252) gives it a synthesized, pinned harbour village, its first village"
+          },
+          "slots": {
+            "$ref": "#/$defs/slots"
+          }
+        }
+      }
+    },
+    "exclusions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "uid",
+          "kind",
+          "reason"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "uid": {
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "village",
+              "castle"
+            ]
+          },
+          "reason": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "notInstantiated": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "villageQuota": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "townVillages",
+        "castleVillages",
+        "kept",
+        "reassigned",
+        "dropped",
+        "synthesized",
+        "exceptions",
+        "movedNotables",
+        "passes",
+        "stable"
+      ],
+      "description": "MMR-252: the 3/2 quota (playability.json villages; docs/travel-graph.md \"Village quota\")",
+      "properties": {
+        "townVillages": {
+          "type": "integer"
+        },
+        "castleVillages": {
+          "type": "integer"
+        },
+        "kept": {
+          "type": "integer"
+        },
+        "reassigned": {
+          "type": "integer"
+        },
+        "dropped": {
+          "type": "integer"
+        },
+        "synthesized": {
+          "type": "integer"
+        },
+        "exceptions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "village",
+              "fortification",
+              "distance",
+              "reason"
+            ],
+            "properties": {
+              "village": {
+                "type": "string"
+              },
+              "fortification": {
+                "type": "string"
+              },
+              "distance": {
+                "type": "number"
+              },
+              "reason": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "movedNotables": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "hero",
+              "from",
+              "to"
+            ],
+            "properties": {
+              "hero": {
+                "type": "string"
+              },
+              "from": {
+                "type": "string"
+              },
+              "to": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "protectedKept": {
+          "type": "integer"
+        },
+        "passes": {
+          "const": 2
+        },
+        "stable": {
+          "type": "boolean"
+        },
+        "clearanceMoves": {
+          "type": "integer",
+          "description": "kept villages moved clear of the fortifications (travel-graph.json clearance repairs)"
+        },
+        "spacing": {
+          "type": "number",
+          "description": "the town spacing S the clearance tiers scale with"
+        },
+        "synthesizedByTier": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "description": "synthesized villages per tier (islet: an exception)"
+        }
+      }
+    },
+    "census": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "fiefs",
+        "towns",
+        "kingdoms",
+        "houses",
+        "adultLords",
+        "minors",
+        "engineChildren",
+        "mercenaryCompanies",
+        "outlawClans",
+        "wanderers",
+        "notables",
+        "unassigned",
+        "buckets",
+        "castles",
+        "sourceHeroes",
+        "targets",
+        "overflow"
+      ],
+      "description": "MMR-279: wanderers is W, the smallest integer not below the float32 product 0.6 x towns; engineChildren the expected children the engine adds (ceil(adults / 2) per house)",
+      "properties": {
+        "fiefs": {
+          "type": "integer"
+        },
+        "towns": {
+          "type": "integer"
+        },
+        "kingdoms": {
+          "type": "integer"
+        },
+        "houses": {
+          "type": "integer"
+        },
+        "adultLords": {
+          "type": "integer"
+        },
+        "minors": {
+          "type": "integer"
+        },
+        "engineChildren": {
+          "type": "integer"
+        },
+        "mercenaryCompanies": {
+          "type": "integer"
+        },
+        "outlawClans": {
+          "type": "integer"
+        },
+        "wanderers": {
+          "type": "integer"
+        },
+        "notables": {
+          "type": "integer"
+        },
+        "unassigned": {
+          "const": 0
+        },
+        "buckets": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "castles": {
+          "type": "integer"
+        },
+        "deadParents": {
+          "type": "integer",
+          "description": "synthesized dead parents of siblings (alive false; not members, not in the census buckets)"
+        },
+        "companyMembers": {
+          "type": "integer"
+        },
+        "outlawMembers": {
+          "type": "integer"
+        },
+        "wanderersPlanned": {
+          "type": "integer",
+          "description": "the planned wanderers (W unless the sources run short; the runtime tops up)"
+        },
+        "notablesBounded": {
+          "type": "integer",
+          "description": "source notables beyond HeroFactory's per-settlement caps, each re-bucketed (overflow)"
+        },
+        "sourceHeroes": {
+          "type": "integer",
+          "description": "living FWGC++ heroes, each in exactly one bucket or an instantiated notable"
+        },
+        "movedNotables": {
+          "type": "integer",
+          "description": "villageQuota.movedNotables, counted where they now live"
+        },
+        "synthesized": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "description": "synthesized people by kind (spouse, sibling, child, minor, deadParents, castellans, seatHeads, captains, soldiers, outlaws)"
+        },
+        "targets": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "description": "the War Sails-scaled targets: kingdoms, houses, adultLords, mercenaryCompanies, outlawClans, wanderers"
+        },
+        "engineChildrenByHouse": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "description": "per house: ceil(adults / 2) less its planned minors"
+        },
+        "overflow": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "hero",
+              "from",
+              "to",
+              "reason"
+            ],
+            "properties": {
+              "hero": {
+                "type": "string"
+              },
+              "from": {
+                "type": "string"
+              },
+              "to": {
+                "type": "string"
+              },
+              "reason": {
+                "type": "string"
+              }
+            }
+          },
+          "description": "heroes placed outside their first bucket (house cap, one-sex fix, HeroFactory notable caps, company fill)"
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "slots": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "owner",
+          "status"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "owner": {
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "pending",
+              "resolved"
+            ]
+          },
+          "value": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

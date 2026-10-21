@@ -13,11 +13,12 @@ using MNBL.ProceduralWorld.CampaignBootstrap;
 using MNBL.ProceduralWorld.Surface;
 
 // MMR-37 runtime surface contract tests, without the game:
-//   SurfaceContractTests REPO BUNDLE_A BUNDLE_B SURFACE_TEMPLATE WORLDBRIDGE OUT_DIR OUT_JSON
+//   SurfaceContractTests REPO BUNDLE_A BUNDLE_B SURFACE_TEMPLATE WORLDBRIDGE OUT_DIR OUT_JSON [OFFICIAL_SCENE_DIR]
 // For two real compiled worlds: the surface model against the bundle (layout, scale record, chunks, seam), the pinned surface encoder's
 // output against the model (heights byte for byte, bounds, per-node ranges and layers), the encoded terrain.bin's chunk seams and heights
 // (tools/check_terrain_seams.py), the landmarks and model queries, and the lifetime primitives (generation tokens, late callbacks, the
-// resource ledger).
+// resource ledger). MMR-255: the layer weights (weights.bin v2) per chunk and across the seam on every plane, the map trees passed through,
+// and, given the installed official scene, the managed template derivation (World/SurfaceTemplateRecipe.cs) giving the generator's bytes.
 internal static class SurfaceContractTests
 {
     private static int checks, failures;
@@ -29,7 +30,7 @@ internal static class SurfaceContractTests
 
     private static int Main(string[] args)
     {
-        if (args.Length != 7) { Console.Error.WriteLine("usage: SurfaceContractTests REPO BUNDLE_A BUNDLE_B SURFACE_TEMPLATE WORLDBRIDGE OUT_DIR OUT_JSON"); return 2; }
+        if (args.Length != 7 && args.Length != 8) { Console.Error.WriteLine("usage: SurfaceContractTests REPO BUNDLE_A BUNDLE_B SURFACE_TEMPLATE WORLDBRIDGE OUT_DIR OUT_JSON [OFFICIAL_SCENE_DIR]"); return 2; }
         var evidence = new SortedDictionary<string, object>(StringComparer.Ordinal) { ["schema"] = "mnbl.evidence.surface-contract", ["version"] = 1, ["ticket"] = "MMR-37" };
         try { Run(args, evidence); }
         catch (Exception e) { Check(false, "unexpected exception: " + e); }
@@ -42,7 +43,7 @@ internal static class SurfaceContractTests
     private static void Run(string[] args, SortedDictionary<string, object> evidence)
     {
         string repo = args[0], template = args[3], bridge = args[4], outDir = args[5];
-        var host = new WorldDataBundle.HostProfile("v1.4.8.119303", "v1.2.8.119303", new[] { "R01", "R02", "R03", "R04", "R05", "R06", "R07", "R08", "R09", "R10" });
+        var host = new WorldDataBundle.HostProfile("v1.4.8.119303", "v1.2.8.119303", WorldDataBundle.HostCapabilities);
         var surfaces = new List<WorldSurface>(); var landmarkSets = new List<List<WorldSurface.Landmark>>();
         var worlds = new List<object>(); evidence["worlds"] = worlds;
         foreach (var label in new[] { "A", "B" })
@@ -55,30 +56,39 @@ internal static class SurfaceContractTests
             var layout = O(projection, "periodicLayout"); var vertical = O(projection, "vertical"); var target = O(projection, "target");
             string id = bundle.WorldContentId.Substring(0, 12);
             // Layout and the scale record, against the projection read here.
-            Check(s.Side == 257 && s.Cells == 64 && s.HeightmapLevel == 6 && s.Extent == D(layout, "physicalWidth") && s.Extent == D(layout, "physicalHeight") && s.Spacing == s.Extent / 256 && s.NodeSize == s.Extent / 4,
+            // MMR-278: the shaped surface is 513 samples, level 7 (navigation keeps the 257-sample travel compile beside it).
+            Check(s.Side == 513 && s.Cells == 128 && s.HeightmapLevel == 7 && s.Extent == D(layout, "physicalWidth") && s.Extent == D(layout, "physicalHeight") && s.Spacing == s.Extent / 512 && s.NodeSize == s.Extent / 4,
                   label + " " + id + ": the native terrain is the projection's square physical domain: " + s.Side + " samples over " + s.Extent + " units (spacing " + s.Spacing + "), 4 x 4 nodes of " + s.Cells + " cells (heightmap level " + s.HeightmapLevel + ")");
             Check((double)s.Scale["verticalExaggeration"] == D(vertical, "exaggeration") && (double)s.Scale["verticalWorldUnitsPerMetre"] == D(vertical, "worldUnitsPerMetre") && (double)s.Scale["logicalWidth"] == D(target, "logicalWidth")
                   && (double)s.Scale["strip"] == D(layout, "strip") && (double)s.Scale["poleMargin"] == D(layout, "poleMargin") && (double)s.Scale["horizontalWorldUnitsPerMetre"] == D(O(projection, "horizontal"), "equatorWorldUnitsPerMetre"),
                   label + ": the scale record keeps campaign XY (logical " + s.LogicalWidth + " x " + s.LogicalHeight + ", strip " + s.Strip + ", pole margin " + s.PoleMargin + ") apart from source metres (" + s.Scale["horizontalWorldUnitsPerMetre"] + " units/m horizontal, " + s.Scale["verticalWorldUnitsPerMetre"] + " vertical) and records the vertical exaggeration " + s.Scale["verticalExaggeration"]);
             // Chunks: tile the domain, deterministic, ranges recomputed here.
-            bool tiled = s.Chunks.Count == 16 && s.Chunks.All(c => c.MinX == c.X * s.NodeSize && c.MaxX == (c.X + 1) * s.NodeSize && c.MinY == c.Y * s.NodeSize && c.MaxY == (c.Y + 1) * s.NodeSize && c.FirstColumn == c.X * 64 && c.FirstRow == c.Y * 64)
+            bool tiled = s.Chunks.Count == 16 && s.Chunks.All(c => c.MinX == c.X * s.NodeSize && c.MaxX == (c.X + 1) * s.NodeSize && c.MinY == c.Y * s.NodeSize && c.MaxY == (c.Y + 1) * s.NodeSize && c.FirstColumn == c.X * s.Cells && c.FirstRow == c.Y * s.Cells)
                 && s.Chunks.Select(c => c.X + "," + c.Y).Distinct().Count() == 16;
             bool ranges = s.Chunks.All(c => {
-                double lo = double.MaxValue, hi = double.MinValue; bool rock = false;
-                for (int r = 0; r <= 64; r++) for (int col = 0; col <= 64; col++) { double h = s.Sample(c.FirstColumn + col, c.FirstRow + r); lo = Math.Min(lo, h); hi = Math.Max(hi, h); rock |= s.Rock(c.FirstColumn + col, c.FirstRow + r) != 0; }
-                return lo == c.MinHeight && hi == c.MaxHeight && rock == c.Rock && c.Mask == (rock ? 3 : 1); });
+                double lo = double.MaxValue, hi = double.MinValue; int mask = 1;
+                for (int r = 0; r <= s.Cells; r++) for (int col = 0; col <= s.Cells; col++)
+                {
+                    double h = s.Sample(c.FirstColumn + col, c.FirstRow + r); lo = Math.Min(lo, h); hi = Math.Max(hi, h);
+                    for (int k = 1; k < s.LayerNames.Count; k++) if (s.Weight(k, c.FirstColumn + col, c.FirstRow + r) != 0) mask |= 1 << k;
+                }
+                return lo == c.MinHeight && hi == c.MaxHeight && c.Mask == mask; });
             bool deterministic = again.InputsSha256 == s.InputsSha256 && again.Chunks.Select(Key).SequenceEqual(s.Chunks.Select(Key)) && again.QuantizedHeightfieldBytes().SequenceEqual(s.QuantizedHeightfieldBytes());
-            Check(tiled && ranges && deterministic, label + ": the 16 chunks tile the domain exactly, each over its own 65 x 65 samples (borders shared), with its height range and material layers recomputed here, identically on a second read (" + s.Chunks.Count(c => c.Rock) + " chunks carry rock_k)");
+            Check(tiled && ranges && deterministic, label + ": the 16 chunks tile the domain exactly, each over its own " + (s.Cells + 1) + " x " + (s.Cells + 1) + " samples (borders shared), with its height range and material layers recomputed here, identically on a second read (" +
+                  s.Chunks.Min(c => Bits(c.Mask)) + " to " + s.Chunks.Max(c => Bits(c.Mask)) + " of " + s.LayerNames.Count + " layers per chunk)");
+            var templateLayers = System.Text.RegularExpressions.Regex.Matches(File.ReadAllText(Path.Combine(template, "scene.xscene")), "<layer name=\"([^\"]+)\">").Cast<System.Text.RegularExpressions.Match>().Select(m => m.Groups[1].Value).ToList();
+            Check(s.LayerNames.SequenceEqual(templateLayers) && s.LayerNames.Count == 15 && s.LayerNames[0] == "grass",
+                  label + ": weights.bin v2 names the template's 15 material layers in slot order (" + String.Join(", ", s.LayerNames) + ")");
             // Periodic seam: the compiled heightfield duplicates columns c and c + logical width / spacing; the model keeps them equal.
             var raw = bundle.ReadVerified("compiled/terrain/heightfield.bin");
             int rawBad = 0, period = (int)Math.Round(s.LogicalWidth / s.Spacing);
-            for (int c = 0; c + period < 257; c++) for (int r = 0; r < 257; r++) if (BitConverter.ToDouble(raw, 12 + (r * 257 + c) * 8) != BitConverter.ToDouble(raw, 12 + (r * 257 + c + period) * 8)) rawBad++;
-            Check(rawBad == 0 && s.SeamMismatches() == 0, label + ": every compiled sample column c equals column c + " + period + " (the strips copy the other side of the seam), and so do the quantized samples");
+            for (int c = 0; c + period < s.Side; c++) for (int r = 0; r < s.Side; r++) if (BitConverter.ToDouble(raw, 12 + (r * s.Side + c) * 8) != BitConverter.ToDouble(raw, 12 + (r * s.Side + c + period) * 8)) rawBad++;
+            Check(rawBad == 0 && s.SeamMismatches() == 0, label + ": every compiled sample column c equals column c + " + period + " (the strips copy the other side of the seam), and so do the quantized samples and every material layer plane");
             // The compiler's own 16-bit heights (height-q16.bin: f64 hmin, f64 hmax, side^2 big-endian u16) carry the model's codes.
             var q16 = bundle.ReadVerified("compiled/terrain/height-q16.bin");
             int codeBad = 0;
-            for (int r = 0; r < 257; r++) for (int c = 0; c < 257; c++) { int i = 12 + 16 + 2 * (r * 257 + c); if (((q16[i] << 8) | q16[i + 1]) != s.Code(c, r)) codeBad++; }
-            Check(System.Text.Encoding.ASCII.GetString(q16, 0, 8) == "MNBLQ16B" && codeBad == 0, label + ": the compiler's published 16-bit heights (height-q16.bin) are the model's quantization codes (" + codeBad + " of 66049 differ)");
+            for (int r = 0; r < s.Side; r++) for (int c = 0; c < s.Side; c++) { int i = 12 + 16 + 2 * (r * s.Side + c); if (((q16[i] << 8) | q16[i + 1]) != s.Code(c, r)) codeBad++; }
+            Check(System.Text.Encoding.ASCII.GetString(q16, 0, 8) == "MNBLQ16B" && codeBad == 0, label + ": the compiler's published 16-bit heights (height-q16.bin) are the model's quantization codes (" + codeBad + " of " + s.Side * s.Side + " differ)");
             // The pinned encoder's output against the model.
             string job = Path.Combine(outDir, label);
             if (Directory.Exists(job)) Directory.Delete(job, true);
@@ -88,13 +98,17 @@ internal static class SurfaceContractTests
             string sceneName = "mnbl_world_" + id + "_contract";
             File.WriteAllText(Path.Combine(localTemplate, "scene.xscene"), File.ReadAllText(Path.Combine(localTemplate, "scene.xscene")).Replace("<scene name=\"mnbl_runtime_surface\"", "<scene name=\"" + sceneName + "\""), new UTF8Encoding(false));
             File.WriteAllBytes(Path.Combine(job, "heightfield.bin"), raw); File.WriteAllBytes(Path.Combine(job, "weights.bin"), bundle.ReadVerified("compiled/terrain/weights.bin"));
+            var flora = bundle.ReadVerified("compiled/terrain/flora.bin");
+            File.WriteAllBytes(Path.Combine(job, "flora.bin"), flora);
             int exit = Run(bridge, new[] { "--surface-heightfield", Path.Combine(job, "heightfield.bin"), "--surface-template", localTemplate, "--surface-output", output,
-                "--surface-extent", s.Extent.ToString("R", CultureInfo.InvariantCulture), "--surface-scale", "1", "--surface-weights", Path.Combine(job, "weights.bin") });
+                "--surface-extent", s.Extent.ToString("R", CultureInfo.InvariantCulture), "--surface-scale", "1", "--surface-weights", Path.Combine(job, "weights.bin"), "--surface-flora", Path.Combine(job, "flora.bin") });
             var manifest = Parse(File.ReadAllText(Path.Combine(output, "surface.json")));
             bool heightsEqual = File.ReadAllBytes(Path.Combine(output, "quantized-heightfield.bin")).SequenceEqual(s.QuantizedHeightfieldBytes());
             Check(exit == 0 && heightsEqual && D(manifest, "minHeight") == s.Low && D(manifest, "maxHeight") == s.High && Math.Abs(D(manifest, "quantizationStep") - s.Step) <= 1e-15 && D(manifest, "nodeSize") == s.NodeSize
                   && Convert.ToInt32(manifest["gridSide"]) == s.Side && Convert.ToInt32(manifest["heightmapLevel"]) == s.HeightmapLevel,
                   label + ": the pinned surface encoder's published heights equal the model byte for byte (" + (s.Side * s.Side) + " samples), with the model's bounds " + s.Low + ".." + s.High + ", step " + s.Step + " and node size");
+            Check(File.ReadAllBytes(Path.Combine(output, "flora.bin")).SequenceEqual(flora) && Convert.ToInt32(manifest["floraInstances"]) == (int)BitConverter.ToUInt32(flora, 8) && BitConverter.ToUInt32(flora, 8) > 0,
+                  label + ": the world's map trees (" + BitConverter.ToUInt32(flora, 8) + ", compiled/terrain/flora.bin) reach the encoded scene byte for byte");
             var xml = new XmlDocument(); xml.Load(Path.Combine(output, "scene.xscene"));
             var terrainNode = (XmlElement)xml.SelectSingleNode("//terrain");
             var nodes = xml.SelectNodes("//terrain/nodes/node").OfType<XmlElement>().ToList();
@@ -106,10 +120,10 @@ internal static class SurfaceContractTests
                   label + ": the encoded scene's 16 terrain nodes carry the model chunks' height ranges and material layer masks, at the model's node size");
             // The encoded terrain.bin itself: shared chunk edges, layers and heights (tools/check_terrain_seams.py).
             string seams = Path.Combine(outDir, "seams-" + label + ".json");
-            int seamExit = Run("python", new[] { "-I", Path.Combine(repo, "tools", "check_terrain_seams.py"), output, seams });
+            int seamExit = Run("python", new[] { "-I", Path.Combine(repo, "tools", "check_terrain_seams.py"), output, seams, "--period", s.SeamColumns.ToString(CultureInfo.InvariantCulture) });
             var seamReport = File.Exists(seams) ? Parse(File.ReadAllText(seams)) : null;
             Check(seamExit == 0 && seamReport != null && Convert.ToInt32(seamReport["passed"]) == Convert.ToInt32(seamReport["total"]),
-                  label + ": the encoded terrain.bin has no chunk seam tear: " + (seamReport == null ? "no report" : seamReport["sharedEdgeSamples"] + " shared edge samples with equal heights, normals and material weights; every decoded height is the model's (" + seamReport["passed"] + "/" + seamReport["total"] + ")"));
+                  label + ": the encoded terrain.bin has no chunk seam tear: " + (seamReport == null ? "no report" : seamReport["sharedEdgeSamples"] + " shared edge samples with equal heights, normals and material weights; every decoded height is the model's; the periodic seam columns equal in height, every layer plane and physical material (" + seamReport["passed"] + "/" + seamReport["total"] + ")"));
             // Landmarks.
             var travel = Parse(new UTF8Encoding(false).GetString(bundle.ReadVerified("compiled/travel/travel-graph.json")));
             var marks = s.Landmarks(travel, 24, 12);
@@ -133,6 +147,18 @@ internal static class SurfaceContractTests
                   label + ": model queries: vertex heights are samples, interior heights the main-diagonal triangle, normals unit, a vertical ray meets the collision reference (within 0.03 of the height everywhere), and a query outside the domain throws (no fallback heights)");
             worlds.Add(new SortedDictionary<string, object>(StringComparer.Ordinal) { ["label"] = label, ["worldContentId"] = bundle.WorldContentId, ["inputsSha256"] = s.InputsSha256, ["scale"] = s.Scale,
                 ["low"] = s.Low, ["high"] = s.High, ["step"] = s.Step, ["chunks"] = s.Chunks.Select(Key).ToList(), ["landmarks"] = marks.Count, ["seams"] = seamReport });
+        }
+        // MMR-255: the managed template derivation (SurfaceTemplateRecipe.Derive, what SurfaceTemplateSource runs on the player's machine)
+        // gives the bytes tools/scenebin/make_surface_template.py derived, from the installed official scene and the tracked recipe.
+        if (args.Length == 8)
+        {
+            var recipe = Parse(File.ReadAllText(Path.Combine(repo, "Modules", "MNBL.ProceduralWorld", "SurfaceTemplate", "template-recipe.json")));
+            var official = File.ReadAllBytes(Path.Combine(args[7], "scene.xscene"));
+            var derived = MNBL.ProceduralWorld.World.SurfaceTemplateRecipe.Derive(official, O(recipe, "substitutions"));
+            string derivedSha;
+            using (var h = System.Security.Cryptography.SHA256.Create()) derivedSha = BitConverter.ToString(h.ComputeHash(derived)).Replace("-", "").ToLowerInvariant();
+            Check(Convert.ToInt32(recipe["version"]) == 2 && derivedSha == (string)O(recipe, "expected")["scene.xscene"] && derived.SequenceEqual(File.ReadAllBytes(Path.Combine(template, "scene.xscene"))),
+                  "the managed template derivation gives the tracked recipe's scene.xscene byte for byte (" + derivedSha.Substring(0, 12) + "): 15 generated layers, dynamic weather on");
         }
         int differing = landmarkSets[0].Count(m => Math.Abs(surfaces[0].Height(m.X, m.Y) - surfaces[1].Height(m.X, m.Y)) > .2);
         Check(surfaces[0].InputsSha256 != surfaces[1].InputsSha256 && differing >= landmarkSets[0].Count / 2, "the two worlds differ at " + differing + " of world A's " + landmarkSets[0].Count + " landmark positions, so world B's answers there can be told from A's");
@@ -183,6 +209,8 @@ internal static class SurfaceContractTests
               "scene names are content-addressed (" + nameA + ": the same world and encoder give the same name, any other world, encoder or template another; only that exact form is the scene store's, never a fixture slot such as mnbl_world_a), and no world generation begins while a campaign map is live");
         evidence["generationLog"] = WorldGenerations.Log;
     }
+
+    private static int Bits(int mask) { int n = 0; for (; mask != 0; mask &= mask - 1) n++; return n; }
 
     private static string Key(WorldSurface.Chunk c) { return c.X + "," + c.Y + " " + c.MinHeight.ToString("R", CultureInfo.InvariantCulture) + ".." + c.MaxHeight.ToString("R", CultureInfo.InvariantCulture) + " mask " + c.Mask; }
 

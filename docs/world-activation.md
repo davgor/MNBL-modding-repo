@@ -17,7 +17,7 @@ playable half-world.
 | The game's boundaries (the commit stage of the generation job) | `Generation/ActivationCommitStage.cs` (`ActivationCommitStage`, `GameActivationHost`) |
 | The compiled world's campaign graph (pure managed) | `Campaign/CompiledWorldDataset.cs`, with the fixture world's re-emission closure (`GeneratedCampaignDataset.CompiledWorldDocuments`) |
 | The compiled world's registration in the new game | `CampaignBootstrap/CompiledWorldRegistration.cs` (`IGeneratedWorld`) |
-| The installed catalog the world is built against | `worldgen/policies/campaign-catalog.json`, written by `tools/make_campaign_catalog_pin.py` |
+| The installed catalog the world is checked against (MMR-283's reduced pin) | `worldgen/policies/campaign-catalog.json` v2, written by `tools/Make-CatalogPin.ps1`; `Generation/CatalogPin.cs`, `Generation/ModuleSources.cs`, `Generation/ContentCompatibility.cs` |
 | Startup recovery | `Persistence/SaveBindingRuntime.RunStartup` (after MMR-62's save recovery) |
 | Component harness (offline) | `tests/Generation/ActivationFailureTests.cs`, run by `tools/Test-Activation.ps1` |
 | Compiled world tests (offline) | `tests/Campaign/CompiledWorldTests.cs`, run by `tools/Test-CompiledWorld.ps1` |
@@ -35,10 +35,10 @@ transition).
 | Admit | The store's writer lock (MMR-62), checked before the journal is begun. A job in Committing with passing runtime validation. The main menu, with no game running. One activation at a time: an unrecovered active journal, or an unreadable one, refuses the next. | worker, one engine item |
 | VerifyData | Re-opens the DATA_READY bundle: manifest, every file hash, host compatibility. This happens before any native resource of the world opens. Its content id and manifest must be the job's. Records the generator, request and policy hashes (the job's inputs) and the host's game and War Sails versions. | worker |
 | VerifyRuntime | The runtime reports belong to this world and scene and still pass. `NavigationGate.Require` (W02) and `RuntimePlayabilityValidator.Require` (MMR-41, made against this navigation and layout). The persisted navigation and playability reports are the ones this job made (their recorded hashes equal the job's). The settlement layout report (`layoutSha256` equals the prepared layout's) and the job's entity check. The installed scene files are unchanged since the job installed them. Copies of the three reports are kept with the activation. | worker |
-| BuildWorld | The campaign graph from the bundle (below), validated whole (C07), against the pinned installed catalog. Also the world's climate, synthesized from its source in its coordinate frame, and its terrain context for the battle map. | worker, engine items for the catalog |
-| PromotePackage | The world package (`GeneratedWorldPackage`, moved into place whole, manifest last), from a compiled-world placement. The bundle is taken over from the job, because the save binding names it. | worker |
+| BuildWorld | The live installed catalog, checked against the reduced pin (below, "Content mods"), and the battle-scene table the campaign will load. The campaign graph from the bundle (below), validated whole (C07), against that catalog. Also the world's climate, synthesized from its source in its coordinate frame, and its terrain context for the battle map. | worker, engine items for the catalog |
+| PromotePackage | The world package (`GeneratedWorldPackage`, moved into place whole, manifest last), from a compiled-world placement, with the world's frozen catalog. The bundle is taken over from the job, because the save binding names it. | worker |
 | StartCampaign | The new game on the world's scene. Registration runs inside the new game's `RegisterSubModuleObjects` (R07, `CompiledWorldRegistration`). Then the map scene, the navigation caches (MMR-41) and the battle map (MMR-42). | engine items; the worker waits for the campaign map |
-| PostBuild | The live campaign against everything it was built from. Closure is settled. Every settlement stands on its layout position (centre, gate, port). No baked entity was made at run time. The navigation caches are registered under their key. The battle map is installed with the world's terrain context, and every land cell and every sea terrain check gives one scene. Every settlement's live location scenes meet the mission contracts. The world's climate is on the live map, and its sea and lake planes are present. The route set passes through the live campaign (MMR-41). The save guard holds. | one engine item |
+| PostBuild | The live campaign against everything it was built from. Closure is settled. Every settlement stands on its layout position (centre, gate, port). No baked entity was made at run time. The navigation caches are registered under their key. The battle map is installed with the world's terrain context, and every land cell and every sea terrain check gives one scene. A failed battle map record (MMR-283's Preflight or Guarded record) is read null-safely and its problem names its error (`PostBuildBattleMap`, MMR-262); one the loaded battle table refused is a content conflict naming the module. Every settlement's live location scenes meet the mission contracts. The world's climate is on the live map, and its sea and lake planes are present. The route set passes through the live campaign (MMR-41). The save guard holds. | one engine item |
 | BindIdentity | The save header's world binding (`WorldIdentity`) with this instance. | one engine item |
 | PublishSave | The initial save (MMR-62's `InitialSavePublisher`), read back bound to this instance and whole. | engine items |
 | WriteReceipt | The receipt and its runtime-derived record. The transaction writes them itself. | worker |
@@ -177,15 +177,88 @@ engine's face generator (`HeroBodies`, MMR-32) and the hero's seed. They are not
 The same seed gives the same body. So the package keeps the documents as validated, and a load draws the same bodies again. The registration
 report records the count and the bodies' hash.
 
-**The catalog pin.** The factories' policies were made from one capture of the installed merged XML. The activation builds a world only from
-live documents (`GetMergedXmlForManaged` at the main menu) whose SHA-256 equals the capture's. `CompiledWorldRegistration` registers only when
-the live engine defaults are exactly the pinned inventory. Another game version or another mod's XML refuses the world instead of building it
-from documents its policies were not made from.
+**The catalog pin (MMR-283).** The factories' policies were made from one capture of the installed merged XML. The pin no longer hashes
+the 24 merged documents whole (any content mod refused every world, RT-36). It lists only what a world can reference, each object by key,
+element and the fields the world reads (see "Content mods" below), and the world is built from the live documents. The world's catalog
+is then frozen with it, so a later mod or balance change never changes a rebuilt world. `CompiledWorldRegistration` requires only the engine
+defaults the world's documents reference to be live; extra ones (a mod's item category or skill) pass.
 
-**Why every captured document is pinned.** The review suggested pinning only the documents the policies read. That was not taken: every
-captured document is an input of C07. The graph validator and the re-emission closure follow references through the installed loaders'
-schema, into items, crafting pieces, monsters and ship pieces, so an item mod changes what the re-emitted templates reference. Mod
-compatibility is stated as a limit. BuildWorld as a whole, the 24 merges included, took 6.8 s in run 22472. The merges were not timed apart.
+**Why the closure is still followed.** The graph validator and the re-emission closure follow references through the installed loaders'
+schema, into items, crafting pieces, monsters and ship pieces. So the pin is the closure of the world's roots over the captured catalog, and
+the setup check closes the live roots (mod additions included) over the pinned engine defaults: a mod's addition that names something not
+installed is refused before generation instead of inside BuildWorld. BuildWorld as a whole, the 24 merges included, took 6.8 s in run 22472.
+
+## Content mods (MMR-283)
+
+**The pin** (`worldgen/policies/campaign-catalog.json` v2, `tools/Make-CatalogPin.ps1` from the `campaign_catalog` capture and the default
+inventory in `rosters.json`'s provenance) covers 6,272 of the capture's 8,072 objects. Its roots:
+- every record of the stock categories the game loads before the world registers (SPCultures, partyTemplates, EquipmentRosters,
+  WorkshopTypes, LocationComplexTemplates);
+- every reusable NPC template (`is_template`), the engine's literal NPC lookups, and the player's `main_hero` and `player_faction`;
+- every object a world policy names (any id or typed key in the graph policy's listed policies: settlement prototypes, bandit and pirate
+  clans, troops, items).
+
+From those it follows the reference schema, never into Calradia's lords, clans, kingdoms or settlements. Six closure problems of the capture
+itself (`fighter_*` templates naming equipment rosters that do not exist; the factories leave them out of their pools) are recorded as
+`tolerated` and not reported again.
+
+**The fields the world reads** (`CatalogPin.Fields`) are never numbers, names, texts or equipment choices:
+
+| Object | Read fields |
+|---|---|
+| NPCCharacter | culture, occupation, `is_template`, `is_hero`, `is_female`, `skill_template`, `upgrade_requires`, upgrade targets, face key template (the world re-emits its own copy of every template it uses, so stats, skills and equipment are free) |
+| Item, CraftedItem | the element, `Type`, `item_category`, `crafting_template`, usable by women and men |
+| EquipmentRoster | culture, flags, how many battle, civilian and stealth sets |
+| Settlement (prototype) | culture, component kind and meshes, location complex template, location scenes, common areas |
+| Faction | culture, clan kind flags, `default_party_template` |
+| Culture | every reference and every true/false flag |
+| PartyTemplate | stack troops and ship hulls, not the counts |
+| any other | every reference |
+
+**Where it is checked.**
+- **Setup screen, before Generate** (`ContentCompatibility.SetupProblems`, appended to the host problems on an otherwise compatible host):
+  - every pinned object is present, of its element, with its read fields;
+  - the live roots close over the pinned defaults;
+  - the battle-scene table the campaign will load (every active module's `ModuleData/sp_battle_scenes.xml`, in active-module order, as
+    `Campaign.InitializeScenes` reads them) serves every geography the catalogue's table serves (`BattleTableCheck`, see
+    `docs/mission-scenes.md`);
+  - every scene the mission catalogue names is installed in an active module.
+- **Activation:** BuildWorld runs the same catalog and battle-table checks before anything is built (`WorldReconstruction.LiveCatalog`,
+  `ContentConflictException`). PromotePackage then keeps the merged documents the world was built from, with the engine defaults and the
+  active modules, as `catalog/<id>.xml` and `catalog/catalog.json` (`mnbl.world-catalog` v1) in the package. If the map's AfterLoad still
+  refuses the loaded table (Preflight's record carries `lost`), PostBuild checks the active modules' tables again and throws a
+  `ContentConflictException` from them, so the setup screen names the module, as the loader does (MMR-262). If those tables show no loss,
+  the post-build problem names Preflight's error instead.
+- **Load:** the world is rebuilt from the package's frozen catalog (`WorldReconstruction.PackageCatalog`), so its documents are the
+  activation's byte for byte whatever changed since. Then the live catalog is checked:
+  - only the installed objects the world references (`CatalogPin.CheckReferences`: its closure, less its own NPC records and the engine
+    defaults);
+  - any stock culture or party template added since that names an NPC the world does not supply (`CatalogPin.AddedStock`);
+  - the battle table, in `CheckStart`, before the load starts and builds its caches.
+  A missing object no active module provides is put on a module that was active at activation and is not now.
+
+**Refusals** name the module and the object, as localizable text with string ids:
+- setup and activation: `GenerationErrors.Content`, category `ContentConflict` (`mnbl_err_content_*`), one error per module (three at most,
+  then one for the rest);
+- load: `LoadPolicy.Content`, code `content-conflict` (`mnbl_load_content_*`).
+
+The module is the last active module whose XML for the object's document defines it, or whose XSLT names it (`ModuleSources`). An official
+module means the game itself changed (an update). Mods that only add items, troops, cultures or battle scenes, or change stats, pass.
+
+**Engine defaults** exist only inside a game. A registration that finds a referenced default missing is refused there, and the activation
+names it as a content conflict.
+
+**Offline tests.** `tools/Test-ContentCompatibility.ps1` (`tests/Generation/ContentCompatibilityTests.cs`), 17 checks on the capture, world A
+and the installed battle tables:
+- the pin and its coverage;
+- a synthetic module adding an item, a troop and a wanderer that carries the item passes setup, the activation's build, the byte-identical
+  rebuild from the frozen catalog and the load's check, also after a balance patch;
+- refusals naming the module and the object: a changed read field, an XSLT removal, a template naming an uninstalled item, and a culture
+  added after the campaign;
+- a scene pack absorbed or refused;
+- the battle map rebuilt with a stored mutation's patch on every strip image;
+- a failing battle map install caught;
+- AfterLoad's order.
 
 **The registry's two-pass list.** It now includes a hero's family (`Hero.father`, `Hero.mother`, `Hero.spouse` to a later hero), as the installed
 `Heroes.xml` has. Installed 1.4.8 IL:
@@ -203,6 +276,8 @@ A compiled world's package (`<store>/worlds/<worldId>-<manifest12>`) holds:
 - a compiled-world placement (`mnbl.compiled-world-placement.v1`): world id, scene, extent, the five installed scene files' hashes, the periodic
   frame, the content id and bundle manifest, the layout, climate and graph hashes;
 - the eight registered documents;
+- the frozen catalog (`catalog/`, MMR-283): the merged documents the world was built from, the engine defaults and the active modules;
+- the frozen settlement looks (`looks/selection.json` and `looks/catalog/<look id>.xml`, MMR-258): the look selection and each used look's normalized hierarchy from the installed campaign map, which a re-encode reads instead of the installed map (`docs/settlement-looks.md`);
 - `world.json`.
 
 **The periodic frame.** `PeriodicWorldCoordinates.ToPlacement` writes it, and `FromPlacement` reads back the same frame: rows, height and
@@ -299,8 +374,10 @@ SettlementPlacement 52, Playability 24.
   - The initial save is whole and bound; a reload is not shown.
 - **Navigation cache cost.** The first campaign of a world in a module build generates its caches: 389-391 s for world A. The key includes this
   module's SHA-256, so every build regenerates them once. MMR-56 measures the profile.
-- **The catalog pin is strict.** Every captured document must equal the live one, so another mod's campaign XML refuses activation. Finding 13
-  of the review gives the reasons.
+- **Content mods (MMR-283).** Only what a world can reference is pinned, by key, element and read fields. A mod that changes those fields of
+  a vanilla object (a culture's troop lists, a troop's culture or upgrade tree, an item's type), or removes one, is refused, naming it. A
+  world keeps its frozen catalog: a mod added mid-campaign never reaches its re-emitted templates, and one whose culture would leave the
+  world a presumed troop refuses the load. Mods that change the game through code alone are not checked.
 - **One world was activated in game: world A (seed 42).** World B is covered offline by the dataset's factories (earlier tickets), not by this
   activation.
 - **A game that fails while loading** is ended once it has loaded: `MBGameManager.EndGame` waits for `IsLoaded`, and the host waits up to

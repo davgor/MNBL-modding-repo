@@ -14,6 +14,8 @@ REPO = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)
 CASES = ('field', 'crossing', 'retreat', 'town', 'castle', 'village', 'hideout', 'siege', 'capture', 'gear', 'locations', 'names', 'assets', 'baselines')
 RULES = ('returnBoundLand', 'missionReadySeconds', 'teardownSeconds', 'sampleSeconds', 'cellStride', 'settlementClearance', 'playerTroops', 'siegeTroops',
          'siegePreparationHours', 'siegeObserveHours', 'siegeCompletionFrom', 'battleClasses', 'substitutedClasses', 'crossingTerrains', 'stockMissingPatterns')
+# MMR-247 F: the siege case's timing, sally guard and retry (a block of their own: a recorded run's rules must equal the file's).
+SIEGE_SETUP = ('siegeCompletionHours', 'siegeObserveMinHours', 'siegeTimingMarginHours', 'siegeSallyMargin', 'siegeCrewLimit', 'siegeAttempts')
 WORLD = ('kind', 'seeds', 'culture', 'designatedSave')
 WORLD_B = ('kind', 'fixtureSeed', 'fixturePlacement', 'catalogReceipt')
 
@@ -40,6 +42,14 @@ def main():
     for rule in RULES:
         if rule not in rules:
             problems.append('rules.%s missing' % rule)
+    siege = plan.get('siegeSetup') or {}
+    for key in SIEGE_SETUP:
+        if not isinstance(siege.get(key), (int, float)):
+            problems.append('siegeSetup.%s missing' % key)
+    if isinstance(siege.get('siegeObserveMinHours'), (int, float)) and not 0 < siege['siegeObserveMinHours'] <= (rules.get('siegeObserveHours') or 0):
+        problems.append('siegeSetup.siegeObserveMinHours must be in (0, rules.siegeObserveHours]')
+    if not 1 <= (siege.get('siegeAttempts') or 0) <= 3:
+        problems.append('siegeSetup.siegeAttempts is %r (1 to 3)' % siege.get('siegeAttempts'))
     if rules.get('cellStride') != 1:
         problems.append('rules.cellStride is %r: a class or crossing is absent only when every cell was sampled' % rules.get('cellStride'))
     if not set(rules.get('substitutedClasses') or []) <= set(rules.get('battleClasses') or []):

@@ -1,0 +1,223 @@
+{
+ "schema": "mnbl.evidence.land-faces",
+ "version": 1,
+ "ticket": "MMR-254",
+ "recipe": "refresh-fixtures (Run-SeedSweep -Stage generate,bundle; size 129, phase 16) for seeds 42 (A') and 73 (B'), then this script; navmesh face histograms: tools/Test-WorldNavigation.ps1 (landFacesByType per world)",
+ "allChecks": true,
+ "worlds": [
+  {
+   "label": "A'",
+   "worldContentId": "8cb9d6c5cc2cfd68a6b521131eec7ee32ca081eb25ff2a3571f41e48173ae40c",
+   "cells": 8192,
+   "classes": {
+    "lake": 59,
+    "land": 1898,
+    "mountain": 491,
+    "river": 37,
+    "sea": 5707
+   },
+   "landTypes": {
+    "Desert": 498,
+    "Forest": 301,
+    "Plain": 45,
+    "Snow": 182,
+    "Steppe": 872
+   },
+   "landTypesMatchGraph": true,
+   "tableRecount": {
+    "mismatches": 0,
+    "examples": [],
+    "permanentWhiteFromBiomesOnly": true,
+    "yearSnowElsewhere": 0
+   },
+   "roads": {
+    "roadBits": 554,
+    "pieceCells": 554,
+    "graphRoadCells": 554,
+    "match": true
+   },
+   "nearSettlements": {
+    "town": {
+     "Desert": 17,
+     "Forest": 26,
+     "Steppe": 9,
+     "SteppeOrDesert": 26
+    },
+    "castle": {
+     "Desert": 14,
+     "Forest": 4,
+     "Steppe": 8,
+     "SteppeOrDesert": 21
+    },
+    "village": {
+     "Desert": 69,
+     "Forest": 101,
+     "Steppe": 45,
+     "SteppeOrDesert": 108
+    }
+   },
+   "settlements": {
+    "castle": 26,
+    "town": 45,
+    "village": 187
+   },
+   "terrainIncidents": {
+    "incident_sandstorm_warning": {
+     "samples": "the main party face",
+     "needs": "Desert",
+     "landCells": 498,
+     "landShare": 0.2624
+    },
+    "incident_heat_and_dust": {
+     "samples": "the main party face",
+     "needs": "Desert",
+     "landCells": 498,
+     "landShare": 0.2624
+    },
+    "incident_water_supplies": {
+     "samples": "the besieging main party face (a fortification's 3-unit disc)",
+     "needs": "Steppe or Desert",
+     "fortifications": 47,
+     "of": 71
+    },
+    "incident_preemptive_work": {
+     "samples": "a 3-unit disc around the last visited player fortification",
+     "needs": "Desert",
+     "fortifications": 31,
+     "of": 71
+    },
+    "incident_through_proper_channels": {
+     "samples": "a 3-unit disc around the current player fortification",
+     "needs": "Desert",
+     "fortifications": 31,
+     "of": 71
+    },
+    "incident_cries_in_the_mist": {
+     "samples": "a 3-unit disc around the last visited village",
+     "needs": "Forest",
+     "villages": 101,
+     "of": 187
+    }
+   },
+   "navmesh": {
+    "landFacesByType": {
+     "Desert": 1010,
+     "Forest": 612,
+     "Plain": 100,
+     "Snow": 364,
+     "Steppe": 1744
+    },
+    "physicalColumns": 256,
+    "faces": 16422,
+    "matchesCells": true
+   }
+  },
+  {
+   "label": "B'",
+   "worldContentId": "aee466c15635ee6f343da5f3c41d6521781cb1f1c81384a9e23caea9ffc62456",
+   "cells": 8192,
+   "classes": {
+    "lake": 538,
+    "land": 3736,
+    "mountain": 456,
+    "river": 145,
+    "sea": 3317
+   },
+   "landTypes": {
+    "Desert": 1131,
+    "Forest": 363,
+    "Plain": 120,
+    "Snow": 671,
+    "Steppe": 1451
+   },
+   "landTypesMatchGraph": true,
+   "tableRecount": {
+    "mismatches": 0,
+    "examples": [],
+    "permanentWhiteFromBiomesOnly": true,
+    "yearSnowElsewhere": 0
+   },
+   "roads": {
+    "roadBits": 1040,
+    "pieceCells": 1040,
+    "graphRoadCells": 1040,
+    "match": true
+   },
+   "nearSettlements": {
+    "town": {
+     "Desert": 29,
+     "Forest": 25,
+     "Steppe": 13,
+     "SteppeOrDesert": 42
+    },
+    "castle": {
+     "Desert": 22,
+     "Forest": 12,
+     "Steppe": 8,
+     "SteppeOrDesert": 30
+    },
+    "village": {
+     "Desert": 132,
+     "Forest": 115,
+     "Steppe": 50,
+     "SteppeOrDesert": 182
+    }
+   },
+   "settlements": {
+    "castle": 39,
+    "town": 66,
+    "village": 276
+   },
+   "terrainIncidents": {
+    "incident_sandstorm_warning": {
+     "samples": "the main party face",
+     "needs": "Desert",
+     "landCells": 1131,
+     "landShare": 0.3027
+    },
+    "incident_heat_and_dust": {
+     "samples": "the main party face",
+     "needs": "Desert",
+     "landCells": 1131,
+     "landShare": 0.3027
+    },
+    "incident_water_supplies": {
+     "samples": "the besieging main party face (a fortification's 3-unit disc)",
+     "needs": "Steppe or Desert",
+     "fortifications": 72,
+     "of": 105
+    },
+    "incident_preemptive_work": {
+     "samples": "a 3-unit disc around the last visited player fortification",
+     "needs": "Desert",
+     "fortifications": 51,
+     "of": 105
+    },
+    "incident_through_proper_channels": {
+     "samples": "a 3-unit disc around the current player fortification",
+     "needs": "Desert",
+     "fortifications": 51,
+     "of": 105
+    },
+    "incident_cries_in_the_mist": {
+     "samples": "a 3-unit disc around the last visited village",
+     "needs": "Forest",
+     "villages": 115,
+     "of": 276
+    }
+   },
+   "navmesh": {
+    "landFacesByType": {
+     "Desert": 2460,
+     "Forest": 746,
+     "Plain": 274,
+     "Snow": 1376,
+     "Steppe": 2902
+    },
+    "physicalColumns": 256,
+    "faces": 16704,
+    "matchesCells": true
+   }
+  }
+ ]
+}

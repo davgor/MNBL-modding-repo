@@ -57,9 +57,9 @@ internal static class RecoveryTests
         File.WriteAllText(Path.Combine(jobRoot, "generate-stderr.log"), new string('x', GenerationDiagnostics.MaxLogBytes + 500));
         var diskFull = new IOException("There is not enough space on the disk.", unchecked((int)0x80070070));
         var matrix = new List<Tuple<string, GenerationError>> {
-            Tuple.Create("missing War Sails", GenerationErrors.Host("v1.4.8.119303", "v1.4.8.119303", null, "v1.2.8", false, null)[0]),
+            Tuple.Create("missing War Sails", GenerationErrors.Host("v1.4.8.119303", "v1.4.8", null, "v1.2.8", false, null)[0]),
             Tuple.Create("missing generator", GenerationErrors.FromGeneration("reader_failed", new FileNotFoundException("missing", "C:\\\\x\\\\fwg.exe"), null, "fwg.exe missing")),
-            Tuple.Create("other game build", GenerationErrors.Host("v1.4.9.1", "v1.4.8.119303", "v1.2.8", "v1.2.8", true, null)[0]),
+            Tuple.Create("game build below the minimum", GenerationErrors.Host("v1.4.7.1", "v1.4.8", "v1.2.8", "v1.2.8", true, null)[0]),
             Tuple.Create("incompatible bundle or schema", GenerationErrors.Job(GenerationErrorCategory.IncompatibleBuild, "bundle.schema", "manifest is not mnbl.world-bundle version 1")),
             Tuple.Create("refused recipe", GenerationErrors.FromGeneration("producer_refused", null, "INVALID_INPUT", "detail")),
             Tuple.Create("exhausted quality attempts", GenerationErrors.FromGeneration("quality_exhausted", null, null, "3 attempts")),
@@ -107,7 +107,7 @@ internal static class RecoveryTests
             ["exhausted"] = GenerationErrors.FromBridge(3, "", "d", "exhausted", "quality", "succeeded").Category,
             ["engine"] = GenerationErrors.FromBridge(3, "", "d", "failed", "engine", "crashed").Category,
             ["cancelled"] = GenerationErrors.FromBridge(4, "", "d", null, null, null).Category,
-            ["bundle versions"] = GenerationErrors.FromBundleProblems(new List<string> { "built for Bannerlord v1.4.9, installed v1.4.8" }).Category,
+            ["bundle versions"] = GenerationErrors.FromBundleProblems(new List<string> { "built for Bannerlord v1.4.8 or later, installed v1.4.7.1" }).Category,
             ["bundle capability"] = GenerationErrors.FromBundleProblems(new List<string> { "requires runtime capability R11 (x), which this host does not provide" }).Category,
             ["bundle hash"] = GenerationErrors.FromBundleProblems(new List<string> { "hash differs: source/world.json" }).Category };
         evidence["bridgeClassification"] = bridge.ToDictionary(kv => kv.Key, kv => (object)kv.Value.ToString());
@@ -238,8 +238,8 @@ internal static class RecoveryTests
               "the cleanup under an unverified root removes nothing; under the verified root it removes the abandoned staging (bundle staging, a package and a journal temporary) and the finished and nothing-recorded job directories, and keeps every bundle, package, activation, unfinished job and live job");
 
         // ---- c3: inspection ----
-        var host = new WorldDataBundle.HostProfile("v1.4.8.119303", "v1.2.8.119303", new[] { "R01", "R02", "R03", "R04", "R05", "R06", "R07", "R08", "R09", "R10" });
-        var otherHost = new WorldDataBundle.HostProfile("v1.4.9.1", "v1.2.8.119303", host.Capabilities);
+        var host = new WorldDataBundle.HostProfile("v1.4.8.119303", "v1.2.8.119303", WorldDataBundle.HostCapabilities);
+        var otherHost = new WorldDataBundle.HostProfile("v1.4.7.1", "v1.2.8.119303", host.Capabilities);   // MMR-284: below the minimum (a newer host is valid)
         var valid = WorldInspector.Bundle(bundleA, host);
         var missing = WorldInspector.Bundle(Path.Combine(temp, "no-such-bundle"), host);
         var incompatible = WorldInspector.Bundle(bundleA, otherHost);
@@ -273,11 +273,11 @@ internal static class RecoveryTests
             ["changedByte"] = status(changedByte) + ": " + problems(changedByte), ["schema"] = status(schema) + ": " + problems(schema), ["unsafePath"] = status(unsafePath) + ": " + problems(unsafePath),
             ["link"] = status(linked) + ": " + problems(linked), ["restored"] = status(restored), ["gameVersion"] = valid["gameVersion"], ["navalVersion"] = valid["navalVersion"] };
         Check(status(valid) == WorldInspector.Valid && valid["gameVersion"] as string == "v1.4.8.119303" && status(missing) == WorldInspector.Missing && status(incompatible) == WorldInspector.Incompatible
-              && problems(incompatible).StartsWith("built for Bannerlord v1.4.8", StringComparison.Ordinal) && status(copiedValid) == WorldInspector.Valid
+              && problems(incompatible).StartsWith("built for Bannerlord v1.4.8 or later, installed v1.4.7.1", StringComparison.Ordinal) && status(copiedValid) == WorldInspector.Valid
               && status(changedByte) == WorldInspector.Corrupt && problems(changedByte).Contains("hash differs") && status(schema) == WorldInspector.Incompatible
               && status(unsafePath) == WorldInspector.Corrupt && ((IEnumerable)unsafePath["problems"]).Cast<string>().Any(p => p.Contains("unsafe inventory path ../escape.json"))
               && linkMade && status(linked) == WorldInspector.Corrupt && ((IEnumerable)linked["problems"]).Cast<string>().Any(p => p.Contains("linked")) && status(restored) == WorldInspector.Valid,
-              "bundle inspection without the game tells a valid bundle (with its versions) from a missing one, an incompatible one (built for another Bannerlord; another manifest schema version) and a corrupt one (one changed byte, an unsafe '../' inventory path, a junction inside), and the repaired copy is valid again");
+              "bundle inspection without the game tells a valid bundle (with its versions) from a missing one, an incompatible one (a host below the minimum Bannerlord; another manifest schema version) and a corrupt one (one changed byte, an unsafe '../' inventory path, a junction inside), and the repaired copy is valid again");
 
         // Saves: bindings from the headers; the store's relationships.
         string saves = Path.Combine(temp, "Game Saves"); Directory.CreateDirectory(saves);

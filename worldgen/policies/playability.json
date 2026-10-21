@@ -3,14 +3,35 @@
   "version": 1,
   "calibration": {
     "file": "../calibration/naval-transitions/naval-transitions.json",
-    "sha256": "2cf08bceca6d7fd089b4ef99fcb77f8c06c247534dd3e5d4b5864233b38f4e85"
+    "sha256": "9dd9604566d15394dcb644712c26b508e25f3f97d47e38860c5aaf0bb60030e3"
   },
   "grid": {
     "side": 257
   },
   "cells": {
-    "mountainSlope": 1.0,
+    "mountainSlope": 0.5,
     "openSeaCells": 4,
+    "landFaceGroups": {
+      "default": "Plain",
+      "biomes": {
+        "tundra": "Snow",
+        "desert": "Desert",
+        "grassland": "Plain",
+        "forest": "Forest",
+        "exposed_rock": "Steppe",
+        "snow": "Snow",
+        "rainforest": "Forest",
+        "marsh": "Swamp",
+        "boreal_forest": "Forest",
+        "cold_tundra": "Steppe",
+        "land_ice": "Snow"
+      },
+      "permanentWhite": {
+        "snowMonths": 12,
+        "snowThreshold": 0.5,
+        "faceGroup": "Snow"
+      }
+    },
     "faceGroups": {
       "land": "Plain",
       "mountain": "Mountain",
@@ -31,7 +52,10 @@
     "maxSnapCells": 2,
     "maxSnapFraction": 0.05,
     "maxHarbourShiftCells": 2,
-    "maxHarbourShiftFraction": 0.1
+    "maxHarbourShiftFraction": 0.1,
+    "maxTownSnapCells": 6,
+    "townCarve": true,
+    "forcedPorts": true
   },
   "bridges": {
     "kinds": [
@@ -51,5 +75,59 @@
     "maxExcludedVillageFraction": 0.1,
     "maxExcludedCastleFraction": 0.25
   },
-  "notes": "MMR-28 static travel policy. Navigation cells are the cells of the compiled terrain grid (MMR-26, grid.side vertices across the physical domain), restricted to the canonical globe: one seam period of columns (wrapping) and the rows between the pole lines; padding rows are not part of the graph. A cell is sea when the height at the centre of its main diagonal is below the datum (the MMR-17/18 bootstrap fixture rule), else lake or river when a main-diagonal corner carries that compiled intent, else land, which is mountain when (max - min corner height) / spacing exceeds mountainSlope (the fixture rule, slope > 1). Sea cells at least openSeaCells cells (Chebyshev) from any other class are OpenSea, the rest CoastalSea; storms need OpenSea (MMR-59). faceGroups is the proposed TerrainType per class for MMR-38; the compiler checks each against the calibration's invalid-terrain sets (land: Default-valid and Naval-invalid; mountain: invalid for All; sea, lake and river: Naval-valid and Default-invalid; bridge: Default-valid; under-bridge: Naval-valid). Cells connect only through shared edges, wrapping across the seam. Repairs are deterministic, bounded and recorded with stable UIDs: a settlement whose touching cells hold no land but a mountain cell gets that cell as its footprint (at most maxFootprintFraction of settlements), and when no land cell shares an edge with the footprint, the shortest run of mountain cells (at most maxAccessCells) to the nearest land cell becomes an access pass; mountain cells on producer roads (footprints excepted) become passes; road and access passes together are at most maxPassFraction of the mountain cells; a settlement with neither land nor mountain touching snaps to the nearest land cell within maxSnapCells (at most maxSnapFraction of settlements); a harbour whose producer sea node touches no navigable cell resolves to the nearest one within maxHarbourShiftCells (at most maxHarbourShiftFraction of harbours). A run of water cells on a producer road between two land cells is a bridge candidate of its kind (river, lake, or coast for sea cells); candidates of the listed kinds that are at most maxCells long join land components for static reachability, at most maxRequired joins, each a mandatory host check. Coast crossings are recorded but join nothing: sea separation is crossed only through ports. A basin (water cells joined by edges) is open when it holds at least one sea cell and at least minOpenCells cells. A port comes only from a producer harbour record on an open basin: the land cell of the gate's own land component sharing an edge with that basin whose sea neighbour is nearest the gate, never a pair another town already holds (towns in id order), and the port cell at most maxPortGateCells from the gate cell (2 cells = 12.5 units covers the installed War Sails maximum of 10.97 units, naval-transitions installedPortGateEnvelope). Reachability follows the MMR-17 contract: the player embarks only at a town port and may disembark on any coast of an open basin; a land group is player-safe when the player can reach it from the main group (the group holding the most towns) and return. Every town must be player-safe or the world is rejected (quality.unreachable_town). A village must share its town's land group and a castle must be player-safe, or it is excluded, at most maxExcludedVillageFraction and maxExcludedCastleFraction of each; beyond that the world is rejected (quality.too_many_exclusions). Exceeding a repair or bridge bound rejects the world (quality.repair_bound_exceeded) and a town with no land cell within reach rejects it (quality.unplaceable_town); every reason names the UIDs involved. Every result is a static candidate with status pendingEngineValidation: MMR-38 builds the faces and runs the emitted host checks."
+  "villages": {
+    "townVillages": 3,
+    "castleVillages": 2,
+    "clearance": 4.0,
+    "minSeparation": 1.0,
+    "tiers": [
+      {
+        "name": "preferred",
+        "minSpacing": 0.12,
+        "maxSpacing": 0.35
+      },
+      {
+        "name": "wide",
+        "minSpacing": 0.08,
+        "maxSpacing": 0.5
+      },
+      {
+        "name": "tight",
+        "minSpacing": 0.0,
+        "maxSpacing": 0.65
+      }
+    ],
+    "isletExceptions": true,
+    "preference": [
+      "pinned",
+      "harbour",
+      "diverse",
+      "nearest"
+    ],
+    "maxExtraHarbours": 1,
+    "reassign": "ownKingdomFirst",
+    "protectedClasses": [
+      "farming"
+    ],
+    "synthesizedClass": "largestDeficit",
+    "uidPrefix": "mnbl-quota-village:"
+  },
+  "roads": {
+    "splitAtPoles": true,
+    "skipSeaLegs": true,
+    "passesAreRoad": true,
+    "endAtUndeckedBank": true,
+    "cellFlag": true,
+    "feeders": {
+      "from": [
+        "castle",
+        "village",
+        "roadlessTown"
+      ],
+      "maxCells": 48,
+      "passes": true,
+      "water": "decksOnly"
+    }
+  },
+  "notes": "Map epic 2 (MMR-248) keys, frozen here and consumed in order by the travel-compiler tickets: cells.landFaceGroups (MMR-254) is the TerrainType of a land cell by the majority of its 4 corner biomes (water corners excluded, ties to the main diagonal; default when every corner is water), and permanentWhite makes a land cell Snow when it holds permanent white (worldgen/policies/terrain-materials.json permanentWhite: land_ice, or snowMonths months of snow at or above snowThreshold); each name must be in the calibration, Default-valid and Naval-invalid, and agree with terrain-materials.json biomes[].terrainType (the shared biome table, docs/biome-presentation.md). mountainSlope is scaled with projection.json verticalScale (0.01 -> 0.005 halves 1.0 to 0.5), so the cell classes are unchanged. repairs.maxTownSnapCells, townCarve and forcedPorts are the town repairs of MMR-251 (docs/travel-graph.md \"Town repairs\"): a towns-only snap radius (placing a town, by snap, footprint or the footprint's access passes, never counts toward maxSnapFraction, maxFootprintFraction or maxPassFraction), the river or lake cell under a town with no land within that radius carved to land (never a sea cell), and, for a town whose land group cannot join a player-safe group through a mountain pass of at most maxAccessCells, a forced port on its own coast (ports.json and campaign.json mark it forced; one per land group), backed by a harbour village MMR-252 pins or synthesizes; a town no other repair makes player-safe moves to the nearest free land cell of a player-safe group. villages (MMR-252): exactly townVillages per town and castleVillages per castle; no village within clearance units of a fortification and no two settlements within minSeparation units; synthesized villages go on the fortification's land component in the first tier that fits, a ring from max(clearance, minSpacing x S) to maxSpacing x S units around the fortification, S the world's mean nearest-town distance; with isletExceptions an islet town without such a position takes the closest feasible Land position, recorded in campaign.json villageQuota; kept villages follow preference (the pinned harbour village, at most maxExtraHarbours more harbour villages, villages that diversify production, then the nearest); surplus goes to short fortifications by reassign; the last village of a culture in a protected production class is never dropped; a synthesized village takes synthesizedClass and the uid uidPrefix + fortification uid + ':' + n. roads (MMR-253): FWGC++ routes split at poles, sea legs (sameGroup false) skipped, road passes count as road land, routes end at the bank of a crossing without a deck, and a road bit per cell is written (cells.bin v2); feeder roads run from every castle, village and road-less town along land travel cells to its bound settlement (road-less towns: the nearest road or town of their land group), at most maxCells cells, through passes when passes, and over water only on existing decks. MMR-28 static travel policy. Navigation cells are the cells of the compiled terrain grid (MMR-26, grid.side vertices across the physical domain), restricted to the canonical globe: one seam period of columns (wrapping) and the rows between the pole lines; padding rows are not part of the graph. A cell is sea when the height at the centre of its main diagonal is below the datum (the MMR-17/18 bootstrap fixture rule), else lake or river when a main-diagonal corner carries that compiled intent, else land, which is mountain when (max - min corner height) / spacing exceeds mountainSlope (the fixture rule, slope > 1). Sea cells at least openSeaCells cells (Chebyshev) from any other class are OpenSea, the rest CoastalSea; storms need OpenSea (MMR-59). faceGroups is the proposed TerrainType per class for MMR-38; the compiler checks each against the calibration's invalid-terrain sets (land: Default-valid and Naval-invalid; mountain: invalid for All; sea, lake and river: Naval-valid and Default-invalid; bridge: Default-valid; under-bridge: Naval-valid). Cells connect only through shared edges, wrapping across the seam. Repairs are deterministic, bounded and recorded with stable UIDs: a settlement whose touching cells hold no land but a mountain cell gets that cell as its footprint (at most maxFootprintFraction of settlements), and when no land cell shares an edge with the footprint, the shortest run of mountain cells (at most maxAccessCells) to the nearest land cell becomes an access pass; mountain cells on producer roads (footprints excepted) become passes; road and access passes together are at most maxPassFraction of the mountain cells; a settlement with neither land nor mountain touching snaps to the nearest land cell within maxSnapCells (at most maxSnapFraction of settlements); a harbour whose producer sea node touches no navigable cell resolves to the nearest one within maxHarbourShiftCells (at most maxHarbourShiftFraction of harbours). A run of water cells on a producer road between two land cells is a bridge candidate of its kind (river, lake, or coast for sea cells); candidates of the listed kinds that are at most maxCells long join land components for static reachability, at most maxRequired joins, each a mandatory host check. Coast crossings are recorded but join nothing: sea separation is crossed only through ports. A basin (water cells joined by edges) is open when it holds at least one sea cell and at least minOpenCells cells. A port comes from a producer harbour record on an open basin (or is a forced port, a town repair): the land cell of the gate's own land component sharing an edge with that basin whose sea neighbour is nearest the gate, never a pair another town already holds (towns in id order), and the port cell at most maxPortGateCells from the gate cell (2 cells = 12.5 units covers the installed War Sails maximum of 10.97 units, naval-transitions installedPortGateEnvelope). Reachability follows the MMR-17 contract: the player embarks only at a town port and may disembark on any coast of an open basin; a land group is player-safe when the player can reach it from the main group (the group holding the most towns) and return. Every town must be player-safe: one that is not is repaired, and only a town no repair makes player-safe rejects the world (quality.unreachable_town). A village must share its town's land group and a castle must be player-safe, or it is excluded, at most maxExcludedVillageFraction and maxExcludedCastleFraction of each; beyond that the world is rejected (quality.too_many_exclusions). Exceeding a repair or bridge bound rejects the world (quality.repair_bound_exceeded) and a town left with no cell after the town repairs rejects it (quality.unplaceable_town); every reason names the UIDs involved. Every result is a static candidate with status pendingEngineValidation: MMR-38 builds the faces and runs the emitted host checks."
 }

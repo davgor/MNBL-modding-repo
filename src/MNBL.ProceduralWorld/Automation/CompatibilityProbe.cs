@@ -104,7 +104,7 @@ namespace MNBL.ProceduralWorld.Automation
             var fixtures = new[] {
                 new { Name = "incompatible-schema", From = "\"mnbl.save.contract\":\"" + contract + "\"", To = "\"mnbl.save.contract\":\"mnbl.save-binding.v99\"", Code = LoadPolicy.IncompatibleBuild },
                 new { Name = "incompatible-build", From = "\"mnbl.save.saveIds\":\"" + saveIds + "\"", To = "\"mnbl.save.saveIds\":\"7910000/v99\"", Code = LoadPolicy.IncompatibleBuild },
-                new { Name = "missing-dlc", From = "\"mnbl.save.naval\":\"" + naval + "\"", To = "\"mnbl.save.naval\":\"v1.3.0.120000\"", Code = LoadPolicy.IncompatibleBuild },
+                new { Name = "missing-dlc", From = "\"mnbl.save.naval\":\"" + naval + "\"", To = "\"mnbl.save.naval\":\"v1.2.7.0\"", Code = LoadPolicy.IncompatibleBuild },   // MMR-284: below the minimum (a newer one loads)
                 new { Name = "corrupted-hash", From = "\"mnbl.world.manifestSha256\":\"" + manifest + "\"", To = "\"mnbl.world.manifestSha256\":\"" + corrupted + "\"", Code = LoadPolicy.DamagedWorld } };
             var rows = new Dictionary<string, object>(); context.Outputs["fixtures"] = rows;
             string sourceSaveHash = WorldSaveTransfer.Sha256File(BannerlordSaveCatalog.SavePath(source)), currentSaveHash = WorldSaveTransfer.Sha256File(BannerlordSaveCatalog.SavePath(current));

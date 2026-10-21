@@ -829,7 +829,8 @@ namespace MNBL.ProceduralWorld.Automation
             var fixtures = new List<KeyValuePair<string, Func<byte[]>>> {
                 new KeyValuePair<string, Func<byte[]>>("torn", () => bytes.Take(bytes.Length - bytes.Length / 3).ToArray()),
                 new KeyValuePair<string, Func<byte[]>>("missing-bundle", () => RewriteHeader(bytes, contentId, new string('e', 64))),
-                new KeyValuePair<string, Func<byte[]>>("other-game-version", () => RewriteHeader(bytes, "\"mnbl.save.game\":\"v1.4.8.119303\"", "\"mnbl.save.game\":\"v9.9.9.999999\"")) };
+                // MMR-284: a game build below the minimum (a newer one loads).
+                new KeyValuePair<string, Func<byte[]>>("other-game-version", () => RewriteHeader(bytes, "\"mnbl.save.game\":\"v1.4.8.119303\"", "\"mnbl.save.game\":\"v1.4.7.0\"")) };
             var expected = new Dictionary<string, string> { ["torn"] = LoadPolicy.DamagedSave, ["missing-bundle"] = LoadPolicy.MissingWorld, ["other-game-version"] = LoadPolicy.IncompatibleBuild };
             string packageDir = Path.Combine(GeneratedWorldPackage.Root, (string)a["package"]), bundleDir = Path.Combine(CompileStage.BundleRoot(), contentId);
             string worldBefore = TreeHash(packageDir) + TreeHash(bundleDir);

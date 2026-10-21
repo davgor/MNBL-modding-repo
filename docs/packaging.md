@@ -5,7 +5,7 @@ MMR-57 packages the Procedural World module for local installation through the p
 | | |
 |---|---|
 | Release staging | `tools/ci/CiBuild.ps1` `Copy-MnblProceduralWorldStage`: the one staging step that both the release build (`tools/ci/Build-ProceduralWorld.ps1`) and the local package use |
-| Packer | `tools/ci/mods.py package`: the zip, its `.sha256`, release notes, and `<id>-<version>.manifest.json`. A mod's `package` block in `config/mods.json` lists the only files a package may hold and the provenance of each; no file may carry an official game, DLC or dependency name |
+| Packer | `tools/ci/mods.py package`: the zip, its `.sha256`, release notes, and `<id>-<version>.manifest.json`. A mod's `package` block in `config/mods.json` lists the only files a package may hold and the provenance of each; no file may carry an official game, DLC or dependency name, except the mod's own published asset packs (`AssetPackages/*.tpac` that the block lists with a provenance, MMR-259) |
 | Local package | `tools/Package.ps1`: built from this PC's verified build (`tools/Build.ps1`), with two audits the CI cannot run: no file is byte-identical to an installed official file, and the module embeds exactly the repository's worldgen files. Writes `artifacts/release/` (git-ignored) and `evidence/release/package-manifest.json` |
 | Paths | `tools/Test-PackagePaths.ps1`: the packaged `worldbridge.exe` and `fwg.exe` run a whole generation under paths with spaces and non-ASCII letters (`build/mmr57/paths.json`) |
 | Clean install | `tools/Test-CleanInstall.ps1` with the `clean_install` probe (`Automation/CleanInstallProbe.cs`); verdict by `tools/summarize_clean_install.py` into `evidence/release/clean-install.json` |
@@ -22,8 +22,10 @@ Extract the zip into `<Bannerlord install>/Modules/`, so that `Modules/MNBL.Proc
 | `bin/Win64_Shipping_Client/worldbridge.exe` | built from `src/WorldBridge` |
 | `bin/Win64_Shipping_Client/fwg.exe` | the FWGC++ producer pinned by `tools.lock.json` |
 | `bin/Win64_Shipping_Client/*.sha256` | the pins the module checks before running either executable |
+| `Producers/<sha256>/fwg.exe` | MMR-261 (RT-37): every FWGC++ producer build a campaign may cast with, by hash (`worldgen/producer-archive.json`; repository files in Git LFS, `Modules/MNBL.ProceduralWorld/Producers`). The pinned build is one of them. A build is kept, never rebuilt (MSVC output is not byte-reproducible); a re-pin adds the new build and removes none |
 | `SurfaceTemplate/terrain.bin`, `navmesh.bin` | this module's own surface template binaries (`tools/scenebin/build_slot.py`'s writers) |
 | `SurfaceTemplate/template-recipe.json` | how to derive the rest of the template on the player's machine (below) |
+| `AssetPackages/*.tpac` | MMR-259: the Modding Kit publish of the magic-ground decal materials and textures (repository files in Git LFS; `docs/magic-ground-textures.md`). Derived from TaleWorlds textures, never byte-identical (`tools/Package.ps1` checks every packaged file against the installed game) |
 
 **Not redistributed:**
 - the game, its official modules and War Sails;
@@ -47,7 +49,7 @@ A package may not carry them, and the development install had masked their absen
   - the flora and physics bounds;
   - the terrain nodes block.
 - Every file must have the recipe's SHA-256, so the template, and with it every scene name, is the same on every installation of this game version. A different official scene refuses with its reason.
-- `tools/scenebin/make_surface_template.py` writes the recipe and proves it: deriving from the installed official scene reproduces the template byte for byte.
+- `tools/scenebin/make_surface_template.py` generates the recipe from tracked source (MMR-255: the material layers from `terrain-materials.json` layerSet, `use_dynamic_weather_effects="true"`) and proves it: deriving from the installed official scene gives the recorded hashes. The official scene contributes its environment, outer mesh and atmosphere; its own layers (with flora meshes) are replaced.
 
 ## Results (2026-10-18)
 

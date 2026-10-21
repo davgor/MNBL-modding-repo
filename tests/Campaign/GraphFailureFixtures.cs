@@ -61,14 +61,17 @@ internal static class GraphFailureFixtures
 
     private static void Run(string bundleDir, string repo, string outJson)
     {
-        var host = new WorldDataBundle.HostProfile("v1.4.8.119303", "v1.2.8.119303", new[] { "R01", "R02", "R03", "R04", "R05", "R06", "R07", "R08", "R09", "R10" });
+        var host = new WorldDataBundle.HostProfile("v1.4.8.119303", "v1.2.8.119303", WorldDataBundle.HostCapabilities);
         var bundle = WorldDataBundle.Open(bundleDir, host);
         Func<string, IDictionary<string, object>> read = path => Parse(new UTF8Encoding(false).GetString(bundle.ReadVerified(path)));
         var campaign = read("compiled/campaign/campaign.json"); var idMap = read("compiled/campaign/id-map.json");
         var travel = read("compiled/travel/travel-graph.json"); var ports = read("compiled/travel/ports.json");
         var cells = bundle.ReadVerified("compiled/travel/cells.bin");
+        var biomes = GeneratedCampaignInitializer.CellBiomes(bundle.ReadVerified("compiled/terrain/masks.bin"), new UTF8Encoding(false).GetString(bundle.ReadVerified("compiled/terrain/projection.json")),
+            new UTF8Encoding(false).GetString(bundle.ReadVerified("policies/terrain-materials.json")));
         var graphPolicy = Load(Path.Combine(repo, "worldgen/policies/graph-validation.json"));
         var rosters = Load(Path.Combine(repo, "worldgen/policies/rosters.json"));
+        var population = Load(Path.Combine(repo, "worldgen/policies/population.json"));
         var economy = Load(Path.Combine(repo, "worldgen/policies/economy.json"));
         var startup = Load(Path.Combine(repo, "worldgen/policies/startup.json"));
         var naval = Load(Path.Combine(repo, "worldgen/policies/naval-content.json"));
@@ -86,12 +89,12 @@ internal static class GraphFailureFixtures
         var defaultsRun = Load(Path.Combine(repo, S(O(rosters, "provenance"), "defaultReferences")));
         var defaults = L(O(Records(O(defaultsRun, "outputs"), "worlds").First(), "registration"), "verifiedLiveDefaultReferences");
         var resolver = new CharacterTemplateResolver(catalog, defaults, O(rosters, "troops"));
-        var factions = FactionFactory.Build(campaign, idMap, Load(Path.Combine(repo, "worldgen/policies/factions.json")), Load(Path.Combine(repo, "worldgen/policies/culture-presentations.json")), templates);
-        var heroes = HeroFactory.Build(campaign, idMap, factions, rosters, resolver);
+        var factions = FactionFactory.Build(campaign, idMap, Load(Path.Combine(repo, "worldgen/policies/factions.json")), Load(Path.Combine(repo, "worldgen/policies/culture-presentations.json")), templates, Load(Path.Combine(repo, "worldgen/policies/population.json")));
+        var heroes = HeroFactory.Build(campaign, idMap, factions, rosters, resolver, population);
         var missionScenes = MNBL.ProceduralWorld.Missions.MissionScenes.FromBytes(File.ReadAllBytes(Path.Combine(repo, MNBL.ProceduralWorld.Missions.MissionScenes.PolicyPath)));
         var factory = new SettlementFactory(economy, prototypes, catalog["Settlements"], resolver.Exists, missionScenes);
         var world = factory.Build(campaign, travel, ports, factions, heroes, NavalContentFactory.ShipyardLevels(naval, ports));
-        var start = new GeneratedCampaignInitializer(startup, factory, catalog["Settlements"], catalog["Factions"], catalog["SPCultures"]).Build(travel, ports, cells, factions, heroes, world);
+        var start = new GeneratedCampaignInitializer(startup, factory, catalog["Settlements"], catalog["Factions"], catalog["SPCultures"]).Build(travel, ports, cells, factions, heroes, world, biomes);
         var navalResult = new NavalContentFactory(naval, catalog["Factions"], catalog["SPCultures"], catalog["ShipHulls"], catalog["MissionShips"], catalog["ShipSlots"], catalog["partyTemplates"])
             .Build(campaign, travel, ports, cells, factions, world, start);
         var documents = factions.Documents.Concat(heroes.Documents).Concat(world.Documents).Concat(start.Documents).Concat(navalResult.Documents).ToList();
@@ -129,7 +132,7 @@ internal static class GraphFailureFixtures
         Func<string, SortedDictionary<string, int>> counts = key => (SortedDictionary<string, int>)census[key];
         var towns = world.Settlements.Count(s => s.Kind == "town"); var castles = world.Settlements.Count(s => s.Kind == "castle"); var villages = world.Settlements.Count(s => s.Kind == "village");
         var expectedGenerated = new SortedDictionary<string, int>(StringComparer.Ordinal) {
-            ["Faction"] = factions.Clans.Count, ["Kingdom"] = factions.Kingdoms.Count, ["Hero"] = heroes.XmlHeroes.Count(), ["NPCCharacter"] = heroes.XmlHeroes.Count(),
+            ["Faction"] = factions.AllClans.Count(), ["Kingdom"] = factions.Kingdoms.Count, ["Hero"] = heroes.XmlHeroes.Count(), ["NPCCharacter"] = heroes.XmlHeroes.Count(),
             ["Settlement"] = world.Settlements.Count + start.Hideouts.Count, ["Town"] = towns + castles, ["Village"] = villages, ["Hideout"] = start.Hideouts.Count };
         var expectedAliases = new SortedDictionary<string, int>(StringComparer.Ordinal) {
             ["Faction"] = start.BanditHomes.Count + navalResult.Pirates.Count, ["Settlement"] = 1, ["RetirementSettlementComponent"] = 1 };
@@ -159,10 +162,10 @@ internal static class GraphFailureFixtures
         var sources = counts("sources");
         var exclusions = Records(campaign, "exclusions").ToList();
         var compilerHeroes = new HashSet<string>(Records(campaign, "heroes").Select(h => S(h, "id")), StringComparer.Ordinal);
-        var compilerClans = new HashSet<string>(Records(campaign, "clans").Select(c => S(c, "id")), StringComparer.Ordinal);
+        var compilerClans = new HashSet<string>(Records(campaign, "houses").Concat(Records(campaign, "mercenaryCompanies")).Concat(Records(campaign, "outlawClans")).Select(c => S(c, "id")), StringComparer.Ordinal);
         var runtimeIds = new HashSet<string>(start.Plan.Notables.Concat(start.Plan.Companions).Select(h => h.Id), StringComparer.Ordinal);
         var expectedSources = new SortedDictionary<string, int>(StringComparer.Ordinal) {
-            ["town staged"] = towns, ["castle staged"] = castles, ["village staged"] = villages, ["clan staged"] = factions.Clans.Count(c => compilerClans.Contains(c.Id)), ["kingdom staged"] = factions.Kingdoms.Count,
+            ["town staged"] = towns, ["castle staged"] = castles, ["village staged"] = villages, ["clan staged"] = factions.AllClans.Count(c => compilerClans.Contains(c.Id)), ["kingdom staged"] = factions.Kingdoms.Count,
             ["hero staged"] = heroes.XmlHeroes.Count(h => compilerHeroes.Contains(h.Id)), ["hero runtime intent"] = compilerHeroes.Count(runtimeIds.Contains) };
         foreach (var e in exclusions) { string k = S(e, "kind") + " excluded"; int n; expectedSources.TryGetValue(k, out n); expectedSources[k] = n + 1; }
         foreach (var g in heroes.Dispositions.Where(d => d.Outcome != "instantiated").GroupBy(d => d.Outcome)) expectedSources["hero " + g.Key] = g.Count();
@@ -170,18 +173,19 @@ internal static class GraphFailureFixtures
         var allUids = Records(idMap, "entries").Select(e => S(e, "uid")).Concat(L(campaign, "notInstantiated")).Distinct().ToList();
         Check(sources.SequenceEqual(expectedSources) && clean.Outcomes.Count == allUids.Count && allUids.All(u => clean.Outcomes.ContainsKey(u) && clean.Outcomes[u] != "MISSING"),
               "every one of the " + allUids.Count + " compiler source UIDs has a generated target or an explicit disposition: " + show(sources) + (sources.SequenceEqual(expectedSources) ? "" : " (expected " + show(expectedSources) + ")") +
-              "; besides them the factories synthesize " + (factions.Clans.Count - expectedSources["clan staged"]) + " vassal clans (MMR-31), " + (heroes.XmlHeroes.Count() - expectedSources["hero staged"]) + " XML heroes and " +
+              "; besides them the factories synthesize " + (factions.AllClans.Count() - expectedSources["clan staged"]) + " clans, " + (heroes.XmlHeroes.Count() - expectedSources["hero staged"]) + " XML heroes and " +
               (runtimeIds.Count - expectedSources["hero runtime intent"]) + " runtime hero intents (MMR-32), counted in the census");
         var slots = counts("slots");
         int scenes = Records(campaign, "towns").Count() + Records(campaign, "castles").Count();
         int moot = slots.Where(s => s.Key.EndsWith(" moot", StringComparison.Ordinal)).Sum(s => s.Value);
-        int boundedSlots = 2 * heroes.Dispositions.Count(d => d.Outcome == "bounded" && d.Id != null && compilerHeroes.Contains(d.Id));
+        // The moot slots: heroes with a disposition (bounded, or not instantiated: a legend or a lord of a dissolved realm).
+        int boundedSlots = 2 * heroes.Dispositions.Count(d => d.Outcome != "instantiated" && d.Id != null && compilerHeroes.Contains(d.Id));
         int sceneSlots = slots.Where(s => s.Key.EndsWith(" prototypeAndScenes resolved", StringComparison.Ordinal)).Sum(s => s.Value);
         Check(slots.Where(s => s.Key.EndsWith(" PENDING")).Count() == 0 && clean.DeferredSlots.Count == 0 && sceneSlots == scenes &&
               moot == boundedSlots && slots.Where(s => s.Key.Contains(" resolved")).Sum(s => s.Value) + moot == slots.Values.Sum() && (int)census["villagesRebound"] == world.Rebound.Count,
               "every compiler slot of a delivered owner (MMR-27/28/31/32/33/35/42) is resolved and, where the staged graph can show it, shown by it (" + slots.Where(s => s.Key.Contains(" resolved")).Sum(s => s.Value) + " slots, " +
               "the " + sceneSlots + " MMR-42 prototypeAndScenes slots among them: each staged town's and castle's locations meet the mission scene contracts); the " + moot +
-              " slots of the bounded heroes are moot (their records have dispositions); nothing is deferred; " + world.Rebound.Count + " villages follow MMR-33's declared rebindings");
+              " slots of the bounded and not-instantiated heroes are moot (their records have dispositions); nothing is deferred; " + world.Rebound.Count + " villages follow MMR-33's declared rebindings");
         // MMR-42: a staged town whose center scene is not installed fails its claimed prototypeAndScenes slot (and only that).
         {
             var tampered = fresh();
@@ -260,7 +264,7 @@ internal static class GraphFailureFixtures
         var installedTown = catalog["Settlements"].DocumentElement.SelectSingleNode("Settlement[Components/Town[not(@is_castle='true')]]") as XmlElement;
         var vanillaCharacter = catalog["NPCCharacters"].DocumentElement.SelectSingleNode("NPCCharacter[@id='" + vanillaHero.GetAttribute("id") + "']") as XmlElement;
         var reachedTroop = clean.Reached.First(k => k.StartsWith("NPCCharacter.", StringComparison.Ordinal) && resolver.Element(k) != null && resolver.Element(k).SelectSingleNode("upgrade_targets/upgrade_target") != null).Substring(13);
-        var bounded = dispositions.First(d => d.Outcome == "bounded");
+        var bounded = dispositions.FirstOrDefault(d => d.Outcome == "bounded") ?? dispositions.First(d => d.Outcome == "notInstantiated");
         var hideout = start.Hideouts.First().Id;
         var secondNotable = start.Plan.Notables[1];
         Func<GeneratedCampaignInitializer.StartupPlan, GeneratedCampaignInitializer.StartupPlan> copyPlan = p => { var q = new GeneratedCampaignInitializer.StartupPlan(); q.Notables.AddRange(p.Notables); q.Companions.AddRange(p.Companions); q.Relations.AddRange(p.Relations); return q; };
@@ -274,7 +278,7 @@ internal static class GraphFailureFixtures
             new Fault("a nested reference to nothing (a hero's equipment set)", i => { var e = Doc(i, "NPCCharacters").CreateElement("EquipmentSet"); e.SetAttribute("id", "missing_roster"); var eq = Node(i, "NPCCharacters", "NPCCharacter[@id='" + lord + "']"); (eq.SelectSingleNode("Equipments") ?? eq.AppendChild(Doc(i, "NPCCharacters").CreateElement("Equipments"))).AppendChild(e); }, "graph.unresolved_reference"),
             new Fault("an installed template whose own reference resolves to nothing (transitive closure: an item of a roster a generated hero uses)", i => i.Catalog["Items"] = without(catalog["Items"], "*[@id='" + rosterItem.Substring(5) + "']"), "graph.unresolved_reference")
                 { Detail = r => r.Diagnostics.Any(d => d.GeneratedId.StartsWith("NPCCharacter." + factions.WorldPrefix, StringComparison.Ordinal) && d.Path.StartsWith("EquipmentRoster.", StringComparison.Ordinal)) },
-            new Fault("a malformed typed reference", i => Node(i, "Heroes", "Hero[@id='" + lord + "']").SetAttribute("faction", "Faction.bad id"), "graph.malformed_reference", "graph.ownership"),
+            new Fault("a malformed typed reference", i => Node(i, "Heroes", "Hero[@id='" + lord + "']").SetAttribute("faction", "Faction.bad id"), "graph.malformed_reference", "graph.ownership", "graph.census"),
             new Fault("a reference to an installed Calradia clan the world does not stage", i => Node(i, "Settlements", String.Format(settlementOf, castle)).SetAttribute("owner", "Faction." + vanillaClan.GetAttribute("id")), "graph.official_reference"),
             new Fault("an installed Calradia town staged unchanged", i => Import(i, "Settlements", vanillaTown), "graph.unexpected_vanilla"),
             new Fault("an installed Calradia hero staged", i => Import(i, "Heroes", vanillaHero), "graph.unexpected_vanilla"),
@@ -293,7 +297,11 @@ internal static class GraphFailureFixtures
             new Fault("a runtime notable whose template is not a template", i => { var plan = copyPlan(i.Plan); plan.Notables[plan.Notables.FindIndex(n => n.Id == notable.Id)] = withPlan(notable, lord, null); i.Plan = plan; }, "graph.party_intent"),
             new Fault("a runtime notable homed at a hideout", i => { var plan = copyPlan(i.Plan); plan.Notables[plan.Notables.FindIndex(n => n.Id == secondNotable.Id)] = withPlan(secondNotable, null, hideout); i.Plan = plan; }, "graph.party_intent"),
             new Fault("a runtime relation to a hero that does not exist", i => { var plan = copyPlan(i.Plan); plan.Relations.Add(new GeneratedCampaignInitializer.RelationPlan { A = notable.Id, B = factions.WorldPrefix + "h_nobody", Value = 10 }); i.Plan = plan; }, "graph.party_intent"),
-            new Fault("a hero whose clan is a kingdom (a reference of the wrong type)", i => Node(i, "Heroes", "Hero[@id='" + nonLeader + "']").SetAttribute("faction", "Kingdom." + kingdom.Id), "graph.reference_type"),
+            new Fault("a mercenary company without is_clan_type_mercenary (MMR-280)", i => Node(i, "Factions", "Faction[@id='" + factions.MinorClans.First(c => c.Kind == "company").Id + "']").RemoveAttribute("is_clan_type_mercenary"), "graph.minor_clan", "graph.census"),
+            new Fault("a noble house whose adult women are all made men (the random child generator's same-sex adult, MMR-280)", i => {
+                var house = factions.Clans.First(c => heroes.XmlHeroes.Any(h => h.Clan == c.Id && h.Alive && h.Age >= 18 && h.Female));
+                foreach (var w in heroes.XmlHeroes.Where(h => h.Clan == house.Id && h.Alive && h.Age >= 18 && h.Female)) Node(i, "NPCCharacters", "NPCCharacter[@id='" + w.Id + "']").RemoveAttribute("is_female"); }, "graph.child_generator"),
+            new Fault("a hero whose clan is a kingdom (a reference of the wrong type)", i => Node(i, "Heroes", "Hero[@id='" + nonLeader + "']").SetAttribute("faction", "Kingdom." + kingdom.Id), "graph.reference_type", "graph.census"),
             new Fault("a castle owned by a hero (a reference of the wrong type)", i => Node(i, "Settlements", String.Format(settlementOf, castleIds[1])).SetAttribute("owner", "Hero." + lord), "graph.reference_type"),
             new Fault("a village whose type is a clan (a reference of the wrong type)", i => Node(i, "Settlements", String.Format(settlementOf, villageList[6]) + "/Components/Village").SetAttribute("village_type", "Faction." + clan.Id), "graph.reference_type"),
             new Fault("the character of an installed Calradia hero staged", i => Import(i, "NPCCharacters", vanillaCharacter), "graph.unexpected_vanilla"),
@@ -322,7 +330,7 @@ internal static class GraphFailureFixtures
             new Fault("a compiler village dropped without a disposition (its MMR-33 slots then claim what the graph lacks" + (plannedHomes.Contains(dropped) ? ", and its runtime notables lose their home)" : ")"), i => { var v = Node(i, "Settlements", String.Format(settlementOf, dropped)); v.ParentNode.RemoveChild(v); },
                       plannedHomes.Contains(dropped) ? new[] { "graph.silent_discard", "graph.party_intent", "graph.pending_slot" } : new[] { "graph.silent_discard", "graph.pending_slot" }),
             new Fault("a staged compiler hero removed although its disposition says instantiated" + (removedClan != null ? " (it led " + removedClan.Id + ")" : ""), i => { var h = Node(i, "Heroes", "Hero[@id='" + removable + "']"); h.ParentNode.RemoveChild(h); },
-                      removedCodes),
+                      removedCodes.Concat(new[] { "graph.census" }).ToArray()),
             new Fault("a delivered owner's slot left pending", i => i.Resolutions.RemoveAll(r => r.Slot == "shipyardAndFleet" && r.Record == portTown), "graph.pending_slot"),
             new Fault("a resolving policy missing from the snapshot", i => i.Policies.Remove("worldgen/policies/rosters.json"), "graph.policy_identity"),
         };
@@ -361,8 +369,9 @@ internal static class GraphFailureFixtures
         dissolvedFactions.Dissolved.Add(new FactionFactory.Dissolution { Kingdom = "mnbl_00000001_k_0000000001", Uid = "realm-node-1", Reason = "no town after the compiler and travel exclusions", Clans = { "mnbl_00000001_l_0000000001" } });
         var dissolvedCampaign = Parse(Json.Serialize(new Dictionary<string, object> {
             ["kingdoms"] = new[] { new Dictionary<string, object> { ["id"] = "mnbl_00000001_k_0000000001", ["uid"] = "realm-node-1", ["slots"] = new[] { new Dictionary<string, object> { ["owner"] = "MMR-31", ["name"] = "policies", ["status"] = "pending" }, new Dictionary<string, object> { ["owner"] = "MMR-31", ["name"] = "bannerAndColors", ["status"] = "pending" } } } },
-            ["clans"] = new[] { new Dictionary<string, object> { ["id"] = "mnbl_00000001_l_0000000001", ["uid"] = "clan-node-1", ["kingdom"] = "mnbl_00000001_k_0000000001", ["slots"] = new[] { new Dictionary<string, object> { ["owner"] = "MMR-31", ["name"] = "banner", ["status"] = "pending" }, new Dictionary<string, object> { ["owner"] = "MMR-31", ["name"] = "tier", ["status"] = "pending" } } } },
-            ["exclusions"] = new object[0], ["notInstantiated"] = new object[0] }));
+            ["houses"] = new[] { new Dictionary<string, object> { ["id"] = "mnbl_00000001_l_0000000001", ["uid"] = "clan-node-1", ["kingdom"] = "mnbl_00000001_k_0000000001", ["slots"] = new[] { new Dictionary<string, object> { ["owner"] = "MMR-31", ["name"] = "banner", ["status"] = "pending" }, new Dictionary<string, object> { ["owner"] = "MMR-31", ["name"] = "tier", ["status"] = "pending" } } } },
+            ["exclusions"] = new object[0], ["notInstantiated"] = new object[0],
+            ["census"] = new[] { "houses", "mercenaryCompanies", "outlawClans", "adultLords", "minors", "deadParents", "companyMembers", "outlawMembers" }.ToDictionary(k => k, k => (object)0) }));
         var dissolvedIdMap = Parse(Json.Serialize(new Dictionary<string, object> { ["entries"] = new[] {
             new Dictionary<string, object> { ["id"] = "mnbl_00000001_k_0000000001", ["uid"] = "realm-node-1", ["kind"] = "kingdom" }, new Dictionary<string, object> { ["id"] = "mnbl_00000001_l_0000000001", ["uid"] = "clan-node-1", ["kind"] = "clan" } } }));
         var dissolvedInput = new CampaignGraphValidator.Input { WorldPrefix = "mnbl_00000001_", Campaign = dissolvedCampaign, IdMap = dissolvedIdMap };

@@ -111,9 +111,10 @@
         "side": {
           "enum": [
             129,
-            257
+            257,
+            513
           ],
-          "description": "A grid side the import calibration lists."
+          "description": "A grid side the import calibration lists; 513 only when terrain-shaping.json resolution.fine (MMR-249 go, MMR-278)."
         },
         "extent": {
           "type": "number",
@@ -354,6 +355,10 @@
         },
         "projection.json": {
           "$ref": "#/$defs/sha256"
+        },
+        "flora.bin": {
+          "$ref": "#/$defs/sha256",
+          "description": "map trees on forest biomes (MMR-255 r1, if MMR-249 says go)"
         }
       }
     },
@@ -380,6 +385,428 @@
           "type": "string"
         }
       }
+    },
+    "layers": {
+      "type": "array",
+      "description": "map epic 2 (MMR-255): per layer of terrain-materials.json layerSet, the share of land samples where it is the dominant visible layer",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "slot",
+          "name",
+          "coverage"
+        ],
+        "properties": {
+          "slot": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 14
+          },
+          "name": {
+            "type": "string"
+          },
+          "coverage": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          }
+        }
+      }
+    },
+    "permanentWhite": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "samples",
+        "biomeSamples",
+        "seasonSamples"
+      ],
+      "properties": {
+        "samples": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "biomeSamples": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "seasonSamples": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "description": "map epic 2 (MMR-255): samples in the permanent-white mask (terrain-materials.json permanentWhite), from its biomes and from 12-month snow"
+    },
+    "shaping": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "policySha256",
+        "sweeps",
+        "residual",
+        "samplesChanged",
+        "interiorSlope",
+        "coastSlope",
+        "crease",
+        "isolatedSpikes",
+        "isolatedSpikesBefore",
+        "pads",
+        "lakes",
+        "navCoastMismatch",
+        "navCellsChecked",
+        "navCoastMismatchBefore"
+      ],
+      "properties": {
+        "policySha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "sweeps": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "despike sweeps run (Jacobi)"
+        },
+        "residual": {
+          "type": "number",
+          "description": "the largest change of the last despike sweep (0 when converged)"
+        },
+        "samplesChanged": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "coarse samples the shaping steps changed (before the B-spline)"
+        },
+        "interiorSlope": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "before",
+            "after"
+          ],
+          "properties": {
+            "before": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "p95",
+                "max",
+                "faces"
+              ],
+              "properties": {
+                "p95": {
+                  "type": "number"
+                },
+                "max": {
+                  "type": "number"
+                },
+                "faces": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            },
+            "after": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "p95",
+                "max",
+                "faces"
+              ],
+              "properties": {
+                "p95": {
+                  "type": "number"
+                },
+                "max": {
+                  "type": "number"
+                },
+                "faces": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            }
+          },
+          "description": "face slope in degrees of land faces with no water within one sample; before: the travel compile (257), after: the shaped surface (513)"
+        },
+        "coastSlope": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "before",
+            "after"
+          ],
+          "properties": {
+            "before": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "p95",
+                "max",
+                "faces"
+              ],
+              "properties": {
+                "p95": {
+                  "type": "number"
+                },
+                "max": {
+                  "type": "number"
+                },
+                "faces": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            },
+            "after": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "p95",
+                "max",
+                "faces"
+              ],
+              "properties": {
+                "p95": {
+                  "type": "number"
+                },
+                "max": {
+                  "type": "number"
+                },
+                "faces": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            }
+          },
+          "description": "face slope of faces with an ocean and a land vertex"
+        },
+        "crease": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "before",
+            "after"
+          ],
+          "properties": {
+            "before": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "p95",
+                "max",
+                "faces"
+              ],
+              "properties": {
+                "p95": {
+                  "type": "number"
+                },
+                "max": {
+                  "type": "number"
+                },
+                "faces": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            },
+            "after": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "p95",
+                "max",
+                "faces"
+              ],
+              "properties": {
+                "p95": {
+                  "type": "number"
+                },
+                "max": {
+                  "type": "number"
+                },
+                "faces": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            }
+          },
+          "description": "angle between the normals of adjacent interior faces"
+        },
+        "isolatedSpikes": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "after: land samples that are a strict extremum steeper than despike.maxSlopeDeg to all 8 neighbours (pads excepted)"
+        },
+        "isolatedSpikesBefore": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "the same on the travel compile"
+        },
+        "pads": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "count",
+            "merged",
+            "over25",
+            "maxSlope"
+          ],
+          "properties": {
+            "count": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "merged": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "over25": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "pads whose face slope at the settlement point exceeds gates.steepPadDeg"
+            },
+            "maxSlope": {
+              "type": "number"
+            }
+          }
+        },
+        "lakes": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "groups",
+            "shownBefore",
+            "shownAfter",
+            "newlyHidden",
+            "unmatched",
+            "bedPasses",
+            "records"
+          ],
+          "properties": {
+            "groups": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "shownBefore": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "shownAfter": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "newlyHidden": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "unmatched": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "bedPasses": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "records": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "index",
+                  "samples",
+                  "matched",
+                  "firstSample",
+                  "canonical",
+                  "shownBefore",
+                  "shownAfter"
+                ],
+                "properties": {
+                  "index": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "samples": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "matched": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "firstSample": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "minItems": 2,
+                    "maxItems": 2,
+                    "description": "[column, row] on the fine physical grid"
+                  },
+                  "canonical": {
+                    "type": "boolean",
+                    "description": "the first sample lies in the canonical columns (strip copies are their own groups)"
+                  },
+                  "levelM": {
+                    "type": "number"
+                  },
+                  "levelZ": {
+                    "type": "number"
+                  },
+                  "planeZ": {
+                    "type": "number",
+                    "description": "the runtime plane height min(levelZ, shoreMinZ - 0.001) (GeneratedWaterSystem.Lakes)"
+                  },
+                  "clamped": {
+                    "type": "boolean"
+                  },
+                  "bedMaxZ": {
+                    "type": "number"
+                  },
+                  "shoreMinZ": {
+                    "type": "number"
+                  },
+                  "bedBelowLevel": {
+                    "type": "boolean",
+                    "description": "every member at most levelZ - lakes.bedBelowLevel"
+                  },
+                  "shoreAboveLevel": {
+                    "type": "boolean",
+                    "description": "every 8-adjacent land sample at least levelZ + lakes.shoreAboveLevel"
+                  },
+                  "shownBefore": {
+                    "type": "boolean",
+                    "description": "the runtime rule shows the group on the unshaped fine compile"
+                  },
+                  "shownAfter": {
+                    "type": "boolean",
+                    "description": "the runtime rule shows the group on the shaped surface"
+                  }
+                }
+              },
+              "description": "one per 4-connected lake group of the fine physical grid, in scan order (the runtime rule's groups); MMR-285 builds every-lake-visible on these"
+            }
+          }
+        },
+        "navCoastMismatch": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "travel cells (Land, Mountain or Sea) whose class disagrees with the sign of the shaped surface at the cell centre"
+        },
+        "navCellsChecked": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "navCoastMismatchBefore": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "the same against the unshaped fine compile"
+        }
+      },
+      "description": "map epic 2 (MMR-278): the shaping stage record (worldgen/policies/terrain-shaping.json). The bundle publishes it as compiled/terrain/shaping.json (worldgen/contracts/terrain-shaping-record.schema.json): the stage needs the travel placements, so only the bundle compile runs it."
     }
   }
 }

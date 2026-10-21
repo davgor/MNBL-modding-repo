@@ -5,15 +5,20 @@
 #include <algorithm>
 #include <cctype>
 #include <chrono>
+#include <cmath>
 #include <exception>
 #include <fstream>
 #include <iostream>
 #include <set>
 #include <sstream>
 #include <string_view>
+#include "worldbridge/capabilities.hpp"
+#include "worldbridge/policy_map2.hpp"
 #include "worldbridge/projected_world.hpp"
 #include "worldbridge/projection.hpp"
 #include "worldbridge/source_world.hpp"
+#include "worldbridge/terrain_layers.hpp"
+#include "worldbridge/terrain_shaping.hpp"
 #include "worldbridge/world_identity.hpp"
 #pragma comment(lib, "bcrypt.lib")
 
@@ -43,9 +48,10 @@ bool safe_bundle_path(const std::string& p) {
 
 const std::vector<std::string>& required_files() {
     static const std::vector<std::string> files{
-        "compiled/campaign/campaign.json", "compiled/campaign/id-map.json", "compiled/compatibility.json", "compiled/terrain/height-q16.bin",
-        "compiled/terrain/heightfield.bin", "compiled/terrain/masks.bin", "compiled/terrain/projection.json", "compiled/terrain/weights.bin",
-        "compiled/travel/cells.bin", "compiled/travel/ports.json", "compiled/travel/travel-graph.json", "compiled/validation.json", "source/world.json"};
+        "compiled/campaign/campaign.json", "compiled/campaign/id-map.json", "compiled/compatibility.json", "compiled/terrain/flora.bin", "compiled/terrain/height-q16.bin",
+        "compiled/terrain/heightfield.bin", "compiled/terrain/masks.bin", "compiled/terrain/navigation-heightfield.bin", "compiled/terrain/navigation-masks.bin",
+        "compiled/terrain/projection.json", "compiled/terrain/shaping.json", "compiled/terrain/weights.bin",
+        "compiled/travel/cells.bin", "compiled/travel/ports.json", "compiled/travel/travel-graph.json", "compiled/validation.json", "source/request.json", "source/world.json"};
     return files;
 }
 
@@ -260,15 +266,123 @@ Built build(const Sources& s) {
         const auto rel = entry.path().lexically_relative(s.split).generic_u8string();
         files["source/" + std::string(rel.begin(), rel.end())] = read_all(entry.path());
     }
-    for (const auto& [path, bytes] : run.compiled) files["compiled/" + path] = bytes;
+    // MMR-261: the accepted request.json (the attempt's recipe, the file `fwg generate --request` took), so `fwg apply` can regenerate the
+    // world during play from the bundle alone.
+    if (!s.recipe) refuse("missing_field", "A bundle needs the attempt's request.json (--recipe): fwg apply regenerates the world from it");
+    if (files.count("source/request.json")) refuse("invalid_path", "The producer split already holds a request.json");
+    files["source/request.json"] = read_all(*s.recipe);
+    // The travel compile's terrain is the navigation field (scaled, unshaped; the travel graph names its heightfield and masks); the
+    // surface files are the shaped fine terrain (MMR-278), compiled after travel placement so the pads sit at the final positions.
+    for (const auto& [path, bytes] : run.compiled) {
+        if (path == "terrain/heightfield.bin") files["compiled/terrain/navigation-heightfield.bin"] = bytes;
+        else if (path == "terrain/masks.bin") files["compiled/terrain/navigation-masks.bin"] = bytes;
+        else if (path != "terrain/weights.bin" && path != "terrain/height-q16.bin") files["compiled/" + path] = bytes;
+    }
     // policies/: every input the compilers read, byte for byte.
     const auto proj_policy = projection::load_policy(s.policies.projection);
     const auto playability = travel::load_policy(s.policies.playability);
+    {
+        const auto shaping = policy::load_shaping(s.shaping);
+        const projection::Projection proj(proj_policy, projection::frame_of(world));
+        const auto materials = terrain::load_materials(s.policies.materials);
+        const auto import = terrain::load_import(s.policies.import);
+        const auto layers = terrain::layers_of(world, materials.permanent_white.snow_threshold);
+        const auto coarse = terrain::compile(layers, proj, materials, import, playability.side);
+        if (terrain::heightfield_bytes(coarse) != run.compiled.at("terrain/heightfield.bin") || terrain::masks_bytes(coarse) != run.compiled.at("terrain/masks.bin"))
+            refuse("broken_join", "The shaping stage's coarse compile differs from the travel compile");
+        const auto fine = terrain::compile(layers, proj, materials, import, shaping.resolution.fine_side);
+        std::set<std::string> excluded;
+        for (const auto& e : run.result.exclusions) excluded.insert(e.id);
+        std::vector<terrain::Pad> pads;
+        for (const auto& pl : run.result.placements)
+            if (pl.cell.valid() && !excluded.count(pl.id)) pads.push_back({pl.id, pl.kind, pl.point.x, pl.point.y});
+        terrain::LakeSource lakes;
+        lakes.side = static_cast<std::int64_t>(world.metadata.grid_side);
+        lakes.water_type = world.read_layer("water_type").values;
+        lakes.water_surface = world.read_layer("water_surface").values;
+        lakes.sea_level_m = projection::frame_of(world).sea_level_m;
+        lakes.vertical_scale = proj_policy.vertical_scale;
+        lakes.central_meridian_deg = proj_policy.central_meridian_deg;
+        terrain::TravelCells cells;
+        cells.cols = static_cast<int>(std::lround(proj.width() / coarse.spacing)); cells.rows = static_cast<int>(std::lround(proj.height() / coarse.spacing));
+        cells.column_offset = run.identity.column_offset; cells.row_offset = run.identity.row_offset;
+        cells.classes = run.result.cls;
+        const auto shaped = terrain::shape(coarse, fine, proj, materials, import, shaping, pads, lakes, cells);
+        // Map trees (MMR-255 r1): forest biomes through flora.bin, clear of the settlement pads and the road cells.
+        terrain::FloraInput flora;
+        for (const auto& pd : pads) {
+            const auto radius = shaping.pads.radius.find(pd.kind);
+            if (radius == shaping.pads.radius.end()) refuse("unmapped_category", "terrain-shaping.json pads has no radius for " + pd.kind);
+            flora.pads.push_back({pd.x, pd.y, radius->second + materials.flora.pad_margin});
+        }
+        flora.road = run.result.road; flora.road_cols = cells.cols; flora.road_rows = cells.rows; flora.road_spacing = coarse.spacing;
+        flora.strip = proj.strip(); flora.pole_margin = proj.pole_margin(); flora.width = proj.width(); flora.height = proj.height();
+        flora.seed = 1469598103934665603ULL;   // FNV-1a 64 of the layout seed: each world plants its own trees, the same ones every time
+        for (const unsigned char ch : world.metadata.layout_seed) { flora.seed ^= ch; flora.seed *= 1099511628211ULL; }
+        terrain::FloraRecord trees;
+        files["compiled/terrain/flora.bin"] = terrain::flora_bytes(shaped.terrain, materials, flora, trees);
+        files["compiled/terrain/heightfield.bin"] = terrain::heightfield_bytes(shaped.terrain);
+        files["compiled/terrain/masks.bin"] = terrain::masks_bytes(shaped.terrain);
+        files["compiled/terrain/weights.bin"] = terrain::weights_bytes(shaped.terrain);
+        files["compiled/terrain/height-q16.bin"] = terrain::q16_bytes(shaped.terrain);
+        Value record = Value::object();
+        record.set("schema", str("mnbl.terrain-shaping-record")); record.set("version", integer(1));
+        Value surface = Value::object();
+        surface.set("side", integer(shaped.terrain.side)); surface.set("spacing", num(shaped.terrain.spacing)); surface.set("seamPeriodColumns", integer(shaped.terrain.period));
+        surface.set("hmin", num(shaped.terrain.height.hmin)); surface.set("hmax", num(shaped.terrain.height.hmax)); surface.set("seamPairs", integer(static_cast<long long>(shaped.terrain.seam_pairs)));
+        surface.set("engineSignViolations", integer(static_cast<long long>(shaped.terrain.engine_sign_violations)));
+        record.set("surface", surface);
+        Value navigation = Value::object();
+        navigation.set("side", integer(coarse.side)); navigation.set("spacing", num(coarse.spacing));
+        navigation.set("files", str("navigation-heightfield.bin and navigation-masks.bin: the travel compile (scaled, unshaped); travel-graph.json inputs name them"));
+        record.set("navigation", navigation);
+        record.set("shaping", terrain::shaping_value(shaped.record));
+        // The layer compile on the shaped surface (MMR-255): dominant-layer shares, permanent white, the table check and the map trees.
+        record.set("layers", terrain::layers_value(shaped.terrain));
+        record.set("permanentWhite", terrain::permanent_white_value(shaped.terrain));
+        const auto& lr = shaped.terrain.layers;
+        Value compile = Value::object();
+        compile.set("landSamples", integer(static_cast<long long>(lr.land)));
+        Value target = array();
+        for (const double v : lr.target) target.items.push_back(num(v));
+        compile.set("target", target);
+        Value by_biome = Value::object();
+        for (const auto& [id, cov] : lr.biome_coverage) {
+            Value b = Value::object();
+            b.set("core", str(materials.biome_core.at(id)));
+            b.set("landSamples", integer(static_cast<long long>(lr.biome_land.at(id))));
+            Value c = array();
+            for (const double v : cov) c.items.push_back(num(v));
+            b.set("coverage", c);
+            by_biome.set(std::to_string(id), b);
+        }
+        compile.set("biomeCoverage", by_biome);
+        compile.set("interiorSamples", integer(static_cast<long long>(lr.interior)));
+        compile.set("interiorMaxError", num(lr.interior_max_error));
+        compile.set("moisturePairMaxError", num(lr.moisture_pair_max_error));
+        compile.set("seamPairs", integer(static_cast<long long>(terrain::check_layer_seams(shaped.terrain))));
+        record.set("layerCompile", compile);
+        Value fl = Value::object();
+        fl.set("trees", integer(static_cast<long long>(trees.trees)));
+        fl.set("canonicalTrees", integer(static_cast<long long>(trees.canonical)));
+        fl.set("clearedPads", integer(static_cast<long long>(trees.cleared_pads)));
+        fl.set("clearedRoads", integer(static_cast<long long>(trees.cleared_roads)));
+        fl.set("densityFactor", num(trees.density_factor));
+        Value kinds = Value::object();
+        for (const auto& [k, v] : trees.kinds) kinds.set(k, integer(static_cast<long long>(v)));
+        fl.set("kinds", kinds);
+        Value biomes = Value::object();
+        for (const auto& [k, v] : trees.biomes) biomes.set(k, integer(static_cast<long long>(v)));
+        fl.set("biomes", biomes);
+        fl.set("sha256", str(cjson::sha256_hex(files["compiled/terrain/flora.bin"])));
+        record.set("flora", fl);
+        files["compiled/terrain/shaping.json"] = cjson::canonical(record);
+    }
     const fs::path projection_calibration = s.policies.projection.parent_path() / fs::path(std::u8string(proj_policy.calibration_file.begin(), proj_policy.calibration_file.end()));
     std::map<std::string, fs::path> policy_files{
         {"projection", s.policies.projection}, {"terrain-materials", s.policies.materials}, {"terrain-import", s.policies.import},
         {"campaign-content", s.policies.content}, {"culture-presentations", s.policies.cultures}, {"playability", s.policies.playability},
-        {"source-compatibility", s.contract}, {"calibration/axis-sea-datum", projection_calibration}};
+        {"population", s.policies.population}, {"source-compatibility", s.contract}, {"terrain-shaping", s.shaping}, {"calibration/axis-sea-datum", projection_calibration}};
     // The playability calibration sits where its policy names it.
     {
         const Value doc = cjson::parse(s.policies.playability);
@@ -332,7 +446,7 @@ Built build(const Sources& s) {
     Value compiler = Value::object();
     compiler.set("bridgeVersion", str(WORLDBRIDGE_VERSION)); compiler.set("binarySha256", str(exe_sha256()));
     Value stages = array();
-    for (const char* st : {"MMR-25 projection", "MMR-26 terrain", "MMR-27 campaign", "MMR-28 travel"}) stages.items.push_back(str(st));
+    for (const char* st : {"MMR-25 projection", "MMR-26 terrain", "MMR-27 campaign", "MMR-28 travel", "MMR-278 terrain shaping"}) stages.items.push_back(str(st));
     compiler.set("stages", stages);
     d.set("compiler", compiler);
     d.set("policies", policies);
@@ -345,19 +459,19 @@ Built build(const Sources& s) {
     }
     engine.set("runtimeLockSha256", str(cjson::sha256_file_hex(s.runtime_lock)));
     engine.set("editor", null());
-    engine.set("note", str("No editor dependency (MMR-21). The host refuses a bundle whose game or War Sails version differs from the installed one."));
+    engine.set("note", str("No editor dependency (MMR-21). The versions are the build this MNBL release was made against, for diagnostics only (MMR-284): the host accepts any game and War Sails at or above the release's minimum, with no maximum."));
     d.set("engine", engine);
     Value caps = array();
     for (const auto& [id, name] : std::vector<std::pair<const char*, const char*>>{
              {"R02", "runtime terrain rendering, heights and picking on generated terrain"}, {"R03", "generated land and War Sails routes"},
              {"R04", "generated campaign objects registered before initialization"}, {"R05", "save identity read before generated references deserialize"},
              {"R08", "generated wind, storm area and snow/rain bound to native consumers"}, {"R09", "generated terrain through land and naval missions"},
-             {"R10", "periodic east/west topology"}}) {
+             {"R10", "periodic east/west topology"}, {capabilities::kFormatsV2, capabilities::kFormatsV2Name}}) {
         Value c = Value::object(); c.set("id", str(id)); c.set("name", str(name)); caps.items.push_back(c);
     }
     d.set("requiredCapabilities", caps);
-    // compiled/compatibility.json: what a host must match, inside the content so the WorldContentId covers it (a game or
-    // War Sails update gives a new bundle, never a reused one with stale versions). The manifest repeats it for inspection.
+    // compiled/compatibility.json: the builds it was made for and the capabilities a host must provide (MMR-284: builds are checked against the
+    // release minimum only), inside the content so the WorldContentId covers it. The manifest repeats it for inspection.
     Value compat = Value::object(), versions = Value::object();
     compat.set("schema", str("mnbl.bundle-compatibility")); compat.set("version", integer(1));
     versions.set("gameVersion", *engine.find("gameVersion")); versions.set("navalVersion", *engine.find("navalVersion"));
@@ -392,9 +506,9 @@ Built build(const Sources& s) {
 
 int bundle_main(int argc, char** argv) {
     const char* usage = "Usage: worldbridge --bundle SPLIT --contract FILE --projection-policy FILE --materials FILE --import FILE --content FILE --cultures FILE "
-                        "--playability FILE --producer-lock FILE --runtime-lock FILE [--recipe FILE] --root DIR --diagnostics DIR";
+                        "--playability FILE --shaping FILE --population FILE --producer-lock FILE --runtime-lock FILE --recipe FILE --root DIR --diagnostics DIR";
     std::map<std::string, std::string> o;
-    static const std::set<std::string> known{"--contract", "--projection-policy", "--materials", "--import", "--content", "--cultures", "--playability",
+    static const std::set<std::string> known{"--contract", "--projection-policy", "--materials", "--import", "--content", "--cultures", "--playability", "--shaping", "--population",
                                              "--producer-lock", "--runtime-lock", "--recipe", "--root", "--diagnostics"};
     for (int i = 3; i < argc; i += 2) {
         const std::string key = argv[i];
@@ -402,12 +516,12 @@ int bundle_main(int argc, char** argv) {
         if (!o.emplace(key, argv[i + 1]).second) throw std::runtime_error("Repeated option " + key);
     }
     for (const auto& key : known)
-        if (key != "--recipe" && !o.count(key)) throw std::runtime_error(usage);
+        if (!o.count(key)) throw std::runtime_error(usage);
     const auto started = std::chrono::system_clock::now();
     const auto clock = std::chrono::steady_clock::now();
     Sources s;
-    s.split = argv[2]; s.contract = o["--contract"]; s.producer_lock = o["--producer-lock"]; s.runtime_lock = o["--runtime-lock"];
-    s.policies = {o["--projection-policy"], o["--materials"], o["--import"], o["--content"], o["--cultures"], o["--playability"]};
+    s.split = argv[2]; s.contract = o["--contract"]; s.producer_lock = o["--producer-lock"]; s.runtime_lock = o["--runtime-lock"]; s.shaping = o["--shaping"];
+    s.policies = {o["--projection-policy"], o["--materials"], o["--import"], o["--content"], o["--cultures"], o["--playability"], o["--population"]};
     if (o.count("--recipe")) s.recipe = fs::path(o["--recipe"]);
     Value report = Value::object();
     int code = 0;

@@ -1,0 +1,15 @@
+{
+  "schema": "mnbl.producer-archive",
+  "version": 1,
+  "rule": "MMR-261 (RT-37): every fwg.exe build a campaign may cast with ships in the package, by SHA-256, at Producers/<sha256>/fwg.exe (Modules/MNBL.ProceduralWorld/Producers, Git LFS: MSVC output is not byte-reproducible, so a build is kept, never rebuilt). A campaign records the build that generated its world (the bundle's source.producer.binarySha256) and casts only with that build; a new cast is refused only when that build is missing here or its bytes differ; stored mutations always load (they replay without a producer). Entries are append-only: a re-pin adds the new build (tests/check_producer_lock.py requires the pinned build to be listed and present); none is ever removed. Builds before FWGC++ 0ae1f3e have no apply command, and their worlds no longer load (the map epic 2 clean break), so none is listed.",
+  "builds": [
+    {
+      "sha256": "7058dbdceec88f5bb160b41d114228c4ddea6e42f893a64cbeb5a321e250eafc",
+      "sourceCommit": "0ae1f3ed57161ed43d9b8b1ec0827f0345a87059",
+      "sourceCommitDate": "2026-10-19T19:40:47-05:00",
+      "since": "MMR-261",
+      "path": "Producers/7058dbdceec88f5bb160b41d114228c4ddea6e42f893a64cbeb5a321e250eafc/fwg.exe",
+      "apply": ["apply", "--request", "{request}", "--operations", "{operations}", "--delta", "{delta}"]
+    }
+  ]
+}

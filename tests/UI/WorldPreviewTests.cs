@@ -18,6 +18,20 @@ using MNBL.ProceduralWorld.UI;
 // different previews; labels are shortened only when long, with the full text kept. Writes the previews (PNG) and their records.
 internal static class WorldPreviewTests
 {
+    // Diagnostics: the pixel distance (Chebyshev) to land for each off-land settlement and to water for each dry port.
+    private static string Reach(WorldPreview p, List<string> offLand, List<string> dryPorts, Func<double, double, int[]> pixel, Func<int, int, bool> water)
+    {
+        Func<string, string, bool, string> need = (id, kind, toWater) => {
+            var m = p.Markers.First(x => x.Id == id && (kind == "port" ? x.Kind == "port" : x.Kind != "port"));
+            var x0 = pixel(m.U, m.V);
+            for (int d = 0; d <= 16; d++)
+                for (int dj = -d; dj <= d; dj++) for (int di = -d; di <= d; di++)
+                    if (Math.Max(Math.Abs(di), Math.Abs(dj)) == d && water(x0[0] + di, x0[1] + dj) == toWater) return id + ":" + d;
+            return id + ":>16"; };
+        var parts = offLand.Select(id => need(id, "land", false)).Concat(dryPorts.Select(id => need(id, "port", true))).ToList();
+        return parts.Count == 0 ? "" : "; px needed " + String.Join(" ", parts);
+    }
+
     private static int checks, failures;
     private static readonly List<string> lines = new List<string>();
     private static readonly JavaScriptSerializer Json = new JavaScriptSerializer { MaxJsonLength = Int32.MaxValue };
@@ -41,7 +55,7 @@ internal static class WorldPreviewTests
     // Each campaign record's kind (town, castle, village) and name, from the bundle.
     private static Dictionary<string, Tuple<string, string>> CampaignRecords(string bundleDir)
     {
-        var host = new WorldDataBundle.HostProfile("v1.4.8.119303", "v1.2.8.119303", new[] { "R01", "R02", "R03", "R04", "R05", "R06", "R07", "R08", "R09", "R10" });
+        var host = new WorldDataBundle.HostProfile("v1.4.8.119303", "v1.2.8.119303", WorldDataBundle.HostCapabilities);
         var campaign = Parse(WorldDataBundle.Open(bundleDir, host).ReadVerified("compiled/campaign/campaign.json"));
         var result = new Dictionary<string, Tuple<string, string>>(StringComparer.Ordinal);
         foreach (var kind in new[] { "town", "castle", "village" })
@@ -52,7 +66,7 @@ internal static class WorldPreviewTests
     // Each village's bound settlement, from the bundle's campaign records.
     private static Dictionary<string, string> Bounds(string bundleDir)
     {
-        var host = new WorldDataBundle.HostProfile("v1.4.8.119303", "v1.2.8.119303", new[] { "R01", "R02", "R03", "R04", "R05", "R06", "R07", "R08", "R09", "R10" });
+        var host = new WorldDataBundle.HostProfile("v1.4.8.119303", "v1.2.8.119303", WorldDataBundle.HostCapabilities);
         var campaign = Parse(WorldDataBundle.Open(bundleDir, host).ReadVerified("compiled/campaign/campaign.json"));
         return ((IEnumerable)campaign["villages"]).Cast<IDictionary<string, object>>().Where(v => v.ContainsKey("bound") && v["bound"] is string).ToDictionary(v => (string)v["id"], v => (string)v["bound"], StringComparer.Ordinal);
     }
@@ -60,14 +74,14 @@ internal static class WorldPreviewTests
     private static VillageBinding.Result lastBinding;
     private static WorldPreview Build(string bundleDir, string repo, IDictionary<string, object> layout, out FactionFactory.Result factions)
     {
-        var host = new WorldDataBundle.HostProfile("v1.4.8.119303", "v1.2.8.119303", new[] { "R01", "R02", "R03", "R04", "R05", "R06", "R07", "R08", "R09", "R10" });
+        var host = new WorldDataBundle.HostProfile("v1.4.8.119303", "v1.2.8.119303", WorldDataBundle.HostCapabilities);
         var bundle = WorldDataBundle.Open(bundleDir, host);
         var surface = WorldSurface.FromBundle(bundle);
         var campaign = Parse(bundle.ReadVerified("compiled/campaign/campaign.json"));
         var idMap = Parse(bundle.ReadVerified("compiled/campaign/id-map.json"));
         var templates = Directory.GetFiles(Path.Combine(repo, "worldgen/templates/cultures"), "*.json").Where(f => Path.GetFileName(f) != "contract.json")
             .ToDictionary(f => Path.GetFileNameWithoutExtension(f), f => Load(f), StringComparer.Ordinal);
-        factions = FactionFactory.Build(campaign, idMap, Load(Path.Combine(repo, "worldgen/policies/factions.json")), Load(Path.Combine(repo, "worldgen/policies/culture-presentations.json")), templates);
+        factions = FactionFactory.Build(campaign, idMap, Load(Path.Combine(repo, "worldgen/policies/factions.json")), Load(Path.Combine(repo, "worldgen/policies/culture-presentations.json")), templates, Load(Path.Combine(repo, "worldgen/policies/population.json")));
         var problems = new List<string>();
         var binding = VillageBinding.FromRecords(Load(Path.Combine(repo, "worldgen/policies/economy.json")), campaign, Parse(bundle.ReadVerified("compiled/travel/travel-graph.json")), problems);
         if (problems.Count > 0) throw new InvalidDataException("village binding: " + String.Join("; ", problems));
@@ -112,13 +126,15 @@ internal static class WorldPreviewTests
             // Settlements on land samples, ports beside water, in the raster itself.
             Func<double, double, int[]> pixel = (u, v) => new[] { Math.Min(p.Width - 1, (int)(u * p.Width)), Math.Min(p.Height - 1, (int)(v * p.Height)) };
             Func<int, int, bool> water = (i, j) => j >= 0 && j < p.Height && p.Water[j * p.Width + ((i + p.Width) % p.Width)] != 0;
-            // A settlement stands on land: its pixel, or one within 2 px (about 2 world units) for a settlement on the coast, where the surface's
-            // water intent (its mask resolution) can put the nearest sample in the sea while the navigation point is on land.
-            var offLand = p.Markers.Where(m => m.Kind != "port").Where(m => { var x = pixel(m.U, m.V); for (int dj = -2; dj <= 2; dj++) for (int di = -2; di <= 2; di++) if (!water(x[0] + di, x[1] + dj)) return false; return true; }).Select(m => m.Id).ToList();
-            var dryPorts = p.Markers.Where(m => m.Kind == "port").Where(m => { var x = pixel(m.U, m.V); for (int dj = -3; dj <= 3; dj++) for (int di = -3; di <= 3; di++) if (water(x[0] + di, x[1] + dj)) return false; return true; }).Select(m => m.Id).ToList();
+            // A settlement stands on land: its pixel, or one within 3 px (about 3 world units) for a settlement on the coast, where the surface's
+            // water intent (its mask resolution) can put the nearest sample in the sea while the navigation point is on land. MMR-278: the
+            // shaped surface's 513 masks take the source's nearest category at every sample, so their coast can sit half a travel cell
+            // (3.125 units) from the 257 masks' nearest-sample coast the navigation grid was classified with: both tolerances grew by 1 px.
+            var offLand = p.Markers.Where(m => m.Kind != "port").Where(m => { var x = pixel(m.U, m.V); for (int dj = -3; dj <= 3; dj++) for (int di = -3; di <= 3; di++) if (!water(x[0] + di, x[1] + dj)) return false; return true; }).Select(m => m.Id).ToList();
+            var dryPorts = p.Markers.Where(m => m.Kind == "port").Where(m => { var x = pixel(m.U, m.V); for (int dj = -4; dj <= 4; dj++) for (int di = -4; di <= 4; di++) if (water(x[0] + di, x[1] + dj)) return false; return true; }).Select(m => m.Id).ToList();
             Check(offLand.Count == 0 && dryPorts.Count == 0,
-                  "world " + label + ": the raster agrees with the placement: all " + rows.Count + " settlements stand on a land pixel or within 2 px of one (coastal), and every port is within 3 px of water (" +
-                  offLand.Count + " settlements off land, " + dryPorts.Count + " ports dry)");
+                  "world " + label + ": the raster agrees with the placement: all " + rows.Count + " settlements stand on a land pixel or within 3 px of one (coastal), and every port is within 4 px of water (" +
+                  offLand.Count + " settlements off land, " + dryPorts.Count + " ports dry" + Reach(p, offLand, dryPorts, pixel, water) + ")");
             // Regions: the kingdoms holding fortifications, with FactionFactory's names and colours.
             var holding = new HashSet<string>(p.Markers.Where(m => (m.Kind == "town" || m.Kind == "castle") && m.Kingdom != null).Select(m => m.Kingdom));
             Check(p.Regions.Count == holding.Count && p.Regions.All(r => factions.Kingdoms.Any(k => k.Id == r.Kingdom && k.Name == r.Name)),
@@ -150,8 +166,11 @@ internal static class WorldPreviewTests
         // Labels: shortened only when long; the panel shows the full text (WorldPreviewViewModel's HoverText and kingdom list).
         var names = previews.Values.SelectMany(p => p.Markers.Select(m => m.Name).Concat(p.Regions.Select(r => r.Name))).Distinct().ToList();
         string longest = names.OrderByDescending(n => n.Length).First();
-        Check(WorldPreview.Shorten("Forimar", 18) == "Forimar" && WorldPreview.Shorten(longest, 18).Length <= 18 && WorldPreview.Shorten(longest, 18).EndsWith("…") && longest.Length > 18,
-              "labels: a short name is shown whole; the longest generated name (" + longest.Length + " characters, \"" + longest + "\") is shortened to \"" + WorldPreview.Shorten(longest, 18) + "\"");
+        // MMR-286: cleaned names are short (no Age tag, no "<town> Fields 2"), so the longest may fit; a long name is checked as well.
+        string longName = longest.Length > 18 ? longest : "Halsel Who Keeps the harbour of Elddun";
+        Check(WorldPreview.Shorten("Forimar", 18) == "Forimar" && WorldPreview.Shorten(longName, 18).Length <= 18 && WorldPreview.Shorten(longName, 18).EndsWith("…") &&
+              names.All(n => n.Length > 18 || WorldPreview.Shorten(n, 18) == n),
+              "labels: a short name is shown whole (the longest generated name has " + longest.Length + " characters, \"" + longest + "\"); a long one is shortened (\"" + WorldPreview.Shorten(longName, 18) + "\")");
     }
 
     // The record without the per-marker list (kept in the preview-<world>.json files).

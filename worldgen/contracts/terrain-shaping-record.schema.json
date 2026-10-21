@@ -1,0 +1,222 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mnbl.local/contracts/terrain-shaping-record.schema.json",
+  "title": "MNBL terrain shaping record",
+  "description": "compiled/terrain/shaping.json of a world bundle (MMR-278, canonical JSON): the shaped surface (heightfield, masks, weights and height-q16 at the fine side), the navigation field beside it (navigation-heightfield.bin and navigation-masks.bin: the travel compile, scaled and unshaped, which travel-graph.json inputs name) and the shaping block of terrain-metadata.schema.json. MMR-255 adds the layer compile on the shaped surface (layers, permanentWhite, layerCompile) and the map trees (flora).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "version",
+    "surface",
+    "navigation",
+    "shaping",
+    "layers",
+    "permanentWhite",
+    "layerCompile",
+    "flora"
+  ],
+  "properties": {
+    "schema": {
+      "const": "mnbl.terrain-shaping-record"
+    },
+    "version": {
+      "const": 1
+    },
+    "surface": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "side",
+        "spacing",
+        "seamPeriodColumns",
+        "hmin",
+        "hmax",
+        "seamPairs",
+        "engineSignViolations"
+      ],
+      "properties": {
+        "side": {
+          "const": 513
+        },
+        "spacing": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "seamPeriodColumns": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "hmin": {
+          "type": "number"
+        },
+        "hmax": {
+          "type": "number"
+        },
+        "seamPairs": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "engineSignViolations": {
+          "const": 0
+        }
+      }
+    },
+    "navigation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "side",
+        "spacing",
+        "files"
+      ],
+      "properties": {
+        "side": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "spacing": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "files": {
+          "type": "string"
+        }
+      }
+    },
+    "shaping": {
+      "$ref": "terrain-metadata.schema.json#/properties/shaping"
+    },
+    "layers": {
+      "$ref": "terrain-metadata.schema.json#/properties/layers"
+    },
+    "permanentWhite": {
+      "$ref": "terrain-metadata.schema.json#/properties/permanentWhite"
+    },
+    "layerCompile": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "MMR-255: over canonical land samples (columns [0, seamPeriodColumns), rows inside the pole lines): the mean target fraction per slot, each biome's mean composited coverage per slot, and the plain interior samples (no rule after the kernel, every kernel neighbour of the same biome) checked against their biome row (the moisture biome's wet + dry total separately); seamPairs: the pairs checked on every plane",
+      "required": [
+        "landSamples",
+        "target",
+        "biomeCoverage",
+        "interiorSamples",
+        "interiorMaxError",
+        "moisturePairMaxError",
+        "seamPairs"
+      ],
+      "properties": {
+        "landSamples": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "target": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          }
+        },
+        "biomeCoverage": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "core",
+              "landSamples",
+              "coverage"
+            ],
+            "properties": {
+              "core": {
+                "type": "string"
+              },
+              "landSamples": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "coverage": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                }
+              }
+            }
+          }
+        },
+        "interiorSamples": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "interiorMaxError": {
+          "type": "number",
+          "minimum": 0
+        },
+        "moisturePairMaxError": {
+          "type": "number",
+          "minimum": 0
+        },
+        "seamPairs": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "flora": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "MMR-255 r1: compiled/terrain/flora.bin (FLR2): trees written (every periodic image), canonical trees, candidates cleared by settlement pads and road cells, the maxTrees density factor, trees per kind and canonical trees per biome core",
+      "required": [
+        "trees",
+        "canonicalTrees",
+        "clearedPads",
+        "clearedRoads",
+        "densityFactor",
+        "kinds",
+        "biomes",
+        "sha256"
+      ],
+      "properties": {
+        "trees": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "canonicalTrees": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "clearedPads": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "clearedRoads": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "densityFactor": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 1
+        },
+        "kinds": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "biomes": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    }
+  }
+}

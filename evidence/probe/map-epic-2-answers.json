@@ -1,0 +1,86 @@
+{
+ "decisions": {
+  "magicGroundDelivery": {
+   "choice": "A",
+   "text": "One runtime decal overlay for all magic ground (generated variants and live mutations). No school terrain layers in the template.",
+   "evidence": [
+    "Entity-less scene decals render over generated relief (run 23716 d1: 16 decals across the hill flank, 48% of their boxes changed).",
+    "SetFactor1 tints a vanilla decal material per instance (run 6284 v3: 1,610 sampled magenta pixels), so one published stamp set can carry several schools.",
+    "Creation and removal are cheap: 7,500 decals in 4.3 ms, removed in 4.7 ms, re-created identically (run 23716 recreated200 vs count200).",
+    "Frame time held the 60 fps cap with 7,500 decals in view (p95 17.6 ms); main-thread cost is about 0.36 us per decal per frame (0.46 ms at 0, 3.19 ms at 7,500).",
+    "B does not fit the 15-slot budget: 8 school layers beside 9-10 biome layers exceed 15, and baked layers cannot change at run time, so mutations need decals anyway."
+   ],
+   "conditions": [
+    "Runtime-made textures do not render on decals (Material.CreateCopy + SetTexture(DiffuseMap, Texture.CreateFromByteArray) drew nothing, with or without CheckAndRegisterToDecalSet). MMR-259's school textures must be published as module decal materials (precedent: NavalDLC's own decal_water_foam, created at run time with Material.GetFromResource).",
+    "Keep the in-view total under about 5,000 decals (about 2 ms of main thread); stamp about one decal per source cell (world A: 1,784 mutated land cells)."
+   ]
+  },
+  "decalTechnique": {
+   "choice": "Entity-less scene decals",
+   "text": "decal = Decal.CreateDecal(null); decal.SetMaterial(Material.GetFromResource(<published decal material>)); scene.AddDecalInstance(decal, \"editor_set\", true); decal.SetIsVisible(true); decal.SetVectorArgument(atlas scale u, scale v, offset u, offset v); decal.Frame = <world frame whose rotation columns are scaled by the half extents; box [-1,1]^3, projected along local z>; optional decal.SetFactor1(ARGB tint). Remove with scene.RemoveDecalInstance(decal, \"editor_set\"). Scene created with DecalAtlasGroup.Worldmap (as SandBox.MapScene).",
+   "rejected": [
+    "GameEntity + AddComponent(Decal) renders only after decal.CheckAndRegisterToDecalSet() (run 23716 d3 drew nothing; run 6284 v4 with the call drew). Usable, but an entity per decal buys nothing.",
+    "Mesh decal fallback (Mesh.CreateMeshWithMaterial(decal material) on a [-1,1]^3 box): drew nothing (run 23716 d4).",
+    "Runtime textures on a material copy: drew nothing (run 23716 d2, run 6284 v1). Material.CreateCopy alone works (run 6284 v2)."
+   ]
+  },
+  "terrain513": {
+   "choice": "go",
+   "text": "Level-7 terrain (513 samples, 4 x 4 nodes of 128 cells) written by our encoder (tools/scenebin/terrain_bin.py) reads in 0.13 s, is ready in 0.9 s with the same shader work as level 6, renders without seams or artefacts, and holds the 60 fps cap with main-thread time equal to level 6 (0.52 vs 0.52 ms at the mountain view). terrain.bin 302 KB.",
+   "caveat": "GPU cost above the 60 fps cap is unmeasured on this machine; the C++ surface encoder still caps at 64 cells per node and must be extended by MMR-278."
+  },
+  "mapTrees": {
+   "choice": "go",
+   "text": "Map trees placed through flora.bin render: 88,000 instances (map_spruce_mix, worldmap_tree_beech_01, worldmap_tree_acacia_01; scale 0.18-0.32) loaded (Scene.GetFloraInstanceCount 88,000), read well at camera distance 38, and fade with distance per the kind's view_distance. Frame time held the cap; the overview costs about 0.24 ms more main thread than the same scene without trees.",
+   "format": "FLR2: u32 payload bytes, u32 count, then per tree u32 name length, name, u32 flora_variation index, 16 f32 (rows: rotation x scale, then x y z 1), 4 f32 colour (1,1,1,1). Read from the installed Main_map flora.bin (69,500 trees) and written by tools/scenebin/build_probe_slots.py flora_bin()."
+  }
+ },
+ "answers": {
+  "1_layers": {
+   "compositing": "Alpha-over, front to back from slot 15 down to slot 0 (slot 0 opaque), linear in the stored weight: the measured ratio is affine in w with residual under 1.5% (band A, plain colour ramp) and a higher slot fully covers a lower one (band B: green at w = 0.5 over the magenta ramp keeps green constant to 0.4%, magenta enters at half strength). The shader divides by smooth_blend_amount (1.0 here). Weights at or below 2/255 draw nothing (shader threshold 0.01).",
+   "heightBlend": "Only with use_transparency_of_ground_slope = true: the layer stays invisible until w is about 0.6 and then rises steeply to full at w = 1 (band C). Without the flag the ramp is linear (band D). MMR-255: leave the flag off and convert target fractions with the over-compositing inverse a_k = f_k / (f_0 + ... + f_k).",
+   "perSeasonMasks": "Inert in practice: MBMapScene.SetSeasonTimeFactor(1) and Scene.SetWinterTimeFactor(1) produced byte-identical images, so neither the per-season node masks (layer 1 removed from the winter mask in half the nodes) nor the per-season layer variants switch at run time. Write identical masks and identical variants for all four seasons; the seasonal look has to come from dynamic snow.",
+   "loadAndCompile": "Scene.Read 0.04-0.17 s; ready to render about 1 s after Read for 2, 6 and 15 layers per node and for level 6 and level 7. Each scene compiles its own terrain shader (6-9 pbr_terrain / pbr_terrain_gbuffer permutations, 'Missing shader from sack' then compile_shader in the engine log), finished inside that second.",
+   "frameCost": "Every view held the 60 fps cap (mean 16.67 ms, p95 at most 17.9 ms) for 2, 6 and 15 layers per node. The cap is outside the game's settings (docs/first-test-profile.md); Utilities.SetForceVsync(false) did not lift it, so GPU cost above the cap is unmeasured. Main-thread time per frame: 0.39-0.56 ms for 2, 6 and 15 layers (no layer-count trend)."
+  },
+  "2_scale": {
+   "tileSize": "A layer's scale is its tile size in map units: scale 5 repeats every 5.03 units, scale 20 every 20.0 units (top-down autocorrelation in x and y).",
+   "pxPerUnitAt38": "37.0 px per map unit at the screen centre on the 1,024-px-tall probe window (vertical FOV 0.698 rad, distance 38, elevation 0.635 rad); in general 0.0362 x screen height per unit, about 39 at 1080p. The camera model matches the measured tile periods to under 1%.",
+   "guidance": "At distance 38 the screen spans about 58 x 37 units. Scale 5 reads as uniform noise; scale 15-20 shows the texture with 2-4 repeats across the screen. A 2048 texture at scale 20 gives about 100 texels per unit against 37 screen px: identity must come from macro colour, not detail inside the tile."
+  },
+  "3_decals": "See decisions.decalTechnique and decisions.magicGroundDelivery. Entity-less path decals follow relief (hill flank, slopes up to about 40 degrees). Cost: 200 / 1,000 / 3,000 / 7,500 decals in view all held the cap; main-thread time 0.46 / 0.84 / 1.59 / 3.19 ms. Removal returns the image exactly to the decal-free baseline; re-creation reproduces the earlier image.",
+  "4_dynamicSnow": {
+   "flag": "use_dynamic_weather_effects=\"true\" alone does nothing visible. With dynamic_flowmap_texture_name=\"main_map_snow_flowmap\" (vanilla Main_map's pair) the terrain snows from that texture.",
+   "seasonResponse": "MBMapScene.SetTerrainDynamicParams(scene, (x, 0.65, 0)) drives the season threshold on the application thread: x = 0.55 (summer) against x = -0.1 (winter) changes the four quadrants by 7-55 grey levels; the shader's grad = smoothstep(x - 0.65, x + 0.65, R).",
+   "setDynamicSnowTexture": "Scene.SetDynamicSnowTexture after Read has no visible effect (runtime RGBA pattern in R, G or A, a B water mask, and the vanilla main_map_snow_flowmap all gave identical images). Calling it before Read hangs the engine (run 26296). The shader samples the terrain's dynamic texture with v = 1 - y / size, R = snow threshold, B = water mask (source: terrain_pixel_functions.rsh).",
+   "channelAndOrientation": "Not settled in game: no runtime pattern reached the shader. By shader source: R channel, texture row 0 at the north edge (max y), column 0 at x = 0. The vanilla texture's snow lands mostly in the two northern quadrants of our terrain, consistent with row 0 = north.",
+   "templateWinterGrass": "Does not whiten the map: the template's winter grass variant (snow_b_d) never activates (see 1_layers.perSeasonMasks).",
+   "colorGradeManager": "A runtime MapColorGradeManager (GameEntity.CreateAndAddScriptComponent) hangs the engine in a non-map scene (run 23716; not responding, no CPU). Drive SetTerrainDynamicParams from our own per-tick code instead.",
+   "renderVersion": "terrain_render_version=\"1\" never reached ready to render (run 6284 hung in load). Do not set it.",
+   "openForMMR256": "A per-world snow mask needs a texture the terrain resolves by name at Read. Untested: registering a runtime texture by name (Texture.LoadTextureFromPath before Read; run 26296 hung on the earlier variant before reaching it). MMR-256 must prove that route in the acceptance build or fall back (permanent-white layer only, plus SetTerrainDynamicParams with no seasonal mask)."
+  },
+  "5_tints": {
+   "mode1": "Adds the colour to the layer albedo (desert_floor_a + (0.2, 0, 0): +0.075 linear red after lighting, other channels unchanged).",
+   "mode2": "Multiplies and saturates, so it only darkens ((1, 0.55, 0.55): lit ratios 1.00 / 0.70 / 0.72 with fog diluting).",
+   "fullColourTextures": "The full-colour battle textures read as their biome at map scale (desert_floor_a, desert_floor_c_d, ground_drygrass_a_d, forest_a_d, ground_mud_b_d, ground_beach_a_d, ground_nord_grass_a_d, rock_k_d, ice_a_d, snow_a_d). The *_mainmap textures (ground_grass_b_d_mainmap, ground_forest_b_d_main_map, main_map_mountains_d) are pale and blue-white without the vista colour multiply and should not be used as plain biome layers."
+  },
+  "6_terrainResolutionAndNormals": {
+   "level7": "See decisions.terrain513.",
+   "normals": "Normals from a [1,2,1]/4 x2 smoothed field are indistinguishable from Sobel on the raw field at level 6 (Laplacian energy 5.23 vs 5.23 on the oblique mountain view): the facets and spikes come from geometry, not from normals.",
+   "shapedField": "The shaped, half-vertical-scale level-7 field (150 samples despiked, masked [1,4,1]/6 low-pass) renders without spikes or blade ridges; land slope p95 39.6 degrees against 62.6 for the unshaped level 7 and 69.0 for today's level 6 (build/probe-slots/probe-slots.json worldA)."
+  },
+  "r1_mapTrees": "See decisions.mapTrees."
+ },
+ "procedure": {
+  "runs": "Run 23716 (all items; hung at the last step, MapColorGradeManager, after every other step was recorded), confirming run 6284 (cost with SetForceVsync(false) and main-thread time, decal variants, snow variants; hung loading terrain_render_version=\"1\" after everything else was recorded), run 26296 (one snow route; hung on SetDynamicSnowTexture before Read, nothing recorded). The third run was spent on the new snow-texture blocker the confirming run found.",
+  "sharedInstall": "No battle-scale session was alive (orchestrator check), so there was nobody to CLAIM with. Before every deploy and launch: no Bannerlord, Bannerlord.Native or Watchdog process, and the battle-scale native-test.lock opened with FileShare.None. Only processes this ticket started were stopped (the three hung games and their Watchdog children).",
+  "installLeftAsFound": "Modules/MNBL.ProceduralWorld was backed up (132 files, SceneObj/mnbl_world_* left untouched), deployed from this worktree's build, and restored after the last run; a hash comparison of every file and folder found it identical (build/install-restore-verify.json in the worktree). The probe slots are gone.",
+  "dialogs": "Runs 6284 and 26296 opened on the Safe Mode prompt left by the previous killed run; the watcher answered No both times (evidence/runtime/in-game/map_epic2-<pid>.dialogs.log, git-ignored). No crash dialog appeared.",
+  "outsideTheModule": "The killed runs left engine_config.txt at safely_exited = 0 (it was 1 before: run 23716 started without the Safe Mode prompt); it was set back to 1. The engine's terrain shader caches for the probe scenes (C:/ProgramData/Mount and Blade II Bannerlord/Shaders/TerrainShaders/MNBL.ProceduralWorld/mnbl_probe_*) were deleted. Game logs (rgl_log_23716/6284/26296, watchdog logs) were left in place as ordinary logs.",
+  "nativeHashes": {
+   "TaleWorlds.Native.dll": "2a5e0e0b15513ebb7052d747a621b82c50ee834553eba283b33bbbc33766e12a",
+   "TaleWorlds.MountAndBlade.dll": "19387f31557ff840d14f378f6bbdf1d58fcff406ab9ff2294dfbb3e49a50b87e",
+   "note": "Identical before the first deploy and after the last run (both dated 2026-10-09 06:40 UTC)."
+  }
+ }
+}

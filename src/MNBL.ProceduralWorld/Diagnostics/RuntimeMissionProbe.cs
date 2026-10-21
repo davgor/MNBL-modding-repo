@@ -403,8 +403,10 @@ namespace MNBL.ProceduralWorld.Diagnostics
             var face = main.CurrentNavigationFace;
             return new Dictionary<string, object> {
                 ["position"] = Xy(position), ["isOnLand"] = position.IsOnLand, ["atSea"] = main.IsCurrentlyAtSea,
+                // MMR-247 (acc5 c13): the map scene's terrain of the face too (GeneratedMapScene.GetFaceTerrainType: a live magic mutation's
+                // retyped type, MMR-260; else the face group), which a battle there takes; the navmesh group never changes (a3).
                 ["face"] = face.IsValid() ? new Dictionary<string, object> { ["index"] = face.FaceIndex, ["group"] = face.FaceGroupIndex,
-                    ["terrain"] = ((TerrainType)face.FaceGroupIndex).ToString(), ["island"] = face.FaceIslandIndex } : null,
+                    ["terrain"] = ((TerrainType)face.FaceGroupIndex).ToString(), ["island"] = face.FaceIslandIndex, ["mapTerrain"] = (int)map.GetFaceTerrainType(face) } : null,
                 ["terrainAtPosition"] = terrainAtPosition.ToString(),
                 ["patch"] = new Dictionary<string, object> { ["sceneIndex"] = patch.sceneIndex, ["coordinates"] = new[] { patch.normalizedCoordinates.X, patch.normalizedCoordinates.Y } },
                 ["expectedBattleScene"] = ExpectedScene(patch.sceneIndex, naval, terrainAtPosition),
@@ -483,7 +485,7 @@ namespace MNBL.ProceduralWorld.Diagnostics
                     var coordinates = (float[])record["PatchCoordinates"]; var expectedCoordinates = (float[])patch["coordinates"];
                     if (!(bool)record["SceneHasMapPatch"] || Math.Abs(coordinates[0] - expectedCoordinates[0]) > 1e-6 || Math.Abs(coordinates[1] - expectedCoordinates[1]) > 1e-6)
                         failures.Add("Initializer record patch differs from the generated patch.");
-                    if (face == null || (int)record["TerrainType"] != (int)face["group"])
+                    if (face == null || (int)record["TerrainType"] != (face.ContainsKey("mapTerrain") ? (int)face["mapTerrain"] : (int)face["group"]))
                         failures.Add("Initializer record terrain differs from the party's generated face terrain.");
                 }
                 if (!(bool)expected["deterministic"]) failures.Add("Generated patch does not resolve to exactly one battle scene: " + expected["rule"]);

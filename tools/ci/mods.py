@@ -10,7 +10,8 @@
                            zip a staged module folder as <id>/..., with a .sha256 file, release notes and a manifest
                            (<id>-<version>.manifest.json: every file's size, SHA-256 and provenance, the dependencies, the
                            build fingerprints and licenses); the mod's "package" block in config/mods.json lists the only
-                           files a package may hold, and no file may carry an official game or DLC name
+                           files a package may hold, and no file may carry an official game or DLC name (but the mod's
+                           own AssetPackages/*.tpac that the block lists)
 """
 import argparse
 import fnmatch
@@ -329,8 +330,9 @@ def file_sha(path):
 
 def package_rows(mod, stage, files):
     """Every staged file's size, SHA-256 and provenance. Every package refuses a file named like an official game, DLC or dependency
-    file; a mod with a "package" block also refuses a file the block does not list or give a provenance, and a package that lacks a
-    listed file (every literal entry present, every pattern matched at least once)."""
+    file, except the mod's own AssetPackages/*.tpac its package block lists with a provenance; a mod with a "package" block also refuses
+    a file the block does not list or give a provenance, and a package that lacks a listed file (every literal entry present, every
+    pattern matched at least once)."""
     block = mod.get('package')
     allowed, provenance = (block or {}).get('files') or [], (block or {}).get('provenance') or {}
     rows, problems = [], []
@@ -338,7 +340,11 @@ def package_rows(mod, stage, files):
         rel = path.relative_to(stage).as_posix()
         origin = next((text for pattern, text in provenance.items() if fnmatch.fnmatchcase(rel, pattern)), None)
         rows.append({'path': rel, 'bytes': path.stat().st_size, 'sha256': file_sha(path), 'provenance': origin})
-        if PROPRIETARY.match(PurePosixPath(rel).name):
+        # The mod's own published asset packs (listed and traced by its package block) carry the engine's .tpac extension;
+        # tools/Package.ps1 still refuses one byte-identical to an installed game file.
+        own_pack = block is not None and origin is not None and rel.startswith('AssetPackages/') and rel.endswith('.tpac') and \
+            any(fnmatch.fnmatchcase(rel, pattern) for pattern in allowed)
+        if PROPRIETARY.match(PurePosixPath(rel).name) and not own_pack:
             problems.append(f'{rel} is named like an official game, DLC or dependency file')
         if block is not None and not any(fnmatch.fnmatchcase(rel, pattern) for pattern in allowed):
             problems.append(f'{rel} is not a file the package may hold (config/mods.json package.files)')

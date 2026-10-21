@@ -12,6 +12,7 @@
 #include <cstdint>
 #include <filesystem>
 #include <functional>
+#include <optional>
 #include <set>
 #include <stdexcept>
 #include <string>
@@ -39,6 +40,7 @@ struct AttemptResult {
     std::string producer_outcome;  // the supervisor's outcome name, when the producer ran
     std::vector<Reason> reasons;
     std::string world_content_id;  // set when accepted
+    std::optional<std::uint64_t> cities;  // the FWGC++ city count of the attempt's world, once the producer wrote one that reads
 };
 
 struct Attempt {
@@ -49,6 +51,7 @@ struct Attempt {
     std::string failure = "none", producer_outcome;
     std::vector<Reason> reasons;
     std::string world_content_id;
+    std::optional<std::uint64_t> cities;  // MMR-251: the attempt world's FWGC++ city count (null when the producer wrote no readable world)
     std::vector<Run> history;  // earlier runs of this attempt, oldest first
 };
 

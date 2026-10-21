@@ -7,6 +7,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
+using MNBL.ProceduralWorld.World;
 
 namespace MNBL.ProceduralWorld.Surface
 {
@@ -24,6 +25,9 @@ namespace MNBL.ProceduralWorld.Surface
         public string RawScripts;   // an installed <script> element copied verbatim (helper entities)
         public bool EditorOnly;
         public readonly List<EntitySpec> Children = new List<EntitySpec>();
+        // MMR-258: <game_entity> elements emitted verbatim after Children (a look's normalized entities, already named, placed and re-snapped).
+        // Only scene XML carries them; SettlementEntityRuntime refuses a spec that has any.
+        public readonly List<XmlElement> Raw = new List<XmlElement>();
 
         public EntitySpec Child(string name, double[] local, params string[] tags)
         {
@@ -127,11 +131,23 @@ namespace MNBL.ProceduralWorld.Surface
     // the installed campaign map's scene levels (DeclareSceneLevels). The XML is deterministic (the encoding's identity hashes it).
     internal static class SettlementEntityFactory
     {
-        public const string Version = "mmr40/2";
+        public const string Version = "mmr258/1";   // MMR-258: looks (clean break: every world's scene name changes)
         // The installed campaign map's scene levels (NavalDLC Main_map <levels>); the generated template declares only base and level_1..3.
         public static readonly KeyValuePair<string, uint>[] SceneLevels = {
             new KeyValuePair<string, uint>("base", 1), new KeyValuePair<string, uint>("level_1", 2), new KeyValuePair<string, uint>("level_2", 4), new KeyValuePair<string, uint>("level_3", 8),
             new KeyValuePair<string, uint>("civilian", 16), new KeyValuePair<string, uint>("siege", 32), new KeyValuePair<string, uint>("looted", 64) };
+
+        // MMR-262: border_max's z, the campaign's MapMaximumHeight (GeneratedMapScene.Load). Its only reader is SandBox.View's MapCameraView
+        // (installed 1.4.8 IL: MaximumCameraHeight = Max(_customMaximumCameraHeight, which nothing sets, MapMaximumHeight)): the camera
+        // distance is clamped to [2.5, it] and the far clip plane is 4 times it. It was the terrain's highest point + 100, which tied the
+        // zoom-out to the vertical scale: about 154-178 on worlds A and B at 0.01 world units per metre, 117-119 on A' and B' at 0.005. A
+        // fixed floor keeps the pre-epic zoom; a world with higher terrain keeps 100 above it. Not vanilla's 620/756: from a distance of
+        // about 161 the camera looks nearly straight down (elevation 0.35 + 0.0075 d, at most 1.555; 40 degree vertical field), so at 180 a
+        // 16:9 screen shows about 233 units across (306 at 21:9), under W/2 = 400, the strip beside the seam, and the nearest-image
+        // presentation (PeriodicMapCameraView) holds; at 756 it would be about 980, more than the world's width. With the target held at a
+        // pole line (MMR-278) it shows about 65 units of the 600-unit polar padding.
+        public const double MinimumMapHeight = 180;
+        public static double MapMaximumHeight(double surfaceHigh) { return Math.Max(surfaceHigh + 100, MinimumMapHeight); }
 
         public static uint LevelMask(IEnumerable<string> names)
         {
@@ -145,20 +161,55 @@ namespace MNBL.ProceduralWorld.Surface
             return mask;
         }
 
-        public static List<EntitySpec> Build(SettlementLayout layout, IPlacementGround ground, SettlementEntityContract contract, SettlementPlacementPolicy policy,
+        // looks: settlement-looks.json (the phase-0 culture pieces and production pieces); null builds the MMR-40 empire pieces (fixtures).
+        public static List<EntitySpec> Build(SettlementLayout layout, IPlacementGround ground, SettlementEntityContract contract, SettlementPlacementPolicy policy, SettlementLooksPolicy looks,
                                              string helperPrefix, double extent, double maxHeight)
         {
             contract.RequireMeshes(policy.SolidWallMesh, policy.BrokenWallMesh);
+            if (looks != null) contract.RequireMeshes(Phase0Meshes(layout, looks).ToArray());
             var roots = new List<EntitySpec> {
                 new EntitySpec { Name = "border_min", Position = new double[] { 0, 0, 0 } },
                 new EntitySpec { Name = "border_max", Position = new[] { extent, extent, maxHeight } } };
             foreach (var name in SettlementEntityContract.BakedHelperScripts)
                 roots.Add(new EntitySpec { Name = helperPrefix + "_helper_" + new string(name.ToLowerInvariant().Select(c => (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') ? c : '_').ToArray()), RawScripts = contract.Helpers[name] });
-            foreach (var s in layout.Settlements) roots.Add(Settlement(s, ground, policy));
+            foreach (var s in layout.Settlements) roots.Add(Settlement(s, ground, policy, looks));
             return roots;
         }
 
-        public static EntitySpec Settlement(ResolvedSettlement s, IPlacementGround ground, SettlementPlacementPolicy policy)
+        // The phase-0 and production meshes the layout's settlements use (each must be one the installed campaign map references).
+        private static IEnumerable<string> Phase0Meshes(SettlementLayout layout, SettlementLooksPolicy looks)
+        {
+            var names = new SortedSet<string>(StringComparer.Ordinal);
+            foreach (var s in layout.Settlements.Where(x => x.Look != null && x.Look.Culture != null && looks.CultureCodes.ContainsKey(x.Look.Culture)))
+            {
+                string culture = s.Look.Culture;
+                for (int level = 1; level <= 3; level++)
+                {
+                    if (s.Site.Fortification && s.Look.Phase0) { names.Add(looks.Name(looks.Keep, culture, level)); names.Add(looks.Name(looks.WallSegment, culture, level)); names.Add(looks.CollapsedWall(culture, level)); }
+                    if (s.Site.Kind == SiteKind.Village && s.Look.Phase0) names.Add(looks.Name(looks.Village, culture, level));
+                }
+                List<string> pieces;
+                if (s.Site.Kind == SiteKind.Village && s.Look.VillageType != null && looks.Production.TryGetValue(s.Look.VillageType, out pieces)) foreach (var p in pieces) names.Add(p);
+            }
+            foreach (var p in looks.Piers) names.Add(p);
+            return names;
+        }
+
+        // MMR-258: a settlement's hierarchy from its look (ResolvedSettlement.Look):
+        //   town, castle  the look's visual tree in <id>_look (turned so the look's gate faces the resolved gate, at the look's scale), its
+        //                 functional entities rebuilt as direct children at the layout's positions (the look's own offsets, moved only by the
+        //                 placement rules): gate, every gate-frame marker, two wall sections per level with the look's solid and broken pieces (at
+        //                 most one of each), four wall engines per level, the circle at the look's scale; the look's banner placeholders when one
+        //                 stands at each wall level under a parent with that level's bit, else the policy's; a grafted pier at a port-grafted
+        //                 town's port
+        //   village       the look's icons per hearth level and looted as the named icons, its production pieces swapped for the village type's
+        //                 (settlement-looks.json phase0.production) and drawn inside the clearance, the rest in <id>_look; a pier at a harbour
+        //                 village's drop-off when the look has none
+        //   phase 0       the culture's keep per wall level (mi_<code>_keep_N) and wall segments (collapsed: the culture's or the empire's), or the
+        //                 culture's village icons with the type's production pieces; the policy's installed offsets
+        //   no look       (fixtures, the run-time path) MMR-40's empire pieces
+        // Every look entity is renamed <id>_l<n> (names are unique scene-wide) and every visible piece re-snapped to the terrain.
+        public static EntitySpec Settlement(ResolvedSettlement s, IPlacementGround ground, SettlementPlacementPolicy policy, SettlementLooksPolicy looks = null)
         {
             var site = s.Site; string id = site.Id;
             var c = ground.Physical(s.Centre[0], s.Centre[1]);
@@ -178,23 +229,49 @@ namespace MNBL.ProceduralWorld.Surface
             }
             root.Tags.Add(site.Kind == SiteKind.Town ? "town" : site.Kind == SiteKind.Castle ? "castle" : "village");
             root.Script("Town Entity Manager", "Override Factor Color", "false", "Factor Color", "1, 1, 1, 1");
+            var choice = looks == null ? null : s.Look;
+            var look = choice == null ? null : choice.Source;
+            string culture = choice != null && choice.Culture != null && looks.CultureCodes.ContainsKey(choice.Culture) ? choice.Culture : null;
+            double scale = look == null ? 1 : choice.Scale;
+            // The look's turn: a fortification's look gate onto the resolved gate; a harbour village's look drop-off onto its drop-off.
+            double turn = 0;
+            if (look != null && site.Fortification && s.Gate != null) turn = s.GateAngle - look.GateAngle;
+            else if (look != null && site.Harbour && s.Dropoff != null && look.DropoffAngle.HasValue)
+                turn = Math.Atan2(s.Dropoff[1] - s.Centre[1], SettlementPositionResolver.Delta(ground, s.Centre[0], s.Dropoff[0])) - look.DropoffAngle.Value;
+            var visual = look == null ? null : new LookBuilder(s, look, choice, ground, looks, root.Position[2], turn);
             if (site.Kind == SiteKind.Village)
             {
-                for (int n = 0; n < 3; n++)
+                if (visual != null) foreach (var icon in visual.Icons()) root.Raw.Add(icon);
+                else
+                    for (int n = 0; n < 3; n++)
+                    {
+                        var icon = root.Child(id + (n == 0 ? "_icon" : "_icon_" + (n + 1)), null);
+                        icon.Mesh = culture == null ? SettlementEntityContract.VillageLevelIcons[n] : looks.Name(looks.Village, culture, n + 1);
+                        icon.Levels.AddRange(new[] { SettlementPlacementPolicy.WallLevels[n], "civilian" });
+                    }
+                if (visual == null)
                 {
-                    var icon = root.Child(id + (n == 0 ? "_icon" : "_icon_" + (n + 1)), null);
-                    icon.Mesh = SettlementEntityContract.VillageLevelIcons[n]; icon.Levels.AddRange(new[] { SettlementPlacementPolicy.WallLevels[n], "civilian" });
+                    var looted = root.Child(id + "_icon_looted", null);
+                    looted.Mesh = culture == null ? SettlementEntityContract.VillageLevelIcons[0] : looks.Name(looks.Village, culture, 1);
+                    looted.Levels.AddRange(SettlementPlacementPolicy.WallLevels.Concat(new[] { "looted" }));
+                    if (culture != null) Phase0Production(root, s, choice, looks, local);
                 }
-                var looted = root.Child(id + "_icon_looted", null);
-                looted.Mesh = SettlementEntityContract.VillageLevelIcons[0]; looted.Levels.AddRange(SettlementPlacementPolicy.WallLevels.Concat(new[] { "looted" }));
             }
-            else root.Child(id + "_icon", null).Mesh = SettlementEntityContract.IconMeshes[site.Kind];
+            else if (visual == null && culture != null)
+                for (int level = 1; level <= 3; level++)
+                {
+                    var keep = root.Child(id + "_keep_" + level, null); keep.Mesh = looks.Name(looks.Keep, culture, level);
+                    keep.Levels.AddRange(new[] { "level_" + level, "civilian", "siege" });
+                }
+            else if (visual == null) root.Child(id + "_icon", null).Mesh = SettlementEntityContract.IconMeshes[site.Kind];
+            if (visual != null) root.Children.Add(visual.Container(id + "_look"));
             var selection = site.Kind == SiteKind.Village ? root.Child(id + "_selection", new double[] { 0, 0, 1 }) : root.Child(id + "_selection", new double[] { 0, 0, 1 }, "bo_town");
             selection.Physics = "bo_sphere_collider"; selection.BodyFlags.Add("only_collide_with_raycast");
             var circle = root.Child(id + "_circle", null, "map_settlement_circle");
             double circleScale;
-            if (policy.CircleScale.TryGetValue(site.Kind == SiteKind.Town ? "town" : "castle", out circleScale) && site.Fortification) circle.Scale = new[] { circleScale, circleScale, circleScale };
-            int banners = site.Kind == SiteKind.Town ? policy.TownBanners : site.Kind == SiteKind.Castle ? policy.CastleBanners : policy.VillageBanners;
+            if (look != null && site.Fortification) circle.Scale = new[] { look.CircleScale * scale, look.CircleScale * scale, look.CircleScale * scale };
+            else if (policy.CircleScale.TryGetValue(site.Kind == SiteKind.Town ? "town" : "castle", out circleScale) && site.Fortification) circle.Scale = new[] { circleScale, circleScale, circleScale };
+            int banners = look != null && look.OwnBanners && site.Fortification ? 0 : site.Kind == SiteKind.Town ? policy.TownBanners : site.Kind == SiteKind.Castle ? policy.CastleBanners : policy.VillageBanners;
             for (int n = 0; n < banners; n++)
             {
                 // SettlementVisual.GetBannerPositionForParty calls GetChild(0) on a placeholder; a childless one faults natively (MMR-33).
@@ -202,30 +279,40 @@ namespace MNBL.ProceduralWorld.Surface
                 var volume = banner.Child(id + "_banner_" + n + "_volume", new[] { 0.5, 0.5, -0.5 });
                 volume.EditorOnly = true; volume.Mesh = "volume_box"; volume.Script("VolumeBox", "NavMeshPrefabName", "");
             }
-            if (site.Harbour && s.Dropoff != null) root.Child(id + "_dropoff", local(s.Dropoff, true), "main_map_village_dropoff");
+            if (site.Harbour && s.Dropoff != null)
+            {
+                root.Child(id + "_dropoff", local(s.Dropoff, true), "main_map_village_dropoff");   // a direct child: War Sails matches Parent.Name to the village id
+                if (culture != null && (look == null || !look.HasPier)) Pier(root, id, s, s.Dropoff, ground, looks, local);
+            }
             if (!site.Fortification || s.Gate == null) return root;
-            double yaw = s.GateAngle - Math.PI / 2;
+            double yaw = s.GateAngle - Math.PI / 2, frame = look == null ? 0 : look.GateAngle;
             root.Child(id + "_gate", local(s.Gate, false), "main_map_city_gate").Yaw = yaw;
             foreach (var m in s.Markers)
             {
                 var marker = root.Child(id + "_" + m.Suffix, local(m.Logical, false), m.Tag);
-                marker.Yaw = yaw;
-                double[] camp; if (policy.CampScale.TryGetValue(m.Tag, out camp)) marker.Scale = new[] { camp[0], camp[1], 1.0 };
+                marker.Yaw = m.LocalYaw + s.GateAngle - frame;
+                double[] camp;
+                if (look != null) { double k = m.LocalScale * scale; if (Math.Abs(k - 1) > 1e-9) marker.Scale = new[] { k, k, k }; }
+                else if (policy.CampScale.TryGetValue(m.Tag, out camp)) marker.Scale = new[] { camp[0], camp[1], 1.0 };
                 if (m.Level != null) marker.Levels.AddRange(policy.WallEngineLevelSets[m.Level]);
             }
             foreach (var w in s.Walls)
             {
                 string name = id + "_" + w.Suffix;
                 var wall = root.Child(name, local(w.Logical, false), "map_breachable_wall");
-                wall.Yaw = yaw; wall.Levels.AddRange(policy.WallLevelSets[w.Level]);
+                wall.Yaw = w.LocalYaw + s.GateAngle - frame; wall.Levels.AddRange(policy.WallLevelSets[w.Level]);
+                if (look != null) { double k = w.LocalScale * scale; if (Math.Abs(k - 1) > 1e-9) wall.Scale = new[] { k, k, k }; }
                 // Raycast-only, like the selection spheres: a plain sphere answers ground and ray queries over a neighbouring village (run 34096).
                 var collider = wall.Child(name + "_collider", null); collider.Physics = "bo_sphere_collider"; collider.BodyFlags.Add("only_collide_with_raycast");
-                wall.Child(name + "_broken", null, "map_broken_wall").Mesh = policy.BrokenWallMesh;
-                wall.Child(name + "_solid", null, "map_solid_wall").Mesh = policy.SolidWallMesh;
+                if (look != null) { foreach (var piece in LookBuilder.WallPieces(name, w.Children)) wall.Raw.Add(piece); continue; }
+                int level = Int32.Parse(w.Level.Substring(6), CultureInfo.InvariantCulture);
+                wall.Child(name + "_broken", null, "map_broken_wall").Mesh = culture == null ? policy.BrokenWallMesh : looks.CollapsedWall(culture, level);
+                wall.Child(name + "_solid", null, "map_solid_wall").Mesh = culture == null ? policy.SolidWallMesh : looks.Name(looks.WallSegment, culture, level);
             }
             if (site.HasPort && s.Port != null)
             {
                 root.Child(id + "_port", local(s.Port, true), "main_map_city_port");   // must be a direct child
+                if (choice != null && choice.Variant == "portGrafted" && culture != null) Pier(root, id, s, s.Port, ground, looks, local);
                 var vars = new List<string>();
                 foreach (var kv in new[] { "MaximumNumberOfShips", "NumberOfArcs", "DistanceBetweenShips" }) { vars.Add(kv); vars.Add(policy.Blockade[kv]); }
                 vars.AddRange(new[] { "DistanceRandomizationOnArcs", "0.100", "DistanceRandomizationBetweenArcs", "0.100", "Angle", policy.Blockade["Angle"], "MissionShipId", policy.Blockade["MissionShipId"],
@@ -238,6 +325,40 @@ namespace MNBL.ProceduralWorld.Surface
                 }
             }
             return root;
+        }
+
+        // A pier (settlement-looks.json phase0.piers, by the settlement's id) on the water at `at`, facing the settlement.
+        private static void Pier(EntitySpec root, string id, ResolvedSettlement s, double[] at, IPlacementGround ground, SettlementLooksPolicy looks, Func<double[], bool, double[]> local)
+        {
+            var pier = root.Child(id + "_pier", local(at, true));
+            pier.Mesh = looks.Piers[(int)(StableHash(id) % (uint)looks.Piers.Count)];
+            pier.Yaw = Math.Atan2(s.Centre[1] - at[1], SettlementPositionResolver.Delta(ground, at[0], s.Centre[0])) - Math.PI / 2;
+        }
+
+        // Phase-0 production: up to three of the village type's pieces round the icons, the first from hearth level 1, the second from 2, the
+        // third at 3 (as the installed villages show more production as they grow). MMR-247: the third piece's levels are the level-3 icon's,
+        // so it is that icon's child without levels (no entity of a village but its icons has an icon's level set; LookBuilder.Icons). The
+        // phase-0 icons stand at the root's origin unturned, so its offset is the same.
+        private static void Phase0Production(EntitySpec root, ResolvedSettlement s, LookChoice choice, SettlementLooksPolicy looks, Func<double[], bool, double[]> local)
+        {
+            List<string> pieces;
+            if (choice == null || choice.VillageType == null || !looks.Production.TryGetValue(choice.VillageType, out pieces)) return;
+            for (int n = 0; n < 3; n++)
+            {
+                double a = 2 * Math.PI * n / 3 + (StableHash(s.Site.Id) % 360) * Math.PI / 180, r = 1.6;
+                var levels = SettlementPlacementPolicy.WallLevels.Skip(n).Concat(new[] { "civilian" }).ToList();
+                var icon = root.Children.FirstOrDefault(x => x.Name.StartsWith(s.Site.Id + "_icon", StringComparison.Ordinal) && new HashSet<string>(x.Levels, StringComparer.Ordinal).SetEquals(levels));
+                var piece = (icon ?? root).Child(s.Site.Id + "_production_" + n, local(new[] { s.Centre[0] + r * Math.Cos(a), s.Centre[1] + r * Math.Sin(a) }, false));
+                piece.Mesh = pieces[n % pieces.Count]; piece.Yaw = a;
+                if (icon == null) piece.Levels.AddRange(levels);
+            }
+        }
+
+        internal static uint StableHash(string text)
+        {
+            uint h = 2166136261;
+            foreach (char ch in text) { h ^= ch; h *= 16777619; }
+            return h;
         }
 
         // A settlement's full hierarchy without a resolved layout (SettlementEntityRuntime, for a settlement the scene lacks), from its record:
@@ -307,7 +428,12 @@ namespace MNBL.ProceduralWorld.Surface
                 }
             }
             if (e.Levels.Count > 0) { var levels = Sub(doc, x, "levels"); foreach (var l in e.Levels) Sub(doc, levels, "level").SetAttribute("name", l); }
-            if (e.Children.Count > 0) { var children = Sub(doc, x, "children"); foreach (var c in e.Children) children.AppendChild(Element(doc, c)); }
+            if (e.Children.Count > 0 || e.Raw.Count > 0)
+            {
+                var children = Sub(doc, x, "children");
+                foreach (var c in e.Children) children.AppendChild(Element(doc, c));
+                foreach (var r in e.Raw) children.AppendChild(doc.ImportNode(r, true));
+            }
             return x;
         }
 
@@ -392,16 +518,48 @@ namespace MNBL.ProceduralWorld.Surface
                 };
                 Func<XmlElement, string> levelsOf = x => String.Join(",", x.SelectNodes("levels/level").Cast<XmlElement>().Select(l => l.GetAttribute("name")));
                 if (s.Site.Kind == SiteKind.Hideout) continue;
+                // MMR-258: the whole hierarchy (SettlementVisual reads it recursively): no nested prefab instance, no solid collider, and every
+                // functional tag only on the direct children the scene builds (a look's tree holds none).
+                if (e.SelectSingleNode(".//game_entity[@prefab]") != null) problems.Add(id + ": a nested prefab instance");
+                int solid = e.SelectNodes(".//physics[@shape]").Cast<XmlElement>().Count(p => p.SelectSingleNode("body_flags/body_flag[@name='only_collide_with_raycast']") == null);
+                if (solid > 0) problems.Add(id + ": " + solid + " solid colliders");
+                // MMR-247 (acc4 V2): every visual piece resolves (SettlementEntityRules.UnresolvedVisual).
+                var unresolved = e.SelectNodes(".//components/meta_mesh_component").Cast<XmlElement>().Select(SettlementEntityRules.UnresolvedVisual).Where(w => w != null).ToList();
+                if (unresolved.Count > 0) problems.Add(id + ": " + unresolved.Count + " visual pieces do not resolve (" + unresolved[0] + ")");
+                foreach (var t in SettlementLook.FunctionalTags.Where(t => t != "map_solid_wall" && t != "map_broken_wall"))
+                {
+                    int anywhere = e.SelectNodes(".//game_entity[tags/tag/@name='" + t + "']").Count;
+                    if (anywhere != direct(t).Count) problems.Add(id + ": " + (anywhere - direct(t).Count) + " " + t + " entities below its direct children");
+                }
                 expect("map_settlement_circle", 1, null);
                 int banners = s.Site.Kind == SiteKind.Town ? policy.TownBanners : s.Site.Kind == SiteKind.Castle ? policy.CastleBanners : policy.VillageBanners;
                 var placeholders = direct("map_banner_placeholder");
-                if (placeholders.Count != banners || placeholders.Any(b => b.SelectNodes("children/game_entity").Count != 1 || b.SelectSingleNode("children/game_entity/components/meta_mesh_component[@name='volume_box']") == null))
-                    problems.Add(id + ": banner placeholders are not " + banners + " each with one volume_box child");
+                var nested = e.SelectNodes(".//game_entity[tags/tag/@name='map_banner_placeholder']").Cast<XmlElement>().Where(b => !placeholders.Contains(b)).ToList();
+                if (nested.Count == 0)
+                {
+                    if (placeholders.Count != banners || placeholders.Any(b => b.SelectNodes("children/game_entity").Count != 1 || b.SelectSingleNode("children/game_entity/components/meta_mesh_component[@name='volume_box']") == null))
+                        problems.Add(id + ": banner placeholders are not " + banners + " each with one volume_box child");
+                }
+                else
+                {
+                    // A look's own placeholders: none beside them, each with one child, each under a parent with a wall level bit, one at each level.
+                    Func<XmlElement, List<string>> parentLevels = b => ((XmlElement)b.ParentNode.ParentNode).SelectNodes("levels/level").Cast<XmlElement>().Select(l => l.GetAttribute("name")).Where(SettlementPlacementPolicy.WallLevels.Contains).ToList();
+                    if (placeholders.Count > 0 || nested.Any(b => b.SelectNodes("children/game_entity").Count != 1) || nested.Any(b => parentLevels(b).Count == 0)
+                        || SettlementPlacementPolicy.WallLevels.Any(l => !nested.Any(b => parentLevels(b).Contains(l))))
+                        problems.Add(id + ": the look's banner placeholders are not one child each under parents with wall level bits, at every wall level");
+                }
                 if (s.Site.Kind == SiteKind.Village)
                 {
                     var icons = e.SelectNodes("children/game_entity[starts-with(@name,'" + id + "_icon')]").Cast<XmlElement>().Select(levelsOf).OrderBy(x => x, StringComparer.Ordinal).ToList();
                     var expected = new[] { "level_1,civilian", "level_2,civilian", "level_3,civilian", "level_1,level_2,level_3,looted" }.OrderBy(x => x, StringComparer.Ordinal).ToList();
                     if (!icons.SequenceEqual(expected)) problems.Add(id + ": village icons' levels are [" + String.Join("; ", icons) + "], not one per level and a looted one");
+                    // MMR-247: no other entity of the village has an icon's level set (the engine's inspection read of acceptance run acc1 lost
+                    // the icons that shared one with a look piece: SettlementEntityRules' same-level-visuals model).
+                    Func<XmlElement, string> setOf = x => String.Join(",", x.SelectNodes("levels/level").Cast<XmlElement>().Select(l => l.GetAttribute("name")).OrderBy(n => n, StringComparer.Ordinal));
+                    var iconSets = new HashSet<string>(expected.Select(x => String.Join(",", x.Split(',').OrderBy(n => n, StringComparer.Ordinal))), StringComparer.Ordinal);
+                    var iconNames = new HashSet<string>(new[] { "_icon", "_icon_2", "_icon_3", "_icon_looted" }.Select(x => id + x), StringComparer.Ordinal);
+                    var twins = e.SelectNodes(".//game_entity").Cast<XmlElement>().Where(x => !iconNames.Contains(x.GetAttribute("name")) && iconSets.Contains(setOf(x))).Select(x => x.GetAttribute("name")).ToList();
+                    if (twins.Count > 0) problems.Add(id + ": " + twins.Count + " entities other than its icons have an icon's level set (" + String.Join(", ", twins.Take(3)) + ")");
                     if (e.SelectSingleNode("children/game_entity[physics/@shape='bo_sphere_collider']") == null) problems.Add(id + ": no selection collider");
                     expect("main_map_village_dropoff", s.Site.Harbour ? 1 : 0, s.Dropoff);
                     continue;
@@ -419,8 +577,10 @@ namespace MNBL.ProceduralWorld.Surface
                         var want = String.Join(",", m.Tag == "map_breachable_wall" ? policy.WallLevelSets[m.Level] : policy.WallEngineLevelSets[m.Level]);
                         if (levelsOf(child) != want) problems.Add(id + ": " + m.Suffix + " has levels [" + levelsOf(child) + "], not [" + want + "]");
                     }
-                    if (m.Tag == "map_breachable_wall" && (child.SelectNodes("children/game_entity[tags/tag/@name='map_solid_wall']").Count != 1 || child.SelectNodes("children/game_entity[tags/tag/@name='map_broken_wall']").Count != 1))
-                        problems.Add(id + ": wall " + m.Suffix + " lacks its one solid and one broken wall child");
+                    // The relaxed contract (MMR-258): at most one solid and one broken piece (7 installed castles have neither, 9 no solid one).
+                    if (m.Tag == "map_breachable_wall" && (child.SelectNodes("children/game_entity[tags/tag/@name='map_solid_wall']").Count > 1 || child.SelectNodes("children/game_entity[tags/tag/@name='map_broken_wall']").Count > 1
+                        || (s.Look == null || s.Look.Source == null) && (child.SelectNodes("children/game_entity[tags/tag/@name='map_solid_wall']").Count != 1 || child.SelectNodes("children/game_entity[tags/tag/@name='map_broken_wall']").Count != 1)))
+                        problems.Add(id + ": wall " + m.Suffix + " has more than one solid or broken wall child (or, built without a look, lacks its one solid and one broken)");
                 }
                 foreach (var g in s.Markers.Concat(s.Walls).GroupBy(m => m.Tag))
                     if (direct(g.Key).Count != g.Count()) problems.Add(id + ": " + direct(g.Key).Count + " " + g.Key + " children, expected " + g.Count());

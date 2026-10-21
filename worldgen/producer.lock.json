@@ -5,24 +5,25 @@
     "implementation": "fwgc++",
     "sourceRepository": "https://github.com/davgor/FWGC-.git",
     "localSource": "C:/Users/davgo/Documents/GitHub/FWGC++",
-    "sourceCommit": "ec5d1c10f5ae4c32fdcef092d23ad7d51e2a30de",
-    "sourceCommitDate": "2026-09-29T13:37:05-05:00",
+    "sourceCommit": "0ae1f3ed57161ed43d9b8b1ec0827f0345a87059",
+    "sourceCommitDate": "2026-10-19T19:40:47-05:00",
     "sourceDirty": false,
     "binary": "build/producer/apps/Release/fwg.exe",
-    "sha256": "564c2629b5b92d49e52cd466a5a1aaa9339380464207ddcae669dd487d2f695e",
+    "sha256": "7058dbdceec88f5bb160b41d114228c4ddea6e42f893a64cbeb5a321e250eafc",
     "generatorSchema": "fwg.world",
     "schemaVersion": 2,
     "splitVersion": 1,
     "capabilitiesSha256": "80d7cb96bfdabae53bf9cbc9fbadc9f0e2d071192083d548bcb6e6aa69437ce1",
-    "helpSha256": "cfde144a043d1dd213ea6061776d7357e9b6dd28a4187c9c3c30ea53e9d01b96",
+    "helpSha256": "63a0a15e7c99ead0792534c67fc0be8511043ba5b58a3ef5a952e60b10955d74",
     "commands": {
       "generate": ["generate", "--request", "{request}", "--split", "{split}", "--quiet"],
       "capabilities": ["capabilities", "--output", "{output}"],
-      "help": ["--help"]
+      "help": ["--help"],
+      "apply": ["apply", "--request", "{request}", "--operations", "{operations}", "--delta", "{delta}"]
     },
     "exitContract": {
       "0": "success; split world written",
-      "2": "refusal: fantasy-world-generator.failure schema_version 2 on stdout"
+      "2": "refusal: fantasy-world-generator.failure schema_version 2 on stdout (apply: the failure document names the refused operations[i] field)"
     }
   },
   "toolchain": {
@@ -54,12 +55,12 @@
     "note": "FWGC++ fetches external content only through dependencies.cmake with hash-checked, licence-recorded entries in dependencies.json; no FWGC++ source is modified by this repository."
   },
   "acceptedEvidence": {
-    "ticket": "MMR-10 (F02) rebuild and registration; MMR-15 (R01) process boundary",
+    "ticket": "MMR-10 (F02) rebuild and registration; MMR-15 (R01) process boundary; MMR-261 re-pin to FWGC++ 0ae1f3e (MMR-250: shift_leylines, fwg apply, the generation baseline fix)",
     "toolsLock": "tools.lock.json",
-    "buildLog": {"path": "evidence/fwg/build.log", "sha256": "76b3921b9f362be5898a3feb00d579454b811bd79c739c000392934908ed600c"},
-    "ctestLog": {"path": "evidence/fwg/ctest.log", "sha256": "8950f902ff14a5afb52951006f8b683cd053ec07c011a9fea0a876b7dbc0d881"},
+    "buildLog": {"path": "evidence/fwg/build.log", "sha256": "f87d7efba1ca0ed5ecd184baef367cca4b0b4873002ecc49090d06c6d620a703"},
+    "ctestLog": {"path": "evidence/fwg/ctest.log", "sha256": "2dda9244bb6f96e22b87734daa451453b1f93a2216debaeec0ee8bda7356ebee"},
     "capabilities": "evidence/fwg/capabilities.json",
     "help": "evidence/fwg/help.txt",
-    "verification": {"path": "evidence/fwg/producer-verification.json", "sha256": "c723a6d2158962f6b55cfc9e81ebd8f627238c8ea330cbf8f563368c81528af2"}
+    "verification": {"path": "evidence/fwg/producer-verification.json", "sha256": "285ac2f98027d10588baf6d1e8125a001a8ce642dd1d6cbe3943a88741c49a80"}
   }
 }

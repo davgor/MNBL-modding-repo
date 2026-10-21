@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -174,14 +175,40 @@ namespace MNBL.ProceduralWorld.Automation
                 throw new InvalidDataException("Generic template must have exactly one expected scene name.");
             File.WriteAllText(sceneXml, xml.Replace(originalName, "<scene name=\"" + sceneName + "\""), new UTF8Encoding(false));
             string output = Path.Combine(root, "surface");
+            // MMR-255: the encoder takes layer weights (MNBLWT02); this regression fixture carries the template's base layer only.
+            string weights = Path.Combine(root, "weights.bin");
+            File.WriteAllBytes(weights, BaseWeights(source, xml));
             string[] args = { "--surface-heightfield", source, "--surface-template", localTemplate, "--surface-output", output,
-                "--surface-extent", extent.ToString(CultureInfo.InvariantCulture), "--surface-scale", seed == 0 ? "1" : "0.01" };
+                "--surface-extent", extent.ToString(CultureInfo.InvariantCulture), "--surface-scale", seed == 0 ? "1" : "0.01", "--surface-weights", weights };
             var encoder = GenerationProbe.RunSurfaceEncoder(args, root, token);
             token.ThrowIfCancellationRequested();
             if (Convert.ToInt32(encoder["exitCode"]) != 0) throw new InvalidDataException("Surface encoder failed: " + root);
             foreach (string file in NativeFiles) if (!File.Exists(Path.Combine(output, file))) throw new FileNotFoundException("Surface encoder omitted " + file);
             DiagnosticHeightfield.Read(Path.Combine(output, "quantized-heightfield.bin"));
             return new Bundle { JobRoot = root, Source = source, Output = output, Extent = extent, Encoder = encoder, SceneName = sceneName };
+        }
+
+        // weights.bin v2 with the template's layers (in slot order), the base at 255 and every other layer empty.
+        private static byte[] BaseWeights(string heightfield, string templateXml)
+        {
+            byte[] head = new byte[12];
+            using (var f = File.OpenRead(heightfield)) if (f.Read(head, 0, 12) != 12) throw new InvalidDataException("Short heightfield: " + heightfield);
+            int side = (int)BitConverter.ToUInt32(head, 8), at = templateXml.IndexOf("<layers version=\"1\">", StringComparison.Ordinal), end = templateXml.IndexOf("</layers>", StringComparison.Ordinal);
+            if (at < 0 || end < at) throw new InvalidDataException("The surface template has no material layers.");
+            var names = System.Text.RegularExpressions.Regex.Matches(templateXml.Substring(at, end - at), "<layer name=\"([^\"]+)\">").Cast<System.Text.RegularExpressions.Match>().Select(m => m.Groups[1].Value).ToList();
+            using (var stream = new MemoryStream())
+            using (var w = new System.IO.BinaryWriter(stream))
+            {
+                w.Write(Encoding.ASCII.GetBytes("MNBLWT02")); w.Write((uint)side); w.Write((uint)names.Count);
+                foreach (var name in names) { var raw = Encoding.UTF8.GetBytes(name); w.Write((uint)raw.Length); w.Write(raw); }
+                var plane = new byte[side * side];
+                for (int i = 0; i < plane.Length; i++) plane[i] = 255;
+                w.Write(plane);
+                var empty = new byte[side * side];
+                for (int k = 1; k < names.Count; k++) w.Write(empty);
+                w.Flush();
+                return stream.ToArray();
+            }
         }
 
         private static object Json(string value) { return new JavaScriptSerializer { MaxJsonLength = int.MaxValue }.DeserializeObject(value); }

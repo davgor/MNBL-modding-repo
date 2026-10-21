@@ -47,19 +47,26 @@ cjson::Value parse_text(const std::string& s) { const fs::path file = work / "pa
 Content sample(const std::string& flavour) {
     Content c;
     auto& f = c.files;
-    f["source/world.json"] = "{\"world\":\"" + flavour + "\"}";
+    // One FWGC++ city that is one town at every stage (the city preservation check).
+    f["source/world.json"] = "{\"world\":\"" + flavour + "\",\"settlements\":{\"founding\":{\"placed_cities\":1},\"sites\":[{\"id\":0,\"uid\":\"city-0\"}]}}";
     f["source/plans/city/a-2.json"] = "{\"plan\":1}";
+    f["source/request.json"] = "{\"seed\":42,\"recipe_version\":3,\"overrides\":{\"size\":129,\"phase\":16}}";   // MMR-261
     f["compiled/terrain/heightfield.bin"] = std::string(1024, '\x7f') + flavour;
     f["compiled/terrain/masks.bin"] = std::string(512, '\x01');
     f["compiled/terrain/weights.bin"] = std::string(128, '\x02');
     f["compiled/terrain/height-q16.bin"] = std::string(256, '\x03');
     f["compiled/terrain/projection.json"] = "{\"projection\":1}";
-    f["compiled/campaign/id-map.json"] = "{\"ids\":[]}";
-    f["compiled/campaign/campaign.json"] = "{\"records\":[]}";
+    f["compiled/terrain/navigation-heightfield.bin"] = std::string(512, '\x7e') + flavour;   // the travel compile (MMR-278)
+    f["compiled/terrain/navigation-masks.bin"] = std::string(256, '\x05');
+    f["compiled/terrain/shaping.json"] = "{\"schema\":\"mnbl.terrain-shaping-record\"}";
+    f["compiled/terrain/flora.bin"] = std::string("FLR2\x04\0\0\0\0\0\0\0", 12);   // map trees (MMR-255): none
+    f["compiled/campaign/id-map.json"] = "{\"entries\":[{\"id\":\"t\",\"kind\":\"town\",\"uid\":\"city-0\"}]}";
+    f["compiled/campaign/campaign.json"] = "{\"towns\":[{\"id\":\"t\",\"uid\":\"city-0\"}]}";
     f["compiled/travel/cells.bin"] = std::string(64, '\x04');
     const std::string inputs = "{\"idMapSha256\":\"" + sha(f["compiled/campaign/id-map.json"]) + "\",\"projectionSha256\":\"" + sha(f["compiled/terrain/projection.json"]) +
-                               "\",\"terrainHeightfieldSha256\":\"" + sha(f["compiled/terrain/heightfield.bin"]) + "\",\"terrainMasksSha256\":\"" + sha(f["compiled/terrain/masks.bin"]) + "\"}";
-    f["compiled/travel/travel-graph.json"] = "{\"grid\":{\"cellsSha256\":\"" + sha(f["compiled/travel/cells.bin"]) + "\"},\"inputs\":" + inputs + ",\"status\":\"ok\"}";
+                               "\",\"terrainHeightfieldSha256\":\"" + sha(f["compiled/terrain/navigation-heightfield.bin"]) + "\",\"terrainMasksSha256\":\"" + sha(f["compiled/terrain/navigation-masks.bin"]) + "\"}";
+    f["compiled/travel/travel-graph.json"] = "{\"grid\":{\"cellsSha256\":\"" + sha(f["compiled/travel/cells.bin"]) + "\"},\"inputs\":" + inputs +
+                                             ",\"settlements\":[{\"id\":\"t\",\"kind\":\"town\",\"uid\":\"city-0\"}],\"status\":\"ok\"}";
     f["compiled/travel/ports.json"] = "{\"inputs\":" + inputs + "}";
     f["compiled/validation.json"] = "{\"schema\":\"mnbl.bundle-validation\",\"travelStatus\":\"ok\"}";
     const std::string capabilities = "[{\"id\":\"R02\",\"name\":\"runtime terrain\"}]";
@@ -203,6 +210,15 @@ void publication_tests() {
     const auto listed = list_ready(root);
     check(throws<json::Error>([&] { publish(wrong, root); }, "staging_invalid") && list_ready(root) == listed && staging_dirs(root).empty(),
           "a staged bundle that fails validation is refused (staging_invalid) and nothing is published");
+    // City preservation (MMR-251): a bundle whose compiled towns lost a FWGC++ city, or whose split reports another placed_cities, is refused.
+    Content lost = sample("lost");
+    lost.files["compiled/campaign/campaign.json"] = "{\"towns\":[]}";
+    bool lost_named = false;
+    try { publish(lost, root); } catch (const json::Error& e) { lost_named = e.code == "staging_invalid" && e.message.find("city preservation") != std::string::npos; }
+    Content miscounted = sample("miscounted");
+    miscounted.files["source/world.json"] = "{\"settlements\":{\"founding\":{\"placed_cities\":2},\"sites\":[{\"id\":0,\"uid\":\"city-0\"}]}}";
+    check(lost_named && throws<json::Error>([&] { publish(miscounted, root); }, "staging_invalid") && list_ready(root) == listed && staging_dirs(root).empty(),
+          "a bundle that drops a FWGC++ city from its compiled towns, or whose placed_cities differs from its sites, fails city preservation and is never published");
     // A root whose bundle paths would exceed MAX_PATH is refused before anything is written.
     const fs::path deep = work / "deep" / std::string(200, 'd');
     check(throws<json::Error>([&] { publish(sample("x"), deep); }, "path_too_long") && !fs::exists(work / "deep"), "a root too deep for MAX_PATH is refused before anything is written");
@@ -230,7 +246,12 @@ void validation_tests() {
     };
     tamper("missing file", [](const fs::path& d) { fs::remove(d / "source/plans/city/a-2.json"); }, "missing file");
     tamper("extra file", [](const fs::path& d) { spit(d / "compiled/extra.bin", "x"); }, "unlisted file");
-    tamper("edited file", [](const fs::path& d) { spit(d / "source/world.json", "{\"world\":\"V\"}"); }, "hash differs");
+    tamper("edited file", [](const fs::path& d) {
+        std::string t = slurp(d / "source/world.json");
+        const auto at = t.find("\"world\":\"") + 9;
+        t[at] = t[at] == 'V' ? 'W' : 'V';
+        spit(d / "source/world.json", t);
+    }, "hash differs");
     tamper("resized file", [](const fs::path& d) { spit(d / "compiled/terrain/heightfield.bin", "short"); }, "size differs");
     tamper("an edited manifest", [](const fs::path& d) { std::string m = slurp(d / "manifest.json"); m.insert(m.size() - 1, ",\"note\":\"x\""); spit(d / "manifest.json", m); }, "DATA_READY names a different manifest");
     tamper("an unsealed bundle", [](const fs::path& d) { fs::remove(d / "DATA_READY"); }, "never sealed");

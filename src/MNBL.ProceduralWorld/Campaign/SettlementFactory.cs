@@ -21,10 +21,11 @@ namespace MNBL.ProceduralWorld.CampaignRegistry
     //     areas); identity, geography, ownership, economy and text are the world's. The prototype's lore text is never copied.
     //   * Prosperity and hearth are quantiles of the installed settlements' own distributions at the settlement's percentile among the
     //     generated ones, so they stay in the installed range whatever the world's size; population only orders settlements.
-    //   * Binding (economy.json binding): a village farther from its bound settlement than the policy limit (relative to the world's
-    //     town spacing, periodic) is rebound to the nearest town or castle of its land group within it; castles take villages of their
-    //     garrison town, then of over-full towns of their kingdom, as the installed castles have them. Balance (villages and hearth per
-    //     fief), the engine's castle-village trade limit and each town's trade-area food supply are validated against the policy.
+    //   * Binding (economy.json binding): the campaign v2 binding of the travel compiler's village quota (MMR-252), exactly townVillages
+    //     per town and castleVillages per castle, passed through (VillageBinding). Balance (villages and hearth per fief), the engine's
+    //     castle-village trade limit, the 3/2 counts and each town's trade-area food supply are validated against the policy.
+    //   * Village types (economy.json villageTypes, villageMix; RT-08): a coastal village draws a fishing type at the installed coastal
+    //     fishing share, and every culture keeps its world-level horse-ranch and wheat-farm floors, which the food pass never breaks.
     //   * Harbour villages (MMR-27 harbour) get a port at their MMR-28 harbour cell and a coastal prototype; fishing types need a port.
     //   * Positions are staged (pendingEngineValidation): MMR-40 places gates and ports on the engine navmesh.
     // Element() is the one builder the world and the in-game fixtures share. Determinism: records in id order, named versioned streams.
@@ -36,6 +37,7 @@ namespace MNBL.ProceduralWorld.CampaignRegistry
             public string MapPrefab;   // the prototype's vanilla map prefab (null for towns, which the vanilla map does not place as prefabs); MMR-40 places entities
             public string TradeTown;   // a castle's village: the nearest town of its kingdom within the engine's trade limit (the engine assigns it in game)
             public string FoodRedraw;  // a village whose type the food pass changed: the type drawn before
+            public string FloorRedraw; // a village whose type the culture's horse-ranch or wheat floor changed: the type drawn before
             public string SourceBound; // a village's compiler town (before any rebinding)
             public double X, Y, GateX, GateY, BoundDistance;
             public double? PortX, PortY;
@@ -136,6 +138,9 @@ namespace MNBL.ProceduralWorld.CampaignRegistry
         private readonly List<string> problems = new List<string>();
         private string prefix;
         private double width;   // the periodic world's east-west extent (0: not periodic)
+        // MMR-258 (RT-14): settlement id -> the prototype its scene look was built from (the layout report's looks, SettlementLookPlan); the
+        // record takes it, so the map look matches the scene the player enters. A settlement without one picks from its pool as before.
+        public IDictionary<string, string> LookPrototypes { get; set; }
 
         // economy: worldgen/policies/economy.json. prototypes: worldgen/templates/settlements/prototypes.json. settlements: the merged
         // catalog's Settlements document (the prototypes' assets). defaults: whether a typed engine-default reference (VillageType.x,
@@ -158,6 +163,7 @@ namespace MNBL.ProceduralWorld.CampaignRegistry
             var result = new Result { WorldPrefix = factions.WorldPrefix };
             prefix = factions.WorldPrefix;
             if (Text(policy, "schema") != "mnbl.economy" || Int(policy, "version") != 2) problems.Add("not mnbl.economy version 2");
+            if (Text(campaign, "schema") != "mnbl.campaign-records" || Int(campaign, "version") != 2) problems.Add("not mnbl.campaign-records version 2 (the village quota's binding)");
             var grid = Obj(travel, "grid");
             width = Int(grid, "cols") * Double(grid, "spacing");
             if (double.IsNaN(width) || width <= 0) problems.Add("the travel graph has no grid extent");
@@ -175,7 +181,6 @@ namespace MNBL.ProceduralWorld.CampaignRegistry
             }
             var clans = factions.Clans.ToDictionary(c => c.Id, StringComparer.Ordinal);
             var kingdoms = factions.Kingdoms.ToDictionary(k => k.Id, StringComparer.Ordinal);
-            var heroesById = Records(campaign, "heroes").ToDictionary(h => Text(h, "id"), StringComparer.Ordinal);
 
             // Towns: class tercile prosperity at the town's population percentile within its class.
             var townTiers = Obj(Obj(policy, "prosperity"), "towns");
@@ -199,91 +204,40 @@ namespace MNBL.ProceduralWorld.CampaignRegistry
                 string kind = s.Port ? "town_port" : "town_inland";
                 var pool = Prototypes(s.Culture, kind);
                 if (pool.Count == 0 && !s.Port) { pool = Prototypes(s.Culture, "town_port"); s.AdaptedPrototype = true; }
-                s.Prototype = Pick("prototypes", id, pool);
-                s.Prototype = Conform(s, pool);
-                s.Text = Fill(Text(Obj(policy, "texts"), "town"), new Dictionary<string, string> { ["kind"] = cls == "capital" ? "capital" : "town", ["name"] = s.SourceName, ["realm"] = Realm(s.Kingdom, kingdoms) });
+                s.Prototype = Looked(s, pool);
+                if (s.Prototype == null) { s.Prototype = Pick("prototypes", id, pool); s.Prototype = Conform(s, pool); }
+                s.Buildings["building_settlement_fortifications"] = WallLevel("towns", cls, id);
+                s.Text = Fill(Text(Obj(policy, "texts"), "town"), new Dictionary<string, string> { ["kind"] = cls == "capital" ? "capital" : "town", ["name"] = s.SourceName, ["realm"] = Realm(s.Kingdom, kingdoms) })
+                         + FactionFactory.SourceNote(Text(Obj(policy, "texts"), "sourceNote"), Text(t, "sourceName"));   // MMR-286: a renamed town's FWGC++ name
                 result.Settlements.Add(s);
             }
             var townPopulations = towns.Select(Population).ToList();
             var townById = towns.ToDictionary(t => Text(t, "id"), StringComparer.Ordinal);
-            // Castles: owned by their castellan's vassal clan when the castle has one (hero uid "hero-castellan-<castle uid>"), else by the
-            // compiler's owner; prosperity at their garrison town's population percentile.
+            // Castles: owned by the house campaign.json v2 plans (MMR-279: each castellan heads or belongs to the house owning its castle);
+            // prosperity at their garrison town's population percentile.
             var castleProsperity = List(Obj(Obj(policy, "prosperity"), "castles"), "values").Select(v => Convert.ToInt32(v, CultureInfo.InvariantCulture)).ToList();
             foreach (var c in castles)
             {
                 string id = Text(c, "id");
                 var s = Base(c, "castle", points, kingdoms);
                 s.Culture = CultureOf(heroes, id);
-                var castellan = heroesById.Values.FirstOrDefault(h => Text(h, "uid") == "hero-castellan-" + Text(c, "uid"));
-                var clan = castellan == null ? null : factions.Clans.FirstOrDefault(x => !x.Ruling && x.LeaderId == Text(castellan, "id"));
-                if (clan != null) { s.Owner = clan.Id; s.Provenance += "; owned by the vassal clan of castellan " + Text(castellan, "id"); }
                 IDictionary<string, object> garrison;
                 s.Prosperity = townById.TryGetValue(Text(c, "garrisonTown") ?? "", out garrison) ? Quantile(castleProsperity, Percentile(Population(garrison), townPopulations)) : Quantile(castleProsperity, 0.5);
                 foreach (var b in Obj(Obj(policy, "buildings"), "castles")) s.Buildings[b.Key] = Convert.ToInt32(b.Value, CultureInfo.InvariantCulture);
                 var castlePool = Prototypes(s.Culture, "castle");
-                s.Prototype = Pick("prototypes", id, castlePool);
-                s.Prototype = Conform(s, castlePool);
+                s.Prototype = Looked(s, castlePool);
+                if (s.Prototype == null) { s.Prototype = Pick("prototypes", id, castlePool); s.Prototype = Conform(s, castlePool); }
                 s.MapPrefab = MapPrefab(s.Prototype);
                 s.Text = Fill(Text(Obj(policy, "texts"), "castle"), new Dictionary<string, string> { ["name"] = s.SourceName, ["realm"] = Realm(s.Kingdom, kingdoms) });
                 result.Settlements.Add(s);
             }
-            // Villages. Binding (economy.json binding, VillageBinding: the world preview binds with the same function): (1) the compiler's town;
-            // (2) distance; (3) castles from their garrison town; (4) castles from over-full towns of their kingdom. Hearth at the village's share
-            // percentile of its compiler town's rural population.
-            var byId = result.Settlements.ToDictionary(x => x.Id, StringComparer.Ordinal);
-            var binding = VillageBinding.Bind(policy, towns, castles, villages, points,
-                result.Settlements.Where(x => x.Kind == "town" || x.Kind == "castle").Select(x => new VillageBinding.Fortification { Id = x.Id, Kind = x.Kind, Kingdom = x.Kingdom, X = x.X, Y = x.Y, LandGroup = x.LandGroup }).ToList(),
-                width, problems);
-            var boundOf = binding.BoundOf; var remote = binding.Remote;
-            result.Spacing = binding.Spacing; result.PreferredLimit = binding.PreferredLimit; result.EngineLimit = binding.EngineLimit;
-            foreach (var kv in binding.Rebound) result.Rebound[kv.Key] = kv.Value;
-            foreach (var kv in binding.ReboundReason) result.ReboundReason[kv.Key] = kv.Value;
-            var share = villages.ToDictionary(v => Text(v, "id"), v => {
-                IDictionary<string, object> town; townById.TryGetValue(Text(v, "bound") ?? "", out town);
-                int count = villages.Count(x => Text(x, "bound") == Text(v, "bound"));
-                return town == null || count == 0 ? 0.0 : Double(Obj(town, "population"), "rural") / count; }, StringComparer.Ordinal);
-            foreach (var v in villages) if (double.IsNaN(share[Text(v, "id")])) problems.Add("village " + Text(v, "id") + " has no rural population share (its town has no rural population)");
-            var hearths = List(Obj(policy, "hearth"), "values").Select(v => Convert.ToInt32(v, CultureInfo.InvariantCulture)).ToList();
-            var cell = Double(grid, "spacing");
-            foreach (var v in villages)
-            {
-                string id = Text(v, "id");
-                var s = Base(v, "village", points, kingdoms);
-                s.Culture = CultureOf(heroes, id);
-                s.Bound = boundOf[id]; s.SourceBound = Text(v, "bound");
-                if (result.Rebound.ContainsKey(id)) s.Provenance += "; rebound (" + result.ReboundReason[id] + ") from town " + Text(v, "bound") + " to " + s.Bound;
-                SettlementIntent bound;
-                if (!byId.TryGetValue(s.Bound ?? "", out bound)) { problems.Add("village " + id + " is bound to " + s.Bound + ", which is not a generated town or castle"); continue; }
-                s.Owner = null; s.Kingdom = bound.Kingdom;
-                s.BoundDistance = Dist(s.X, s.Y, bound.X, bound.Y); s.Remote = remote.Contains(id);
-                s.Hearth = Quantile(hearths, Percentile(share[id], share.Values.ToList()));
-                s.Production = Text(v, "production");
-                // A harbour village's port: the centre of its MMR-28 harbour cell (row, column), a navigable sea cell.
-                s.Harbour = Bool(v, "harbour");
-                IDictionary<string, object> harbour;
-                if (s.Harbour && harbourOf.TryGetValue(id, out harbour))
-                {
-                    var hc = List(harbour, "harbourCell").Select(x => Convert.ToInt32(x, CultureInfo.InvariantCulture)).ToArray();
-                    s.HarbourCell = hc; s.Port = true; s.PortX = (hc[1] + 0.5) * cell; s.PortY = (hc[0] + 0.5) * cell;
-                }
-                else if (s.Harbour) problems.Add("harbour village " + id + " has no MMR-28 harbour cell");
-                s.VillageType = Weighted("villageTypes", id, VillagePool(s.Culture, s.Production, s.Port));
-                var pool = Prototypes(s.Culture, s.Port ? "village_coastal" : "village_inland");
-                if (pool.Count == 0) { pool = Prototypes(s.Culture, s.Port ? "village_inland" : "village_coastal"); s.AdaptedPrototype = true; }
-                s.Prototype = Pick("prototypes", id, pool);
-                s.Prototype = Conform(s, pool);
-                s.MapPrefab = MapPrefab(s.Prototype);
-                s.Text = Fill(Text(Obj(policy, "texts"), "village"), new Dictionary<string, string> { ["name"] = s.SourceName, ["bound"] = bound.SourceName });
-                result.Settlements.Add(s);
-            }
-            // A castle's villages trade with the nearest town of the castle's kingdom within the engine limit (VillageTradeBoundCampaignBehavior).
-            var allTowns = result.Settlements.Where(x => x.Kind == "town").OrderBy(x => x.Id, StringComparer.Ordinal).ToList();
-            foreach (var s in result.Settlements.Where(x => x.Kind == "village" && byId.ContainsKey(x.Bound ?? "") && byId[x.Bound].Kind == "castle"))
-            {
-                var trade = allTowns.Where(t => t.Kingdom == s.Kingdom && Dist(s.X, s.Y, t.X, t.Y) <= result.EngineLimit).OrderBy(t => Dist(s.X, s.Y, t.X, t.Y)).ThenBy(t => t.Id, StringComparer.Ordinal).FirstOrDefault();
-                s.TradeTown = trade == null ? null : trade.Id;
-            }
-            FoodPass(result);
+            // MMR-258 (RT-14): a castle's initial wall level from the installed levels of its prosperity tercile (by rank among the world's castles,
+            // as tools/make_economy_policy.py counted the installed ones).
+            var ranked = result.Settlements.Where(x => x.Kind == "castle").OrderBy(x => x.Prosperity).ThenBy(x => x.Id, StringComparer.Ordinal).ToList();
+            for (int i = 0; i < ranked.Count; i++)
+                ranked[i].Buildings["building_castle_fortifications"] = WallLevel("castles", i < ranked.Count / 3 ? "low" : i < 2 * ranked.Count / 3 ? "middle" : "high", ranked[i].Id);
+            Villages(result, towns, castles, villages, points, harbourOf, grid, id => CultureOf(heroes, id));
+
             Validate(result, clans, villages, towns.Count, castles.Count);
             Slots(result);
             Balance(result);
@@ -300,6 +254,123 @@ namespace MNBL.ProceduralWorld.CampaignRegistry
             result.IntentsJson = Canonical(result);
             result.IntentsSha256 = Sha256(result.IntentsJson);
             return result;
+        }
+
+        // Villages (shared by Build and PlanVillageTypes, so the scene's production pieces and the records agree). Binding: the campaign v2
+        // binding (VillageBinding passes it through; the world preview binds with the same function), then the village types, the castle
+        // villages' trade towns, the culture floors and the food pass.
+        private void Villages(Result result, List<IDictionary<string, object>> towns, List<IDictionary<string, object>> castles, List<IDictionary<string, object>> villages,
+                              Dictionary<string, IDictionary<string, object>> points, Dictionary<string, IDictionary<string, object>> harbourOf, IDictionary<string, object> grid, Func<string, string> cultureOf)
+        {
+            var townById = towns.ToDictionary(t => Text(t, "id"), StringComparer.Ordinal);
+            // Villages. Binding: the campaign v2 binding (VillageBinding passes it through; the world preview binds with the same function).
+            // Hearth at the village's share percentile of its source town's rural population (sourceTown: the compiler town, the garrison town
+            // for a castle's synthesized village; RT-10), shared among the villages of that source town.
+            var byId = result.Settlements.ToDictionary(x => x.Id, StringComparer.Ordinal);
+            var binding = VillageBinding.Bind(policy, towns, castles, villages, points,
+                result.Settlements.Where(x => x.Kind == "town" || x.Kind == "castle").Select(x => new VillageBinding.Fortification { Id = x.Id, Kind = x.Kind, Kingdom = x.Kingdom, X = x.X, Y = x.Y, LandGroup = x.LandGroup }).ToList(),
+                width, problems);
+            var boundOf = binding.BoundOf; var remote = binding.Remote;
+            result.Spacing = binding.Spacing; result.PreferredLimit = binding.PreferredLimit; result.EngineLimit = binding.EngineLimit;
+            foreach (var kv in binding.Rebound) result.Rebound[kv.Key] = kv.Value;
+            foreach (var kv in binding.ReboundReason) result.ReboundReason[kv.Key] = kv.Value;
+            var sourceCount = villages.GroupBy(v => Text(v, "sourceTown") ?? "").ToDictionary(g => g.Key, g => g.Count(), StringComparer.Ordinal);
+            var share = villages.ToDictionary(v => Text(v, "id"), v => {
+                IDictionary<string, object> town;
+                if (!townById.TryGetValue(Text(v, "sourceTown") ?? "", out town)) return double.NaN;
+                return Double(Obj(town, "population"), "rural") / sourceCount[Text(v, "sourceTown")]; }, StringComparer.Ordinal);
+            foreach (var v in villages) if (double.IsNaN(share[Text(v, "id")])) problems.Add("village " + Text(v, "id") + " has no rural population share (no source town " + Text(v, "sourceTown") + ", or it has no rural population)");
+            var hearths = List(Obj(policy, "hearth"), "values").Select(v => Convert.ToInt32(v, CultureInfo.InvariantCulture)).ToList();
+            var cell = Double(grid, "spacing");
+            foreach (var v in villages)
+            {
+                string id = Text(v, "id");
+                var s = Base(v, "village", points, null);
+                s.Culture = cultureOf(id);
+                string boundId; boundOf.TryGetValue(id, out boundId);
+                s.Bound = boundId; s.SourceBound = Text(v, "sourceTown");
+                s.Provenance += "; " + Text(v, "origin") + " (village quota, MMR-252), bound to " + Text(v, "boundKind") + " " + s.Bound + ", source town " + s.SourceBound;
+                SettlementIntent bound;
+                if (!byId.TryGetValue(s.Bound ?? "", out bound)) { problems.Add("village " + id + " is bound to " + s.Bound + ", which is not a generated town or castle"); continue; }
+                s.Owner = null; s.Kingdom = bound.Kingdom;
+                s.BoundDistance = Dist(s.X, s.Y, bound.X, bound.Y); s.Remote = remote.Contains(id);
+                s.Hearth = double.IsNaN(share[id]) ? hearths.Min() : Quantile(hearths, Percentile(share[id], share.Values.Where(x => !double.IsNaN(x)).ToList()));
+                s.Production = Text(v, "production");
+                // A harbour village's port: the centre of its MMR-28 harbour cell (row, column), a navigable sea cell.
+                s.Harbour = Bool(v, "harbour");
+                IDictionary<string, object> harbour;
+                if (s.Harbour && harbourOf.TryGetValue(id, out harbour))
+                {
+                    var hc = List(harbour, "harbourCell").Select(x => Convert.ToInt32(x, CultureInfo.InvariantCulture)).ToArray();
+                    s.HarbourCell = hc; s.Port = true; s.PortX = (hc[1] + 0.5) * cell; s.PortY = (hc[0] + 0.5) * cell;
+                }
+                else if (s.Harbour) problems.Add("harbour village " + id + " has no MMR-28 harbour cell");
+                s.VillageType = Weighted("villageTypes", id, CoastalPool(id, s.Culture, s.Production, s.Port));
+                var pool = Prototypes(s.Culture, s.Port ? "village_coastal" : "village_inland");
+                if (pool.Count == 0) { pool = Prototypes(s.Culture, s.Port ? "village_inland" : "village_coastal"); s.AdaptedPrototype = true; }
+                s.Prototype = Looked(s, pool);
+                if (s.Prototype == null) { s.Prototype = Pick("prototypes", id, pool); s.Prototype = Conform(s, pool); }
+                s.MapPrefab = MapPrefab(s.Prototype);
+                s.Text = Fill(Text(Obj(policy, "texts"), "village"), new Dictionary<string, string> { ["name"] = s.SourceName, ["bound"] = bound.SourceName });
+                result.Settlements.Add(s);
+            }
+            // A castle's villages trade with the nearest town of the castle's kingdom within the engine limit (VillageTradeBoundCampaignBehavior).
+            var allTowns = result.Settlements.Where(x => x.Kind == "town").OrderBy(x => x.Id, StringComparer.Ordinal).ToList();
+            foreach (var s in result.Settlements.Where(x => x.Kind == "village" && byId.ContainsKey(x.Bound ?? "") && byId[x.Bound].Kind == "castle"))
+            {
+                var trade = allTowns.Where(t => t.Kingdom == s.Kingdom && Dist(s.X, s.Y, t.X, t.Y) <= result.EngineLimit).OrderBy(t => Dist(s.X, s.Y, t.X, t.Y)).ThenBy(t => t.Id, StringComparer.Ordinal).FirstOrDefault();
+                s.TradeTown = trade == null ? null : trade.Id;
+            }
+            Floors(result);
+            FoodPass(result);
+        }
+
+        // MMR-258: the village types Build gives the campaign's villages, from the campaign records, travel graph and ports alone (no factions,
+        // heroes or catalog): the fortifications' kingdoms and positions, the static settlement cultures (HeroFactory.SettlementCulturesOf) and
+        // the world prefix (FactionFactory.WorldPrefixOf), through the same Villages pass. The scene's look plan draws each village's production
+        // pieces from it before the campaign is built; CompiledWorldDataset refuses a world whose records differ.
+        public SortedDictionary<string, string> PlanVillageTypes(IDictionary<string, object> campaign, IDictionary<string, object> travel, IDictionary<string, object> ports)
+        {
+            var result = new Result();
+            prefix = FactionFactory.WorldPrefixOf(campaign) ?? "";
+            var grid = Obj(travel, "grid");
+            width = Int(grid, "cols") * Double(grid, "spacing");
+            var towns = Records(campaign, "towns").OrderBy(t => Text(t, "id"), StringComparer.Ordinal).ToList();
+            var castles = Records(campaign, "castles").OrderBy(c => Text(c, "id"), StringComparer.Ordinal).ToList();
+            var villages = Records(campaign, "villages").OrderBy(v => Text(v, "id"), StringComparer.Ordinal).ToList();
+            var points = Records(travel, "settlements").ToDictionary(x => Text(x, "id"), StringComparer.Ordinal);
+            var harbourOf = new Dictionary<string, IDictionary<string, object>>(StringComparer.Ordinal);
+            foreach (var p in Records(ports, "ports"))
+                foreach (var c in Records(p, "candidates")) if (Text(c, "village") != null && List(c, "harbourCell").Count() == 2) harbourOf[Text(c, "village")] = c;
+            foreach (var t in towns) { var town = Base(t, "town", points, null); town.Culture = Text(t, "presentation"); result.Settlements.Add(town); }
+            foreach (var c in castles) result.Settlements.Add(Base(c, "castle", points, null));
+            var cultures = HeroFactory.SettlementCulturesOf(campaign);
+            Villages(result, towns, castles, villages, points, harbourOf, grid, id => { string c; return cultures.TryGetValue(id, out c) ? c : null; });
+            var types = new SortedDictionary<string, string>(StringComparer.Ordinal);
+            foreach (var v in result.Settlements.Where(x => x.Kind == "village")) types[v.Id] = v.VillageType;
+            return types;
+        }
+
+        // The look's prototype for a settlement (LookPrototypes), when it has one: an installed record of the settlement's culture and kind that
+        // meets the mission scene contracts; one outside the settlement's own pool is an adapted prototype.
+        private string Looked(SettlementIntent s, List<string> pool)
+        {
+            string id;
+            if (LookPrototypes == null || !LookPrototypes.TryGetValue(s.Id, out id) || id == null) return null;
+            if (!catalog.ContainsKey(id)) { problems.Add(s.Kind + " " + s.Id + ": its look's prototype " + id + " is not an installed settlement"); return id; }
+            if (!pool.Contains(id)) s.AdaptedPrototype = true;
+            if (scenes != null && scenes.PrototypeProblems(id, s.Kind, s.Port).Count > 0) problems.Add(s.Kind + " " + s.Id + ": its look's prototype " + id + " fails the mission scene contracts (" + scenes.PrototypeProblems(id, s.Kind, s.Port)[0] + ")");
+            return id;
+        }
+
+        // MMR-258 (RT-14): an initial wall level (the fortifications building) drawn from economy.json walls.<kind>.<tier> (installed level counts),
+        // from the prototypes stream (entity "<id>|walls").
+        private int WallLevel(string kind, string tier, string id)
+        {
+            var weights = Obj(Obj(Obj(policy, "walls"), kind), tier);
+            if (weights == null) { problems.Add(kind + " " + id + ": economy.json walls has no tier " + tier); return 1; }
+            var level = Weighted("prototypes", id + "|walls", weights);
+            return level == null ? 1 : Int32.Parse(level, CultureInfo.InvariantCulture);
         }
 
         // The one settlement builder (world and fixtures): the prototype's component, location complex and common areas as assets; the
@@ -445,10 +516,16 @@ namespace MNBL.ProceduralWorld.CampaignRegistry
             var castleRange = List(Obj(Obj(policy, "prosperity"), "castles"), "values").Select(v => Convert.ToInt32(v, CultureInfo.InvariantCulture)).ToList();
             var hearthRange = List(Obj(policy, "hearth"), "values").Select(v => Convert.ToInt32(v, CultureInfo.InvariantCulture)).ToList();
             var binding = Obj(policy, "binding");
-            int castleVillages = Int(binding, "castleVillages"), townMinimum = Int(binding, "townMinimum"), townMaximum = Int(binding, "townMaximum");
+            int castleVillages = Int(binding, "castleVillages"), townVillages = Int(binding, "townVillages");
             var fishing = new HashSet<string>(List(Obj(policy, "villageTypes"), "fishingTypes").Select(x => (string)x), StringComparer.Ordinal);
             var villagePorts = Obj(Obj(policy, "positions"), "villagePorts");
             double portEnvelope = Double(villagePorts, "installedPortCentreMax") + Double(villagePorts, "allowance");
+            // MMR-280: every house's home is one of its fiefs, a town or castle it owns (campaign v2 home = seat).
+            foreach (var c in clans.Values.OrderBy(c => c.Id, StringComparer.Ordinal))
+            {
+                SettlementIntent home;
+                if (c.HomeId == null || !c.Fiefs.Contains(c.HomeId) || !byId.TryGetValue(c.HomeId, out home) || home.Owner != c.Id) problems.Add("house " + c.Id + " home " + c.HomeId + " is not one of its fiefs");
+            }
             foreach (var s in r.Settlements)
             {
                 string p = CampaignIdentity.Problem(s.Id, prefix);
@@ -457,17 +534,18 @@ namespace MNBL.ProceduralWorld.CampaignRegistry
                 if (double.IsNaN(s.X) || double.IsNaN(s.Y) || double.IsInfinity(s.X) || double.IsInfinity(s.Y)) problems.Add(s.Kind + " " + s.Id + " has no finite position");
                 if (s.Kind == "town" || s.Kind == "castle")
                 {
-                    if (s.Owner == null || !clans.ContainsKey(s.Owner)) problems.Add(s.Kind + " " + s.Id + " owner " + s.Owner + " is not a clan intent");
-                    else if (clans[s.Owner].KingdomId != s.Kingdom) problems.Add(s.Kind + " " + s.Id + " owner " + s.Owner + " is not of its kingdom " + s.Kingdom);
+                    // MMR-280: the owner is the campaign v2 house that holds the fief, a house of the settlement's kingdom.
+                    if (s.Owner == null || !clans.ContainsKey(s.Owner)) problems.Add(s.Kind + " " + s.Id + " owner " + s.Owner + " is not a house intent");
+                    else if (clans[s.Owner].KingdomId != s.Kingdom) problems.Add(s.Kind + " " + s.Id + " owner " + s.Owner + " is not a house of its kingdom " + s.Kingdom);
+                    else if (!clans[s.Owner].Fiefs.Contains(s.Id)) problems.Add(s.Kind + " " + s.Id + " owner " + s.Owner + " does not list it among its fiefs");
                     var range = s.Kind == "town" ? townRange : castleRange;
                     if (s.Prosperity < range.Min() || s.Prosperity > range.Max()) problems.Add(s.Kind + " " + s.Id + " prosperity " + s.Prosperity + " leaves the installed range");
                     foreach (var b in s.Buildings.Keys) if (!defaults("BuildingType." + b)) problems.Add(s.Kind + " " + s.Id + " building " + b + " is not a registered building type");
-                    int bound = r.Settlements.Count(v => v.Kind == "village" && v.Bound == s.Id);
-                    if (bound == 0) problems.Add(s.Kind + " " + s.Id + " has no bound village");
-                    else if (s.Kind == "castle" && bound > castleVillages) problems.Add("castle " + s.Id + " has " + bound + " villages, more than " + castleVillages);
-                    else if (s.Kind == "town" && bound > townMaximum) problems.Add("town " + s.Id + " has " + bound + " villages, more than " + townMaximum);
-                    else if (s.Kind == "town" && bound < townMinimum && villages.Count(v => Text(v, "bound") == s.Id) >= townMinimum)
-                        problems.Add("town " + s.Id + " was left " + bound + " villages of the source's " + villages.Count(v => Text(v, "bound") == s.Id));
+                    // Exactly townVillages per town and castleVillages per castle (the village quota, MMR-252). A fortification with no village
+                    // crashes SnareTheWealthyIssueQuest, incident_the_quiet_life and incident_wages_of_war_and_diseases (RT-31).
+                    int bound = r.Settlements.Count(v => v.Kind == "village" && v.Bound == s.Id), quota = s.Kind == "town" ? townVillages : castleVillages;
+                    if (bound == 0) problems.Add(s.Kind + " " + s.Id + " has no bound village (SnareTheWealthy, incident_the_quiet_life and incident_wages_of_war_and_diseases throw on it)");
+                    else if (bound != quota) problems.Add(s.Kind + " " + s.Id + " has " + bound + " villages, not exactly " + quota);
                 }
                 else if (s.Kind == "village")
                 {
@@ -497,6 +575,9 @@ namespace MNBL.ProceduralWorld.CampaignRegistry
                 double installed = Double(Obj(balance, "installed"), measure.Key), ratio = measure.Value / installed;
                 if (band.Count != 2 || double.IsNaN(ratio) || ratio < band[0] || ratio > band[1]) problems.Add(measure.Key + " " + Math.Round(measure.Value, 2) + " is " + Math.Round(ratio, 2) + " x the installed " + installed + ", outside the band");
             }
+            // Village mix: every culture keeps its horse-ranch and wheat-farm floors (after the food pass).
+            foreach (var f in FloorCounts(r)) if (f.Value[0] < f.Value[1] || f.Value[2] < f.Value[3])
+                problems.Add("culture " + f.Key + " keeps " + f.Value[0] + " horse ranches (floor " + f.Value[1] + ") and " + f.Value[2] + " wheat farms (floor " + f.Value[3] + ")");
             // Food: every town's trade-area supply reaches the policy minimum (after the food pass).
             int minimum = Int(Obj(policy, "food"), "townMinimum");
             foreach (var t in r.Settlements.Where(s => s.Kind == "town"))
@@ -536,9 +617,98 @@ namespace MNBL.ProceduralWorld.CampaignRegistry
             return pick;
         }
 
+        // A coastal village's pool (economy.json villageMix, RT-08): a coastal village (one with a port) draws a fishing type of its culture
+        // with probability coastalFishingShare (the installed share among villages with a port; the villageTypes stream's draw 1), else a
+        // non-fishing type of its class (its culture's farming types when the class has none). A culture without fishing types, and every
+        // village without a port, draws as VillagePool says.
+        private IDictionary<string, object> CoastalPool(string id, string culture, string production, bool port)
+        {
+            var pool = VillagePool(culture, production, port);
+            if (!port) return pool;
+            var fishing = new HashSet<string>(List(Obj(policy, "villageTypes"), "fishingTypes").Select(x => (string)x), StringComparer.Ordinal);
+            Func<IDictionary<string, object>, bool, SortedDictionary<string, object>> part = (p, fish) => {
+                var o = new SortedDictionary<string, object>(StringComparer.Ordinal);
+                foreach (var w in p) if (fishing.Contains(w.Key) == fish) o[w.Key] = w.Value;
+                return o; };
+            var pools = Obj(Obj(Obj(policy, "villageTypes"), "pools"), culture ?? "") ?? new Dictionary<string, object>();
+            var fishPool = new SortedDictionary<string, object>(StringComparer.Ordinal);
+            foreach (var cls in pools) foreach (var w in part((IDictionary<string, object>)cls.Value, true)) fishPool[w.Key] = Math.Max(Convert.ToInt32(w.Value, CultureInfo.InvariantCulture), fishPool.ContainsKey(w.Key) ? (int)fishPool[w.Key] : 0);
+            var land = part(pool, false);
+            if (land.Count == 0) land = part(VillagePool(culture, "farming", false), false);
+            if (fishPool.Count == 0) return land.Count > 0 ? (IDictionary<string, object>)land : pool;
+            if (land.Count == 0) return fishPool;
+            double share = Double(Obj(policy, "villageMix"), "coastalFishingShare");
+            return (Stream("villageTypes", id, 1) % 10000UL) < (ulong)Math.Round(share * 10000) ? (IDictionary<string, object>)fishPool : land;
+        }
+
+        // A culture's floor types (economy.json villageMix.floors, RT-08/RT-09): its installed horse-ranch type and wheat_farm, each with the
+        // floor max(1 when its installed pool has the type, floor(share x the culture's generated villages)).
+        private sealed class Floor { public string Ranch, Wheat; public int RanchFloor, WheatFloor; }
+        private Floor FloorOf(Result r, string culture)
+        {
+            var pools = Obj(Obj(Obj(policy, "villageTypes"), "pools"), culture ?? "") ?? new Dictionary<string, object>();
+            var types = pools.SelectMany(p => ((IDictionary<string, object>)p.Value).Keys).Distinct().OrderBy(x => x, StringComparer.Ordinal).ToList();
+            var floors = Obj(Obj(Obj(policy, "villageMix"), "floors"), culture ?? "");
+            int n = r.Settlements.Count(v => v.Kind == "village" && v.Culture == culture);
+            var f = new Floor { Ranch = types.FirstOrDefault(t => t.EndsWith("_horse_ranch", StringComparison.Ordinal) && defaults("VillageType." + t)),
+                                Wheat = types.Contains("wheat_farm") && defaults("VillageType.wheat_farm") ? "wheat_farm" : null };
+            if (f.Ranch != null) f.RanchFloor = Math.Max(1, (int)Math.Floor(Double(floors, "horseRanchShare") * n));
+            if (f.Wheat != null) f.WheatFloor = Math.Max(1, (int)Math.Floor(Double(floors, "wheatShare") * n));
+            if (floors == null) { f.RanchFloor = f.Ranch == null ? 0 : 1; f.WheatFloor = f.Wheat == null ? 0 : 1; }
+            return f;
+        }
+
+        // culture -> [horse ranches, ranch floor, wheat farms, wheat floor] over the generated villages.
+        private SortedDictionary<string, int[]> FloorCounts(Result r)
+        {
+            var o = new SortedDictionary<string, int[]>(StringComparer.Ordinal);
+            foreach (var culture in r.Settlements.Where(v => v.Kind == "village" && v.Culture != null).Select(v => v.Culture).Distinct())
+            {
+                var f = FloorOf(r, culture);
+                var mine = r.Settlements.Where(v => v.Kind == "village" && v.Culture == culture).ToList();
+                o[culture] = new[] { mine.Count(v => f.Ranch != null && v.VillageType == f.Ranch), f.RanchFloor, mine.Count(v => v.VillageType == "wheat_farm"), f.WheatFloor };
+            }
+            return o;
+        }
+
+        // Whether redrawing village v to `type` leaves its culture below a floor.
+        private bool BreaksFloor(Result r, SettlementIntent v, string type)
+        {
+            if (type == v.VillageType) return false;
+            var f = FloorOf(r, v.Culture);
+            var mine = r.Settlements.Where(x => x.Kind == "village" && x.Culture == v.Culture).ToList();
+            if (f.Ranch != null && v.VillageType == f.Ranch && mine.Count(x => x.VillageType == f.Ranch) <= f.RanchFloor) return true;
+            if (v.VillageType == "wheat_farm" && mine.Count(x => x.VillageType == "wheat_farm") <= f.WheatFloor) return true;
+            return false;
+        }
+
+        // A culture below its horse-ranch or wheat-farm floor redraws villages to the floor type: villages without a port first, then of the
+        // farming class, then the type with the least food (so the trade-area supply suffers least), then id; never a village whose own type
+        // is at its floor.
+        private void Floors(Result r)
+        {
+            foreach (var culture in r.Settlements.Where(v => v.Kind == "village" && v.Culture != null).Select(v => v.Culture).Distinct().OrderBy(x => x, StringComparer.Ordinal).ToList())
+            {
+                var f = FloorOf(r, culture);
+                foreach (var target in new[] { new KeyValuePair<string, int>(f.Ranch, f.RanchFloor), new KeyValuePair<string, int>(f.Wheat, f.WheatFloor) })
+                {
+                    if (target.Key == null) continue;
+                    while (r.Settlements.Count(v => v.Kind == "village" && v.Culture == culture && v.VillageType == target.Key) < target.Value)
+                    {
+                        var pick = r.Settlements.Where(v => v.Kind == "village" && v.Culture == culture && v.VillageType != target.Key && !BreaksFloor(r, v, target.Key))
+                            .OrderBy(v => v.Port ? 1 : 0).ThenBy(v => v.Production == "farming" ? 0 : 1).ThenBy(v => FoodOf(v.VillageType)).ThenBy(v => v.Id, StringComparer.Ordinal).FirstOrDefault();
+                        if (pick == null) break;   // Validate refuses the culture
+                        pick.FloorRedraw = pick.FloorRedraw ?? pick.VillageType;
+                        pick.Provenance += "; village type " + pick.VillageType + " redrawn to " + target.Key + " for culture " + culture + "'s floor";
+                        pick.VillageType = target.Key;
+                    }
+                }
+            }
+        }
+
         // A town whose trade-area food supply is below the policy minimum: its trade-area village with the least food (nearest the town
         // first) takes the most food-producing type its culture allows for its class (else among its culture's farming types), until the
-        // town reaches the minimum.
+        // town reaches the minimum; never a redraw that breaks a culture's horse-ranch or wheat floor.
         private void FoodPass(Result r)
         {
             int minimum = Int(Obj(policy, "food"), "townMinimum");
@@ -551,7 +721,7 @@ namespace MNBL.ProceduralWorld.CampaignRegistry
                     {
                         var options = VillagePool(v.Culture, v.Production, v.Port).Keys.Concat(VillagePool(v.Culture, "farming", v.Port).Keys);
                         var best = options.Where(x => defaults("VillageType." + x)).OrderByDescending(FoodOf).ThenBy(x => x, StringComparer.Ordinal).FirstOrDefault();
-                        if (best == null || FoodOf(best) <= FoodOf(v.VillageType)) continue;
+                        if (best == null || FoodOf(best) <= FoodOf(v.VillageType) || BreaksFloor(r, v, best)) continue;
                         v.FoodRedraw = v.FoodRedraw ?? v.VillageType; v.VillageType = best; changed = true;
                         v.Provenance += "; village type " + v.FoodRedraw + " redrawn to " + best + " for town " + t.Id + "'s food supply";
                         break;
@@ -609,8 +779,14 @@ namespace MNBL.ProceduralWorld.CampaignRegistry
                 ["remote"] = villages.Where(v => v.Remote).OrderBy(v => v.Id, StringComparer.Ordinal).ToDictionary(v => v.Id, v => (object)new SortedDictionary<string, object>(StringComparer.Ordinal) {
                     ["bound"] = v.Bound, ["distance"] = Math.Round(v.BoundDistance, 1), ["ratio"] = Math.Round(v.BoundDistance / r.Spacing, 2) }),
                 ["maxDistance"] = villages.Count == 0 ? 0 : Math.Round(villages.Max(v => v.BoundDistance), 1),
-                ["maxDistanceNotRemote"] = villages.Count(v => !v.Remote) == 0 ? 0 : Math.Round(villages.Where(v => !v.Remote).Max(v => v.BoundDistance), 1),
-                ["townsBelowMinimumBySource"] = towns.Where(t => villages.Count(v => v.Bound == t.Id) < Int(Obj(policy, "binding"), "townMinimum")).Select(t => t.Id).OrderBy(x => x, StringComparer.Ordinal).ToList() };
+                ["maxDistanceNotRemote"] = villages.Count(v => !v.Remote) == 0 ? 0 : Math.Round(villages.Where(v => !v.Remote).Max(v => v.BoundDistance), 1) };
+            var fishingTypes = List(Obj(policy, "villageTypes"), "fishingTypes").Cast<string>().ToList();
+            r.Balance["villageMix"] = new SortedDictionary<string, object>(StringComparer.Ordinal) {
+                ["coastal"] = villages.Count(v => v.Port), ["coastalFishing"] = villages.Count(v => v.Port && fishingTypes.Contains(v.VillageType)),
+                ["coastalFishingShare"] = Double(Obj(policy, "villageMix"), "coastalFishingShare"),
+                ["floorRedraws"] = villages.Count(v => v.FloorRedraw != null),
+                ["floors"] = FloorCounts(r).ToDictionary(f => f.Key, f => (object)new SortedDictionary<string, object>(StringComparer.Ordinal) {
+                    ["horseRanch"] = f.Value[0], ["horseRanchFloor"] = f.Value[1], ["wheat"] = f.Value[2], ["wheatFloor"] = f.Value[3] }) };
             var supply = towns.Select(t => TradeArea(r, t.Id).Sum(v => FoodOf(v.VillageType))).OrderBy(x => x).ToList();
             r.Balance["food"] = new SortedDictionary<string, object>(StringComparer.Ordinal) {
                 ["townMinimum"] = Int(Obj(policy, "food"), "townMinimum"), ["minimum"] = supply.Count == 0 ? 0 : supply[0], ["p10"] = supply.Count == 0 ? 0 : supply[supply.Count / 10],
@@ -724,7 +900,7 @@ namespace MNBL.ProceduralWorld.CampaignRegistry
                     ["adaptedPrototype"] = s.AdaptedPrototype, ["mapPrefab"] = s.MapPrefab, ["bound"] = s.Bound, ["villageType"] = s.VillageType, ["production"] = s.Production, ["class"] = s.CityClass,
                     ["position"] = new[] { s.X, s.Y }, ["gate"] = new[] { s.GateX, s.GateY }, ["port"] = s.PortX.HasValue ? new[] { s.PortX.Value, s.PortY.Value } : null,
                     ["harbour"] = s.Harbour, ["harbourCell"] = s.HarbourCell, ["boundDistance"] = Math.Round(s.BoundDistance, 2), ["remote"] = s.Remote, ["tradeTown"] = s.TradeTown,
-                    ["foodRedraw"] = s.FoodRedraw, ["sourceBound"] = s.SourceBound,
+                    ["foodRedraw"] = s.FoodRedraw, ["floorRedraw"] = s.FloorRedraw, ["sourceBound"] = s.SourceBound,
                     ["positionStatus"] = s.PositionStatus, ["prosperity"] = s.Prosperity, ["hearth"] = s.Hearth, ["buildings"] = s.Buildings, ["landGroup"] = s.LandGroup,
                     ["provenance"] = s.Provenance }).ToList(),
                 ["rebound"] = r.Rebound, ["reboundReason"] = r.ReboundReason,

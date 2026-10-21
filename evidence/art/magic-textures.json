@@ -1,0 +1,1374 @@
+{
+ "schema": "mnbl.magic-textures",
+ "version": 2,
+ "ticket": "MMR-288 (re-derived from MMR-259)",
+ "atlas": {
+  "size": 2048,
+  "grid": 4,
+  "cell": 512,
+  "marginPx": 16,
+  "rows": [
+   "arid",
+   "verdant",
+   "rock",
+   "cold"
+  ],
+  "rowBiomes": {
+   "arid": [
+    "desert"
+   ],
+   "verdant": [
+    "grassland",
+    "forest",
+    "rainforest",
+    "marsh"
+   ],
+   "rock": [
+    "exposed_rock"
+   ],
+   "cold": [
+    "boreal_forest",
+    "cold_tundra",
+    "land_ice"
+   ]
+  },
+  "columns": [
+   "trunk",
+   "fork",
+   "tip",
+   "burst"
+  ],
+  "vectorArgument": "SetVectorArgument(0.25, 0.25, column / 4, row / 4)",
+  "frame": "u = (x - 16) / 480 left to right, v likewise top to bottom; growth toward +u; the decal box (L along u, W across) spans the whole 512 px cell, margin included",
+  "chain": {
+   "spacing": "0.75 L (384 texels)",
+   "overlapU": [
+    0.8,
+    1.0
+   ],
+   "jointRule": "a chained stamp's head anchor (u 0.1, v 0.5) sits on the previous stamp's tail anchor (u 0.9): centres 0.375 L + 0.375 L' apart along each heading",
+   "feather": "optical depth: alpha = 1 - (1 - a)^f, f a smoothstep over u 0..0.2 (head) and 1 - smoothstep over u 0.8..1 (tail; trunk and fork); the two sum to 1 across a joint",
+   "trunkPeriodic": "trunk texels at u 0.8..1 equal those at u 0..0.2 (x + 384)"
+  },
+  "kinds": {
+   "trunk": {
+    "coreWidthTexels": 40.0,
+    "coreWidth": "about 1/12 of the inner height, +-10 percent",
+    "meanderMaxTexels": 30.0,
+    "haloAlphaMax": 0.35,
+    "haloReach": "about 1/4 of the height"
+   },
+   "fork": {
+    "splitU": 0.4,
+    "childExit": [
+     [
+      1.0,
+      0.2
+     ],
+     [
+      1.0,
+      0.8
+     ]
+    ],
+    "childAtU0.9": [
+     [
+      0.9,
+      0.24
+     ],
+     [
+      0.9,
+      0.76
+     ]
+    ],
+    "childHeading": "dv/du = +-0.4 over u 0.75..1, a world yaw of +-atan(0.4 W / L)",
+    "childWidth": 0.7
+   },
+   "tip": {
+    "endU": 0.85,
+    "end": "hairline with a mirrored capillary splay"
+   },
+   "burst": {
+    "nodeRadius": 0.12,
+    "rays": 8,
+    "rayAngles": "about 0, +-42, +-94, +-140, 180 degrees from +u",
+    "rayEndRadius": 0.47
+   }
+  }
+ },
+ "gatesAndLineage": "magic-veins.json",
+ "passed": true,
+ "files": {
+  "weave": {
+   "d": {
+    "file": "mnbl_magic_weave_d.png",
+    "sha256": "16b8007b2f1e6410102efbfbe470549e635339c56760d007567fc5d990ea6f29",
+    "mode": "RGBA",
+    "size": [
+     2048,
+     2048
+    ]
+   },
+   "n": {
+    "file": "mnbl_magic_weave_n.png",
+    "sha256": "1f38efe3530767bec9b0125822d849d5458b380eb7107393f4dce83ad26dd410",
+    "mode": "RGB",
+    "size": [
+     2048,
+     2048
+    ]
+   },
+   "s": {
+    "file": "mnbl_magic_weave_s.png",
+    "sha256": "5ab30599f0de1948b77ab87f3f2bf69fbcca0a0be1a4c8013f0d89f4e71b398e",
+    "mode": "RGB",
+    "size": [
+     2048,
+     2048
+    ]
+   }
+  },
+  "umbral": {
+   "d": {
+    "file": "mnbl_magic_umbral_d.png",
+    "sha256": "9fed78cb15b3b4ccd5cb2ac66f1bfb56f183144608db10d5226b6c3ddea819f4",
+    "mode": "RGBA",
+    "size": [
+     2048,
+     2048
+    ]
+   },
+   "n": {
+    "file": "mnbl_magic_umbral_n.png",
+    "sha256": "ccaa53cfcb4d71f5b60df8de591f7947904622e8b7f33c2a7e906f1adef81f0f",
+    "mode": "RGB",
+    "size": [
+     2048,
+     2048
+    ]
+   },
+   "s": {
+    "file": "mnbl_magic_umbral_s.png",
+    "sha256": "f76d8debe485de6c7e3abff574bfa490e0f3c5bf86d86ea034afca29bc0849c6",
+    "mode": "RGB",
+    "size": [
+     2048,
+     2048
+    ]
+   }
+  },
+  "infernal": {
+   "d": {
+    "file": "mnbl_magic_infernal_d.png",
+    "sha256": "b62b3dd60f1f18188d014b999d3fe40c83117045bc55a929de966e709c4fca72",
+    "mode": "RGBA",
+    "size": [
+     2048,
+     2048
+    ]
+   },
+   "n": {
+    "file": "mnbl_magic_infernal_n.png",
+    "sha256": "3e76f05ba0b68c9d4ba966b2345221b69747ab39093443aca9bdf7d800016438",
+    "mode": "RGB",
+    "size": [
+     2048,
+     2048
+    ]
+   },
+   "s": {
+    "file": "mnbl_magic_infernal_s.png",
+    "sha256": "7084f5068cd3ae69f7c5e6b4bb0ca5b11db8ca51461b5254baab708f7929833b",
+    "mode": "RGB",
+    "size": [
+     2048,
+     2048
+    ]
+   }
+  },
+  "radiant": {
+   "d": {
+    "file": "mnbl_magic_radiant_d.png",
+    "sha256": "456b676cc6b83126887a7b101be64f55dc5a2da6b5f08210b0b5dc2f71683676",
+    "mode": "RGBA",
+    "size": [
+     2048,
+     2048
+    ]
+   },
+   "n": {
+    "file": "mnbl_magic_radiant_n.png",
+    "sha256": "37e509695f963e0c20ecb3ed300c4bb517e6df531a0ba6db7268217eb891ffd6",
+    "mode": "RGB",
+    "size": [
+     2048,
+     2048
+    ]
+   },
+   "s": {
+    "file": "mnbl_magic_radiant_s.png",
+    "sha256": "0a7a98796588553a9534a9530cde6ee973a9ae91ed946ac647d0a91c1da0ea73",
+    "mode": "RGB",
+    "size": [
+     2048,
+     2048
+    ]
+   }
+  },
+  "fire": {
+   "d": {
+    "file": "mnbl_magic_fire_d.png",
+    "sha256": "2e28cff89b5c82557df7c3f37ae2610544c0819f8369480356b964ce04687764",
+    "mode": "RGBA",
+    "size": [
+     2048,
+     2048
+    ]
+   },
+   "n": {
+    "file": "mnbl_magic_fire_n.png",
+    "sha256": "b987271abb2bdbfbbc984fb93f1b6425e352d824654798a478249128d8216dd0",
+    "mode": "RGB",
+    "size": [
+     2048,
+     2048
+    ]
+   },
+   "s": {
+    "file": "mnbl_magic_fire_s.png",
+    "sha256": "61ac7afec66b81696440852827317b39bb456e17909e41e0363dc9b871a626b3",
+    "mode": "RGB",
+    "size": [
+     2048,
+     2048
+    ]
+   }
+  },
+  "water": {
+   "d": {
+    "file": "mnbl_magic_water_d.png",
+    "sha256": "cfb5c7839cf0bd35b4812bd9604fb5c7321a7d03a44a55311b3ba23b3b45fb30",
+    "mode": "RGBA",
+    "size": [
+     2048,
+     2048
+    ]
+   },
+   "n": {
+    "file": "mnbl_magic_water_n.png",
+    "sha256": "c85c754c467e56ce2786c9cd4a058f6a694e73cb36055cf14a549b5319c684e2",
+    "mode": "RGB",
+    "size": [
+     2048,
+     2048
+    ]
+   },
+   "s": {
+    "file": "mnbl_magic_water_s.png",
+    "sha256": "e3aba59c0d7e08559b8001b570a89ab5c5973e6e33c097d548fc363cd42f727c",
+    "mode": "RGB",
+    "size": [
+     2048,
+     2048
+    ]
+   }
+  },
+  "earth": {
+   "d": {
+    "file": "mnbl_magic_earth_d.png",
+    "sha256": "957d35a45c053634c133c8c30075e6bdb51e0386dc3114091c9f5322a3efecde",
+    "mode": "RGBA",
+    "size": [
+     2048,
+     2048
+    ]
+   },
+   "n": {
+    "file": "mnbl_magic_earth_n.png",
+    "sha256": "408725fda8bd72f3e5ae675fe915d8f4f3f0f9ab9a57f244dfdaa6da4645352e",
+    "mode": "RGB",
+    "size": [
+     2048,
+     2048
+    ]
+   },
+   "s": {
+    "file": "mnbl_magic_earth_s.png",
+    "sha256": "f3c1ab9ae444be161c04be3b8cb02663b8998472fac216e2a2216a9e0ad82f4c",
+    "mode": "RGB",
+    "size": [
+     2048,
+     2048
+    ]
+   }
+  },
+  "air": {
+   "d": {
+    "file": "mnbl_magic_air_d.png",
+    "sha256": "a26de2b85b13d2aa905dd454e78e0dac50795a4585b2df4fbc4edd2b3d09d4a6",
+    "mode": "RGBA",
+    "size": [
+     2048,
+     2048
+    ]
+   },
+   "n": {
+    "file": "mnbl_magic_air_n.png",
+    "sha256": "ab834ca82b01f9a58c7d7db056931c4aec91d3d61bfd9e764a2ee57175c8e6e9",
+    "mode": "RGB",
+    "size": [
+     2048,
+     2048
+    ]
+   },
+   "s": {
+    "file": "mnbl_magic_air_s.png",
+    "sha256": "736277ff8cfdd5dee72c9ffa6b85b5e07c0f73267d2fd1307809484632c6a651",
+    "mode": "RGB",
+    "size": [
+     2048,
+     2048
+    ]
+   }
+  }
+ },
+ "inputs": {
+  "ground_grass_b_d": {
+   "pack": "Native/EmAssetPackages/terrain_textures/grass/ground_grass_b/ground_grass_b.tpac",
+   "source": "$BASE/Modules/Native/AssetSources/terrain_textures/grass/ground_grass_b/ground_grass_b_d.psd",
+   "format": "DXT1",
+   "size": [
+    2048,
+    2048
+   ],
+   "flags": [
+    "for_terrain"
+   ],
+   "decodedPngSha256": "a410f4d2a04a73033f0a4340723fe07f1f7a74bc83125bc54ee68a49aa3a10da"
+  },
+  "ground_grass_b_n": {
+   "pack": "Native/EmAssetPackages/terrain_textures/grass/ground_grass_b/ground_grass_b.tpac",
+   "source": "$BASE/Modules/Native/AssetSources/terrain_textures/grass/ground_grass_b/ground_grass_b_n.psd",
+   "format": "BC5",
+   "size": [
+    2048,
+    2048
+   ],
+   "flags": [
+    "for_terrain"
+   ],
+   "decodedPngSha256": "931a4ddb41035e2993e7b16dbdceaef727df07fb762ad7c9b82a9c937f980b2a"
+  },
+  "ground_grass_b_s": {
+   "pack": "Native/EmAssetPackages/terrain_textures/grass/ground_grass_b/ground_grass_b.tpac",
+   "source": "$BASE/Modules/Native/AssetSources/terrain_textures/grass/ground_grass_b/ground_grass_b_s.psd",
+   "format": "DXT1",
+   "size": [
+    2048,
+    2048
+   ],
+   "flags": [
+    "for_terrain",
+    "is_specularmap"
+   ],
+   "decodedPngSha256": "33d27f8a378aada90af49146faed3f318d166eb15f42da0eb2abc25d2b691b59"
+  },
+  "ground_grass_b_h": {
+   "pack": "Native/EmAssetPackages/terrain_textures/grass/ground_grass_b/ground_grass_b.tpac",
+   "source": "$BASE/Modules/Native/AssetSources/terrain_textures/grass/ground_grass_b/ground_grass_b_h.psd",
+   "format": "BC4",
+   "size": [
+    2048,
+    2048
+   ],
+   "flags": [
+    "for_terrain"
+   ],
+   "decodedPngSha256": "ae39ce1d728c1485f8d3bdb36d080bcd31584c1c2369dcbf372fdd09e0827b10"
+  },
+  "ground_drygrass_a_d": {
+   "pack": "Native/EmAssetPackages/terrain_textures/grass/ground_drygrass_a/ground_drygrass_a.tpac",
+   "source": "$BASE/Modules/Native/AssetSources/terrain_textures/grass/ground_drygrass_a/ground_drygrass_a_d.psd",
+   "format": "DXT1",
+   "size": [
+    2048,
+    2048
+   ],
+   "flags": [
+    "for_terrain"
+   ],
+   "decodedPngSha256": "d1dde3e53fc24e6e90058566beedce9c344db620e5b2f5cb123c6ebf0aaedb58"
+  },
+  "ground_drygrass_a_n": {
+   "pack": "Native/EmAssetPackages/terrain_textures/grass/ground_drygrass_a/ground_drygrass_a.tpac",
+   "source": "$BASE/Modules/Native/AssetSources/terrain_textures/grass/ground_drygrass_a/ground_drygrass_a_n.psd",
+   "format": "BC5",
+   "size": [
+    2048,
+    2048
+   ],
+   "flags": [
+    "for_terrain"
+   ],
+   "decodedPngSha256": "e8eed55a9a36607742c076e79b3f95865a6cb7633e7c71ef93328c767f65c504"
+  },
+  "ground_drygrass_a_s": {
+   "pack": "Native/EmAssetPackages/terrain_textures/grass/ground_drygrass_a/ground_drygrass_a.tpac",
+   "source": "$BASE/Modules/Native/AssetSources/terrain_textures/grass/ground_drygrass_a/ground_drygrass_a_s.psd",
+   "format": "DXT1",
+   "size": [
+    2048,
+    2048
+   ],
+   "flags": [
+    "for_terrain",
+    "is_specularmap"
+   ],
+   "decodedPngSha256": "6b2323d903a2385168c52be5faa3572300b98ef076b7f8b13773cae811141324"
+  },
+  "ground_drygrass_a_h": {
+   "pack": "Native/EmAssetPackages/terrain_textures/grass/ground_drygrass_a/ground_drygrass_a.tpac",
+   "source": "$BASE/Modules/Native/AssetSources/terrain_textures/grass/ground_drygrass_a/ground_drygrass_a_h.psd",
+   "format": "BC4",
+   "size": [
+    2048,
+    2048
+   ],
+   "flags": [
+    "for_terrain"
+   ],
+   "decodedPngSha256": "3456bd2831ac0be85042a5fcd054bab638e130d0eacced3aa3a44245c73883a5"
+  },
+  "ground_drygrass_b_d": {
+   "pack": "Native/EmAssetPackages/terrain_textures/grass/ground_drygrass_b/ground_drygrass_b.tpac",
+   "source": "$BASE/Modules/Native/AssetSources/terrain_textures/grass/ground_drygrass_b/ground_drygrass_b_d.psd",
+   "format": "DXT1",
+   "size": [
+    2048,
+    2048
+   ],
+   "flags": [
+    "for_terrain"
+   ],
+   "decodedPngSha256": "f36f63243862dc18f08bfb20dc0f375a5d9002e7ef480cdb61437e521c7486af"
+  },
+  "ground_drygrass_b_n": {
+   "pack": "Native/EmAssetPackages/terrain_textures/grass/ground_drygrass_b/ground_drygrass_b.tpac",
+   "source": "$BASE/Modules/Native/AssetSources/terrain_textures/grass/ground_drygrass_b/ground_drygrass_b_n.psd",
+   "format": "BC5",
+   "size": [
+    2048,
+    2048
+   ],
+   "flags": [
+    "for_terrain"
+   ],
+   "decodedPngSha256": "d83a33b95e7289a0e6173db62a799f3daebd0238a25a6f758b0e358455d75d6b"
+  },
+  "ground_drygrass_b_s": {
+   "pack": "Native/EmAssetPackages/terrain_textures/grass/ground_drygrass_b/ground_drygrass_b.tpac",
+   "source": "$BASE/Modules/Native/AssetSources/terrain_textures/grass/ground_drygrass_b/ground_drygrass_b_s.psd",
+   "format": "DXT1",
+   "size": [
+    2048,
+    2048
+   ],
+   "flags": [
+    "for_terrain",
+    "is_specularmap"
+   ],
+   "decodedPngSha256": "15c890d46aa78cefff2fa244c915787172eabca9f940ecb139f8ea9c85a0fe82"
+  },
+  "ground_drygrass_b_h": {
+   "pack": "Native/EmAssetPackages/terrain_textures/grass/ground_drygrass_b/ground_drygrass_b.tpac",
+   "source": "$BASE/Modules/Native/AssetSources/terrain_textures/grass/ground_drygrass_b/ground_drygrass_b_h.psd",
+   "format": "BC4",
+   "size": [
+    2048,
+    2048
+   ],
+   "flags": [
+    "for_terrain"
+   ],
+   "decodedPngSha256": "8140197aa702114517a405489aeaf346a62e7ff9a13f7c4c2d415bb2ef94f3f1"
+  },
+  "ground_nord_grass_a_d": {
+   "pack": "NavalDLC/EmAssetPackages/nord_terrain_textures/ground_nord_grass_a/ground_nord_grass_a.tpac",
+   "source": "$BASE/Modules/NavalDLC/AssetSources/nord_terrain_textures/ground_nord_grass_a/ground_nord_grass_a_d.png",
+   "format": "DXT1",
+   "size": [
+    4096,
+    4096
+   ],
+   "flags": [
+    "for_terrain"
+   ],
+   "decodedPngSha256": "976a814ba2979539cf51e31506955d962e2182b3a9156bfdc38b1f0c0e9456e9"
+  },
+  "ground_nord_grass_a_n": {
+   "pack": "NavalDLC/EmAssetPackages/nord_terrain_textures/ground_nord_grass_a/ground_nord_grass_a.tpac",
+   "source": "$BASE/Modules/NavalDLC/AssetSources/nord_terrain_textures/ground_nord_grass_a/ground_nord_grass_a_n.png",
+   "format": "BC5",
+   "size": [
+    4096,
+    4096
+   ],
+   "flags": [
+    "for_terrain"
+   ],
+   "decodedPngSha256": "440869e460f59684c8ec7dd1099089084671a87cddae83a06699e8a8050300e1"
+  },
+  "ground_nord_grass_a_s": {
+   "pack": "NavalDLC/EmAssetPackages/nord_terrain_textures/ground_nord_grass_a/ground_nord_grass_a.tpac",
+   "source": "$BASE/Modules/NavalDLC/AssetSources/nord_terrain_textures/ground_nord_grass_a/ground_nord_grass_a_s.png",
+   "format": "DXT1",
+   "size": [
+    4096,
+    4096
+   ],
+   "flags": [
+    "for_terrain",
+    "is_specularmap"
+   ],
+   "decodedPngSha256": "ca4ea66a9bbf86ba4fd83a9f64b5c41c6f5892861feaa48a3567e98a67ec1439"
+  },
+  "ground_nord_grass_a_h": {
+   "pack": "NavalDLC/EmAssetPackages/nord_terrain_textures/ground_nord_grass_a/ground_nord_grass_a.tpac",
+   "source": "$BASE/Modules/NavalDLC/AssetSources/nord_terrain_textures/ground_nord_grass_a/ground_nord_grass_a_h.png",
+   "format": "BC4",
+   "size": [
+    2048,
+    2048
+   ],
+   "flags": [
+    "for_terrain"
+   ],
+   "decodedPngSha256": "299e05cd9e61436ba628b132a16dfd52764f39ac23fe37f3d4f643e7dcd06830"
+  },
+  "ground_forest_b_d": {
+   "pack": "Native/EmAssetPackages/terrain_textures/grass/ground_forest_b/ground_forest_b.tpac",
+   "source": "$BASE/Modules/Native/AssetSources/terrain_textures/grass/ground_forest_b/ground_forest_b_d.psd",
+   "format": "DXT1",
+   "size": [
+    2048,
+    2048
+   ],
+   "flags": [
+    "for_terrain"
+   ],
+   "decodedPngSha256": "f7e2b95581939c88649636b3a2e560ffdab59a38278e321b0e5dca0f5f4bbe4e"
+  },
+  "ground_forest_b_n": {
+   "pack": "Native/EmAssetPackages/terrain_textures/grass/ground_forest_b/ground_forest_b.tpac",
+   "source": "$BASE/Modules/Native/AssetSources/terrain_textures/grass/ground_forest_b/ground_forest_b_n.psd",
+   "format": "BC5",
+   "size": [
+    2048,
+    2048
+   ],
+   "flags": [
+    "for_terrain"
+   ],
+   "decodedPngSha256": "fc8c8be27cb6640719cf26ee954209eb381cdc84ddbd5981e28d31d9aad6e6c2"
+  },
+  "ground_forest_b_s": {
+   "pack": "Native/EmAssetPackages/terrain_textures/grass/ground_forest_b/ground_forest_b.tpac",
+   "source": "$BASE/Modules/Native/AssetSources/terrain_textures/grass/ground_forest_b/ground_forest_b_s.psd",
+   "format": "DXT1",
+   "size": [
+    2048,
+    2048
+   ],
+   "flags": [
+    "for_terrain",
+    "is_specularmap"
+   ],
+   "decodedPngSha256": "90f988c5887bdf85ebe7358703f7aaf557c222487ec7f44d2224a5de65d750ad"
+  },
+  "ground_forest_b_h": {
+   "pack": "Native/EmAssetPackages/terrain_textures/grass/ground_forest_b/ground_forest_b.tpac",
+   "source": "$BASE/Modules/Native/AssetSources/terrain_textures/grass/ground_forest_b/ground_forest_b_h.psd",
+   "format": "BC4",
+   "size": [
+    1024,
+    1024
+   ],
+   "flags": [
+    "for_terrain"
+   ],
+   "decodedPngSha256": "d7304a2731426e0d0f5ceb8399fcae6cfe731bdd137e49aad27680ee40e86cd2"
+  },
+  "forest_a_d": {
+   "pack": "Native/EmAssetPackages/terrain_textures/grass/forest_a/forest_a.tpac",
+   "source": "$BASE/Modules/Native/AssetSources/terrain_textures/grass/forest_a/forest_a_d.psd",
+   "format": "DXT1",
+   "size": [
+    2048,
+    2048
+   ],
+   "flags": [
+    "for_terrain"
+   ],
+   "decodedPngSha256": "546ba000c6337be7f0fb4f1fd667bfebd5f5ef0484acdfa5baa94839ed764193"
+  },
+  "forest_a_n": {
+   "pack": "Native/EmAssetPackages/terrain_textures/grass/forest_a/forest_a.tpac",
+   "source": "$BASE/Modules/Native/AssetSources/terrain_textures/grass/forest_a/forest_a_n.psd",
+   "format": "BC5",
+   "size": [
+    2048,
+    2048
+   ],
+   "flags": [
+    "for_terrain"
+   ],
+   "decodedPngSha256": "ddaed4bbaf36f3ce941117e62dec4ed686c2203581c4ea62282bf4d3eeb67c54"
+  },
+  "forest_a_s": {
+   "pack": "Native/EmAssetPackages/terrain_textures/grass/forest_a/forest_a.tpac",
+   "source": "$BASE/Modules/Native/AssetSources/terrain_textures/grass/forest_a/forest_a_s.psd",
+   "format": "DXT1",
+   "size": [
+    2048,
+    2048
+   ],
+   "flags": [
+    "for_terrain",
+    "is_specularmap"
+   ],
+   "decodedPngSha256": "799b9334e63bab897410c845467322754bdd591a3bbf78a6ddce43b82b3462c9"
+  },
+  "forest_a_h": {
+   "pack": "Native/EmAssetPackages/terrain_textures/grass/forest_a/forest_a.tpac",
+   "source": "$BASE/Modules/Native/AssetSources/terrain_textures/grass/forest_a/forest_a_h.psd",
+   "format": "BC4",
+   "size": [
+    2048,
+    2048
+   ],
+   "flags": [
+    "for_terrain"
+   ],
+   "decodedPngSha256": "138a3e2c352be9febf80c01430c504650228eabd6779de3d34e0b37686783ecd"
+  },
+  "desert_floor_a": {
+   "pack": "Native/EmAssetPackages/terrain_textures/desert/desert_floor_a/desert_floor_a.tpac",
+   "source": "$BASE/Modules/Native/AssetSources/terrain_textures/desert/desert_floor_a/desert_floor_a.psd",
+   "format": "DXT1",
+   "size": [
+    2048,
+    2048
+   ],
+   "flags": [
+    "for_terrain"
+   ],
+   "decodedPngSha256": "77654221b2543973e5b40127628fb948f6051fcd675c7b7cbb5317e94a4ebe10"
+  },
+  "desert_floor_a_n": {
+   "pack": "Native/EmAssetPackages/terrain_textures/desert/desert_floor_a/desert_floor_a.tpac",
+   "source": "$BASE/Modules/Native/AssetSources/terrain_textures/desert/desert_floor_a/desert_floor_a_n.psd",
+   "format": "BC5",
+   "size": [
+    2048,
+    2048
+   ],
+   "flags": [
+    "for_terrain"
+   ],
+   "decodedPngSha256": "a8ab74b95bd42a27e3741b16cb3406be604863cd1f87e2ee72da11a9664b6120"
+  },
+  "desert_floor_a_s": {
+   "pack": "Native/EmAssetPackages/terrain_textures/desert/desert_floor_a/desert_floor_a.tpac",
+   "source": "$BASE/Modules/Native/AssetSources/terrain_textures/desert/desert_floor_a/desert_floor_a_s.psd",
+   "format": "DXT1",
+   "size": [
+    512,
+    512
+   ],
+   "flags": [
+    "for_terrain",
+    "is_specularmap"
+   ],
+   "decodedPngSha256": "ac2c2711e277e6a7992e1843f69b83ce31aa81c6be804327fe94c5059138fee4"
+  },
+  "desert_floor_a_h": {
+   "pack": "Native/EmAssetPackages/terrain_textures/desert/desert_floor_a/desert_floor_a.tpac",
+   "source": "$BASE/Modules/Native/AssetSources/terrain_textures/desert/desert_floor_a/desert_floor_a_h.psd",
+   "format": "BC4",
+   "size": [
+    512,
+    512
+   ],
+   "flags": [
+    "for_terrain"
+   ],
+   "decodedPngSha256": "3f00d65b542402efa4b17589934f5506fd44d66a3e93644b5c75c2d1c3bc965f"
+  },
+  "desert_floor_c_d": {
+   "pack": "Native/EmAssetPackages/terrain_textures/desert/desert_floor_c/desert_floor_c.tpac",
+   "source": "$BASE/Modules/Native/AssetSources/terrain_textures/desert/desert_floor_c/desert_floor_c_d.psd",
+   "format": "DXT1",
+   "size": [
+    2048,
+    2048
+   ],
+   "flags": [
+    "for_terrain"
+   ],
+   "decodedPngSha256": "49babb8e15f8cfd94a32c3b68f9cafcf193f9a9e79a2765fe26ec191c8534f86"
+  },
+  "desert_floor_c_n": {
+   "pack": "Native/EmAssetPackages/terrain_textures/desert/desert_floor_c/desert_floor_c.tpac",
+   "source": "$BASE/Modules/Native/AssetSources/terrain_textures/desert/desert_floor_c/desert_floor_c_n.psd",
+   "format": "BC5",
+   "size": [
+    2048,
+    2048
+   ],
+   "flags": [
+    "for_terrain"
+   ],
+   "decodedPngSha256": "4de7a089cf3aa26625907a75f1f538da801e9e99440aad3c79f044959558d51f"
+  },
+  "desert_floor_c_s": {
+   "pack": "Native/EmAssetPackages/terrain_textures/desert/desert_floor_c/desert_floor_c.tpac",
+   "source": "$BASE/Modules/Native/AssetSources/terrain_textures/desert/desert_floor_c/desert_floor_c_s.psd",
+   "format": "DXT1",
+   "size": [
+    2048,
+    2048
+   ],
+   "flags": [
+    "for_terrain",
+    "is_specularmap"
+   ],
+   "decodedPngSha256": "4477c804fbfdeadec99f93b4f7e999d87df3513c2797f5448c4365d577dc26ca"
+  },
+  "desert_floor_c_h": {
+   "pack": "Native/EmAssetPackages/terrain_textures/desert/desert_floor_c/desert_floor_c.tpac",
+   "source": "$BASE/Modules/Native/AssetSources/terrain_textures/desert/desert_floor_c/desert_floor_c_h.psd",
+   "format": "BC4",
+   "size": [
+    2048,
+    2048
+   ],
+   "flags": [
+    "for_terrain"
+   ],
+   "decodedPngSha256": "1d3d1ef1da35a15d32aeba2ab322fc555e68cf44ba6a45f48671554b341de98b"
+  },
+  "ground_mud_b_d": {
+   "pack": "Native/EmAssetPackages/terrain_textures/mud/ground_mud_b/ground_mud_b.tpac",
+   "source": "$BASE/Modules/Native/AssetSources/terrain_textures/mud/ground_mud_b/ground_mud_b_d.psd",
+   "format": "DXT1",
+   "size": [
+    2048,
+    2048
+   ],
+   "flags": [
+    "for_terrain"
+   ],
+   "decodedPngSha256": "eb64240a67a61d043dd0761bd9d99c943baa63d55fe184ec54ff1167e770153d"
+  },
+  "ground_mud_b_n": {
+   "pack": "Native/EmAssetPackages/terrain_textures/mud/ground_mud_b/ground_mud_b.tpac",
+   "source": "$BASE/Modules/Native/AssetSources/terrain_textures/mud/ground_mud_b/ground_mud_b_n.psd",
+   "format": "BC5",
+   "size": [
+    2048,
+    2048
+   ],
+   "flags": [
+    "for_terrain"
+   ],
+   "decodedPngSha256": "f87040292d28eeb7b64cb394db63197202d520a6ca74283796e098b32ab1dd51"
+  },
+  "ground_mud_b_s": {
+   "pack": "Native/EmAssetPackages/terrain_textures/mud/ground_mud_b/ground_mud_b.tpac",
+   "source": "$BASE/Modules/Native/AssetSources/terrain_textures/mud/ground_mud_b/ground_mud_b_s.psd",
+   "format": "DXT1",
+   "size": [
+    2048,
+    2048
+   ],
+   "flags": [
+    "for_terrain",
+    "is_specularmap"
+   ],
+   "decodedPngSha256": "8c6518cce906bcde0eefec927ac1c4c88b671b615f3c78d536d0bd1ccbe4ebc4"
+  },
+  "ground_mud_b_h": {
+   "pack": "Native/EmAssetPackages/terrain_textures/mud/ground_mud_b/ground_mud_b.tpac",
+   "source": "$BASE/Modules/Native/AssetSources/terrain_textures/mud/ground_mud_b/ground_mud_b_h.psd",
+   "format": "BC4",
+   "size": [
+    1024,
+    1024
+   ],
+   "flags": [
+    "for_terrain"
+   ],
+   "decodedPngSha256": "56cce4437461824de0e0da28298b3897d30c57cf8730aec5481ed3559faa19b8"
+  },
+  "ground_beach_a_d": {
+   "pack": "Native/EmAssetPackages/terrain_textures/earth/ground_beach_a/ground_beach_a.tpac",
+   "source": "$BASE/Modules/Native/AssetSources/terrain_textures/earth/ground_beach_a/ground_beach_a_d.psd",
+   "format": "DXT1",
+   "size": [
+    2048,
+    2048
+   ],
+   "flags": [
+    "for_terrain"
+   ],
+   "decodedPngSha256": "b6305ade7179652bd415c95211261a7b1aa829a1ec5a1782d248614ce72ff7c4"
+  },
+  "ground_beach_a_n": {
+   "pack": "Native/EmAssetPackages/terrain_textures/earth/ground_beach_a/ground_beach_a.tpac",
+   "source": "$BASE/Modules/Native/AssetSources/terrain_textures/earth/ground_beach_a/ground_beach_a_n.psd",
+   "format": "BC5",
+   "size": [
+    2048,
+    2048
+   ],
+   "flags": [
+    "for_terrain"
+   ],
+   "decodedPngSha256": "d4d67f7f07e2862592b5b3e50d5c397a53c8345888faef346515b2f07eae1e15"
+  },
+  "ground_beach_a_h": {
+   "pack": "Native/EmAssetPackages/terrain_textures/earth/ground_beach_a/ground_beach_a.tpac",
+   "source": "$BASE/Modules/Native/AssetSources/terrain_textures/earth/ground_beach_a/ground_beach_a_h.png",
+   "format": "BC4",
+   "size": [
+    512,
+    512
+   ],
+   "flags": [
+    "for_terrain"
+   ],
+   "decodedPngSha256": "65e3edeffad4c5d5bc8ead8410cab287caed6bc327236cf15cc948651bf8dfb3"
+  },
+  "ground_pebbles_a_d": {
+   "pack": "Native/EmAssetPackages/terrain_textures/earth/ground_pebbles_a/ground_pebbles_a.tpac",
+   "source": "$BASE/Modules/Native/AssetSources/terrain_textures/earth/ground_pebbles_a/ground_pebbles_a_d.psd",
+   "format": "DXT1",
+   "size": [
+    2048,
+    2048
+   ],
+   "flags": [
+    "for_terrain"
+   ],
+   "decodedPngSha256": "5458487bb58b1bebdff30cbb8e4e655e82863cebbfd79f829f1d484f73f4cc41"
+  },
+  "ground_pebbles_a_n": {
+   "pack": "Native/EmAssetPackages/terrain_textures/earth/ground_pebbles_a/ground_pebbles_a.tpac",
+   "source": "$BASE/Modules/Native/AssetSources/terrain_textures/earth/ground_pebbles_a/ground_pebbles_a_n.psd",
+   "format": "BC5",
+   "size": [
+    2048,
+    2048
+   ],
+   "flags": [
+    "for_terrain"
+   ],
+   "decodedPngSha256": "b2e33f5c7b1f61f4b48318940b1a299db5cb7d1df8fb761e82bc27e21daac129"
+  },
+  "ground_pebbles_a_s": {
+   "pack": "Native/EmAssetPackages/terrain_textures/earth/ground_pebbles_a/ground_pebbles_a.tpac",
+   "source": "$BASE/Modules/Native/AssetSources/terrain_textures/earth/ground_pebbles_a/ground_pebbles_a_s.psd",
+   "format": "DXT1",
+   "size": [
+    512,
+    512
+   ],
+   "flags": [
+    "for_terrain",
+    "is_specularmap"
+   ],
+   "decodedPngSha256": "3006206b283c6b4377d946f9f1cc4ff821ee4875c512f93c35703e7efbe4c1f6"
+  },
+  "ground_pebbles_a_h": {
+   "pack": "Native/EmAssetPackages/terrain_textures/earth/ground_pebbles_a/ground_pebbles_a.tpac",
+   "source": "$BASE/Modules/Native/AssetSources/terrain_textures/earth/ground_pebbles_a/ground_pebbles_a_h.psd",
+   "format": "BC4",
+   "size": [
+    1024,
+    1024
+   ],
+   "flags": [
+    "for_terrain"
+   ],
+   "decodedPngSha256": "13c45203a130c5fd1e2302cdc550eaac8229d4ec54566bd92f2824ec95d79256"
+  },
+  "rock_k_d": {
+   "pack": "Native/EmAssetPackages/terrain_textures/rock/rock_k/rock_k.tpac",
+   "source": "$BASE/Modules/Native/AssetSources/terrain_textures/rock/rock_k/rock_k_d.psd",
+   "format": "BC7",
+   "size": [
+    2048,
+    2048
+   ],
+   "flags": [
+    "for_terrain",
+    "has_alpha"
+   ],
+   "decodedPngSha256": "cf9d6843dc0c02fc2a68d3ae6aa4e4d6cab0687d33e3acb9832eb9412036386e"
+  },
+  "rock_k_n": {
+   "pack": "Native/EmAssetPackages/terrain_textures/rock/rock_k/rock_k.tpac",
+   "source": "$BASE/Modules/Native/AssetSources/terrain_textures/rock/rock_k/rock_k_n.psd",
+   "format": "BC5",
+   "size": [
+    2048,
+    2048
+   ],
+   "flags": [
+    "for_terrain"
+   ],
+   "decodedPngSha256": "d471a0b455922e981030a482dee0471be16bdd19c726a7bdb5d1f72b0f9a9ea8"
+  },
+  "rock_k_s": {
+   "pack": "Native/EmAssetPackages/terrain_textures/rock/rock_k/rock_k.tpac",
+   "source": "$BASE/Modules/Native/AssetSources/terrain_textures/rock/rock_k/rock_k_s.psd",
+   "format": "DXT1",
+   "size": [
+    2048,
+    2048
+   ],
+   "flags": [
+    "for_terrain"
+   ],
+   "decodedPngSha256": "7762c07ec991425d8da43bbba28c2aeac26a66e564e9661b12ec6a8ab3d3b1e3"
+  },
+  "cliff_b_d": {
+   "pack": "Native/EmAssetPackages/terrain_textures/rock/cliff_b/cliff_b.tpac",
+   "source": "$BASE/Modules/Native/AssetSources/terrain_textures/rock/cliff_b/cliff_b_d.psd",
+   "format": "DXT1",
+   "size": [
+    2048,
+    2048
+   ],
+   "flags": [
+    "for_terrain"
+   ],
+   "decodedPngSha256": "7fbb8c004398d171f53df1c83920ded44ee28ff749bdb1c5b4d26bda74414d26"
+  },
+  "cliff_b_n": {
+   "pack": "Native/EmAssetPackages/terrain_textures/rock/cliff_b/cliff_b.tpac",
+   "source": "$BASE/Modules/Native/AssetSources/terrain_textures/rock/cliff_b/cliff_b_n.psd",
+   "format": "BC5",
+   "size": [
+    2048,
+    2048
+   ],
+   "flags": [
+    "for_terrain"
+   ],
+   "decodedPngSha256": "9fe80c57dfd3230654bab61465a480ca87cf5bbe45447097c60cd6862f478eb4"
+  },
+  "cliff_b_s": {
+   "pack": "Native/EmAssetPackages/terrain_textures/rock/cliff_b/cliff_b.tpac",
+   "source": "$BASE/Modules/Native/AssetSources/terrain_textures/rock/cliff_b/cliff_b_s.psd",
+   "format": "DXT1",
+   "size": [
+    2048,
+    2048
+   ],
+   "flags": [
+    "for_terrain",
+    "is_specularmap"
+   ],
+   "decodedPngSha256": "8177743ac8ff71e27ada0b4530974cfeac80ae40bbb18b6ad3c898f08550c6a5"
+  },
+  "cliff_b_h": {
+   "pack": "Native/EmAssetPackages/terrain_textures/rock/cliff_b/cliff_b.tpac",
+   "source": "$BASE/Modules/Native/AssetSources/terrain_textures/rock/cliff_b/cliff_b_h.psd",
+   "format": "BC4",
+   "size": [
+    512,
+    512
+   ],
+   "flags": [
+    "for_terrain"
+   ],
+   "decodedPngSha256": "11fc746a6097f85a293ad1c1ada6bc4743d827028dfc76ada2a9220b497ccf22"
+  },
+  "stone_desert_a_d": {
+   "pack": "Native/EmAssetPackages/aserai_castle/aserai_castle.tpac",
+   "source": "$BASE/Modules/Native/AssetSources/aserai_castle/stone_desert_a_d.psd",
+   "format": "DXT1",
+   "size": [
+    2048,
+    2048
+   ],
+   "flags": [
+    "for_terrain"
+   ],
+   "decodedPngSha256": "889bfffb4d98d4890e73f1667b3be3a5d3f08382710a4debd194e39e1f3bb39f"
+  },
+  "stone_desert_a_n": {
+   "pack": "Native/EmAssetPackages/aserai_castle/aserai_castle.tpac",
+   "source": "$BASE/Modules/Native/AssetSources/aserai_castle/stone_desert_a_n.psd",
+   "format": "BC5",
+   "size": [
+    2048,
+    2048
+   ],
+   "flags": [
+    "for_terrain"
+   ],
+   "decodedPngSha256": "21e993d6e1b3cbb3abfa6859bd3a05b806efe5fcf8f68448239b6e51155bc91c"
+  },
+  "stone_desert_a_s": {
+   "pack": "Native/EmAssetPackages/aserai_castle/aserai_castle.tpac",
+   "source": "$BASE/Modules/Native/AssetSources/aserai_castle/stone_desert_a_s.psd",
+   "format": "DXT1",
+   "size": [
+    2048,
+    2048
+   ],
+   "flags": [
+    "for_terrain"
+   ],
+   "decodedPngSha256": "3c040bcd14cc2d69635b73c6f80f064a6f60f5ed44479e408cef2835ce0b94fa"
+  },
+  "stone_desert_a_h": {
+   "pack": "Native/EmAssetPackages/aserai_castle/aserai_castle.tpac",
+   "source": "$BASE/Modules/Native/AssetSources/aserai_castle/stone_desert_a_h.psd",
+   "format": "BC4",
+   "size": [
+    512,
+    512
+   ],
+   "flags": [
+    "for_terrain"
+   ],
+   "decodedPngSha256": "1f4a187d957ce0f4e387a0af0acc70c7f50a799ba22c984ec066ffee9546a3af"
+  },
+  "snow_a_d": {
+   "pack": "Native/EmAssetPackages/core/core.tpac",
+   "source": "$BASE/Modules/Native/AssetSources/Core/snow_a_d.psd",
+   "format": "DXT1",
+   "size": [
+    2048,
+    2048
+   ],
+   "flags": [
+    "for_terrain"
+   ],
+   "decodedPngSha256": "80bf36d5e588f9f7b0f5acd616677f99b726a671cbbd7825dd1e380089a13d03"
+  },
+  "snow_a_n": {
+   "pack": "Native/EmAssetPackages/core/core.tpac",
+   "source": "$BASE/Modules/Native/AssetSources/Core/snow_a_n.psd",
+   "format": "BC5",
+   "size": [
+    2048,
+    2048
+   ],
+   "flags": [
+    "for_terrain"
+   ],
+   "decodedPngSha256": "2a353d79d266a600266ee59ffcbd226ae1eb0e37b1828f03b17c5eeb861b8878"
+  },
+  "snow_a_s": {
+   "pack": "Native/EmAssetPackages/core/core.tpac",
+   "source": "$BASE/Modules/Native/AssetSources/Core/snow_a_s.psd",
+   "format": "DXT1",
+   "size": [
+    2048,
+    2048
+   ],
+   "flags": [
+    "for_terrain",
+    "is_specularmap"
+   ],
+   "decodedPngSha256": "10c53805ce3c3f2cfc938307a4051caefc0de404af7225c494474479c9dc947b"
+  },
+  "snow_a_h": {
+   "pack": "Native/EmAssetPackages/core/core.tpac",
+   "source": "$BASE/Modules/Native/AssetSources/Core/snow_a_h.psd",
+   "format": "BC4",
+   "size": [
+    2048,
+    2048
+   ],
+   "flags": [
+    "for_terrain"
+   ],
+   "decodedPngSha256": "1b1c17b780ca0aff70e40f4ef5ec9bc99105358b7de191e9d5c889d8de8fdb6c"
+  },
+  "ashes_a_d": {
+   "pack": "Native/EmAssetPackages/terrain_textures/misc/ashes_a/ashes_a.tpac",
+   "source": "$BASE/Modules/Native/AssetSources/terrain_textures/misc/ashes_a/ashes_a_d.psd",
+   "format": "DXT1",
+   "size": [
+    2048,
+    2048
+   ],
+   "flags": [
+    "for_terrain"
+   ],
+   "decodedPngSha256": "8715171cfac210d19ba770c88cab484468af5fc5ee34984184ae050f01f3e06e"
+  },
+  "ashes_a_n": {
+   "pack": "Native/EmAssetPackages/terrain_textures/misc/ashes_a/ashes_a.tpac",
+   "source": "$BASE/Modules/Native/AssetSources/terrain_textures/misc/ashes_a/ashes_a_n.psd",
+   "format": "BC5",
+   "size": [
+    2048,
+    2048
+   ],
+   "flags": [
+    "for_terrain"
+   ],
+   "decodedPngSha256": "e1a9855f3b25f8835cebac2aa15ec920659c7e16419018b17f56f70fa27e3cbc"
+  },
+  "ashes_a_s": {
+   "pack": "Native/EmAssetPackages/terrain_textures/misc/ashes_a/ashes_a.tpac",
+   "source": "$BASE/Modules/Native/AssetSources/terrain_textures/misc/ashes_a/ashes_a_s.psd",
+   "format": "DXT1",
+   "size": [
+    2048,
+    2048
+   ],
+   "flags": [
+    "for_terrain",
+    "is_specularmap"
+   ],
+   "decodedPngSha256": "6ef851be30c615fd475b44f0fff03fb7927929caf589a6059b1c4b5f3f707266"
+  },
+  "ground_soil_a_d": {
+   "pack": "Native/EmAssetPackages/terrain_textures/earth/ground_soil_a/ground_soil_a.tpac",
+   "source": "$BASE/Modules/Native/AssetSources/terrain_textures/earth/ground_soil_a/ground_soil_a_d.psd",
+   "format": "DXT1",
+   "size": [
+    2048,
+    2048
+   ],
+   "flags": [
+    "for_terrain"
+   ],
+   "decodedPngSha256": "2dc1deb04e010ea6de696af950d93030fc8b3c8318090411002bd774c02e48e1"
+  },
+  "ground_soil_a_h": {
+   "pack": "Native/EmAssetPackages/terrain_textures/earth/ground_soil_a/ground_soil_a.tpac",
+   "source": "$BASE/Modules/Native/AssetSources/terrain_textures/earth/ground_soil_a/ground_soil_a_h.psd",
+   "format": "BC4",
+   "size": [
+    1024,
+    1024
+   ],
+   "flags": [
+    "for_terrain"
+   ],
+   "decodedPngSha256": "39352c708fcc26f5d1549e486be79d0e28866258a38a73310dc61210d875fe35"
+  },
+  "ice_a_d": {
+   "pack": "Native/EmAssetPackages/core/core.tpac",
+   "source": "$BASE/Modules/Native/AssetSources/Core/ice_a_d.tif",
+   "format": "BC7",
+   "size": [
+    2048,
+    2048
+   ],
+   "flags": [
+    "for_terrain",
+    "has_alpha"
+   ],
+   "decodedPngSha256": "1cf859fa120caec0a66b5117d49afe372eb897cc8cb9e59af8c4745b4999aed8"
+  },
+  "ice_a_s": {
+   "pack": "Native/EmAssetPackages/core/core.tpac",
+   "source": "$BASE/Modules/Native/AssetSources/Core/ice_a_s.tif",
+   "format": "DXT1",
+   "size": [
+    2048,
+    2048
+   ],
+   "flags": [
+    "for_terrain",
+    "is_specularmap"
+   ],
+   "decodedPngSha256": "2d31e6d40d854f17d71286f48410478ea6fe7906eb3491ea4d7fd5b54ed5fe07"
+  },
+  "ground_grass_stone_a_d": {
+   "pack": "Native/EmAssetPackages/terrain_textures/grass/ground_grass_stone_a/ground_grass_stone_a.tpac",
+   "source": "$BASE/Modules/Native/AssetSources/terrain_textures/grass/ground_grass_stone_a/ground_grass_stone_a_d.psd",
+   "format": "DXT1",
+   "size": [
+    2048,
+    2048
+   ],
+   "flags": [
+    "for_terrain"
+   ],
+   "decodedPngSha256": "3f612ba31ed43516dcc7adec9d43f8612ebdb3d6fd61a3e22617253c1b11e92f"
+  },
+  "mainmap_decal_moss_d": {
+   "pack": "Native/EmAssetPackages/mainmap_decals/mainmap_decals.tpac",
+   "source": "$BASE/Modules/Native/AssetSources/mainmap_decals/mainmap_decal_moss_d.psd",
+   "format": "BC7",
+   "size": [
+    1024,
+    1024
+   ],
+   "flags": [
+    "has_alpha"
+   ],
+   "decodedPngSha256": "5bd90c7c7582269fd0ce878cdc5c91b2a2e6bed8aa22ea3ca1c42f55807781f8"
+  },
+  "decal_b_d": {
+   "pack": "Native/EmAssetPackages/mainmap_decals/mainmap_cracked_mud_a/mainmap_cracked_mud_a.tpac",
+   "source": "$BASE/Modules/Native/AssetSources/mainmap_decals/mainmap_cracked_mud_a/decal_b_d.psd",
+   "format": "DXT5",
+   "size": [
+    2048,
+    2048
+   ],
+   "flags": [
+    "has_alpha"
+   ],
+   "decodedPngSha256": "0e5f446bc603d758b937af6edab1b496c372c381b659eac97677d3b51890ff80"
+  },
+  "decal_b_h": {
+   "pack": "Native/EmAssetPackages/mainmap_decals/mainmap_cracked_mud_a/mainmap_cracked_mud_a.tpac",
+   "source": "$BASE/Modules/Native/AssetSources/mainmap_decals/mainmap_cracked_mud_a/decal_b_h.png",
+   "format": "BC4",
+   "size": [
+    2048,
+    2048
+   ],
+   "flags": [],
+   "decodedPngSha256": "563e6ee6242ad7839b0c173a5d9da04878e79df7c4725e1871b275dce7629e7a"
+  },
+  "ground_pebbles_a_d_mainmap": {
+   "pack": "Native/EmAssetPackages/terrain_textures/earth/ground_pebbles_a/ground_pebbles_a.tpac",
+   "source": "$BASE/Modules/Native/AssetSources/terrain_textures/earth/ground_pebbles_a/ground_pebbles_a_d_mainmap.PSD",
+   "format": "DXT1",
+   "size": [
+    2048,
+    2048
+   ],
+   "flags": [
+    "for_terrain"
+   ],
+   "decodedPngSha256": "70b3664ee0ec16a81839c9618e410a6e66c607a9a348b3892d6a45b4bcaa94aa"
+  },
+  "mainmap_decal_undervillage_d": {
+   "pack": "Native/EmAssetPackages/mainmap_decals/mainmap_decals.tpac",
+   "source": "$BASE/Modules/Native/AssetSources/mainmap_decals/mainmap_decal_undervillage_d.psd",
+   "format": "BC7",
+   "size": [
+    1024,
+    1024
+   ],
+   "flags": [
+    "has_alpha",
+    "dont_resize_in_atlas"
+   ],
+   "decodedPngSha256": "b436d5cff76c4ef722aa84a67e9aa1c313df928c94a5dd2190d6ee3cd565bf90"
+  },
+  "mainmap_decal_undervillage_burnt_d": {
+   "pack": "Native/EmAssetPackages/mainmap_decals/mainmap_decals.tpac",
+   "source": "$BASE/Modules/Native/AssetSources/mainmap_decals/mainmap_decal_undervillage_burnt_d.psd",
+   "format": "BC7",
+   "size": [
+    1024,
+    1024
+   ],
+   "flags": [
+    "has_alpha",
+    "dont_resize_in_atlas"
+   ],
+   "decodedPngSha256": "e326292f21824cacedf7a8253edd4d8f96da66b6401b970c90972347afa8ae65"
+  },
+  "worldmap_swamp_decal_1_d": {
+   "pack": "Native/EmAssetPackages/worldmap_detail_rocks_decals/swamp_decal/swamp_decal.tpac",
+   "source": "$BASE/Modules/Native/AssetSources/worldmap_detail_rocks_decals/swamp_decal/worldmap_swamp_decal_1_d.psd",
+   "format": "DXT5",
+   "size": [
+    2048,
+    2048
+   ],
+   "flags": [
+    "has_alpha"
+   ],
+   "decodedPngSha256": "56a0f79dcb23c34c7c038955fd9930a63affe1ed429024a5cbc83a161e758091"
+  },
+  "ground_soil_a_n": {
+   "pack": "Native/EmAssetPackages/terrain_textures/earth/ground_soil_a/ground_soil_a.tpac",
+   "source": "$BASE/Modules/Native/AssetSources/terrain_textures/earth/ground_soil_a/ground_soil_a_n.psd",
+   "format": "BC5",
+   "size": [
+    2048,
+    2048
+   ],
+   "flags": [
+    "for_terrain"
+   ],
+   "decodedPngSha256": "088ca4bea58636a6927e676b2dd0040ef678aa572eab92090c5a3481935f3ad8"
+  },
+  "ground_soil_a_s": {
+   "pack": "Native/EmAssetPackages/terrain_textures/earth/ground_soil_a/ground_soil_a.tpac",
+   "source": "$BASE/Modules/Native/AssetSources/terrain_textures/earth/ground_soil_a/ground_soil_a_s.psd",
+   "format": "DXT1",
+   "size": [
+    1024,
+    1024
+   ],
+   "flags": [
+    "for_terrain",
+    "is_specularmap"
+   ],
+   "decodedPngSha256": "4dbcfb0e4d7b9672628beec5c4b54ee1897eedc5d37d425d8573387ddf6afd76"
+  },
+  "ice_a_n": {
+   "pack": "Native/EmAssetPackages/core/core.tpac",
+   "source": "$BASE/Modules/Native/AssetSources/Core/ice_a_n.tif",
+   "format": "BC5",
+   "size": [
+    2048,
+    2048
+   ],
+   "flags": [
+    "for_terrain"
+   ],
+   "decodedPngSha256": "b6fab4b3f30bcc5f4308fd8f3b49cb14ed1b237d65a24fb8765726147aa91413"
+  },
+  "ground_grass_stone_a_n": {
+   "pack": "Native/EmAssetPackages/terrain_textures/grass/ground_grass_stone_a/ground_grass_stone_a.tpac",
+   "source": "$BASE/Modules/Native/AssetSources/terrain_textures/grass/ground_grass_stone_a/ground_grass_stone_a_n.psd",
+   "format": "BC5",
+   "size": [
+    2048,
+    2048
+   ],
+   "flags": [
+    "for_terrain"
+   ],
+   "decodedPngSha256": "afc6077efb93802b0fa441130af7fc0f86c903c88fdbd6774d01584393385cdc"
+  },
+  "ground_grass_stone_a_s": {
+   "pack": "Native/EmAssetPackages/terrain_textures/grass/ground_grass_stone_a/ground_grass_stone_a.tpac",
+   "source": "$BASE/Modules/Native/AssetSources/terrain_textures/grass/ground_grass_stone_a/ground_grass_stone_a_s.psd",
+   "format": "DXT1",
+   "size": [
+    2048,
+    2048
+   ],
+   "flags": [
+    "for_terrain",
+    "is_specularmap"
+   ],
+   "decodedPngSha256": "08582337d4369337877587cdbe0dca6601a715f449e5e7f6429a3d9d031c1d3d"
+  }
+ },
+ "hiddenLooks": {
+  "blood": "infernal",
+  "void": "umbral",
+  "rot": "water",
+  "eldritch": "weave"
+ }
+}

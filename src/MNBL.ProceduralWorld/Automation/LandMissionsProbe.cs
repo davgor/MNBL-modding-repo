@@ -41,7 +41,8 @@ namespace MNBL.ProceduralWorld.Automation
     //     spawn and gear checked, the mission ended (Mission.OnEndMissionResult; RetreatMission for the retreat), the return checked;
     //   settlements: a town's center with a notable or merchant conversation and its tavern interior; a castle's courtyard; a village's center;
     //   a siege assault with deployment; a defeat leading to capture and the escape; world B for the classes A lacks; a hideout cleared last.
-    // A case that starts from anything but an idle map is preceded by a reload of the designated save. Diagnostic setup (relocations, wars,
+    // A case that starts from anything but an idle map is preceded by a reload of the designated save (with FreshMapAfterMission, the map
+    // acceptance probe's, also a case that would start on a map where a mission has run since it loaded: MMR-247). Diagnostic setup (relocations, wars,
     // troops, the castle given to the player, the siege camp's preparation advanced, the troop selection answered) is recorded with each case.
     // Every expectation is recomputed by tools/summarize_land_missions.py from the outputs; that summary is the verdict.
     // The harness members marked internal (State, Case, the mission, menu and return helpers) are shared with NavalMissionsProbe (MMR-53).
@@ -64,7 +65,24 @@ namespace MNBL.ProceduralWorld.Automation
             public int Reloads;
             public bool NoReload; // world B: no designated save to reload
             public string Tag = "land"; // the probe's stage prefix and screenshot tag (MMR-53's naval_missions: "naval")
+            public string LastEnemy, LastEnemyFaction; // the previous field battle's enemy party and its faction (the next case picks another)
+            // MMR-247 (results/MMR-247-H.md): every engine-thread block of acc4/acc5 came in the first frames of a case that teleported the player
+            // and changed its diplomacy (a war declared, a castle given to it) on a campaign map that had already run a mission since it loaded;
+            // the same actions on a map with no mission since its load never blocked. FreshMapAfterMission (the acceptance probe's) reloads the
+            // designated save before a case when a mission ran on the current campaign (MissionCampaign: the campaign a mission last ran on).
+            public bool FreshMapAfterMission;
+            public WeakReference MissionCampaign;
+            public bool MissionRanOnThisMap { get { var c = MissionCampaign == null ? null : MissionCampaign.Target; return c != null && ReferenceEquals(c, Campaign.Current); } }
             public double Rule(string key) { return Convert.ToDouble(Rules[key], CultureInfo.InvariantCulture); }
+            // MMR-247 F: the scenario file's siegeSetup block (the siege case's timing, sally guard and retry), apart from Rules, which a recorded
+            // run must match.
+            public Dictionary<string, object> SiegeSetup;
+            public double SiegeRule(string key)
+            {
+                if (SiegeSetup == null || !SiegeSetup.ContainsKey(key)) throw new InvalidOperationException("the scenario file's siegeSetup." + key + " is missing");
+                return Convert.ToDouble(SiegeSetup[key], CultureInfo.InvariantCulture);
+            }
+            public static Dictionary<string, object> SiegeSetupOf(Dictionary<string, object> plan) { return plan.ContainsKey("siegeSetup") ? (Dictionary<string, object>)plan["siegeSetup"] : null; }
             public List<string> RuleList(string key) { return ((IEnumerable)Rules[key]).Cast<object>().Select(o => (string)o).ToList(); }
         }
 
@@ -74,7 +92,7 @@ namespace MNBL.ProceduralWorld.Automation
             if (path == null || !File.Exists(path)) throw new InvalidOperationException("scenarios=<tests/Runtime/LandMissionScenarios.json> is required.");
             var plan = (Dictionary<string, object>)new JavaScriptSerializer().DeserializeObject(File.ReadAllText(path));
             var world = (Dictionary<string, object>)plan["world"];
-            var st = new State { Context = context, Rules = (Dictionary<string, object>)plan["rules"], Save = (string)world["designatedSave"] };
+            var st = new State { Context = context, Rules = (Dictionary<string, object>)plan["rules"], SiegeSetup = State.SiegeSetupOf(plan), Save = (string)world["designatedSave"] };
             st.Tally = st.Cultures;
             st.LogPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "Mount and Blade II Bannerlord", "logs", "rgl_log_" + context.ProcessId + ".txt");
             string phase = context.Str("phase", "run");
@@ -82,6 +100,7 @@ namespace MNBL.ProceduralWorld.Automation
             context.Outputs["phase"] = phase;
             context.Outputs["scenarioFile"] = new Dictionary<string, object> { ["schema"] = plan["schema"], ["sha256"] = GeneratedWorldPackage.Sha256(File.ReadAllBytes(path)) };
             context.Outputs["rules"] = st.Rules;
+            context.Outputs["siegeSetup"] = st.SiegeSetup;
             context.Outputs["failures"] = st.Failures;
             context.Outputs["cases"] = st.Cases;
             context.Outputs["cultures"] = st.Cultures;
@@ -292,6 +311,19 @@ namespace MNBL.ProceduralWorld.Automation
             var row = new Dictionary<string, object> { ["caseName"] = name }; st.Cases[name] = row;
             var failures = new List<string>(); row["failures"] = failures;
             string notIdle = NotIdle();
+            // MMR-247 (c32): whether a mission ran on this map since it loaded, before any reload (the acc4/acc5 freezes came in such cases).
+            row["missionOnThisMapBefore"] = st.MissionRanOnThisMap;
+            // MMR-247: a fresh map before the case (Map2AcceptancePlan.FreshMapReason), recorded; a failed reload leaves the case to run as before.
+            string fresh = notIdle == null ? Map2AcceptancePlan.FreshMapReason(st.FreshMapAfterMission, st.MissionRanOnThisMap, st.NoReload, st.Save) : null;
+            if (fresh != null)
+            {
+                var reload = new Dictionary<string, object> { ["reason"] = fresh }; row["freshMapBefore"] = reload;
+                context.Stage(st.Tag + "_missions:" + name + ":freshMap");
+                yield return LoadDesignated(st, reload);
+                st.Reloads++;
+                if (Equals(reload["loaded"], true)) Setup(st);
+                else failures.Add("the designated save did not load for a fresh map before the case (it ran on the map as it was)");
+            }
             if (notIdle != null)
             {
                 row["notIdleBefore"] = notIdle;
@@ -343,6 +375,9 @@ namespace MNBL.ProceduralWorld.Automation
             if (main.CurrentSettlement != null) return "in " + main.CurrentSettlement.StringId;
             if (main.BesiegerCamp != null) return "a siege camp";
             if (map.MenuContext != null && map.MenuContext.GameMenu != null) return "the menu " + map.MenuContext.GameMenu.StringId;
+            // MMR-247 (acc4 triage notrun-4): a map incident stops time and pauses the engine until it is confirmed.
+            if (map.NextIncident != null) return "a map incident is due (" + map.NextIncident.StringId + ")";
+            if (Map2AcceptanceChecks.IncidentOpen()) return "a map incident is open";
             return null;
         }
 
@@ -424,36 +459,56 @@ namespace MNBL.ProceduralWorld.Automation
 
         // A field battle at the candidate: the enemy a lord party of the given culture (war declared on its kingdom for the battle, peace made after,
         // recorded), else a bandit party; the player with a crew of its culture. retreat: left by Mission.RetreatMission.
+        // MMR-247 (acc4 triage hang-1): the engine thread blocked in field.forest's setup after the snow battle's return, before StartBattle; the
+        // call is not proven. A breadcrumb stage (st.Tag + "_missions:<case>:<call>", flushed per line) goes before each native call of the
+        // setup, so a repeat names it. The two suspects are gone from the setup: the teleport runs only once the map has rebuilt after the last
+        // mission (MapRebuilt: shaders compiled, the scene loaded, 120 frames, the camera settled; 60 s at most), and the enemy's point and the
+        // isolation targets come from FindPointAroundPosition without its native path search (FindPointNear: same navmesh island as the origin,
+        // valid land). Each case takes a fresh enemy (not the previous case's party or faction where another fits), and one campaign hour runs
+        // after the encounter is finished so the old map event (WaitingRemoval) is gone before the next case.
         private static IEnumerator Field(State st, Dictionary<string, object> row, Candidate c, string culture, bool retreat)
         {
             var context = st.Context; var failures = (List<string>)row["failures"];
             var main = MobileParty.MainParty;
+            string crumb = st.Tag + "_missions:" + (row.ContainsKey("caseName") ? row["caseName"] : "field") + ":";
             row["candidate"] = Describe(c); row["retreat"] = retreat;
             var setup = new Dictionary<string, object>(); row["setup"] = setup;
+            context.Stage(crumb + "rebuildWait");
+            yield return MapRebuilt(context, setup);
             Heal();
             setup["crewAdded"] = Crew(main, (int)st.Rule("playerTroops"));
+            context.Stage(crumb + "teleport");
             main.Position = new CampaignVec2(c.Position, true); main.SetMoveModeHold();
             IFaction war = null; MobileParty enemyParty = null; CampaignVec2 enemyHome = default(CampaignVec2);
             var aside = new List<KeyValuePair<MobileParty, CampaignVec2>>();
             try
             {
                 string left;
-                var enemy = Enemy(st, culture, out war, out left);
+                context.Stage(crumb + "enemy");
+                var enemy = Enemy(st, culture, out war, out left, crumb);
                 if (enemy == null) throw new InvalidOperationException("no hostile land party for the battle");
                 setup["enemyLeftSettlement"] = left;
                 if (culture != null && !enemy.IsLordParty) setup["lordCensus"] = LordCensus(st, culture);
                 setup["enemy"] = enemy.StringId; setup["enemyKind"] = GeneratedSpawnAssertions.KindOf(enemy); setup["enemyCulture"] = enemy.LeaderHero != null && enemy.LeaderHero.Culture != null ? enemy.LeaderHero.Culture.StringId : enemy.MapFaction.Culture == null ? null : enemy.MapFaction.Culture.StringId;
                 setup["enemyTroops"] = enemy.MemberRoster.TotalManCount; setup["warDeclared"] = war == null ? null : war.StringId; setup["enemyShips"] = enemy.Ships.Count;
-                var point = RuntimeMissionProbe.FindPoint(main.Position, MobileParty.NavigationType.Default, 2, 1);
+                setup["previousEnemy"] = st.LastEnemy;
+                st.LastEnemy = enemy.StringId; st.LastEnemyFaction = enemy.MapFaction == null ? null : enemy.MapFaction.StringId;
+                context.Stage(crumb + "findPoint");
+                var point = FindPointNear(main.Position, 2, 1);
                 enemyHome = enemy.Position; enemyParty = enemy;
+                context.Stage(crumb + "placeEnemy");
                 enemy.Position = point; enemy.SetMoveModeHold();
-                aside = Isolate(point, main, enemy);
+                aside = Isolate(point, crumb, context, main, enemy);
                 setup["movedAside"] = aside.Select(kv => kv.Key.StringId).ToArray();
+                context.Stage(crumb + "settle");
                 yield return RuntimeMissionProbe.SettleCamera(context);
+                context.Stage(crumb + "snapshot");
                 row["before"] = RuntimeMissionProbe.Snapshot(false);
                 int observedBefore = MNBL.ProceduralWorld.Missions.MissionScenePatches.Observed;
+                context.Stage(crumb + "restartEncounter");
                 PlayerEncounter.RestartPlayerEncounter(enemy.Party, main.Party, true, false);
                 var encounter = PlayerEncounter.Current;
+                context.Stage(crumb + "startBattle");
                 var battle = PlayerEncounter.StartBattle();
                 if (battle != null && battle.IsNavalMapEvent) failures.Add("the land battle became a naval map event");
                 var involved = battle == null ? new List<PartyBase>() : battle.InvolvedParties.ToList();
@@ -461,11 +516,14 @@ namespace MNBL.ProceduralWorld.Automation
                     ["involved"] = involved.Select(p => p.MobileParty == null ? "settlement" : p.MobileParty.StringId).ToArray() };
                 // Only the two parties of the case fight (run 17928: parties parked by earlier cases joined as the player's allies).
                 if (involved.Count != 2 || !involved.Contains(enemy.Party) || !involved.Contains(main.Party)) failures.Add("the battle's parties are not exactly the player's and the enemy's: " + String.Join(", ", (string[])((Dictionary<string, object>)row["mapEvent"])["involved"]));
+                context.Stage(crumb + "menu");
                 GameMenu.ActivateGameMenu("encounter");
                 yield return Menu(st, "encounter");
+                context.Stage(crumb + "attack");
                 RuntimeMissionProbe.RunOption("attack");
                 yield return RunMission(st, row, true, m => GearAndSample(st, m, row),
                     m => { if (retreat) m.RetreatMission(); else m.OnEndMissionResult(); });
+                context.Stage(crumb + "returned");
                 // The outcome on the map before the encounter is finished: the installed OnEndMissionResult also ends by retreating, so a field
                 // battle and the retreat both leave the battle to the enemy; for the retreat it is required.
                 var mapEvent = PlayerEncounter.Battle ?? battle;
@@ -474,8 +532,13 @@ namespace MNBL.ProceduralWorld.Automation
                     ["playerWon"] = playerWon, ["enemyActive"] = enemy.IsActive, ["enemyHealthy"] = enemy.MemberRoster.TotalHealthyCount,
                     ["encounterState"] = PlayerEncounter.Current == null ? null : PlayerEncounter.Current.EncounterState.ToString() };
                 if (retreat && (playerWon || !enemy.IsActive || enemy.MemberRoster.TotalHealthyCount == 0)) failures.Add("the retreat did not leave the battle to the enemy");
+                context.Stage(crumb + "finish");
                 if (PlayerEncounter.Current != null && PlayerEncounter.Current == encounter) PlayerEncounter.Finish(true);
+                context.Stage(crumb + "idle");
                 yield return Idle(st, 30);
+                context.Stage(crumb + "hour");
+                yield return OneHour(context, setup);
+                context.Stage(crumb + "settleAfter");
                 yield return RuntimeMissionProbe.SettleCamera(context);
                 row["after"] = RuntimeMissionProbe.Snapshot(false);
                 RuntimeMissionProbe.CompareReturn(row, failures, false);
@@ -493,6 +556,7 @@ namespace MNBL.ProceduralWorld.Automation
             }
             finally
             {
+                context.Stage(crumb + "restore");
                 setup["putBack"] = Restore(aside);
                 if (war != null && war.IsAtWarWith(Clan.PlayerClan)) { MakePeaceAction.Apply(Clan.PlayerClan, war); setup["peaceMade"] = !war.IsAtWarWith(Clan.PlayerClan); }
                 // The enemy back where it was (into its settlement if it left one), so no later case meets it.
@@ -506,11 +570,103 @@ namespace MNBL.ProceduralWorld.Automation
             }
         }
 
+        // MMR-247: a field battle at a given point; its battle cell is sampled and classed as Candidates samples one (the class, face, biome
+        // and landform recorded with the case). An iterator, so a sampling error is the case's own failure.
+        internal static IEnumerator FieldAt(State st, Dictionary<string, object> row, Vec2 point, string culture)
+        {
+            var c = CandidateAt(point);
+            row["fieldAt"] = Describe(c);
+            yield return Field(st, row, c, culture, false);
+        }
+
+        // The battle cell holding a point, sampled (GeneratedBattleTerrain.SampleCell: the cell's centre biome) and classed by the resolver.
+        private static Candidate CandidateAt(Vec2 point)
+        {
+            var map = (GeneratedMapScene)Campaign.Current.MapSceneWrapper;
+            int width, height; float cellX, cellY; Vec2 size;
+            GeneratedBattleTerrain.Cells(map, out width, out height, out cellX, out cellY, out size);
+            int x = (int)Math.Floor(point.X / cellX), y = (int)Math.Floor(point.Y / cellY);
+            var s = GeneratedBattleTerrain.SampleCell(x, y, cellX, cellY, GeneratedBattleTerrain.Context(map), Campaign.Current.Models.PartyNavigationModel);
+            var position = new CampaignVec2(point, true);
+            return new Candidate { Class = GeneratedBattleTerrain.Resolver().ClassOf(s), Face = ((TerrainType)position.Face.FaceGroupIndex).ToString(), Biome = s.Biome, Landform = s.Landform, X = x, Y = y, Position = point };
+        }
+
+        // MMR-247: the resolver's class of the battle cell at a point and that cell's centre biome (what a battle there opens).
+        internal static string BattleClassAt(Vec2 point, out string biome)
+        {
+            var c = CandidateAt(point); biome = c.Biome; return c.Class;
+        }
+
+        // MMR-247 (hang-1): wait, before a teleport, until the map has rebuilt after a mission (the terrain re-bake and shader rebind of a map
+        // re-entry): no shader compiling, the map scene loaded, then 120 frames and a settled camera; 60 s at most. Recorded in setup.
+        internal static IEnumerator MapRebuilt(ProbeContext context, Dictionary<string, object> setup)
+        {
+            double start = context.Seconds;
+            var wrapper = Campaign.Current == null ? null : Campaign.Current.MapSceneWrapper as SandBox.MapScene;
+            var scene = wrapper == null ? null : wrapper.Scene;
+            int compiling = 0;
+            while (context.Seconds - start < 60)
+            {
+                compiling = TaleWorlds.Engine.Utilities.GetNumberOfShaderCompilationsInProgress();
+                if (compiling == 0 && (scene == null || scene.IsLoadingFinished())) break;
+                yield return null;
+            }
+            double loaded = context.Seconds - start;
+            for (int i = 0; i < 120 && context.Seconds - start < 60; i++) yield return null;
+            if (context.Seconds - start < 60) yield return RuntimeMissionProbe.SettleCamera(context);
+            setup["mapRebuilt"] = new Dictionary<string, object> { ["loadedSeconds"] = Math.Round(loaded, 2), ["seconds"] = Math.Round(context.Seconds - start, 2), ["compiling"] = compiling,
+                ["capped"] = context.Seconds - start >= 60 };
+        }
+
+        // One campaign hour at play speed (the player sheltered), so a finished battle's map event (WaitingRemoval) is removed by the campaign
+        // tick before the next case; 15 s of wall clock at most.
+        internal static IEnumerator OneHour(ProbeContext context, Dictionary<string, object> setup)
+        {
+            var campaign = Campaign.Current;
+            if (campaign == null) yield break;
+            double from = CampaignTime.Now.ToHours, start = context.Seconds;
+            DiagnosticSandboxBootstrap.Run(campaign, CampaignTimeControlMode.UnstoppableFastForward);
+            while (CampaignTime.Now.ToHours - from < 1 && context.Seconds - start < 15)
+            {
+                if (PlayerEncounter.Current != null || Mission.Current != null) break;
+                if (campaign.TimeControlMode == CampaignTimeControlMode.Stop) DiagnosticSandboxBootstrap.Run(campaign, CampaignTimeControlMode.UnstoppableFastForward);
+                yield return null;
+            }
+            RuntimeMissionProbe.Pause();
+            setup["hourAfter"] = new Dictionary<string, object> { ["hours"] = Math.Round(CampaignTime.Now.ToHours - from, 2), ["seconds"] = Math.Round(context.Seconds - start, 2), ["encounter"] = PlayerEncounter.Current != null };
+        }
+
+        // A land point max..min units from a centre without the native path search (hang-1 H2: FindPointAroundPosition with requirePath runs up
+        // to 250 native path queries, which GeneratedMapScene fans out over the periodic images): FindPointAroundPosition(requirePath: false),
+        // kept only when it is valid land for a party on the centre face's navmesh island; 12 tries, then the centre itself.
+        internal static CampaignVec2 FindPointNear(CampaignVec2 centre, float max, float min)
+        {
+            int island = centre.Face.IsValid() ? centre.Face.FaceIslandIndex : -1;
+            for (int k = 0; k < 12; k++)
+            {
+                var point = NavigationHelper.FindPointAroundPosition(centre, MobileParty.NavigationType.Default, max, min, false, false);
+                if (!point.IsValid() || !point.Face.IsValid() || !point.IsOnLand) continue;
+                if (island >= 0 && point.Face.FaceIslandIndex != island) continue;
+                if (GeneratedSpawnAssertions.Problem(point, MobileParty.NavigationType.Default) != null) continue;
+                return point;
+            }
+            if (!centre.IsValid() || !centre.Face.IsValid()) throw new InvalidOperationException("No valid diagnostic point near the player.");
+            return centre;
+        }
+
+        // MMR-247: the acceptance probe's map screenshot of the siege state, called once per case: when the camp is prepared, before the assault;
+        // else when an attempt ends unprepared with its siege standing and no map event; and on a retry's camp as soon as it is up (MMR-247 F:
+        // acc6's only attempt ended in a sally-out and took none).
+        internal static Func<Settlement, Dictionary<string, object>, IEnumerator> SiegeHook;
+
         // One-shot run 29368: an AI lord's party standing near the battle point joined the case's battle (normal joining, not a defect). Every
         // other free party within IsolationRadius of the point (periodic distance) is moved aside for the case, to a point 20-30 units from where
         // it stood on its own navigation, and put back after it (Restore: the ids put back).
+        // MMR-247 (hang-1 H2): the targets come from FindPointAroundPosition without its native path search, kept on the party's own navmesh
+        // island; a breadcrumb stage per party when a crumb is given.
         internal const float IsolationRadius = 12f;
-        internal static List<KeyValuePair<MobileParty, CampaignVec2>> Isolate(CampaignVec2 point, params MobileParty[] keep)
+        internal static List<KeyValuePair<MobileParty, CampaignVec2>> Isolate(CampaignVec2 point, params MobileParty[] keep) { return Isolate(point, null, null, keep); }
+        internal static List<KeyValuePair<MobileParty, CampaignVec2>> Isolate(CampaignVec2 point, string crumb, ProbeContext context, params MobileParty[] keep)
         {
             var periodic = PeriodicWorld.Current;
             Func<CampaignVec2, float> distance = p => periodic != null ? periodic.Distance(p.ToVec2(), point.ToVec2()) : p.ToVec2().Distance(point.ToVec2());
@@ -518,9 +674,16 @@ namespace MNBL.ProceduralWorld.Automation
             foreach (var p in MobileParty.All.Where(p => !keep.Contains(p) && p.IsActive && p.CurrentSettlement == null && p.MapEvent == null && p.AttachedTo == null
                                                       && distance(p.Position) < IsolationRadius).OrderBy(p => p.StringId, StringComparer.Ordinal).ToList())
             {
+                if (crumb != null && context != null) context.Stage(crumb + "isolate:" + p.StringId);
                 var navigation = p.IsCurrentlyAtSea ? MobileParty.NavigationType.Naval : MobileParty.NavigationType.Default;
-                var away = NavigationHelper.FindPointAroundPosition(p.Position, navigation, 30, 20, true, false);
-                if (!away.IsValid() || !away.Face.IsValid() || away.IsOnLand != !p.IsCurrentlyAtSea) continue;
+                int island = p.Position.Face.IsValid() ? p.Position.Face.FaceIslandIndex : -1;
+                CampaignVec2 away = default(CampaignVec2); bool found = false;
+                for (int k = 0; k < 8 && !found; k++)
+                {
+                    away = NavigationHelper.FindPointAroundPosition(p.Position, navigation, 30, 20, false, false);
+                    found = away.IsValid() && away.Face.IsValid() && away.IsOnLand == !p.IsCurrentlyAtSea && (island < 0 || away.Face.FaceIslandIndex == island);
+                }
+                if (!found) continue;
                 moved.Add(new KeyValuePair<MobileParty, CampaignVec2>(p, p.Position));
                 p.Position = away;
             }
@@ -538,26 +701,29 @@ namespace MNBL.ProceduralWorld.Automation
         // A lord party of the culture (its kingdom put at war with the player; a lord in a settlement not under siege leaves it first, recorded as
         // setup), else a bandit party: active, on land, free. A party owning ships (War Sails gives most northern lords a fleet) fights on land
         // like any other when it is not at sea; the battle must still be a land map event (Field checks it).
-        internal static MobileParty Enemy(State st, string culture, out IFaction war, out string left)
+        // MMR-247 (hang-1 H3): the previous case's enemy party, then its faction, are taken last (acc4: every case re-picked the same lord of the
+        // kingdom it had just made peace with).
+        internal static MobileParty Enemy(State st, string culture, out IFaction war, out string left, string crumb = null)
         {
             war = null; left = null;
             var main = MobileParty.MainParty;
             Func<MobileParty, bool> free = p => p != main && p.IsActive && p.MapEvent == null && p.Army == null && p.AttachedTo == null && p.BesiegerCamp == null
                 && !p.IsCurrentlyAtSea && p.MemberRoster.TotalHealthyCount >= 5;
+            Func<MobileParty, int> fresh = p => p.StringId == st.LastEnemy ? 2 : p.MapFaction != null && p.MapFaction.StringId == st.LastEnemyFaction ? 1 : 0;
             if (culture != null)
             {
                 var lord = MobileParty.All.Where(p => free(p) && p.IsLordParty && p.LeaderHero != null && p.LeaderHero.IsActive && !p.LeaderHero.IsWounded && p.LeaderHero.Culture != null
                         && p.LeaderHero.Culture.StringId == culture && p.MapFaction is Kingdom && p.StringId.StartsWith(st.Prefix, StringComparison.Ordinal)
                         && (p.CurrentSettlement == null ? p.Position.IsOnLand : p.CurrentSettlement.SiegeEvent == null))
-                    .OrderBy(p => p.CurrentSettlement == null ? 0 : 1).ThenBy(p => p.MemberRoster.TotalManCount).ThenBy(p => p.StringId, StringComparer.Ordinal).FirstOrDefault();
+                    .OrderBy(fresh).ThenBy(p => p.CurrentSettlement == null ? 0 : 1).ThenBy(p => p.MemberRoster.TotalManCount).ThenBy(p => p.StringId, StringComparer.Ordinal).FirstOrDefault();
                 if (lord != null)
                 {
-                    if (lord.CurrentSettlement != null) { left = lord.CurrentSettlement.StringId; LeaveSettlementAction.ApplyForParty(lord); }
-                    if (!lord.MapFaction.IsAtWarWith(main.MapFaction)) { DeclareWarAction.ApplyByDefault(Clan.PlayerClan, lord.MapFaction); war = lord.MapFaction; }
+                    if (lord.CurrentSettlement != null) { if (crumb != null) st.Context.Stage(crumb + "leaveSettlement"); left = lord.CurrentSettlement.StringId; LeaveSettlementAction.ApplyForParty(lord); }
+                    if (!lord.MapFaction.IsAtWarWith(main.MapFaction)) { if (crumb != null) st.Context.Stage(crumb + "declareWar"); DeclareWarAction.ApplyByDefault(Clan.PlayerClan, lord.MapFaction); war = lord.MapFaction; }
                     return lord;
                 }
             }
-            return MobileParty.All.Where(p => free(p) && p.CurrentSettlement == null && p.Position.IsOnLand && p.IsBandit).OrderBy(p => p.MemberRoster.TotalManCount).ThenBy(p => p.StringId, StringComparer.Ordinal).FirstOrDefault();
+            return MobileParty.All.Where(p => free(p) && p.CurrentSettlement == null && p.Position.IsOnLand && p.IsBandit).OrderBy(fresh).ThenBy(p => p.MemberRoster.TotalManCount).ThenBy(p => p.StringId, StringComparer.Ordinal).FirstOrDefault();
         }
 
         // Why no lord party of the culture could fight: the culture's lord parties of the world counted by the first filter each fails.
@@ -685,6 +851,7 @@ namespace MNBL.ProceduralWorld.Automation
                     if (state != null && Mission.Current != null && state.CurrentMission == Mission.Current)
                     {
                         owned = Mission.Current;
+                        if (Campaign.Current != null && !st.MissionRanOnThisMap) st.MissionCampaign = new WeakReference(Campaign.Current);
                         if (owned.Scene != null && owned.Scene.IsLoadingFinished() && owned.MainAgent != null && RuntimeMissionProbe.IsMissionScreen()
                             && TaleWorlds.Engine.Utilities.GetNumberOfShaderCompilationsInProgress() == 0
                             && (!combat || (owned.PlayerTeam != null && owned.PlayerEnemyTeam != null))
@@ -866,6 +1033,7 @@ namespace MNBL.ProceduralWorld.Automation
                 var active = Game.Current.GameStateManager.ActiveState;
                 if (active is InventoryState) { try { InventoryScreenHelper.CloseScreen(true); } catch (Exception) { } }
                 else if (active is PartyState) { try { PartyScreenHelper.CloseScreen(true, true); } catch (Exception) { } }
+                if (active is MapState) Map2AcceptanceChecks.ResolveIncident(null);
                 if (active is MapState && Mission.Current == null && PlayerEncounter.Current == null && main.MapEvent == null && main.CurrentSettlement == null && !Hero.MainHero.IsPrisoner)
                 {
                     var map = (MapState)active;
@@ -879,7 +1047,7 @@ namespace MNBL.ProceduralWorld.Automation
 
         // ---------------------------------------------------------------- settlements
 
-        private static IEnumerator Town(State st, Dictionary<string, object> row)
+        internal static IEnumerator Town(State st, Dictionary<string, object> row)
         {
             var context = st.Context; var failures = (List<string>)row["failures"]; var main = MobileParty.MainParty;
             var town = Settlement.All.Where(s => s.IsTown && s.StringId.StartsWith(st.Prefix, StringComparison.Ordinal) && !s.MapFaction.IsAtWarWith(main.MapFaction) && s.SiegeEvent == null && s.Notables.Count > 0
@@ -914,7 +1082,7 @@ namespace MNBL.ProceduralWorld.Automation
             if (conversation == null || !Equals(conversation["started"], true)) failures.Add("no notable or merchant conversation in the town center");
         }
 
-        private static IEnumerator Castle(State st, Dictionary<string, object> row)
+        internal static IEnumerator Castle(State st, Dictionary<string, object> row)
         {
             var failures = (List<string>)row["failures"]; var main = MobileParty.MainParty;
             var castle = Settlement.All.Where(s => s.IsCastle && s.StringId.StartsWith(st.Prefix, StringComparison.Ordinal) && !s.MapFaction.IsAtWarWith(main.MapFaction) && s.SiegeEvent == null && s.LocationComplex != null)
@@ -937,14 +1105,17 @@ namespace MNBL.ProceduralWorld.Automation
             }
             finally
             {
-                if (owner != null && owner.IsAlive && castle.OwnerClan == Clan.PlayerClan) { ChangeOwnerOfSettlementAction.ApplyByDefault(owner, castle); ((Dictionary<string, object>)row["setup"])["givenBack"] = castle.Owner == owner; }
+                // MMR-247: with FreshMapAfterMission the next case reloads the save after this one's mission, so the castle is not given back on
+                // this map (an ownership change after a mission is the acc5 block's pattern, results/MMR-247-H.md); recorded.
+                if (Map2AcceptancePlan.FreshMapReason(st.FreshMapAfterMission, st.MissionRanOnThisMap, st.NoReload, st.Save) != null) ((Dictionary<string, object>)row["setup"])["givenBack"] = "skipped: the next case reloads " + st.Save;
+                else if (owner != null && owner.IsAlive && castle.OwnerClan == Clan.PlayerClan) { ChangeOwnerOfSettlementAction.ApplyByDefault(owner, castle); ((Dictionary<string, object>)row["setup"])["givenBack"] = castle.Owner == owner; }
             }
             var mission = row.ContainsKey("center") ? (Dictionary<string, object>)row["center"] : null;
             if (mission == null) failures.Add("the castle courtyard did not open");
             else if (!String.Equals((string)mission["scene"], expected, StringComparison.Ordinal)) failures.Add("the castle opened " + mission["scene"] + ", not the mapped " + expected);
         }
 
-        private static IEnumerator Village(State st, Dictionary<string, object> row)
+        internal static IEnumerator Village(State st, Dictionary<string, object> row)
         {
             var failures = (List<string>)row["failures"]; var main = MobileParty.MainParty;
             var village = Settlement.All.Where(s => s.IsVillage && s.StringId.StartsWith(st.Prefix, StringComparison.Ordinal) && !s.MapFaction.IsAtWarWith(main.MapFaction) && !s.IsUnderRaid && s.LocationComplex != null
@@ -1240,86 +1411,132 @@ namespace MNBL.ProceduralWorld.Automation
             victim.Die(blow, Agent.KillInfo.Invalid);
         }
 
-        private static IEnumerator Siege(State st, Dictionary<string, object> row)
+        internal static IEnumerator Siege(State st, Dictionary<string, object> row)
         {
             var context = st.Context; var failures = (List<string>)row["failures"]; var main = MobileParty.MainParty;
-            // The castle farthest from its own kingdom's lord parties (they come to relieve a siege; an encounter with one stops the camp's
-            // preparation), its distance recorded.
+            // The castles farthest from their own kingdom's lord parties first (they come to relieve a siege; an encounter with one stops the
+            // camp's preparation), the besieged one's distance recorded.
             var lords = MobileParty.All.Where(p => p.IsActive && p.IsLordParty && p.MapFaction is Kingdom).ToList();
             Func<Settlement, float> nearestLord = s => lords.Where(p => p.MapFaction == s.MapFaction).Select(p => p.Position.ToVec2().Distance(s.Position.ToVec2())).DefaultIfEmpty(float.MaxValue).Min();
-            var target = Settlement.All.Where(s => s.IsCastle && s.StringId.StartsWith(st.Prefix, StringComparison.Ordinal) && s.SiegeEvent == null && s.MapFaction is Kingdom && s.LocationComplex != null
+            var candidates = Settlement.All.Where(s => s.IsCastle && s.StringId.StartsWith(st.Prefix, StringComparison.Ordinal) && s.SiegeEvent == null && s.MapFaction is Kingdom && s.LocationComplex != null
                     && GeneratedSpawnAssertions.Problem(s.GatePosition, MobileParty.NavigationType.Default) == null)
-                .OrderByDescending(nearestLord).ThenBy(s => s.StringId, StringComparer.Ordinal).FirstOrDefault();
-            if (target == null) throw new InvalidOperationException("no castle to besiege");
-            row["nearestDefendingLord"] = nearestLord(target); row["garrison"] = target.Town.GarrisonParty == null ? 0 : target.Town.GarrisonParty.MemberRoster.TotalManCount;
-            int wall = target.Town.GetWallLevel();
-            string expected = target.LocationComplex.GetLocationWithId("center").GetSceneName(wall);
-            row["settlement"] = target.StringId; row["expectedScene"] = expected; row["wallLevel"] = wall;
+                .OrderByDescending(nearestLord).ThenBy(s => s.StringId, StringComparer.Ordinal).ToList();
+            if (candidates.Count == 0) throw new InvalidOperationException("no castle to besiege");
             var setup = new Dictionary<string, object>(); row["setup"] = setup;
-            var war = target.MapFaction;
-            if (!war.IsAtWarWith(main.MapFaction)) { DeclareWarAction.ApplyByDefault(Clan.PlayerClan, war); setup["warDeclared"] = war.StringId; }
+            var attempts = new List<object>(); setup["attempts"] = attempts;
+            var wars = new List<IFaction>(); var tried = new HashSet<Settlement>();
             Heal(); setup["crewAdded"] = Crew(main, (int)st.Rule("siegeTroops"));
+            Settlement target = null; string expected = null; var camped = main.Position.ToVec2();
+            bool prepared = false, shot = false;
+            int tries = Math.Max(1, (int)st.SiegeRule("siegeAttempts"));
+            double observeRule = st.Rule("siegeObserveHours"), completion = st.SiegeRule("siegeCompletionHours"), margin = st.SiegeRule("siegeTimingMarginHours"), minObserve = st.SiegeRule("siegeObserveMinHours");
             try
             {
-                var point = RuntimeMissionProbe.FindPoint(target.GatePosition, MobileParty.NavigationType.Default, 2, 1);
-                main.SetMoveModeHold(); main.Position = point;
-                yield return RuntimeMissionProbe.SettleCamera(context);
-                row["before"] = RuntimeMissionProbe.Snapshot(false);
-                EncounterManager.StartSettlementEncounter(main, target);
-                double start = context.Seconds;
-                while (CurrentMenu() != "castle_outside" && CurrentMenu() != "town_outside" && context.Seconds - start < 30) yield return null;
-                RecordMenu(st);
-                setup["outsideMenu"] = CurrentMenu();
-                RuntimeMissionProbe.RunOption("town_besiege");
-                yield return Menu(st, "menu_siege_strategies");
-                var camped = main.Position.ToVec2(); setup["campPosition"] = new[] { camped.X, camped.Y };
-                // The camp prepares as campaign time runs (BesiegerCamp.PreparationProgress); the player sheltered, the menu open.
-                double hours = CampaignTime.Now.ToHours;
-                var siege = target.SiegeEvent;
-                var camp = siege == null ? null : siege.BesiegerCamp;
-                if (camp != null && camp.SiegeEngines != null && camp.SiegeEngines.SiegePreparations != null)
-                    setup["preparationPerHour"] = Campaign.Current.Models.SiegeEventModel.GetConstructionProgressPerHour(camp.SiegeEngines.SiegePreparations.SiegeEngine, siege, camp);
-                // Every half campaign hour: the menu, the siege, the camp's progress, the player's map event; an encounter (a sally-out or a relief)
-                // stops the preparation and the case, recorded with its parties. The camp's own preparation is observed for siegeObserveHours;
-                // then it is brought to siegeCompletionFrom (diagnostic setup, recorded: at the installed rate the camp needs about four days, in
-                // which the garrison sallies out, run 17928 - a stock mechanic MMR-52 does not retest) and the engine's tick completes it.
-                var series = new List<object>(); setup["series"] = series;
-                DiagnosticSandboxBootstrap.Run(Campaign.Current, CampaignTimeControlMode.UnstoppableFastForward);
-                start = context.Seconds;
-                double lastHours = hours, lastProgress = start, nextSample = hours;
-                bool advanced = false;
-                while (camp != null && !camp.IsPreparationComplete && CampaignTime.Now.ToHours - hours < st.Rule("siegePreparationHours") && context.Seconds - start < 240)
+                // MMR-247 F (acc6 c11: the garrison sallied out 2.06 campaign hours after the camp went up, before the advanced camp completed):
+                // each attempt is timed to complete before the stock sally check's next hour, the besieger is topped up until the stock sally rule
+                // leaves the garrison in, and an attempt that does not prepare is ended by peace and retried once on the next castle.
+                for (int k = 0; k < tries && !prepared; k++)
                 {
-                    double now = CampaignTime.Now.ToHours;
-                    if (now >= nextSample && series.Count < 60) { nextSample = now + 0.5; series.Add(SiegeSample(target, siege, camp, now - hours)); }
-                    if (!advanced && now - hours >= st.Rule("siegeObserveHours") && main.MapEvent == null)
+                    target = candidates.FirstOrDefault(s => !tried.Contains(s) && s.SiegeEvent == null && s.MapFaction is Kingdom);
+                    if (target == null) { setup["noCastleLeft"] = k; break; }
+                    tried.Add(target);
+                    var at = new Dictionary<string, object> { ["settlement"] = target.StringId }; attempts.Add(at);
+                    row["nearestDefendingLord"] = nearestLord(target); row["garrison"] = target.Town.GarrisonParty == null ? 0 : target.Town.GarrisonParty.MemberRoster.TotalManCount;
+                    int wall = target.Town.GetWallLevel();
+                    expected = target.LocationComplex.GetLocationWithId("center").GetSceneName(wall);
+                    row["settlement"] = target.StringId; row["expectedScene"] = expected; row["wallLevel"] = wall;
+                    // When even the shortest observation would not end before the next sally check, that check hour passes first, at peace.
+                    var timing = Map2AcceptancePlan.Timing(CampaignTime.Now.ToHours, observeRule, completion, margin, minObserve);
+                    if (timing.WaitHours > 0)
                     {
-                        advanced = true;
-                        object observed = Property(camp, "PreparationProgress");
-                        float to = (float)st.Rule("siegeCompletionFrom");
-                        camp.SiegeEngines.SiegePreparations.SetProgress(to);
-                        setup["preparationAdvanced"] = new Dictionary<string, object> { ["atHours"] = now - hours, ["observedProgress"] = observed, ["to"] = to,
-                            ["naturalHoursNeeded"] = setup.ContainsKey("preparationPerHour") && Convert.ToDouble(setup["preparationPerHour"], CultureInfo.InvariantCulture) > 0 ? (object)(1.0 / Convert.ToDouble(setup["preparationPerHour"], CultureInfo.InvariantCulture)) : null };
+                        var waited = new Dictionary<string, object> { ["wanted"] = timing.WaitHours }; at["waitedForSallyCheck"] = waited;
+                        yield return RunHours(st, timing.WaitHours, waited);
+                        if (main.MapEvent != null) { at["interruption"] = Interruption(main.MapEvent, 0); break; }
                     }
-                    if (main.MapEvent != null) { setup["interruption"] = Interruption(main.MapEvent, now - hours); break; }
-                    if (target.SiegeEvent != siege) { setup["interruption"] = new Dictionary<string, object> { ["hours"] = now - hours, ["siegeEnded"] = true, ["menu"] = CurrentMenu() }; break; }
-                    if (now > lastHours) { lastHours = now; lastProgress = context.Seconds; }
-                    else if (context.Seconds - lastProgress > 15) { setup["timeStalled"] = TwoWorldMatrixProbe.TimeState(context.Seconds); break; }
-                    if (Campaign.Current.TimeControlMode == CampaignTimeControlMode.Stop) DiagnosticSandboxBootstrap.Run(Campaign.Current, CampaignTimeControlMode.UnstoppableFastForward);
-                    yield return null;
+                    var war = target.MapFaction;
+                    if (!war.IsAtWarWith(main.MapFaction)) { DeclareWarAction.ApplyByDefault(Clan.PlayerClan, war); wars.Add(war); at["warDeclared"] = war.StringId; }
+                    Heal(); at["sallyGuard"] = SallyGuard(st, main, target);
+                    var point = RuntimeMissionProbe.FindPoint(target.GatePosition, MobileParty.NavigationType.Default, 2, 1);
+                    main.SetMoveModeHold(); main.Position = point;
+                    yield return RuntimeMissionProbe.SettleCamera(context);
+                    row["before"] = RuntimeMissionProbe.Snapshot(false);
+                    EncounterManager.StartSettlementEncounter(main, target);
+                    double start = context.Seconds;
+                    while (CurrentMenu() != "castle_outside" && CurrentMenu() != "town_outside" && context.Seconds - start < 30) yield return null;
+                    RecordMenu(st);
+                    at["outsideMenu"] = CurrentMenu();
+                    RuntimeMissionProbe.RunOption("town_besiege");
+                    yield return Menu(st, "menu_siege_strategies");
+                    camped = main.Position.ToVec2(); at["campPosition"] = new[] { camped.X, camped.Y };
+                    // The camp prepares as campaign time runs (BesiegerCamp.PreparationProgress); the player sheltered, the menu open.
+                    double hours = CampaignTime.Now.ToHours;
+                    double observe = Map2AcceptancePlan.ObserveFor(Map2AcceptancePlan.HoursToSallyCheck(hours), observeRule, completion, margin, minObserve);
+                    at["timing"] = new Dictionary<string, object> { ["untilSallyCheck"] = Map2AcceptancePlan.HoursToSallyCheck(hours), ["observeHours"] = observe, ["completionHours"] = completion,
+                        ["marginHours"] = margin, ["fits"] = observe + completion + margin <= Map2AcceptancePlan.HoursToSallyCheck(hours) + 1e-9, ["campaignHour"] = hours };
+                    var siege = target.SiegeEvent;
+                    var camp = siege == null ? null : siege.BesiegerCamp;
+                    double rate = 0;
+                    if (camp != null && camp.SiegeEngines != null && camp.SiegeEngines.SiegePreparations != null)
+                        at["preparationPerHour"] = rate = Campaign.Current.Models.SiegeEventModel.GetConstructionProgressPerHour(camp.SiegeEngines.SiegePreparations.SiegeEngine, siege, camp);
+                    // A retry's camp is shot as soon as it stands, so the case has the siege state on the map whatever the retry does.
+                    if (SiegeHook != null && !shot && k > 0 && k == tries - 1 && camp != null) { shot = true; at["shot"] = "camp up (retry)"; yield return SiegeHook(target, setup); }
+                    // Every half campaign hour: the menu, the siege, the camp's progress, the player's map event; an encounter (a sally-out or a relief)
+                    // stops the attempt, recorded with its parties. The camp's own preparation is observed for `observe` hours (siegeObserveHours,
+                    // shortened to end before the sally check); then it is brought to what the installed rate builds in siegeCompletionHours
+                    // (diagnostic setup, recorded: at the installed rate the camp needs about four days, in which the garrison sallies out, run 17928)
+                    // and the engine's tick completes it.
+                    var series = new List<object>(); at["series"] = series;
+                    DiagnosticSandboxBootstrap.Run(Campaign.Current, CampaignTimeControlMode.UnstoppableFastForward);
+                    start = context.Seconds;
+                    double lastHours = hours, lastProgress = start, nextSample = hours;
+                    bool advanced = false;
+                    while (camp != null && !camp.IsPreparationComplete && CampaignTime.Now.ToHours - hours < st.Rule("siegePreparationHours") && context.Seconds - start < 240)
+                    {
+                        double now = CampaignTime.Now.ToHours;
+                        if (now >= nextSample && series.Count < 60) { nextSample = now + 0.5; series.Add(SiegeSample(target, siege, camp, now - hours)); }
+                        if (!advanced && now - hours >= observe && main.MapEvent == null)
+                        {
+                            advanced = true;
+                            object observed = Property(camp, "PreparationProgress");
+                            float to = (float)Map2AcceptancePlan.CompletionFrom(rate, completion, st.Rule("siegeCompletionFrom"));
+                            camp.SiegeEngines.SiegePreparations.SetProgress(to);
+                            at["preparationAdvanced"] = new Dictionary<string, object> { ["atHours"] = now - hours, ["observedProgress"] = observed, ["to"] = to,
+                                ["naturalHoursNeeded"] = rate > 0 ? (object)(1.0 / rate) : null };
+                        }
+                        if (main.MapEvent != null) { at["interruption"] = Interruption(main.MapEvent, now - hours); break; }
+                        if (target.SiegeEvent != siege) { at["interruption"] = new Dictionary<string, object> { ["hours"] = now - hours, ["siegeEnded"] = true, ["menu"] = CurrentMenu() }; break; }
+                        if (now > lastHours) { lastHours = now; lastProgress = context.Seconds; }
+                        else if (context.Seconds - lastProgress > 15) { at["timeStalled"] = TwoWorldMatrixProbe.TimeState(context.Seconds); break; }
+                        Map2AcceptanceChecks.ResolveIncident(null);
+                        if (Campaign.Current.TimeControlMode == CampaignTimeControlMode.Stop) DiagnosticSandboxBootstrap.Run(Campaign.Current, CampaignTimeControlMode.UnstoppableFastForward);
+                        yield return null;
+                    }
+                    RuntimeMissionProbe.Pause();
+                    series.Add(SiegeSample(target, siege, camp, CampaignTime.Now.ToHours - hours));
+                    prepared = camp != null && camp.IsPreparationComplete;
+                    at["preparationHours"] = CampaignTime.Now.ToHours - hours; at["preparationProgress"] = camp == null ? null : Property(camp, "PreparationProgress");
+                    at["prepared"] = prepared; at["menuAfterPreparation"] = CurrentMenu();
+                    if (SiegeHook != null && !shot && siege != null && target.SiegeEvent == siege && main.MapEvent == null)
+                    {
+                        shot = true; at["shot"] = prepared ? "camp prepared" : "camp not prepared, its siege standing";
+                        yield return SiegeHook(target, setup);
+                    }
+                    if (prepared || k + 1 >= tries) break;
+                    var end = new Dictionary<string, object>(); at["endedForRetry"] = end;
+                    yield return EndSiegeAttempt(st, wars, end);
+                    if (!Equals(end["idle"], true)) break;
                 }
-                RuntimeMissionProbe.Pause();
-                series.Add(SiegeSample(target, siege, camp, CampaignTime.Now.ToHours - hours));
-                setup["preparationHours"] = CampaignTime.Now.ToHours - hours; setup["preparationProgress"] = camp == null ? null : Property(camp, "PreparationProgress");
-                setup["prepared"] = camp != null && camp.IsPreparationComplete; setup["menuAfterPreparation"] = CurrentMenu();
-                if (camp == null || !camp.IsPreparationComplete)
-                    throw new InvalidOperationException("the siege camp was not prepared" + (setup.ContainsKey("interruption") ? " (interrupted: see setup.interruption)" : setup.ContainsKey("timeStalled") ? " (campaign time stalled)" : ""));
+                // The case's setup is its last attempt's (the summaries read it), with every attempt listed in setup.attempts.
+                foreach (var kv in (Dictionary<string, object>)attempts[attempts.Count - 1]) setup[kv.Key] = kv.Value;
+                if (!prepared)
+                    throw new InvalidOperationException("the siege camp was not prepared in " + attempts.Count + " attempt(s)" + (setup.ContainsKey("interruption") ? " (interrupted: see setup.interruption and setup.attempts)"
+                        : setup.ContainsKey("timeStalled") ? " (campaign time stalled)" : setup.ContainsKey("noCastleLeft") ? " (no castle left to retry on)" : ""));
                 if (CurrentMenu() != "menu_siege_strategies") yield return Menu(st, "menu_siege_strategies");
                 RuntimeMissionProbe.RunOption("menu_siege_strategies_lead_assault");
                 yield return RunMission(st, row, true, m => GearAndSample(st, m, row), m => m.OnEndMissionResult(), "mission");
                 // Back at the siege: the mission returned the party to its camp; then the siege is lifted through the menu.
-                start = context.Seconds;
-                while (CurrentMenu() == "the map" && context.Seconds - start < 10) yield return null;
+                double back = context.Seconds;
+                while (CurrentMenu() == "the map" && context.Seconds - back < 10) yield return null;
                 setup["menuAfterAssault"] = CurrentMenu();
                 ReturnTo(st, row, failures, camped, "the siege camp, where the assault began");
                 if (CurrentMenu() == "encounter" && PlayerEncounter.Current != null) { PlayerEncounter.Finish(true); yield return TwoWorldMatrixProbe.Frames(10); }
@@ -1327,8 +1544,8 @@ namespace MNBL.ProceduralWorld.Automation
                 {
                     RecordMenu(st);
                     RuntimeMissionProbe.RunOption("menu_siege_strategies_leave");
-                    start = context.Seconds;
-                    while (CurrentMenu() != "menu_siege_strategies_break_siege" && CurrentMenu() != "the map" && context.Seconds - start < 10) yield return null;
+                    back = context.Seconds;
+                    while (CurrentMenu() != "menu_siege_strategies_break_siege" && CurrentMenu() != "the map" && context.Seconds - back < 10) yield return null;
                     if (CurrentMenu() == "menu_siege_strategies_break_siege") { RecordMenu(st); RuntimeMissionProbe.RunOption("menu_siege_strategies_break_siege_go_on"); }
                 }
                 yield return Idle(st, 30);
@@ -1344,7 +1561,85 @@ namespace MNBL.ProceduralWorld.Automation
                 }
                 row["siegeAfter"] = target.SiegeEvent != null;
             }
-            finally { if (war.IsAtWarWith(Clan.PlayerClan) && setup.ContainsKey("warDeclared")) { MakePeaceAction.Apply(Clan.PlayerClan, war); setup["peaceMade"] = !war.IsAtWarWith(Clan.PlayerClan); } }
+            finally
+            {
+                foreach (var w in wars) if (w.IsAtWarWith(Clan.PlayerClan)) MakePeaceAction.Apply(Clan.PlayerClan, w);
+                if (wars.Count > 0) setup["peaceMade"] = wars.All(w => !w.IsAtWarWith(Clan.PlayerClan));
+            }
+        }
+
+        // MMR-247 F: tops the besieger up with its culture's basic troop until the stock sally rule leaves the garrison in (Map2AcceptancePlan.
+        // SallyCrew: twice the besiegers' strength at least siegeSallyMargin x the defenders'), at most siegeCrewLimit troops; diagnostic setup,
+        // recorded with both strengths as the engine's SallyOutsCampaignBehavior computes them.
+        private static Dictionary<string, object> SallyGuard(State st, MobileParty main, Settlement target)
+        {
+            // The stock sally-out party list (Town.GetDefenderParties) reads the siege event, which does not exist before the siege starts
+            // (acc6confirm: NullReferenceException); until then the settlement's own garrison, militia and its faction's lord parties stand in.
+            Func<IEnumerable<PartyBase>> sallyParties = () => target.SiegeEvent != null
+                ? target.GetInvolvedPartiesForEventType(TaleWorlds.CampaignSystem.MapEvents.MapEvent.BattleTypes.SallyOut)
+                : target.Parties.Where(p => p.IsActive && (p.IsGarrison || p.IsMilitia || (p.IsLordParty && p.MapFaction == target.MapFaction))).Select(p => p.Party);
+            Func<float> defenders = () => sallyParties()
+                .Sum(p => p.GetCustomStrength(BattleSideEnum.Attacker, TaleWorlds.CampaignSystem.MapEvents.MapEvent.PowerCalculationContext.PlainBattle));
+            Func<float> besiegers = () => main.Party.GetCustomStrength(BattleSideEnum.Defender, TaleWorlds.CampaignSystem.MapEvents.MapEvent.PowerCalculationContext.PlainBattle);
+            float d = defenders(), before = besiegers(), b = before;
+            double margin = st.SiegeRule("siegeSallyMargin");
+            int added = 0, cap = (int)st.SiegeRule("siegeCrewLimit");
+            for (int round = 0; round < 3 && added < cap; round++)
+            {
+                int healthy = main.MemberRoster.TotalHealthyCount;
+                int more = Map2AcceptancePlan.SallyCrew(d, b, healthy > 0 ? b / healthy : 0, margin, cap - added);
+                if (more <= 0) break;
+                added += Crew(main, healthy + more);
+                b = besiegers();
+            }
+            return new Dictionary<string, object> { ["defenders"] = d, ["besiegersBefore"] = before, ["besiegers"] = b, ["margin"] = margin, ["added"] = added,
+                ["troops"] = main.MemberRoster.TotalManCount, ["salliesOut"] = Map2AcceptancePlan.SalliesOut(d, b) };
+        }
+
+        // MMR-247 F: campaign time runs `hours` with the party held where it stands (the wait for a sally check hour to pass, at peace), stopping
+        // early on a map event of the party; what ran is recorded.
+        private static IEnumerator RunHours(State st, double hours, Dictionary<string, object> record)
+        {
+            var main = MobileParty.MainParty; double from = CampaignTime.Now.ToHours, start = st.Context.Seconds;
+            main.SetMoveModeHold();
+            DiagnosticSandboxBootstrap.Run(Campaign.Current, CampaignTimeControlMode.UnstoppableFastForward);
+            while (CampaignTime.Now.ToHours - from < hours && st.Context.Seconds - start < 120 && main.MapEvent == null)
+            {
+                Map2AcceptanceChecks.ResolveIncident(null);
+                if (Campaign.Current.TimeControlMode == CampaignTimeControlMode.Stop) DiagnosticSandboxBootstrap.Run(Campaign.Current, CampaignTimeControlMode.UnstoppableFastForward);
+                yield return null;
+            }
+            RuntimeMissionProbe.Pause();
+            record["hours"] = CampaignTime.Now.ToHours - from; record["seconds"] = st.Context.Seconds - start; record["mapEvent"] = main.MapEvent != null; record["menu"] = CurrentMenu();
+        }
+
+        // MMR-247 F: ends a siege attempt that did not prepare before the retry. Peace with every faction the case declared war on ends its map
+        // event and its siege (as the case's own end does: acc6's sally-out ended that way, at hostile_action_end_by_peace); the menus are passed
+        // as the player passes them until the party is idle on the map (at most 30 s). The menus seen, any refused option and the outcome recorded.
+        private static IEnumerator EndSiegeAttempt(State st, List<IFaction> wars, Dictionary<string, object> end)
+        {
+            var main = MobileParty.MainParty; var menus = new List<string>(); end["menus"] = menus;
+            foreach (var w in wars) if (w.IsAtWarWith(Clan.PlayerClan)) MakePeaceAction.Apply(Clan.PlayerClan, w);
+            double start = st.Context.Seconds; bool idle = false;
+            while (st.Context.Seconds - start < 30)
+            {
+                string menu = CurrentMenu();
+                if (menus.Count == 0 || menus[menus.Count - 1] != menu) menus.Add(menu);
+                if (Game.Current.GameStateManager.ActiveState is MapState && Mission.Current == null && PlayerEncounter.Current == null && main.MapEvent == null && main.CurrentSettlement == null
+                    && main.BesiegerCamp == null && menu == "the map") { idle = true; break; }
+                try
+                {
+                    Map2AcceptanceChecks.ResolveIncident(null);
+                    if (menu == "hostile_action_end_by_peace") { RecordMenu(st); RuntimeMissionProbe.RunOption("hostile_action_en_by_peace_end"); }
+                    else if (menu == "menu_siege_strategies") RuntimeMissionProbe.RunOption("menu_siege_strategies_leave");
+                    else if (menu == "menu_siege_strategies_break_siege") RuntimeMissionProbe.RunOption("menu_siege_strategies_break_siege_go_on");
+                    else if (menu == "encounter" && PlayerEncounter.Current != null) PlayerEncounter.Finish(true);
+                }
+                catch (Exception e) { end["error"] = e.GetType().Name + ": " + e.Message; }
+                yield return TwoWorldMatrixProbe.Frames(10);
+            }
+            RuntimeMissionProbe.Pause();
+            end["idle"] = idle; end["peace"] = wars.All(w => !w.IsAtWarWith(Clan.PlayerClan)); end["seconds"] = st.Context.Seconds - start;
         }
 
         private static Dictionary<string, object> SiegeSample(Settlement target, TaleWorlds.CampaignSystem.Siege.SiegeEvent siege, TaleWorlds.CampaignSystem.Siege.BesiegerCamp camp, double hours)

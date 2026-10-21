@@ -17,7 +17,8 @@ using MNBL.ProceduralWorld.Persistence;
 // that does not), a process stop is simulated after each boundary and inside the initial save's publication, a journal write fails after the
 // save was published, and the save store and the activation journals are recovered as at the next start. After every case: the earlier world's package, receipt and save are byte for byte
 // unchanged; no save is bound to an instance unless its activation committed with a receipt (and then exactly one); recovery is idempotent;
-// the receipt is the v1 contract, written once, and verifies against its runtime-derived record.
+// the receipt is the v1 contract, written once, and verifies against its runtime-derived record. Also PostBuild's battle map checks over the
+// record shapes the map's AfterLoad writes (MMR-262).
 internal static class ActivationFailureTests
 {
     private static int checks, failures;
@@ -34,6 +35,8 @@ internal static class ActivationFailureTests
         try { Run(scratch); }
         catch (Exception e) { Check(false, "unexpected exception: " + e); }
         finally { try { if (Directory.Exists(scratch)) Directory.Delete(scratch, true); } catch (Exception) { } }
+        try { BattleMapRecords(); }
+        catch (Exception e) { Check(false, "battle map records: unexpected exception: " + e); }
         evidence["checks"] = checks; evidence["failures"] = failures; evidence["lines"] = lines; evidence["matrix"] = matrix;
         evidence["boundaries"] = WorldActivationTransaction.Order.Select(b => b.ToString()).ToList();
         File.WriteAllText(args[0], new JavaScriptSerializer { MaxJsonLength = Int32.MaxValue }.Serialize(evidence), new UTF8Encoding(false));
@@ -288,6 +291,45 @@ internal static class ActivationFailureTests
         row["rollback"] = journal == null ? null : journal.Rollback.Select(r => r["boundary"] + (Equals(r["undone"], true) ? "" : r.ContainsKey("kept") ? " (kept)" : " (not undone)")).ToList();
         matrix.Add(row);
         return row;
+    }
+
+    // MMR-262: PostBuild's battle map checks (PostBuildBattleMap) over the three record shapes AfterLoad writes, and none: Install's report,
+    // Preflight's refusal (BattleTableCheck.Record plus status and error), Guarded's failure (status and error only). A failed record gives
+    // one problem naming its error and never throws (an indexed read of terrainContextSource threw KeyNotFoundException and hid the error).
+    private static void BattleMapRecords()
+    {
+        Func<IDictionary<string, object>, object, Tuple<List<string>, SortedDictionary<string, object>, Exception>> run = (record, afterLoad) =>
+        {
+            var problems = new List<string>();
+            try { return Tuple.Create(problems, PostBuildBattleMap.Check(record, afterLoad, problems), (Exception)null); }
+            catch (Exception e) { return Tuple.Create(problems, (SortedDictionary<string, object>)null, e); }
+        };
+        string preflightError = "the loaded battle scenes leave 3 kinds of ground without a deterministic scene (first forest land; battle_terrain_x of SyntheticScenes)";
+        var preflight = new Dictionary<string, object> { ["ok"] = false, ["tableIsCatalogues"] = false, ["sceneTableSha256"] = Sha("table"), ["lost"] = new List<string> { "forest land", "steppe land", "snow land" },
+            ["lostCount"] = 3, ["changed"] = new List<string> { "battle_terrain_x (SyntheticScenes)" }, ["changedCount"] = 1, ["removed"] = new List<string>(), ["fileProblems"] = new List<string>(),
+            ["status"] = "failed", ["error"] = preflightError };
+        var p = run(preflight, null);
+        Check(p.Item3 == null && p.Item1.Count == 1 && p.Item1[0].Contains(preflightError) && p.Item2 != null && Equals(p.Item2["error"], preflightError) && p.Item2["terrainContextSource"] == null
+              && Equals(p.Item2["sceneTableSha256"], Sha("table")) && PostBuildBattleMap.Refused(preflight),
+              "battle map: Preflight's failed record (BattleTableCheck.Record, status, error) gives one problem naming its error, is kept with the error, and is refused as the battle table's" +
+              " (no KeyNotFoundException)" + (p.Item3 == null ? "" : ": " + p.Item3.GetType().Name + " " + p.Item3.Message) + (p.Item1.Count == 1 ? "" : " - " + String.Join("; ", p.Item1)));
+        string guardedError = "NullReferenceException: Object reference not set to an instance of an object.";
+        var guarded = new Dictionary<string, object> { ["status"] = "failed", ["error"] = guardedError };
+        var g = run(guarded, null);
+        Check(g.Item3 == null && g.Item1.Count == 1 && g.Item1[0].Contains(guardedError) && g.Item2 != null && Equals(g.Item2["error"], guardedError) && !PostBuildBattleMap.Refused(guarded),
+              "battle map: Guarded's failed record (status and error only) gives one problem naming its error, and is not a battle table refusal (no KeyNotFoundException)" +
+              (g.Item3 == null ? "" : ": " + g.Item3.GetType().Name + " " + g.Item3.Message) + (g.Item1.Count == 1 ? "" : " - " + String.Join("; ", g.Item1)));
+        Func<long, Dictionary<string, object>> installed = landDeterministic => new Dictionary<string, object> { ["status"] = "installed", ["navigationSetsMatchCatalogue"] = true,
+            ["terrainContextSource"] = "the world's masks (WorldSurface.BiomeAt, LandformAt)", ["sceneTableSha256"] = Sha("table"), ["inventorySha256"] = Sha("inventory"), ["catalogueSha256"] = Sha("catalogue"),
+            ["sha256"] = Sha("map"), ["landCells"] = 5548, ["landDeterministic"] = landDeterministic, ["seaTerrainChecks"] = 16076, ["seaDeterministic"] = 16076 };
+        var ok = run(installed(5548), null);
+        var partial = run(installed(5547), null);
+        Check(ok.Item3 == null && ok.Item1.Count == 0 && Equals(ok.Item2["mapSha256"], Sha("map")) && ok.Item2["error"] == null && !PostBuildBattleMap.Refused(installed(5548))
+              && partial.Item3 == null && partial.Item1.Count == 1 && partial.Item1[0].Contains("land 5547 of 5548"),
+              "battle map: Install's report passes and is kept; one with a cell lacking its scene fails, naming the counts");
+        var none = run(null, "InvalidOperationException: navigation setup already attempted");
+        Check(none.Item3 == null && none.Item2 == null && none.Item1.Count == 1 && none.Item1[0].Contains("navigation setup already attempted") && !PostBuildBattleMap.Refused(null),
+              "battle map: no record (AfterLoad failed before writing one) gives one problem naming the AfterLoad failure");
     }
 
     private static void Run(string scratch)

@@ -56,7 +56,8 @@ namespace MNBL.ProceduralWorld.Surface
                     Basin = port ? transitionBasin[s.Id] : -1 };
             }
             Func<Site, bool> openPort = x => x.HasPort && openBasin.ContainsKey(x.Basin) && openBasin[x.Basin];
-            foreach (IDictionary<string, object> c in Json.A(campaign, "clans"))
+            // Every clan of campaign.json v2: the noble houses, the mercenary companies and the outlaw clans (MMR-280).
+            foreach (IDictionary<string, object> c in Json.A(campaign, "houses").Cast<object>().Concat(Json.A(campaign, "mercenaryCompanies").Cast<object>()).Concat(Json.A(campaign, "outlawClans").Cast<object>()))
             {
                 string id = Json.S(c, "id"), home = Json.S(c, "home"); Site homeSite;
                 if (home == null || !w.Sites.TryGetValue(home, out homeSite)) { w.Clans[id] = new Capability { Naval = false, Reason = "clan " + id + " has no placed home" }; continue; }
@@ -64,7 +65,7 @@ namespace MNBL.ProceduralWorld.Surface
                 w.Clans[id] = new Capability { Naval = ports > 0, Reason = ports > 0 ? "clan " + id + "'s home " + home + " shares land group " + homeSite.Group + " with " + ports + " port towns on open basins"
                                                                                     : "no port town on an open basin in clan " + id + "'s home " + home + "'s land group " + homeSite.Group };
             }
-            foreach (IDictionary<string, object> k in Json.A(campaign, "kingdoms")) w.Kingdoms.Add(new Faction { Id = Json.S(k, "id"), Capital = Json.S(k, "capital"), RulingClan = Json.S(k, "rulingClan") });
+            foreach (IDictionary<string, object> k in Json.A(campaign, "kingdoms")) w.Kingdoms.Add(new Faction { Id = Json.S(k, "id"), Capital = Json.S(k, "capital"), RulingClan = Json.S(k, "rulingHouse") });
             foreach (var t in w.Sites.Values.Where(x => x.Kind == "town" && openPort(x)))
                 if (w.Sites.Values.Any(o => o.Id != t.Id && o.HasPort && o.Basin == t.Basin)) w.Starts.Add(new Start { Culture = "(any creation culture)", Town = t.Id, Point = null });
             return w;

@@ -25,6 +25,16 @@ import xml.etree.ElementTree as ET
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CATALOG = 'evidence/runtime/in-game/campaign_catalog-10212.json'
 NAVAL_CLANS = ['northern_pirates', 'southern_pirates']   # MMR-35: pirate clans and spawn intents
+# Map epic 2 (MMR-248, RT-28): the bandit cultures each natural land biome favours (terrain-materials.json biome cores; authored).
+BIOME_WEIGHTS = {
+    'desert': {'desert_bandits': 1.0},
+    'grassland': {'steppe_bandits': 0.5, 'forest_bandits': 0.3, 'mountain_bandits': 0.2},
+    'forest': {'forest_bandits': 1.0}, 'rainforest': {'forest_bandits': 1.0}, 'boreal_forest': {'forest_bandits': 1.0},
+    'marsh': {'forest_bandits': 1.0},
+    'exposed_rock': {'mountain_bandits': 1.0},
+    'cold_tundra': {'mountain_bandits': 0.5, 'forest_bandits': 0.5},
+    'tundra': {'mountain_bandits': 1.0}, 'snow': {'mountain_bandits': 1.0}, 'land_ice': {'mountain_bandits': 1.0},
+}
 
 
 def sha(path):
@@ -118,6 +128,14 @@ def main():
                         ('requiredCultures', required),
                         ('settlementDistance', round(q(to_settlement, 0.1), 4)), ('hideoutSpacing', round(between[0], 4)),
                         ('cultureWeights', od(*[(k, od(*sorted(v.items()))) for k, v in sorted(weights.items())])),
+                        ('biome', od(('rule', 'map epic 2 (MMR-248 keys, MMR-287 RT-28): the bandit culture weights of a hideout are '
+                                              '(1 - share) x its nearest town culture\'s cultureWeights + share x biomeWeights of the natural biome '
+                                              'of its cell (both normalized to 1), and a hideout whose cell is within coastCells cells of sea adds '
+                                              'coastWeight to coastCulture before normalizing; requiredCultures still each get a hideout. Every '
+                                              'value is a starting value MMR-287 checks with its hideout census on worlds A and B'),
+                                     ('share', 0.6),
+                                     ('biomeWeights', od(*[(k, od(*sorted(v.items()))) for k, v in sorted(BIOME_WEIGHTS.items())])),
+                                     ('coastCells', 1), ('coastCulture', 'sea_raiders'), ('coastWeight', 1.0))),
                         ('installed', od(('hideouts', len(hideouts)), ('towns', len(towns)), ('spacing', round(spacing, 2)),
                                          ('toSettlement', od(('minimum', round(to_settlement[0], 4)), ('p10', round(q(to_settlement, 0.1), 4)),
                                                              ('median', round(q(to_settlement, 0.5), 4)))),

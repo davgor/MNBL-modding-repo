@@ -107,6 +107,28 @@ namespace MNBL.ProceduralWorld.CampaignRegistry
             return result;
         }
 
+        // A culture's noble child (teenager false) or teenager civilian rosters for one sex, as the installed equipment selection flags them
+        // (IsLordTemplate with IsChildEquipmentTemplate or IsTeenagerEquipmentTemplate): the four rosters the engine's random child generator
+        // dresses a culture's children from. clean: every item must exist, fit its slot and be usable by that sex, and a roster that fails is
+        // excluded; otherwise every flagged roster (the engine's generator uses them as installed).
+        public List<string> ChildEquipment(string culture, bool female, bool teenager, bool clean = true)
+        {
+            var result = new List<string>();
+            foreach (var key in Keys("EquipmentRoster.").Select(k => "EquipmentRoster." + k))
+            {
+                var e = Element(key);
+                var flags = e.SelectSingleNode("Flags") as XmlElement;
+                if (e.GetAttribute("culture") != "Culture." + culture || flags == null || flags.GetAttribute("IsLordTemplate") != "true" ||
+                    (flags.GetAttribute("IsFemaleTemplate") == "true") != female || flags.GetAttribute(teenager ? "IsTeenagerEquipmentTemplate" : "IsChildEquipmentTemplate") != "true") continue;
+                var sets = e.ChildNodes.OfType<XmlElement>().Where(s => s.Name == "EquipmentSet" && Kind(s) == "civilian").ToList();
+                if (sets.Count == 0) continue;
+                var p = clean ? sets.SelectMany(s => ItemProblems(key, s, female)).ToList() : new List<string>();
+                if (p.Count > 0) { excluded[key] = String.Join("; ", p); continue; }
+                result.Add(key.Substring("EquipmentRoster.".Length));
+            }
+            return result;
+        }
+
         // The culture's installed name strings ("{=id}Name"), for synthesized relatives and notables.
         public List<string> Names(string culture, bool female)
         {
@@ -136,14 +158,18 @@ namespace MNBL.ProceduralWorld.CampaignRegistry
             foreach (var target in Targets(e)) if (!Exists(target)) problems.Add(key + " upgrade target " + target + " does not exist");
             bool battle = false, civilian = false;
             var references = new List<KeyValuePair<string, string>>();   // roster id, wanted kind
-            if (equipmentOverride != null) { references.Add(new KeyValuePair<string, string>(equipmentOverride[0], "battle")); references.Add(new KeyValuePair<string, string>(equipmentOverride[1], "civilian")); }
+            // A null override keeps the character's own equipment of that kind (a boy's battle equipment under his child civilian roster).
+            bool overrideBattle = equipmentOverride != null && equipmentOverride[0] != null, overrideCivilian = equipmentOverride != null && equipmentOverride[1] != null;
+            if (overrideBattle) references.Add(new KeyValuePair<string, string>(equipmentOverride[0], "battle"));
+            if (overrideCivilian) references.Add(new KeyValuePair<string, string>(equipmentOverride[1], "civilian"));
             var equipments = e.SelectSingleNode("Equipments");
             if (equipments != null)
                 foreach (var child in equipments.ChildNodes.OfType<XmlElement>())
                 {
                     string kind = Kind(child);
-                    if (child.Name == "EquipmentSet") { if (equipmentOverride == null) references.Add(new KeyValuePair<string, string>(child.GetAttribute("id"), kind)); }
-                    else if (child.Name == "EquipmentRoster") { if (equipmentOverride == null) { if (kind == "civilian") civilian = true; else if (kind == "battle") battle = true; problems.AddRange(ItemProblems(key, child, woman)); } }
+                    bool overridden = kind == "battle" ? overrideBattle : kind == "civilian" ? overrideCivilian : overrideBattle && overrideCivilian;
+                    if (child.Name == "EquipmentSet") { if (!overridden) references.Add(new KeyValuePair<string, string>(child.GetAttribute("id"), kind)); }
+                    else if (child.Name == "EquipmentRoster") { if (!overridden) { if (kind == "civilian") civilian = true; else if (kind == "battle") battle = true; problems.AddRange(ItemProblems(key, child, woman)); } }
                     else if (child.Name == "equipment") problems.AddRange(ItemProblems(key, child, woman));
                 }
             // CharacterObject.AddEquipmentRoster takes the roster's sets of the referenced equipment type (installed IL).

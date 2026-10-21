@@ -50,13 +50,16 @@ internal static class SpawnPolicyTests
 
     private static void Run(string bundleDir, string repo, string outJson)
     {
-        var host = new WorldDataBundle.HostProfile("v1.4.8.119303", "v1.2.8.119303", new[] { "R01", "R02", "R03", "R04", "R05", "R06", "R07", "R08", "R09", "R10" });
+        var host = new WorldDataBundle.HostProfile("v1.4.8.119303", "v1.2.8.119303", WorldDataBundle.HostCapabilities);
         var bundle = WorldDataBundle.Open(bundleDir, host);
         Func<string, IDictionary<string, object>> read = path => Parse(new UTF8Encoding(false).GetString(bundle.ReadVerified(path)));
         var campaign = read("compiled/campaign/campaign.json"); var idMap = read("compiled/campaign/id-map.json");
         var travel = read("compiled/travel/travel-graph.json"); var ports = read("compiled/travel/ports.json");
         var cells = bundle.ReadVerified("compiled/travel/cells.bin");
+        var biomes = GeneratedCampaignInitializer.CellBiomes(bundle.ReadVerified("compiled/terrain/masks.bin"), new UTF8Encoding(false).GetString(bundle.ReadVerified("compiled/terrain/projection.json")),
+            new UTF8Encoding(false).GetString(bundle.ReadVerified("policies/terrain-materials.json")));
         var rosters = Load(Path.Combine(repo, "worldgen/policies/rosters.json"));
+        var population = Load(Path.Combine(repo, "worldgen/policies/population.json"));
         var economy = Load(Path.Combine(repo, "worldgen/policies/economy.json"));
         var startup = Load(Path.Combine(repo, "worldgen/policies/startup.json"));
         var prototypes = Load(Path.Combine(repo, "worldgen/templates/settlements/prototypes.json"));
@@ -76,16 +79,16 @@ internal static class SpawnPolicyTests
         var defaultsRun = Load(Path.Combine(repo, S(O(rosters, "provenance"), "defaultReferences")));
         var defaults = L(O(Records(O(defaultsRun, "outputs"), "worlds").First(), "registration"), "verifiedLiveDefaultReferences");
         var resolver = new CharacterTemplateResolver(catalog, defaults, O(rosters, "troops"));
-        Func<IDictionary<string, object>, FactionFactory.Result> factionsOf = c => FactionFactory.Build(c, idMap, Load(Path.Combine(repo, "worldgen/policies/factions.json")), Load(Path.Combine(repo, "worldgen/policies/culture-presentations.json")), templates);
+        Func<IDictionary<string, object>, FactionFactory.Result> factionsOf = c => FactionFactory.Build(c, idMap, Load(Path.Combine(repo, "worldgen/policies/factions.json")), Load(Path.Combine(repo, "worldgen/policies/culture-presentations.json")), templates, Load(Path.Combine(repo, "worldgen/policies/population.json")));
         Func<IDictionary<string, object>, IDictionary<string, object>, IDictionary<string, object>, XmlDocument, GeneratedCampaignInitializer.Result> buildWith = (c, t, policy, cultureDoc) => {
-            var f = factionsOf(c); var h = HeroFactory.Build(c, idMap, f, rosters, resolver);
+            var f = factionsOf(c); var h = HeroFactory.Build(c, idMap, f, rosters, resolver, population);
             var sf = new SettlementFactory(economy, prototypes, catalog["Settlements"], resolver.Exists); var w = sf.Build(c, t, ports, f, h);
-            return new GeneratedCampaignInitializer(policy, sf, catalog["Settlements"], catalog["Factions"], cultureDoc).Build(t, ports, cells, f, h, w); };
+            return new GeneratedCampaignInitializer(policy, sf, catalog["Settlements"], catalog["Factions"], cultureDoc).Build(t, ports, cells, f, h, w, biomes); };
         Func<IDictionary<string, object>, IDictionary<string, object>, IDictionary<string, object>, GeneratedCampaignInitializer.Result> build = (c, t, policy) => buildWith(c, t, policy, catalog["SPCultures"]);
-        var factions = factionsOf(campaign); var heroes = HeroFactory.Build(campaign, idMap, factions, rosters, resolver);
+        var factions = factionsOf(campaign); var heroes = HeroFactory.Build(campaign, idMap, factions, rosters, resolver, population);
         var factory = new SettlementFactory(economy, prototypes, catalog["Settlements"], resolver.Exists);
         var world = factory.Build(campaign, travel, ports, factions, heroes);
-        var r = new GeneratedCampaignInitializer(startup, factory, catalog["Settlements"], catalog["Factions"], catalog["SPCultures"]).Build(travel, ports, cells, factions, heroes, world);
+        var r = new GeneratedCampaignInitializer(startup, factory, catalog["Settlements"], catalog["Factions"], catalog["SPCultures"]).Build(travel, ports, cells, factions, heroes, world, biomes);
         var map = new GeneratedSpawnModel.CellMap(O(travel, "grid"), cells, L(O(startup, "passable"), "classes"), Records(travel, "settlements"));
         var towns = world.Settlements.Where(s => s.Kind == "town").ToList();
         var fixedSettlements = world.Settlements.ToList();
@@ -166,14 +169,18 @@ internal static class SpawnPolicyTests
         extraCulture.SetAttribute("id", "mnbl_test_culture"); extraCultures.DocumentElement.AppendChild(extraCulture);
         var townless = Copy(startup); O(townless, "starts")["creationCultures"] = creation.Concat(new[] { "mnbl_test_culture" }).ToArray();
         var townlessStarts = buildWith(campaign, travel, townless, extraCultures);
-        var fallbacks = pickyStarts.Starts.Where(s => s.Fallback).ToList();
+        // MMR-262: a creation culture the world has no town of (khuzait on B') falls back for that reason under any food minimum.
+        var absent = pickyStarts.Starts.Where(s => !towns.Any(t => t.Culture == s.Culture)).ToList();
+        var fallbacks = pickyStarts.Starts.Where(s => s.Fallback && !absent.Contains(s)).ToList();
         var qualifyingTowns = new HashSet<string>(pickyStarts.Starts.Where(s => !s.Fallback).Select(s => s.Town));
         var noTown = townlessStarts.Starts.FirstOrDefault(s => s.Culture == "mnbl_test_culture");
         Check(fallbacks.Count > 0 && fallbacks.All(s => s.Reason.StartsWith("no " + s.Culture + " town qualifies") && byId[s.Town].Culture != s.Culture && s.Food >= pickyMinimum &&
                                                        towns.Where(t => t.Culture == s.Culture).All(t => pickyStarts.Starts.All(o => o.Culture != t.Culture || o.Fallback))) &&
+              absent.All(s => s.Fallback && s.Reason == "the world has no " + s.Culture + " town" && s.Town != null && byId.ContainsKey(s.Town) && s.Food >= pickyMinimum) &&
               noTown != null && noTown.Fallback && noTown.Reason == "the world has no mnbl_test_culture town" && byId.ContainsKey(noTown.Town) && noTown.Food >= foodMinimum &&
               townlessStarts.Documents.Single(d => d.Key == "SPCultures").Value.SelectSingleNode("SPCultures/Culture[@id='mnbl_test_culture']") != null,
               "the fallback rule: with foodMinimum " + pickyMinimum + " (one above the poorest culture's best port town), " + String.Join("; ", fallbacks.Select(s => s.Culture + " falls back to " + byId[s.Town].Culture + " town " + s.Town.Substring(s.Town.Length - 6) + " (food " + s.Food + ")")) +
+              String.Concat(absent.Select(s => "; " + s.Culture + " (no town in this world) falls back to " + (s.Town != null && byId.ContainsKey(s.Town) ? byId[s.Town].Culture + " town " + s.Town.Substring(s.Town.Length - 6) : "no town"))) +
               "; a creation culture with no town (a test culture added to the catalog) takes the qualifying town " + (noTown == null ? "?" : noTown.Town.Substring(noTown.Town.Length - 6)) + " the starts stream draws, reported");
 
         // Hideouts.
@@ -185,16 +192,35 @@ internal static class SpawnPolicyTests
         Check(r.Hideouts.Count >= Math.Min(total, 1) && r.Hideouts.All(h => map.Passable(h.X, h.Y) && townGroups.Contains(map.Group(h.X, h.Y))) &&
               r.Hideouts.All(h => fixedSettlements.All(s => map.Distance(h.X, h.Y, s.X, s.Y) >= away - 1e-9)) &&
               r.Hideouts.All(h => r.Hideouts.Where(g => g != h).All(g => map.Distance(h.X, h.Y, g.X, g.Y) >= apart - 1e-9)) &&
-              r.Hideouts.All(h => (weights.ContainsKey(nearestTownCulture(h)) ? O(weights, nearestTownCulture(h)) : weights.Values.Cast<IDictionary<string, object>>().SelectMany(w => w).ToDictionary(x => x.Key, x => x.Value)).ContainsKey(h.Culture)) &&
+              r.Hideouts.All(h => r.HideoutGrounds[h.Id].TownCulture == nearestTownCulture(h) && (r.HideoutGrounds[h.Id].Weights.ContainsKey(h.Culture) || h.Provenance.Contains(" replaced by " + h.Culture + " "))) &&
               r.Hideouts.All(h => CampaignIdentity.Problem(h.Id, r.WorldPrefix) == null && h.MapPrefab != null && h.Prototype != null) &&
               docs["Settlements"].DocumentElement.SelectNodes("Settlement[@type='Hideout']/Components/Hideout").Count == r.Hideouts.Count &&
               L(hp, "requiredCultures").All(c => r.Hideouts.Any(h => h.Culture == c)),
               r.Hideouts.Count + " hideouts (the installed " + D(hp, "perTown") + " per town gives " + total + "; " + String.Join(", ", r.Hideouts.GroupBy(h => h.Culture).OrderBy(g => g.Key).Select(g => g.Key + " " + g.Count())) +
-              "; every one of the " + L(hp, "requiredCultures").Count + " bandit cultures BanditSpawnCampaignBehavior spawns for has one) sit on passable land of a land group with towns, at least " + Math.Round(away, 1) + " from every settlement and " + Math.Round(apart, 1) + " from each other, with the bandit culture the installed weights give their nearest town's culture" +
+              "; every one of the " + L(hp, "requiredCultures").Count + " bandit cultures BanditSpawnCampaignBehavior spawns for has one) sit on passable land of a land group with towns, at least " + Math.Round(away, 1) + " from every settlement and " + Math.Round(apart, 1) + " from each other, with a bandit culture weighted by their nearest town's culture and their ground" +
               (r.Notes.Count == 0 ? "" : "; " + String.Join("; ", r.Notes)));
+        // MMR-287 (RT-28): each hideout's weights are its nearest town culture's mixed with its cell's ground, recomputed from the bundle's biome
+        // plane and the travel cells' sea class; a ground the policy lists moves the draw toward it.
+        var hb = O(hp, "biome");
+        var regrounded = r.Hideouts.Where(h => !h.Provenance.Contains(" replaced by ")).Where(h => {
+            var g = r.HideoutGrounds[h.Id]; var cell = map.Index(h.X, h.Y);
+            bool coast = map.Near(cell / map.Cols, cell % map.Cols, (int)D(hb, "coastCells"), "sea");
+            var w = GeneratedCampaignInitializer.GroundWeights(weights.ContainsKey(g.TownCulture) ? O(weights, g.TownCulture) : null, hb, biomes(h.X, h.Y), coast);
+            return g.Biome == biomes(h.X, h.Y) && g.Coast == coast && w.Count == g.Weights.Count && w.All(kv => g.Weights.ContainsKey(kv.Key) && Math.Abs(g.Weights[kv.Key] - kv.Value) < 1e-12) &&
+                   Math.Abs(g.Weights.Values.Sum() - 1) < 1e-9 && g.Weights[h.Culture] > 0; }).Count();
+        var desertCell = GeneratedCampaignInitializer.GroundWeights(O(weights, "sturgia"), hb, "desert", false);
+        var coastForest = GeneratedCampaignInitializer.GroundWeights(O(weights, "khuzait"), hb, "forest", true);
+        var unlisted = GeneratedCampaignInitializer.GroundWeights(O(weights, "khuzait"), hb, "lake", false);
+        Check(regrounded == r.Hideouts.Count(h => !h.Provenance.Contains(" replaced by ")) && Math.Abs(desertCell["desert_bandits"] - D(hb, "share")) < 1e-12 &&
+              Math.Abs(coastForest["forest_bandits"] - D(hb, "share") / 2) < 1e-12 && Math.Abs(coastForest["sea_raiders"] - D(hb, "share") / 2) < 1e-12 &&
+              Math.Abs(coastForest["steppe_bandits"] - (1 - D(hb, "share"))) < 1e-12 && unlisted.Count == 1 && unlisted["steppe_bandits"] == 1,
+              "every drawn hideout's weights are (1 - " + D(hb, "share") + ") x its nearest town culture's + " + D(hb, "share") + " x its ground's (biome plane, coast within " + D(hb, "coastCells") +
+              " cell of sea), recomputed for " + regrounded + " hideouts; a sturgian town's desert cell weighs desert bandits " + D(hb, "share") + ", a khuzait town's coastal forest cell splits the ground share between forest bandits and sea raiders, an unlisted biome keeps the town's weights");
         // The coverage rule: with every installed weight pointing at forest bandits, every required bandit culture still gets a hideout.
         var forestOnly = Copy(startup);
         foreach (var w in O(O(forestOnly, "hideouts"), "cultureWeights").Values.Cast<IDictionary<string, object>>()) { foreach (var k in w.Keys.ToList()) w.Remove(k); w["forest_bandits"] = 1; }
+        foreach (var w in O(O(O(forestOnly, "hideouts"), "biome"), "biomeWeights").Values.Cast<IDictionary<string, object>>()) { foreach (var k in w.Keys.ToList()) w.Remove(k); w["forest_bandits"] = 1; }
+        O(O(forestOnly, "hideouts"), "biome")["coastWeight"] = 0;
         var covered = build(campaign, travel, forestOnly);
         Check(L(hp, "requiredCultures").All(c => covered.Hideouts.Count(h => h.Culture == c) >= 1) && covered.Hideouts.Count == r.Hideouts.Count &&
               covered.Notes.Count(n => n.Contains("so every bandit culture has a hideout")) == L(hp, "requiredCultures").Count - 1,
@@ -250,7 +276,7 @@ internal static class SpawnPolicyTests
 
         // Determinism and refusals.
         var again = build(campaign, travel, startup);
-        var shuffled = Copy(campaign); foreach (var key in new[] { "towns", "castles", "villages", "heroes", "kingdoms", "clans" }) shuffled[key] = ((IEnumerable)shuffled[key]).Cast<object>().Reverse().ToArray();
+        var shuffled = Copy(campaign); foreach (var key in new[] { "towns", "castles", "villages", "heroes", "kingdoms", "houses" }) shuffled[key] = ((IEnumerable)shuffled[key]).Cast<object>().Reverse().ToArray();
         Check(again.IntentsSha256 == r.IntentsSha256 && build(shuffled, travel, startup).IntentsSha256 == r.IntentsSha256 &&
               again.Documents.Select(d => d.Value.OuterXml).SequenceEqual(r.Documents.Select(d => d.Value.OuterXml)),
               "building twice, or from reordered records, gives the same startup intents (" + r.IntentsSha256.Substring(0, 12) + ") and documents");

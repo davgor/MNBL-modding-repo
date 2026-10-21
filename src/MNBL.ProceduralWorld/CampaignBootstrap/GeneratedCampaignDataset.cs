@@ -598,8 +598,9 @@ namespace MNBL.ProceduralWorld.CampaignBootstrap
         // MMR-45: a compiled world's documents for the new game, in RegistrationPlan.NewGameOrder: its own documents (SPCultures with the
         // creation cultures' generated start points, NPCCharacters, Heroes, Kingdoms, Factions, Settlements: the factories' records, merged)
         // with the installed records they need re-emitted by the same closure as the fixture world (stock categories, the engine's
-        // literal NPC lookups, the startup plan's templates, every generated record's references), and the installed WorkshopTypes and
-        // LocationComplexTemplates whole. generated: the world's declared objects (Type.id); an official key among them must be an alias.
+        // literal NPC lookups, the plan's templates, every generated record's references), and the installed WorkshopTypes and
+        // LocationComplexTemplates whole. planTemplates: the startup plan's templates and the backstory-safe wanderer pool the runtime top-up
+        // draws from (CompiledWorldDataset; MMR-262). generated: the world's declared objects (Type.id); an official key among them must be an alias.
         internal static List<KeyValuePair<string, XmlDocument>> CompiledWorldDocuments(IDictionary<string, XmlDocument> mergedSources, IEnumerable<string> verifiedDefaultReferences,
             IDictionary<string, XmlDocument> worldDocuments, IEnumerable<string> generatedKeys, IEnumerable<string> planTemplates, out List<Provenance> templates, out List<string> optionalAbsent)
         {
@@ -625,7 +626,7 @@ namespace MNBL.ProceduralWorld.CampaignBootstrap
             }
             var roots = StockRoots(catalog)
                 .Concat(InstalledEngineCharacterIds.OrderBy(x => x, StringComparer.Ordinal).Select(id => new KeyValuePair<string, string>("NPCCharacter." + id, "installed code string-literal lookup")))
-                .Concat(planTemplates.Distinct().OrderBy(x => x, StringComparer.Ordinal).Select(t => new KeyValuePair<string, string>("NPCCharacter." + t, "MMR-34 startup plan template")));
+                .Concat(planTemplates.Distinct().OrderBy(x => x, StringComparer.Ordinal).Select(t => new KeyValuePair<string, string>("NPCCharacter." + t, "MMR-34 startup plan or MMR-281 wanderer pool template")));
             var closure = Close(catalog, generated, defaults, roots, docs.Values);
             EmitTemplates(docs["NPCCharacters"], catalog, closure);
             templates = closure.Provenance.OrderBy(x => x.Reference, StringComparer.Ordinal).ToList();

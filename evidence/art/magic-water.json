@@ -1,0 +1,2270 @@
+{
+ "schema": "mnbl.magic-water-art",
+ "version": 1,
+ "ticket": "MMR-290",
+ "atlas": {
+  "size": 2048,
+  "columns": [
+   "trunk",
+   "fork",
+   "tip",
+   "burst"
+  ],
+  "rows": [
+   "weave",
+   "umbral",
+   "infernal",
+   "radiant",
+   "fire",
+   "water",
+   "earth",
+   "air"
+  ],
+  "cell": [
+   512,
+   256
+  ],
+  "marginPx": 16,
+  "inner": [
+   480,
+   224
+  ],
+  "vectorArgument": "SetVectorArgument(0.25, 0.125, column / 4, row / 8)",
+  "widthScale": 1.07,
+  "frame": "u left to right, v top to bottom inside the margin; growth toward +u; the box spans the whole cell; every stamp mirrored about v = 0.5",
+  "chain": "as magic_ground.py (contract C1): 0.75 L spacing, head u 0..0.2 over tail u 0.8..1, feather in optical depth"
+ },
+ "blend": "the water shader adds albedo x alpha x factor x lighting to the water colour (water_surface_worldmap.rs :400-468); additive only",
+ "palette": {
+  "weave": {
+   "hot": [
+    244,
+    240,
+    250
+   ],
+   "thread": null,
+   "halo": [
+    187,
+    173,
+    245
+   ]
+  },
+  "umbral": {
+   "hot": [
+    206,
+    168,
+    246
+   ],
+   "thread": [
+    138,
+    74,
+    214
+   ],
+   "halo": [
+    101,
+    50,
+    158
+   ]
+  },
+  "infernal": {
+   "hot": [
+    246,
+    150,
+    112
+   ],
+   "thread": [
+    214,
+    38,
+    40
+   ],
+   "halo": [
+    158,
+    22,
+    29
+   ]
+  },
+  "radiant": {
+   "hot": [
+    248,
+    244,
+    222
+   ],
+   "thread": [
+    236,
+    206,
+    116
+   ],
+   "halo": [
+    191,
+    166,
+    86
+   ]
+  },
+  "fire": {
+   "hot": [
+    248,
+    216,
+    140
+   ],
+   "thread": [
+    246,
+    126,
+    38
+   ],
+   "halo": [
+    191,
+    72,
+    22
+   ]
+  },
+  "water": {
+   "hot": [
+    200,
+    246,
+    246
+   ],
+   "thread": [
+    38,
+    200,
+    222
+   ],
+   "halo": [
+    18,
+    140,
+    169
+   ]
+  },
+  "earth": {
+   "hot": [
+    232,
+    206,
+    162
+   ],
+   "thread": [
+    160,
+    118,
+    26
+   ],
+   "halo": [
+    104,
+    72,
+    16
+   ]
+  },
+  "air": {
+   "hot": [
+    238,
+    244,
+    250
+   ],
+   "thread": [
+    230,
+    236,
+    248
+   ],
+   "halo": [
+    156,
+    164,
+    198
+   ]
+  }
+ },
+ "haloAlphaMax": 0.25,
+ "waters": {
+  "deepSea": [
+   19,
+   35,
+   58
+  ],
+  "coastSea": [
+   35,
+   47,
+   62
+  ],
+  "lakeB": [
+   52,
+   63,
+   75
+  ],
+  "shallowLakeA": [
+   62,
+   98,
+   98
+  ]
+ },
+ "gates": {
+  "seams": "alpha 0 within the 16 px margin of every cell",
+  "vSymmetry": "max |a(u, v) - a(u, 1 - v)| <= 2/255 (mirrored by construction)",
+  "chain": "trunk raw alpha at u 0..0.2 equals u 0.8..1 (period 384 texels) and the feathered head over tail composites to one stamp's alpha: MAE <= 4/255 each",
+  "readsOnWater": "core texels (core and burst node masks) added to each acc4 water colour (linear light, lighting 1): CIEDE2000 >= 15; halo-only texels <= 8, so the halo never reads as a slab",
+  "noClipping": "at most 1% of core texels (alpha >= 64) have a channel >= 254 (adaptation: a luminous additive thread is not a ground albedo, so the vanilla world-map decal envelope MMR-259 used is recorded by MMR-288's evidence, not applied here)",
+  "separation": "every pair of schools: thread colours (weave: its opal mean) added to each acc4 water colour (linear light, lighting 1) differ by CIEDE2000 >= 15",
+  "bcn": "DXT5 stand-in for BC7: diffuse RGB MAE weighted by alpha <= 4.87 (MMR-259 ceiling), alpha MAE <= 3"
+ },
+ "schools": {
+  "weave": {
+   "cells": [
+    {
+     "kind": "trunk",
+     "marginAlphaMax": 0,
+     "vSymmetryMaxAlpha": 0,
+     "coreOnWaterDe": {
+      "deepSea": 55.85,
+      "coastSea": 53.8,
+      "lakeB": 49.47,
+      "shallowLakeA": 37.13
+     },
+     "coreOnWaterSrgb": {
+      "deepSea": [
+       164.6,
+       182.6,
+       206.4
+      ],
+      "coastSea": [
+       166.6,
+       184.7,
+       207.3
+      ],
+      "lakeB": [
+       170.0,
+       188.3,
+       210.5
+      ],
+      "shallowLakeA": [
+       172.6,
+       199.9,
+       217.8
+      ]
+     },
+     "haloOnWaterDe": {
+      "deepSea": 4.89,
+      "coastSea": 4.77,
+      "lakeB": 4.03,
+      "shallowLakeA": 3.27
+     },
+     "coreClippedShare": 0.0,
+     "alphaMean": 0.1205,
+     "skeleton": {
+      "mains": 1,
+      "capillaries": 36,
+      "node": false
+     }
+    },
+    {
+     "kind": "fork",
+     "marginAlphaMax": 0,
+     "vSymmetryMaxAlpha": 0,
+     "coreOnWaterDe": {
+      "deepSea": 52.31,
+      "coastSea": 50.22,
+      "lakeB": 47.0,
+      "shallowLakeA": 35.51
+     },
+     "coreOnWaterSrgb": {
+      "deepSea": [
+       154.9,
+       175.7,
+       200.0
+      ],
+      "coastSea": [
+       157.1,
+       177.8,
+       200.9
+      ],
+      "lakeB": [
+       160.8,
+       181.6,
+       204.3
+      ],
+      "shallowLakeA": [
+       163.6,
+       193.7,
+       211.9
+      ]
+     },
+     "haloOnWaterDe": {
+      "deepSea": 4.8,
+      "coastSea": 4.69,
+      "lakeB": 3.98,
+      "shallowLakeA": 3.28
+     },
+     "coreClippedShare": 0.0,
+     "alphaMean": 0.1311,
+     "skeleton": {
+      "mains": 3,
+      "capillaries": 9,
+      "node": false
+     }
+    },
+    {
+     "kind": "tip",
+     "marginAlphaMax": 0,
+     "vSymmetryMaxAlpha": 0,
+     "coreOnWaterDe": {
+      "deepSea": 53.92,
+      "coastSea": 51.83,
+      "lakeB": 48.16,
+      "shallowLakeA": 36.17
+     },
+     "coreOnWaterSrgb": {
+      "deepSea": [
+       160.2,
+       178.8,
+       201.6
+      ],
+      "coastSea": [
+       162.3,
+       180.9,
+       202.5
+      ],
+      "lakeB": [
+       165.8,
+       184.6,
+       205.8
+      ],
+      "shallowLakeA": [
+       168.5,
+       196.5,
+       213.3
+      ]
+     },
+     "haloOnWaterDe": {
+      "deepSea": 4.85,
+      "coastSea": 4.73,
+      "lakeB": 4.04,
+      "shallowLakeA": 3.39
+     },
+     "coreClippedShare": 0.0,
+     "alphaMean": 0.0679,
+     "skeleton": {
+      "mains": 1,
+      "capillaries": 8,
+      "node": false
+     }
+    },
+    {
+     "kind": "burst",
+     "marginAlphaMax": 0,
+     "vSymmetryMaxAlpha": 0,
+     "coreOnWaterDe": {
+      "deepSea": 63.26,
+      "coastSea": 60.6,
+      "lakeB": 53.09,
+      "shallowLakeA": 40.48
+     },
+     "coreOnWaterSrgb": {
+      "deepSea": [
+       183.8,
+       196.2,
+       221.0
+      ],
+      "coastSea": [
+       185.5,
+       198.0,
+       221.8
+      ],
+      "lakeB": [
+       188.5,
+       201.3,
+       224.7
+      ],
+      "shallowLakeA": [
+       190.8,
+       212.0,
+       231.5
+      ]
+     },
+     "haloOnWaterDe": {
+      "deepSea": 5.45,
+      "coastSea": 5.33,
+      "lakeB": 4.54,
+      "shallowLakeA": 3.75
+     },
+     "coreClippedShare": 0.0,
+     "alphaMean": 0.2442,
+     "skeleton": {
+      "mains": 8,
+      "capillaries": 21,
+      "node": true
+     }
+    }
+   ],
+   "failures": [],
+   "chain": {
+    "periodAlphaMae": 1.261,
+    "jointAlphaMae": 0.837
+   },
+   "row": 0
+  },
+  "umbral": {
+   "cells": [
+    {
+     "kind": "trunk",
+     "marginAlphaMax": 0,
+     "vSymmetryMaxAlpha": 0,
+     "coreOnWaterDe": {
+      "deepSea": 36.68,
+      "coastSea": 34.86,
+      "lakeB": 32.55,
+      "shallowLakeA": 34.69
+     },
+     "coreOnWaterSrgb": {
+      "deepSea": [
+       150.8,
+       117.0,
+       201.2
+      ],
+      "coastSea": [
+       153.1,
+       120.5,
+       202.1
+      ],
+      "lakeB": [
+       156.9,
+       126.6,
+       205.4
+      ],
+      "shallowLakeA": [
+       159.8,
+       145.0,
+       213.0
+      ]
+     },
+     "haloOnWaterDe": {
+      "deepSea": 3.39,
+      "coastSea": 3.61,
+      "lakeB": 2.89,
+      "shallowLakeA": 1.81
+     },
+     "coreClippedShare": 0.0,
+     "alphaMean": 0.1314,
+     "skeleton": {
+      "mains": 1,
+      "capillaries": 39,
+      "node": false
+     }
+    },
+    {
+     "kind": "fork",
+     "marginAlphaMax": 0,
+     "vSymmetryMaxAlpha": 0,
+     "coreOnWaterDe": {
+      "deepSea": 34.67,
+      "coastSea": 32.83,
+      "lakeB": 30.53,
+      "shallowLakeA": 33.54
+     },
+     "coreOnWaterSrgb": {
+      "deepSea": [
+       145.3,
+       111.0,
+       197.0
+      ],
+      "coastSea": [
+       147.7,
+       114.8,
+       197.9
+      ],
+      "lakeB": [
+       151.6,
+       121.2,
+       201.4
+      ],
+      "shallowLakeA": [
+       154.6,
+       140.5,
+       209.1
+      ]
+     },
+     "haloOnWaterDe": {
+      "deepSea": 3.71,
+      "coastSea": 3.98,
+      "lakeB": 3.2,
+      "shallowLakeA": 2.03
+     },
+     "coreClippedShare": 0.0,
+     "alphaMean": 0.1465,
+     "skeleton": {
+      "mains": 3,
+      "capillaries": 13,
+      "node": false
+     }
+    },
+    {
+     "kind": "tip",
+     "marginAlphaMax": 0,
+     "vSymmetryMaxAlpha": 0,
+     "coreOnWaterDe": {
+      "deepSea": 35.65,
+      "coastSea": 33.83,
+      "lakeB": 31.55,
+      "shallowLakeA": 34.12
+     },
+     "coreOnWaterSrgb": {
+      "deepSea": [
+       147.9,
+       114.3,
+       198.2
+      ],
+      "coastSea": [
+       150.2,
+       117.9,
+       199.1
+      ],
+      "lakeB": [
+       154.1,
+       124.1,
+       202.5
+      ],
+      "shallowLakeA": [
+       157.0,
+       143.0,
+       210.2
+      ]
+     },
+     "haloOnWaterDe": {
+      "deepSea": 3.44,
+      "coastSea": 3.67,
+      "lakeB": 2.94,
+      "shallowLakeA": 1.85
+     },
+     "coreClippedShare": 0.0,
+     "alphaMean": 0.073,
+     "skeleton": {
+      "mains": 1,
+      "capillaries": 9,
+      "node": false
+     }
+    },
+    {
+     "kind": "burst",
+     "marginAlphaMax": 0,
+     "vSymmetryMaxAlpha": 0,
+     "coreOnWaterDe": {
+      "deepSea": 41.37,
+      "coastSea": 39.5,
+      "lakeB": 37.14,
+      "shallowLakeA": 37.02
+     },
+     "coreOnWaterSrgb": {
+      "deepSea": [
+       163.9,
+       128.5,
+       214.4
+      ],
+      "coastSea": [
+       166.0,
+       131.7,
+       215.2
+      ],
+      "lakeB": [
+       169.4,
+       137.2,
+       218.3
+      ],
+      "shallowLakeA": [
+       172.0,
+       154.0,
+       225.3
+      ]
+     },
+     "haloOnWaterDe": {
+      "deepSea": 4.03,
+      "coastSea": 4.36,
+      "lakeB": 3.53,
+      "shallowLakeA": 2.26
+     },
+     "coreClippedShare": 0.0,
+     "alphaMean": 0.2688,
+     "skeleton": {
+      "mains": 8,
+      "capillaries": 23,
+      "node": true
+     }
+    }
+   ],
+   "failures": [],
+   "chain": {
+    "periodAlphaMae": 1.52,
+    "jointAlphaMae": 0.908
+   },
+   "row": 1
+  },
+  "infernal": {
+   "cells": [
+    {
+     "kind": "trunk",
+     "marginAlphaMax": 0,
+     "vSymmetryMaxAlpha": 0,
+     "coreOnWaterDe": {
+      "deepSea": 45.3,
+      "coastSea": 43.01,
+      "lakeB": 40.69,
+      "shallowLakeA": 43.04
+     },
+     "coreOnWaterSrgb": {
+      "deepSea": [
+       197.1,
+       103.2,
+       93.2
+      ],
+      "coastSea": [
+       198.7,
+       107.3,
+       95.6
+      ],
+      "lakeB": [
+       201.4,
+       114.3,
+       103.9
+      ],
+      "shallowLakeA": [
+       203.5,
+       134.8,
+       120.6
+      ]
+     },
+     "haloOnWaterDe": {
+      "deepSea": 5.59,
+      "coastSea": 4.77,
+      "lakeB": 3.39,
+      "shallowLakeA": 1.48
+     },
+     "coreClippedShare": 0.0,
+     "alphaMean": 0.1322,
+     "skeleton": {
+      "mains": 1,
+      "capillaries": 42,
+      "node": false
+     }
+    },
+    {
+     "kind": "fork",
+     "marginAlphaMax": 0,
+     "vSymmetryMaxAlpha": 0,
+     "coreOnWaterDe": {
+      "deepSea": 43.27,
+      "coastSea": 41.08,
+      "lakeB": 38.84,
+      "shallowLakeA": 42.13
+     },
+     "coreOnWaterSrgb": {
+      "deepSea": [
+       190.1,
+       95.4,
+       88.8
+      ],
+      "coastSea": [
+       191.8,
+       99.8,
+       91.3
+      ],
+      "lakeB": [
+       194.7,
+       107.4,
+       100.0
+      ],
+      "shallowLakeA": [
+       196.9,
+       129.3,
+       117.4
+      ]
+     },
+     "haloOnWaterDe": {
+      "deepSea": 5.47,
+      "coastSea": 4.66,
+      "lakeB": 3.3,
+      "shallowLakeA": 1.44
+     },
+     "coreClippedShare": 0.0,
+     "alphaMean": 0.1497,
+     "skeleton": {
+      "mains": 3,
+      "capillaries": 16,
+      "node": false
+     }
+    },
+    {
+     "kind": "tip",
+     "marginAlphaMax": 0,
+     "vSymmetryMaxAlpha": 0,
+     "coreOnWaterDe": {
+      "deepSea": 43.71,
+      "coastSea": 41.5,
+      "lakeB": 39.25,
+      "shallowLakeA": 42.21
+     },
+     "coreOnWaterSrgb": {
+      "deepSea": [
+       190.9,
+       98.5,
+       90.5
+      ],
+      "coastSea": [
+       192.5,
+       102.8,
+       92.9
+      ],
+      "lakeB": [
+       195.4,
+       110.1,
+       101.5
+      ],
+      "shallowLakeA": [
+       197.6,
+       131.5,
+       118.6
+      ]
+     },
+     "haloOnWaterDe": {
+      "deepSea": 5.43,
+      "coastSea": 4.62,
+      "lakeB": 3.27,
+      "shallowLakeA": 1.43
+     },
+     "coreClippedShare": 0.0,
+     "alphaMean": 0.0728,
+     "skeleton": {
+      "mains": 1,
+      "capillaries": 9,
+      "node": false
+     }
+    },
+    {
+     "kind": "burst",
+     "marginAlphaMax": 0,
+     "vSymmetryMaxAlpha": 0,
+     "coreOnWaterDe": {
+      "deepSea": 48.77,
+      "coastSea": 46.37,
+      "lakeB": 43.96,
+      "shallowLakeA": 44.74
+     },
+     "coreOnWaterSrgb": {
+      "deepSea": [
+       210.4,
+       112.8,
+       99.2
+      ],
+      "coastSea": [
+       211.9,
+       116.4,
+       101.4
+      ],
+      "lakeB": [
+       214.3,
+       122.8,
+       109.1
+      ],
+      "shallowLakeA": [
+       216.3,
+       141.8,
+       125.0
+      ]
+     },
+     "haloOnWaterDe": {
+      "deepSea": 5.79,
+      "coastSea": 4.95,
+      "lakeB": 3.52,
+      "shallowLakeA": 1.53
+     },
+     "coreClippedShare": 0.0,
+     "alphaMean": 0.2719,
+     "skeleton": {
+      "mains": 8,
+      "capillaries": 23,
+      "node": true
+     }
+    }
+   ],
+   "failures": [],
+   "chain": {
+    "periodAlphaMae": 1.49,
+    "jointAlphaMae": 0.921
+   },
+   "row": 2
+  },
+  "radiant": {
+   "cells": [
+    {
+     "kind": "trunk",
+     "marginAlphaMax": 0,
+     "vSymmetryMaxAlpha": 0,
+     "coreOnWaterDe": {
+      "deepSea": 68.12,
+      "coastSea": 64.67,
+      "lakeB": 56.86,
+      "shallowLakeA": 42.15
+     },
+     "coreOnWaterSrgb": {
+      "deepSea": [
+       205.3,
+       194.4,
+       162.5
+      ],
+      "coastSea": [
+       206.8,
+       196.3,
+       163.7
+      ],
+      "lakeB": [
+       209.4,
+       199.6,
+       168.0
+      ],
+      "shallowLakeA": [
+       211.4,
+       210.4,
+       177.7
+      ]
+     },
+     "haloOnWaterDe": {
+      "deepSea": 5.54,
+      "coastSea": 4.47,
+      "lakeB": 3.36,
+      "shallowLakeA": 2.2
+     },
+     "coreClippedShare": 0.0,
+     "alphaMean": 0.1215,
+     "skeleton": {
+      "mains": 1,
+      "capillaries": 33,
+      "node": false
+     }
+    },
+    {
+     "kind": "fork",
+     "marginAlphaMax": 0,
+     "vSymmetryMaxAlpha": 0,
+     "coreOnWaterDe": {
+      "deepSea": 65.44,
+      "coastSea": 62.36,
+      "lakeB": 55.79,
+      "shallowLakeA": 41.17
+     },
+     "coreOnWaterSrgb": {
+      "deepSea": [
+       199.8,
+       188.3,
+       155.0
+      ],
+      "coastSea": [
+       201.4,
+       190.2,
+       156.3
+      ],
+      "lakeB": [
+       204.0,
+       193.7,
+       160.9
+      ],
+      "shallowLakeA": [
+       206.1,
+       204.9,
+       171.1
+      ]
+     },
+     "haloOnWaterDe": {
+      "deepSea": 5.25,
+      "coastSea": 4.23,
+      "lakeB": 3.17,
+      "shallowLakeA": 2.07
+     },
+     "coreClippedShare": 0.0,
+     "alphaMean": 0.1351,
+     "skeleton": {
+      "mains": 3,
+      "capillaries": 7,
+      "node": false
+     }
+    },
+    {
+     "kind": "tip",
+     "marginAlphaMax": 0,
+     "vSymmetryMaxAlpha": 0,
+     "coreOnWaterDe": {
+      "deepSea": 66.33,
+      "coastSea": 63.14,
+      "lakeB": 56.07,
+      "shallowLakeA": 41.4
+     },
+     "coreOnWaterSrgb": {
+      "deepSea": [
+       201.4,
+       190.8,
+       159.5
+      ],
+      "coastSea": [
+       202.9,
+       192.7,
+       160.7
+      ],
+      "lakeB": [
+       205.6,
+       196.1,
+       165.2
+      ],
+      "shallowLakeA": [
+       207.6,
+       207.2,
+       175.0
+      ]
+     },
+     "haloOnWaterDe": {
+      "deepSea": 5.79,
+      "coastSea": 4.69,
+      "lakeB": 3.52,
+      "shallowLakeA": 2.31
+     },
+     "coreClippedShare": 0.0,
+     "alphaMean": 0.0691,
+     "skeleton": {
+      "mains": 1,
+      "capillaries": 11,
+      "node": false
+     }
+    },
+    {
+     "kind": "burst",
+     "marginAlphaMax": 0,
+     "vSymmetryMaxAlpha": 0,
+     "coreOnWaterDe": {
+      "deepSea": 74.27,
+      "coastSea": 68.65,
+      "lakeB": 59.08,
+      "shallowLakeA": 44.41
+     },
+     "coreOnWaterSrgb": {
+      "deepSea": [
+       217.9,
+       208.1,
+       177.3
+      ],
+      "coastSea": [
+       219.3,
+       209.8,
+       178.4
+      ],
+      "lakeB": [
+       221.7,
+       212.8,
+       182.3
+      ],
+      "shallowLakeA": [
+       223.6,
+       222.8,
+       191.1
+      ]
+     },
+     "haloOnWaterDe": {
+      "deepSea": 5.78,
+      "coastSea": 4.68,
+      "lakeB": 3.52,
+      "shallowLakeA": 2.31
+     },
+     "coreClippedShare": 0.0,
+     "alphaMean": 0.247,
+     "skeleton": {
+      "mains": 8,
+      "capillaries": 21,
+      "node": true
+     }
+    }
+   ],
+   "failures": [],
+   "chain": {
+    "periodAlphaMae": 1.495,
+    "jointAlphaMae": 0.94
+   },
+   "row": 3
+  },
+  "fire": {
+   "cells": [
+    {
+     "kind": "trunk",
+     "marginAlphaMax": 0,
+     "vSymmetryMaxAlpha": 0,
+     "coreOnWaterDe": {
+      "deepSea": 57.7,
+      "coastSea": 54.34,
+      "lakeB": 51.09,
+      "shallowLakeA": 42.14
+     },
+     "coreOnWaterSrgb": {
+      "deepSea": [
+       205.0,
+       155.7,
+       106.1
+      ],
+      "coastSea": [
+       206.5,
+       158.2,
+       108.1
+      ],
+      "lakeB": [
+       209.1,
+       162.5,
+       115.3
+      ],
+      "shallowLakeA": [
+       211.1,
+       176.4,
+       130.3
+      ]
+     },
+     "haloOnWaterDe": {
+      "deepSea": 7.63,
+      "coastSea": 6.58,
+      "lakeB": 4.77,
+      "shallowLakeA": 2.22
+     },
+     "coreClippedShare": 0.0,
+     "alphaMean": 0.1317,
+     "skeleton": {
+      "mains": 1,
+      "capillaries": 33,
+      "node": false
+     }
+    },
+    {
+     "kind": "fork",
+     "marginAlphaMax": 0,
+     "vSymmetryMaxAlpha": 0,
+     "coreOnWaterDe": {
+      "deepSea": 55.53,
+      "coastSea": 52.2,
+      "lakeB": 49.11,
+      "shallowLakeA": 41.8
+     },
+     "coreOnWaterSrgb": {
+      "deepSea": [
+       202.8,
+       148.0,
+       100.0
+      ],
+      "coastSea": [
+       204.4,
+       150.6,
+       102.1
+      ],
+      "lakeB": [
+       207.0,
+       155.3,
+       109.8
+      ],
+      "shallowLakeA": [
+       209.0,
+       169.9,
+       125.6
+      ]
+     },
+     "haloOnWaterDe": {
+      "deepSea": 6.49,
+      "coastSea": 5.5,
+      "lakeB": 3.93,
+      "shallowLakeA": 1.84
+     },
+     "coreClippedShare": 0.0,
+     "alphaMean": 0.1432,
+     "skeleton": {
+      "mains": 3,
+      "capillaries": 13,
+      "node": false
+     }
+    },
+    {
+     "kind": "tip",
+     "marginAlphaMax": 0,
+     "vSymmetryMaxAlpha": 0,
+     "coreOnWaterDe": {
+      "deepSea": 55.22,
+      "coastSea": 51.83,
+      "lakeB": 48.71,
+      "shallowLakeA": 41.07
+     },
+     "coreOnWaterSrgb": {
+      "deepSea": [
+       199.0,
+       149.3,
+       101.9
+      ],
+      "coastSea": [
+       200.6,
+       151.9,
+       104.1
+      ],
+      "lakeB": [
+       203.2,
+       156.5,
+       111.6
+      ],
+      "shallowLakeA": [
+       205.3,
+       171.0,
+       127.1
+      ]
+     },
+     "haloOnWaterDe": {
+      "deepSea": 6.04,
+      "coastSea": 5.09,
+      "lakeB": 3.62,
+      "shallowLakeA": 1.7
+     },
+     "coreClippedShare": 0.0,
+     "alphaMean": 0.0691,
+     "skeleton": {
+      "mains": 1,
+      "capillaries": 8,
+      "node": false
+     }
+    },
+    {
+     "kind": "burst",
+     "marginAlphaMax": 0,
+     "vSymmetryMaxAlpha": 0,
+     "coreOnWaterDe": {
+      "deepSea": 64.67,
+      "coastSea": 61.37,
+      "lakeB": 56.62,
+      "shallowLakeA": 45.15
+     },
+     "coreOnWaterSrgb": {
+      "deepSea": [
+       222.2,
+       171.6,
+       115.4
+      ],
+      "coastSea": [
+       223.6,
+       173.8,
+       117.2
+      ],
+      "lakeB": [
+       225.9,
+       177.7,
+       123.8
+      ],
+      "shallowLakeA": [
+       227.8,
+       190.2,
+       137.6
+      ]
+     },
+     "haloOnWaterDe": {
+      "deepSea": 7.52,
+      "coastSea": 6.48,
+      "lakeB": 4.68,
+      "shallowLakeA": 2.19
+     },
+     "coreClippedShare": 0.0,
+     "alphaMean": 0.2704,
+     "skeleton": {
+      "mains": 8,
+      "capillaries": 24,
+      "node": true
+     }
+    }
+   ],
+   "failures": [],
+   "chain": {
+    "periodAlphaMae": 1.476,
+    "jointAlphaMae": 0.935
+   },
+   "row": 4
+  },
+  "water": {
+   "cells": [
+    {
+     "kind": "trunk",
+     "marginAlphaMax": 0,
+     "vSymmetryMaxAlpha": 0,
+     "coreOnWaterDe": {
+      "deepSea": 57.47,
+      "coastSea": 54.94,
+      "lakeB": 50.77,
+      "shallowLakeA": 35.87
+     },
+     "coreOnWaterSrgb": {
+      "deepSea": [
+       125.6,
+       189.2,
+       200.4
+      ],
+      "coastSea": [
+       128.5,
+       191.1,
+       201.3
+      ],
+      "lakeB": [
+       133.2,
+       194.5,
+       204.7
+      ],
+      "shallowLakeA": [
+       136.7,
+       205.7,
+       212.3
+      ]
+     },
+     "haloOnWaterDe": {
+      "deepSea": 3.7,
+      "coastSea": 2.74,
+      "lakeB": 2.02,
+      "shallowLakeA": 1.13
+     },
+     "coreClippedShare": 0.0,
+     "alphaMean": 0.128,
+     "skeleton": {
+      "mains": 1,
+      "capillaries": 66,
+      "node": false
+     }
+    },
+    {
+     "kind": "fork",
+     "marginAlphaMax": 0,
+     "vSymmetryMaxAlpha": 0,
+     "coreOnWaterDe": {
+      "deepSea": 55.57,
+      "coastSea": 53.03,
+      "lakeB": 49.47,
+      "shallowLakeA": 35.07
+     },
+     "coreOnWaterSrgb": {
+      "deepSea": [
+       117.7,
+       185.3,
+       197.6
+      ],
+      "coastSea": [
+       120.8,
+       187.3,
+       198.5
+      ],
+      "lakeB": [
+       125.9,
+       190.8,
+       201.9
+      ],
+      "shallowLakeA": [
+       129.7,
+       202.2,
+       209.6
+      ]
+     },
+     "haloOnWaterDe": {
+      "deepSea": 3.81,
+      "coastSea": 2.82,
+      "lakeB": 2.08,
+      "shallowLakeA": 1.16
+     },
+     "coreClippedShare": 0.0,
+     "alphaMean": 0.1467,
+     "skeleton": {
+      "mains": 3,
+      "capillaries": 21,
+      "node": false
+     }
+    },
+    {
+     "kind": "tip",
+     "marginAlphaMax": 0,
+     "vSymmetryMaxAlpha": 0,
+     "coreOnWaterDe": {
+      "deepSea": 55.48,
+      "coastSea": 52.93,
+      "lakeB": 49.36,
+      "shallowLakeA": 34.99
+     },
+     "coreOnWaterSrgb": {
+      "deepSea": [
+       120.8,
+       184.9,
+       196.4
+      ],
+      "coastSea": [
+       123.8,
+       186.9,
+       197.3
+      ],
+      "lakeB": [
+       128.7,
+       190.4,
+       200.7
+      ],
+      "shallowLakeA": [
+       132.4,
+       201.9,
+       208.5
+      ]
+     },
+     "haloOnWaterDe": {
+      "deepSea": 3.25,
+      "coastSea": 2.39,
+      "lakeB": 1.75,
+      "shallowLakeA": 0.96
+     },
+     "coreClippedShare": 0.0,
+     "alphaMean": 0.0693,
+     "skeleton": {
+      "mains": 1,
+      "capillaries": 13,
+      "node": false
+     }
+    },
+    {
+     "kind": "burst",
+     "marginAlphaMax": 0,
+     "vSymmetryMaxAlpha": 0,
+     "coreOnWaterDe": {
+      "deepSea": 66.56,
+      "coastSea": 63.2,
+      "lakeB": 55.25,
+      "shallowLakeA": 39.54
+     },
+     "coreOnWaterSrgb": {
+      "deepSea": [
+       143.7,
+       208.0,
+       218.2
+      ],
+      "coastSea": [
+       146.1,
+       209.7,
+       219.0
+      ],
+      "lakeB": [
+       150.1,
+       212.8,
+       222.0
+      ],
+      "shallowLakeA": [
+       153.1,
+       222.8,
+       228.8
+      ]
+     },
+     "haloOnWaterDe": {
+      "deepSea": 4.36,
+      "coastSea": 3.24,
+      "lakeB": 2.41,
+      "shallowLakeA": 1.35
+     },
+     "coreClippedShare": 0.0,
+     "alphaMean": 0.2689,
+     "skeleton": {
+      "mains": 8,
+      "capillaries": 39,
+      "node": true
+     }
+    }
+   ],
+   "failures": [],
+   "chain": {
+    "periodAlphaMae": 1.518,
+    "jointAlphaMae": 0.93
+   },
+   "row": 5
+  },
+  "earth": {
+   "cells": [
+    {
+     "kind": "trunk",
+     "marginAlphaMax": 0,
+     "vSymmetryMaxAlpha": 0,
+     "coreOnWaterDe": {
+      "deepSea": 50.18,
+      "coastSea": 46.58,
+      "lakeB": 43.3,
+      "shallowLakeA": 35.18
+     },
+     "coreOnWaterSrgb": {
+      "deepSea": [
+       171.8,
+       149.0,
+       116.6
+      ],
+      "coastSea": [
+       173.7,
+       151.6,
+       118.4
+      ],
+      "lakeB": [
+       176.9,
+       156.2,
+       124.8
+      ],
+      "shallowLakeA": [
+       179.4,
+       170.7,
+       138.5
+      ]
+     },
+     "haloOnWaterDe": {
+      "deepSea": 1.79,
+      "coastSea": 1.38,
+      "lakeB": 0.99,
+      "shallowLakeA": 0.63
+     },
+     "coreClippedShare": 0.0,
+     "alphaMean": 0.1446,
+     "skeleton": {
+      "mains": 1,
+      "capillaries": 33,
+      "node": false
+     }
+    },
+    {
+     "kind": "fork",
+     "marginAlphaMax": 0,
+     "vSymmetryMaxAlpha": 0,
+     "coreOnWaterDe": {
+      "deepSea": 47.44,
+      "coastSea": 43.76,
+      "lakeB": 40.4,
+      "shallowLakeA": 33.51
+     },
+     "coreOnWaterSrgb": {
+      "deepSea": [
+       164.1,
+       141.2,
+       109.1
+      ],
+      "coastSea": [
+       166.1,
+       144.0,
+       111.1
+      ],
+      "lakeB": [
+       169.5,
+       148.9,
+       118.0
+      ],
+      "shallowLakeA": [
+       172.1,
+       164.3,
+       132.6
+      ]
+     },
+     "haloOnWaterDe": {
+      "deepSea": 1.76,
+      "coastSea": 1.35,
+      "lakeB": 0.97,
+      "shallowLakeA": 0.62
+     },
+     "coreClippedShare": 0.0,
+     "alphaMean": 0.1578,
+     "skeleton": {
+      "mains": 3,
+      "capillaries": 9,
+      "node": false
+     }
+    },
+    {
+     "kind": "tip",
+     "marginAlphaMax": 0,
+     "vSymmetryMaxAlpha": 0,
+     "coreOnWaterDe": {
+      "deepSea": 48.26,
+      "coastSea": 44.61,
+      "lakeB": 41.29,
+      "shallowLakeA": 33.99
+     },
+     "coreOnWaterSrgb": {
+      "deepSea": [
+       166.4,
+       144.0,
+       112.3
+      ],
+      "coastSea": [
+       168.4,
+       146.7,
+       114.2
+      ],
+      "lakeB": [
+       171.7,
+       151.5,
+       120.9
+      ],
+      "shallowLakeA": [
+       174.3,
+       166.5,
+       135.1
+      ]
+     },
+     "haloOnWaterDe": {
+      "deepSea": 1.68,
+      "coastSea": 1.29,
+      "lakeB": 0.93,
+      "shallowLakeA": 0.59
+     },
+     "coreClippedShare": 0.0,
+     "alphaMean": 0.0778,
+     "skeleton": {
+      "mains": 1,
+      "capillaries": 8,
+      "node": false
+     }
+    },
+    {
+     "kind": "burst",
+     "marginAlphaMax": 0,
+     "vSymmetryMaxAlpha": 0,
+     "coreOnWaterDe": {
+      "deepSea": 55.96,
+      "coastSea": 52.5,
+      "lakeB": 49.63,
+      "shallowLakeA": 38.43
+     },
+     "coreOnWaterSrgb": {
+      "deepSea": [
+       187.0,
+       162.7,
+       126.8
+      ],
+      "coastSea": [
+       188.7,
+       165.0,
+       128.4
+      ],
+      "lakeB": [
+       191.6,
+       169.2,
+       134.3
+      ],
+      "shallowLakeA": [
+       193.9,
+       182.4,
+       146.9
+      ]
+     },
+     "haloOnWaterDe": {
+      "deepSea": 1.92,
+      "coastSea": 1.48,
+      "lakeB": 1.07,
+      "shallowLakeA": 0.68
+     },
+     "coreClippedShare": 0.0,
+     "alphaMean": 0.2899,
+     "skeleton": {
+      "mains": 8,
+      "capillaries": 24,
+      "node": true
+     }
+    }
+   ],
+   "failures": [],
+   "chain": {
+    "periodAlphaMae": 1.674,
+    "jointAlphaMae": 0.941
+   },
+   "row": 6
+  },
+  "air": {
+   "cells": [
+    {
+     "kind": "trunk",
+     "marginAlphaMax": 0,
+     "vSymmetryMaxAlpha": 0,
+     "coreOnWaterDe": {
+      "deepSea": 66.95,
+      "coastSea": 63.05,
+      "lakeB": 54.29,
+      "shallowLakeA": 40.98
+     },
+     "coreOnWaterSrgb": {
+      "deepSea": [
+       196.0,
+       202.6,
+       213.5
+      ],
+      "coastSea": [
+       197.7,
+       204.4,
+       214.3
+      ],
+      "lakeB": [
+       200.4,
+       207.5,
+       217.4
+      ],
+      "shallowLakeA": [
+       202.5,
+       217.8,
+       224.4
+      ]
+     },
+     "haloOnWaterDe": {
+      "deepSea": 3.53,
+      "coastSea": 2.82,
+      "lakeB": 2.25,
+      "shallowLakeA": 1.9
+     },
+     "coreClippedShare": 0.0,
+     "alphaMean": 0.1232,
+     "skeleton": {
+      "mains": 1,
+      "capillaries": 58,
+      "node": false
+     }
+    },
+    {
+     "kind": "fork",
+     "marginAlphaMax": 0,
+     "vSymmetryMaxAlpha": 0,
+     "coreOnWaterDe": {
+      "deepSea": 65.18,
+      "coastSea": 61.86,
+      "lakeB": 53.62,
+      "shallowLakeA": 40.34
+     },
+     "coreOnWaterSrgb": {
+      "deepSea": [
+       192.6,
+       199.1,
+       210.2
+      ],
+      "coastSea": [
+       194.3,
+       200.9,
+       211.1
+      ],
+      "lakeB": [
+       197.1,
+       204.2,
+       214.3
+      ],
+      "shallowLakeA": [
+       199.2,
+       214.7,
+       221.4
+      ]
+     },
+     "haloOnWaterDe": {
+      "deepSea": 3.86,
+      "coastSea": 3.1,
+      "lakeB": 2.49,
+      "shallowLakeA": 2.1
+     },
+     "coreClippedShare": 0.0,
+     "alphaMean": 0.1406,
+     "skeleton": {
+      "mains": 3,
+      "capillaries": 51,
+      "node": false
+     }
+    },
+    {
+     "kind": "tip",
+     "marginAlphaMax": 0,
+     "vSymmetryMaxAlpha": 0,
+     "coreOnWaterDe": {
+      "deepSea": 65.09,
+      "coastSea": 61.79,
+      "lakeB": 53.59,
+      "shallowLakeA": 40.29
+     },
+     "coreOnWaterSrgb": {
+      "deepSea": [
+       192.4,
+       199.0,
+       209.9
+      ],
+      "coastSea": [
+       194.1,
+       200.7,
+       210.7
+      ],
+      "lakeB": [
+       196.9,
+       204.0,
+       213.9
+      ],
+      "shallowLakeA": [
+       199.1,
+       214.5,
+       221.1
+      ]
+     },
+     "haloOnWaterDe": {
+      "deepSea": 3.38,
+      "coastSea": 2.68,
+      "lakeB": 2.13,
+      "shallowLakeA": 1.79
+     },
+     "coreClippedShare": 0.0,
+     "alphaMean": 0.0676,
+     "skeleton": {
+      "mains": 1,
+      "capillaries": 22,
+      "node": false
+     }
+    },
+    {
+     "kind": "burst",
+     "marginAlphaMax": 0,
+     "vSymmetryMaxAlpha": 0,
+     "coreOnWaterDe": {
+      "deepSea": 73.56,
+      "coastSea": 66.63,
+      "lakeB": 56.94,
+      "shallowLakeA": 43.74
+     },
+     "coreOnWaterSrgb": {
+      "deepSea": [
+       210.8,
+       217.6,
+       228.2
+      ],
+      "coastSea": [
+       212.3,
+       219.2,
+       229.0
+      ],
+      "lakeB": [
+       214.8,
+       222.1,
+       231.8
+      ],
+      "shallowLakeA": [
+       216.7,
+       231.6,
+       238.3
+      ]
+     },
+     "haloOnWaterDe": {
+      "deepSea": 4.03,
+      "coastSea": 3.25,
+      "lakeB": 2.61,
+      "shallowLakeA": 2.21
+     },
+     "coreClippedShare": 0.0,
+     "alphaMean": 0.2471,
+     "skeleton": {
+      "mains": 8,
+      "capillaries": 8,
+      "node": true
+     }
+    }
+   ],
+   "failures": [],
+   "chain": {
+    "periodAlphaMae": 1.452,
+    "jointAlphaMae": 0.891
+   },
+   "row": 7
+  }
+ },
+ "failures": [],
+ "separation": {
+  "min": 17.66,
+  "closest": [
+   {
+    "pair": [
+     "weave",
+     "umbral"
+    ],
+    "de": {
+     "deepSea": 23.02,
+     "coastSea": 22.29,
+     "lakeB": 20.99,
+     "shallowLakeA": 17.66
+    },
+    "min": 17.66
+   },
+   {
+    "pair": [
+     "infernal",
+     "fire"
+    ],
+    "de": {
+     "deepSea": 24.53,
+     "coastSea": 23.74,
+     "lakeB": 22.54,
+     "shallowLakeA": 19.76
+    },
+    "min": 19.76
+   },
+   {
+    "pair": [
+     "radiant",
+     "earth"
+    ],
+    "de": {
+     "deepSea": 24.62,
+     "coastSea": 23.9,
+     "lakeB": 22.84,
+     "shallowLakeA": 19.77
+    },
+    "min": 19.77
+   },
+   {
+    "pair": [
+     "fire",
+     "earth"
+    ],
+    "de": {
+     "deepSea": 20.32,
+     "coastSea": 20.19,
+     "lakeB": 19.77,
+     "shallowLakeA": 21.23
+    },
+    "min": 19.77
+   },
+   {
+    "pair": [
+     "water",
+     "air"
+    ],
+    "de": {
+     "deepSea": 24.93,
+     "coastSea": 24.57,
+     "lakeB": 23.86,
+     "shallowLakeA": 21.01
+    },
+    "min": 21.01
+   }
+  ],
+  "pairs": [
+   {
+    "pair": [
+     "weave",
+     "umbral"
+    ],
+    "de": {
+     "deepSea": 23.02,
+     "coastSea": 22.29,
+     "lakeB": 20.99,
+     "shallowLakeA": 17.66
+    },
+    "min": 17.66
+   },
+   {
+    "pair": [
+     "infernal",
+     "fire"
+    ],
+    "de": {
+     "deepSea": 24.53,
+     "coastSea": 23.74,
+     "lakeB": 22.54,
+     "shallowLakeA": 19.76
+    },
+    "min": 19.76
+   },
+   {
+    "pair": [
+     "radiant",
+     "earth"
+    ],
+    "de": {
+     "deepSea": 24.62,
+     "coastSea": 23.9,
+     "lakeB": 22.84,
+     "shallowLakeA": 19.77
+    },
+    "min": 19.77
+   },
+   {
+    "pair": [
+     "fire",
+     "earth"
+    ],
+    "de": {
+     "deepSea": 20.32,
+     "coastSea": 20.19,
+     "lakeB": 19.77,
+     "shallowLakeA": 21.23
+    },
+    "min": 19.77
+   },
+   {
+    "pair": [
+     "water",
+     "air"
+    ],
+    "de": {
+     "deepSea": 24.93,
+     "coastSea": 24.57,
+     "lakeB": 23.86,
+     "shallowLakeA": 21.01
+    },
+    "min": 21.01
+   },
+   {
+    "pair": [
+     "weave",
+     "air"
+    ],
+    "de": {
+     "deepSea": 22.19,
+     "coastSea": 21.95,
+     "lakeB": 21.56,
+     "shallowLakeA": 22.04
+    },
+    "min": 21.56
+   },
+   {
+    "pair": [
+     "radiant",
+     "air"
+    ],
+    "de": {
+     "deepSea": 30.36,
+     "coastSea": 29.99,
+     "lakeB": 30.77,
+     "shallowLakeA": 25.46
+    },
+    "min": 25.46
+   },
+   {
+    "pair": [
+     "weave",
+     "water"
+    ],
+    "de": {
+     "deepSea": 30.69,
+     "coastSea": 30.41,
+     "lakeB": 29.77,
+     "shallowLakeA": 26.25
+    },
+    "min": 26.25
+   },
+   {
+    "pair": [
+     "radiant",
+     "fire"
+    ],
+    "de": {
+     "deepSea": 27.76,
+     "coastSea": 27.45,
+     "lakeB": 27.14,
+     "shallowLakeA": 26.31
+    },
+    "min": 26.31
+   },
+   {
+    "pair": [
+     "infernal",
+     "earth"
+    ],
+    "de": {
+     "deepSea": 31.78,
+     "coastSea": 31.39,
+     "lakeB": 30.32,
+     "shallowLakeA": 30.45
+    },
+    "min": 30.32
+   },
+   {
+    "pair": [
+     "umbral",
+     "air"
+    ],
+    "de": {
+     "deepSea": 39.98,
+     "coastSea": 38.83,
+     "lakeB": 36.82,
+     "shallowLakeA": 32.22
+    },
+    "min": 32.22
+   },
+   {
+    "pair": [
+     "earth",
+     "air"
+    ],
+    "de": {
+     "deepSea": 40.29,
+     "coastSea": 39.46,
+     "lakeB": 37.44,
+     "shallowLakeA": 32.36
+    },
+    "min": 32.36
+   },
+   {
+    "pair": [
+     "umbral",
+     "infernal"
+    ],
+    "de": {
+     "deepSea": 34.72,
+     "coastSea": 34.67,
+     "lakeB": 33.59,
+     "shallowLakeA": 32.97
+    },
+    "min": 32.97
+   },
+   {
+    "pair": [
+     "weave",
+     "infernal"
+    ],
+    "de": {
+     "deepSea": 36.55,
+     "coastSea": 35.98,
+     "lakeB": 34.61,
+     "shallowLakeA": 33.2
+    },
+    "min": 33.2
+   },
+   {
+    "pair": [
+     "fire",
+     "air"
+    ],
+    "de": {
+     "deepSea": 37.32,
+     "coastSea": 36.87,
+     "lakeB": 35.85,
+     "shallowLakeA": 33.82
+    },
+    "min": 33.82
+   },
+   {
+    "pair": [
+     "weave",
+     "fire"
+    ],
+    "de": {
+     "deepSea": 38.53,
+     "coastSea": 38.17,
+     "lakeB": 37.1,
+     "shallowLakeA": 35.61
+    },
+    "min": 35.61
+   },
+   {
+    "pair": [
+     "weave",
+     "earth"
+    ],
+    "de": {
+     "deepSea": 40.64,
+     "coastSea": 40.14,
+     "lakeB": 38.33,
+     "shallowLakeA": 35.8
+    },
+    "min": 35.8
+   },
+   {
+    "pair": [
+     "water",
+     "earth"
+    ],
+    "de": {
+     "deepSea": 43.76,
+     "coastSea": 43.08,
+     "lakeB": 41.47,
+     "shallowLakeA": 37.3
+    },
+    "min": 37.3
+   },
+   {
+    "pair": [
+     "radiant",
+     "water"
+    ],
+    "de": {
+     "deepSea": 40.72,
+     "coastSea": 40.37,
+     "lakeB": 39.73,
+     "shallowLakeA": 37.69
+    },
+    "min": 37.69
+   },
+   {
+    "pair": [
+     "umbral",
+     "water"
+    ],
+    "de": {
+     "deepSea": 43.02,
+     "coastSea": 42.22,
+     "lakeB": 40.74,
+     "shallowLakeA": 38.12
+    },
+    "min": 38.12
+   },
+   {
+    "pair": [
+     "infernal",
+     "air"
+    ],
+    "de": {
+     "deepSea": 46.75,
+     "coastSea": 45.81,
+     "lakeB": 44.1,
+     "shallowLakeA": 40.82
+    },
+    "min": 40.82
+   },
+   {
+    "pair": [
+     "weave",
+     "radiant"
+    ],
+    "de": {
+     "deepSea": 45.55,
+     "coastSea": 45.07,
+     "lakeB": 44.13,
+     "shallowLakeA": 41.36
+    },
+    "min": 41.36
+   },
+   {
+    "pair": [
+     "infernal",
+     "radiant"
+    ],
+    "de": {
+     "deepSea": 48.95,
+     "coastSea": 47.92,
+     "lakeB": 46.53,
+     "shallowLakeA": 42.95
+    },
+    "min": 42.95
+   },
+   {
+    "pair": [
+     "umbral",
+     "fire"
+    ],
+    "de": {
+     "deepSea": 49.69,
+     "coastSea": 49.17,
+     "lakeB": 47.38,
+     "shallowLakeA": 44.94
+    },
+    "min": 44.94
+   },
+   {
+    "pair": [
+     "fire",
+     "water"
+    ],
+    "de": {
+     "deepSea": 49.89,
+     "coastSea": 49.49,
+     "lakeB": 48.68,
+     "shallowLakeA": 46.93
+    },
+    "min": 46.93
+   },
+   {
+    "pair": [
+     "umbral",
+     "earth"
+    ],
+    "de": {
+     "deepSea": 52.58,
+     "coastSea": 52.27,
+     "lakeB": 50.09,
+     "shallowLakeA": 48.81
+    },
+    "min": 48.81
+   },
+   {
+    "pair": [
+     "umbral",
+     "radiant"
+    ],
+    "de": {
+     "deepSea": 66.76,
+     "coastSea": 65.97,
+     "lakeB": 64.11,
+     "shallowLakeA": 60.67
+    },
+    "min": 60.67
+   },
+   {
+    "pair": [
+     "infernal",
+     "water"
+    ],
+    "de": {
+     "deepSea": 75.06,
+     "coastSea": 73.86,
+     "lakeB": 71.74,
+     "shallowLakeA": 68.26
+    },
+    "min": 68.26
+   }
+  ]
+ },
+ "bcn": {
+  "diffuseDxt5RgbMaeVisible": 3.605,
+  "diffuseDxt5RgbMae": 2.177,
+  "alphaMae": 1.765
+ },
+ "files": {
+  "d": {
+   "file": "mnbl_magicwater_d.png",
+   "sha256": "d3f7dfbab332811de0808c33a1cda182452311d1912887ce9df14043d1ab9846",
+   "mode": "RGBA",
+   "size": [
+    2048,
+    2048
+   ]
+  },
+  "n": {
+   "file": "mnbl_magicwater_n.png",
+   "sha256": "9d773acc0f278cf59ca127c8ecf5bdea76039beb60e863994661bce070f0ae94",
+   "mode": "RGB",
+   "size": [
+    2048,
+    2048
+   ]
+  }
+ },
+ "passed": true,
+ "inputs": {
+  "foam_shore": {
+   "pack": "Native/EmAssetPackages/particles/particles.tpac",
+   "source": "$BASE/Modules/Native/AssetSources/particles/foam_shore.psd",
+   "format": "BC7",
+   "size": [
+    2048,
+    2048
+   ],
+   "flags": [
+    "has_alpha"
+   ],
+   "decodedPngSha256": "ddf69760a3f7adbdbc14055a6966cfa785b889a8d8b38a68520c33433eb2c835"
+  },
+  "decal_water_a": {
+   "pack": "Native/EmAssetPackages/misc/misc_materials/water_wetness_decal/water_wetness_decal.tpac",
+   "source": "$BASE/Modules/Native/AssetSources/misc/misc_materials/water_wetness_decal/decal_water_a.tga",
+   "format": "DXT5",
+   "size": [
+    1024,
+    1024
+   ],
+   "flags": [
+    "has_alpha",
+    "dont_resize_in_atlas"
+   ],
+   "decodedPngSha256": "e1d5cdf7ecc7a87b1a79427b4289c931562e1141e7071be5446bd39bf721269e"
+  },
+  "water_foam_circular": {
+   "pack": "Native/EmAssetPackages/particles/particles.tpac",
+   "source": "$BASE/Modules/Native/AssetSources/particles/water_foam_circular.dds",
+   "format": "DXT5",
+   "size": [
+    1024,
+    1024
+   ],
+   "flags": [
+    "has_alpha"
+   ],
+   "decodedPngSha256": "87d4c0af641f2c0a405583b2fe9ab4bd97859023f897a02c925571e353970a64"
+  }
+ },
+ "lineage": {
+  "geometry": "MMR-288's vein kits (tools/art/magic_ground.py vein_skeleton, vein_masks, periodic, head_blend, apply_feather), seeded by sha256('water/<school>'), mirrored about v = 0.5 and squashed from the 480 px to the 224 px inner height",
+  "lace": "Native foam_shore's alpha (the vanilla shore-foam network), a 768 x 384 window of its dense band per school, mirrored: the edge break-up of every thread and the lace modulating thread colour and halo alpha",
+  "halo": "Native decal_water_a's alpha (the vanilla wetness decal) modulates the halo's alpha",
+  "colour": "per-school luminous palettes (PALETTE) after the FWGC++ school colours and the MMR-288 vein looks; weave uses mg.OPAL",
+  "codex": "not used: no generated imagery fed the atlas"
+ }
+}

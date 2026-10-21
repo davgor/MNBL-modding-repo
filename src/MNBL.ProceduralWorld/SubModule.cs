@@ -52,6 +52,20 @@ namespace MNBL.ProceduralWorld
             MNBL.ProceduralWorld.Generation.GenerationRuntime.Scheduler.Pump();
             // MMR-46: a world handed from the setup screen to the activation; the screen reopens if the player withdraws.
             MNBL.ProceduralWorld.UI.WorldSetupScreen.TickPending();
+            // MMR-257: a ruin marker's name under the cursor on the campaign map.
+            EngineMarks.Enter("MapDressingRuntime.Tick");
+            MNBL.ProceduralWorld.World.MapDressingRuntime.Tick();
+            // MMR-256: the generated campaign map's season threshold, atmosphere frame and colour grade (the manager's tick).
+            EngineMarks.Enter("GeneratedMapAtmosphere.Tick");
+            MNBL.ProceduralWorld.CampaignBootstrap.GeneratedMapAtmosphere.Tick(dt);
+            EngineMarks.Leave();   // MMR-247: the hang capture's section marks (HangWatchdog)
+        }
+
+        // MMR-257: SandBox has built the campaign's encyclopedia pages (its module loads first); a generated campaign adds its ruins page.
+        public override void OnGameInitializationFinished(TaleWorlds.Core.Game game)
+        {
+            base.OnGameInitializationFinished(game);
+            MNBL.ProceduralWorld.CampaignRegistry.RuinsEncyclopediaPage.Register(game);
         }
 
         // MMR-39: War Sails' view has built its naval map-scene wrapper by now (its module loads first); a generated world wraps it with its

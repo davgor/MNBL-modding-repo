@@ -23,14 +23,23 @@ namespace MNBL.ProceduralWorld.CampaignRegistry
             WorldLifetimeScope.Track("map: live campaign map generation", () => WorldGenerations.LiveCampaignMap == 0 ? 0 : 1);
             WorldLifetimeScope.Track("world generation: current token", () => WorldGenerations.Current == 0 ? 0 : 1);
             WorldLifetimeScope.Track("battle: terrain contexts", () => GeneratedBattleTerrain.ContextSources.Count);
+            WorldLifetimeScope.Track("map: dressing plans", () => MNBL.ProceduralWorld.World.MapDressingRuntime.Plans.Count);
+            WorldLifetimeScope.Track("map: dressing objects drawn", () => MNBL.ProceduralWorld.World.MapDressingRuntime.Current == null ? 0 : MNBL.ProceduralWorld.World.MapDressingRuntime.Current.Live);
+            WorldLifetimeScope.Track("map: magic overlays", () => MNBL.ProceduralWorld.World.MagicGroundRuntime.Overlays.Count + MNBL.ProceduralWorld.World.MagicGroundRuntime.PendingCount);
+            WorldLifetimeScope.Track("map: magic objects drawn", () => MNBL.ProceduralWorld.World.MagicGroundRuntime.Drawn);
+            WorldLifetimeScope.Track("map: magic water drawn", () => MNBL.ProceduralWorld.World.MagicWaterRuntime.Drawn);   // MMR-290
+            WorldLifetimeScope.Track("speed: road cells", () => GeneratedPartySpeedModel.RoadSources.Count + (GeneratedPartySpeedModel.Active == null ? 0 : 1));
             WorldLifetimeScope.Track("battle: mission scene observations", () => MNBL.ProceduralWorld.Missions.MissionScenePatches.Observed);
             WorldLifetimeScope.Track("periodic: current frame", () => PeriodicWorld.Current == null ? 0 : 1);
             WorldLifetimeScope.Track("periodic: patches applied", () => PeriodicPatches.IsApplied ? 1 : 0);
             WorldLifetimeScope.Track("climate: colour grade applied", () => GeneratedColorGrade.Applied ? 1 : 0);
+            WorldLifetimeScope.Track("climate: atmosphere driver", () => GeneratedMapAtmosphere.Active ? 1 : 0);   // MMR-256
+            WorldLifetimeScope.Track("climate: snow textures held", () => GeneratedSnowTexture.Holding);
             WorldLifetimeScope.Track("naval: map scene wrapper", () => GeneratedNavalMapSceneWrapper.Current == null ? 0 : 1);
             WorldLifetimeScope.Track("saves: binding attached", () => MNBL.ProceduralWorld.Persistence.WorldSaveBinding.Attached ? 1 : 0);
             WorldLifetimeScope.Track("saves: activation save block", () => MNBL.ProceduralWorld.Generation.ActivationSaveBlock.Active ? 1 : 0);
             WorldLifetimeScope.Track("startup: behaviour active", () => GeneratedStartupBehavior.Active == null ? 0 : 1);
+            WorldLifetimeScope.Track("population: behaviour active", () => GeneratedPopulationBehavior.Active == null && CompanionsTickPatch.Handler == null ? 0 : 1);   // MMR-281
             // The last teardown's own measurement: the module's behaviours' listeners still on the ended campaign's events after it removed
             // them (non-zero when a removal failed), and whether the teardown itself failed.
             WorldLifetimeScope.Track("campaign events: module listeners left", () => GeneratedGameManager.LastTeardown == null ? 0 : GeneratedGameManager.LastTeardown.OwnListenersLeft);

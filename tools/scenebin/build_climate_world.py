@@ -182,7 +182,7 @@ def main():
     parser.add_argument('--wind-zones', type=int, choices=(1, 2), default=1)
     parser.add_argument('--from', help='existing build of the same world: write only a new placement and climate files')
     parser.add_argument('--scale', type=float, default=.01)
-    parser.add_argument('--surface-template', default='build/slots/mnbl_world_b')
+    parser.add_argument('--surface-template', default='build/surface-template', help='python tools/scenebin/make_surface_template.py --materialize build/surface-template')
     parser.add_argument('--encoder', default='build/worldbridge/Release/worldbridge.exe')
     parser.add_argument('--game-root', default=bbw.build_slot.GAME)
     parser.add_argument('--settlement-ids', nargs=4, metavar=('TOWN1', 'TOWN2', 'VILLAGE1', 'VILLAGE2'))

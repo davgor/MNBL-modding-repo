@@ -15,7 +15,7 @@ namespace MNBL.ProceduralWorld.CampaignBootstrap
     // MMR-45: a compiled world as the new game registers it (docs/world-activation.md). The activation built and validated its documents at
     // the main menu (CompiledWorldDataset, BuildWorld); inside the new game's RegisterSubModuleObjects (R07) this registers exactly those
     // documents through the world's CampaignObjectRegistry (MMR-30: plan checks before the first document loads, phase by phase, closure),
-    // after checking that the live engine defaults are the pinned inventory the documents were built against. Every XML hero's explicit body
+    // after checking that the live engine defaults the documents reference are there (MMR-283: extra ones pass). Every XML hero's explicit body
     // is drawn here, with the engine's face generator (HeroBodies, MMR-32), from the hero's seed: the body ranges live in the game's object
     // manager, which the main menu does not have. The same seed gives the same body, so the package keeps the documents as validated and a
     // load draws the same bodies again.
@@ -61,14 +61,16 @@ namespace MNBL.ProceduralWorld.CampaignBootstrap
             if (forLoad) throw new InvalidOperationException("A load's registration replays; it never registers anew.");
             if (registered || registry != null) throw new InvalidOperationException("A compiled world registers once.");
             if (Campaign.Current == null || Game.Current == null) throw new InvalidOperationException("Campaign defaults are unavailable.");
-            // The documents were built against the pinned default inventory; the live one must be the same.
+            // MMR-283: the engine defaults the world's documents reference must be live; others the game or a mod adds (an item category, a
+            // skill) are recorded, not refused. Missing ones are kept in the report (DefaultsMissing): the activation names them.
             var live = LiveDefaults();
             var pinned = new HashSet<string>(dataset.Defaults, StringComparer.Ordinal);
-            var missing = pinned.Where(x => !live.Contains(x)).OrderBy(x => x, StringComparer.Ordinal).ToList();
+            var missing = ReferencedDefaults(dataset).Where(x => !live.Contains(x)).OrderBy(x => x, StringComparer.Ordinal).ToList();
             var extra = live.Where(x => !pinned.Contains(x)).OrderBy(x => x, StringComparer.Ordinal).ToList();
-            Report["liveDefaults"] = live.Count; Report["liveDefaultsSha256"] = CampaignGraphValidator.InventorySha256(live);
-            if (missing.Count > 0 || extra.Count > 0)
-                throw new RegistrationException("Refused before loading", new[] { "the live engine defaults are not the pinned inventory: missing " + String.Join(", ", missing.Take(10)) + "; extra " + String.Join(", ", extra.Take(10)) });
+            Report["liveDefaults"] = live.Count; Report["liveDefaultsSha256"] = CampaignGraphValidator.InventorySha256(live); Report["liveDefaultsExtra"] = extra.Take(50).ToList();
+            DefaultsMissing = missing;
+            if (missing.Count > 0)
+                throw new RegistrationException("Refused before loading", new[] { "engine defaults the world references are not live: " + String.Join(", ", missing.Take(10)) });
             trace("compiled_defaults_verified:" + live.Count);
             var loads = dataset.Documents.Select(d => new KeyValuePair<string, XmlDocument>(d.Key, (XmlDocument)d.Value.CloneNode(true))).ToList();
             var bodyProblems = new List<string>();
@@ -163,6 +165,17 @@ namespace MNBL.ProceduralWorld.CampaignBootstrap
         public bool SuppliesStartup { get { return true; } }
         public GeneratedCampaignInitializer.StartupPlan StartupPlan { get { return dataset.Start.Plan; } }
         public NavalContentFactory.NavalPlan NavalPlan { get { return dataset.NavalPlan; } }
+        public PopulationPlan Population { get { return dataset.Population; } }
+
+        // MMR-283: the engine defaults Register found missing (empty until it ran).
+        public List<string> DefaultsMissing { get; private set; } = new List<string>();
+
+        // The engine defaults a world's documents reference: its closure's default entries (CompiledWorldDataset.Templates).
+        internal static IEnumerable<string> ReferencedDefaults(CompiledWorldDataset dataset)
+        {
+            var pinned = new HashSet<string>(dataset.Defaults, StringComparer.Ordinal);
+            return dataset.Templates.Select(t => t.Reference).Select(k => k.StartsWith("?", StringComparison.Ordinal) ? k.Substring(k.IndexOf('|') + 1) : k).Where(pinned.Contains).Distinct();
+        }
 
         // The ready engine defaults of the kinds a world may reference (the fixture registration's inventory).
         internal static HashSet<string> LiveDefaults()

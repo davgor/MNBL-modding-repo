@@ -45,7 +45,8 @@
         "mnbl.save.backend": { "type": "string" },
         "mnbl.save.navigationCache": { "type": "string" },
         "mnbl.save.saveIds": { "type": "string", "pattern": "^[0-9]+/v[0-9]+$" },
-        "mnbl.save.worldIdentity": { "const": "mnbl.world-identity.v1" }
+        "mnbl.save.worldIdentity": { "const": "mnbl.world-identity.v1" },
+        "mnbl.campaign.mutationProducer": { "anyOf": [{ "$ref": "#/$defs/sha256" }, { "const": "" }] }
       }
     },
     "saveJournal": {

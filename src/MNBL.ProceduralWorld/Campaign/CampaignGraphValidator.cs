@@ -24,13 +24,16 @@ namespace MNBL.ProceduralWorld.CampaignRegistry
     //     (followed transitively; a failure inside a template is reported against the generated record that reached it), or a verified live
     //     default; a world alias is exempt only when staged; references the installed loaders tolerate missing are noted, not refused; and
     //     every reference names an object of the type its property holds;
-    //   * semantics: kingdom ruler, ruling clan and capital; clan leaders; heroes, their characters, clans and occupations; one settlement
+    //   * semantics: kingdom ruler, ruling clan and capital; clan leaders; heroes, their characters, clans and occupations; minor clans (MMR-280:
+    //     mercenary companies and outlaw clans) with the flags of their kind, a party template, 4 character templates and a town home; the random
+    //     child generator's needs (each noble house an adult Lord of each sex, each lord culture its child and teen rosters); one settlement
     //     component of a known kind, with the location complex every installed settlement of its kind has; villages bound to a town or
     //     castle of the world; ports with shipyards and shipyards with ports; troop upgrade trees of every character the world reaches,
     //     without cycles; every clan with members has a generated fortified home (where its lords' parties start); every runtime hero intent
     //     an installed template of its occupation and a home of its kind, and every runtime relation two heroes of the world;
     //   * census: generated objects, aliases, re-emitted templates, referenced templates and defaults, by type; settlement, start and spawn
-    //     positions that copy an installed Calradia coordinate;
+    //     positions that copy an installed Calradia coordinate; the staged houses, lords, minors, dead parents (outside every other count),
+    //     company and outlaw members and wanderers against the campaign v2 census (MMR-279);
     //   * sources: every compiler record (by source UID) is staged as its kind, a runtime intent, or has an explicit disposition of a policy
     //     outcome with a reason, never both; staged records agree with their compiler records (kind, village binding, port); every pending
     //     compiler slot of a delivered owner is resolved and, where the staged graph shows it, resolved in the graph; slots of owners not yet
@@ -353,7 +356,9 @@ namespace MNBL.ProceduralWorld.CampaignRegistry
                 case "Kingdom/@owner": return "Hero";
                 case "Kingdom/@initial_home_settlement": case "Faction/@initial_home_settlement": return "Settlement";
                 case "Faction/@owner": return "Hero";
-                case "Faction/@super_faction": return "Kingdom";
+                case "Faction/@super_faction": case "Kingdom/relationship@kingdom": return "Kingdom";
+                case "Faction/@default_party_template": return "PartyTemplate";
+                case "Faction/template@id": return "NPCCharacter";
                 case "Settlement/@owner": return "Faction";
                 case "Settlement/Village@bound": case "Settlement/Village@trade_bound": return "Settlement";
                 case "Settlement/Village@village_type": return "VillageType";
@@ -440,6 +445,7 @@ namespace MNBL.ProceduralWorld.CampaignRegistry
                         Add("graph.hero_role", c.Key, "@owner", "its leader " + owner + " is a " + character(owner).GetAttribute("occupation") + ", not a Lord");
                 }
                 var home = Get(Ref(c.Value, "initial_home_settlement"));
+                if (kindOf[c.Key] == "generated" && Ref(c.Value, "is_minor_faction") == "true") MinorClan(c.Key, c.Value, home);
                 bool hasMembers = heroFaction.Values.Any(f => f == cid);
                 if (home == null) Add("graph.party_intent", c.Key, "@initial_home_settlement", "the clan has no staged home");
                 else if (hasMembers && SettlementKind(home) != "town" && SettlementKind(home) != "castle") Add("graph.party_intent", c.Key, "@initial_home_settlement", "its home " + Ref(c.Value, "initial_home_settlement") + " is a " + (SettlementKind(home) ?? "settlement without a component") + ", not a town or castle, where its lords' parties start");
@@ -456,12 +462,14 @@ namespace MNBL.ProceduralWorld.CampaignRegistry
                 else if (npc != null && clan != null && kindOf[h.Key] == "generated" && clan.GetAttribute("is_noble") == "true" && npc.GetAttribute("occupation") != "Lord")
                     Add("graph.hero_role", h.Key, "NPCCharacter/@occupation", "a hero of noble clan " + Ref(h.Value, "faction") + " is a " + npc.GetAttribute("occupation") + ", not a Lord");
             }
+            if (input.Campaign != null) ChildGenerator(clans, heroes, character);
             // Settlements: one component of a known kind and the location complex every installed settlement of its kind has; bindings;
             // ports and shipyards.
             var installedKinds = installed.Where(x => x.Key.StartsWith("Settlement.", StringComparison.Ordinal) && Component(x.Value) != null).GroupBy(x => SettlementKind(x.Value)).ToList();
             var located = new HashSet<string>(installedKinds.Where(g => g.All(x => x.Value.SelectSingleNode("Locations/@complex_template") != null)).Select(g => g.Key), StringComparer.Ordinal);
             report.Census["locationComplexRequired"] = located.OrderBy(x => x, StringComparer.Ordinal).ToList();
             var fortified = new HashSet<string>(settlements.Where(s => SettlementKind(s.Value) == "town" || SettlementKind(s.Value) == "castle").Select(s => "Settlement." + s.Value.GetAttribute("id")), StringComparer.Ordinal);
+            var boundVillages = new HashSet<string>(StringComparer.Ordinal);
             foreach (var s in settlements)
             {
                 var comps = s.Value.SelectNodes("Components/*").OfType<XmlElement>().ToList();
@@ -483,9 +491,14 @@ namespace MNBL.ProceduralWorld.CampaignRegistry
                 {
                     string bound = Ref(c, "bound");
                     if (bound == null || !fortified.Contains(bound)) Add("graph.village_binding", s.Key, "Components/Village/@bound", "bound to " + (bound ?? "nothing") + ", not a town or castle of the world");
+                    else boundVillages.Add(bound);
                     if (Ref(c, "village_type") == null) Add("graph.settlement_component", s.Key, "Components/Village/@village_type", "the village has no type");
                 }
             }
+            // A generated town or castle with no bound village: SnareTheWealthyIssueQuest, incident_the_quiet_life and
+            // incident_wages_of_war_and_diseases throw on it (RT-31; the village quota, MMR-252, gives every one 3 or 2).
+            foreach (var s in settlements.Where(s => fortified.Contains(s.Key) && kindOf.ContainsKey(s.Key) && kindOf[s.Key] == "generated" && !boundVillages.Contains(s.Key)).OrderBy(s => s.Key, StringComparer.Ordinal))
+                Add("graph.village_binding", s.Key, "Components/Town", "a " + SettlementKind(s.Value) + " with no bound village (SnareTheWealthy, incident_the_quiet_life and incident_wages_of_war_and_diseases throw on it)");
             // Troop upgrade trees of every character the world stages or reaches: no cycle.
             var characters = staged.Where(x => x.Key.StartsWith("NPCCharacter.", StringComparison.Ordinal)).Concat(installed.Where(x => x.Key.StartsWith("NPCCharacter.", StringComparison.Ordinal) && !staged.ContainsKey(x.Key)))
                 .ToDictionary(x => x.Key, x => x.Value.SelectNodes("upgrade_targets/upgrade_target/@id").OfType<XmlAttribute>().Select(a => a.Value).ToList(), StringComparer.Ordinal);
@@ -535,6 +548,84 @@ namespace MNBL.ProceduralWorld.CampaignRegistry
                     foreach (var hero in new[] { r.A, r.B })
                         if (hero == null || (!runtimeIds.Contains(hero) && Get("Hero." + hero) == null)) Add("graph.party_intent", hero, "relations", "a runtime relation names " + (hero ?? "nobody") + ", neither a staged hero nor a runtime intent");
             }
+        }
+
+        // MMR-280: a generated minor clan is a mercenary company (is_clan_type_mercenary) or an outlaw clan (is_outlaw with one kind flag), with
+        // the flags of its kind, no kingdom, a default party template, the policy's number of minor_faction_character_templates and a town home.
+        private void MinorClan(string key, XmlElement c, XmlElement home)
+        {
+            var rules = Obj(policy, "minorClans");
+            bool company = Ref(c, "is_clan_type_mercenary") == "true", outlaw = Ref(c, "is_outlaw") == "true";
+            if (company == outlaw) { Add("graph.minor_clan", key, "@is_clan_type_mercenary", company ? "a minor clan both mercenary and outlaw" : "a minor clan neither mercenary nor outlaw"); return; }
+            foreach (var flag in List(rules, company ? "company" : "outlaw").Cast<string>())
+                if (Ref(c, flag) != "true") Add("graph.minor_clan", key, "@" + flag, "the " + (company ? "mercenary company" : "outlaw clan") + " lacks " + flag);
+            var kinds = List(rules, "outlawKinds").Cast<string>().Where(k => Ref(c, k) == "true").ToList();
+            if (outlaw && kinds.Count != 1) Add("graph.minor_clan", key, "@is_mafia", "the outlaw clan has " + kinds.Count + " kind flags (" + String.Join(", ", kinds) + "), not one");
+            if (company && kinds.Count > 0) Add("graph.minor_clan", key, "@" + kinds[0], "a mercenary company with an outlaw kind flag");
+            if (Ref(c, "super_faction") != null) Add("graph.minor_clan", key, "@super_faction", "the minor clan belongs to kingdom " + Ref(c, "super_faction"));
+            if (Ref(c, "default_party_template") == null) Add("graph.minor_clan", key, "@default_party_template", "the minor clan has no default_party_template");
+            int templates = c.SelectNodes("minor_faction_character_templates/template[@id]").Count;
+            if (templates != Int(rules, "characterTemplates")) Add("graph.minor_clan", key, "minor_faction_character_templates", templates + " character templates, not " + Int(rules, "characterTemplates"));
+            foreach (XmlElement t in c.SelectNodes("minor_faction_character_templates/template[@id]"))
+            {
+                var template = Find(t.GetAttribute("id"));
+                if (template != null && template.GetAttribute("is_template") != "true") Add("graph.minor_clan", key, "minor_faction_character_templates", t.GetAttribute("id") + " is not an installed template");
+            }
+            if (home == null || SettlementKind(home) != "town") Add("graph.minor_clan", key, "@initial_home_settlement", "the minor clan's home " + Ref(c, "initial_home_settlement") + " is not a town");
+        }
+
+        // MMR-280: InitialChildGenerationCampaignBehavior (kept on) clones each child of a non-minor clan from a same-sex adult Lord of the clan
+        // and dresses it from its culture's four child and teenager civilian rosters; with no same-sex adult it looks in another clan of the
+        // culture and can throw at new game. Every generated noble house of a compiler world has a living adult Lord of each sex, and every
+        // living Lord's culture (one that resolves; closure reports the others) has the four rosters. The fixture world's one-lord clans predate it.
+        private void ChildGenerator(List<KeyValuePair<string, XmlElement>> clans, List<KeyValuePair<string, XmlElement>> heroes, Func<string, XmlElement> character)
+        {
+            var rules = Obj(policy, "childGenerator");
+            int adult = Int(rules, "adultAge");
+            var living = heroes.Where(h => h.Value.GetAttribute("alive") != "false").Select(h => new { Hero = h, Npc = character(h.Key) }).Where(x => x.Npc != null && x.Npc.GetAttribute("occupation") == "Lord").ToList();
+            Func<XmlElement, int> age = npc => { double v; return Num(npc, "age", out v) ? (int)v : -1; };
+            foreach (var c in clans.Where(c => kindOf[c.Key] == "generated" && Ref(c.Value, "is_noble") == "true"))
+            {
+                string cid = "Faction." + c.Value.GetAttribute("id");
+                var adults = living.Where(x => Ref(x.Hero.Value, "faction") == cid && age(x.Npc) >= adult).ToList();
+                if (!adults.Any(x => x.Npc.GetAttribute("is_female") == "true") || !adults.Any(x => x.Npc.GetAttribute("is_female") != "true"))
+                    Add("graph.child_generator", c.Key, "members", "the noble house has no living adult Lord of each sex (" + adults.Count + " adults)");
+            }
+            var rosters = installed.Where(x => x.Key.StartsWith("EquipmentRoster.", StringComparison.Ordinal)).Select(x => x.Value).ToList();
+            foreach (var culture in living.Select(x => Ref(x.Npc, "culture")).Where(x => x != null && Find(x) != null).Distinct().OrderBy(x => x, StringComparer.Ordinal))
+                foreach (var flag in new[] { "IsChildEquipmentTemplate", "IsTeenagerEquipmentTemplate" })
+                    foreach (var female in new[] { "false", "true" })
+                        if (!rosters.Any(r => r.GetAttribute("culture") == culture && r.SelectSingleNode("Flags[@IsLordTemplate='true' and @" + flag + "='true' and " + (female == "true" ? "@IsFemaleTemplate='true'" : "not(@IsFemaleTemplate='true')") + "]") != null))
+                            Add("graph.child_generator", culture, "EquipmentRoster", "no installed noble " + (flag == "IsChildEquipmentTemplate" ? "child" : "teenager") + (female == "true" ? " female" : " male") + " civilian roster for lord culture " + culture);
+        }
+
+        // MMR-280: the staged population against the campaign v2 census (MMR-279): houses, companies and outlaw clans; adult house lords, minors
+        // and dead parents (outside every other count); company and outlaw clan members; the companions W.
+        private void PopulationCensus()
+        {
+            var census = Obj(input.Campaign, "census");
+            if (census == null) { Add("graph.census", null, "census", "campaign v2 has no census"); return; }
+            var clans = Generated("Faction").ToDictionary(c => "Faction." + c.Value.GetAttribute("id"), c => c.Value, StringComparer.Ordinal);
+            Func<XmlElement, string> kind = c => c == null ? null : Ref(c, "is_noble") == "true" ? "house" : Ref(c, "is_clan_type_mercenary") == "true" ? "company" : Ref(c, "is_outlaw") == "true" && Ref(c, "is_bandit") != "true" ? "outlaw" : null;
+            var counts = new SortedDictionary<string, int>(StringComparer.Ordinal) {
+                ["houses"] = clans.Values.Count(c => kind(c) == "house"), ["mercenaryCompanies"] = clans.Values.Count(c => kind(c) == "company"), ["outlawClans"] = clans.Values.Count(c => kind(c) == "outlaw"),
+                ["adultLords"] = 0, ["minors"] = 0, ["deadParents"] = 0, ["companyMembers"] = 0, ["outlawMembers"] = 0 };
+            foreach (var h in Generated("Hero"))
+            {
+                XmlElement clan; clans.TryGetValue(Ref(h.Value, "faction") ?? "", out clan);
+                var npc = Get("NPCCharacter." + h.Value.GetAttribute("id"));
+                double age = 0;
+                if (npc == null || !Num(npc, "age", out age)) continue;
+                string k = kind(clan);
+                if (h.Value.GetAttribute("alive") == "false") { if (k == "house") counts["deadParents"]++; else Add("graph.census", h.Key, "@alive", "a dead hero outside a noble house"); continue; }
+                if (k == "house") counts[age >= Int(Obj(policy, "childGenerator"), "adultAge") ? "adultLords" : "minors"]++;
+                else if (k == "company") counts["companyMembers"]++;
+                else if (k == "outlaw") counts["outlawMembers"]++;
+            }
+            if (input.Plan != null) counts["wanderers"] = input.Plan.Companions.Count;
+            foreach (var c in counts)
+                if (Int(census, c.Key) != c.Value || !census.ContainsKey(c.Key)) Add("graph.census", null, "census." + c.Key, c.Value + " staged, the campaign v2 census says " + (census.ContainsKey(c.Key) ? Int(census, c.Key).ToString(CultureInfo.InvariantCulture) : "nothing"));
+            report.Census["population"] = counts;
         }
 
         // Settlement positions, culture start points and spawn positions that copy an installed Calradia coordinate (an installed settlement,
@@ -615,6 +706,7 @@ namespace MNBL.ProceduralWorld.CampaignRegistry
                 string bucket = outcome.Split(':')[0]; int n; outcomes.TryGetValue(kind + " " + bucket, out n); outcomes[kind + " " + bucket] = n + 1;
             }
             report.Census["sources"] = new SortedDictionary<string, int>(outcomes, StringComparer.Ordinal);
+            PopulationCensus();
             // Staged settlements agree with their compiler records: a village's binding (or MMR-33's explicit rebinding, with its reason), a
             // town's port.
             int rebound = 0;
@@ -644,8 +736,9 @@ namespace MNBL.ProceduralWorld.CampaignRegistry
             var deferred = Obj(policy, "deferredOwners") ?? new Dictionary<string, object>();
             var resolved = new HashSet<string>(input.Resolutions.Where(r => r != null).Select(r => r.Record + "|" + r.Slot), StringComparer.Ordinal);
             var slotCounts = new Dictionary<string, int>(StringComparer.Ordinal);
-            var compilerClans = Records(input.Campaign, "clans").Where(c => Text(c, "id") != null).GroupBy(c => Text(c, "id")).ToDictionary(g => g.Key, g => g.First(), StringComparer.Ordinal);
-            foreach (var list in new[] { "towns", "castles", "villages", "clans", "kingdoms", "heroes", "ports" })
+            // campaign.json v2 (MMR-279): the compiler's clans are its noble houses, mercenary companies and outlaw clans (MMR-280 emits them).
+            var compilerClans = Records(input.Campaign, "houses").Where(c => Text(c, "id") != null).GroupBy(c => Text(c, "id")).ToDictionary(g => g.Key, g => g.First(), StringComparer.Ordinal);
+            foreach (var list in new[] { "towns", "castles", "villages", "houses", "mercenaryCompanies", "outlawClans", "kingdoms", "heroes", "ports" })
                 foreach (var r in Records(input.Campaign, list))
                 {
                     string record = list == "ports" ? Text(r, "town") : Text(r, "id");
@@ -684,6 +777,7 @@ namespace MNBL.ProceduralWorld.CampaignRegistry
             switch (slot)
             {
                 case "banner": return has(clan, "banner_key") ? null : "the staged clan has no banner_key";
+                case "colors": return has(clan, "color") && has(clan, "color2") ? null : "the staged clan has no color and color2";
                 case "tier": return number(clan, "tier") >= 0 ? null : "the staged clan has no tier";
                 case "vassalClans":
                 {
@@ -766,11 +860,12 @@ namespace MNBL.ProceduralWorld.CampaignRegistry
         public static List<SlotResolution> Resolutions(FactionFactory.Result factions, HeroFactory.Result heroes, SettlementFactory.Result settlements, NavalContentFactory.Result naval)
         {
             var list = new List<SlotResolution>();
-            foreach (var c in factions.Clans)
+            foreach (var c in factions.AllClans)
             {
                 if (!String.IsNullOrEmpty(c.BannerKey)) list.Add(new SlotResolution { Record = c.Id, Slot = "banner", Value = c.BannerKey });
                 list.Add(new SlotResolution { Record = c.Id, Slot = "tier", Value = c.Tier.ToString(CultureInfo.InvariantCulture) });
-                list.Add(new SlotResolution { Record = c.Id, Slot = "vassalClans", Value = c.KingdomId == null ? "independent" : "vassal of " + c.KingdomId + (c.Ruling ? " (ruling clan)" : "") });
+                if (c.Minor) { if (!String.IsNullOrEmpty(c.Color)) list.Add(new SlotResolution { Record = c.Id, Slot = "colors", Value = c.Color + "/" + c.Color2 }); }
+                else list.Add(new SlotResolution { Record = c.Id, Slot = "vassalClans", Value = "vassal of " + c.KingdomId + (c.Ruling ? " (ruling clan)" : "") });
             }
             foreach (var k in factions.Kingdoms)
             {
