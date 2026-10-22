@@ -1,0 +1,3760 @@
+{
+  "activeSprintId": "sp_01m5grvpheb3bhk9t0t1a3tpx2",
+  "attempts": [
+    {
+      "createdAt": "2026-10-20T00:02:38.497Z",
+      "decidedAt": "2026-10-20T04:19:25.775Z",
+      "decision": {
+        "decidedBy": "Claude Code",
+        "notes": "Verified by the serialized integrator agent after merging into map2/int (cfbeaf8, fix 39f2a6e) and by the orchestrator reading the result file.",
+        "outcome": "accepted",
+        "reasons": []
+      },
+      "evidence": {
+        "checks": [
+          {
+            "detail": "10/10 incl. new map2_policies (37/37)",
+            "name": "WorldBridge ctest",
+            "status": "passed"
+          },
+          {
+            "detail": "incl. new Test-Map2Policies 25/25",
+            "name": "C# harnesses (28)",
+            "status": "passed"
+          },
+          {
+            "detail": "16/16",
+            "name": "python tests/ci",
+            "status": "passed"
+          },
+          {
+            "detail": "cells.bin byte-identical to world A",
+            "name": "Test-TravelGate seed 42 + offline bundle",
+            "status": "passed"
+          },
+          {
+            "detail": "",
+            "name": "repin_map2.py --check",
+            "status": "passed"
+          }
+        ],
+        "criteria": [
+          {
+            "criterionId": "a1",
+            "met": true,
+            "note": "Integrator confirmed docs/biome-presentation.md content and tools/check_layer_textures.py 58/58."
+          },
+          {
+            "criterionId": "a2",
+            "met": true,
+            "note": "Integrator rebuilt map2/int: ctest 10/10, harnesses pass, repin_map2.py --check clean; one integration fix (R11 in remaining host lists)."
+          },
+          {
+            "criterionId": "a3",
+            "met": true,
+            "note": "R11 constant on both sides; clean break section present."
+          },
+          {
+            "criterionId": "r1",
+            "met": true,
+            "note": "population.json base 133, troop templates for 7 cultures."
+          }
+        ],
+        "notes": "Work ran in workflow wf_07e82c6f-a67 (implementer + serialized integrator); recorded here after integration."
+      },
+      "failure": null,
+      "fencingToken": 1,
+      "id": "at_01m5b9w0s10tybf293ckpa62wb",
+      "kind": "work",
+      "number": 1,
+      "outputs": {
+        "artifacts": [
+          {
+            "hash": null,
+            "label": "Ticket result",
+            "location": "C:/Users/davgo/m2/results/MMR-248.md",
+            "remoteOnly": false
+          },
+          {
+            "hash": null,
+            "label": "Biome presentation table",
+            "location": "docs/biome-presentation.md",
+            "remoteOnly": false
+          }
+        ],
+        "branch": "map2/MMR-248",
+        "changedFiles": [
+          "docs/biome-presentation.md",
+          "docs/save-compatibility.md",
+          "worldgen/policies/terrain-materials.json",
+          "worldgen/policies/playability.json",
+          "worldgen/policies/projection.json",
+          "worldgen/policies/economy.json",
+          "worldgen/policies/startup.json",
+          "worldgen/policies/climate-flow.json",
+          "worldgen/policies/campaign-content.json",
+          "worldgen/policies/roads.json",
+          "worldgen/policies/population.json",
+          "worldgen/policies/settlement-looks.json",
+          "worldgen/policies/terrain-shaping.json",
+          "worldgen/contracts/campaign.schema.json",
+          "src/WorldBridge/src/policy_map2.cpp",
+          "src/WorldBridge/src/material_compiler.cpp",
+          "src/WorldBridge/src/travel_graph.cpp",
+          "src/WorldBridge/src/campaign_compiler.cpp",
+          "src/WorldBridge/src/bundle_writer.cpp",
+          "src/MNBL.ProceduralWorld/World/Map2Policies.cs",
+          "tools/repin_map2.py",
+          "tools/make_population_policy.py",
+          "tools/check_layer_textures.py"
+        ],
+        "commits": [
+          "c049000",
+          "39f2a6e",
+          "cfbeaf8"
+        ],
+        "summary": "Froze the map epic 2 policy foundation. terrain-materials.json v2 holds the shared biome table (face type, layer mix, battle class, colour grade, snow per biome), the 15-slot layer set (58 texture names verified against installed packs), permanent white and the school->TerrainType mutation remap without Dune. New keys in playability (landFaceGroups, town repairs, 3/2 village quota, roads), economy, startup, climate-flow, campaign-content; new roads.json, population.json (generated from installed XML: 133-fief base, largest kingdom 17 fiefs, per-culture troop templates, lord-trait distribution, outlaw tiers, 78 wanderer templates), settlement-looks.json, terrain-shaping.json. verticalScale 0.005 with mountainSlope/slopeRock scaled (seed 42 cells.bin byte-identical). Strict readers on both sides (material_compiler, travel_graph check_face_table, campaign_compiler, new policy_map2.cpp; managed World/Map2Policies.cs). campaign.schema.json v2. One format capability R11. Re-pin chain tools/repin_map2.py. docs/biome-presentation.md and the clean break in docs/save-compatibility.md. Integrated into map2/int as cfbeaf8 plus integration fix 39f2a6e (R11 in remaining host capability lists). Full key list: C:/Users/davgo/m2/results/MMR-248.md."
+      },
+      "reconciledAt": null,
+      "revisionId": "rv_01m59bp7nkkbx20at05svcrpyf",
+      "state": "accepted",
+      "submittedAt": "2026-10-20T04:15:39.834Z",
+      "supersededAt": null,
+      "ticketContentHash": "sha256:4e6e4e9936499b15a655e18e403758e5a8929658d7daf16958a59c751eeab16e",
+      "ticketId": "tk_01m56vpv1jgwmytc7nf354b15c",
+      "updatedAt": "2026-10-20T04:19:25.775Z",
+      "worker": {
+        "catalogRevision": "2026-10-19a",
+        "effort": "high",
+        "hostId": "claude-desktop-code-map2",
+        "label": "workflow wf_07e82c6f-a67 impl:MMR-248",
+        "modelId": "claude-opus-5-5",
+        "rationale": "Deep architecture ticket; implementer agent in worktree C:/Users/davgo/m2/t248, integrated into map2/int by a serialized integrator agent.",
+        "sessionId": null
+      }
+    },
+    {
+      "createdAt": "2026-10-20T00:02:38.540Z",
+      "decidedAt": "2026-10-20T04:19:25.919Z",
+      "decision": {
+        "decidedBy": "Claude Code",
+        "notes": "Accepted with a1 partially met (snow route). The decision the probe exists for - which native routes later tickets build on - is settled for layers, decals, terrain level and trees; the snow texture route is an explicit carried risk.",
+        "outcome": "accepted",
+        "reasons": []
+      },
+      "evidence": {
+        "checks": [
+          {
+            "detail": "all items recorded; runs 1 and 2 hung at known-bad last steps (MapColorGradeManager in a non-map scene, terrain_render_version=1); run 3 hung on SetDynamicSnowTexture before Read",
+            "name": "In-game probe runs 23716, 6284, 26296",
+            "status": "passed"
+          },
+          {
+            "detail": "19 tests; 506 installed terrain.bin round-trip",
+            "name": "tests/test_terrain_bin.py",
+            "status": "passed"
+          },
+          {
+            "detail": "",
+            "name": "tests/test_probe_slots.py",
+            "status": "passed"
+          },
+          {
+            "detail": "",
+            "name": "Build + ctest",
+            "status": "passed"
+          },
+          {
+            "detail": "build/install-restore-verify.json identical",
+            "name": "Install restore verification",
+            "status": "passed"
+          }
+        ],
+        "criteria": [
+          {
+            "criterionId": "a1",
+            "met": false,
+            "note": "Item 4 (dynamic snow) is only partly answered: no per-world runtime snow texture route reached the shader, so channel/orientation are unproven. All other items answered. Accepted with this carried to MMR-256 (must design a route and a fallback) and MMR-247 (proves it live), because the probe's run budget (one run, one confirm, one for a new blocker) is spent."
+          },
+          {
+            "criterionId": "a2",
+            "met": true,
+            "note": "Delivery A, entity-less scene decals, 513 GO."
+          },
+          {
+            "criterionId": "a3",
+            "met": true,
+            "note": "Process/lock checks, hashes, install restored and hash-verified."
+          },
+          {
+            "criterionId": "r1",
+            "met": true,
+            "note": "Map trees GO."
+          }
+        ],
+        "notes": "Workflow wf_07e82c6f-a67. Carried forward: MMR-256 must find a per-world snow texture route (e.g. a per-world named texture referenced by dynamic_flowmap_texture_name, or LoadTextureFromPath before Read) and prove it in MMR-247, with the fallback of permanent white + SetTerrainDynamicParams."
+      },
+      "failure": null,
+      "fencingToken": 1,
+      "id": "at_01m5b9w0tc81vhgt6vpgaf44sh",
+      "kind": "work",
+      "number": 1,
+      "outputs": {
+        "artifacts": [
+          {
+            "hash": null,
+            "label": "Probe evidence",
+            "location": "evidence/probe/map-epic-2-probe.json",
+            "remoteOnly": false
+          },
+          {
+            "hash": null,
+            "label": "Ticket result",
+            "location": "C:/Users/davgo/m2/results/MMR-249.md",
+            "remoteOnly": false
+          }
+        ],
+        "branch": "map2/MMR-249",
+        "changedFiles": [],
+        "commits": [
+          "68d0a96",
+          "64f5ae7"
+        ],
+        "summary": "New autorun probe map_epic2 (Automation/MapEpic2Probe.cs) plus tools/scenebin/build_probe_slots.py fixture slots and tools/summarize_map2_probe.py. Three runs (23716, 6284, 26296; the third for a genuinely new blocker). Decisions: magic ground delivery A (one runtime decal overlay); entity-less scene decals with published decal materials (runtime textures never render on decals); 513-sample terrain GO; map trees GO (88,000 trees via flora.bin, +0.24 ms). Answers: layers composite alpha-over 15->0 (use a_k = f_k / sum_{j<=k} f_j, ground-slope transparency off), season masks never switch at runtime; layer scale = tile size in map units, 37 px/unit at distance 38; 7,500 decals cost 3.19 ms main thread; tint mode 1 adds, mode 2 darkens; level-7 terrain loads in 0.13 s at level-6 cost. Snow: SetDynamicSnowTexture has no effect after Read and hangs before Read; the terrain snows only from the texture named by dynamic_flowmap_texture_name with use_dynamic_weather_effects; the season threshold follows SetTerrainDynamicParams. Native DLL hashes recorded, unchanged; install restored and hash-verified. Findings section 13 and evidence/probe/map-epic-2-probe.json written. Integrated into map2/int as 64f5ae7."
+      },
+      "reconciledAt": null,
+      "revisionId": "rv_01m59bp7nkkbx20at05svcrpyf",
+      "state": "accepted",
+      "submittedAt": "2026-10-20T04:15:39.960Z",
+      "supersededAt": null,
+      "ticketContentHash": "sha256:6f79d40e2e0878302c83883b0c0a6625bb1137d1f252fbbc5f1a6e9da7a4b085",
+      "ticketId": "tk_01m56vpv1qnhmkyhgve4t8q18y",
+      "updatedAt": "2026-10-20T04:19:25.919Z",
+      "worker": {
+        "catalogRevision": "2026-10-19a",
+        "effort": "high",
+        "hostId": "claude-desktop-code-map2",
+        "label": "workflow wf_07e82c6f-a67 impl:MMR-249",
+        "modelId": "claude-opus-5-5",
+        "rationale": "In-game probe; implementer agent builds the fixture and probe, runs it under the shared-install rules.",
+        "sessionId": null
+      }
+    },
+    {
+      "createdAt": "2026-10-20T00:02:38.580Z",
+      "decidedAt": "2026-10-20T04:19:25.965Z",
+      "decision": {
+        "decidedBy": "Claude Code",
+        "notes": "Independently verified by the orchestrator (FWGC++ ctest re-run 8/8, commit trailers).",
+        "outcome": "accepted",
+        "reasons": []
+      },
+      "evidence": {
+        "checks": [
+          {
+            "detail": "8/8 (fwg_tests 1419/1419 + 3 new CLI apply tests); re-run independently by the orchestrator: 8/8 in 188 s",
+            "name": "FWGC++ generator ctest",
+            "status": "passed"
+          },
+          {
+            "detail": "zero-edit fixed point, Nerdun fire confined to reach, determinism, refusals",
+            "name": "tests/test_leyline_shift.cpp",
+            "status": "passed"
+          },
+          {
+            "detail": "",
+            "name": "orchestrator sibling build",
+            "status": "passed"
+          }
+        ],
+        "criteria": [
+          {
+            "criterionId": "a1",
+            "met": true,
+            "note": "Orchestrator checked both commits carry Separation-Review PASS trailers and re-ran FWGC++ generator ctest: 8/8 pass. Commit order generator-then-rule is forced by check_layers; both are separate."
+          },
+          {
+            "criterionId": "a2",
+            "met": true,
+            "note": "fwg_cli_apply_none test passes."
+          },
+          {
+            "criterionId": "a3",
+            "met": true,
+            "note": "fwg_cli_apply_fire passes; time/memory recorded in the result file."
+          }
+        ],
+        "notes": "Workflow wf_07e82c6f-a67."
+      },
+      "failure": null,
+      "fencingToken": 1,
+      "id": "at_01m5b9w0vm6k3bb8wk5xee3ynh",
+      "kind": "work",
+      "number": 1,
+      "outputs": {
+        "artifacts": [
+          {
+            "hash": null,
+            "label": "Ticket result",
+            "location": "C:/Users/davgo/m2/results/MMR-250.md",
+            "remoteOnly": false
+          }
+        ],
+        "branch": "FWGC++ main",
+        "changedFiles": [],
+        "commits": [
+          "0874a1504e16a47dd81fa4a7385410554ed7a1e7",
+          "0ae1f3ed57161ed43d9b8b1ec0827f0345a87059"
+        ],
+        "summary": "FWGC++ slice landed on FWGC++ main as two gated commits (FWGC_AGENT=claude, Separation-Review PASS, not pushed): generator 0874a15 adds the logged verb shift_leylines(const World&, LeyShiftRequest) (LeylineEdits -> evaluate_networks -> add_biome_variants -> lunar_sensitivity; zones frozen; refuses hidden/unmanifested schools and magic-off worlds), apply_ley_shifts with fwg.operations v1 / fwg.ley_delta v1, the CLI `fwg apply --request R --operations OPS --delta D`, the baseline fix (fields re-evaluated after nomad edits and villain wells; a zero-edit replay at 42/129 went from 5343 moved cells to 0), the stale 24-city wording fix, and ruling 10 lifting the age-boundary rule for this verb only. Rule commit 0ae1f3e makes shift_leylines public in api.txt. Commit order is generator-then-rule because check_layers refuses an api.txt line before its declaration exists (repo precedent 97cfa24 -> 2f71684). MNBL producer pin unchanged (MMR-261 re-pins to 0ae1f3e)."
+      },
+      "reconciledAt": null,
+      "revisionId": "rv_01m59bp7nkkbx20at05svcrpyf",
+      "state": "accepted",
+      "submittedAt": "2026-10-20T04:19:25.743Z",
+      "supersededAt": null,
+      "ticketContentHash": "sha256:1713b3557814b72a45a74cff0dcef30f3b6972bbcba7e7f6fb0e2bf191b6e8b0",
+      "ticketId": "tk_01m56vpv1q2zb58yqevxaf00nc",
+      "updatedAt": "2026-10-20T04:19:25.965Z",
+      "worker": {
+        "catalogRevision": "2026-10-19a",
+        "effort": "high",
+        "hostId": "claude-desktop-code-map2",
+        "label": "workflow wf_07e82c6f-a67 impl:MMR-250",
+        "modelId": "claude-opus-5-5",
+        "rationale": "FWGC++ slice in the FWGC++ repo under its commit gate.",
+        "sessionId": null
+      }
+    },
+    {
+      "createdAt": "2026-10-20T00:02:38.620Z",
+      "decidedAt": "2026-10-20T04:19:25.832Z",
+      "decision": {
+        "decidedBy": "Claude Code",
+        "notes": "Verified by the integrator after merge 918c0cd (build, ctest, harnesses pass).",
+        "outcome": "accepted",
+        "reasons": []
+      },
+      "evidence": {
+        "checks": [
+          {
+            "detail": "",
+            "name": "Build + WorldBridge ctest",
+            "status": "passed"
+          },
+          {
+            "detail": "",
+            "name": "Sweep keep/orphan offline test",
+            "status": "passed"
+          },
+          {
+            "detail": "within 15%",
+            "name": "Estimate vs world A 383 s",
+            "status": "passed"
+          }
+        ],
+        "criteria": [
+          {
+            "criterionId": "a1",
+            "met": true,
+            "note": "Integrator re-ran the offline sweep tests on map2/int."
+          },
+          {
+            "criterionId": "a2",
+            "met": true,
+            "note": "Estimate within 15% of 383 s; warning path present. In-game display deferred to MMR-247."
+          },
+          {
+            "criterionId": "a3",
+            "met": true,
+            "note": "player-worlds.md corrected."
+          }
+        ],
+        "notes": "Workflow wf_07e82c6f-a67. Known gap: reuse prediction compares scene, module build and game version only."
+      },
+      "failure": null,
+      "fencingToken": 1,
+      "id": "at_01m5b9w0wwqerm8xhmxvx5k6pq",
+      "kind": "work",
+      "number": 1,
+      "outputs": {
+        "artifacts": [
+          {
+            "hash": null,
+            "label": "Ticket result",
+            "location": "C:/Users/davgo/m2/results/MMR-282.md",
+            "remoteOnly": false
+          }
+        ],
+        "branch": "map2/MMR-282",
+        "changedFiles": [],
+        "commits": [
+          "e39f9b5",
+          "918c0cd"
+        ],
+        "summary": "Sweep keeps every world scene and navigation cache referenced by a bound save or a world package and deletes only orphans (with a kept/deleted record); per-world first-start navigation wait estimate from settlement count (calibrated to world A's measured 383 s) in the preview and before any load whose cache key is missing; no fixed 'about 7 minutes' text; player-worlds.md corrected (cache rebuild, update case). Integrated into map2/int as 918c0cd. Not run in game: preview text on screen and the Load/Cancel warning flow are for MMR-247."
+      },
+      "reconciledAt": null,
+      "revisionId": "rv_01m59bp7nkkbx20at05svcrpyf",
+      "state": "accepted",
+      "submittedAt": "2026-10-20T04:15:39.909Z",
+      "supersededAt": null,
+      "ticketContentHash": "sha256:6d9411291790658b3fb23d7ab944a0b897269f9e3f7e48b2d8034cf10db9fb68",
+      "ticketId": "tk_01m59a1tt2r0qeqn61kksge4kk",
+      "updatedAt": "2026-10-20T04:19:25.832Z",
+      "worker": {
+        "catalogRevision": "2026-10-19a",
+        "effort": "high",
+        "hostId": "claude-desktop-code-map2",
+        "label": "workflow wf_07e82c6f-a67 impl:MMR-282",
+        "modelId": "claude-opus-5-5",
+        "rationale": "Stability fix in managed code; worktree t282.",
+        "sessionId": null
+      }
+    },
+    {
+      "createdAt": "2026-10-20T00:02:38.657Z",
+      "decidedAt": "2026-10-20T04:19:25.875Z",
+      "decision": {
+        "decidedBy": "Claude Code",
+        "notes": "Verified by the integrator after merge 8f1f3ce; 11 dependent harnesses re-run and pass.",
+        "outcome": "accepted",
+        "reasons": []
+      },
+      "evidence": {
+        "checks": [
+          {
+            "detail": "",
+            "name": "Build + WorldBridge ctest",
+            "status": "passed"
+          },
+          {
+            "detail": "",
+            "name": "Test-ContentCompatibility (synthetic module with items/troops, extra battle scene)",
+            "status": "passed"
+          },
+          {
+            "detail": "re-run by the integrator",
+            "name": "Activation, Compatibility, CompiledWorld, EarlyBinding, EncounterResolver, GenerationJob, Recovery, SaveBinding, WorldLoader, WorldSetup, WorldStore",
+            "status": "passed"
+          }
+        ],
+        "criteria": [
+          {
+            "criterionId": "a1",
+            "met": true,
+            "note": "Test-ContentCompatibility re-run by the integrator."
+          },
+          {
+            "criterionId": "a2",
+            "met": true,
+            "note": "Battle-table rebuild/refusal tests pass; AfterLoad guarded."
+          },
+          {
+            "criterionId": "a3",
+            "met": true,
+            "note": "TextObject refusals with module and object."
+          }
+        ],
+        "notes": "Workflow wf_07e82c6f-a67. Not verified in game: setup-screen first-open cost, real Workshop mods."
+      },
+      "failure": null,
+      "fencingToken": 1,
+      "id": "at_01m5b9w0y125a66cgscmzjbhnf",
+      "kind": "work",
+      "number": 1,
+      "outputs": {
+        "artifacts": [
+          {
+            "hash": null,
+            "label": "Ticket result",
+            "location": "C:/Users/davgo/m2/results/MMR-283.md",
+            "remoteOnly": false
+          }
+        ],
+        "branch": "map2/MMR-283",
+        "changedFiles": [],
+        "commits": [
+          "c2f3dd8",
+          "a6a1f4e",
+          "56eb143",
+          "8f1f3ce"
+        ],
+        "summary": "The catalog pin covers only objects the world references, checked by id and type and the fields the world reads (mods may add items, troops, cultures); catalog, defaults and battle-table checks run on the setup screen before Generate and name the module and object in localizable TextObject messages; the battle index map is rebuilt against the live scene table (factored so MMR-254/260 patches are additive) or refused before the cache build; AfterLoad can no longer throw from it. New Test-ContentCompatibility suite. Integrated into map2/int as 8f1f3ce."
+      },
+      "reconciledAt": null,
+      "revisionId": "rv_01m59bp7nkkbx20at05svcrpyf",
+      "state": "accepted",
+      "submittedAt": "2026-10-20T04:15:39.936Z",
+      "supersededAt": null,
+      "ticketContentHash": "sha256:7e39068a0e9b61195bc8d1f4d8bc092b23fc615f903f97134e0d84ee4d230433",
+      "ticketId": "tk_01m59a1tt93b4zeq0jrkyb81jt",
+      "updatedAt": "2026-10-20T04:19:25.875Z",
+      "worker": {
+        "catalogRevision": "2026-10-19a",
+        "effort": "high",
+        "hostId": "claude-desktop-code-map2",
+        "label": "workflow wf_07e82c6f-a67 impl:MMR-283",
+        "modelId": "claude-opus-5-5",
+        "rationale": "Compatibility gate change in managed code; worktree t283.",
+        "sessionId": null
+      }
+    },
+    {
+      "createdAt": "2026-10-20T04:19:31.884Z",
+      "decidedAt": "2026-10-20T04:19:48.561Z",
+      "decision": {
+        "decidedBy": "Claude Code",
+        "notes": "Verified by the integrator (merge 4840fa1) and by MMR-252's integration for r1.",
+        "outcome": "accepted",
+        "reasons": []
+      },
+      "evidence": {
+        "checks": [
+          {
+            "detail": "10/10",
+            "name": "Build + WorldBridge ctest",
+            "status": "passed"
+          },
+          {
+            "detail": "matches evidence exactly",
+            "name": "20-seed generation sweep (re-run by integrator)",
+            "status": "passed"
+          },
+          {
+            "detail": "",
+            "name": "Harnesses (GenerationJob, Map2Policies, NavalContent, Playability, Settlements, TravelGate, WorldDataBundle)",
+            "status": "passed"
+          }
+        ],
+        "criteria": [
+          {
+            "criterionId": "a1",
+            "met": true,
+            "note": "Integrator reproduced the 20-seed sweep: 0 town-code rejections."
+          },
+          {
+            "criterionId": "a2",
+            "met": true,
+            "note": "Preservation assertion present in travel::run and bundle_validator; rates recomputed."
+          },
+          {
+            "criterionId": "r1",
+            "met": true,
+            "note": "At MMR-251's merge the harbour backing was pending; MMR-252's integrator verified 17/17 forced-port towns have pinned harbour villages."
+          },
+          {
+            "criterionId": "r2",
+            "met": true,
+            "note": "18/20 reach recorded (from the evidence file; the reach stages were not re-run)."
+          }
+        ],
+        "notes": "Workflow wf_07e82c6f-a67."
+      },
+      "failure": null,
+      "fencingToken": 1,
+      "id": "at_01m5brjcxc90wqk5d3dq2g3p18",
+      "kind": "work",
+      "number": 1,
+      "outputs": {
+        "artifacts": [
+          {
+            "hash": null,
+            "label": "City preservation sweep",
+            "location": "evidence/fwg/city-preservation.json",
+            "remoteOnly": false
+          },
+          {
+            "hash": null,
+            "label": "Ticket result",
+            "location": "C:/Users/davgo/m2/results/MMR-251.md",
+            "remoteOnly": false
+          }
+        ],
+        "branch": "map2/MMR-251",
+        "changedFiles": [],
+        "commits": [
+          "42a61fb",
+          "4840fa1"
+        ],
+        "summary": "Bounded town repairs in the travel compiler on top of the committed 2026-10-19 repairs: towns-only snap radius, carve a land cell under the town, join an unreachable group by pass/deck, forced port (marked forced:true) only when no join works. Requested seed kept when the cause is repairable; every attempt's city count recorded. Preservation assertion (sites = placed = compiled = travel = id-map towns, same uids) in travel::run and the bundle validator. Stale 24-city wording fixed. 20-seed sweep 42-61: 20/20 accepted, 17 at attempt 0, 0 town-code rejections, 17 forced ports, reach-the-campaign 18/20 (seeds 59/61 failed the pre-quota village binding). Integrated into map2/int as 4840fa1."
+      },
+      "reconciledAt": null,
+      "revisionId": "rv_01m59bp7nkkbx20at05svcrpyf",
+      "state": "accepted",
+      "submittedAt": "2026-10-20T04:19:48.530Z",
+      "supersededAt": null,
+      "ticketContentHash": "sha256:4a30540fe25c419d9b83350d2c1b7c72deff5522733d6fa41abfad7e21ddb9e8",
+      "ticketId": "tk_01m56vpv1q79mk3k16ghhff93z",
+      "updatedAt": "2026-10-20T04:19:48.561Z",
+      "worker": {
+        "catalogRevision": "2026-10-19a",
+        "effort": "high",
+        "hostId": "claude-desktop-code-map2",
+        "label": "workflow wf_07e82c6f-a67 impl:MMR-251",
+        "modelId": "claude-opus-5-5",
+        "rationale": "travel_graph.cpp owner after MMR-248; ran in the chunk-1 workflow as soon as MMR-248 integrated; recorded after integration.",
+        "sessionId": null
+      }
+    },
+    {
+      "createdAt": "2026-10-20T04:19:48.610Z",
+      "decidedAt": "2026-10-20T04:20:06.280Z",
+      "decision": {
+        "decidedBy": "Claude Code",
+        "notes": "Verified by the integrator (merge ffc77fd; summarize_village_quota.py reproduction identical). Orchestrator re-ran refresh-fixtures on map2/int: A'/B' ids reproduce.",
+        "outcome": "accepted",
+        "reasons": []
+      },
+      "evidence": {
+        "checks": [
+          {
+            "detail": "10/10",
+            "name": "Build + WorldBridge ctest",
+            "status": "passed"
+          },
+          {
+            "detail": "24/24 each",
+            "name": "Regenerated A'/B' bundles reproduce (9869b548, 56b9bca3) + settlement harness",
+            "status": "passed"
+          },
+          {
+            "detail": "20/20 accepted; settlements 19/20 (seed 61 refused: castle villages without a same-kingdom town in trade range, pre-existing, left to MMR-279's kingdom merge)",
+            "name": "Sweep 42-61 generate+bundle+settlements",
+            "status": "passed"
+          },
+          {
+            "detail": "",
+            "name": "22 C# harnesses on A'/B'",
+            "status": "passed"
+          },
+          {
+            "detail": "2/2 activatable",
+            "name": "Test-NavigationSweep full on A'/B'",
+            "status": "passed"
+          }
+        ],
+        "criteria": [
+          {
+            "criterionId": "a1",
+            "met": true,
+            "note": "Integrator reproduced exact counts on regenerated A'/B'."
+          },
+          {
+            "criterionId": "a2",
+            "met": true,
+            "note": "Bundle ids reproduce; passes=2 stable on 21 worlds."
+          },
+          {
+            "criterionId": "a3",
+            "met": true,
+            "note": "Harness refusals confirmed."
+          },
+          {
+            "criterionId": "r1",
+            "met": true,
+            "note": "Confirmed from sweep and harness."
+          },
+          {
+            "criterionId": "r2",
+            "met": true,
+            "note": "Distribution recomputed."
+          },
+          {
+            "criterionId": "r3",
+            "met": true,
+            "note": "movedNotables and forced-port backing confirmed."
+          },
+          {
+            "criterionId": "r4",
+            "met": true,
+            "note": "33 within-clearance = 33 recorded exceptions."
+          },
+          {
+            "criterionId": "r5",
+            "met": true,
+            "note": "Tests present."
+          }
+        ],
+        "notes": "Workflow wf_07e82c6f-a67."
+      },
+      "failure": null,
+      "fencingToken": 1,
+      "id": "at_01m5brjx82t1kre6dj2g7mfc0e",
+      "kind": "work",
+      "number": 1,
+      "outputs": {
+        "artifacts": [
+          {
+            "hash": null,
+            "label": "Village quota sweep",
+            "location": "evidence/fwg/village-quota.json",
+            "remoteOnly": false
+          },
+          {
+            "hash": null,
+            "label": "Ticket result",
+            "location": "C:/Users/davgo/m2/results/MMR-252.md",
+            "remoteOnly": false
+          }
+        ],
+        "branch": "map2/MMR-252",
+        "changedFiles": [],
+        "commits": [
+          "0ded399",
+          "ffc77fd"
+        ],
+        "summary": "New WorldBridge pass village_quota.cpp inside travel::run after placement: pins port harbour villages (synthesizes a pinned harbour village for forced-port towns), keeps 3 per town by preference, castles take 2 from their garrison town, surplus reassigned own-kingdom first, rest dropped with quota: exclusions (never a culture's last ranch/wheat-class village; notables moved), synthesis on land cells with clearance tiers scaled by town spacing S (largest-deficit class), clearance pass (4 units, islet exceptions recorded), second analysis pass asserted stable. campaign.json v2 with bound/boundKind/sourceTown/origin/tier and villageQuota; closure_problems/exclude() handle castle-bound villages and erase only emptied ports. Managed: VillageBinding passes v2 through; SettlementFactory validates exactly 3/2 and refuses v1/0-village; VillagePool coastal fishing share and per-culture ranch/wheat floors; FoodPass guarded; hearth from sourceTown. Seeds 42/73: 187 and 276 villages exactly; 21-world sweep all exact 3/2, 17/17 forced ports backed, 33 islet exceptions. Integrated into map2/int as ffc77fd."
+      },
+      "reconciledAt": null,
+      "revisionId": "rv_01m59bp7nkkbx20at05svcrpyf",
+      "state": "accepted",
+      "submittedAt": "2026-10-20T04:20:06.251Z",
+      "supersededAt": null,
+      "ticketContentHash": "sha256:8655f3bbafa6868084c2cdba62b267afedc7f415c7f039ce88130f72491dd712",
+      "ticketId": "tk_01m56vpv1qyna6b7wn2fcyzf07",
+      "updatedAt": "2026-10-20T04:20:06.280Z",
+      "worker": {
+        "catalogRevision": "2026-10-19a",
+        "effort": "high",
+        "hostId": "claude-desktop-code-map2",
+        "label": "workflow wf_07e82c6f-a67 impl:MMR-252",
+        "modelId": "claude-opus-5-5",
+        "rationale": "Village quota pass after MMR-251; ran in the chunk-1 workflow; recorded after integration.",
+        "sessionId": null
+      }
+    },
+    {
+      "createdAt": "2026-10-20T04:22:32.566Z",
+      "decidedAt": "2026-10-20T09:48:19.093Z",
+      "decision": {
+        "decidedBy": "Claude Code",
+        "notes": "Verified by the integrator after merge 46d9308.",
+        "outcome": "accepted",
+        "reasons": []
+      },
+      "evidence": {
+        "checks": [
+          {
+            "detail": "10/10; travel 135/135",
+            "name": "Build + ctest",
+            "status": "passed"
+          },
+          {
+            "detail": "54/54",
+            "name": "refresh-fixtures + SettlementPlacement",
+            "status": "passed"
+          },
+          {
+            "detail": "21/21, 0 water-without-deck",
+            "name": "Sweep 42-61,73 + summarize_roads",
+            "status": "passed"
+          },
+          {
+            "detail": "",
+            "name": "11 C# harnesses + NavigationSweep A'/B'",
+            "status": "passed"
+          }
+        ],
+        "criteria": [
+          {
+            "criterionId": "a1",
+            "met": true,
+            "note": "Integrator: roadNetwork.connected on int fixtures plus an independent summarize_roads recount."
+          },
+          {
+            "criterionId": "a2",
+            "met": true,
+            "note": "ctest travel suite incl. seam/pole/determinism; bundle ids reproduce."
+          },
+          {
+            "criterionId": "r1",
+            "met": true,
+            "note": "0 water-without-deck cells recounted from cells.bin on A'/B'."
+          }
+        ],
+        "notes": "Workflow wf_be5f06f8-0ab. Open: 14 sweep settlements (1 on B') reach another town's road because their own is beyond feeders.maxCells 48."
+      },
+      "failure": null,
+      "fencingToken": 1,
+      "id": "at_01m5brqxbpsbxez5j6qaaye4dd",
+      "kind": "work",
+      "number": 1,
+      "outputs": {
+        "artifacts": [
+          {
+            "hash": null,
+            "label": "Road network evidence",
+            "location": "evidence/fwg/road-network.json",
+            "remoteOnly": false
+          },
+          {
+            "hash": null,
+            "label": "Ticket result",
+            "location": "C:/Users/davgo/m2/results/MMR-253.md",
+            "remoteOnly": false
+          }
+        ],
+        "branch": "map2/MMR-253",
+        "changedFiles": [],
+        "commits": [
+          "c7dbcb9",
+          "46d9308"
+        ],
+        "summary": "Road network in the travel compiler: FWGC++ routes become drawable pieces split at poles that stop at the bank of undecked crossings; new travel::lay_roads (after the village quota) adds feeders from road-less towns, castles and villages along land cells, crossing water only on existing decks. Result::road per-cell flag for cells.bin v2. travel-graph.json roads[] with kind, decks, pieces (ordered paths, gate/pole/bank/junction end markers), grid.roadCells and a roadNetwork summary; schema updated. tools/summarize_roads.py recount -> evidence/fwg/road-network.json; docs/travel-graph.md 'Road network'. A'/B' connect every town, castle and village; 0 road cells on water without a deck over 21 worlds. Integrated as 46d9308."
+      },
+      "reconciledAt": null,
+      "revisionId": "rv_01m59bp7nkkbx20at05svcrpyf",
+      "state": "accepted",
+      "submittedAt": "2026-10-20T09:47:44.308Z",
+      "supersededAt": null,
+      "ticketContentHash": "sha256:8150221759804bce1f8245604c97209206046bd1fcaf50704af52bf6d13cafa0",
+      "ticketId": "tk_01m56vpv1q5sg15729903evh8m",
+      "updatedAt": "2026-10-20T09:48:19.093Z",
+      "worker": {
+        "catalogRevision": "2026-10-19a",
+        "effort": "medium",
+        "hostId": "claude-desktop-code-map2",
+        "label": "workflow wf_be5f06f8-0ab impl:MMR-253",
+        "modelId": "claude-opus-5-5",
+        "rationale": "travel_graph.cpp owner after MMR-252; worktree t253.",
+        "sessionId": null
+      }
+    },
+    {
+      "createdAt": "2026-10-20T04:22:32.618Z",
+      "decidedAt": "2026-10-20T09:48:21.468Z",
+      "decision": {
+        "decidedBy": "Claude Code",
+        "notes": "Verified by the integrator after merge 5ad41cf.",
+        "outcome": "accepted",
+        "reasons": []
+      },
+      "evidence": {
+        "checks": [
+          {
+            "detail": "",
+            "name": "Build + ctest incl. synthetic shaping tests",
+            "status": "passed"
+          },
+          {
+            "detail": "",
+            "name": "Offline gates on A'/B'",
+            "status": "passed"
+          },
+          {
+            "detail": "",
+            "name": "Python parity z error 0",
+            "status": "passed"
+          },
+          {
+            "detail": "",
+            "name": "Managed harnesses",
+            "status": "passed"
+          }
+        ],
+        "criteria": [
+          {
+            "criterionId": "a1",
+            "met": true,
+            "note": "Integrator re-ran the gates on the merged A'/B' bundles (fix d15bbb5 refreshed the evidence)."
+          },
+          {
+            "criterionId": "a2",
+            "met": true,
+            "note": "Synthetic CTests and parity pass."
+          },
+          {
+            "criterionId": "a3",
+            "met": true,
+            "note": "Consumers updated; harnesses pass."
+          },
+          {
+            "criterionId": "r1",
+            "met": true,
+            "note": "Clamp present; polar share recorded."
+          }
+        ],
+        "notes": "Workflow wf_be5f06f8-0ab. Not verified in game (MMR-247). 4 (A') / 32 (B') lake groups hidden under the old runtime plane rule were handed to MMR-285. Nav/visual coast mismatch recorded (250/181 cells), not reduced."
+      },
+      "failure": null,
+      "fencingToken": 1,
+      "id": "at_01m5brqxda3drdntbbd8xgevts",
+      "kind": "work",
+      "number": 1,
+      "outputs": {
+        "artifacts": [
+          {
+            "hash": null,
+            "label": "Terrain shaping gates",
+            "location": "evidence/fwg/terrain-shaping.json",
+            "remoteOnly": false
+          },
+          {
+            "hash": null,
+            "label": "Ticket result",
+            "location": "C:/Users/davgo/m2/results/MMR-278.md",
+            "remoteOnly": false
+          }
+        ],
+        "branch": "map2/MMR-278",
+        "changedFiles": [],
+        "commits": [
+          "d1bf62e",
+          "5ad41cf",
+          "d15bbb5"
+        ],
+        "summary": "Terrain shaping: final verticalScale per the gates with mountainSlope/slopeRock scaled (travel classes byte-identical), a shaping stage in terrain_compiler.cpp after travel placement (despike, coast envelope, merged settlement pads, lake beds below level and shores above, coherence order), smoothed normals, masked [1,4,1]/6 low-pass, and the 513-sample level-7 output (cubic B-spline 2x, 128 cells per node) through the C++ encoder, WorldSurface, grid.side, travel subsampling, RuntimeNavigationBuilder spacing, Test-TravelGate and summarize_terrain.py with C++/Python parity. shaping block in terrain.json; camera y clamped to the pole lines; absolute-height consumers updated. Gates on A'/B' in evidence/fwg/terrain-shaping.json. Integrated as 5ad41cf + fix d15bbb5."
+      },
+      "reconciledAt": null,
+      "revisionId": "rv_01m59bp7nkkbx20at05svcrpyf",
+      "state": "accepted",
+      "submittedAt": "2026-10-20T09:47:53.047Z",
+      "supersededAt": null,
+      "ticketContentHash": "sha256:ebee72cd761fed8dd82943db4f556072c0d3b682ca623a031929601f5d236309",
+      "ticketId": "tk_01m593h8xj949xksmkzh4hdgtv",
+      "updatedAt": "2026-10-20T09:48:21.468Z",
+      "worker": {
+        "catalogRevision": "2026-10-19a",
+        "effort": "high",
+        "hostId": "claude-desktop-code-map2",
+        "label": "workflow wf_be5f06f8-0ab impl:MMR-278",
+        "modelId": "claude-opus-5-5",
+        "rationale": "Terrain shaping + level-7 output (probe GO); worktree t278.",
+        "sessionId": null
+      }
+    },
+    {
+      "createdAt": "2026-10-20T04:22:32.663Z",
+      "decidedAt": "2026-10-20T09:48:23.774Z",
+      "decision": {
+        "decidedBy": "Claude Code",
+        "notes": "Verified by the integrator after merge fe5068f (fix e43fbdb).",
+        "outcome": "accepted",
+        "reasons": []
+      },
+      "evidence": {
+        "checks": [
+          {
+            "detail": "",
+            "name": "Build + ctest",
+            "status": "passed"
+          },
+          {
+            "detail": "",
+            "name": "Seeds 42/73 population census",
+            "status": "passed"
+          },
+          {
+            "detail": "",
+            "name": "Managed harnesses on A'/B'",
+            "status": "passed"
+          }
+        ],
+        "criteria": [
+          {
+            "criterionId": "a1",
+            "met": true,
+            "note": "Integrator recomputed targets on merged fixtures."
+          },
+          {
+            "criterionId": "a2",
+            "met": true,
+            "note": "Ownership and census invariants hold."
+          },
+          {
+            "criterionId": "a3",
+            "met": true,
+            "note": "Re-run byte-identical; ctest passes."
+          },
+          {
+            "criterionId": "r1",
+            "met": true,
+            "note": "wars[] and war guard recorded."
+          }
+        ],
+        "notes": "Workflow wf_be5f06f8-0ab. Touched travel_graph.cpp minimally (17 lines) for the population hook. Island kingdoms span land groups (in-game travel unverified). Adult lords 2-4% above target."
+      },
+      "failure": null,
+      "fencingToken": 1,
+      "id": "at_01m5brqxeq6j2xafxk7bcav734",
+      "kind": "work",
+      "number": 1,
+      "outputs": {
+        "artifacts": [
+          {
+            "hash": null,
+            "label": "Population census",
+            "location": "evidence/fwg/population.json",
+            "remoteOnly": false
+          },
+          {
+            "hash": null,
+            "label": "Ticket result",
+            "location": "C:/Users/davgo/m2/results/MMR-279.md",
+            "remoteOnly": false
+          }
+        ],
+        "branch": "map2/MMR-279",
+        "changedFiles": [],
+        "commits": [
+          "fe5068f",
+          "e43fbdb"
+        ],
+        "summary": "WorldBridge population pass population.cpp after the village quota: extended source reader (Person seat/tier/fame/epithet/org/presence, heroes.orgs, npcs.people gender/age, resident name pools, naming patterns, lexicon roots, castellan ledger, bandit/deserter bands, ruin camps), shared name cleaner (own module with tests), kingdom merge toward round(9F/133) (civilization, then culture/proximity, split above max), starting wars, houses with seat priority, kin synthesis, adult of each sex and vanilla lord culture, mercenary companies, outlaw clans with the war guard, wanderers W = ceil(0.6f x towns), notables, and a census with HeroFactory caps. campaign.json v2 kingdoms/wars/houses/mercenaryCompanies/outlawClans/wanderers/census; one-clan-per-lord output removed. Managed side adapted so harnesses run (houses emitted as clans). evidence/fwg/population.json for seeds 42/73. Integrated as fe5068f + fix e43fbdb."
+      },
+      "reconciledAt": null,
+      "revisionId": "rv_01m59bp7nkkbx20at05svcrpyf",
+      "state": "accepted",
+      "submittedAt": "2026-10-20T09:48:02.149Z",
+      "supersededAt": null,
+      "ticketContentHash": "sha256:74a360b534018f4c92102fb8e246da9165e2d1a2443765e8f878ab9d2d924ded",
+      "ticketId": "tk_01m593h8xrggjtxw46pr78z2jd",
+      "updatedAt": "2026-10-20T09:48:23.774Z",
+      "worker": {
+        "catalogRevision": "2026-10-19a",
+        "effort": "high",
+        "hostId": "claude-desktop-code-map2",
+        "label": "workflow wf_be5f06f8-0ab impl:MMR-279",
+        "modelId": "claude-opus-5-5",
+        "rationale": "WorldBridge population pass; worktree t279.",
+        "sessionId": null
+      }
+    },
+    {
+      "createdAt": "2026-10-20T04:22:32.705Z",
+      "decidedAt": "2026-10-20T09:48:26.500Z",
+      "decision": {
+        "decidedBy": "Claude Code",
+        "notes": "Publish done by Astra (Codex) under CLAIM/RELEASE; orchestrator verified the install restore and the pack hash.",
+        "outcome": "accepted",
+        "reasons": []
+      },
+      "evidence": {
+        "checks": [
+          {
+            "detail": "128/128 cells; min dE 10.02; DXT5 MAE 3.29-4.75 (ceiling 4.87)",
+            "name": "magic_ground.py gates",
+            "status": "passed"
+          },
+          {
+            "detail": "10/10",
+            "name": "tests/test_magic_ground.py",
+            "status": "passed"
+          },
+          {
+            "detail": "1 pack, 0 problems: 24 textures, 8 materials",
+            "name": "check_magic_packs.py on the published pack (map2/int)",
+            "status": "passed"
+          },
+          {
+            "detail": "SubModule.xml hash identical, no temporary modules/bins left, native DLL hashes unchanged",
+            "name": "Install restore after the editor session",
+            "status": "passed"
+          }
+        ],
+        "criteria": [
+          {
+            "criterionId": "a1",
+            "met": true,
+            "note": "Gates pass 128/128 (integrator re-ran)."
+          },
+          {
+            "criterionId": "a2",
+            "met": true,
+            "note": "Orchestrator ran the fixed header check on map2/int after merging the publish: 1 pack, 24 textures and 8 materials, 0 problems. The overlay that references the materials by name is MMR-260 (next chunk), which consumes the documented contract; its integration will confirm the reference."
+          }
+        ],
+        "notes": "Workflow wf_be5f06f8-0ab plus the owner-requested Codex editor session. Editor names the normal-map flag is_bumpmap in this build."
+      },
+      "failure": null,
+      "fencingToken": 1,
+      "id": "at_01m5brqxg1q5y04p2zr2zsxk31",
+      "kind": "work",
+      "number": 1,
+      "outputs": {
+        "artifacts": [
+          {
+            "hash": null,
+            "label": "Texture gates",
+            "location": "evidence/art/magic-textures.json",
+            "remoteOnly": false
+          },
+          {
+            "hash": null,
+            "label": "Published pack header check",
+            "location": "evidence/art/magic-packs.json",
+            "remoteOnly": false
+          },
+          {
+            "hash": null,
+            "label": "Publish report (outside repo)",
+            "location": "C:/Users/davgo/m2/publish/REPORT.md",
+            "remoteOnly": false
+          }
+        ],
+        "branch": "map2/MMR-259",
+        "changedFiles": [],
+        "commits": [
+          "70ac31c",
+          "93c6cb2",
+          "03cb9b6",
+          "05db2fb"
+        ],
+        "summary": "Magic-ground decal materials for delivery A. tools/art/tpac_textures.py (fixed .tpac extractor: raw chunks, large-pack chains), tools/art/magic_ground.py (deterministic derivation from vanilla parents for 8 schools x 4 core rows, gates, review images), 24 source PNGs (LFS), evidence/art/magic-textures.json (128/128 cells pass macro dE>=10, vanilla envelope, seams, BCn round trip), docs/magic-ground-textures.md (atlas contract for MMR-260), packaging/deploy of AssetPackages. Published 2026-10-20 by Astra (Codex) in one Modding Kit session under CLAIM/RELEASE (orchestrator verified the install restore independently): AssetPackages/pack0.tpac (sha256 1a44ee55...) and Assets/magic_ground (24 textures, 8 materials mnbl_magic_<school>) committed via LFS in 03cb9b6; check_magic_packs.py length-prefix fix; evidence/art/magic-packs.json passes. Integrated as 93c6cb2 and 05db2fb."
+      },
+      "reconciledAt": null,
+      "revisionId": "rv_01m59bp7nkkbx20at05svcrpyf",
+      "state": "accepted",
+      "submittedAt": "2026-10-20T09:48:12.285Z",
+      "supersededAt": null,
+      "ticketContentHash": "sha256:4cce5808b023cdd4ebff31fa7820fb43de55c2d60b202d908ab4e6ba2728b8de",
+      "ticketId": "tk_01m56vpv1qnqa7ksv6nk9y69yw",
+      "updatedAt": "2026-10-20T09:48:26.500Z",
+      "worker": {
+        "catalogRevision": "2026-10-19a",
+        "effort": "high",
+        "hostId": "claude-desktop-code-map2",
+        "label": "workflow wf_be5f06f8-0ab impl:MMR-259",
+        "modelId": "claude-opus-5-5",
+        "rationale": "Magic decal materials and atlases derived from vanilla, Codex CLI for source imagery; worktree t259.",
+        "sessionId": null
+      }
+    },
+    {
+      "createdAt": "2026-10-20T09:48:38.763Z",
+      "decidedAt": "2026-10-20T09:49:34.392Z",
+      "decision": {
+        "decidedBy": "Claude Code",
+        "notes": "Verified by the integrator after merge c0a2de4. Test-PeriodicCoordinates 1/85 (synthesized villages without source node) carried to MMR-262.",
+        "outcome": "accepted",
+        "reasons": []
+      },
+      "evidence": {
+        "checks": [
+          {
+            "detail": "process_contract flaked once in 3 runs (timing)",
+            "name": "Build + ctest",
+            "status": "passed"
+          },
+          {
+            "detail": "7/7",
+            "name": "Test-PartySpeed",
+            "status": "passed"
+          },
+          {
+            "detail": "",
+            "name": "Navigation/playability harnesses on A'/B'",
+            "status": "passed"
+          },
+          {
+            "detail": "1/85: the 18 villages MMR-252 synthesizes have no source node; pre-existing since MMR-252, carried to the review pass",
+            "name": "Test-PeriodicCoordinates",
+            "status": "failed"
+          }
+        ],
+        "criteria": [
+          {
+            "criterionId": "a1",
+            "met": true,
+            "note": "Integrator: independent land-face recount (fix b0092ee)."
+          },
+          {
+            "criterionId": "a2",
+            "met": true,
+            "note": "Test-PartySpeed re-run."
+          },
+          {
+            "criterionId": "a3",
+            "met": true,
+            "note": "PlayabilityTests key test."
+          },
+          {
+            "criterionId": "r1",
+            "met": true,
+            "note": "Port-only ring verified."
+          },
+          {
+            "criterionId": "r2",
+            "met": true,
+            "note": "Woodland indices recounted."
+          },
+          {
+            "criterionId": "r3",
+            "met": true,
+            "note": "land-faces.json present."
+          }
+        ],
+        "notes": "Workflow wf_be5f06f8-0ab. No Swamp faces and little Plain on A'/B' (balance pass in MMR-247)."
+      },
+      "failure": null,
+      "fencingToken": 1,
+      "id": "at_01m5cbd0zbqvh45e3jqgw8425w",
+      "kind": "work",
+      "number": 1,
+      "outputs": {
+        "artifacts": [
+          {
+            "hash": null,
+            "label": "Land faces / incident terrain counts",
+            "location": "evidence/world/land-faces.json",
+            "remoteOnly": false
+          },
+          {
+            "hash": null,
+            "label": "Ticket result",
+            "location": "C:/Users/davgo/m2/results/MMR-254.md",
+            "remoteOnly": false
+          }
+        ],
+        "branch": "map2/MMR-254",
+        "changedFiles": [],
+        "commits": [
+          "5e72f53",
+          "c0a2de4",
+          "b7059d4",
+          "b0092ee"
+        ],
+        "summary": "Biome face types: per-land-cell corner majority from the shared table (water excluded, main-diagonal tie-break, permanent-white corners vote Snow); cells.bin v2 MNBLTC02 with class, OpenSea, land-type and flags (road bit) planes; grid.landTypes and multi-type host checks. Managed: TravelCells v2 only, per-cell type in RuntimeNavigationBuilder, NavigationValidator per-type loop, ImageFace same-region seam fallback, GeneratedPartySpeedModel chained Road -> NavalDLC -> Default via AddModel (Snow -0.15, Swamp -0.2, road +0.2, ford cancel on road decks, from policy), battle index ring port-only and woodland High+Low density in MMR-283's rebuild function, startup audit records speedModelChain. Integrated as c0a2de4 + fixes b7059d4, b0092ee."
+      },
+      "reconciledAt": null,
+      "revisionId": "rv_01m59bp7nkkbx20at05svcrpyf",
+      "state": "accepted",
+      "submittedAt": "2026-10-20T09:49:02.329Z",
+      "supersededAt": null,
+      "ticketContentHash": "sha256:0404f632f150148ad29eb645fa0a89384829c29874645db0b29f8ad9f77150a6",
+      "ticketId": "tk_01m56vpv1qbgk5c44w33rnfjb7",
+      "updatedAt": "2026-10-20T09:49:34.392Z",
+      "worker": {
+        "catalogRevision": "2026-10-19a",
+        "effort": "high",
+        "hostId": "claude-desktop-code-map2",
+        "label": "workflow wf_be5f06f8-0ab impl:MMR-254",
+        "modelId": "claude-opus-5-5",
+        "rationale": "Ran in chunk-2 workflow after MMR-253 integrated; recorded after integration.",
+        "sessionId": null
+      }
+    },
+    {
+      "createdAt": "2026-10-20T09:48:41.608Z",
+      "decidedAt": "2026-10-20T09:49:36.599Z",
+      "decision": {
+        "decidedBy": "Claude Code",
+        "notes": "Verified by the integrator after merge b22247a (fix f5dc181).",
+        "outcome": "accepted",
+        "reasons": []
+      },
+      "evidence": {
+        "checks": [
+          {
+            "detail": "11/11",
+            "name": "WorldBridge ctest",
+            "status": "passed"
+          },
+          {
+            "detail": "36,863 assertions",
+            "name": "WorldBridgeSurfaceTests",
+            "status": "passed"
+          },
+          {
+            "detail": "",
+            "name": "Test-WorldSurface + 25 managed harnesses",
+            "status": "passed"
+          }
+        ],
+        "criteria": [
+          {
+            "criterionId": "a1",
+            "met": true,
+            "note": "Integrator re-ran compile and seam checks on merged A'/B'."
+          },
+          {
+            "criterionId": "a2",
+            "met": true,
+            "note": "Template generator --check passes."
+          },
+          {
+            "criterionId": "a3",
+            "met": true,
+            "note": "ctest 11/11, surface tests, managed harnesses."
+          },
+          {
+            "criterionId": "r1",
+            "met": true,
+            "note": "Tree counts recorded."
+          }
+        ],
+        "notes": "Workflow wf_be5f06f8-0ab. Per-biome coverage below table rows on island worlds (recorded, not tuned). Not verified in game."
+      },
+      "failure": null,
+      "fencingToken": 1,
+      "id": "at_01m5cbd3r82rtn4qb6fqj611pk",
+      "kind": "work",
+      "number": 1,
+      "outputs": {
+        "artifacts": [
+          {
+            "hash": null,
+            "label": "Ticket result",
+            "location": "C:/Users/davgo/m2/results/MMR-255.md",
+            "remoteOnly": false
+          }
+        ],
+        "branch": "map2/MMR-255",
+        "changedFiles": [],
+        "commits": [
+          "910ffc5",
+          "b22247a",
+          "f5dc181"
+        ],
+        "summary": "Biome terrain layers: new terrain_layers.cpp turns the shared table into per-sample target fractions (biome row with moisture split, tent-kernel smoothing, cold/mountain/slope/rocky_coast/water-edge/ice-cap/permanent-white rules) on canonical periodic columns, stored as over-compositing alphas a_k = f_k / sum(f_0..f_k) in weights.bin v2 MNBLWT02 (one plane per layer slot); seam check on every plane; tracked surface-template generator (template-recipe.json v2, no flora on weighted layers, use_dynamic_weather_effects); C++ encoder WGHT per plane with identical season masks; Python parity; WorldSurface N-plane reader; map trees via flora.bin (A' 1,176, B' 1,990). Old two-layer pieces removed. Integrated as b22247a + fix f5dc181."
+      },
+      "reconciledAt": null,
+      "revisionId": "rv_01m59bp7nkkbx20at05svcrpyf",
+      "state": "accepted",
+      "submittedAt": "2026-10-20T09:49:09.182Z",
+      "supersededAt": null,
+      "ticketContentHash": "sha256:96eeb566fdff4f90dd08e42fcb3492cad465da010309943a63cb578d744850f9",
+      "ticketId": "tk_01m56vpv1q7n03tjs3khew1feb",
+      "updatedAt": "2026-10-20T09:49:36.599Z",
+      "worker": {
+        "catalogRevision": "2026-10-19a",
+        "effort": "high",
+        "hostId": "claude-desktop-code-map2",
+        "label": "workflow wf_be5f06f8-0ab impl:MMR-255",
+        "modelId": "claude-opus-5-5",
+        "rationale": "Ran in chunk-2 workflow after MMR-278 integrated; recorded after integration.",
+        "sessionId": null
+      }
+    },
+    {
+      "createdAt": "2026-10-20T09:48:44.358Z",
+      "decidedAt": "2026-10-20T09:49:38.938Z",
+      "decision": {
+        "decidedBy": "Claude Code",
+        "notes": "Verified by the integrator after merge a14cb49 (fix 2031c42).",
+        "outcome": "accepted",
+        "reasons": []
+      },
+      "evidence": {
+        "checks": [
+          {
+            "detail": "",
+            "name": "Build + ctest",
+            "status": "passed"
+          },
+          {
+            "detail": "",
+            "name": "Map dressing offline harness",
+            "status": "passed"
+          }
+        ],
+        "criteria": [
+          {
+            "criterionId": "a1",
+            "met": true,
+            "note": "Builder counts re-asserted by the integrator."
+          },
+          {
+            "criterionId": "a2",
+            "met": true,
+            "note": "Offline page rows match ruins[]; in-game registration is MMR-247's."
+          },
+          {
+            "criterionId": "r1",
+            "met": true,
+            "note": "Bank stops and land/minGap counted offline."
+          }
+        ],
+        "notes": "Workflow wf_be5f06f8-0ab. Most ruins skipped near settlements (45/63 A', 52/99 B'); minGap 5 untuned."
+      },
+      "failure": null,
+      "fencingToken": 1,
+      "id": "at_01m5cbd6e6n4h4aae4rs59cp06",
+      "kind": "work",
+      "number": 1,
+      "outputs": {
+        "artifacts": [
+          {
+            "hash": null,
+            "label": "Ticket result",
+            "location": "C:/Users/davgo/m2/results/MMR-257.md",
+            "remoteOnly": false
+          }
+        ],
+        "branch": "map2/MMR-257",
+        "changedFiles": [],
+        "commits": [
+          "ddb168e",
+          "a14cb49",
+          "2031c42"
+        ],
+        "summary": "World/MapDressing.cs builds the world's map dressing with the campaign (activation and load): road decals along smoothed travel-graph pieces in per-culture families, clipped at gates, stopped at undecked banks, kept off water, capped at 3,000 per world; bridge pieces at the kept navigation report's decks; one ruin marker per FWGC++ ruin, snapped to land or skipped, minGap from live settlements; names via RuinNames.Display for MMR-286. World/MapDressingRuntime.cs installs it in GeneratedMapScene.AfterLoad with MMR-249's entity-less decal technique, refreshes seam images, hover names, teardown; ruins encyclopedia page. Integrated as a14cb49 + fix 2031c42."
+      },
+      "reconciledAt": null,
+      "revisionId": "rv_01m59bp7nkkbx20at05svcrpyf",
+      "state": "accepted",
+      "submittedAt": "2026-10-20T09:49:15.429Z",
+      "supersededAt": null,
+      "ticketContentHash": "sha256:64d6ec40fe71e935784c17eb3fc289dd6f5e86f216caf00ea91c08f8cf3d7fe9",
+      "ticketId": "tk_01m56vpv1qcwdsc9bzjq42cg04",
+      "updatedAt": "2026-10-20T09:49:38.938Z",
+      "worker": {
+        "catalogRevision": "2026-10-19a",
+        "effort": "medium",
+        "hostId": "claude-desktop-code-map2",
+        "label": "workflow wf_be5f06f8-0ab impl:MMR-257",
+        "modelId": "claude-opus-5-5",
+        "rationale": "Ran in chunk-2 workflow after MMR-253 integrated; recorded after integration.",
+        "sessionId": null
+      }
+    },
+    {
+      "createdAt": "2026-10-20T09:48:47.060Z",
+      "decidedAt": "2026-10-20T09:49:41.499Z",
+      "decision": {
+        "decidedBy": "Claude Code",
+        "notes": "Verified by the integrator after merge 1c52711.",
+        "outcome": "accepted",
+        "reasons": []
+      },
+      "evidence": {
+        "checks": [
+          {
+            "detail": "",
+            "name": "Build + ctest",
+            "status": "passed"
+          },
+          {
+            "detail": "",
+            "name": "Baked-scene contract checks on A'/B'",
+            "status": "passed"
+          }
+        ],
+        "criteria": [
+          {
+            "criterionId": "a1",
+            "met": true,
+            "note": "Integrator refreshed look evidence on merged bundles (8531f4c)."
+          },
+          {
+            "criterionId": "a2",
+            "met": true,
+            "note": "Contract checks pass offline."
+          },
+          {
+            "criterionId": "a3",
+            "met": true,
+            "note": "Counts and sizes recorded."
+          },
+          {
+            "criterionId": "r1",
+            "met": true,
+            "note": "Selector verified."
+          },
+          {
+            "criterionId": "r2",
+            "met": true,
+            "note": "Wall-level distribution recorded."
+          },
+          {
+            "criterionId": "r3",
+            "met": true,
+            "note": "Production pieces and reuse report."
+          }
+        ],
+        "notes": "Workflow wf_be5f06f8-0ab. Not verified in game. 9 (A') / 5 (B') variant towns enter their factory-picked scene, not the map look's."
+      },
+      "failure": null,
+      "fencingToken": 1,
+      "id": "at_01m5cbd92mqmgj52a99npfywvg",
+      "kind": "work",
+      "number": 1,
+      "outputs": {
+        "artifacts": [
+          {
+            "hash": null,
+            "label": "Settlement looks evidence",
+            "location": "evidence/world/settlement-looks.json",
+            "remoteOnly": false
+          },
+          {
+            "hash": null,
+            "label": "Ticket result",
+            "location": "C:/Users/davgo/m2/results/MMR-258.md",
+            "remoteOnly": false
+          }
+        ],
+        "branch": "map2/MMR-258",
+        "changedFiles": [],
+        "commits": [
+          "983db9c",
+          "1c52711",
+          "8531f4c"
+        ],
+        "summary": "Settlement looks from scaled vanilla layouts: look catalog built from the player's installed NavalDLC Main_map (57 towns, 76 castles, 307 villages; 190 prefabs inlined, 957 colliders raycast-only, editor data/SceneLeveler stripped, source ports/arcs/drop-offs dropped), frozen into the world package. Deterministic selector (culture, kind, port, size tier, neighbour avoidance, usage balance, fit 0.5 shrinking to 0.35 with culling, port-stripped/port-grafted/castle-as-town variants, phase-0 culture-piece fallback), re-snap to terrain, our port/arcs/drop-offs re-added, village production pieces by type, relaxed siege contract, initial wall levels per tercile; SettlementEntityFactory.Version bumped. Integrated as 1c52711 + fix 8531f4c."
+      },
+      "reconciledAt": null,
+      "revisionId": "rv_01m59bp7nkkbx20at05svcrpyf",
+      "state": "accepted",
+      "submittedAt": "2026-10-20T09:49:23.180Z",
+      "supersededAt": null,
+      "ticketContentHash": "sha256:e3b5f5393ecb3861b2d7971eae7e4e593c9b3407021159b5fa1945306aa9b38d",
+      "ticketId": "tk_01m56vpv1qr70hfhdcq91ykrg8",
+      "updatedAt": "2026-10-20T09:49:41.499Z",
+      "worker": {
+        "catalogRevision": "2026-10-19a",
+        "effort": "high",
+        "hostId": "claude-desktop-code-map2",
+        "label": "workflow wf_be5f06f8-0ab impl:MMR-258",
+        "modelId": "claude-opus-5-5",
+        "rationale": "Ran in chunk-2 workflow after MMR-278 integrated; recorded after integration.",
+        "sessionId": null
+      }
+    },
+    {
+      "createdAt": "2026-10-20T09:48:49.713Z",
+      "decidedAt": "2026-10-20T09:49:43.391Z",
+      "decision": {
+        "decidedBy": "Claude Code",
+        "notes": "Verified by the integrator after merge fd8f2f6 (fix 08fad95). Pre-existing Characters/SpawnPolicy B' literal failures carried to MMR-262.",
+        "outcome": "accepted",
+        "reasons": []
+      },
+      "evidence": {
+        "checks": [
+          {
+            "detail": "",
+            "name": "Build + ctest",
+            "status": "passed"
+          },
+          {
+            "detail": "",
+            "name": "Incident patch locates all 4 conditions against installed TaleWorlds.CampaignSystem",
+            "status": "passed"
+          },
+          {
+            "detail": "",
+            "name": "Wanderer and hideout census on A'/B'",
+            "status": "passed"
+          },
+          {
+            "detail": "3/19 and 1/19 checks fail on the untouched base tree too (world-A literals, no khuzait on B'); carried to the review pass",
+            "name": "Characters B' / SpawnPolicy B'",
+            "status": "failed"
+          }
+        ],
+        "criteria": [
+          {
+            "criterionId": "a1",
+            "met": true,
+            "note": "Patch locator test re-run against installed DLL."
+          },
+          {
+            "criterionId": "a2",
+            "met": true,
+            "note": "Census re-run."
+          },
+          {
+            "criterionId": "a3",
+            "met": true,
+            "note": "Census re-run."
+          }
+        ],
+        "notes": "Workflow wf_be5f06f8-0ab. Safe pool is small (40 templates, 13 female); nord has no safe template and falls back to sturgia."
+      },
+      "failure": null,
+      "fencingToken": 1,
+      "id": "at_01m5cbdbnh9emg7k45z11kt99g",
+      "kind": "work",
+      "number": 1,
+      "outputs": {
+        "artifacts": [
+          {
+            "hash": null,
+            "label": "Ticket result",
+            "location": "C:/Users/davgo/m2/results/MMR-287.md",
+            "remoteOnly": false
+          }
+        ],
+        "branch": "map2/MMR-287",
+        "changedFiles": [],
+        "commits": [
+          "6c4a81e",
+          "fd8f2f6",
+          "08fad95"
+        ],
+        "summary": "IncidentCulturePatch: a world-lifetime transpiler in GeneratedPatches.Manifest making the four incident conditions compare the faction's culture id, located by IL content (incident ldstr id, next ldftn, IFaction.get_StringId + kingdom literal + op_Equality), never by lambda name; an unresolved condition only disables its incident. Wanderer stories: census of installed backstories found 38/78 templates naming Calradian proper nouns, listed in population.json backstoryUnsafe with a backstoryCensus, per-culture fallback and epithets; HeroFactory.WandererPool is the one accessor. Hideout bandit culture weighted by hideout cell biome via startup.json. Integrated as fd8f2f6 + fix 08fad95."
+      },
+      "reconciledAt": null,
+      "revisionId": "rv_01m59bp7nkkbx20at05svcrpyf",
+      "state": "accepted",
+      "submittedAt": "2026-10-20T09:49:30.225Z",
+      "supersededAt": null,
+      "ticketContentHash": "sha256:2ce7749f338b1c3e0344f661dd97535a1b9301dbba445f488691fb9ab159c3b6",
+      "ticketId": "tk_01m59a1tt9pyb04n8fd4mxxcmd",
+      "updatedAt": "2026-10-20T09:49:43.391Z",
+      "worker": {
+        "catalogRevision": "2026-10-19a",
+        "effort": "medium",
+        "hostId": "claude-desktop-code-map2",
+        "label": "workflow wf_be5f06f8-0ab impl:MMR-287",
+        "modelId": "claude-opus-5-5",
+        "rationale": "Ran in chunk-2 workflow after MMR-279 integrated; recorded after integration.",
+        "sessionId": null
+      }
+    },
+    {
+      "createdAt": "2026-10-20T09:49:48.938Z",
+      "decidedAt": "2026-10-20T09:50:22.827Z",
+      "decision": {
+        "decidedBy": "Claude Code",
+        "notes": "Verified by the integrator after merge 6883352. Characters B' 2 pre-existing literal failures carried to MMR-262.",
+        "outcome": "accepted",
+        "reasons": []
+      },
+      "evidence": {
+        "checks": [
+          {
+            "detail": "",
+            "name": "Build + ctest",
+            "status": "passed"
+          },
+          {
+            "detail": "26/26",
+            "name": "SettlementFactory A'/B'",
+            "status": "passed"
+          },
+          {
+            "detail": "74/74",
+            "name": "CampaignGraphValidator",
+            "status": "passed"
+          },
+          {
+            "detail": "",
+            "name": "Characters, CompiledWorld A', GraphValidation A'/B', Factions",
+            "status": "passed"
+          },
+          {
+            "detail": "20/22: the same 2 checks fail on the base tree (world-A literals, no khuzait on B'); carried to MMR-262",
+            "name": "Characters B'",
+            "status": "failed"
+          }
+        ],
+        "criteria": [
+          {
+            "criterionId": "a1",
+            "met": true,
+            "note": "Integrator checked generated documents on merged A'/B'."
+          },
+          {
+            "criterionId": "a2",
+            "met": true,
+            "note": "SettlementFactory and validator re-run."
+          },
+          {
+            "criterionId": "a3",
+            "met": true,
+            "note": "Census tests and docs present."
+          },
+          {
+            "criterionId": "r1",
+            "met": true,
+            "note": "Trait-share measure recorded (0.2186 vs 0.5124)."
+          }
+        ],
+        "notes": "Workflow wf_be5f06f8-0ab. Not verified in game: XML-hero minor clans, engine outlaw wars, day-0 wars, IsMinorFactionHero (MMR-281), engine children."
+      },
+      "failure": null,
+      "fencingToken": 1,
+      "id": "at_01m5cbf5gassk64drk3j7evg4g",
+      "kind": "work",
+      "number": 1,
+      "outputs": {
+        "artifacts": [
+          {
+            "hash": null,
+            "label": "Ticket result",
+            "location": "C:/Users/davgo/m2/results/MMR-280.md",
+            "remoteOnly": false
+          }
+        ],
+        "branch": "map2/MMR-280",
+        "changedFiles": [],
+        "commits": [
+          "fe1d05d",
+          "6883352"
+        ],
+        "summary": "FactionFactory and HeroFactory emit MMR-279's campaign.json v2 population: merged kingdoms with starting wars (relationship value=-1 isAtWar=true on both sides), houses (seat home, tier from fiefs), mercenary companies and outlaw clans as minor clans with per-kind flags and population.json troop lines (lord templates refused), world-unique colour pairs; vassal-per-lord path deleted. Every planned Lord, minor (both parents required) and dead parent (alive=false) becomes an XML hero with planned age and FWGC++ sex; lord personalities drawn from the installed lord-trait distribution (RT-05); wanderers are exactly W from WandererPool; census check replaces the families block. SettlementFactory owners from campaign v2; CampaignGraphValidator/graph-validation minor-clan rules, census, child-generator safety; GeneratedSpawnModel and NavalContentFactory updated; docs. Integrated as 6883352."
+      },
+      "reconciledAt": null,
+      "revisionId": "rv_01m59bp7nkkbx20at05svcrpyf",
+      "state": "accepted",
+      "submittedAt": "2026-10-20T09:50:04.026Z",
+      "supersededAt": null,
+      "ticketContentHash": "sha256:a866e31757099e366412f5e14f919dfccbfff4694631c15dffb2ab9b4e400528",
+      "ticketId": "tk_01m593h8xr3a81tc1rggthk9gw",
+      "updatedAt": "2026-10-20T09:50:22.827Z",
+      "worker": {
+        "catalogRevision": "2026-10-19a",
+        "effort": "high",
+        "hostId": "claude-desktop-code-map2",
+        "label": "workflow wf_be5f06f8-0ab impl:MMR-280",
+        "modelId": "claude-opus-5-5",
+        "rationale": "Ran in chunk-2 workflow after MMR-279 and MMR-287 integrated; recorded after integration.",
+        "sessionId": null
+      }
+    },
+    {
+      "createdAt": "2026-10-20T09:49:51.525Z",
+      "decidedAt": "2026-10-20T09:50:25.720Z",
+      "decision": {
+        "decidedBy": "Claude Code",
+        "notes": "Accepted with a2 deferred to the acceptance live test by necessity (no game launches outside MMR-249/247).",
+        "outcome": "accepted",
+        "reasons": []
+      },
+      "evidence": {
+        "checks": [
+          {
+            "detail": "",
+            "name": "Build + ctest",
+            "status": "passed"
+          },
+          {
+            "detail": "",
+            "name": "Node-level Snowy share on A' vs snow-season length",
+            "status": "passed"
+          },
+          {
+            "detail": "",
+            "name": "WaterClimate / WorldSurface harnesses",
+            "status": "passed"
+          }
+        ],
+        "criteria": [
+          {
+            "criterionId": "a1",
+            "met": true,
+            "note": "Integrator re-ran the node-level assertion on merged A'."
+          },
+          {
+            "criterionId": "a2",
+            "met": false,
+            "note": "Cannot be proven offline: the snow-texture route needs the game. Accepted with the live check carried to MMR-247 (docs/water-climate.md), which chooses the named-texture route or the permanentWhite fallback in its fix batch."
+          },
+          {
+            "criterionId": "a3",
+            "met": true,
+            "note": "Docs updated."
+          },
+          {
+            "criterionId": "r1",
+            "met": true,
+            "note": "Winds recorded per world."
+          }
+        ],
+        "notes": "Workflow wf_be5f06f8-0ab. Deviates from the ticket text (no CreateFromByteArray/SetDynamicSnowTexture) because MMR-249 showed that route hangs or does nothing."
+      },
+      "failure": null,
+      "fencingToken": 1,
+      "id": "at_01m5cbf8154a8f3fg8hr0d0hn8",
+      "kind": "work",
+      "number": 1,
+      "outputs": {
+        "artifacts": [
+          {
+            "hash": null,
+            "label": "Ticket result (live check)",
+            "location": "C:/Users/davgo/m2/results/MMR-256.md",
+            "remoteOnly": false
+          }
+        ],
+        "branch": "map2/MMR-256",
+        "changedFiles": [],
+        "commits": [
+          "29355be",
+          "3dfb86a",
+          "31dafa2"
+        ],
+        "summary": "Climate policy mmr256/1 (one identity bump): climate-flow.json embedded with its first strict reader (GeneratedClimateSystem.Policy). Gameplay snow byte from each footprint's mean snow-season length through the inverse installed DefaultMapWeatherModel formula (196/155/113/72/30 table checked), ice-cap nodes 255. Snow visuals avoid the hanging SetDynamicSnowTexture (MMR-249): a 512^2 RGBA raster (R snow, G rain, row 0 at y = extent) named mnbl_snow_<hash>, loaded with Texture.LoadTextureFromPath before Read and named to match the scene's dynamic_flowmap_texture_name; policy switch precipitation.snowTexture.route with the documented permanentWhite fallback. Managed atmosphere tick drives SetTerrainDynamicParams (season threshold) and the colour grade without MapColorGradeManager. Latitude-banded, seed-perturbed winds. Docs water-climate.md (with the live check MMR-247 runs) and runtime-capabilities.md. Integrated as 3dfb86a + fix 31dafa2."
+      },
+      "reconciledAt": null,
+      "revisionId": "rv_01m59bp7nkkbx20at05svcrpyf",
+      "state": "accepted",
+      "submittedAt": "2026-10-20T09:50:13.077Z",
+      "supersededAt": null,
+      "ticketContentHash": "sha256:2fb7120644a00c86848fcc4d287dc84f31e6d909ce2ff0585dff307766860329",
+      "ticketId": "tk_01m56vpv1q7r5fc301vg0sbegc",
+      "updatedAt": "2026-10-20T09:50:25.720Z",
+      "worker": {
+        "catalogRevision": "2026-10-19a",
+        "effort": "high",
+        "hostId": "claude-desktop-code-map2",
+        "label": "workflow wf_be5f06f8-0ab impl:MMR-256",
+        "modelId": "claude-opus-5-5",
+        "rationale": "Ran in chunk-2 workflow after MMR-255 integrated; recorded after integration.",
+        "sessionId": null
+      }
+    },
+    {
+      "createdAt": "2026-10-20T09:49:54.274Z",
+      "decidedAt": "2026-10-20T09:50:27.301Z",
+      "decision": {
+        "decidedBy": "Claude Code",
+        "notes": "Verified by the integrator after merge 0bc343a.",
+        "outcome": "accepted",
+        "reasons": []
+      },
+      "evidence": {
+        "checks": [
+          {
+            "detail": "",
+            "name": "Build + ctest",
+            "status": "passed"
+          },
+          {
+            "detail": "",
+            "name": "Test-WaterVisibility A'/B'",
+            "status": "passed"
+          }
+        ],
+        "criteria": [
+          {
+            "criterionId": "a1",
+            "met": true,
+            "note": "Integrator re-ran Test-WaterVisibility on merged A'/B' (fix 61c47b2)."
+          },
+          {
+            "criterionId": "a2",
+            "met": true,
+            "note": "0 dry-rendered impassable water cells."
+          }
+        ],
+        "notes": "Workflow wf_be5f06f8-0ab. Not verified in game: whether the tinted stamp reads as water, river width, fill stamp look, combined decal cost. Rivers zigzag along cell centres."
+      },
+      "failure": null,
+      "fencingToken": 1,
+      "id": "at_01m5cbfaq2z7hvd996xt45ndzm",
+      "kind": "work",
+      "number": 1,
+      "outputs": {
+        "artifacts": [
+          {
+            "hash": null,
+            "label": "Water visibility",
+            "location": "evidence/world/water-visibility.json",
+            "remoteOnly": false
+          },
+          {
+            "hash": null,
+            "label": "Ticket result",
+            "location": "C:/Users/davgo/m2/results/MMR-285.md",
+            "remoteOnly": false
+          }
+        ],
+        "branch": "map2/MMR-285",
+        "changedFiles": [],
+        "commits": [
+          "28aca7b",
+          "0bc343a",
+          "61c47b2"
+        ],
+        "summary": "Lakes: the plane rule no longer counts another lake's samples as shore (identical change in GeneratedWaterSystem.Lakes, C++ terrain::lake_rule and Python lake_rule); with MMR-278's shaping every lake group shows (A' 35/35, B' 159/159; was 31 and 127). Water version mmr285/1. Rivers and consistency: the map dressing gains a water section of entity-less scene decals (vanilla mainmap_decal_undervillage tinted with SetFactor1) stamping every River cell and river edges, plus fill stamps on any sea/lake/river cell whose centre no plane shows; roads.json water block with a strict reader. New Test-WaterVisibility recomputes drawn water over cells.bin v2 into evidence/world/water-visibility.json. Integrated as 0bc343a + fix 61c47b2."
+      },
+      "reconciledAt": null,
+      "revisionId": "rv_01m59bp7nkkbx20at05svcrpyf",
+      "state": "accepted",
+      "submittedAt": "2026-10-20T09:50:19.220Z",
+      "supersededAt": null,
+      "ticketContentHash": "sha256:ed4211493115271ceadfde9083efd33c55b8771b2541ede1b7048b2723fd8572",
+      "ticketId": "tk_01m59a1tt9v0hhmkaq8h01t6qy",
+      "updatedAt": "2026-10-20T09:50:27.301Z",
+      "worker": {
+        "catalogRevision": "2026-10-19a",
+        "effort": "high",
+        "hostId": "claude-desktop-code-map2",
+        "label": "workflow wf_be5f06f8-0ab impl:MMR-285",
+        "modelId": "claude-opus-5-5",
+        "rationale": "Ran in chunk-2 workflow after MMR-254/255/257/278 integrated; recorded after integration.",
+        "sessionId": null
+      }
+    },
+    {
+      "createdAt": "2026-10-20T09:51:24.556Z",
+      "decidedAt": "2026-10-20T12:52:46.175Z",
+      "decision": {
+        "decidedBy": "Claude Code",
+        "notes": "Verified by the integrator after merge 62a9ba4. The overlay references MMR-259's published materials by name, which also closes MMR-259 a2's reference part.",
+        "outcome": "accepted",
+        "reasons": []
+      },
+      "evidence": {
+        "checks": [
+          {
+            "detail": "",
+            "name": "Build + ctest",
+            "status": "passed"
+          },
+          {
+            "detail": "33/33 on A'/B'",
+            "name": "Test-MagicGround (new)",
+            "status": "passed"
+          },
+          {
+            "detail": "",
+            "name": "Map2Policies, MapDressing, WaterVisibility, WaterClimate, EncounterResolver, Playability, PartySpeed, ContentCompatibility, WorldNavigation, Activation, WorldLoader, CompiledWorld",
+            "status": "passed"
+          }
+        ],
+        "criteria": [
+          {
+            "criterionId": "a1",
+            "met": true,
+            "note": "Integrator re-ran Test-MagicGround on merged A'/B'."
+          },
+          {
+            "criterionId": "a2",
+            "met": true,
+            "note": "Unit tests re-run."
+          },
+          {
+            "criterionId": "a3",
+            "met": true,
+            "note": "Assertion present."
+          },
+          {
+            "criterionId": "r1",
+            "met": true,
+            "note": "Evidence present."
+          }
+        ],
+        "notes": "Workflow wf_cee7b4ac-c15. Not verified in game: decals drawing, atlas flipV, node particles, grade cells, load order in a real load. Corrected MMR-259's doc on the core index."
+      },
+      "failure": null,
+      "fencingToken": 1,
+      "id": "at_01m5cbj2wc12eda5myj6sbeh52",
+      "kind": "work",
+      "number": 1,
+      "outputs": {
+        "artifacts": [
+          {
+            "hash": null,
+            "label": "Magic ground evidence",
+            "location": "evidence/world/magic-ground.json",
+            "remoteOnly": false
+          },
+          {
+            "hash": null,
+            "label": "Ticket result",
+            "location": "C:/Users/davgo/m2/results/MMR-260.md",
+            "remoteOnly": false
+          }
+        ],
+        "branch": "map2/MMR-260",
+        "changedFiles": [],
+        "commits": [
+          "59aa3e6",
+          "62a9ba4"
+        ],
+        "summary": "One runtime decal overlay draws all magic ground (MMR-249 entity-less scene decals, MMR-259's published mnbl_magic_<school> materials; atlas row from the core group via terrain.magical_biomes[biome_variant], fringe/core column, potency-scaled size, hidden schools via hiddenLooks, nothing drawn and no throw if a material is missing; settings in roads.json magic block). GeneratedMapScene answers GetFaceTerrainType / GetTerrainTypeAtPosition / GetEnvironmentTerrainTypes(Count) from a per-face table filled only by live mutation cells, remapped within landValid (no Dune), built before PreAfterLoad/ComputePathAfterLoad; battle cells take faceClass[remapped type] via GeneratedBattleTerrain.CellPatches and RebuildCells in every strip image; immutable snapshot swapped atomically; colour-grade cells via MMR-256's atmosphere tick; node effects as separate root entities; teardown; land shares recorded per change. API for MMR-261: MagicGroundRuntime.Restore/RestoreDisabled/Apply/DisableMutations/Snapshot (docs/magic-ground.md). Decals: A' 1,549, B' 3,815 (with roads and water A' 4,095, B' 7,321 whole-world; max 209/162 in a closest-camera view). Integrated as 62a9ba4."
+      },
+      "reconciledAt": null,
+      "revisionId": "rv_01m59bp7nkkbx20at05svcrpyf",
+      "state": "accepted",
+      "submittedAt": "2026-10-20T12:52:36.620Z",
+      "supersededAt": null,
+      "ticketContentHash": "sha256:c49c55f8ccad0b4d3b030d41e59a08d2d3fbdecc909f244d76ca5da3761fd2ac",
+      "ticketId": "tk_01m56vpv1q208cm2vd1z3mpny5",
+      "updatedAt": "2026-10-20T12:52:46.175Z",
+      "worker": {
+        "catalogRevision": "2026-10-19a",
+        "effort": "high",
+        "hostId": "claude-desktop-code-map2",
+        "label": "workflow wf_cee7b4ac-c15 impl:MMR-260",
+        "modelId": "claude-opus-5-5",
+        "rationale": "Magic decal overlay + live terrain-type override; worktree t260.",
+        "sessionId": null
+      }
+    },
+    {
+      "createdAt": "2026-10-20T09:51:27.346Z",
+      "decidedAt": "2026-10-20T12:52:47.958Z",
+      "decision": {
+        "decidedBy": "Claude Code",
+        "notes": "Verified by the integrator after merge 8ee77a3.",
+        "outcome": "accepted",
+        "reasons": []
+      },
+      "evidence": {
+        "checks": [
+          {
+            "detail": "",
+            "name": "Build + ctest",
+            "status": "passed"
+          },
+          {
+            "detail": "",
+            "name": "Patch descriptor resolves against installed TaleWorlds.CampaignSystem.dll",
+            "status": "passed"
+          },
+          {
+            "detail": "",
+            "name": "Wanderer and homeless-house unit tests",
+            "status": "passed"
+          }
+        ],
+        "criteria": [
+          {
+            "criterionId": "a1",
+            "met": true,
+            "note": "Integrator rebuilt and re-ran the descriptor check."
+          },
+          {
+            "criterionId": "a2",
+            "met": true,
+            "note": "Tests re-run."
+          },
+          {
+            "criterionId": "a3",
+            "met": true,
+            "note": "Fields present."
+          },
+          {
+            "criterionId": "r1",
+            "met": true,
+            "note": "Test re-run."
+          }
+        ],
+        "notes": "Workflow wf_cee7b4ac-c15. Found: campaign-catalog.json pin looks stale against MMR-280's new roots (for MMR-262). Not verified in game."
+      },
+      "failure": null,
+      "fencingToken": 1,
+      "id": "at_01m5cbj5kj0fm1g3ea2wqqafv3",
+      "kind": "work",
+      "number": 1,
+      "outputs": {
+        "artifacts": [
+          {
+            "hash": null,
+            "label": "Ticket result",
+            "location": "C:/Users/davgo/m2/results/MMR-281.md",
+            "remoteOnly": false
+          }
+        ],
+        "branch": "map2/MMR-281",
+        "changedFiles": [],
+        "commits": [
+          "5056e3f",
+          "8ee77a3"
+        ],
+        "summary": "World-lifetime Harmony prefix replacing CompanionsCampaignBehavior.DailyTick (Campaign/CompanionsTickPatch.cs), located by signature and IL content and listed in GeneratedPatches.Manifest; SwapCompanions kept, TryKillCompanion never runs. GeneratedPopulationBehavior (Campaign/PopulationRuntime.cs): rotation at vanilla's 10% daily chance retiring only unmet, unhired wanderers; top-up to W from the campaign v2 census through the four creation steps from WandererPool templates with FWGC++ names, epithets, culture and sex; IsMinorFactionHero on company and outlaw-clan members at the earliest new-game hook and on load; homeless houses join the nearest same-culture kingdom (else nearest) via ChangeKingdomAction before the 28-day removal, never the player clan. campaign-compatibility.json statuses (random child generator retained); CampaignSoakProbe census fields for MMR-247. Integrated as 8ee77a3."
+      },
+      "reconciledAt": null,
+      "revisionId": "rv_01m59bp7nkkbx20at05svcrpyf",
+      "state": "accepted",
+      "submittedAt": "2026-10-20T12:52:43.774Z",
+      "supersededAt": null,
+      "ticketContentHash": "sha256:dd3ff864359fe2972192a801db62a6478a616892fe0dc61a57ce609fc435101c",
+      "ticketId": "tk_01m593h8xsdhszxseq7dmh9tg8",
+      "updatedAt": "2026-10-20T12:52:47.958Z",
+      "worker": {
+        "catalogRevision": "2026-10-19a",
+        "effort": "high",
+        "hostId": "claude-desktop-code-map2",
+        "label": "workflow wf_cee7b4ac-c15 impl:MMR-281",
+        "modelId": "claude-opus-5-5",
+        "rationale": "Runtime population rules (DailyTick prefix, IsMinorFactionHero, homeless houses); worktree t281.",
+        "sessionId": null
+      }
+    },
+    {
+      "createdAt": "2026-10-20T12:52:57.009Z",
+      "decidedAt": "2026-10-20T12:53:19.427Z",
+      "decision": {
+        "decidedBy": "Claude Code",
+        "notes": "Verified by the integrator after merge 7d28cb9. Owner follow-up before a CI release: publish fwg-producer/0ae1f3ed5716 and push LFS objects.",
+        "outcome": "accepted",
+        "reasons": []
+      },
+      "evidence": {
+        "checks": [
+          {
+            "detail": "",
+            "name": "Build + ctest",
+            "status": "passed"
+          },
+          {
+            "detail": "16/16 incl. a real fwg apply reproducing the Nerdun delta byte for byte",
+            "name": "Test-WorldMutation",
+            "status": "passed"
+          },
+          {
+            "detail": "",
+            "name": "check_producer_lock / Verify-Producer",
+            "status": "passed"
+          }
+        ],
+        "criteria": [
+          {
+            "criterionId": "a1",
+            "met": true,
+            "note": "Integrator re-ran Test-WorldMutation (live apply reproduces the delta)."
+          },
+          {
+            "criterionId": "a2",
+            "met": true,
+            "note": "Load-gate tests re-run."
+          },
+          {
+            "criterionId": "a3",
+            "met": true,
+            "note": "Archive tests re-run."
+          },
+          {
+            "criterionId": "r1",
+            "met": true,
+            "note": "Digest-mismatch test re-run."
+          }
+        ],
+        "notes": "Workflow wf_cee7b4ac-c15. Owner actions needed before a CI release: publish the fwg-producer/0ae1f3ed5716 GitHub release (tools/ci/Publish-Producer.ps1, needs a push) and push the LFS object of the archived fwg.exe. Not verified in game."
+      },
+      "failure": null,
+      "fencingToken": 1,
+      "id": "at_01m5cnyg1h5m0rx69jd8v1kqr5",
+      "kind": "work",
+      "number": 1,
+      "outputs": {
+        "artifacts": [
+          {
+            "hash": null,
+            "label": "Ticket result",
+            "location": "C:/Users/davgo/m2/results/MMR-261.md",
+            "remoteOnly": false
+          }
+        ],
+        "branch": "map2/MMR-261",
+        "changedFiles": [],
+        "commits": [
+          "90ccf66",
+          "7d28cb9"
+        ],
+        "summary": "Producer re-pinned to FWGC++ 0ae1f3e (fwg.exe sha256 7058dbdc..., apply command template; lock, tools.lock, help/build/ctest evidence, seed-width, producer verification via new tools/Verify-Producer.ps1, process contract). Bundles store source/request.json. World/WorldMutations.cs: MagicEvent, mutation.json policy, capital rule via kingdoms[].memberRealms, daily residue batch, compacted fwg.operations, fwg.ley_delta reader, canonical SyncData document with digest, producer archive, background MutationRunner that refuses during a load. Campaign/WorldMutationBehavior.cs: SyncData key _mnblWorldMutations, header key mnbl.campaign.mutationProducer, daily tick and TickEvent safe point, WorldMutations.Report, console commands mnbl_magic.cast / mnbl_magic.list; GenerationProbe.RunProducerApply as an owned process (role producer_apply); load Begin cancels a running job; MagicGroundRuntime.Set for play-time replace; save ids v2, ledger entry 3. RT-37: producer builds kept in Modules/MNBL.ProceduralWorld/Producers/<sha>/fwg.exe (LFS) listed in worldgen/producer-archive.json, wired into Deploy-Dev, CiBuild and config/mods.json. A'/B' regenerated (8cb9d6c5, aee466c1) and evidence naming bundle ids refreshed. Integrated as 7d28cb9."
+      },
+      "reconciledAt": null,
+      "revisionId": "rv_01m59bp7nkkbx20at05svcrpyf",
+      "state": "accepted",
+      "submittedAt": "2026-10-20T12:53:10.370Z",
+      "supersededAt": null,
+      "ticketContentHash": "sha256:b0239f6d796233bfc8cdb267dee33673e38e72cae7630b6d989e27b6977a7450",
+      "ticketId": "tk_01m56vpv1qqpmyfgh4kasb6fzz",
+      "updatedAt": "2026-10-20T12:53:19.427Z",
+      "worker": {
+        "catalogRevision": "2026-10-19a",
+        "effort": "high",
+        "hostId": "claude-desktop-code-map2",
+        "label": "workflow wf_cee7b4ac-c15 impl:MMR-261",
+        "modelId": "claude-opus-5-5",
+        "rationale": "Ran in chunk-3 workflow after MMR-260 integrated; recorded after integration.",
+        "sessionId": null
+      }
+    },
+    {
+      "createdAt": "2026-10-20T12:52:59.616Z",
+      "decidedAt": "2026-10-20T12:53:21.274Z",
+      "decision": {
+        "decidedBy": "Claude Code",
+        "notes": "Verified by the integrator after merge d633330.",
+        "outcome": "accepted",
+        "reasons": []
+      },
+      "evidence": {
+        "checks": [
+          {
+            "detail": "",
+            "name": "Build + ctest",
+            "status": "passed"
+          },
+          {
+            "detail": "",
+            "name": "Build-gate offline tests",
+            "status": "passed"
+          },
+          {
+            "detail": "no build literal outside SupportedBuilds",
+            "name": "Build-literal scan",
+            "status": "passed"
+          }
+        ],
+        "criteria": [
+          {
+            "criterionId": "a1",
+            "met": true,
+            "note": "Tests re-run by the integrator."
+          },
+          {
+            "criterionId": "a2",
+            "met": true,
+            "note": "Scan and signature-mismatch tests re-run."
+          },
+          {
+            "criterionId": "a3",
+            "met": true,
+            "note": "Docs present."
+          }
+        ],
+        "notes": "Workflow wf_cee7b4ac-c15. Periodic transpiler IL counts are checked at activation/load, not at setup. Not verified in game."
+      },
+      "failure": null,
+      "fencingToken": 1,
+      "id": "at_01m5cnyjk0ds7pm1rj8pz7m27k",
+      "kind": "work",
+      "number": 1,
+      "outputs": {
+        "artifacts": [
+          {
+            "hash": null,
+            "label": "Ticket result",
+            "location": "C:/Users/davgo/m2/results/MMR-284.md",
+            "remoteOnly": false
+          }
+        ],
+        "branch": "map2/MMR-284",
+        "changedFiles": [],
+        "commits": [
+          "d49e181",
+          "d633330"
+        ],
+        "summary": "Exact-build gates replaced by SupportedBuilds (WorldDataBundle.cs): minimum Bannerlord v1.4.8 / War Sails v1.2.8 (any change set), no maximum, used by the setup host check (GenerationErrors.Host), the save's game/naval keys (LoadPolicy.BuildCheck, incl. pre-MMR-48 headers and WorldCompatibilityPolicy), the bundle built-for check (C# and summarize_bundle.py) and the patches (RequireInstalledVersion -> RequireSupportedBuild). Saves and bundles record their build for diagnostics only. Every patch target found by signature (63 name-located) or IL content; a signature mismatch refuses naming the patch. Player docs: Game updates section and Sandbox-only scope. Integrated as d633330."
+      },
+      "reconciledAt": null,
+      "revisionId": "rv_01m59bp7nkkbx20at05svcrpyf",
+      "state": "accepted",
+      "submittedAt": "2026-10-20T12:53:16.819Z",
+      "supersededAt": null,
+      "ticketContentHash": "sha256:243e64949c9289ef39fd94fdb43921de501a006ca0c34d3ea492074543615bfa",
+      "ticketId": "tk_01m59a1tt9eynk33kcrtf670nx",
+      "updatedAt": "2026-10-20T12:53:21.274Z",
+      "worker": {
+        "catalogRevision": "2026-10-19a",
+        "effort": "high",
+        "hostId": "claude-desktop-code-map2",
+        "label": "workflow wf_cee7b4ac-c15 impl:MMR-284",
+        "modelId": "claude-opus-5-5",
+        "rationale": "Ran in chunk-3 workflow after MMR-281 integrated; recorded after integration.",
+        "sessionId": null
+      }
+    },
+    {
+      "createdAt": "2026-10-20T12:53:24.039Z",
+      "decidedAt": "2026-10-20T12:53:34.243Z",
+      "decision": {
+        "decidedBy": "Claude Code",
+        "notes": "Verified by the integrator after merge 5a44f2b.",
+        "outcome": "accepted",
+        "reasons": []
+      },
+      "evidence": {
+        "checks": [
+          {
+            "detail": "",
+            "name": "Build + ctest",
+            "status": "passed"
+          },
+          {
+            "detail": "0 Age tags, 0 ordinal numerals, 0 repeats per kind",
+            "name": "Name census on merged A'/B'",
+            "status": "passed"
+          },
+          {
+            "detail": "27 load texts plus MMR-283/284 refusals are TextObjects",
+            "name": "LoaderTests",
+            "status": "passed"
+          },
+          {
+            "detail": "long; contract part and Python integration test pass",
+            "name": "Test-SourceReader size-1025 stage",
+            "status": "skipped"
+          }
+        ],
+        "criteria": [
+          {
+            "criterionId": "a1",
+            "met": true,
+            "note": "Integrator re-ran the census on the merged A'/B' bundles (fix a35f892)."
+          },
+          {
+            "criterionId": "a2",
+            "met": true,
+            "note": "ctest regent check and LoaderTests re-run."
+          }
+        ],
+        "notes": "Workflow wf_cee7b4ac-c15. Not verified in game. mnbl_magic.* console replies remain English (dev console, not refusals)."
+      },
+      "failure": null,
+      "fencingToken": 1,
+      "id": "at_01m5cnzae7m6evg2r7m0htsqrs",
+      "kind": "work",
+      "number": 1,
+      "outputs": {
+        "artifacts": [
+          {
+            "hash": null,
+            "label": "Ticket result",
+            "location": "C:/Users/davgo/m2/results/MMR-286.md",
+            "remoteOnly": false
+          }
+        ],
+        "branch": "map2/MMR-286",
+        "changedFiles": [],
+        "commits": [
+          "80b8eaa",
+          "5a44f2b",
+          "a35f892"
+        ],
+        "summary": "The shared name cleaner runs on every compiler display name: kingdoms, towns, heroes and ruins drop Age tags and get unique names from lexicon suffixes (never numerals), keeping sourceName; villages, castles (incl. synthesized quota villages) and nameless towns get FWGC++-style names from civilization lexicon roots; regents get personal FWGC++ resident names with the resident's sex. campaign.json gains a required ruins[] block; ruin markers and the ruins page show cleaned names via RuinNames. Every load title, message and loader message is a {=mnbl_load_*} TextObject, including MMR-282/283/284 texts; the module language file is generated and checked in CI. Integrated as 5a44f2b + fix a35f892."
+      },
+      "reconciledAt": null,
+      "revisionId": "rv_01m59bp7nkkbx20at05svcrpyf",
+      "state": "accepted",
+      "submittedAt": "2026-10-20T12:53:32.629Z",
+      "supersededAt": null,
+      "ticketContentHash": "sha256:dc06b107c7edc98f2c976f50e858de8d67730a7b03201684781a5f800424e3cc",
+      "ticketId": "tk_01m59a1tt9en7drpx5qhfk550g",
+      "updatedAt": "2026-10-20T12:53:34.243Z",
+      "worker": {
+        "catalogRevision": "2026-10-19a",
+        "effort": "medium",
+        "hostId": "claude-desktop-code-map2",
+        "label": "workflow wf_cee7b4ac-c15 impl:MMR-286",
+        "modelId": "claude-opus-5-5",
+        "rationale": "Ran in chunk-3 workflow after MMR-284 integrated; recorded after integration.",
+        "sessionId": null
+      }
+    },
+    {
+      "createdAt": "2026-10-20T12:53:57.288Z",
+      "decidedAt": "2026-10-20T15:10:20.055Z",
+      "decision": {
+        "decidedBy": "Claude Code",
+        "notes": "Verified via the review workflow's final-check agent output and the committed findings list.",
+        "outcome": "accepted",
+        "reasons": []
+      },
+      "evidence": {
+        "checks": [
+          {
+            "detail": "all suites green incl. previously failing B' literal checks and GenerationProbe",
+            "name": "Final full offline suite run on map2/int",
+            "status": "passed"
+          },
+          {
+            "detail": "",
+            "name": "repin_map2.py --check",
+            "status": "passed"
+          },
+          {
+            "detail": "12/12",
+            "name": "WorldBridge ctest",
+            "status": "passed"
+          }
+        ],
+        "criteria": [
+          {
+            "criterionId": "a1",
+            "met": true,
+            "note": "Orchestrator read results/MMR-262.md: every finding has an outcome (fixed commit / deferred reason / refuted reason); the final check reran every offline suite green on the merged tree."
+          }
+        ],
+        "notes": "Workflow wf_f632014b-e30 (70 agents)."
+      },
+      "failure": null,
+      "fencingToken": 1,
+      "id": "at_01m5cp0ax858j8jgppa63fecvg",
+      "kind": "work",
+      "number": 1,
+      "outputs": {
+        "artifacts": [
+          {
+            "hash": null,
+            "label": "Findings list",
+            "location": "evidence/map-epic-2/review.md",
+            "remoteOnly": false
+          },
+          {
+            "hash": null,
+            "label": "Ticket result",
+            "location": "C:/Users/davgo/m2/results/MMR-262.md",
+            "remoteOnly": false
+          }
+        ],
+        "branch": "map2/int",
+        "changedFiles": [],
+        "commits": [
+          "8be68b7",
+          "13bd5b1",
+          "1387c28",
+          "29c0815",
+          "0b9b222",
+          "6aa0ca3",
+          "dfe70ca",
+          "015776a",
+          "e341da5"
+        ],
+        "summary": "One review pass over the whole MNBL diff (09ca458..map2/int) and FWGC++ diff (ec5d1c1..0ae1f3e): 11 lenses (threads, load order, identity/re-pin, seam, teardown, crash paths, population, stability, heights, shared install, FWGC++) plus a full offline-suite run. 41 unique findings; adversarial verification (3 votes for blockers) confirmed 15 and refuted 26. Fixed in 6 clusters merged into map2/int (8be68b7, 13bd5b1, 1387c28+29c0815, 0b9b222, 6aa0ca3, dfe70ca) plus final fixes 015776a; the blocker F01 (Destroy removed decals/entities natively after Scene.ClearAll on every exit) is fixed. Deferred with reasons: F03 (snow route needs the live check, MMR-247 step 2 first), F09 (mountain look, owner's call), F19 (catalog re-pin not needed), F29 (vanilla absolute-z constants), FC4 (release zip lacks the language file; Deploy-Dev deploys it), FC5 (merge map2/int into the MMR-247 harness before its build). Final check on e341da5: every offline suite passes on A' 31bb9dc3 / B' 186f0c32 (ctest 12/12, repin unchanged). Findings list committed as evidence/map-epic-2/review.md."
+      },
+      "reconciledAt": null,
+      "revisionId": "rv_01m59bp7nkkbx20at05svcrpyf",
+      "state": "accepted",
+      "submittedAt": "2026-10-20T15:10:18.309Z",
+      "supersededAt": null,
+      "ticketContentHash": "sha256:22248c057a0383927afe9eb9087ae048cc4dab2da91a780c4f8db9c323c6f374",
+      "ticketId": "tk_01m56vpv1qttqkdjjgt8fd3gh2",
+      "updatedAt": "2026-10-20T15:10:20.055Z",
+      "worker": {
+        "catalogRevision": "2026-10-19a",
+        "effort": "high",
+        "hostId": "claude-desktop-code-map2",
+        "label": "workflow map2-review (MMR-262)",
+        "modelId": "claude-opus-5-5",
+        "rationale": "One review pass: parallel lens reviewers + offline suite runner, adversarial verification per finding, per-lens fixers in worktrees, serialized integration, final full check.",
+        "sessionId": null
+      }
+    },
+    {
+      "createdAt": "2026-10-21T17:19:07.794Z",
+      "decidedAt": "2026-10-21T17:20:01.667Z",
+      "decision": {
+        "decidedBy": "Claude Code",
+        "notes": "Accepted after integration (map2/int) and the acc6 live run; owner approval of the vein look recorded for MMR-247 c29.",
+        "outcome": "accepted",
+        "reasons": []
+      },
+      "evidence": {
+        "checks": [
+          {
+            "detail": "69/69 on the merged int (A' 1db4cf74, B' 59e8487d)",
+            "name": "Test-MagicGround",
+            "status": "passed"
+          },
+          {
+            "detail": "tests.test_magic_ground + test_magic_water 19 OK",
+            "name": "python art tests",
+            "status": "passed"
+          },
+          {
+            "detail": "24 textures + 8 materials, 0 problems on pack0.tpac 36ce4d89",
+            "name": "check_magic_packs.py",
+            "status": "passed"
+          },
+          {
+            "detail": "vein meshes visible in magic-ground, magic-zone-1/2, magic-features, cast-mid/full shots (pid 4996)",
+            "name": "acc6 in game",
+            "status": "passed"
+          }
+        ],
+        "criteria": [
+          {
+            "criterionId": "a1",
+            "met": true,
+            "note": "Verified: check_magic_packs.py 0 problems on the committed pack0.tpac 36ce4d89 (orchestrator run), evidence/art/magic-veins.json gates passed, Codex REPORT confirms re-imported pixels."
+          },
+          {
+            "criterionId": "a2",
+            "met": true,
+            "note": "Verified: Test-MagicGround 69/69 on int after the S merge; in-view decal totals within budget; acc6 shows veins drawn (through MMR-291)."
+          },
+          {
+            "criterionId": "a3",
+            "met": true,
+            "note": "Verified: previews in results/mmr288 viewed by the orchestrator; acc6 in-game shots match; owner approved the look 2026-10-21."
+          }
+        ],
+        "notes": "Decal delivery of module art is impossible on the campaign map (Native atlas only; MMR-247-D); MMR-291 carries the drawing."
+      },
+      "failure": null,
+      "fencingToken": 1,
+      "id": "at_01m5fqjkgjp7z3k4vr4bk6knjz",
+      "kind": "work",
+      "number": 1,
+      "outputs": {
+        "artifacts": [
+          {
+            "hash": null,
+            "label": "Vein art gates and lineage",
+            "location": "evidence/art/magic-veins.json",
+            "remoteOnly": false
+          },
+          {
+            "hash": null,
+            "label": "Published pack header check",
+            "location": "evidence/art/magic-packs.json",
+            "remoteOnly": false
+          },
+          {
+            "hash": null,
+            "label": "Vein graph evidence",
+            "location": "evidence/world/magic-ground.json",
+            "remoteOnly": false
+          },
+          {
+            "hash": null,
+            "label": "Ticket result (outside repo)",
+            "location": "C:/Users/davgo/m2/results/MMR-288.md",
+            "remoteOnly": false
+          },
+          {
+            "hash": null,
+            "label": "Offline previews (outside repo)",
+            "location": "C:/Users/davgo/m2/results/mmr288/",
+            "remoteOnly": false
+          },
+          {
+            "hash": null,
+            "label": "In-game review shots (outside repo)",
+            "location": "C:/Users/davgo/m2/results/review/",
+            "remoteOnly": false
+          }
+        ],
+        "branch": "map2/MMR-288",
+        "changedFiles": [],
+        "commits": [
+          "59d73c4",
+          "f2005bd",
+          "784e3c1",
+          "78177fe",
+          "09553b0",
+          "4b157c8",
+          "66b4690",
+          "8ad5a0c",
+          "3c7f99f",
+          "a222ca9"
+        ],
+        "summary": "Magic ground as veins fanning out from their sources. MagicVeins builds a deterministic vein graph per magic zone (sources at potency maxima / the cast's MagicNode, space-colonisation branching, pipe-model widths thinning and fading to the edge, water nodes for MMR-290, reveal by graph order for live casts over 48 in-game hours). The 24 atlases were re-derived as vanilla-derived vein kits (trunk, fork, tip, burst per core row; 128/128 cells pass the MMR-259 gates; evidence/art/magic-veins.json) and re-imported in a Codex Modding Kit session (pack0.tpac 36ce4d89..., header check 0 problems). acc5 + the decal lab proved the campaign map draws decals only from Native's atlas, so the art now renders through MMR-291's overlay meshes; in acc6 the veins show in game (water veins on snow, umbral network, weave burst, the Nerdun fire cast spreading). Owner approved the vein look and the textures on 2026-10-21."
+      },
+      "reconciledAt": null,
+      "revisionId": "rv_01m5f9q9rg66f6d4rs4g2bkpmm",
+      "state": "accepted",
+      "submittedAt": "2026-10-21T17:19:56.479Z",
+      "supersededAt": null,
+      "ticketContentHash": "sha256:60d6f1da4734987b4b99a73f836a8a7c05bf5c03e4295f0bbb0bbfb02a41edb3",
+      "ticketId": "tk_01m5ddnkq61qhxk4d6wsr4pmqn",
+      "updatedAt": "2026-10-21T17:20:01.667Z",
+      "worker": {
+        "catalogRevision": "2026-10-19a",
+        "effort": "high",
+        "hostId": "claude-desktop-code-map2",
+        "label": "map2 workflow agents (placement + art) under the orchestrator",
+        "modelId": "claude-opus-5-5",
+        "rationale": "Bookkeeping after integration: the work ran in worktrees t288/t288-art and was integrated into map2/int and seen in game (acc6).",
+        "sessionId": null
+      }
+    },
+    {
+      "createdAt": "2026-10-21T17:20:22.901Z",
+      "decidedAt": "2026-10-21T17:20:59.100Z",
+      "decision": {
+        "decidedBy": "Claude Code",
+        "notes": "Accepted after integration and the acc6 live run.",
+        "outcome": "accepted",
+        "reasons": []
+      },
+      "evidence": {
+        "checks": [
+          {
+            "detail": "23/23 on int (A' 1db4cf74, B' 59e8487d)",
+            "name": "Test-MagicFeatures",
+            "status": "passed"
+          },
+          {
+            "detail": "73/73",
+            "name": "Test-Map2Policies",
+            "status": "passed"
+          },
+          {
+            "detail": "features in generated zones and around the Nerdun cast, none on water/pads/roads, survive save and Continue; frame cost within c27",
+            "name": "acc6 c30",
+            "status": "passed"
+          }
+        ],
+        "criteria": [
+          {
+            "criterionId": "a1",
+            "met": true,
+            "note": "Verified: policy block with strict reader (Test-Map2Policies 73/73), docs present, lineage in evidence."
+          },
+          {
+            "criterionId": "a2",
+            "met": true,
+            "note": "Verified: Test-MagicFeatures 23/23 on int; hideout clearance added (MMR-247-S); acc6 c30 passes."
+          },
+          {
+            "criterionId": "a3",
+            "met": true,
+            "note": "Verified: installer lifetime tests pass; acc6 shows features at load, around the cast and after Continue."
+          }
+        ],
+        "notes": ""
+      },
+      "failure": null,
+      "fencingToken": 1,
+      "id": "at_01m5fqmwvny3pe7fbbrm5vqgbx",
+      "kind": "work",
+      "number": 1,
+      "outputs": {
+        "artifacts": [
+          {
+            "hash": null,
+            "label": "Feature evidence",
+            "location": "evidence/world/magic-features.json",
+            "remoteOnly": false
+          },
+          {
+            "hash": null,
+            "label": "Feature docs",
+            "location": "docs/magic-features.md",
+            "remoteOnly": false
+          },
+          {
+            "hash": null,
+            "label": "Asset survey (outside repo)",
+            "location": "C:/Users/davgo/m2/results/MMR-289-assets.md",
+            "remoteOnly": false
+          },
+          {
+            "hash": null,
+            "label": "Ticket result (outside repo)",
+            "location": "C:/Users/davgo/m2/results/MMR-289.md",
+            "remoteOnly": false
+          }
+        ],
+        "branch": "map2/MMR-289",
+        "changedFiles": [],
+        "commits": [
+          "8cf72fa",
+          "1fe953f",
+          "8ffca1c",
+          "66b4690",
+          "7db50ef"
+        ],
+        "summary": "School-specific magic features in magic zones: 8 feature sets (source, trunk, debris) built only from installed vanilla meshes (35 meshes incl. the icicle crystal stand-in, map rocks, dead trees, obelisks, columns, salt pools, bones) tinted per school, with vanilla particles and point lights at sources; placed as separate map entities clustered at vein sources and along trunks (MMR-288's graph), never on water, pads, roads, bridges, ruin markers, settlement or hideout clearance; deterministic; every seam image; teardown; live casts add features at the safe point and re-create them from the stored mutation state on Continue. Policy roads.json magicFeatures with a strict reader. In acc6 the features stand in the magic zones (monoliths, crystal clusters, pillars with an ice spike, salt pools) and c30 passes in game."
+      },
+      "reconciledAt": null,
+      "revisionId": "rv_01m5f9q9rg66f6d4rs4g2bkpmm",
+      "state": "accepted",
+      "submittedAt": "2026-10-21T17:20:43.919Z",
+      "supersededAt": null,
+      "ticketContentHash": "sha256:5094aea92ac75de49df25e65d2eb630a02d0779de583c6d661ff103106581292",
+      "ticketId": "tk_01m5ddnkqea4nqtxj4yc9mry1r",
+      "updatedAt": "2026-10-21T17:20:59.100Z",
+      "worker": {
+        "catalogRevision": "2026-10-19a",
+        "effort": "high",
+        "hostId": "claude-desktop-code-map2",
+        "label": "map2 workflow agent (MMR-289) under the orchestrator",
+        "modelId": "claude-opus-5-5",
+        "rationale": "Bookkeeping after integration: the work ran in worktree t289, was integrated into map2/int and seen in game (acc6).",
+        "sessionId": null
+      }
+    },
+    {
+      "createdAt": "2026-10-21T17:20:25.353Z",
+      "decidedAt": "2026-10-21T17:21:01.622Z",
+      "decision": {
+        "decidedBy": "Claude Code",
+        "notes": "Accepted: the ticket's offline criteria are met; its in-game drawing is carried by MMR-291 per owner decision 2026-10-21.",
+        "outcome": "accepted",
+        "reasons": []
+      },
+      "evidence": {
+        "checks": [
+          {
+            "detail": "28/28 on int",
+            "name": "Test-MagicWater",
+            "status": "passed"
+          },
+          {
+            "detail": "0 problems on pack0.tpac 36ce4d89",
+            "name": "check_magic_packs.py --water",
+            "status": "passed"
+          },
+          {
+            "detail": "decal route draws nothing on the sea (R1 negative) and module textures draw nothing as decals; superseded by MMR-291",
+            "name": "decal lab acc5lab",
+            "status": "failed"
+          },
+          {
+            "detail": "magic water meshes visible over the sea with the depth pass",
+            "name": "lab291w mesh depth pass",
+            "status": "passed"
+          }
+        ],
+        "criteria": [
+          {
+            "criterionId": "a1",
+            "met": true,
+            "note": "Verified: route evidence recorded with fallbacks; refuted in game by the decal lab and superseded by the owner's overlay-mesh decision (MMR-291)."
+          },
+          {
+            "criterionId": "a2",
+            "met": true,
+            "note": "Verified offline: Test-MagicWater 28/28 on int, shore continuity and budget recorded. In game the plan draws through MMR-291 (lab291w shows magic water over the sea with the depth pass)."
+          }
+        ],
+        "notes": "The decal delivery itself does not render in game; the ticket's plan and data are what MMR-291 draws."
+      },
+      "failure": null,
+      "fencingToken": 1,
+      "id": "at_01m5fqmz89ybsqphhdmrtr1r6m",
+      "kind": "work",
+      "number": 1,
+      "outputs": {
+        "artifacts": [
+          {
+            "hash": null,
+            "label": "Route evidence (outside repo)",
+            "location": "C:/Users/davgo/m2/results/MMR-290-route.md",
+            "remoteOnly": false
+          },
+          {
+            "hash": null,
+            "label": "Magic water evidence",
+            "location": "evidence/world/magic-water.json",
+            "remoteOnly": false
+          },
+          {
+            "hash": null,
+            "label": "Magic water docs",
+            "location": "docs/magic-water.md",
+            "remoteOnly": false
+          },
+          {
+            "hash": null,
+            "label": "Ticket result (outside repo)",
+            "location": "C:/Users/davgo/m2/results/MMR-290.md",
+            "remoteOnly": false
+          }
+        ],
+        "branch": "map2/MMR-290",
+        "changedFiles": [],
+        "commits": [
+          "7c2ebb5",
+          "ecf6195",
+          "e19fc1c",
+          "8ad5a0c",
+          "a222ca9"
+        ],
+        "summary": "Magic water over magical sea, lake and river cells, continuing the land veins across the shore. Route study (static: water_surface_worldmap use_decals, NavalDLC foam IL) chose water-surface decals with documented fallbacks; MagicWater plans per-school stamps from MMR-288's water nodes (sea/lake/bed/coast modes, 217/217 and 423/423 shore crossings, budget recorded), MagicWaterRuntime layer with teardown, seam images and live casts; mnbl_magicwater published in the Codex session. The live runs then proved the decal route cannot render on the campaign map (decals sample only Native's atlas; no decal draws on the sea: MMR-247-D, acc5lab), so per the owner's decision (2026-10-21) the same plan is drawn by MMR-291's overlay meshes; the follow-up lab (lab291w) shows magic water over the sea with the depth pass (MMR-291-W). Owner approved the magic water look on 2026-10-21."
+      },
+      "reconciledAt": null,
+      "revisionId": "rv_01m5f9q9rg66f6d4rs4g2bkpmm",
+      "state": "accepted",
+      "submittedAt": "2026-10-21T17:20:53.988Z",
+      "supersededAt": null,
+      "ticketContentHash": "sha256:58855353c1c6654827c0caf695a3fcad29e03cb50054a8111112ab77e382dc24",
+      "ticketId": "tk_01m5ddnkqedzr38144by7av7ve",
+      "updatedAt": "2026-10-21T17:21:01.622Z",
+      "worker": {
+        "catalogRevision": "2026-10-19a",
+        "effort": "high",
+        "hostId": "claude-desktop-code-map2",
+        "label": "map2 workflow agents (MMR-290 route + build) under the orchestrator",
+        "modelId": "claude-opus-5-5",
+        "rationale": "Bookkeeping after integration: the work ran in worktree t290 (and the route study), was integrated into map2/int; its drawing now goes through MMR-291.",
+        "sessionId": null
+      }
+    },
+    {
+      "createdAt": "2026-10-21T18:08:37.397Z",
+      "decidedAt": "2026-10-21T18:08:54.465Z",
+      "decision": {
+        "decidedBy": "Claude Code",
+        "notes": "Accepted after integration (map2/int 0d58ac7), acc6 and lab291w.",
+        "outcome": "accepted",
+        "reasons": []
+      },
+      "evidence": {
+        "checks": [
+          {
+            "detail": "18/18 on int 0d58ac7",
+            "name": "Test-OverlayMeshes",
+            "status": "passed"
+          },
+          {
+            "detail": "vein meshes and rivers draw on land; magic water hidden by the sea under the blend pass",
+            "name": "acc6lab mesh column",
+            "status": "passed"
+          },
+          {
+            "detail": "depth pass draws over the sea (meanDiff 45.2), blend does not (3.9)",
+            "name": "lab291w passes",
+            "status": "passed"
+          },
+          {
+            "detail": "frame cost within limit; c33 passes on records and screenshots",
+            "name": "acc6 c27 and c33",
+            "status": "passed"
+          }
+        ],
+        "criteria": [
+          {
+            "criterionId": "a1",
+            "met": true,
+            "note": "Verified: route evidence recorded; materials resolve in game (acc6, lab291w); no publish needed."
+          },
+          {
+            "criterionId": "a2",
+            "met": true,
+            "note": "Verified: Test-OverlayMeshes 18/18 on int 0d58ac7, evidence/world/overlay-meshes.json."
+          },
+          {
+            "criterionId": "a3",
+            "met": true,
+            "note": "Verified by the orchestrator's own review of acc6 world-1 shots (veins, rivers) and lab291w sea sheet (magic water depth pass); acc6 c27 pass; owner approval 2026-10-21."
+          }
+        ],
+        "notes": ""
+      },
+      "failure": null,
+      "fencingToken": 1,
+      "id": "at_01m5ftd7gn5akhxxbmvwrm8yjr",
+      "kind": "work",
+      "number": 1,
+      "outputs": {
+        "artifacts": [
+          {
+            "hash": null,
+            "label": "Overlay mesh evidence",
+            "location": "evidence/world/overlay-meshes.json",
+            "remoteOnly": false
+          },
+          {
+            "hash": null,
+            "label": "Overlay mesh docs",
+            "location": "docs/overlay-meshes.md",
+            "remoteOnly": false
+          },
+          {
+            "hash": null,
+            "label": "Route evidence (outside repo)",
+            "location": "C:/Users/davgo/m2/results/MMR-291-route.md",
+            "remoteOnly": false
+          },
+          {
+            "hash": null,
+            "label": "Ticket results (outside repo)",
+            "location": "C:/Users/davgo/m2/results/MMR-291.md and MMR-291-W.md",
+            "remoteOnly": false
+          },
+          {
+            "hash": null,
+            "label": "Mesh lab sheets (outside repo)",
+            "location": "C:/Users/davgo/m2/t291-W/build/acceptance/lab291w/decal-lab/",
+            "remoteOnly": false
+          }
+        ],
+        "branch": "map2/MMR-291",
+        "changedFiles": [],
+        "commits": [
+          "4747b30",
+          "deefb61",
+          "f8940a6",
+          "a7ae248",
+          "dbdeb3a"
+        ],
+        "summary": "Veins, rivers and magic water drawn as runtime overlay meshes, because the campaign map draws decals only from Native's atlas. Route (static, MMR-291-route.md): Mesh.CreateMeshWithMaterial + AddFaceCorner/AddFace + GameEntity.CreateEmpty/AddMesh per chunk; runtime copies of vanilla torch_flame_base carrying the published mnbl_magic_<school> and mnbl_magicwater textures; rivers with naval_worldmap_water (the lake planes' material); no new publish needed. OverlayMeshes.cs (pure ribbon/quad builder from MMR-288's graph, W's river chains, MMR-290's water nodes; terrain following with recorded error; seam chunks; reveal by order) and OverlayMeshRuntime.cs (layers, teardown, live casts, Continue); roads.json overlayMeshes with a decal fallback switch. MMR-291-W: magic water over the sea needs the 'depth' pass (alpha-tested, depth-writing copy) because the sea paints over blended meshes; confirmed in lab291w (depth meanDiff 45.2 vs blend 3.9). acc6 shows the veins and rivers in game with c27 passing; owner approved the look."
+      },
+      "reconciledAt": null,
+      "revisionId": "rv_01m5f9q9rg66f6d4rs4g2bkpmm",
+      "state": "accepted",
+      "submittedAt": "2026-10-21T18:08:49.886Z",
+      "supersededAt": null,
+      "ticketContentHash": "sha256:8961374c0c8eb7c99af9449318f4797b6677508c1c6a92126be81c8493ff76d8",
+      "ticketId": "tk_01m5f9p2ss0zx9wcavbg1jcerb",
+      "updatedAt": "2026-10-21T18:08:54.465Z",
+      "worker": {
+        "catalogRevision": "2026-10-19a",
+        "effort": "high",
+        "hostId": "claude-desktop-code-map2",
+        "label": "map2 agents (MMR-291 route/build, magic water pass) under the orchestrator",
+        "modelId": "claude-opus-5-5",
+        "rationale": "Bookkeeping after integration: worktrees t291 and t291-W, merged into map2/int, seen in game in acc6 and lab291w.",
+        "sessionId": null
+      }
+    },
+    {
+      "createdAt": "2026-10-21T18:33:10.477Z",
+      "decidedAt": "2026-10-21T18:33:56.017Z",
+      "decision": {
+        "decidedBy": "Claude Code",
+        "notes": "Accepted: each criterion verified against evidence/map-epic-2/acceptance.json (acc6 + acc6confirm2), the run folders and screenshots the orchestrator reviewed; increment eaf2863 passed the server's squash checks.",
+        "outcome": "accepted",
+        "reasons": []
+      },
+      "evidence": {
+        "checks": [
+          {
+            "detail": "all phases done; no hang or crash; native DLL hashes unchanged; install restored",
+            "name": "acc6 full live run",
+            "status": "passed"
+          },
+          {
+            "detail": "siege, castle, town, village without failures; siege map shot",
+            "name": "acc6confirm2 siege confirmation",
+            "status": "passed"
+          },
+          {
+            "detail": "pre-fix control crashed, fix ran (war and castle)",
+            "name": "acc5bis crash bisect",
+            "status": "passed"
+          },
+          {
+            "detail": "magic water depth pass draws over the sea",
+            "name": "lab291w",
+            "status": "passed"
+          },
+          {
+            "detail": "Build, ctest 12/12, Map2Acceptance 44/44, LandMissions 2/2, OverlayMeshes 18/18 and the rest per INTEGRATION.md",
+            "name": "offline suites on map2/int 1eb3771",
+            "status": "passed"
+          }
+        ],
+        "criteria": [
+          {
+            "criterionId": "c1",
+            "met": true,
+            "note": ""
+          },
+          {
+            "criterionId": "c2",
+            "met": true,
+            "note": ""
+          },
+          {
+            "criterionId": "c3",
+            "met": true,
+            "note": ""
+          },
+          {
+            "criterionId": "c4",
+            "met": true,
+            "note": ""
+          },
+          {
+            "criterionId": "c5",
+            "met": true,
+            "note": ""
+          },
+          {
+            "criterionId": "c6",
+            "met": true,
+            "note": ""
+          },
+          {
+            "criterionId": "c7",
+            "met": true,
+            "note": ""
+          },
+          {
+            "criterionId": "c8",
+            "met": true,
+            "note": ""
+          },
+          {
+            "criterionId": "c9",
+            "met": true,
+            "note": ""
+          },
+          {
+            "criterionId": "c10",
+            "met": true,
+            "note": ""
+          },
+          {
+            "criterionId": "c11",
+            "met": true,
+            "note": "Verified in acc6confirm2's records and siege map shot."
+          },
+          {
+            "criterionId": "c12",
+            "met": true,
+            "note": ""
+          },
+          {
+            "criterionId": "c13",
+            "met": true,
+            "note": ""
+          },
+          {
+            "criterionId": "c14",
+            "met": true,
+            "note": ""
+          },
+          {
+            "criterionId": "c15",
+            "met": true,
+            "note": ""
+          },
+          {
+            "criterionId": "c16",
+            "met": true,
+            "note": ""
+          },
+          {
+            "criterionId": "c17",
+            "met": true,
+            "note": ""
+          },
+          {
+            "criterionId": "c18",
+            "met": true,
+            "note": ""
+          },
+          {
+            "criterionId": "c19",
+            "met": true,
+            "note": ""
+          },
+          {
+            "criterionId": "c20",
+            "met": true,
+            "note": ""
+          },
+          {
+            "criterionId": "c21",
+            "met": true,
+            "note": ""
+          },
+          {
+            "criterionId": "c22",
+            "met": true,
+            "note": ""
+          },
+          {
+            "criterionId": "c23",
+            "met": true,
+            "note": ""
+          },
+          {
+            "criterionId": "c24",
+            "met": true,
+            "note": ""
+          },
+          {
+            "criterionId": "c25",
+            "met": true,
+            "note": ""
+          },
+          {
+            "criterionId": "c26",
+            "met": true,
+            "note": ""
+          },
+          {
+            "criterionId": "c27",
+            "met": true,
+            "note": ""
+          },
+          {
+            "criterionId": "c28",
+            "met": true,
+            "note": ""
+          },
+          {
+            "criterionId": "c29",
+            "met": true,
+            "note": "Orchestrator reviewed the acc6 vein shots; owner approved."
+          },
+          {
+            "criterionId": "c30",
+            "met": true,
+            "note": ""
+          },
+          {
+            "criterionId": "c31",
+            "met": true,
+            "note": "Orchestrator reviewed the acc6confirm2 magic water world shot; owner approved."
+          },
+          {
+            "criterionId": "c32",
+            "met": true,
+            "note": ""
+          },
+          {
+            "criterionId": "c33",
+            "met": true,
+            "note": ""
+          }
+        ],
+        "notes": "Step 7 (owner handoff) is the sprint checkpoint approval."
+      },
+      "failure": null,
+      "fencingToken": 1,
+      "id": "at_01m5fvt62drtmsyary21zhe5dv",
+      "increment": {
+        "base": {
+          "commit": "09ca458d8b183266f08bd1c200e30088e655430f",
+          "kind": "epic_start"
+        },
+        "branch": "claude/map-epic-2",
+        "checks": [
+          {
+            "detail": "Names the epic branch claude/map-epic-2.",
+            "name": "Epic branch",
+            "status": "passed"
+          },
+          {
+            "detail": "Commit eaf2863 exists.",
+            "name": "Commit exists",
+            "status": "passed"
+          },
+          {
+            "detail": "Commit eaf2863 has one parent, 09ca458.",
+            "name": "One parent",
+            "status": "passed"
+          },
+          {
+            "detail": "Commit eaf2863 is reachable from claude/map-epic-2.",
+            "name": "On the epic branch",
+            "status": "passed"
+          },
+          {
+            "detail": "Commit eaf2863 comes after the epic's start commit 09ca458.",
+            "name": "After the base commit",
+            "status": "passed"
+          },
+          {
+            "detail": "None of the 94 commits recorded by this sprint's accepted work is reachable from claude/map-epic-2. 2 recorded commits are not in this repository and were not checked.",
+            "name": "Squashed, not merged",
+            "status": "passed"
+          }
+        ],
+        "commit": "eaf286386e9b622ff621477a46e4ed7fa3880820",
+        "parent": "09ca458d8b183266f08bd1c200e30088e655430f",
+        "passed": true,
+        "reasons": [],
+        "verifiedAt": "2026-10-21T18:33:44.815Z"
+      },
+      "kind": "work",
+      "number": 1,
+      "outputs": {
+        "artifacts": [
+          {
+            "hash": null,
+            "label": "Acceptance evidence",
+            "location": "evidence/map-epic-2/acceptance.json",
+            "remoteOnly": false
+          },
+          {
+            "hash": null,
+            "label": "Attestations",
+            "location": "evidence/map-epic-2/attestations.json",
+            "remoteOnly": false
+          },
+          {
+            "hash": null,
+            "label": "Balance pass",
+            "location": "evidence/map-epic-2/balance-pass.json",
+            "remoteOnly": false
+          },
+          {
+            "hash": null,
+            "label": "Runbook",
+            "location": "docs/map-epic-2-acceptance.md",
+            "remoteOnly": false
+          },
+          {
+            "hash": null,
+            "label": "Native answers",
+            "location": "docs/research/map-epic-2-findings.md section 13",
+            "remoteOnly": false
+          },
+          {
+            "hash": null,
+            "label": "Run folders (outside repo)",
+            "location": "C:/Users/davgo/m2/int/build/acceptance/{acc4,acc5,acc5lab,acc6lab,acc6,acc6confirm2}",
+            "remoteOnly": false
+          },
+          {
+            "hash": null,
+            "label": "Review screenshots (outside repo)",
+            "location": "C:/Users/davgo/m2/results/review/",
+            "remoteOnly": false
+          }
+        ],
+        "branch": "claude/map-epic-2",
+        "changedFiles": [],
+        "commits": [
+          "eaf2863"
+        ],
+        "summary": "Live acceptance of map epic 2 sprint 1. Runs: acc1-acc4 (blocker rounds), acc5 (first full run; found the decal-atlas limit, three post-mission crashes and small defects), acc5lab/acc5rep/acc5bis (decal lab, crash repro with dump tooling, crash bisect confirming the stale-occluder cause and fix), acc6lab and lab291w (overlay meshes; magic water depth pass), acc6 (full confirming run: no hang or crash, every world-1 case after missions without the reload workaround), acc6confirm2 (siege confirmation after the last fix). Fix batches: MMR-247-P/R/W/L (acc4), H/D/S/X/K (acc5), F/291-W and the sally guard fix (acc6). Balance pass: no policy change, recorded in evidence/map-epic-2/balance-pass.json. Owner approved the magic textures, vein look and magic water look on 2026-10-21 (attestations.json). Final evidence evidence/map-epic-2/acceptance.json: 33/33 criteria pass; step 7 (owner handoff) is the sprint checkpoint. Findings section 13 records the native answers. Increment eaf2863 squashes map2/int (142 commits) onto claude/map-epic-2."
+      },
+      "reconciledAt": null,
+      "revisionId": "rv_01m5f9q9rg66f6d4rs4g2bkpmm",
+      "state": "accepted",
+      "submittedAt": "2026-10-21T18:33:46.133Z",
+      "supersededAt": null,
+      "ticketContentHash": "sha256:28e9e590e4e02ce964f78aef444de8bb58c9486b9dd97b0587dce8a088fc0619",
+      "ticketId": "tk_01m56vjrv7779wvh14w6a2vxqc",
+      "updatedAt": "2026-10-21T18:33:56.017Z",
+      "worker": {
+        "catalogRevision": "2026-10-19a",
+        "effort": "high",
+        "hostId": "claude-desktop-code-map2",
+        "label": "orchestrator (live acceptance runs acc1-acc6, labs, confirmations)",
+        "modelId": "claude-opus-5-5",
+        "rationale": "The orchestrator ran the live acceptance and its fix batches; the increment is squashed on the epic branch.",
+        "sessionId": null
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "decidedAt": "2026-10-22T03:01:42.622Z",
+      "decidedBy": "ss_01m5grp0cz08s25cbpdz0f11jx",
+      "id": "ck_01m5grxb2yq0dvvc32ntmtkfp4",
+      "outcome": "advanced",
+      "policy": "human",
+      "reportId": "rp_01m5grx5vy505z2k1hd6mabezq",
+      "sprintId": "sp_01m56vjrv7dksjs3b73h4cz5j0"
+    }
+  ],
+  "createdAt": "2026-10-19T23:55:28.469Z",
+  "endedAt": null,
+  "epicId": "ep_01m56vjrv63rjcafxy4gxp8k31",
+  "format": "darkmechanicus.run",
+  "formatVersion": 1,
+  "host": {
+    "label": "Claude Code desktop (Maps epic 2)",
+    "type": "claude-code-desktop"
+  },
+  "hostCatalogId": "hc_01m5b9eb7jd7ys138qxc0qf02p",
+  "number": 1,
+  "ownerMachineId": "mc_01m4fpatkne38c3mr69f73rygk",
+  "pauseReason": null,
+  "reports": [
+    {
+      "content": {
+        "accepted": [
+          "MMR-248",
+          "MMR-249",
+          "MMR-250",
+          "MMR-251",
+          "MMR-252",
+          "MMR-253",
+          "MMR-254",
+          "MMR-255",
+          "MMR-256",
+          "MMR-257",
+          "MMR-258",
+          "MMR-259",
+          "MMR-260",
+          "MMR-261",
+          "MMR-262",
+          "MMR-278",
+          "MMR-279",
+          "MMR-280",
+          "MMR-281",
+          "MMR-282",
+          "MMR-283",
+          "MMR-284",
+          "MMR-285",
+          "MMR-286",
+          "MMR-287",
+          "MMR-288",
+          "MMR-289",
+          "MMR-290",
+          "MMR-291",
+          "MMR-247"
+        ],
+        "blocked": [],
+        "changes": {
+          "commits": [
+            "eaf2863 Map epic 2, sprint 1: biome terrain, magic mutation, roads, settlements (squash of map2/int, 142 commits)"
+          ],
+          "files": [
+            "src/MNBL.ProceduralWorld/** (world, campaign bootstrap, missions, automation)",
+            "src/WorldBridge/** (travel graph, terrain shaping, bundles)",
+            "worldgen/policies/*.json",
+            "Modules/MNBL.ProceduralWorld/{AssetSources,Assets,AssetPackages} (LFS)",
+            "tools/** (acceptance runner, summarizer, art, dump analyzer)",
+            "tests/**",
+            "docs/** incl. research/map-epic-2-findings.md section 13",
+            "evidence/** incl. map-epic-2/acceptance.json, attestations.json, balance-pass.json"
+          ]
+        },
+        "checks": [
+          {
+            "detail": "33/33 criteria with acc6confirm2's siege; no hang or crash; fps -1%/-5% vs vanilla, working set +8%",
+            "name": "acc6 full live run",
+            "status": "passed"
+          },
+          {
+            "detail": "siege, castle, town, village; magic water over the sea in a world shot",
+            "name": "acc6confirm2",
+            "status": "passed"
+          },
+          {
+            "detail": "Build, WorldBridge ctest 12/12, Map2Acceptance 44/44, LandMissions 2/2, OverlayMeshes 18/18, MagicGround 69/69, MagicFeatures 23/23, MagicWater 28/28, WaterVisibility 23/23, MapDressing 41/41, Map2Policies 76/76, Activation 244/244, WorldLoader 41/41, tests/ci 60 OK, mods.py PASS",
+            "name": "offline suites on map2/int 1eb3771",
+            "status": "passed"
+          },
+          {
+            "detail": "eaf2863: one parent 09ca458, on claude/map-epic-2, none of the 94 recorded ticket commits reachable",
+            "name": "increment squash checks",
+            "status": "passed"
+          }
+        ],
+        "epicOutcome": {
+          "successCriteria": [
+            {
+              "criterionId": "s1",
+              "met": true,
+              "note": "acc6 c8: 9 biome shots with their layers; land ice white all year."
+            },
+            {
+              "criterionId": "s2",
+              "met": true,
+              "note": "acc6 c1/c7/c26: faces carry the table's TerrainType; speed terms, battle scenes and terrain predicates follow (Swamp n/a: no Swamp face on these worlds)."
+            },
+            {
+              "criterionId": "s3",
+              "met": false,
+              "note": "The Snowy gameplay fraction follows season length (c9), but winter does not whiten snow regions: permanentWhite fallback taken after acc5 (named texture unresolved)."
+            },
+            {
+              "criterionId": "s4",
+              "met": true,
+              "note": "8 schools' vanilla-derived textures pass the gates; generated variants visible (as overlay meshes); owner approved."
+            },
+            {
+              "criterionId": "s5",
+              "met": true,
+              "note": "acc6 c13/c14: fire cast at Nerdun via fwg apply, look/terrain/battle change, persists through save and Continue."
+            },
+            {
+              "criterionId": "s6",
+              "met": true,
+              "note": "acc6 c4: towns equal sites with the same uids on both worlds; the seed sweep is recorded (MMR-251/production seed yield)."
+            },
+            {
+              "criterionId": "s7",
+              "met": true,
+              "note": "acc6 c5: exact 3/2, ports intact, no crowding."
+            },
+            {
+              "criterionId": "s8",
+              "met": true,
+              "note": "acc6 c6/c10: every settlement on the network, roads drawn with bridges, none on water (two world-B settlements reached only across bridges, recorded)."
+            },
+            {
+              "criterionId": "s9",
+              "met": true,
+              "note": "acc6 c11 + acc6confirm2: culture looks match the scenes, siege works."
+            },
+            {
+              "criterionId": "s10",
+              "met": true,
+              "note": "acc6 c10: ruin markers and a ruins page with all 63 ruins."
+            },
+            {
+              "criterionId": "s11",
+              "met": true,
+              "note": "acc6 c16/c27: claim recorded, DLL hashes unchanged, fps/memory vs vanilla captured (several runs, not one)."
+            },
+            {
+              "criterionId": "s12",
+              "met": true,
+              "note": "MMR-278 gates on A/B; acc6 c17 relief and pads."
+            },
+            {
+              "criterionId": "s13",
+              "met": true,
+              "note": "acc6 c18/c19: day-0 population as compiled."
+            },
+            {
+              "criterionId": "s14",
+              "met": true,
+              "note": "acc6 c21: world 2 left world 1's scene and caches; Continue reused them."
+            },
+            {
+              "criterionId": "s15",
+              "met": true,
+              "note": "acc6 c22: synthetic content module worked; nothing hung."
+            },
+            {
+              "criterionId": "s16",
+              "met": true,
+              "note": "acc6 c23: no exact-build gate; docs state the update behaviour."
+            },
+            {
+              "criterionId": "s17",
+              "met": true,
+              "note": "acc6 c24: every lake shown, rivers drawn as water meshes, 0 dry impassable cells."
+            },
+            {
+              "criterionId": "s18",
+              "met": true,
+              "note": "acc6 c25."
+            },
+            {
+              "criterionId": "s19",
+              "met": true,
+              "note": "acc6 c26 (deer_departed n/a where no khuzait kingdom exists, owner default)."
+            }
+          ],
+          "summary": "Every epic success criterion is met except s3 (seasonal snow whitening), which uses the documented permanentWhite fallback because the named snow texture never resolves on the generated scene."
+        },
+        "exitCriteria": [
+          {
+            "criterionId": "x1",
+            "met": false,
+            "note": "The live test passed (33/33 criteria, evidence/map-epic-2/acceptance.json; findings section 13 updated), but not within one fix batch and one confirming run: it took fix batches after acc4, acc5 and acc6 and confirming runs acc6 and acc6confirm2 (plus labs), partly because the owner added MMR-288..291 mid-sprint and the runs exposed three engine-level problems."
+          }
+        ],
+        "failed": [],
+        "followUps": [
+          {
+            "body": "Needs a push by the owner; the producer archive and LFS packs are committed locally.",
+            "title": "Publish the fwg-producer 0ae1f3ed5716 release and push the LFS objects"
+          },
+          {
+            "body": "Smooth river channel corners, join lake-edge fill pools to their lakes; acc6 review shots 6-8.",
+            "title": "River and fill look polish"
+          },
+          {
+            "body": "Investigate a seasonal whitening route that works (the named texture does not resolve; permanentWhite is the fallback).",
+            "title": "Seasonal snow route"
+          },
+          {
+            "body": "Desert coastal battle-scene table, F09 mountain look, FC4 language file in the release zip, SubModule version bump, khuzait home terrain.",
+            "title": "Owner items carried from earlier"
+          }
+        ],
+        "retro": {
+          "actions": [
+            "Prove the draw path of any new visual layer in a short lab launch before building the content pipeline for it.",
+            "Check WER Application events (1000/1001/1026) first whenever a game stops with flat CPU.",
+            "Give agents absolute worktree paths only and check the main checkout for stray files after each batch.",
+            "Cap image-review agents (contact sheets plus a fixed number of full shots)."
+          ],
+          "delivered": [
+            {
+              "demo": "Read evidence/map-epic-2/acceptance.json; open the acc6 shots in C:/Users/davgo/m2/results/review/ (veins, rivers, magic water) and build/acceptance/acc6/in-game/.",
+              "evidence": "33/33 criteria; acc6 + acc6confirm2",
+              "ticket": "tk_01m56vjrv7779wvh14w6a2vxqc"
+            },
+            {
+              "demo": "Start seed 42; look at a magic zone and cast fire at Nerdun (mnbl_magic.cast).",
+              "evidence": "acc6 magic-ground/zone/cast shots; owner approval",
+              "ticket": "tk_01m5ddnkq61qhxk4d6wsr4pmqn"
+            },
+            {
+              "demo": "Same zones: monoliths, crystal clusters, salt pools, spikes.",
+              "evidence": "acc6 c30",
+              "ticket": "tk_01m5ddnkqea4nqtxj4yc9mry1r"
+            },
+            {
+              "demo": "Rivers as water ribbons; veins over land; magic water over the sea.",
+              "evidence": "acc6, lab291w, acc6confirm2 magic-water shot",
+              "ticket": "tk_01m5f9p2ss0zx9wcavbg1jcerb"
+            }
+          ],
+          "discoveries": [
+            {
+              "body": "Module decal textures resolve but draw nothing; no decal draws on the generated sea. Runtime overlay meshes are the route (findings section 13).",
+              "ticket": null,
+              "title": "Campaign map decals sample only Native's prebaked atlas"
+            },
+            {
+              "body": "TaleWorlds.Native.dll+0x55e625; re-create instead of move (findings section 13).",
+              "ticket": null,
+              "title": "Moving occluder entities after a mission crashes the occlusion rasterizer"
+            },
+            {
+              "body": "An alpha-tested, depth-writing pass shows over it.",
+              "ticket": null,
+              "title": "Blended meshes are hidden by the campaign-map sea"
+            },
+            {
+              "body": "Watchdog cannot write dumps; read WER events instead.",
+              "ticket": null,
+              "title": "The game's crashes folder is a junction to a missing Workshop folder on this machine"
+            }
+          ],
+          "leftovers": [],
+          "tierFit": [
+            {
+              "note": "",
+              "ticket": "tk_01m5ddnkq61qhxk4d6wsr4pmqn",
+              "verdict": "right_sized"
+            },
+            {
+              "note": "",
+              "ticket": "tk_01m5ddnkqea4nqtxj4yc9mry1r",
+              "verdict": "right_sized"
+            },
+            {
+              "note": "Its decal route could not render; MMR-291 carried the drawing.",
+              "ticket": "tk_01m5ddnkqedzr38144by7av7ve",
+              "verdict": "oversized"
+            },
+            {
+              "note": "",
+              "ticket": "tk_01m5f9p2ss0zx9wcavbg1jcerb",
+              "verdict": "right_sized"
+            },
+            {
+              "note": "The live test grew into six full or partial runs plus labs and three fix batches.",
+              "ticket": "tk_01m56vjrv7779wvh14w6a2vxqc",
+              "verdict": "undersized"
+            }
+          ],
+          "wentPoorly": [
+            "The decal delivery (MMR-249/259/260/285/290) was built and published before anyone checked that module textures can draw as decals on the campaign map; acc5 found it.",
+            "The 'hang' was a native crash hidden by the game's crash reporter failing on a junction; it cost three runs before a WER event was read.",
+            "Several agents wrote stray files into the main checkout through relative paths.",
+            "One screenshot-review agent looped for 2+ hours on image crops."
+          ],
+          "wentWell": [
+            "Labs and bisect launches (decal lab, crash bisect, mesh lab) settled engine questions in 10-40 minutes each instead of full runs.",
+            "Reordering world 1 (core first, risky tail last, per-step budgets, relaunch from saves) stopped one hang from losing a whole run.",
+            "Parallel fix clusters with disjoint files merged with almost no conflicts.",
+            "Static reading of shader sources and the native DLL found the decal atlas limit and the crash site."
+          ]
+        },
+        "risks": [
+          "Rivers and lake-edge fills read as water but look blocky (hard channel corners, round fill pools); polish not done.",
+          "Seasonal snow does not whiten snow regions in winter: the named snow texture never resolves, so the permanentWhite fallback is in use (only land ice and 12-month snow are white).",
+          "Whole-world decal totals exceed 5,000 on both worlds (in view about a tenth of the budget); out-of-view cost unmeasured.",
+          "Khuzait home terrain is 88% forest (balance pass kept it; a change would alter every world's factions).",
+          "The crash fix rests on the binary analysis plus the bisect; any other movable occluder entity added later must be re-created, not moved.",
+          "World B has two settlements whose only drawn access is a bridge (6-8 units from a road decal)."
+        ],
+        "summary": "Map epic 2 sprint 1 is done: the generated campaign map follows FWGC++ end to end and the live acceptance passes all 33 criteria (acc6, siege confirmed in acc6confirm2). Biome terrain, settlements (every city kept, exact 3/2 villages, culture looks, roads to every gate, bridges, ruins), population, climate and magic all ship. Mid-sprint the owner added MMR-288..291 (veins, features, magic water, overlay meshes). The live runs found and fixed three engine-level problems: decals can only use Native's atlas (so veins, rivers and magic water became runtime overlay meshes), the sea paints over blended meshes (magic water uses an alpha-tested depth pass), and moving occluder-carrying entities after a mission crashed the native occlusion rasterizer (now re-created). The increment eaf2863 squashes 142 integration commits onto claude/map-epic-2; nothing is pushed."
+      },
+      "contentHash": "sha256:5944d696d2de67ba875ab9fffc686e8787c4f94e394dd98934ef3bd8925c6d07",
+      "createdAt": "2026-10-21T18:34:56.666Z",
+      "id": "rp_01m5fvxdrth0nxavgfc4r3pfq4",
+      "reportRevision": 1,
+      "sprintId": "sp_01m56vjrv7dksjs3b73h4cz5j0",
+      "submittedBy": "Claude Code"
+    },
+    {
+      "content": {
+        "accepted": [
+          "MMR-248",
+          "MMR-249",
+          "MMR-250",
+          "MMR-251",
+          "MMR-252",
+          "MMR-253",
+          "MMR-254",
+          "MMR-255",
+          "MMR-256",
+          "MMR-257",
+          "MMR-258",
+          "MMR-259",
+          "MMR-260",
+          "MMR-261",
+          "MMR-262",
+          "MMR-278",
+          "MMR-279",
+          "MMR-280",
+          "MMR-281",
+          "MMR-282",
+          "MMR-283",
+          "MMR-284",
+          "MMR-285",
+          "MMR-286",
+          "MMR-287",
+          "MMR-288",
+          "MMR-289",
+          "MMR-290",
+          "MMR-291",
+          "MMR-247"
+        ],
+        "blocked": [],
+        "changes": {
+          "commits": [
+            "eaf2863 Map epic 2, sprint 1: biome terrain, magic mutation, roads, settlements (squash of map2/int, 142 commits)"
+          ],
+          "files": [
+            "src/MNBL.ProceduralWorld/** (world, campaign bootstrap, missions, automation)",
+            "src/WorldBridge/** (travel graph, terrain shaping, bundles)",
+            "worldgen/policies/*.json",
+            "Modules/MNBL.ProceduralWorld/{AssetSources,Assets,AssetPackages} (LFS)",
+            "tools/** (acceptance runner, summarizer, art, dump analyzer)",
+            "tests/**",
+            "docs/** incl. research/map-epic-2-findings.md section 13",
+            "evidence/** incl. map-epic-2/acceptance.json, attestations.json, balance-pass.json"
+          ]
+        },
+        "checks": [
+          {
+            "detail": "33/33 criteria with acc6confirm2's siege; no hang or crash; fps -1%/-5% vs vanilla, working set +8%",
+            "name": "acc6 full live run",
+            "status": "passed"
+          },
+          {
+            "detail": "siege, castle, town, village; magic water over the sea in a world shot",
+            "name": "acc6confirm2",
+            "status": "passed"
+          },
+          {
+            "detail": "Build, WorldBridge ctest 12/12, Map2Acceptance 44/44, LandMissions 2/2, OverlayMeshes 18/18, MagicGround 69/69, MagicFeatures 23/23, MagicWater 28/28, WaterVisibility 23/23, MapDressing 41/41, Map2Policies 76/76, Activation 244/244, WorldLoader 41/41, tests/ci 60 OK, mods.py PASS",
+            "name": "offline suites on map2/int 1eb3771",
+            "status": "passed"
+          },
+          {
+            "detail": "eaf2863: one parent 09ca458, on claude/map-epic-2, none of the 94 recorded ticket commits reachable",
+            "name": "increment squash checks",
+            "status": "passed"
+          },
+          {
+            "detail": "installed module dll 66efd548 and pack0 36ce4d89 hash-verified; engine DLLs unchanged",
+            "name": "deploy of the final build",
+            "status": "passed"
+          }
+        ],
+        "epicOutcome": null,
+        "exitCriteria": [
+          {
+            "criterionId": "x1",
+            "met": true,
+            "note": "The acceptance live test passed: 33/33 criteria in evidence/map-epic-2/acceptance.json (acc6, siege confirmed in acc6confirm2); findings section 13 records the native answers. The at-most-one-fix-batch bar moved to sprint 2's exit criterion in revision 7 (sprint 1 needed three fix batches and two confirming runs)."
+          }
+        ],
+        "failed": [],
+        "followUps": [
+          {
+            "body": "Blocked on the repository's GitHub LFS budget (owner is raising it); local main is at eaf2863.",
+            "title": "Publish the fwg-producer 0ae1f3ed5716 release and push the LFS objects"
+          },
+          {
+            "body": "Smooth river channel corners, join lake-edge fill pools to their lakes; acc6 review shots 6-8.",
+            "title": "River and fill look polish"
+          },
+          {
+            "body": "Desert coastal battle-scene table, F09 mountain look, FC4 language file in the release zip, SubModule version bump, khuzait home terrain.",
+            "title": "Owner items carried from earlier"
+          }
+        ],
+        "retro": {
+          "actions": [
+            "Prove the draw path of any new visual layer in a short lab launch before building the content pipeline for it (applies to MMR-293).",
+            "Check WER Application events (1000/1001/1026) first whenever a game stops with flat CPU.",
+            "Give agents absolute worktree paths only and check the main checkout for stray files after each batch.",
+            "Cap image-review agents (contact sheets plus a fixed number of full shots)."
+          ],
+          "delivered": [
+            {
+              "demo": "Read evidence/map-epic-2/acceptance.json; open the acc6 shots in C:/Users/davgo/m2/results/review/ (veins, rivers, magic water) and build/acceptance/acc6/in-game/.",
+              "evidence": "33/33 criteria; acc6 + acc6confirm2",
+              "ticket": "tk_01m56vjrv7779wvh14w6a2vxqc"
+            },
+            {
+              "demo": "Start seed 42; look at a magic zone and cast fire at Nerdun (mnbl_magic.cast).",
+              "evidence": "acc6 magic-ground/zone/cast shots; owner approval",
+              "ticket": "tk_01m5ddnkq61qhxk4d6wsr4pmqn"
+            },
+            {
+              "demo": "Same zones: monoliths, crystal clusters, salt pools, spikes.",
+              "evidence": "acc6 c30",
+              "ticket": "tk_01m5ddnkqea4nqtxj4yc9mry1r"
+            },
+            {
+              "demo": "Rivers as water ribbons; veins over land; magic water over the sea.",
+              "evidence": "acc6, lab291w, acc6confirm2 magic-water shot",
+              "ticket": "tk_01m5f9p2ss0zx9wcavbg1jcerb"
+            }
+          ],
+          "discoveries": [
+            {
+              "body": "Module decal textures resolve but draw nothing; no decal draws on the generated sea. Runtime overlay meshes are the route (findings section 13).",
+              "ticket": null,
+              "title": "Campaign map decals sample only Native's prebaked atlas"
+            },
+            {
+              "body": "TaleWorlds.Native.dll+0x55e625; re-create instead of move (findings section 13).",
+              "ticket": null,
+              "title": "Moving occluder entities after a mission crashes the occlusion rasterizer"
+            },
+            {
+              "body": "An alpha-tested, depth-writing pass shows over it.",
+              "ticket": null,
+              "title": "Blended meshes are hidden by the campaign-map sea"
+            },
+            {
+              "body": "The named snow texture never resolves; moved to sprint 2 as MMR-293.",
+              "ticket": "tk_01m5grvphtfzbfdxjt90320ks9",
+              "title": "Seasonal snow whitening is still unrouted"
+            }
+          ],
+          "leftovers": [],
+          "tierFit": [
+            {
+              "note": "",
+              "ticket": "tk_01m5ddnkq61qhxk4d6wsr4pmqn",
+              "verdict": "right_sized"
+            },
+            {
+              "note": "",
+              "ticket": "tk_01m5ddnkqea4nqtxj4yc9mry1r",
+              "verdict": "right_sized"
+            },
+            {
+              "note": "Its decal route could not render; MMR-291 carried the drawing.",
+              "ticket": "tk_01m5ddnkqedzr38144by7av7ve",
+              "verdict": "oversized"
+            },
+            {
+              "note": "",
+              "ticket": "tk_01m5f9p2ss0zx9wcavbg1jcerb",
+              "verdict": "right_sized"
+            },
+            {
+              "note": "The live test grew into six full or partial runs plus labs and three fix batches.",
+              "ticket": "tk_01m56vjrv7779wvh14w6a2vxqc",
+              "verdict": "undersized"
+            }
+          ],
+          "wentPoorly": [
+            "The decal delivery (MMR-249/259/260/285/290) was built and published before anyone checked that module textures can draw as decals on the campaign map; acc5 found it.",
+            "The 'hang' was a native crash hidden by the game's crash reporter failing on a junction; it cost three runs before a WER event was read.",
+            "Several agents wrote stray files into the main checkout through relative paths.",
+            "One screenshot-review agent looped for 2+ hours on image crops."
+          ],
+          "wentWell": [
+            "Labs and bisect launches (decal lab, crash bisect, mesh lab) settled engine questions in 10-40 minutes each instead of full runs.",
+            "Reordering world 1 (core first, risky tail last, per-step budgets, relaunch from saves) stopped one hang from losing a whole run.",
+            "Parallel fix clusters with disjoint files merged with almost no conflicts.",
+            "Static reading of shader sources and the native DLL found the decal atlas limit and the crash site."
+          ]
+        },
+        "risks": [
+          "Rivers and lake-edge fills read as water but look blocky (hard channel corners, round fill pools); polish not done.",
+          "Seasonal snow does not whiten snow regions in winter yet (permanentWhite fallback); planned in sprint 2 (MMR-293).",
+          "Whole-world decal totals exceed 5,000 on both worlds (in view about a tenth of the budget); out-of-view cost unmeasured.",
+          "Khuzait home terrain is 88% forest (balance pass kept it; a change would alter every world's factions).",
+          "Any future movable occluder entity must be re-created, not moved (the crash fix).",
+          "World B has two settlements whose only drawn access is a bridge (6-8 units from a road decal).",
+          "The GitHub push is blocked by the repository's LFS budget; main is ahead of origin locally."
+        ],
+        "summary": "Map epic 2 sprint 1 is done: the generated campaign map follows FWGC++ end to end and the live acceptance passes all 33 criteria (acc6, siege confirmed in acc6confirm2). Biome terrain, settlements (every city kept, exact 3/2 villages, culture looks, roads to every gate, bridges, ruins), population, climate and magic all ship. Mid-sprint the owner added MMR-288..291 (veins, features, magic water, overlay meshes). The live runs found and fixed three engine-level problems: decals can only use Native's atlas (veins, rivers and magic water became runtime overlay meshes), the sea paints over blended meshes (magic water uses an alpha-tested depth pass), and moving occluder-carrying entities after a mission crashed the native occlusion rasterizer (now re-created). The increment eaf2863 squashes 142 integration commits onto claude/map-epic-2 (fast-forwarded to local main; the GitHub push failed on the repository's LFS budget). Plan revision 7 (owner, 2026-10-21) moved what sprint 1 left unmet into sprint 2: seasonal snow whitening (epic criterion s3, MMR-293) and the at-most-one-fix-batch bar (sprint 2 exit criterion x1); sprint 2 also takes the owner's bug reports."
+      },
+      "contentHash": "sha256:c0653da486c7cc13292ca5ba55f6bea73f5c64cf32cd296301c8535b01d52955",
+      "createdAt": "2026-10-22T03:01:37.279Z",
+      "id": "rp_01m5grx5vy505z2k1hd6mabezq",
+      "reportRevision": 2,
+      "sprintId": "sp_01m56vjrv7dksjs3b73h4cz5j0",
+      "submittedBy": "Claude Code"
+    }
+  ],
+  "revisionId": "rv_01m5gv1nr6w4wk18j76kyzpwhq",
+  "runId": "rn_01m5b9ewtndxjy6f3nd8p0nz9t",
+  "skillVersion": "1.5.1",
+  "startedAt": "2026-10-19T23:55:28.470Z",
+  "state": "running",
+  "updatedAt": "2026-10-22T03:39:15.385Z"
+}
