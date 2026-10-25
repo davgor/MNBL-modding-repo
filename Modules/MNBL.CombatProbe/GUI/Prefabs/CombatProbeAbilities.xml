@@ -1,0 +1,25 @@
+<Prefab>
+  <Window>
+    <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Sprite="BlankWhiteSquare_9" Color="#17140FFF">
+      <Children>
+        <ListPanel WidthSizePolicy="Fixed" HeightSizePolicy="CoverChildren" SuggestedWidth="1000" HorizontalAlignment="Center" VerticalAlignment="Center" StackLayout.LayoutMethod="VerticalTopToBottom">
+          <Children>
+            <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="80" Brush="Popup.Title.Text" Text="@TitleText" />
+            <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="120" Brush="Popup.Description.Text" Text="@DescriptionText" />
+            <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="70" Brush="Popup.Description.Text" Text="@AssignmentText" />
+            <NavigationForcedScopeCollectionTargeter CollectionParent="..\." />
+            <NavigationScopeTargeter ScopeID="CombatProbeActions" ScopeParent="..\ProbeActions" ScopeMovements="Horizontal" />
+            <ListPanel Id="ProbeActions" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" HorizontalAlignment="Center" StackLayout.LayoutMethod="HorizontalLeftToRight">
+              <Children>
+                <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="280" SuggestedHeight="60" Brush="Popup.Done.Button" DoNotPassEventsToChildren="true" Command.Click="ExecuteAssign" GamepadNavigationIndex="0"><Children><TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Brush="Popup.Button.Text" Text="@AssignText" /></Children></ButtonWidget>
+                <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="180" SuggestedHeight="60" MarginLeft="12" Brush="Popup.Done.Button" DoNotPassEventsToChildren="true" Command.Click="ExecuteApply" GamepadNavigationIndex="1"><Children><TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Brush="Popup.Button.Text" Text="@ApplyText" /></Children></ButtonWidget>
+                <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="180" SuggestedHeight="60" MarginLeft="12" Brush="Popup.Cancel.Button" DoNotPassEventsToChildren="true" Command.Click="ExecuteReset" GamepadNavigationIndex="2"><Children><TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Brush="Popup.Button.Text" Text="@ResetText" /></Children></ButtonWidget>
+                <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="180" SuggestedHeight="60" MarginLeft="12" Brush="Popup.Cancel.Button" DoNotPassEventsToChildren="true" Command.Click="ExecuteBack" GamepadNavigationIndex="3"><Children><TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Brush="Popup.Button.Text" Text="@BackText" /></Children></ButtonWidget>
+              </Children>
+            </ListPanel>
+          </Children>
+        </ListPanel>
+      </Children>
+    </Widget>
+  </Window>
+</Prefab>
