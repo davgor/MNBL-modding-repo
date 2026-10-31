@@ -1,0 +1,25 @@
+{
+  "schema": "mnbl.modding-mcp.native-analysis-attempts.v1",
+  "research_date_local": "2026-10-30",
+  "artifact": {
+    "path": "D:/SteamLibrary/steamapps/common/Mount & Blade II Bannerlord/bin/Win64_Shipping_wEditor/TaleWorlds.Native.dll",
+    "sha256": "b87f2439e0869945e6aa4a0ada3d8ee735d6e12276aecfea84dce44379243413"
+  },
+  "provider": "Ghidra 12.1.4",
+  "attempts": [
+    {
+      "operation": "search_procedures",
+      "parameters": { "pattern": "import|publish|save_scene|editor|resource_manager", "mode": "regex", "case_sensitive": false },
+      "result": "tool call error: tool call failed for rea/search_procedures; timed out awaiting tools/call after 300s",
+      "native_result_obtained": false
+    },
+    {
+      "operation": "xrefs",
+      "parameters": { "address": "0x181428b80" },
+      "result": "tool call error: tool call failed for rea/xrefs; timed out awaiting tools/call after 300s",
+      "native_result_obtained": false
+    }
+  ],
+  "cleanup": "REA close_binary returned result:null after the second request; CLI fallback uses a separately owned process.",
+  "interpretation": "Connection timeout during native analysis startup. Neither absence of APIs nor successful decompilation is established. Native string/PE inspection results are separate static artifacts."
+}

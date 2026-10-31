@@ -1,0 +1,110 @@
+{
+  "schema_version": 1,
+  "audit_date": "2026-10-30",
+  "scope": "Read-only source audit of public APIs, BannerlordSceneToolkit and the pinned Editor-Free SDK; historical local animation evidence review.",
+  "limitations": [
+    "No game, editor, SDK test, build, installation or deployment was executed by this audit.",
+    "Observed implementation means source was inspected, not that the operation passed on this installation.",
+    "Upstream runtime claims are source-author assertions; historical local runtime evidence is identified separately.",
+    "Absence from inspected public documentation does not prove absence from native code.",
+    "This audit does not establish complete Modding Kit API coverage."
+  ],
+  "repositories": {
+    "editor_free_sdk": {
+      "url": "https://github.com/theartur2000/bannerlord-editor-free-sdk",
+      "commit": "211907728117ec836998b72908f84238a2d179c2",
+      "local_path": "build/combat-feasibility/animation/editor-free-sdk",
+      "independently_observed": "git rev-parse HEAD matched this commit; git status --short was empty.",
+      "license": "MIT; Copyright (c) 2026 theartur2000; retain notice.",
+      "license_url": "https://github.com/theartur2000/bannerlord-editor-free-sdk/blob/211907728117ec836998b72908f84238a2d179c2/LICENSE",
+      "declared_target": "Bannerlord v1.4.8.119303, Steam Windows singleplayer; other versions untested."
+    },
+    "scene_toolkit": {
+      "url": "https://github.com/fiefevictionnotice/BannerlordSceneToolkit",
+      "commit": "4edd557f4f7f8814d5a11831cecef791df14748b"
+    }
+  },
+  "sources": [
+    {"id":"sdk_readme","url":"https://github.com/theartur2000/bannerlord-editor-free-sdk/blob/211907728117ec836998b72908f84238a2d179c2/README.md","inspected_lines":[[1,170],[127,164]],"additional_inspection":"Targeted numbered search hits through line 468; not every intervening line was read."},
+    {"id":"sdk_mcp","url":"https://github.com/theartur2000/bannerlord-editor-free-sdk/blob/211907728117ec836998b72908f84238a2d179c2/sdk/mcp_server.py","inspected_lines":"entire file"},
+    {"id":"sdk_bl","url":"https://github.com/theartur2000/bannerlord-editor-free-sdk/blob/211907728117ec836998b72908f84238a2d179c2/sdk/bl.py","inspected_lines":[[339,443],[689,724],[1106,1165]],"additional_inspection":"Function and command-registration inventory."},
+    {"id":"sdk_scene","url":"https://github.com/theartur2000/bannerlord-editor-free-sdk/blob/211907728117ec836998b72908f84238a2d179c2/sdk/scenebuild.py","inspected_lines":[[1,40],[215,330]]},
+    {"id":"sdk_pack","url":"https://github.com/theartur2000/bannerlord-editor-free-sdk/blob/211907728117ec836998b72908f84238a2d179c2/sdk/tpac_pack.py","inspected_lines":[[1,63],[345,386]],"additional_inspection":"Function inventory, including writer functions at 128/164 and pack at 302."},
+    {"id":"sdk_install","url":"https://github.com/theartur2000/bannerlord-editor-free-sdk/blob/211907728117ec836998b72908f84238a2d179c2/sdk/install.py","inspected_lines":[[120,189]],"additional_inspection":"Function inventory."},
+    {"id":"sdk_tests","url":"https://github.com/theartur2000/bannerlord-editor-free-sdk/blob/211907728117ec836998b72908f84238a2d179c2/tests/run_offline.py","inspected_lines":[[1,296],[361,399],[551,645],[905,923]],"additional_inspection":"Function/test-registration inventory; large initial read was truncated, so no claim to have inspected every test body."},
+    {"id":"sdk_morph","url":"https://github.com/theartur2000/bannerlord-editor-free-sdk/blob/211907728117ec836998b72908f84238a2d179c2/sdk/morph.py","inspected_lines":[[1,45]],"additional_inspection":"Function inventory."},
+    {"id":"sdk_skeleton","url":"https://github.com/theartur2000/bannerlord-editor-free-sdk/blob/211907728117ec836998b72908f84238a2d179c2/sdk/sdk_skeleton.py","inspected_lines":[[236,278]],"additional_inspection":"Targeted search for limits and ragdoll construction."},
+    {"id":"sdk_tpac","url":"https://github.com/theartur2000/bannerlord-editor-free-sdk/blob/211907728117ec836998b72908f84238a2d179c2/sdk/tpac.py","inspected_lines":[[1073,1113]],"additional_inspection":"Numbered search hits at 1264-1279 establish single-take check."},
+    {"id":"sdk_mesh","url":"https://github.com/theartur2000/bannerlord-editor-free-sdk/blob/211907728117ec836998b72908f84238a2d179c2/sdk/sdk_mesh.py","inspected_lines":[[115,132]]},
+    {"id":"sdk_bridge","url":"https://github.com/theartur2000/bannerlord-editor-free-sdk/blob/211907728117ec836998b72908f84238a2d179c2/sdk/bridge.py","inspected_lines":[[1,65]]},
+    {"id":"sdk_tick","url":"https://github.com/theartur2000/bannerlord-editor-free-sdk/blob/211907728117ec836998b72908f84238a2d179c2/sdk/scaffold/src/SubModule.cs.tpl","inspected_lines":[[29,33]],"inspection_method":"numbered search matches"},
+    {"id":"sdk_requirements","url":"https://github.com/theartur2000/bannerlord-editor-free-sdk/blob/211907728117ec836998b72908f84238a2d179c2/requirements.txt","inspected_lines":"entire file"},
+    {"id":"toolkit_tick","url":"https://github.com/fiefevictionnotice/BannerlordSceneToolkit/blob/4edd557f4f7f8814d5a11831cecef791df14748b/MaterialSwapTool/Patches/MBEditorTickPatch.cs","inspected_lines":"retrieved source file; numeric bounds not retained"},
+    {"id":"toolkit_undo","url":"https://github.com/fiefevictionnotice/BannerlordSceneToolkit/blob/4edd557f4f7f8814d5a11831cecef791df14748b/Core/EditUndo.cs","inspected_lines":"retrieved source file; numeric bounds not retained"},
+    {"id":"toolkit_frames","url":"https://github.com/fiefevictionnotice/BannerlordSceneToolkit/blob/4edd557f4f7f8814d5a11831cecef791df14748b/Core/EditorFrameSync.cs","inspected_lines":"retrieved source file; numeric bounds not retained"},
+    {"id":"toolkit_scene","url":"https://github.com/fiefevictionnotice/BannerlordSceneToolkit/blob/4edd557f4f7f8814d5a11831cecef791df14748b/MaterialSwapTool/Core/EntitySelector.cs","inspected_lines":"retrieved source file; numeric bounds not retained"},
+    {"id":"toolkit_camera","url":"https://github.com/fiefevictionnotice/BannerlordSceneToolkit/blob/4edd557f4f7f8814d5a11831cecef791df14748b/MaterialSwapTool/Core/EditorNavigation.cs","inspected_lines":"retrieved source file; numeric bounds not retained"},
+    {"id":"toolkit_backup","url":"https://github.com/fiefevictionnotice/BannerlordSceneToolkit/blob/4edd557f4f7f8814d5a11831cecef791df14748b/MaterialSwapTool/Backup/BackupManager.cs","inspected_lines":"retrieved source file; numeric bounds not retained"},
+    {"id":"toolkit_physics","url":"https://github.com/fiefevictionnotice/BannerlordSceneToolkit/blob/4edd557f4f7f8814d5a11831cecef791df14748b/PrefabCreatorTool/Core/SavedScenePhysicsStripper.cs","inspected_lines":"retrieved source file; numeric bounds not retained"},
+    {"id":"api_editor","url":"https://apidoc.bannerlord.com/v/1.4.8/class_tale_worlds_1_1_mount_and_blade_1_1_m_b_editor.html","inspected_lines":null,"inspection_method":"HTML member listings"},
+    {"id":"api_scene","url":"https://apidoc.bannerlord.com/v/1.4.8/class_tale_worlds_1_1_engine_1_1_scene.html","inspected_lines":null,"inspection_method":"HTML member listings"},
+    {"id":"api_utilities","url":"https://apidoc.bannerlord.com/v/1.4.8/class_tale_worlds_1_1_engine_1_1_utilities.html","inspected_lines":null,"inspection_method":"HTML member listings"},
+    {"id":"api_resource","url":"https://apidoc.bannerlord.com/v/1.4.8/class_tale_worlds_1_1_engine_1_1_resource.html","inspected_lines":null,"inspection_method":"HTML member listings"},
+    {"id":"api_texture","url":"https://apidoc.bannerlord.com/v/1.4.8/class_tale_worlds_1_1_engine_1_1_texture.html","inspected_lines":null,"inspection_method":"HTML member listings"},
+    {"id":"api_material","url":"https://apidoc.bannerlord.com/v/1.4.8/class_tale_worlds_1_1_engine_1_1_material.html","inspected_lines":null,"inspection_method":"HTML member listings"},
+    {"id":"api_skeleton","url":"https://apidoc.bannerlord.com/v/1.4.8/class_tale_worlds_1_1_engine_1_1_skeleton.html","inspected_lines":null,"inspection_method":"HTML member listings"},
+    {"id":"api_cloth","url":"https://apidoc.bannerlord.com/v/1.4.8/class_tale_worlds_1_1_engine_1_1_cloth_simulator_component.html","inspected_lines":null,"inspection_method":"HTML member listings"},
+    {"id":"local_animation","path":"evidence/combat-overhaul/runtime/animation/editor-free-writer-findings.md","inspected_lines":"entire file"}
+  ],
+  "operation_findings": [
+    {"operation":"editor_tick_scene_camera","evidence_class":"source_observed","sources":["api_editor","toolkit_tick","toolkit_scene","toolkit_camera"],"finding":"MBEditor exposes _editorScene, GetEditorSceneView and ZoomToPosition. Toolkit uses _editorScene and ZoomToPosition and patches TickSceneEditorPresentation. Its comment reports TickEditMode did not fire while TickSceneEditorPresentation did; that runtime observation belongs to the source author."},
+    {"operation":"active_scene_save_undo","evidence_class":"source_observed_boundary","sources":["api_editor","api_scene","toolkit_backup","toolkit_undo","toolkit_physics","toolkit_frames"],"finding":"No general scene-save/global-undo method found in inspected public members. Toolkit backup copies saved disk state and does not attempt force-save. Custom undo is a 10-entry stack for frames, created entities and tags; deletion/physics are excluded. Runtime frame changes need editor triad synchronization. Physics stripper edits saved scene XML after final editor save because runtime removal did not persist; saving editor state again can restore those nodes.","not_established":"This does not prove no native save/undo route exists."},
+    {"operation":"public_terrain_navigation","evidence_class":"source_observed_boundary","sources":["api_scene"],"finding":"Scene offers terrain reads, navigation queries, ClearNavMesh, navigation prefab import/save and path operations. Arbitrary terrain-heightmap authoring or complete navmesh editor parity was not established."},
+    {"operation":"public_resources_import_publish","evidence_class":"source_observed_boundary","sources":["api_utilities","api_resource","api_texture","api_material"],"finding":"Utilities exposes bake/shader/resource-modification helpers. Texture has runtime creation and SaveToFile; Material has runtime copy/flags/slots. These are not evidence for persistent TPAC registration, the resource browser database, arbitrary FBX import or publication."},
+    {"operation":"offline_import_assets","evidence_class":"implementation_observed_not_locally_executed","sources":["sdk_bl","sdk_tpac","sdk_mesh"],"finding":"Implemented texture, material, static/skinned FBX mesh, skeleton, animation, clip/cache and collision commands write files without editor UI.","limits":["FBX animation importer requires a single take.","X-up mesh FBX is rejected.","Animation decoder rejects per-bone position channels.","Supported format paths do not imply all official importer options are covered."]},
+    {"operation":"offline_scene_terrain_navigation_save","evidence_class":"implementation_observed_not_locally_executed","sources":["sdk_scene","sdk_bl"],"finding":"Builder writes scene.xscene, terrain.bin and navmesh.bin from arrays, masks, entities, spawn paths and walkable areas. Heightmap command accepts PNG/NPY/R16 and grid/polygon navigation. It copies template atmosphere/shader data and writes empty flora initially.","limits":["Template supplies layer definitions, outer mesh, atmosphere, shader header and node dimensions.","This persists generated files, not the dirty active editor session."]},
+    {"operation":"offline_package_install_revert","evidence_class":"implementation_observed_not_locally_executed","sources":["sdk_pack","sdk_install"],"finding":"TPAC/RDC packer merges packages/caches and verifies item/dependency/stored-byte preservation. Install records backups and incomplete/complete manifests, copies batches and supports revert. It is recoverable file deployment, not a demonstrated atomic multi-file transaction."},
+    {"operation":"skeleton_cloth_morph_authoring","evidence_class":"implementation_observed_with_explicit_limits","sources":["sdk_skeleton","sdk_morph","sdk_tests","api_skeleton","api_cloth"],"finding":"SDK skeleton builder allows at most 64 bones and generates minimal capsule/d6 ragdolls. Cloth has actual fabric/map/clothing writers. Morph functions build keys and animation packages.","limits":["Minimal auto-ragdoll is not full Skeleton Editor control parity.","Morph source explicitly says generated morph assets have not been tried in game and missing-key/blend semantics are unknown.","Public runtime skeleton/cloth transforms do not establish persistent editor-authoring support."]},
+    {"operation":"workshop_publish","evidence_class":"implementation_observed_boundary","sources":["sdk_bl"],"finding":"workshop.config generates uploader XML and returns instructions for manual uploader invocation; it does not upload."},
+    {"operation":"mcp_surface","evidence_class":"implementation_observed","sources":["sdk_mcp","sdk_bl"],"registered_tool_count":59,"finding":"Every bl registry command is mapped to an MCP tool. Morph, particles, PRT baking and explicit TPAC packing exist outside the named bl registry.","limits":["Serial subprocess calls have no subprocess timeout or cancellation handling.","Initialization echoes requested protocol version without negotiation.","No resource interface or job lifecycle implemented.","live is not registered as writing, so readOnlyHint=true also covers spawn/remove/teleport/mapmove/play/quit.","scene.heightmap writes an export file but is similarly marked read-only."]},
+    {"operation":"live_runtime_bridge","evidence_class":"implementation_observed_not_locally_executed","sources":["sdk_bridge","sdk_tick","sdk_bl"],"finding":"File request/reply bridge polls from SubModule.OnApplicationTick in a loaded game module; it is not an active editor bridge. Its request timeout does not cancel an operation already taken by the game."}
+  ],
+  "verification_distinctions": {
+    "offline_tests": {
+      "registered_count":45,
+      "run_in_this_audit":false,
+      "observed_assertions":["Synthetic geometry coverage and topology checks", "Byte-preserving scene edits", "Texture codec error checks", "Synthetic morph/cloth structures", "MCP list/call/error/stdio"],
+      "limits":["Bridge response test simulates game behavior.","One sprite generation test uses a stub.","Full sound build test returns early when exact FMOD or sample project is absent.","Same-library round trips are not independent engine acceptance proof."]
+    },
+    "upstream_reported_not_reproduced_here": {
+      "sources":["sdk_readme"],
+      "claims":["Generated scenes and 200-versus-200 battles", "Static/skinned assets, two-bone skeleton and clip", "Collision raycasts/player support", "Animated cloth and modified particles", "Campaign-map edits and continent", "Seven scaffold/bridge sessions"],
+      "reported_counts":{"cloth_cooks_byte_identical":664,"cloth_cooks_total":898,"placed_flora_roundtrips":722,"prt_files_roundtripped":178},
+      "explicit_unknowns":["Fresh prt_bake output untested in game", "Sound tested at volume zero; nobody listened", "Other game versions untested", "Morph authoring unverified in game"],
+      "source_inconsistencies":["README feature text says cooked collisions untested; status later reports live success.","bridge.py introductory text says bridge never run; README reports seven sessions."]
+    },
+    "historical_local_run30840": {
+      "evidence_class":"review_of_retained_local_report_not_fresh_runtime",
+      "source":"local_animation",
+      "action_index":5167,
+      "action_set":"as_mnbl_probe",
+      "clip":"mnbl_probe_sweep",
+      "matching_samples":20,
+      "last_sample_progress":0.974396348,
+      "last_sample_elapsed_seconds":1.95719421,
+      "completion_by_seconds":2.06134582,
+      "slope_duration_seconds":1.99999992,
+      "restore_elapsed_seconds":2.20717287,
+      "restored_set":"as_human_warrior",
+      "reported_observations":["Three captures show distinct arm/weapon poses", "Hand-bone trajectory and holds support actual motion", "Three post-run installed TPAC/RDC hashes match sdk-writer-result.json"],
+      "limits":["Post-run hashes are not execution-time asset-read tracing.","Restoration verifies set identity, not every native field.","Animation polish, mounted variants, interruption/cancellation, custom damage and hit timing unproven.","Editor importer untested.","All other SDK capabilities lack equivalent local proof in this report."],
+      "regression":{"finding":"Default clip writer assumes 12.548 keys per second while FBX retained 61 samples; default selection would truncate at keys 0-25.","local_fix":"Explicit src_range=(0,60), duration 2 seconds, cache 61 frames."},
+      "artifacts":["run-30840.jsonl","run-30840-custom-animation-*.png","run-30840-filmstrip.png","run-30840-review.json","sdk-writer-result.json","sdk-writer-audit.json"]
+    }
+  },
+  "reinstall_dependencies": {
+    "sources":["sdk_readme","sdk_requirements"],
+    "requirements":["Python >=3.10", "numpy>=1.24 (not locked)", "Pillow for selected image/assetpack paths", "Local Bannerlord assets", ".NET SDK able to target net472 for game module", "PowerShell 5.1 for harness", "Shipped PhysX cooking DLL for cooked collision", "FMOD Studio 2.02.27 and Kit sample mixer for sound", "Optional vgmstream-cli for sound decoding checks"],
+    "boundary":"Ignored build-directory clone is not a durable reinstall source. Pin/vendor source and license; discover local proprietary content rather than assuming it is redistributed with the SDK."
+  }
+}

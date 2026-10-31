@@ -1,0 +1,2543 @@
+{
+  "schema_version": 1,
+  "audit_date": "2026-10-30",
+  "scope": "Target-free REA managed static inspection of shipped sprite/font generator artifacts for MMR-416.",
+  "executed_target": false,
+  "shared_native_session_changed": false,
+  "limitations": [
+    "No generated sprite/font output or dynamic dependency resolution was tested.",
+    "Public metadata/signatures and CIL call anchors are observed; practical adapter viability remains a candidate until bounded generation/reload verification.",
+    "Build-local tokens must be paired with recorded SHA-256 and MVID.",
+    "FontAtlas is native, so managed inspection establishes identity/non-managed classification only; its CLI/API remains unresolved."
+  ],
+  "artifacts": [
+    {
+      "file": "TaleWorlds.TwoDimension.SpriteSheetGenerator.exe",
+      "identity_evidence_id": "ev_5efc9aafa3d557fbc855e6e1411eb467848b7d78dd62690f9c9797809d38a4e0",
+      "summary_evidence_id": "ev_f8f71b2fea9d5787534ff8e0b233e3976cdde5ad6a8290aa071230cb0464dea0",
+      "path": "D:\\SteamLibrary\\steamapps\\common\\Mount & Blade II Bannerlord\\bin\\Win64_Shipping_wEditor\\TaleWorlds.TwoDimension.SpriteSheetGenerator.exe",
+      "sha256": "ebe584b446d946c47d027d58056f96a185af7585d43bf413670d1b9fb2671485",
+      "byte_length": 21976,
+      "format": "pe",
+      "module": {
+        "name": "TaleWorlds.TwoDimension.SpriteSheetGenerator.exe",
+        "generation": 0,
+        "mvid": "83d7c2b3-58d3-4ead-b5b4-c5389e307c32",
+        "enc_id": null,
+        "enc_base_id": null,
+        "token": "0x00000001",
+        "row_offset": 1456
+      },
+      "classification": {
+        "status": "managed",
+        "container": "pe",
+        "runtime_family": "dotnet-framework",
+        "implementation": "cil",
+        "managed_architecture": "x86_64",
+        "evidence": [
+          {
+            "code": "cli-header-observed",
+            "detail": "A file-backed PE CLI header and metadata root were admitted.",
+            "file_offset": 512
+          },
+          {
+            "code": "target-framework-observed",
+            "detail": "An assembly-level TargetFrameworkAttribute names .NET Framework.",
+            "file_offset": 2154
+          },
+          {
+            "code": "managed-architecture-derived",
+            "detail": "Managed architecture x86_64 is derived from PE machine and CLI flags.",
+            "file_offset": 528
+          }
+        ]
+      },
+      "metadata": {
+        "status": "complete",
+        "version": "v4.0.30319",
+        "stream_names": [
+          "#Blob",
+          "#GUID",
+          "#Strings",
+          "#US",
+          "#~"
+        ],
+        "table_row_counts": {
+          "Module": 1,
+          "TypeRef": 34,
+          "TypeDef": 3,
+          "Field": 6,
+          "MethodDef": 8,
+          "Param": 3,
+          "MemberRef": 43,
+          "Constant": 3,
+          "CustomAttribute": 15,
+          "StandAloneSig": 2,
+          "TypeSpec": 1,
+          "Assembly": 1,
+          "AssemblyRef": 3,
+          "NestedClass": 1,
+          "MethodSpec": 4
+        }
+      },
+      "target_frameworks": [
+        ".NETFramework,Version=v4.7.2"
+      ],
+      "coverage": {
+        "state": "complete",
+        "issues": []
+      },
+      "entry_point": {
+        "kind": "metadata-token",
+        "value": "0x06000001"
+      },
+      "limitations": [
+        "Static inspection did not load the assembly, resolve dependencies through a CLR, decompile C#, or execute target code."
+      ]
+    },
+    {
+      "file": "TaleWorlds.TwoDimension.SpriteSheetGenerator.Library.dll",
+      "identity_evidence_id": "ev_e9d9123711cc0eec151823cbbf8c4293a6af7806cd29a10570eb4c0091af9808",
+      "summary_evidence_id": "ev_1838a77ad72d91b14c25a57fbaa60288e98e4d70eb5572c7127cba6ac23c758e",
+      "path": "D:\\SteamLibrary\\steamapps\\common\\Mount & Blade II Bannerlord\\bin\\Win64_Shipping_wEditor\\TaleWorlds.TwoDimension.SpriteSheetGenerator.Library.dll",
+      "sha256": "ddba0ee90f89b5258edca316d8b9341ecbc4b5ef5498dac4dd6b4d1f07c2f0a9",
+      "byte_length": 42456,
+      "format": "pe",
+      "module": {
+        "name": "TaleWorlds.TwoDimension.SpriteSheetGenerator.Library.dll",
+        "generation": 0,
+        "mvid": "54c59e6a-2c53-41e4-b200-539fce3b8035",
+        "enc_id": null,
+        "enc_base_id": null,
+        "token": "0x00000001",
+        "row_offset": 11048
+      },
+      "classification": {
+        "status": "managed",
+        "container": "pe",
+        "runtime_family": "dotnet-framework",
+        "implementation": "cil",
+        "managed_architecture": "x86_64",
+        "evidence": [
+          {
+            "code": "cli-header-observed",
+            "detail": "A file-backed PE CLI header and metadata root were admitted.",
+            "file_offset": 512
+          },
+          {
+            "code": "target-framework-observed",
+            "detail": "An assembly-level TargetFrameworkAttribute names .NET Framework.",
+            "file_offset": 15540
+          },
+          {
+            "code": "managed-architecture-derived",
+            "detail": "Managed architecture x86_64 is derived from PE machine and CLI flags.",
+            "file_offset": 528
+          }
+        ]
+      },
+      "metadata": {
+        "status": "complete",
+        "version": "v4.0.30319",
+        "stream_names": [
+          "#Blob",
+          "#GUID",
+          "#Strings",
+          "#US",
+          "#~"
+        ],
+        "table_row_counts": {
+          "Module": 1,
+          "TypeRef": 79,
+          "TypeDef": 16,
+          "Field": 60,
+          "MethodDef": 110,
+          "Param": 110,
+          "MemberRef": 199,
+          "Constant": 5,
+          "CustomAttribute": 89,
+          "StandAloneSig": 36,
+          "PropertyMap": 5,
+          "Property": 25,
+          "MethodSemantics": 48,
+          "TypeSpec": 21,
+          "FieldRVA": 1,
+          "Assembly": 1,
+          "AssemblyRef": 6,
+          "NestedClass": 5,
+          "MethodSpec": 1
+        }
+      },
+      "target_frameworks": [
+        ".NETFramework,Version=v4.7.2"
+      ],
+      "coverage": {
+        "state": "complete",
+        "issues": []
+      },
+      "entry_point": {
+        "kind": "none",
+        "value": null
+      },
+      "limitations": [
+        "Static inspection did not load the assembly, resolve dependencies through a CLR, decompile C#, or execute target code."
+      ]
+    },
+    {
+      "file": "TaleWorlds.GauntletUI.FontAtlas.exe",
+      "identity_evidence_id": "ev_e6e2eec33db0aad6eabb0852026da034fd56bfd938d1101f14e4447fd3419ce5",
+      "summary_evidence_id": "ev_a0a55617ba54e1f2d4be49c7d5682f5cdb6cd1f8cfcd6feb184daca5333342ad",
+      "path": "D:\\SteamLibrary\\steamapps\\common\\Mount & Blade II Bannerlord\\bin\\Win64_Shipping_wEditor\\TaleWorlds.GauntletUI.FontAtlas.exe",
+      "sha256": "ebc5d6ac95877d04a6bfed1e98f933f001203f502c00235d2365b80df9de1029",
+      "byte_length": 263128,
+      "format": "pe",
+      "module": null,
+      "classification": {
+        "status": "not-managed",
+        "container": "pe",
+        "runtime_family": "unknown",
+        "implementation": "not-managed",
+        "managed_architecture": "unknown",
+        "evidence": [
+          {
+            "code": "cli-directory-absent",
+            "detail": "The PE has no CLI data directory; managed metadata and CIL are unavailable.",
+            "file_offset": null
+          }
+        ]
+      },
+      "metadata": {
+        "status": "absent",
+        "version": null,
+        "stream_names": [],
+        "table_row_counts": {}
+      },
+      "target_frameworks": [],
+      "coverage": {
+        "state": "unavailable",
+        "issues": []
+      },
+      "entry_point": null,
+      "limitations": [
+        "The PE has no CLI data directory; managed metadata and CIL are unavailable."
+      ]
+    }
+  ],
+  "findings": [
+    {
+      "id": "sprite_cli",
+      "state": "observed-static",
+      "artifact": "TaleWorlds.TwoDimension.SpriteSheetGenerator.exe",
+      "evidence_id": "ev_d1b603d251ed82a786d881745e9d73f022708e81252d29376408b87a176205bd",
+      "entry_point": "Program.Main(string[]) -> void; public static; token 0x06000001",
+      "parameters": [
+        "SourceDirectory=<full module or Modules-directory path>",
+        "CollectionType=SingleModule|AllAvailableModules",
+        "OutputType=Engine|Standalone"
+      ],
+      "help_aliases": [
+        "help",
+        "-help",
+        "-h"
+      ],
+      "boundary": "Program.Main calls SpriteEditorDomain.Start and then Console.ReadKey. This is a CLI with an interactive terminal wait, not a demonstrated unattended executable contract. No no-pause switch appears in inspected parameter parser.",
+      "main_start_call_il_offset": 67,
+      "main_readkey_call_il_offset": 137,
+      "parser_token": "0x06000002",
+      "help_token": "0x06000003"
+    },
+    {
+      "id": "sprite_library",
+      "state": "observed-public-static-api-candidate",
+      "artifact": "TaleWorlds.TwoDimension.SpriteSheetGenerator.Library.dll",
+      "evidence_id": "ev_bf8ba26d303770978ada28000702eba48e5d0f49212f3a0b2a9e8e713dad1e98",
+      "signature": "public static bool TaleWorlds.TwoDimension.SpriteSheetGenerator.Library.SpriteEditorDomain.Start(SpriteEditorDomainConfiguration configuration)",
+      "token": "0x0600003a",
+      "metadata_flags": 150,
+      "configuration_type_token": "0x02000008",
+      "parameter_resolution": "Raw signature valuetype:32 is TypeDefOrRef coded index 32 -> TypeDef row 8 (SpriteEditorDomainConfiguration).",
+      "configuration_fields": [
+        "SourceDirectoryPath:string",
+        "OutputType:SpriteSheetOutputType",
+        "CollectionType:SpriteSheetCollectionType"
+      ],
+      "finding": "The executable's own Start call provides a concrete library route that avoids its trailing Console.ReadKey. Start dispatches through TWParallel.ForWithoutRenderThread to per-module work. No target assembly was loaded or invoked."
+    },
+    {
+      "id": "sprite_outputs",
+      "state": "observed-cil-operations",
+      "artifact": "TaleWorlds.TwoDimension.SpriteSheetGenerator.Library.dll",
+      "evidence_id": "ev_bf8ba26d303770978ada28000702eba48e5d0f49212f3a0b2a9e8e713dad1e98",
+      "finding": "Tick calls sprite import/generation, packing, SaveSpriteSheets and SaveSpriteSheetData. SaveSpriteSheetData calls SaveSpriteSheetDataAsXml. SaveSheet calls image-writing paths selected by SingleChannel/NoAlphaChannel. SaveSpriteSheets calls EmptyDirectory, so output-directory containment must be verified before adapter execution.",
+      "config_string_names": [
+        "PackAllSpritesToUniqueTextures",
+        "SingleChannel",
+        "NoAlphaChannel",
+        "EdgeSize"
+      ],
+      "path_strings": [
+        "SpriteParts\\\\Config.xml",
+        "\\\\AssetSources\\\\GauntletUI\\\\",
+        "\\\\Assets\\\\GauntletUI\\\\",
+        "\\\\GUI\\\\",
+        "SpriteSheets\\\\"
+      ],
+      "observed_limit_message": "The file has too much folder depth. Maximum allowed is 8.",
+      "unknowns": [
+        "Actual generated PNG/XML correctness and game reload are unexecuted.",
+        "Whole UI-resource authoring coverage is not established."
+      ]
+    },
+    {
+      "id": "sdk_reuse",
+      "state": "source-observed-not-run",
+      "source_url": "https://github.com/theartur2000/bannerlord-editor-free-sdk/blob/211907728117ec836998b72908f84238a2d179c2/sdk/sprites.py#L26",
+      "inspected_lines": [
+        24,
+        66
+      ],
+      "finding": "Pinned SDK already loads the shipped library, constructs configuration and calls SpriteEditorDomain.Start from a subprocess PowerShell script. It selects SingleModule, chooses output type, then forces GC/finalizers. Source asserts generated file streams otherwise remain unflushed and runs against a private staged module copy.",
+      "boundary": "ReadKey and library signature are independently corroborated by shipped CIL. Stream-finalizer behavior and runtime generation are source-author assertions, not reproduced by this audit."
+    },
+    {
+      "id": "font_atlas",
+      "state": "unresolved-cli-api",
+      "artifact": "TaleWorlds.GauntletUI.FontAtlas.exe",
+      "finding": "REA found x86_64 native PE with no CLI data directory; managed metadata and CIL unavailable. No adjacent FontAtlas DLL appeared in exact-name directory listing. No native session opened and no claim that it is GUI-only or that a CLI exists."
+    }
+  ],
+  "static_members": {
+    "executable": {
+      "evidence_id": "ev_d1b603d251ed82a786d881745e9d73f022708e81252d29376408b87a176205bd",
+      "identity": {
+        "token_identity": "build-local",
+        "requires_artifact_sha256": "ebe584b446d946c47d027d58056f96a185af7585d43bf413670d1b9fb2671485",
+        "requires_mvid": "83d7c2b3-58d3-4ead-b5b4-c5389e307c32"
+      },
+      "coverage": {
+        "state": "complete",
+        "issues": []
+      },
+      "methods": [
+        {
+          "token": "0x06000001",
+          "row_offset": 1748,
+          "declaring_type_token": "0x02000002",
+          "declaring_type": "TaleWorlds.TwoDimension.SpriteSheetGenerator.Program",
+          "name": "Main",
+          "rva": 8264,
+          "impl_flags": 0,
+          "flags": 150,
+          "signature": {
+            "raw_length": 5,
+            "raw_sha256": "807699fcdf98b6674a8081ad707088ec859d5d71737ad4ea8bb251d224f73869",
+            "kind": "method",
+            "parse_status": "decoded",
+            "calling_convention": "default",
+            "generic_parameter_count": null,
+            "parameter_count": 1,
+            "return_type": "void",
+            "parameter_types": [
+              "string[]"
+            ],
+            "field_type": null,
+            "issue": null
+          },
+          "body": {
+            "status": "present",
+            "header_format": "fat",
+            "rva": 8264,
+            "file_offset": 584,
+            "max_stack": 3,
+            "init_locals": true,
+            "local_var_sig_token": "0x11000001",
+            "il_size": 144,
+            "il_sha256": "e3fbc121cbf22826becc31f799e30a420ca4babb376070045cbcc87bdb178ff3",
+            "normalized_il_sha256": "3cffce7238bc97ea75e273df2222062f3d15266ff6b6b24a2732d271486e0934",
+            "instruction_count": 43,
+            "decoded_instruction_count": 43,
+            "truncated_instructions": 0,
+            "opcode_counts": {
+              "ldarg.0": 2,
+              "ldsfld": 2,
+              "dup": 4,
+              "brtrue.s": 3,
+              "pop": 2,
+              "ldftn": 1,
+              "newobj": 1,
+              "stsfld": 1,
+              "call": 12,
+              "brfalse.s": 1,
+              "ret": 2,
+              "box": 1,
+              "ldc.i4.s": 2,
+              "br.s": 2,
+              "ldstr": 5,
+              "stloc.0": 1,
+              "ldloc.0": 1
+            },
+            "anchors": [
+              {
+                "il_offset": 1,
+                "opcode": "ldsfld",
+                "operand_kind": "field",
+                "operand": "0x04000006"
+              },
+              {
+                "il_offset": 7,
+                "opcode": "brtrue.s",
+                "operand_kind": "branch",
+                "operand": "32"
+              },
+              {
+                "il_offset": 10,
+                "opcode": "ldsfld",
+                "operand_kind": "field",
+                "operand": "0x04000005"
+              },
+              {
+                "il_offset": 15,
+                "opcode": "ldftn",
+                "operand_kind": "method",
+                "operand": "0x06000008"
+              },
+              {
+                "il_offset": 21,
+                "opcode": "newobj",
+                "operand_kind": "method",
+                "operand": "0x0a000010"
+              },
+              {
+                "il_offset": 27,
+                "opcode": "stsfld",
+                "operand_kind": "field",
+                "operand": "0x04000006"
+              },
+              {
+                "il_offset": 32,
+                "opcode": "call",
+                "operand_kind": "method",
+                "operand": "0x2b000001"
+              },
+              {
+                "il_offset": 37,
+                "opcode": "brfalse.s",
+                "operand_kind": "branch",
+                "operand": "50"
+              },
+              {
+                "il_offset": 39,
+                "opcode": "call",
+                "operand_kind": "method",
+                "operand": "0x06000003"
+              },
+              {
+                "il_offset": 44,
+                "opcode": "call",
+                "operand_kind": "method",
+                "operand": "0x0a000012"
+              },
+              {
+                "il_offset": 51,
+                "opcode": "call",
+                "operand_kind": "method",
+                "operand": "0x06000002"
+              },
+              {
+                "il_offset": 57,
+                "opcode": "box",
+                "operand_kind": "type",
+                "operand": "0x01000011"
+              },
+              {
+                "il_offset": 62,
+                "opcode": "call",
+                "operand_kind": "method",
+                "operand": "0x0a000013"
+              },
+              {
+                "il_offset": 67,
+                "opcode": "call",
+                "operand_kind": "method",
+                "operand": "0x0a000014"
+              },
+              {
+                "il_offset": 73,
+                "opcode": "brtrue.s",
+                "operand_kind": "branch",
+                "operand": "79"
+              },
+              {
+                "il_offset": 75,
+                "opcode": "ldc.i4.s",
+                "operand_kind": "constant",
+                "operand": "12"
+              },
+              {
+                "il_offset": 77,
+                "opcode": "br.s",
+                "operand_kind": "branch",
+                "operand": "81"
+              },
+              {
+                "il_offset": 79,
+                "opcode": "ldc.i4.s",
+                "operand_kind": "constant",
+                "operand": "10"
+              },
+              {
+                "il_offset": 81,
+                "opcode": "call",
+                "operand_kind": "method",
+                "operand": "0x0a000015"
+              },
+              {
+                "il_offset": 86,
+                "opcode": "brtrue.s",
+                "operand_kind": "branch",
+                "operand": "95"
+              },
+              {
+                "il_offset": 88,
+                "opcode": "ldstr",
+                "operand_kind": "string",
+                "operand": "0x70000001"
+              },
+              {
+                "il_offset": 93,
+                "opcode": "br.s",
+                "operand_kind": "branch",
+                "operand": "100"
+              },
+              {
+                "il_offset": 95,
+                "opcode": "ldstr",
+                "operand_kind": "string",
+                "operand": "0x70000019"
+              },
+              {
+                "il_offset": 101,
+                "opcode": "ldstr",
+                "operand_kind": "string",
+                "operand": "0x70000033"
+              },
+              {
+                "il_offset": 107,
+                "opcode": "ldstr",
+                "operand_kind": "string",
+                "operand": "0x7000005b"
+              },
+              {
+                "il_offset": 112,
+                "opcode": "call",
+                "operand_kind": "method",
+                "operand": "0x0a000016"
+              },
+              {
+                "il_offset": 117,
+                "opcode": "call",
+                "operand_kind": "method",
+                "operand": "0x0a000012"
+              },
+              {
+                "il_offset": 122,
+                "opcode": "call",
+                "operand_kind": "method",
+                "operand": "0x0a000017"
+              },
+              {
+                "il_offset": 127,
+                "opcode": "ldstr",
+                "operand_kind": "string",
+                "operand": "0x7000005f"
+              },
+              {
+                "il_offset": 132,
+                "opcode": "call",
+                "operand_kind": "method",
+                "operand": "0x0a000012"
+              },
+              {
+                "il_offset": 137,
+                "opcode": "call",
+                "operand_kind": "method",
+                "operand": "0x0a000018"
+              }
+            ],
+            "exception_regions": [],
+            "issue": null
+          }
+        },
+        {
+          "token": "0x06000002",
+          "row_offset": 1762,
+          "declaring_type_token": "0x02000002",
+          "declaring_type": "TaleWorlds.TwoDimension.SpriteSheetGenerator.Program",
+          "name": "GetProgramParameters",
+          "rva": 8420,
+          "impl_flags": 0,
+          "flags": 145,
+          "signature": {
+            "raw_length": 6,
+            "raw_sha256": "c3249876e0702b9ae9fc87e7a7ae251bb5564fcf7e609aa3ef17bde6490e7d42",
+            "kind": "method",
+            "parse_status": "decoded",
+            "calling_convention": "default",
+            "generic_parameter_count": null,
+            "parameter_count": 1,
+            "return_type": "valuetype:69",
+            "parameter_types": [
+              "string[]"
+            ],
+            "field_type": null,
+            "issue": null
+          },
+          "body": {
+            "status": "present",
+            "header_format": "fat",
+            "rva": 8420,
+            "file_offset": 740,
+            "max_stack": 5,
+            "init_locals": true,
+            "local_var_sig_token": "0x11000002",
+            "il_size": 246,
+            "il_sha256": "a61a1395c97b80f80aea82f57a3f1d51df035d5aee09e6e620d3a9770257a1a2",
+            "normalized_il_sha256": "95f8c2fd04c204187d4318b5785d79cab127a8e9548c0242bb25bbdaf0019142",
+            "instruction_count": 97,
+            "decoded_instruction_count": 97,
+            "truncated_instructions": 0,
+            "opcode_counts": {
+              "ldloca.s": 8,
+              "call": 10,
+              "ldstr": 6,
+              "stfld": 6,
+              "ldc.i4.0": 4,
+              "ldc.i4.1": 6,
+              "ldarg.0": 1,
+              "stloc.1": 1,
+              "stloc.2": 2,
+              "br": 1,
+              "ldloc.1": 2,
+              "ldloc.2": 3,
+              "ldelem.ref": 3,
+              "stloc.3": 1,
+              "ldloc.3": 2,
+              "callvirt": 2,
+              "brfalse": 1,
+              "newarr": 1,
+              "dup": 1,
+              "ldc.i4.s": 1,
+              "stelem.i2": 1,
+              "stloc.s": 3,
+              "ldloc.s": 12,
+              "ldlen": 2,
+              "conv.i4": 2,
+              "ldc.i4.2": 1,
+              "bne.un": 1,
+              "brtrue.s": 3,
+              "br.s": 4,
+              "brfalse.s": 2,
+              "add": 1,
+              "blt": 1,
+              "ldloc.0": 1,
+              "ret": 1
+            },
+            "anchors": [
+              {
+                "il_offset": 0,
+                "opcode": "ldloca.s",
+                "operand_kind": "variable",
+                "operand": "0"
+              },
+              {
+                "il_offset": 2,
+                "opcode": "call",
+                "operand_kind": "method",
+                "operand": "0x0a000019"
+              },
+              {
+                "il_offset": 7,
+                "opcode": "ldstr",
+                "operand_kind": "string",
+                "operand": "0x7000008d"
+              },
+              {
+                "il_offset": 12,
+                "opcode": "call",
+                "operand_kind": "method",
+                "operand": "0x0a00001a"
+              },
+              {
+                "il_offset": 17,
+                "opcode": "call",
+                "operand_kind": "method",
+                "operand": "0x0a00001b"
+              },
+              {
+                "il_offset": 22,
+                "opcode": "stfld",
+                "operand_kind": "field",
+                "operand": "0x0a00001c"
+              },
+              {
+                "il_offset": 27,
+                "opcode": "ldloca.s",
+                "operand_kind": "variable",
+                "operand": "0"
+              },
+              {
+                "il_offset": 30,
+                "opcode": "stfld",
+                "operand_kind": "field",
+                "operand": "0x0a00001d"
+              },
+              {
+                "il_offset": 35,
+                "opcode": "ldloca.s",
+                "operand_kind": "variable",
+                "operand": "0"
+              },
+              {
+                "il_offset": 38,
+                "opcode": "stfld",
+                "operand_kind": "field",
+                "operand": "0x0a00001e"
+              },
+              {
+                "il_offset": 47,
+                "opcode": "br",
+                "operand_kind": "branch",
+                "operand": "235"
+              },
+              {
+                "il_offset": 57,
+                "opcode": "ldstr",
+                "operand_kind": "string",
+                "operand": "0x700000ad"
+              },
+              {
+                "il_offset": 62,
+                "opcode": "callvirt",
+                "operand_kind": "method",
+                "operand": "0x0a00001f"
+              },
+              {
+                "il_offset": 67,
+                "opcode": "brfalse",
+                "operand_kind": "branch",
+                "operand": "231"
+              },
+              {
+                "il_offset": 74,
+                "opcode": "newarr",
+                "operand_kind": "type",
+                "operand": "0x0100001f"
+              },
+              {
+                "il_offset": 81,
+                "opcode": "ldc.i4.s",
+                "operand_kind": "constant",
+                "operand": "61"
+              },
+              {
+                "il_offset": 84,
+                "opcode": "callvirt",
+                "operand_kind": "method",
+                "operand": "0x0a000020"
+              },
+              {
+                "il_offset": 89,
+                "opcode": "stloc.s",
+                "operand_kind": "variable",
+                "operand": "4"
+              },
+              {
+                "il_offset": 91,
+                "opcode": "ldloc.s",
+                "operand_kind": "variable",
+                "operand": "4"
+              },
+              {
+                "il_offset": 96,
+                "opcode": "bne.un",
+                "operand_kind": "branch",
+                "operand": "231"
+              },
+              {
+                "il_offset": 101,
+                "opcode": "ldloc.s",
+                "operand_kind": "variable",
+                "operand": "4"
+              },
+              {
+                "il_offset": 105,
+                "opcode": "stloc.s",
+                "operand_kind": "variable",
+                "operand": "5"
+              },
+              {
+                "il_offset": 107,
+                "opcode": "ldloc.s",
+                "operand_kind": "variable",
+                "operand": "4"
+              },
+              {
+                "il_offset": 111,
+                "opcode": "stloc.s",
+                "operand_kind": "variable",
+                "operand": "6"
+              },
+              {
+                "il_offset": 113,
+                "opcode": "ldloc.s",
+                "operand_kind": "variable",
+                "operand": "5"
+              },
+              {
+                "il_offset": 115,
+                "opcode": "ldstr",
+                "operand_kind": "string",
+                "operand": "0x700000b1"
+              },
+              {
+                "il_offset": 120,
+                "opcode": "call",
+                "operand_kind": "method",
+                "operand": "0x0a000021"
+              },
+              {
+                "il_offset": 125,
+                "opcode": "brtrue.s",
+                "operand_kind": "branch",
+                "operand": "157"
+              },
+              {
+                "il_offset": 127,
+                "opcode": "ldloc.s",
+                "operand_kind": "variable",
+                "operand": "5"
+              },
+              {
+                "il_offset": 129,
+                "opcode": "ldstr",
+                "operand_kind": "string",
+                "operand": "0x700000d1"
+              },
+              {
+                "il_offset": 134,
+                "opcode": "call",
+                "operand_kind": "method",
+                "operand": "0x0a000021"
+              },
+              {
+                "il_offset": 139,
+                "opcode": "brtrue.s",
+                "operand_kind": "branch",
+                "operand": "168"
+              },
+              {
+                "il_offset": 141,
+                "opcode": "ldloc.s",
+                "operand_kind": "variable",
+                "operand": "5"
+              },
+              {
+                "il_offset": 143,
+                "opcode": "ldstr",
+                "operand_kind": "string",
+                "operand": "0x700000e7"
+              },
+              {
+                "il_offset": 148,
+                "opcode": "call",
+                "operand_kind": "method",
+                "operand": "0x0a000021"
+              },
+              {
+                "il_offset": 153,
+                "opcode": "brtrue.s",
+                "operand_kind": "branch",
+                "operand": "191"
+              },
+              {
+                "il_offset": 155,
+                "opcode": "br.s",
+                "operand_kind": "branch",
+                "operand": "214"
+              },
+              {
+                "il_offset": 157,
+                "opcode": "ldloca.s",
+                "operand_kind": "variable",
+                "operand": "0"
+              },
+              {
+                "il_offset": 159,
+                "opcode": "ldloc.s",
+                "operand_kind": "variable",
+                "operand": "6"
+              },
+              {
+                "il_offset": 161,
+                "opcode": "stfld",
+                "operand_kind": "field",
+                "operand": "0x0a00001c"
+              },
+              {
+                "il_offset": 166,
+                "opcode": "br.s",
+                "operand_kind": "branch",
+                "operand": "231"
+              },
+              {
+                "il_offset": 168,
+                "opcode": "ldloc.s",
+                "operand_kind": "variable",
+                "operand": "6"
+              },
+              {
+                "il_offset": 171,
+                "opcode": "ldloca.s",
+                "operand_kind": "variable",
+                "operand": "7"
+              },
+              {
+                "il_offset": 173,
+                "opcode": "call",
+                "operand_kind": "method",
+                "operand": "0x2b000002"
+              },
+              {
+                "il_offset": 178,
+                "opcode": "brfalse.s",
+                "operand_kind": "branch",
+                "operand": "231"
+              },
+              {
+                "il_offset": 180,
+                "opcode": "ldloca.s",
+                "operand_kind": "variable",
+                "operand": "0"
+              },
+              {
+                "il_offset": 182,
+                "opcode": "ldloc.s",
+                "operand_kind": "variable",
+                "operand": "7"
+              },
+              {
+                "il_offset": 184,
+                "opcode": "stfld",
+                "operand_kind": "field",
+                "operand": "0x0a00001d"
+              },
+              {
+                "il_offset": 189,
+                "opcode": "br.s",
+                "operand_kind": "branch",
+                "operand": "231"
+              },
+              {
+                "il_offset": 191,
+                "opcode": "ldloc.s",
+                "operand_kind": "variable",
+                "operand": "6"
+              },
+              {
+                "il_offset": 194,
+                "opcode": "ldloca.s",
+                "operand_kind": "variable",
+                "operand": "8"
+              },
+              {
+                "il_offset": 196,
+                "opcode": "call",
+                "operand_kind": "method",
+                "operand": "0x2b000003"
+              },
+              {
+                "il_offset": 201,
+                "opcode": "brfalse.s",
+                "operand_kind": "branch",
+                "operand": "231"
+              },
+              {
+                "il_offset": 203,
+                "opcode": "ldloca.s",
+                "operand_kind": "variable",
+                "operand": "0"
+              },
+              {
+                "il_offset": 205,
+                "opcode": "ldloc.s",
+                "operand_kind": "variable",
+                "operand": "8"
+              },
+              {
+                "il_offset": 207,
+                "opcode": "stfld",
+                "operand_kind": "field",
+                "operand": "0x0a00001e"
+              },
+              {
+                "il_offset": 212,
+                "opcode": "br.s",
+                "operand_kind": "branch",
+                "operand": "231"
+              },
+              {
+                "il_offset": 214,
+                "opcode": "ldstr",
+                "operand_kind": "string",
+                "operand": "0x70000105"
+              },
+              {
+                "il_offset": 219,
+                "opcode": "ldloc.s",
+                "operand_kind": "variable",
+                "operand": "5"
+              },
+              {
+                "il_offset": 221,
+                "opcode": "call",
+                "operand_kind": "method",
+                "operand": "0x0a00001a"
+              },
+              {
+                "il_offset": 226,
+                "opcode": "call",
+                "operand_kind": "method",
+                "operand": "0x0a000012"
+              },
+              {
+                "il_offset": 239,
+                "opcode": "blt",
+                "operand_kind": "branch",
+                "operand": "52"
+              }
+            ],
+            "exception_regions": [],
+            "issue": null
+          }
+        },
+        {
+          "token": "0x06000003",
+          "row_offset": 1776,
+          "declaring_type_token": "0x02000002",
+          "declaring_type": "TaleWorlds.TwoDimension.SpriteSheetGenerator.Program",
+          "name": "GetHelpString",
+          "rva": 8680,
+          "impl_flags": 0,
+          "flags": 145,
+          "signature": {
+            "raw_length": 3,
+            "raw_sha256": "7654e92fcd606089e218382991601eea77b70226c9ee308320f38cd03c6297eb",
+            "kind": "method",
+            "parse_status": "decoded",
+            "calling_convention": "default",
+            "generic_parameter_count": null,
+            "parameter_count": 0,
+            "return_type": "string",
+            "parameter_types": [],
+            "field_type": null,
+            "issue": null
+          },
+          "body": {
+            "status": "present",
+            "header_format": "fat",
+            "rva": 8680,
+            "file_offset": 1000,
+            "max_stack": 5,
+            "init_locals": true,
+            "local_var_sig_token": null,
+            "il_size": 174,
+            "il_sha256": "68e00fb5526c6dab06c35dfd36e6870892323fbff7fcd00ac385fe50d32563e8",
+            "normalized_il_sha256": "cac4f8de54f7ba3b9e12b409463765ed703f78d4ef29ed47685d8501513a339c",
+            "instruction_count": 58,
+            "decoded_instruction_count": 58,
+            "truncated_instructions": 0,
+            "opcode_counts": {
+              "newobj": 1,
+              "dup": 14,
+              "ldstr": 10,
+              "call": 2,
+              "callvirt": 16,
+              "pop": 14,
+              "ret": 1
+            },
+            "anchors": [
+              {
+                "il_offset": 0,
+                "opcode": "newobj",
+                "operand_kind": "method",
+                "operand": "0x0a000023"
+              },
+              {
+                "il_offset": 6,
+                "opcode": "ldstr",
+                "operand_kind": "string",
+                "operand": "0x7000012d"
+              },
+              {
+                "il_offset": 11,
+                "opcode": "call",
+                "operand_kind": "method",
+                "operand": "0x0a000024"
+              },
+              {
+                "il_offset": 16,
+                "opcode": "callvirt",
+                "operand_kind": "method",
+                "operand": "0x0a000025"
+              },
+              {
+                "il_offset": 21,
+                "opcode": "ldstr",
+                "operand_kind": "string",
+                "operand": "0x7000013d"
+              },
+              {
+                "il_offset": 26,
+                "opcode": "call",
+                "operand_kind": "method",
+                "operand": "0x0a000016"
+              },
+              {
+                "il_offset": 31,
+                "opcode": "callvirt",
+                "operand_kind": "method",
+                "operand": "0x0a000026"
+              },
+              {
+                "il_offset": 38,
+                "opcode": "callvirt",
+                "operand_kind": "method",
+                "operand": "0x0a000027"
+              },
+              {
+                "il_offset": 45,
+                "opcode": "ldstr",
+                "operand_kind": "string",
+                "operand": "0x700001cc"
+              },
+              {
+                "il_offset": 50,
+                "opcode": "callvirt",
+                "operand_kind": "method",
+                "operand": "0x0a000026"
+              },
+              {
+                "il_offset": 57,
+                "opcode": "callvirt",
+                "operand_kind": "method",
+                "operand": "0x0a000027"
+              },
+              {
+                "il_offset": 64,
+                "opcode": "ldstr",
+                "operand_kind": "string",
+                "operand": "0x700002ad"
+              },
+              {
+                "il_offset": 69,
+                "opcode": "callvirt",
+                "operand_kind": "method",
+                "operand": "0x0a000026"
+              },
+              {
+                "il_offset": 76,
+                "opcode": "ldstr",
+                "operand_kind": "string",
+                "operand": "0x700002c5"
+              },
+              {
+                "il_offset": 81,
+                "opcode": "callvirt",
+                "operand_kind": "method",
+                "operand": "0x0a000026"
+              },
+              {
+                "il_offset": 88,
+                "opcode": "ldstr",
+                "operand_kind": "string",
+                "operand": "0x70000301"
+              },
+              {
+                "il_offset": 93,
+                "opcode": "callvirt",
+                "operand_kind": "method",
+                "operand": "0x0a000026"
+              },
+              {
+                "il_offset": 100,
+                "opcode": "callvirt",
+                "operand_kind": "method",
+                "operand": "0x0a000027"
+              },
+              {
+                "il_offset": 107,
+                "opcode": "ldstr",
+                "operand_kind": "string",
+                "operand": "0x700003ee"
+              },
+              {
+                "il_offset": 112,
+                "opcode": "callvirt",
+                "operand_kind": "method",
+                "operand": "0x0a000026"
+              },
+              {
+                "il_offset": 119,
+                "opcode": "ldstr",
+                "operand_kind": "string",
+                "operand": "0x70000456"
+              },
+              {
+                "il_offset": 124,
+                "opcode": "callvirt",
+                "operand_kind": "method",
+                "operand": "0x0a000026"
+              },
+              {
+                "il_offset": 131,
+                "opcode": "callvirt",
+                "operand_kind": "method",
+                "operand": "0x0a000027"
+              },
+              {
+                "il_offset": 138,
+                "opcode": "ldstr",
+                "operand_kind": "string",
+                "operand": "0x70000555"
+              },
+              {
+                "il_offset": 143,
+                "opcode": "callvirt",
+                "operand_kind": "method",
+                "operand": "0x0a000026"
+              },
+              {
+                "il_offset": 150,
+                "opcode": "ldstr",
+                "operand_kind": "string",
+                "operand": "0x70000597"
+              },
+              {
+                "il_offset": 155,
+                "opcode": "callvirt",
+                "operand_kind": "method",
+                "operand": "0x0a000026"
+              },
+              {
+                "il_offset": 162,
+                "opcode": "callvirt",
+                "operand_kind": "method",
+                "operand": "0x0a000027"
+              },
+              {
+                "il_offset": 168,
+                "opcode": "callvirt",
+                "operand_kind": "method",
+                "operand": "0x0a000028"
+              }
+            ],
+            "exception_regions": [],
+            "issue": null
+          }
+        }
+      ],
+      "call_edges": [
+        {
+          "caller_token": "0x06000001",
+          "caller": "TaleWorlds.TwoDimension.SpriteSheetGenerator.Program.Main",
+          "opcode": "ldftn",
+          "target_token": "0x06000008",
+          "target_kind": "method-def",
+          "target_name": "<Main>b__4_0",
+          "target_declaring_type": "<>c"
+        },
+        {
+          "caller_token": "0x06000001",
+          "caller": "TaleWorlds.TwoDimension.SpriteSheetGenerator.Program.Main",
+          "opcode": "newobj",
+          "target_token": "0x0a000010",
+          "target_kind": "member-ref",
+          "target_name": ".ctor",
+          "target_declaring_type": "System.Func`2"
+        },
+        {
+          "caller_token": "0x06000001",
+          "caller": "TaleWorlds.TwoDimension.SpriteSheetGenerator.Program.Main",
+          "opcode": "call",
+          "target_token": "0x2b000001",
+          "target_kind": "method-spec",
+          "target_name": "Any",
+          "target_declaring_type": "System.Linq.Enumerable"
+        },
+        {
+          "caller_token": "0x06000001",
+          "caller": "TaleWorlds.TwoDimension.SpriteSheetGenerator.Program.Main",
+          "opcode": "call",
+          "target_token": "0x06000003",
+          "target_kind": "method-def",
+          "target_name": "GetHelpString",
+          "target_declaring_type": "TaleWorlds.TwoDimension.SpriteSheetGenerator.Program"
+        },
+        {
+          "caller_token": "0x06000001",
+          "caller": "TaleWorlds.TwoDimension.SpriteSheetGenerator.Program.Main",
+          "opcode": "call",
+          "target_token": "0x0a000012",
+          "target_kind": "member-ref",
+          "target_name": "WriteLine",
+          "target_declaring_type": "System.Console"
+        },
+        {
+          "caller_token": "0x06000001",
+          "caller": "TaleWorlds.TwoDimension.SpriteSheetGenerator.Program.Main",
+          "opcode": "call",
+          "target_token": "0x06000002",
+          "target_kind": "method-def",
+          "target_name": "GetProgramParameters",
+          "target_declaring_type": "TaleWorlds.TwoDimension.SpriteSheetGenerator.Program"
+        },
+        {
+          "caller_token": "0x06000001",
+          "caller": "TaleWorlds.TwoDimension.SpriteSheetGenerator.Program.Main",
+          "opcode": "call",
+          "target_token": "0x0a000013",
+          "target_kind": "member-ref",
+          "target_name": "WriteLine",
+          "target_declaring_type": "System.Console"
+        },
+        {
+          "caller_token": "0x06000001",
+          "caller": "TaleWorlds.TwoDimension.SpriteSheetGenerator.Program.Main",
+          "opcode": "call",
+          "target_token": "0x0a000014",
+          "target_kind": "member-ref",
+          "target_name": "Start",
+          "target_declaring_type": "TaleWorlds.TwoDimension.SpriteSheetGenerator.Library.SpriteEditorDomain"
+        },
+        {
+          "caller_token": "0x06000001",
+          "caller": "TaleWorlds.TwoDimension.SpriteSheetGenerator.Program.Main",
+          "opcode": "call",
+          "target_token": "0x0a000015",
+          "target_kind": "member-ref",
+          "target_name": "set_ForegroundColor",
+          "target_declaring_type": "System.Console"
+        },
+        {
+          "caller_token": "0x06000001",
+          "caller": "TaleWorlds.TwoDimension.SpriteSheetGenerator.Program.Main",
+          "opcode": "call",
+          "target_token": "0x0a000016",
+          "target_kind": "member-ref",
+          "target_name": "Concat",
+          "target_declaring_type": "System.String"
+        },
+        {
+          "caller_token": "0x06000001",
+          "caller": "TaleWorlds.TwoDimension.SpriteSheetGenerator.Program.Main",
+          "opcode": "call",
+          "target_token": "0x0a000012",
+          "target_kind": "member-ref",
+          "target_name": "WriteLine",
+          "target_declaring_type": "System.Console"
+        },
+        {
+          "caller_token": "0x06000001",
+          "caller": "TaleWorlds.TwoDimension.SpriteSheetGenerator.Program.Main",
+          "opcode": "call",
+          "target_token": "0x0a000017",
+          "target_kind": "member-ref",
+          "target_name": "ResetColor",
+          "target_declaring_type": "System.Console"
+        },
+        {
+          "caller_token": "0x06000001",
+          "caller": "TaleWorlds.TwoDimension.SpriteSheetGenerator.Program.Main",
+          "opcode": "call",
+          "target_token": "0x0a000012",
+          "target_kind": "member-ref",
+          "target_name": "WriteLine",
+          "target_declaring_type": "System.Console"
+        },
+        {
+          "caller_token": "0x06000001",
+          "caller": "TaleWorlds.TwoDimension.SpriteSheetGenerator.Program.Main",
+          "opcode": "call",
+          "target_token": "0x0a000018",
+          "target_kind": "member-ref",
+          "target_name": "ReadKey",
+          "target_declaring_type": "System.Console"
+        },
+        {
+          "caller_token": "0x06000002",
+          "caller": "TaleWorlds.TwoDimension.SpriteSheetGenerator.Program.GetProgramParameters",
+          "opcode": "call",
+          "target_token": "0x0a000019",
+          "target_kind": "member-ref",
+          "target_name": "GetCurrentDirectory",
+          "target_declaring_type": "System.IO.Directory"
+        },
+        {
+          "caller_token": "0x06000002",
+          "caller": "TaleWorlds.TwoDimension.SpriteSheetGenerator.Program.GetProgramParameters",
+          "opcode": "call",
+          "target_token": "0x0a00001a",
+          "target_kind": "member-ref",
+          "target_name": "Concat",
+          "target_declaring_type": "System.String"
+        },
+        {
+          "caller_token": "0x06000002",
+          "caller": "TaleWorlds.TwoDimension.SpriteSheetGenerator.Program.GetProgramParameters",
+          "opcode": "call",
+          "target_token": "0x0a00001b",
+          "target_kind": "member-ref",
+          "target_name": "GetFullPath",
+          "target_declaring_type": "System.IO.Path"
+        },
+        {
+          "caller_token": "0x06000002",
+          "caller": "TaleWorlds.TwoDimension.SpriteSheetGenerator.Program.GetProgramParameters",
+          "opcode": "callvirt",
+          "target_token": "0x0a00001f",
+          "target_kind": "member-ref",
+          "target_name": "Contains",
+          "target_declaring_type": "System.String"
+        },
+        {
+          "caller_token": "0x06000002",
+          "caller": "TaleWorlds.TwoDimension.SpriteSheetGenerator.Program.GetProgramParameters",
+          "opcode": "callvirt",
+          "target_token": "0x0a000020",
+          "target_kind": "member-ref",
+          "target_name": "Split",
+          "target_declaring_type": "System.String"
+        },
+        {
+          "caller_token": "0x06000002",
+          "caller": "TaleWorlds.TwoDimension.SpriteSheetGenerator.Program.GetProgramParameters",
+          "opcode": "call",
+          "target_token": "0x0a000021",
+          "target_kind": "member-ref",
+          "target_name": "op_Equality",
+          "target_declaring_type": "System.String"
+        },
+        {
+          "caller_token": "0x06000002",
+          "caller": "TaleWorlds.TwoDimension.SpriteSheetGenerator.Program.GetProgramParameters",
+          "opcode": "call",
+          "target_token": "0x0a000021",
+          "target_kind": "member-ref",
+          "target_name": "op_Equality",
+          "target_declaring_type": "System.String"
+        },
+        {
+          "caller_token": "0x06000002",
+          "caller": "TaleWorlds.TwoDimension.SpriteSheetGenerator.Program.GetProgramParameters",
+          "opcode": "call",
+          "target_token": "0x0a000021",
+          "target_kind": "member-ref",
+          "target_name": "op_Equality",
+          "target_declaring_type": "System.String"
+        },
+        {
+          "caller_token": "0x06000002",
+          "caller": "TaleWorlds.TwoDimension.SpriteSheetGenerator.Program.GetProgramParameters",
+          "opcode": "call",
+          "target_token": "0x2b000002",
+          "target_kind": "method-spec",
+          "target_name": "TryParse",
+          "target_declaring_type": "System.Enum"
+        },
+        {
+          "caller_token": "0x06000002",
+          "caller": "TaleWorlds.TwoDimension.SpriteSheetGenerator.Program.GetProgramParameters",
+          "opcode": "call",
+          "target_token": "0x2b000003",
+          "target_kind": "method-spec",
+          "target_name": "TryParse",
+          "target_declaring_type": "System.Enum"
+        },
+        {
+          "caller_token": "0x06000002",
+          "caller": "TaleWorlds.TwoDimension.SpriteSheetGenerator.Program.GetProgramParameters",
+          "opcode": "call",
+          "target_token": "0x0a00001a",
+          "target_kind": "member-ref",
+          "target_name": "Concat",
+          "target_declaring_type": "System.String"
+        },
+        {
+          "caller_token": "0x06000002",
+          "caller": "TaleWorlds.TwoDimension.SpriteSheetGenerator.Program.GetProgramParameters",
+          "opcode": "call",
+          "target_token": "0x0a000012",
+          "target_kind": "member-ref",
+          "target_name": "WriteLine",
+          "target_declaring_type": "System.Console"
+        }
+      ],
+      "user_strings": {
+        "state": "complete",
+        "literals": [
+          {
+            "token": "0x70000001",
+            "offset": 3765,
+            "value": "with errors"
+          },
+          {
+            "token": "0x70000019",
+            "offset": 3789,
+            "value": "successfully"
+          },
+          {
+            "token": "0x70000033",
+            "offset": 3815,
+            "value": "Generator finished "
+          },
+          {
+            "token": "0x7000005b",
+            "offset": 3855,
+            "value": "."
+          },
+          {
+            "token": "0x7000005f",
+            "offset": 3859,
+            "value": "Press any key to exit."
+          },
+          {
+            "token": "0x7000008d",
+            "offset": 3905,
+            "value": "\\..\\..\\Modules\\"
+          },
+          {
+            "token": "0x700000ad",
+            "offset": 3937,
+            "value": "="
+          },
+          {
+            "token": "0x700000b1",
+            "offset": 3941,
+            "value": "SourceDirectory"
+          },
+          {
+            "token": "0x700000d1",
+            "offset": 3973,
+            "value": "OutputType"
+          },
+          {
+            "token": "0x700000e7",
+            "offset": 3995,
+            "value": "CollectionType"
+          },
+          {
+            "token": "0x70000105",
+            "offset": 4025,
+            "value": "Unknown parameter: "
+          },
+          {
+            "token": "0x7000012d",
+            "offset": 4065,
+            "value": "Usage: "
+          },
+          {
+            "token": "0x7000013d",
+            "offset": 4081,
+            "value": " PARAMETER_NAME1=PARAMETER_VALUE1 PARAMETER_NAME2=PARAMETER_VALUE2 ..."
+          },
+          {
+            "token": "0x700001cc",
+            "offset": 4224,
+            "value": "If no parameters are given, this program will generate sprite sheets for all modules under your Modules folder."
+          },
+          {
+            "token": "0x700002ad",
+            "offset": 4449,
+            "value": "Parameters:"
+          },
+          {
+            "token": "0x700002c5",
+            "offset": 4473,
+            "value": "SourceDirectory=[Source Path]"
+          },
+          {
+            "token": "0x70000301",
+            "offset": 4533,
+            "value": "\tIt can be the path of Modules folder OR it can be path of a single module (i.e. Launcher). This has to be full path."
+          },
+          {
+            "token": "0x700003ee",
+            "offset": 4770,
+            "value": "CollectionType=[SingleModule / AllAvailableModules]"
+          },
+          {
+            "token": "0x70000456",
+            "offset": 4874,
+            "value": "\tSingle Module is used for standalone projects like launcher. AllAvailableModules is used for general sprite sheet generation."
+          },
+          {
+            "token": "0x70000555",
+            "offset": 5129,
+            "value": "OutputType=[Engine / Standalone]"
+          },
+          {
+            "token": "0x70000597",
+            "offset": 5195,
+            "value": "\tOutput directory modifier. For Mount & Blade II: Bannerlord, Engine is used. For launcher, Standalone is used."
+          },
+          {
+            "token": "0x70000678",
+            "offset": 5420,
+            "value": "help"
+          },
+          {
+            "token": "0x70000682",
+            "offset": 5430,
+            "value": "-help"
+          },
+          {
+            "token": "0x7000068e",
+            "offset": 5442,
+            "value": "-h"
+          }
+        ],
+        "issues": []
+      },
+      "limitations": [
+        "Metadata tokens are build-local coordinates and are only meaningful with the reported artifact SHA-256 and MVID.",
+        "CIL instruction anchors are decoded from file-backed method bodies only; no target assembly is loaded or executed.",
+        "Exported types are reported from ExportedType rows as declared; forwarded types are not resolved in their implementing assemblies.",
+        "User strings are the #US literals loaded by ldstr in the inspected method bodies, with their own coverage; instruction anchors and normalized CIL digests keep their build-local tokens.",
+        "Member signatures decode ECMA-335 primitive, class, valuetype, generic instantiation, generic variable, pointer, byref, single-dimension and general array, function pointer, custom modifier, and typed reference forms; class and valuetype operands keep their encoded TypeDefOrRefOrSpec values, and unsupported forms such as vararg sentinels retain raw signature hashes."
+      ]
+    },
+    "library": {
+      "evidence_id": "ev_bf8ba26d303770978ada28000702eba48e5d0f49212f3a0b2a9e8e713dad1e98",
+      "identity": {
+        "token_identity": "build-local",
+        "requires_artifact_sha256": "ddba0ee90f89b5258edca316d8b9341ecbc4b5ef5498dac4dd6b4d1f07c2f0a9",
+        "requires_mvid": "54c59e6a-2c53-41e4-b200-539fce3b8035"
+      },
+      "coverage": {
+        "state": "complete",
+        "issues": []
+      },
+      "method_count": 110,
+      "methods": [
+        {
+          "token": "0x06000012",
+          "declaring_type": "TaleWorlds.TwoDimension.SpriteSheetGenerator.Library.SpriteDataEditor",
+          "name": "GenerateNineRegionSpriteFromSpritePart",
+          "flags": 134,
+          "signature": {
+            "raw_length": 7,
+            "raw_sha256": "465d1d7abb4669174f9425a5384e694fb217d5bdb8e2692bdd3d5f5debb249eb",
+            "kind": "method",
+            "parse_status": "decoded",
+            "calling_convention": "default has-this",
+            "generic_parameter_count": null,
+            "parameter_count": 2,
+            "return_type": "void",
+            "parameter_types": [
+              "class:93",
+              "class:8"
+            ],
+            "field_type": null,
+            "issue": null
+          },
+          "body": {
+            "status": "present",
+            "file_offset": 1044,
+            "il_size": 81,
+            "il_sha256": "2cfd553077e696a2891d304f12b6914d9a94d87a1f9a0d01ab685169763ede39",
+            "normalized_il_sha256": "5134170874c1793237c1fee079283029ae9abd219cbf1e58db6d726703e5b176",
+            "instruction_count": 32,
+            "decoded_instruction_count": 32,
+            "truncated_instructions": 0
+          }
+        },
+        {
+          "token": "0x06000013",
+          "declaring_type": "TaleWorlds.TwoDimension.SpriteSheetGenerator.Library.SpriteDataEditor",
+          "name": "GenerateSpriteFromSpritePart",
+          "flags": 134,
+          "signature": {
+            "raw_length": 5,
+            "raw_sha256": "6a903e40d297d305e8646e0806fdd333066005e24b9908858f813e9790fad00a",
+            "kind": "method",
+            "parse_status": "decoded",
+            "calling_convention": "default has-this",
+            "generic_parameter_count": null,
+            "parameter_count": 1,
+            "return_type": "void",
+            "parameter_types": [
+              "class:93"
+            ],
+            "field_type": null,
+            "issue": null
+          },
+          "body": {
+            "status": "present",
+            "file_offset": 1140,
+            "il_size": 42,
+            "il_sha256": "54431f4af45d4ec3f5cc5e1ff10f589ee473fc83329f0d919a1271b31862416f",
+            "normalized_il_sha256": "35004969d5943931d52c57c86ed662ecf4bcad95b5b5c87d88cdbed8ce66e419",
+            "instruction_count": 14,
+            "decoded_instruction_count": 14,
+            "truncated_instructions": 0
+          }
+        },
+        {
+          "token": "0x06000015",
+          "declaring_type": "TaleWorlds.TwoDimension.SpriteSheetGenerator.Library.SpriteDataEditor",
+          "name": "CalculateSpriteSheets",
+          "flags": 134,
+          "signature": {
+            "raw_length": 10,
+            "raw_sha256": "abf849c99e0e5bfceff6f7cb1f5260a72e6f7db75bbaa6ca3b1f55118967067c",
+            "kind": "method",
+            "parse_status": "decoded",
+            "calling_convention": "default has-this",
+            "generic_parameter_count": null,
+            "parameter_count": 1,
+            "return_type": "void",
+            "parameter_types": [
+              "class:105<string,class:16>"
+            ],
+            "field_type": null,
+            "issue": null
+          },
+          "body": {
+            "status": "present",
+            "file_offset": 1216,
+            "il_size": 340,
+            "il_sha256": "859121f042b07ca1fd87ac6e98550f15e8e6a955f1df618575663dc7e32ddf0a",
+            "normalized_il_sha256": "7a4c933ead35089b15d492fa36a82d11e74073a1498938d1adb1f6f513bf77be",
+            "instruction_count": 121,
+            "decoded_instruction_count": 121,
+            "truncated_instructions": 0
+          }
+        },
+        {
+          "token": "0x06000019",
+          "declaring_type": "TaleWorlds.TwoDimension.SpriteSheetGenerator.Library.SpriteDataEditor",
+          "name": "SaveSpriteSheetData",
+          "flags": 134,
+          "signature": {
+            "raw_length": 10,
+            "raw_sha256": "abf849c99e0e5bfceff6f7cb1f5260a72e6f7db75bbaa6ca3b1f55118967067c",
+            "kind": "method",
+            "parse_status": "decoded",
+            "calling_convention": "default has-this",
+            "generic_parameter_count": null,
+            "parameter_count": 1,
+            "return_type": "void",
+            "parameter_types": [
+              "class:105<string,class:16>"
+            ],
+            "field_type": null,
+            "issue": null
+          },
+          "body": {
+            "status": "present",
+            "file_offset": 2664,
+            "il_size": 8,
+            "il_sha256": "794a6582fdcf96826105d71d5b31e277b2dbebf26ea27bdd14762784e3906621",
+            "normalized_il_sha256": "de3d996a41fa266dcb71c6c686722672f87f595a4c7242736461927d13fec484",
+            "instruction_count": 4,
+            "decoded_instruction_count": 4,
+            "truncated_instructions": 0
+          }
+        },
+        {
+          "token": "0x0600001a",
+          "declaring_type": "TaleWorlds.TwoDimension.SpriteSheetGenerator.Library.SpriteDataEditor",
+          "name": "SaveSpriteSheetDataAsXml",
+          "flags": 129,
+          "signature": {
+            "raw_length": 10,
+            "raw_sha256": "abf849c99e0e5bfceff6f7cb1f5260a72e6f7db75bbaa6ca3b1f55118967067c",
+            "kind": "method",
+            "parse_status": "decoded",
+            "calling_convention": "default has-this",
+            "generic_parameter_count": null,
+            "parameter_count": 1,
+            "return_type": "void",
+            "parameter_types": [
+              "class:105<string,class:16>"
+            ],
+            "field_type": null,
+            "issue": null
+          },
+          "body": {
+            "status": "present",
+            "file_offset": 2676,
+            "il_size": 1523,
+            "il_sha256": "faa4985f5cb54775663563985d31a33fbcab3790023f3fb0795727d44f5267b7",
+            "normalized_il_sha256": "20a34c893bdd577613425b1343ce583742b345100711ce2fd6ca997e44f3d0ec",
+            "instruction_count": 487,
+            "decoded_instruction_count": 487,
+            "truncated_instructions": 0
+          }
+        },
+        {
+          "token": "0x0600001b",
+          "declaring_type": "TaleWorlds.TwoDimension.SpriteSheetGenerator.Library.SpriteDataEditor",
+          "name": "EmptyDirectory",
+          "flags": 150,
+          "signature": {
+            "raw_length": 6,
+            "raw_sha256": "b3f868e625ff6a4ae9260031b962dd58969992fc18660c3d4982556263185f7a",
+            "kind": "method",
+            "parse_status": "decoded",
+            "calling_convention": "default",
+            "generic_parameter_count": null,
+            "parameter_count": 1,
+            "return_type": "void",
+            "parameter_types": [
+              "class:133"
+            ],
+            "field_type": null,
+            "issue": null
+          },
+          "body": {
+            "status": "present",
+            "file_offset": 4288,
+            "il_size": 60,
+            "il_sha256": "01576bf1fea15e311eee62053851073b7f26761c859b9279a301e8ff75515845",
+            "normalized_il_sha256": "2e825b99beb971e1bf7dc243244c72953b68dd6ad181cc3d3b73ca071ae5001c",
+            "instruction_count": 40,
+            "decoded_instruction_count": 40,
+            "truncated_instructions": 0
+          }
+        },
+        {
+          "token": "0x0600001c",
+          "declaring_type": "TaleWorlds.TwoDimension.SpriteSheetGenerator.Library.SpriteDataEditor",
+          "name": "SaveSpriteSheets",
+          "flags": 134,
+          "signature": {
+            "raw_length": 3,
+            "raw_sha256": "0c9373898d2dd1c85902837a9e979cb88484e2548a008ad2b2176cc7119d09df",
+            "kind": "method",
+            "parse_status": "decoded",
+            "calling_convention": "default has-this",
+            "generic_parameter_count": null,
+            "parameter_count": 0,
+            "return_type": "void",
+            "parameter_types": [],
+            "field_type": null,
+            "issue": null
+          },
+          "body": {
+            "status": "present",
+            "file_offset": 4360,
+            "il_size": 347,
+            "il_sha256": "8bbbdc46042814cf6ac5f3624e139394e2f54d0b4a9b6a492c7d861423f3e901",
+            "normalized_il_sha256": "e23f701d94c68b395f2db0ac51332ae553e81b3790195babe2a6e37d04296359",
+            "instruction_count": 109,
+            "decoded_instruction_count": 109,
+            "truncated_instructions": 0
+          }
+        },
+        {
+          "token": "0x06000031",
+          "declaring_type": "TaleWorlds.TwoDimension.SpriteSheetGenerator.Library.SpriteEditorDomain",
+          "name": "Tick",
+          "flags": 134,
+          "signature": {
+            "raw_length": 3,
+            "raw_sha256": "59a9a8765c535212b9ad71c5c8e1e24ffadbd3331fd04b3bbe1b121ecf6004cc",
+            "kind": "method",
+            "parse_status": "decoded",
+            "calling_convention": "default has-this",
+            "generic_parameter_count": null,
+            "parameter_count": 0,
+            "return_type": "bool",
+            "parameter_types": [],
+            "field_type": null,
+            "issue": null
+          },
+          "body": {
+            "status": "present",
+            "file_offset": 5616,
+            "il_size": 490,
+            "il_sha256": "6750350d92f3bd12ddfa64054b2c10357a656783e91c954bcb8eb97d1d4f4b61",
+            "normalized_il_sha256": "5b13f6596c298c64951179d6117e6e0d3436b4bd4efc5767dc5b9609bb776457",
+            "instruction_count": 178,
+            "decoded_instruction_count": 178,
+            "truncated_instructions": 0
+          }
+        },
+        {
+          "token": "0x0600003a",
+          "declaring_type": "TaleWorlds.TwoDimension.SpriteSheetGenerator.Library.SpriteEditorDomain",
+          "name": "Start",
+          "flags": 150,
+          "signature": {
+            "raw_length": 5,
+            "raw_sha256": "3626cac7f38a9da8b52c4301e110f8b1f936c2b6c088b7ec2992c6704717abb0",
+            "kind": "method",
+            "parse_status": "decoded",
+            "calling_convention": "default",
+            "generic_parameter_count": null,
+            "parameter_count": 1,
+            "return_type": "bool",
+            "parameter_types": [
+              "valuetype:32"
+            ],
+            "field_type": null,
+            "issue": null
+          },
+          "body": {
+            "status": "present",
+            "file_offset": 6964,
+            "il_size": 95,
+            "il_sha256": "4f723a2e6ed889984a68f222f30580c9f5a8def4e941badba49c7c1b4f22f2eb",
+            "normalized_il_sha256": "03a5dae02e41ab00a448ef4ef546acba44957d0ccf9db10aec7eef61998ee447",
+            "instruction_count": 30,
+            "decoded_instruction_count": 30,
+            "truncated_instructions": 0
+          }
+        },
+        {
+          "token": "0x06000046",
+          "declaring_type": "TaleWorlds.TwoDimension.SpriteSheetGenerator.Library.SpriteSheet",
+          "name": "SaveSheet",
+          "flags": 134,
+          "signature": {
+            "raw_length": 3,
+            "raw_sha256": "0c9373898d2dd1c85902837a9e979cb88484e2548a008ad2b2176cc7119d09df",
+            "kind": "method",
+            "parse_status": "decoded",
+            "calling_convention": "default has-this",
+            "generic_parameter_count": null,
+            "parameter_count": 0,
+            "return_type": "void",
+            "parameter_types": [],
+            "field_type": null,
+            "issue": null
+          },
+          "body": {
+            "status": "present",
+            "file_offset": 9132,
+            "il_size": 131,
+            "il_sha256": "4e57cc71cb2191c966ad390f5e28beddde28c28096f9016215163e030ce8c4b5",
+            "normalized_il_sha256": "2737fe1cca438a82d29c83d98d56279b9a62c4f4514aa3e1d9b4e429db13c63d",
+            "instruction_count": 57,
+            "decoded_instruction_count": 57,
+            "truncated_instructions": 0
+          }
+        },
+        {
+          "token": "0x0600006e",
+          "declaring_type": "<>c__DisplayClass23_0",
+          "name": "<Start>b__0",
+          "flags": 131,
+          "signature": {
+            "raw_length": 5,
+            "raw_sha256": "b8f2f531aa5a002bd4f03f64a8784890b813b6fc461576872a98958629b8e249",
+            "kind": "method",
+            "parse_status": "decoded",
+            "calling_convention": "default has-this",
+            "generic_parameter_count": null,
+            "parameter_count": 2,
+            "return_type": "void",
+            "parameter_types": [
+              "i4",
+              "i4"
+            ],
+            "field_type": null,
+            "issue": null
+          },
+          "body": {
+            "status": "present",
+            "file_offset": 10776,
+            "il_size": 50,
+            "il_sha256": "721f780e8067d7a78fb6e5afea277d4303b3772731c6cd7c97980a6d2c481178",
+            "normalized_il_sha256": "d5b1b18435225bfc6f0e8af191491aa3a0ad34d44ef1cddc551815d558a35c8b",
+            "instruction_count": 26,
+            "decoded_instruction_count": 26,
+            "truncated_instructions": 0
+          }
+        }
+      ],
+      "config_fields": [
+        {
+          "token": "0x04000020",
+          "row_offset": 11942,
+          "declaring_type_token": "0x02000008",
+          "declaring_type": "TaleWorlds.TwoDimension.SpriteSheetGenerator.Library.SpriteEditorDomainConfiguration",
+          "name": "SourceDirectoryPath",
+          "flags": 6,
+          "signature": {
+            "raw_length": 2,
+            "raw_sha256": "89c0c2d74467289c8bf954f4cde47f4f794bcf8e6ee65e19cd0b275e47aca3ec",
+            "kind": "field",
+            "parse_status": "decoded",
+            "calling_convention": "field",
+            "generic_parameter_count": null,
+            "parameter_count": null,
+            "return_type": null,
+            "parameter_types": [],
+            "field_type": "string",
+            "issue": null
+          }
+        },
+        {
+          "token": "0x04000021",
+          "row_offset": 11948,
+          "declaring_type_token": "0x02000008",
+          "declaring_type": "TaleWorlds.TwoDimension.SpriteSheetGenerator.Library.SpriteEditorDomainConfiguration",
+          "name": "OutputType",
+          "flags": 6,
+          "signature": {
+            "raw_length": 3,
+            "raw_sha256": "78b2c479ae8f9fb5eb6464406854c0b53cf77da0c74698bc0b40f3a240602373",
+            "kind": "field",
+            "parse_status": "decoded",
+            "calling_convention": "field",
+            "generic_parameter_count": null,
+            "parameter_count": null,
+            "return_type": null,
+            "parameter_types": [],
+            "field_type": "valuetype:24",
+            "issue": null
+          }
+        },
+        {
+          "token": "0x04000022",
+          "row_offset": 11954,
+          "declaring_type_token": "0x02000008",
+          "declaring_type": "TaleWorlds.TwoDimension.SpriteSheetGenerator.Library.SpriteEditorDomainConfiguration",
+          "name": "CollectionType",
+          "flags": 6,
+          "signature": {
+            "raw_length": 3,
+            "raw_sha256": "1dacd00ce197f04f0fb8d30c32438c9793fb0bf3aae5c97ada3e6dd4d5eeb3bd",
+            "kind": "field",
+            "parse_status": "decoded",
+            "calling_convention": "field",
+            "generic_parameter_count": null,
+            "parameter_count": null,
+            "return_type": null,
+            "parameter_types": [],
+            "field_type": "valuetype:28",
+            "issue": null
+          }
+        }
+      ],
+      "call_edges": [
+        {
+          "caller_token": "0x06000019",
+          "caller": "TaleWorlds.TwoDimension.SpriteSheetGenerator.Library.SpriteDataEditor.SaveSpriteSheetData",
+          "opcode": "call",
+          "target_token": "0x0600001a",
+          "target_kind": "method-def",
+          "target_name": "SaveSpriteSheetDataAsXml",
+          "target_declaring_type": "TaleWorlds.TwoDimension.SpriteSheetGenerator.Library.SpriteDataEditor"
+        },
+        {
+          "caller_token": "0x0600001a",
+          "caller": "TaleWorlds.TwoDimension.SpriteSheetGenerator.Library.SpriteDataEditor.SaveSpriteSheetDataAsXml",
+          "opcode": "callvirt",
+          "target_token": "0x0a00006c",
+          "target_kind": "member-ref",
+          "target_name": "Save",
+          "target_declaring_type": "System.Xml.XmlDocument"
+        },
+        {
+          "caller_token": "0x0600001b",
+          "caller": "TaleWorlds.TwoDimension.SpriteSheetGenerator.Library.SpriteDataEditor.EmptyDirectory",
+          "opcode": "callvirt",
+          "target_token": "0x0a00006e",
+          "target_kind": "member-ref",
+          "target_name": "Delete",
+          "target_declaring_type": "System.IO.FileSystemInfo"
+        },
+        {
+          "caller_token": "0x0600001b",
+          "caller": "TaleWorlds.TwoDimension.SpriteSheetGenerator.Library.SpriteDataEditor.EmptyDirectory",
+          "opcode": "callvirt",
+          "target_token": "0x0a000070",
+          "target_kind": "member-ref",
+          "target_name": "Delete",
+          "target_declaring_type": "System.IO.DirectoryInfo"
+        },
+        {
+          "caller_token": "0x0600001c",
+          "caller": "TaleWorlds.TwoDimension.SpriteSheetGenerator.Library.SpriteDataEditor.SaveSpriteSheets",
+          "opcode": "call",
+          "target_token": "0x0600001b",
+          "target_kind": "method-def",
+          "target_name": "EmptyDirectory",
+          "target_declaring_type": "TaleWorlds.TwoDimension.SpriteSheetGenerator.Library.SpriteDataEditor"
+        },
+        {
+          "caller_token": "0x0600001c",
+          "caller": "TaleWorlds.TwoDimension.SpriteSheetGenerator.Library.SpriteDataEditor.SaveSpriteSheets",
+          "opcode": "call",
+          "target_token": "0x0600001b",
+          "target_kind": "method-def",
+          "target_name": "EmptyDirectory",
+          "target_declaring_type": "TaleWorlds.TwoDimension.SpriteSheetGenerator.Library.SpriteDataEditor"
+        },
+        {
+          "caller_token": "0x0600001c",
+          "caller": "TaleWorlds.TwoDimension.SpriteSheetGenerator.Library.SpriteDataEditor.SaveSpriteSheets",
+          "opcode": "ldftn",
+          "target_token": "0x0600006c",
+          "target_kind": "method-def",
+          "target_name": "<SaveSpriteSheets>b__0",
+          "target_declaring_type": "<>c__DisplayClass20_0"
+        },
+        {
+          "caller_token": "0x0600001c",
+          "caller": "TaleWorlds.TwoDimension.SpriteSheetGenerator.Library.SpriteDataEditor.SaveSpriteSheets",
+          "opcode": "call",
+          "target_token": "0x0a000075",
+          "target_kind": "member-ref",
+          "target_name": "ForWithoutRenderThread",
+          "target_declaring_type": "TaleWorlds.Library.TWParallel"
+        },
+        {
+          "caller_token": "0x06000031",
+          "caller": "TaleWorlds.TwoDimension.SpriteSheetGenerator.Library.SpriteEditorDomain.Tick",
+          "opcode": "callvirt",
+          "target_token": "0x06000013",
+          "target_kind": "method-def",
+          "target_name": "GenerateSpriteFromSpritePart",
+          "target_declaring_type": "TaleWorlds.TwoDimension.SpriteSheetGenerator.Library.SpriteDataEditor"
+        },
+        {
+          "caller_token": "0x06000031",
+          "caller": "TaleWorlds.TwoDimension.SpriteSheetGenerator.Library.SpriteEditorDomain.Tick",
+          "opcode": "callvirt",
+          "target_token": "0x06000015",
+          "target_kind": "method-def",
+          "target_name": "CalculateSpriteSheets",
+          "target_declaring_type": "TaleWorlds.TwoDimension.SpriteSheetGenerator.Library.SpriteDataEditor"
+        },
+        {
+          "caller_token": "0x06000031",
+          "caller": "TaleWorlds.TwoDimension.SpriteSheetGenerator.Library.SpriteEditorDomain.Tick",
+          "opcode": "callvirt",
+          "target_token": "0x06000012",
+          "target_kind": "method-def",
+          "target_name": "GenerateNineRegionSpriteFromSpritePart",
+          "target_declaring_type": "TaleWorlds.TwoDimension.SpriteSheetGenerator.Library.SpriteDataEditor"
+        },
+        {
+          "caller_token": "0x06000031",
+          "caller": "TaleWorlds.TwoDimension.SpriteSheetGenerator.Library.SpriteEditorDomain.Tick",
+          "opcode": "callvirt",
+          "target_token": "0x06000019",
+          "target_kind": "method-def",
+          "target_name": "SaveSpriteSheetData",
+          "target_declaring_type": "TaleWorlds.TwoDimension.SpriteSheetGenerator.Library.SpriteDataEditor"
+        },
+        {
+          "caller_token": "0x06000031",
+          "caller": "TaleWorlds.TwoDimension.SpriteSheetGenerator.Library.SpriteEditorDomain.Tick",
+          "opcode": "callvirt",
+          "target_token": "0x0600001c",
+          "target_kind": "method-def",
+          "target_name": "SaveSpriteSheets",
+          "target_declaring_type": "TaleWorlds.TwoDimension.SpriteSheetGenerator.Library.SpriteDataEditor"
+        },
+        {
+          "caller_token": "0x0600003a",
+          "caller": "TaleWorlds.TwoDimension.SpriteSheetGenerator.Library.SpriteEditorDomain.Start",
+          "opcode": "ldftn",
+          "target_token": "0x0600006e",
+          "target_kind": "method-def",
+          "target_name": "<Start>b__0",
+          "target_declaring_type": "<>c__DisplayClass23_0"
+        },
+        {
+          "caller_token": "0x0600003a",
+          "caller": "TaleWorlds.TwoDimension.SpriteSheetGenerator.Library.SpriteEditorDomain.Start",
+          "opcode": "call",
+          "target_token": "0x0a000075",
+          "target_kind": "member-ref",
+          "target_name": "ForWithoutRenderThread",
+          "target_declaring_type": "TaleWorlds.Library.TWParallel"
+        },
+        {
+          "caller_token": "0x06000046",
+          "caller": "TaleWorlds.TwoDimension.SpriteSheetGenerator.Library.SpriteSheet.SaveSheet",
+          "opcode": "call",
+          "target_token": "0x06000041",
+          "target_kind": "method-def",
+          "target_name": "SaveSingleChannel",
+          "target_declaring_type": "TaleWorlds.TwoDimension.SpriteSheetGenerator.Library.SpriteSheet"
+        },
+        {
+          "caller_token": "0x06000046",
+          "caller": "TaleWorlds.TwoDimension.SpriteSheetGenerator.Library.SpriteSheet.SaveSheet",
+          "opcode": "call",
+          "target_token": "0x06000042",
+          "target_kind": "method-def",
+          "target_name": "SaveWithoutAlphaChannel",
+          "target_declaring_type": "TaleWorlds.TwoDimension.SpriteSheetGenerator.Library.SpriteSheet"
+        },
+        {
+          "caller_token": "0x06000046",
+          "caller": "TaleWorlds.TwoDimension.SpriteSheetGenerator.Library.SpriteSheet.SaveSheet",
+          "opcode": "call",
+          "target_token": "0x06000043",
+          "target_kind": "method-def",
+          "target_name": "SaveAllChannels",
+          "target_declaring_type": "TaleWorlds.TwoDimension.SpriteSheetGenerator.Library.SpriteSheet"
+        },
+        {
+          "caller_token": "0x0600006e",
+          "caller": "<>c__DisplayClass23_0.<Start>b__0",
+          "opcode": "callvirt",
+          "target_token": "0x06000031",
+          "target_kind": "method-def",
+          "target_name": "Tick",
+          "target_declaring_type": "TaleWorlds.TwoDimension.SpriteSheetGenerator.Library.SpriteEditorDomain"
+        }
+      ],
+      "user_strings": {
+        "state": "complete",
+        "literals": [
+          {
+            "token": "0x70000001",
+            "offset": 22453,
+            "value": "SpriteParts\\"
+          },
+          {
+            "token": "0x7000001b",
+            "offset": 22479,
+            "value": "\\"
+          },
+          {
+            "token": "0x7000001f",
+            "offset": 22483,
+            "value": ".png"
+          },
+          {
+            "token": "0x70000029",
+            "offset": 22493,
+            "value": "\\AssetSources\\GauntletUI\\"
+          },
+          {
+            "token": "0x7000005d",
+            "offset": 22545,
+            "value": "SpriteSheets\\"
+          },
+          {
+            "token": "0x70000079",
+            "offset": 22573,
+            "value": "Unique packing: "
+          },
+          {
+            "token": "0x7000009b",
+            "offset": 22607,
+            "value": "Creating new sheet: "
+          },
+          {
+            "token": "0x700000c5",
+            "offset": 22649,
+            "value": "sprite "
+          },
+          {
+            "token": "0x700000d5",
+            "offset": 22665,
+            "value": " placing"
+          },
+          {
+            "token": "0x700000e7",
+            "offset": 22683,
+            "value": "Normal packing: "
+          },
+          {
+            "token": "0x70000109",
+            "offset": 22717,
+            "value": "1.0"
+          },
+          {
+            "token": "0x70000111",
+            "offset": 22725,
+            "value": "UTF-8"
+          },
+          {
+            "token": "0x7000011d",
+            "offset": 22737,
+            "value": "SpriteData"
+          },
+          {
+            "token": "0x70000133",
+            "offset": 22759,
+            "value": "SpriteCategories"
+          },
+          {
+            "token": "0x70000155",
+            "offset": 22793,
+            "value": "SpriteCategory"
+          },
+          {
+            "token": "0x70000173",
+            "offset": 22823,
+            "value": "Name"
+          },
+          {
+            "token": "0x7000017d",
+            "offset": 22833,
+            "value": "AlwaysLoad"
+          },
+          {
+            "token": "0x70000193",
+            "offset": 22855,
+            "value": "SpriteSheetCount"
+          },
+          {
+            "token": "0x700001b5",
+            "offset": 22889,
+            "value": "SpriteSheetSize"
+          },
+          {
+            "token": "0x700001d5",
+            "offset": 22921,
+            "value": "ID"
+          },
+          {
+            "token": "0x700001db",
+            "offset": 22927,
+            "value": "Width"
+          },
+          {
+            "token": "0x700001e7",
+            "offset": 22939,
+            "value": "Height"
+          },
+          {
+            "token": "0x700001f5",
+            "offset": 22953,
+            "value": "SpriteParts"
+          },
+          {
+            "token": "0x7000020d",
+            "offset": 22977,
+            "value": "SpritePart"
+          },
+          {
+            "token": "0x70000223",
+            "offset": 22999,
+            "value": "SheetID"
+          },
+          {
+            "token": "0x70000233",
+            "offset": 23015,
+            "value": "SheetX"
+          },
+          {
+            "token": "0x70000241",
+            "offset": 23029,
+            "value": "SheetY"
+          },
+          {
+            "token": "0x7000024f",
+            "offset": 23043,
+            "value": "CategoryName"
+          },
+          {
+            "token": "0x70000269",
+            "offset": 23069,
+            "value": "Sprites"
+          },
+          {
+            "token": "0x70000279",
+            "offset": 23085,
+            "value": "NineRegionSprite"
+          },
+          {
+            "token": "0x7000029b",
+            "offset": 23119,
+            "value": "SpritePartName"
+          },
+          {
+            "token": "0x700002b9",
+            "offset": 23149,
+            "value": "LeftWidth"
+          },
+          {
+            "token": "0x700002cd",
+            "offset": 23169,
+            "value": "RightWidth"
+          },
+          {
+            "token": "0x700002e3",
+            "offset": 23191,
+            "value": "TopHeight"
+          },
+          {
+            "token": "0x700002f7",
+            "offset": 23211,
+            "value": "BottomHeight"
+          },
+          {
+            "token": "0x70000311",
+            "offset": 23237,
+            "value": "GenericSprite"
+          },
+          {
+            "token": "0x7000032d",
+            "offset": 23265,
+            "value": ".xml"
+          },
+          {
+            "token": "0x70000337",
+            "offset": 23275,
+            "value": "\\Assets\\GauntletUI\\"
+          },
+          {
+            "token": "0x7000035f",
+            "offset": 23315,
+            "value": "Creating sprite sheet directories"
+          },
+          {
+            "token": "0x700003a3",
+            "offset": 23383,
+            "value": "Finised {0}/{1} sheets.."
+          },
+          {
+            "token": "0x700003d5",
+            "offset": 23433,
+            "value": "\\GUI\\"
+          },
+          {
+            "token": "0x700003e1",
+            "offset": 23445,
+            "value": "SpriteParts\\Config.xml"
+          },
+          {
+            "token": "0x7000040f",
+            "offset": 23491,
+            "value": "PackAllSpritesToUniqueTextures"
+          },
+          {
+            "token": "0x7000044d",
+            "offset": 23553,
+            "value": "SingleChannel"
+          },
+          {
+            "token": "0x70000469",
+            "offset": 23581,
+            "value": "NoAlphaChannel"
+          },
+          {
+            "token": "0x70000487",
+            "offset": 23611,
+            "value": "EdgeSize"
+          },
+          {
+            "token": "0x70000499",
+            "offset": 23629,
+            "value": "Value"
+          },
+          {
+            "token": "0x700004a5",
+            "offset": 23641,
+            "value": "Failed to load configuration file, using defaults"
+          },
+          {
+            "token": "0x70000509",
+            "offset": 23741,
+            "value": "Exception: "
+          },
+          {
+            "token": "0x70000521",
+            "offset": 23765,
+            "value": "!!ERROR!!"
+          },
+          {
+            "token": "0x70000535",
+            "offset": 23785,
+            "value": "*."
+          },
+          {
+            "token": "0x7000053b",
+            "offset": 23791,
+            "value": "The file: "
+          },
+          {
+            "token": "0x70000551",
+            "offset": 23813,
+            "value": " has too much folder depth. Maximum allowed is 8. e.g.(Modules\\1\\2\\3\\4\\5\\6\\7\\8.png)"
+          },
+          {
+            "token": "0x700005fa",
+            "offset": 23982,
+            "value": "png"
+          },
+          {
+            "token": "0x70000602",
+            "offset": 23990,
+            "value": "Default"
+          },
+          {
+            "token": "0x70000612",
+            "offset": 24006,
+            "value": "STARTED: sprite compiler"
+          },
+          {
+            "token": "0x70000644",
+            "offset": 24056,
+            "value": "COMPLETED: sprite compiler"
+          },
+          {
+            "token": "0x7000067a",
+            "offset": 24110,
+            "value": "Configuration"
+          },
+          {
+            "token": "0x70000696",
+            "offset": 24138,
+            "value": "Source Directory: "
+          },
+          {
+            "token": "0x700006bc",
+            "offset": 24176,
+            "value": "Output Type: {0}"
+          },
+          {
+            "token": "0x700006de",
+            "offset": 24210,
+            "value": "Collecting From: {0}"
+          },
+          {
+            "token": "0x70000708",
+            "offset": 24252,
+            "value": "_"
+          },
+          {
+            "token": "0x7000070c",
+            "offset": 24256,
+            "value": "{0}{1}_{2}.png"
+          },
+          {
+            "token": "0x7000072a",
+            "offset": 24286,
+            "value": "Saving sheet: {0} ({1}/{2})"
+          }
+        ],
+        "issues": []
+      },
+      "limitations": [
+        "Metadata tokens are build-local coordinates and are only meaningful with the reported artifact SHA-256 and MVID.",
+        "CIL instruction anchors are decoded from file-backed method bodies only; no target assembly is loaded or executed.",
+        "Exported types are reported from ExportedType rows as declared; forwarded types are not resolved in their implementing assemblies.",
+        "User strings are the #US literals loaded by ldstr in the inspected method bodies, with their own coverage; instruction anchors and normalized CIL digests keep their build-local tokens.",
+        "Member signatures decode ECMA-335 primitive, class, valuetype, generic instantiation, generic variable, pointer, byref, single-dimension and general array, function pointer, custom modifier, and typed reference forms; class and valuetype operands keep their encoded TypeDefOrRefOrSpec values, and unsupported forms such as vararg sentinels retain raw signature hashes."
+      ]
+    }
+  }
+}
