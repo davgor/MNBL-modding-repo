@@ -1,5 +1,21 @@
 # Modding engine MCP epic planning
 
+## Execution authorized — 2026-10-31
+
+The owner's "Alright lets get this rolling" supersedes the earlier planning-only constraint. Run `rn_01m68w9j6dd891ynbrjs7brr1r` is active on `codex/modding-mcp`, pinned to saved revision5 `rv_01m68w9j24z8kd8n9ckvg5fnb7`. Root claimed MMR-391 as attempt `at_01m68w9stpfy40s88nt49xy5sq`; token is retained privately, not in repository files. No acceptance is claimed yet.
+
+- Root owns identity capture/verification, integration and all future live launches. Installed inventory captured176 binary/module records; Doctor registration preflight passed. Identity parser matches three independent REA MVIDs; same-length content drift, missing files and bad manifests fail closed.
+- api_sources_audit owns official operation inventory JSON and inventory documentation only.
+- prior_evidence owns historical evidence reconciliation JSON/documentation only. Both workers are offline; no competing install/native actions.
+- Visual-map owner explicitly released shared desktop/game/install control after independent restoration checks. Root acknowledged acquisition in task-notes/desktop-coordination.md after process/lock checks. Future native batches must hold the exclusive file lock and restore their changes.
+- Switching the coordinating checkout caused Dark Mechanicus to safety-pause the old map run `rn_01m5b9ewtndxjy6f3nd8p0nz9t`. The map owner confirmed map work is human-paused; it was not restarted. No map ticket was accepted or retried by this chat.
+
+Current checkpoint: MMR-391 c2/c3 research artifacts passed independent review; c1 usable editor/DLC readiness is BLOCKED, not passed. Inventory has362 documented/derived operations,17 separate installed candidates and25 explicit owned gaps; inventory SHA7092c33b0aa8bcd15fc71101507c4d1a45e76673d3342ed1e9d38e3b57e64ef5. Root verified176 identities, five tests pass, and deliberately wrong identity fails. No MCP server or runtime capability is delivered.
+
+Readiness launcher PID52808 started but the Windows helper misbound its window to unrelated Launcher.exe and refused observation after supported recovery. Manual owner startup/Main_map check was requested, unanswered during the attempt. Owned launcher/watchdog stopped;8 configs restored and independently checked;7 official scene files unchanged;176 identities still match;no target processes;native lock released. Receipt: evidence/modding-mcp/research/identity/readiness-attempt.json. Local backups: build/modding-mcp/readiness-20261031/. Research workers finished; no worker or REA session remains pending.
+
+Resume: recover window control or receive owner-assisted current editor/DLC readiness evidence, reacquire shared lease, finish narrow readiness proof and preservation checks, then retry/accept MMR-391 only when c1 is met. Never waive c1, use historical screenshots, or count UI inspection as an MCP route. All other work tickets depend on391; no independent ready work can bypass it. Existing text below records planning history, not current execution restrictions. The full epic remains incomplete.
+
 Epic: `ep_01m67zj976cc99wwmspbknqfrb` — Bannerlord Modding Engine MCP: API-first control and verified coverage.
 
 User scope: EVERYTHING across modding workflows; local Windows Bannerlord + War Sails first; reusable architecture; source and reinstall tooling in this repository; exactly one long sprint. This chat creates the researched epic/plan only. No implementation run, source server stub, deployment or game/editor launch.
